@@ -31,3 +31,5 @@ Este repositório passa a incluir uma documentação de referência de nível av
 
 - Pipeline GitHub Actions em `.github/workflows/ci.yml` com build estrito (`-Wall -Wextra -Werror`) e smoke test do binário.
 - Hotfix de compilação aplicado no núcleo C para restaurar uma base compilável e facilitar futuras refatorações incrementais.
+
+- [`docs/PROTOCOLO_FALSIFICABILIDADE_PK.md`](docs/PROTOCOLO_FALSIFICABILIDADE_PK.md): protocolo mínimo de falsificabilidade em P(k) com execução automática.

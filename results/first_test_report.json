@@ -1,0 +1,25 @@
+{
+  "input": {
+    "data": "data/pk_observado.csv",
+    "k_range": [
+      0.02,
+      0.2
+    ],
+    "model_params": {
+      "a": 20000.0,
+      "n": 1.0,
+      "kd": 0.18
+    },
+    "criteria": {
+      "rrmse_max": 1.5,
+      "coverage_min": 0.6,
+      "slope_abs_max": 5.0
+    }
+  },
+  "metrics": {
+    "rrmse": 3.8088385045683095,
+    "coverage_1sigma": 0.5,
+    "residual_slope": 50.99632893103299
+  },
+  "verdict": "FAIL"
+}
