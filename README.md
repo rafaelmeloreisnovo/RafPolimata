@@ -17,6 +17,9 @@ Este repositório passa a incluir uma documentação de referência de nível av
 - [`docs/LICENCAS_COMPARADAS.md`](docs/LICENCAS_COMPARADAS.md): comparação entre licenças/termos (incluindo referência a BLAKE3, e práticas de grandes fornecedores como Microsoft/Oracle/Google).
 - [`docs/ATRATORES_42_JURIDICOS.md`](docs/ATRATORES_42_JURIDICOS.md): framework de 42 atratores jurídicos com 4 níveis por conteúdo e 7 direções antagônicas.
 - [`docs/BASES_SUPRALEGAIS_E_PADROES.md`](docs/BASES_SUPRALEGAIS_E_PADROES.md): mapeamento de bases supralegais, constitucionais e padrões técnicos internacionais.
+- [`docs/IA_AGENTE_HUMANOS_TECNICO_FORMALIDADE.md`](docs/IA_AGENTE_HUMANOS_TECNICO_FORMALIDADE.md): protocolo técnico para validação prévia, execução acoplada e auditoria IA↔humanos.
+- [`docs/ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md`](docs/ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md): roadmap para evolução conjunta de código e documentação.
+- [`docs/RELEASE_NOTES_PENDING.md`](docs/RELEASE_NOTES_PENDING.md): registro de pendências de release (pending only).
 
 ## Aviso importante
 
