@@ -6,6 +6,9 @@
 #pragma once
 #include "raf_types.h"
 
+typedef struct { s64 sec; s64 nsec; } Timespec;
+#define CLOCK_MONO 1
+
 /* ── ARM64 ──────────────────────────────────────────────────────────────── */
 #ifdef RAF_ARCH_A64
 #define SYS_write          64
@@ -98,20 +101,20 @@ s64 _sc1(s64 nr, s64 a) {
     __asm__ volatile("svc #0" : "+r"(r0) : "r"(r7) : "memory","cc");
     return r0;
 }
-/* ARM32: PMCCNTR — precisa PMU userland enable pelo kernel                  */
+/* ARM32/Termux: clock_gettime(CLOCK_MONOTONIC)
+ * PMCCNTR pode ser bloqueado em Android userland; monotonic funciona em 100%
+ * Retorno em ns para benchmark determinístico entre kernels distintos.      */
 static __attribute__((always_inline)) inline u64 raf_tsc(void) {
-    u32 v;
-    __asm__ volatile("mrc p15,0,%0,c9,c13,0" : "=r"(v));
-    return (u64)v;
+    Timespec ts;
+    _sc3(SYS_clock_gettime, CLOCK_MONO, (s64)(usize)&ts, 0);
+    return (u64)ts.sec * 1000000000ULL + (u64)ts.nsec;
 }
 static __attribute__((always_inline)) inline u64 raf_tsc_freq(void) {
-    return 0;
+    return 1000000000ULL; /* tsc já em nanos: 1e9 ticks/s */
 }
 #endif /* RAF_ARCH_A32 */
 
 /* ── Interface unificada ─────────────────────────────────────────────────── */
-typedef struct { s64 sec; s64 nsec; } Timespec;
-#define CLOCK_MONO 1
 
 static inline void raf_write(const void *buf, usize n) {
     _sc3(SYS_write, FD_STDOUT, (s64)(usize)buf, (s64)n);
