@@ -1,0 +1,7 @@
+# Perfil ApkC freestanding auditável.
+# Uma flag por linha para facilitar revisão e diffs.
+-std=c11
+-Wall
+-Wextra
+-nostdlib
+-static

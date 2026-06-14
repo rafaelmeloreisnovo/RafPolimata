@@ -1,0 +1,1 @@
+TOKEN_VAZIO: não há binário apkc executável neste ambiente; instale linker/toolchain ARM compatível ou rode em ARM/Linux.

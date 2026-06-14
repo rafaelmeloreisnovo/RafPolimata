@@ -1,0 +1,1 @@
+TOKEN_VAZIO: adb ausente; instale Android platform-tools.

@@ -39,6 +39,23 @@ jobs:
       - name: Validate Android ABI plan
         run: bash scripts/android_build_matrix.sh --plan
 
+      - name: Audit ApkC freestanding invariants
+        run: bash scripts/ci_freestanding_audit.sh
+
+      - name: Validate ApkC proof protocol
+        run: bash scripts/apkc_validate.sh
+
+      - name: Try ApkC debug signing proof (TOKEN_VAZIO allowed)
+        run: bash scripts/apkc_sign_debug.sh
+
+      - name: Upload ApkC proof artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkc-proofs-out
+          path: Apkc/proofs/out/
+          if-no-files-found: warn
+
       - name: Generate P(k) falsifiability report (non-blocking verdict)
         run: |
           python3 scripts/first_test_pk.py --output results/first_test_report.json

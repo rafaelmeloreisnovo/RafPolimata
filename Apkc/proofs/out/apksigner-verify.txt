@@ -1,0 +1,1 @@
+TOKEN_VAZIO: apksigner ausente; instale Android build-tools.

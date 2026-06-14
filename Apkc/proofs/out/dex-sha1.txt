@@ -1,0 +1,1 @@
+TOKEN_VAZIO: hello.apk ausente; DEX SHA-1 não executado.

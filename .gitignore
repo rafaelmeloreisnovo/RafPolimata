@@ -9,3 +9,10 @@ Benchmark/raf_enterprise_*
 # Python cache
 __pycache__/
 *.py[cod]
+
+# ApkC generated/local proof artifacts
+Apkc/proofs/*.keystore
+Apkc/proofs/out/*.apk
+Apkc/proofs/out/*.so
+Apkc/proofs/out/apkc
+Apkc/proofs/out/apkc.o

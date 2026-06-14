@@ -42,3 +42,28 @@ Este repositório passa a incluir uma documentação de referência de nível av
 - [`docs/ROTINA_OPERACIONAL_BENCHMARKS.md`](docs/ROTINA_OPERACIONAL_BENCHMARKS.md): rotina operacional de auditoria, benchmark com prewarm/warmup e top 20 modelos.
 - [`docs/LOGOTIPO_RAFAELIA_60COL.md`](docs/LOGOTIPO_RAFAELIA_60COL.md): logotipo ASCII de 60 colunas com variante colorida ANSI.
 - [`assets/raf_operational_seal.svg`](assets/raf_operational_seal.svg): selo visual local dos gates operacionais, sem alegação de certificação.
+
+## ApkC — micro-toolchain Android freestanding
+
+Resumo: `Apkc/` contém um micro-toolchain experimental em C para gerar APK nativo mínimo por escrita direta de ZIP/APK, AndroidManifest AXML, DEX e ELF `.so`, com backends ARM64 e ARM32.
+
+Status: experimental, com validação em andamento.
+
+Ver:
+- `docs/APKC_STRUCTURE.md`
+- `docs/APKC_PROTOCOL.md`
+- `docs/APKC_VALUE_AND_GAPS.md`
+- `docs/CI_COMPILER_EXCELLENCE/README.md`
+- `Apkc/proofs/`
+
+| Gate | Status |
+|---|---|
+| Compile ApkC | NOT_RUN |
+| Generate APK | NOT_RUN |
+| ZIP parse | NOT_RUN |
+| AXML parse | NOT_RUN |
+| DEX SHA-1 | NOT_RUN |
+| ELF readelf | NOT_RUN |
+| APK signing | TOKEN_VAZIO |
+| adb install | TOKEN_VAZIO |
+| NativeActivity runtime | TOKEN_VAZIO |
