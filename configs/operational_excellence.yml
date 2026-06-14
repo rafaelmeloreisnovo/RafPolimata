@@ -56,3 +56,8 @@ benchmark_policy:
 audit_docs:
   operational_routine: docs/ROTINA_OPERACIONAL_BENCHMARKS.md
   logo_60col: docs/LOGOTIPO_RAFAELIA_60COL.md
+
+seal:
+  svg: assets/raf_operational_seal.svg
+  generator: tools/raf_emit_iconic_seal.c
+  certification_claim: false

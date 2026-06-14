@@ -62,6 +62,9 @@ int main(void) {
     if (require_file_has("docs/EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md", "morph-on-runtime")) return 12;
     if (!has("TOKEN_VAZIO")) return 13;
     if (validate_logo_60()) return 14;
+    if (require_file_has("assets/raf_operational_seal.svg", "RAFAELIA Operational Gate Seal")) return 15;
+    if (!has("no certification claim")) return 16;
+    if (require_file_has("tools/raf_emit_iconic_seal.c", "FAILOVER | ROLLBACK")) return 17;
     puts("operational_excellence=PASS");
     return 0;
 }
