@@ -71,6 +71,10 @@ typedef struct {
   char out_asm[256];
   char out_hex[256];
   char out_bin[256];
+  char out_ops[256];
+  char flags[128];
+  uint64_t src_hash;
+  int rollback_code;
   uint64_t elapsed_ns;
 } RafCtx;
 
