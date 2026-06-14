@@ -3,6 +3,9 @@ build_host_check/
 raf_compile
 ci_out*
 
+# Big Test orchestration artefacts
+big_test_runs/
+
 # Benchmark binaries
 Benchmark/raf_enterprise_*
 
