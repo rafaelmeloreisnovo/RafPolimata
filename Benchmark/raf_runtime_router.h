@@ -40,9 +40,9 @@ typedef struct {
     u32 mitigation;
 } RafRouteDecision;
 
-static inline u32 raf_mask_pick(u32 mask, u32 bit, u32 value) {
+static inline u32 raf_mask_select(u32 current, u32 mask, u32 bit, u32 value) {
     u32 m = 0u - ((mask & bit) != 0u);
-    return value & m;
+    return (current & ~m) | (value & m);
 }
 
 static inline RafRouteDecision raf_runtime_route(RafRouteInput in) {
@@ -52,10 +52,10 @@ static inline RafRouteDecision raf_runtime_route(RafRouteInput in) {
     u32 usable = in.caps & ~in.degraded;
     u32 gpu_ready = ((in.batch >= in.min_batch_gpu) & ((usable & RAF_CAP_GPU_BATCH) != 0u));
     u32 route = RAF_BACKEND_GENERIC_C;
-    route |= raf_mask_pick(usable, RAF_CAP_STORAGE_BUFFER, RAF_BACKEND_STORAGE_BUFFER);
-    route |= raf_mask_pick(usable, RAF_CAP_SYSCALL_DIRECT, RAF_BACKEND_SYSCALL_DIRECT);
-    route |= raf_mask_pick(usable, RAF_CAP_ARM32_NEON, RAF_BACKEND_ARM32_NEON);
-    route |= raf_mask_pick(usable, RAF_CAP_ARM64_NEON, RAF_BACKEND_ARM64_NEON);
+    route = raf_mask_select(route, usable, RAF_CAP_STORAGE_BUFFER, RAF_BACKEND_STORAGE_BUFFER);
+    route = raf_mask_select(route, usable, RAF_CAP_SYSCALL_DIRECT, RAF_BACKEND_SYSCALL_DIRECT);
+    route = raf_mask_select(route, usable, RAF_CAP_ARM32_NEON, RAF_BACKEND_ARM32_NEON);
+    route = raf_mask_select(route, usable, RAF_CAP_ARM64_NEON, RAF_BACKEND_ARM64_NEON);
     route = gpu_ready ? RAF_BACKEND_GPU_BATCH : route;
     route = live ? route : RAF_BACKEND_GENERIC_C;
 
