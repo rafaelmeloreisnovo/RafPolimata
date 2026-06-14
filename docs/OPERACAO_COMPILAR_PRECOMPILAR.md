@@ -40,3 +40,11 @@ O caminho de produção recomendado é manter o compilador pequeno, mensurável 
 - Manifestos pequenos e comparáveis são uma superfície de estabilidade que muitos pipelines legados negligenciam.
 - O próximo nível é tratar metadados de compilação como contrato invariável: hash, flags, arquitetura, IR, bytes e rollback devem ser testados como ABI operacional.
 - A inovação prática está em provar invariantes simples antes de adicionar modelos grandes: menos símbolos, menos estado oculto, mais rollback verificável.
+
+## Android 9–16+ e interoperabilidade de instalação
+
+- A rota Android mínima é API 28 (Android 9), mantendo compatibilidade planejada até Android 16+ por perfis explícitos.
+- `armeabi-v7a` representa ARM32/v7 com NEON quando disponível; `arm64-v8a` representa ARM64/v8 com SIMD.
+- `scripts/android_build_matrix.sh --plan` gera um plano auditável de instalação por ABI sem exigir NDK no host.
+- `scripts/android_build_matrix.sh --build` tenta compilar com Android NDK quando `ANDROID_NDK_HOME` ou `ANDROID_NDK_ROOT` está definido.
+- O manifesto `.ops` agora inclui `ops_schema` e `ops_signature` para assinatura determinística dos campos estáveis, facilitando interoperabilidade entre empacotamento, instalação e rollback.

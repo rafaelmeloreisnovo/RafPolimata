@@ -75,6 +75,7 @@ typedef struct {
   char out_ops[256];
   char flags[128];
   uint64_t src_hash;
+  uint64_t ops_signature;
   int rollback_code;
   uint64_t elapsed_ns;
 } RafCtx;

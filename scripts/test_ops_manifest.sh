@@ -24,3 +24,5 @@ if [ "$rc" -eq 0 ]; then
   exit 1
 fi
 python3 scripts/validate_ops_manifest.py "$build_dir/fail.ops" --expect-rollback -1
+bash scripts/android_build_matrix.sh --plan >/dev/null
+test -s build_host_check/android_matrix/plan.txt

@@ -24,12 +24,38 @@ static uint64_t raf_now_ns(void) {
   return ((uint64_t)ts.tv_sec * UINT64_C(1000000000)) + (uint64_t)ts.tv_nsec;
 }
 
-static uint64_t raf_fnv1a64(const uint8_t *buf, size_t len) {
-  uint64_t h = UINT64_C(1469598103934665603);
+static uint64_t raf_hash_update(uint64_t h, const uint8_t *buf, size_t len) {
   for (size_t i = 0; i < len; ++i) {
     h ^= (uint64_t)buf[i];
     h *= UINT64_C(1099511628211);
   }
+  return h;
+}
+
+static uint64_t raf_fnv1a64(const uint8_t *buf, size_t len) {
+  return raf_hash_update(UINT64_C(1469598103934665603), buf, len);
+}
+
+static uint64_t raf_hash_u64(uint64_t h, uint64_t v) {
+  uint8_t b[8];
+  for (uint32_t i = 0; i < 8u; ++i) b[i] = (uint8_t)(v >> (i * 8u));
+  return raf_hash_update(h, b, sizeof(b));
+}
+
+static uint64_t raf_ops_signature(const RafCtx *ctx) {
+  uint64_t h = UINT64_C(1469598103934665603);
+  h = raf_hash_u64(h, ctx->cpu.arch);
+  h = raf_hash_update(h, (const uint8_t *)ctx->cpu.brand, strlen(ctx->cpu.brand));
+  h = raf_hash_u64(h, ctx->lang);
+  h = raf_hash_u64(h, ctx->opt);
+  h = raf_hash_u64(h, ctx->feat);
+  h = raf_hash_update(h, (const uint8_t *)ctx->flags, strlen(ctx->flags));
+  h = raf_hash_u64(h, (uint64_t)ctx->src_len);
+  h = raf_hash_u64(h, ctx->src_hash);
+  h = raf_hash_u64(h, ctx->ir.n);
+  h = raf_hash_u64(h, ctx->asm_out.n);
+  h = raf_hash_u64(h, ctx->bin.n);
+  h = raf_hash_u64(h, (uint64_t)(int64_t)ctx->rollback_code);
   return h;
 }
 
@@ -54,28 +80,30 @@ static void prepare_manifest(RafCtx *ctx, const char *out_base) {
   snprintf(ctx->out_ops, sizeof(ctx->out_ops), "%s.ops", out_base);
 }
 
-static int write_ops_manifest(const RafCtx *ctx) {
+static int write_ops_manifest(RafCtx *ctx) {
+  ctx->ops_signature = raf_ops_signature(ctx);
   FILE *fo = fopen(ctx->out_ops, "w");
   if (!fo) return -12;
-  fprintf(fo, "arch=%u\nbrand=%s\nlang=%u\nopt=%u\nfeat=0x%08x\nflags=%s\nsrc_len=%zu\nsrc_hash=%016llx\nir=%u\nasm=%u\nbin=%u\nelapsed_ns=%llu\nrollback_code=%d\n",
+  fprintf(fo, "ops_schema=1\narch=%u\nbrand=%s\nlang=%u\nopt=%u\nfeat=0x%08x\nflags=%s\nsrc_len=%zu\nsrc_hash=%016llx\nir=%u\nasm=%u\nbin=%u\nelapsed_ns=%llu\nrollback_code=%d\nops_signature=%016llx\n",
           ctx->cpu.arch, ctx->cpu.brand, ctx->lang, ctx->opt, ctx->feat,
           ctx->flags, ctx->src_len, (unsigned long long)ctx->src_hash,
           ctx->ir.n, ctx->asm_out.n, ctx->bin.n,
-          (unsigned long long)ctx->elapsed_ns, ctx->rollback_code);
+          (unsigned long long)ctx->elapsed_ns, ctx->rollback_code,
+          (unsigned long long)ctx->ops_signature);
   fclose(fo);
   return 0;
 }
 
 static int write_artifacts(RafCtx *ctx) {
   FILE *fa = fopen(ctx->out_asm, "w");
-  if (!fa) return -10;
+  if (!fa) { ctx->rollback_code = -10; (void)write_ops_manifest(ctx); return -10; }
   for (uint32_t i = 0; i < ctx->asm_out.n; ++i) {
     fprintf(fa, "%s\n", ctx->asm_out.lines[i]);
   }
   fclose(fa);
 
   FILE *fh = fopen(ctx->out_hex, "w");
-  if (!fh) return -11;
+  if (!fh) { ctx->rollback_code = -11; (void)write_ops_manifest(ctx); return -11; }
   for (uint32_t i = 0; i < ctx->bin.n; ++i) {
     fprintf(fh, "%02X%s", ctx->bin.bytes[i], ((i + 1u) % 16u) ? " " : "\n");
   }

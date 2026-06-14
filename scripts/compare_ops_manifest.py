@@ -2,7 +2,7 @@
 import argparse
 from pathlib import Path
 
-STABLE_KEYS = ("arch", "lang", "opt", "feat", "flags", "src_len", "src_hash", "ir", "asm", "bin", "rollback_code")
+STABLE_KEYS = ("ops_schema", "arch", "lang", "opt", "feat", "flags", "src_len", "src_hash", "ir", "asm", "bin", "rollback_code", "ops_signature")
 
 
 def parse_ops(path: Path) -> dict[str, str]:

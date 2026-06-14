@@ -33,6 +33,9 @@ jobs:
       - name: Validate operational manifest
         run: bash scripts/test_ops_manifest.sh
 
+      - name: Validate Android ABI plan
+        run: bash scripts/android_build_matrix.sh --plan
+
       - name: Generate P(k) falsifiability report (non-blocking verdict)
         run: |
           python3 scripts/first_test_pk.py --output results/first_test_report.json
