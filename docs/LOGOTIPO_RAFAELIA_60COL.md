@@ -11,7 +11,7 @@ Arte ASCII com largura fixa de 60 colunas. A cor pode ser aplicada pelo terminal
 |  R   R  A   A  F      A     A EEEEE  LLLLL  III  A     A |
 |                                                          |
 |  GPU | NEON | CACHE L1/L2 | RAM | STORAGE | FAILSAFE     |
-|  ISO8000 + ISO9001 + ISO27000 + 6SIGMA + T7 + A42        |
+|  AUDIT + QUALITY + SECURITY + SIGMA + T7 + A42           |
 +----------------------------------------------------------+
 ```
 

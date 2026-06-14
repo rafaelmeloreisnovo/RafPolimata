@@ -54,10 +54,10 @@ int main(void) {
     if (!has("samples: 31")) return 4;
     if (!has("Benchmark/raf_runtime_router_test.c")) return 5;
     if (!has("Benchmark/raf_runtime_benchmark.c")) return 6;
-    if (require_file_has("docs/AUDITORIA_ISO_SIGMA_BENCHMARKS.md", "ISO 8000")) return 7;
-    if (!has("ISO 9001")) return 8;
-    if (!has("ISO 27000")) return 9;
-    if (!has("Six Sigma")) return 10;
+    if (require_file_has("docs/ROTINA_OPERACIONAL_BENCHMARKS.md", "Dados")) return 7;
+    if (!has("Qualidade")) return 8;
+    if (!has("Segurança operacional")) return 9;
+    if (!has("Variação de benchmark")) return 10;
     if (!has("20. Revis")) return 11;
     if (require_file_has("docs/EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md", "morph-on-runtime")) return 12;
     if (!has("TOKEN_VAZIO")) return 13;

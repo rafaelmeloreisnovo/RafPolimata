@@ -54,5 +54,5 @@ benchmark_policy:
   test: Benchmark/raf_runtime_benchmark.c
 
 audit_docs:
-  iso_sigma: docs/AUDITORIA_ISO_SIGMA_BENCHMARKS.md
+  operational_routine: docs/ROTINA_OPERACIONAL_BENCHMARKS.md
   logo_60col: docs/LOGOTIPO_RAFAELIA_60COL.md

@@ -1,13 +1,13 @@
-# Auditoria operacional ISO/Six Sigma e benchmark estrutural
+# Rotina operacional de auditoria e benchmark estrutural
 
-Este guia transforma a governança operacional em rotina de auditoria: conferir arquivos, validar dados, medir caminhos de execução e só promover uma otimização quando a evidência for melhor que a alternativa simples.
+Este guia descreve como o agente deve trabalhar: conferir arquivos, validar dados, medir caminhos de execução e só promover uma otimização quando a evidência for melhor que a alternativa simples. Ele não declara certificação, conformidade formal ou selo normativo do software.
 
-## Rotina de auditoria obrigatória
+## Rotina de auditoria obrigatória do agente
 
-1. **ISO 8000 / dados**: entrada versionada, formato declarado, hash/reprodutibilidade e ausência de preenchimento falso.
-2. **ISO 9001 / qualidade**: requisito, execução, evidência, não conformidade e ação corretiva documentada.
-3. **ISO 27000 / segurança**: menor privilégio, integridade, rollback, trilha de comando e não exposição de segredo.
-4. **Six Sigma / variação**: prewarm, warmup, mediana, p95, p99 e análise de regressão antes de promover.
+1. **Dados**: entrada versionada, formato declarado, hash/reprodutibilidade e ausência de preenchimento falso.
+2. **Qualidade**: requisito, execução, evidência, não conformidade e ação corretiva documentada.
+3. **Segurança operacional**: menor privilégio, integridade, rollback, trilha de comando e não exposição de segredo.
+4. **Variação de benchmark**: prewarm, warmup, mediana, p95, p99 e análise de regressão antes de promover.
 5. **TOKEN_VAZIO**: quando falta evidência, registrar `VOID`/`SKIPPED`; nunca inventar PASS.
 
 ## Condições estruturais de benchmark
@@ -42,7 +42,7 @@ Este guia transforma a governança operacional em rotina de auditoria: conferir 
 17. Hash/integridade do relatório.
 18. Falsificabilidade P(k).
 19. Manifesto operacional auditável.
-20. Revisão de risco ISO/Six Sigma antes de release.
+20. Revisão de risco operacional antes de release.
 
 ## Critério de parada
 
