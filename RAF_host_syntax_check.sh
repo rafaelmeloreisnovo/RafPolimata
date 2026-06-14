@@ -3,8 +3,8 @@ set -eu
 
 cc="${CC:-gcc}"
 build_dir="build_host_check"
-log_file="/tmp/rafaelia_cc.log"
 mkdir -p "$build_dir"
+log_file="$build_dir/rafaelia_cc.log"
 : > "$log_file"
 
 ok=0
