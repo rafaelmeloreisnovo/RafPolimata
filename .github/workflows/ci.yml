@@ -33,6 +33,9 @@ jobs:
       - name: Validate operational manifest
         run: bash scripts/test_ops_manifest.sh
 
+      - name: Audit repository structure
+        run: python3 scripts/audit_repository_structure.py --depth 5
+
       - name: Validate Android ABI plan
         run: bash scripts/android_build_matrix.sh --plan
 
