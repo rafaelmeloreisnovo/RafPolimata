@@ -236,10 +236,9 @@ static sz axml_build(const char *pkg, const char *label,
 } while(0)
 
     /* ── <manifest package="PKG" android:versionCode="1" android:versionName="1.0"> */
-    /* chunkSize = 16(hdr)+8(node)+20(attrExt)+3*20(attrs) = 16+8+20+60 = 104 */
-    /* We'll compute it precisely: headerSize=16, nodeHdr=8, attrExt=20, each attr=20 */
+    /* chunkSize = 36 (fixed header) + nattr*20 = 36 + 3*20 = 96 */
     sz _man_csz = A.pos + 4;
-    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,104u);
+    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,96u);
     _ax32(&A,_LINE); _ax32(&A,_CMT);
     _ax32(&A,_NONS); _ax32(&A,SI_EL_MAN);
     _ax16(&A,0x14u); _ax16(&A,0x14u); _ax16(&A,3u);
@@ -250,8 +249,9 @@ static sz axml_build(const char *pkg, const char *label,
     (void)_man_csz;
 
     /* ── <uses-sdk android:minSdkVersion="N" android:targetSdkVersion="N"/> */
+    /* chunkSize = 36 + 2*20 = 76 */
     sz _sdk_csz = A.pos + 4;
-    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,96u);
+    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,76u);
     _ax32(&A,_LINE); _ax32(&A,_CMT);
     _ax32(&A,_NONS); _ax32(&A,SI_EL_SDK);
     _ax16(&A,0x14u); _ax16(&A,0x14u); _ax16(&A,2u);
@@ -262,7 +262,8 @@ static sz axml_build(const char *pkg, const char *label,
     (void)_sdk_csz;
 
     /* ── <application android:label=".." android:hasCode="false"> */
-    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,96u);
+    /* chunkSize = 36 + 2*20 = 76 */
+    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,76u);
     _ax32(&A,_LINE); _ax32(&A,_CMT);
     _ax32(&A,_NONS); _ax32(&A,SI_EL_APP);
     _ax16(&A,0x14u); _ax16(&A,0x14u); _ax16(&A,2u);
@@ -271,7 +272,8 @@ static sz axml_build(const char *pkg, const char *label,
     _ATTR(SI_AND_URI, SI_HASCODE, SI_FALSE,    0x12u, 0u); /* false */
 
     /* ── <activity android:name="NativeActivity" android:label=".." android:exported="true"> */
-    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,116u);
+    /* chunkSize = 36 + 3*20 = 96 */
+    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,96u);
     _ax32(&A,_LINE); _ax32(&A,_CMT);
     _ax32(&A,_NONS); _ax32(&A,SI_EL_ACT);
     _ax16(&A,0x14u); _ax16(&A,0x14u); _ax16(&A,3u);
@@ -281,7 +283,8 @@ static sz axml_build(const char *pkg, const char *label,
     _ATTR(SI_AND_URI, SI_EXPORTED, _CMT,       0x12u, 1u); /* true */
 
     /* ── <meta-data android:name="android.app.lib_name" android:value="libname"/> */
-    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,96u);
+    /* chunkSize = 36 + 2*20 = 76 */
+    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,76u);
     _ax32(&A,_LINE); _ax32(&A,_CMT);
     _ax32(&A,_NONS); _ax32(&A,SI_EL_META);
     _ax16(&A,0x14u); _ax16(&A,0x14u); _ax16(&A,2u);
@@ -291,14 +294,16 @@ static sz axml_build(const char *pkg, const char *label,
     _END_ELEM(_NONS, SI_EL_META);
 
     /* ── <intent-filter> */
-    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,44u);
+    /* chunkSize = 36 + 0*20 = 36 */
+    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,36u);
     _ax32(&A,_LINE); _ax32(&A,_CMT);
     _ax32(&A,_NONS); _ax32(&A,SI_EL_FILT);
     _ax16(&A,0x14u); _ax16(&A,0x14u); _ax16(&A,0u);
     _ax16(&A,0u); _ax16(&A,0u); _ax16(&A,0u);
 
     /* ── <action android:name="android.intent.action.MAIN"/> */
-    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,76u);
+    /* chunkSize = 36 + 1*20 = 56 */
+    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,56u);
     _ax32(&A,_LINE); _ax32(&A,_CMT);
     _ax32(&A,_NONS); _ax32(&A,SI_EL_ACN);
     _ax16(&A,0x14u); _ax16(&A,0x14u); _ax16(&A,1u);
@@ -307,7 +312,8 @@ static sz axml_build(const char *pkg, const char *label,
     _END_ELEM(_NONS, SI_EL_ACN);
 
     /* ── <category android:name="android.intent.category.LAUNCHER"/> */
-    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,76u);
+    /* chunkSize = 36 + 1*20 = 56 */
+    _ax16(&A,0x0102u); _ax16(&A,16u); _ax32(&A,56u);
     _ax32(&A,_LINE); _ax32(&A,_CMT);
     _ax32(&A,_NONS); _ax32(&A,SI_EL_CAT);
     _ax16(&A,0x14u); _ax16(&A,0x14u); _ax16(&A,1u);

@@ -248,7 +248,15 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
     if (tok_eq(mn,".sym2")) { em->sym2_va=pos; em->has_sym2=1; return; }
 
     if (tok_eqi(mn,"nop"))  { emit32(em,A64_NOP); return; }
-    if (tok_eqi(mn,"ret"))  { emit32(em,A64_RET); return; }
+    if (tok_eqi(mn,"ret"))  {
+        if (l->cur.kind==TK_IDENT && reg64(l->cur)>=0) {
+            i32 rn=reg64(l->cur); lex_next(l);
+            emit32(em,a64_ret((u32)rn));
+        } else {
+            emit32(em,A64_RET);
+        }
+        return;
+    }
     if (tok_eqi(mn,"brk"))  {
         u32 imm=(u32)lex_imm(l);
         emit32(em,0xD4200000u|((imm&0xFFFFu)<<5)); return;
@@ -264,10 +272,6 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
     if (tok_eqi(mn,"br"))   {
         i32 rn=reg64(l->cur); lex_next(l);
         emit32(em,a64_br((u32)rn)); return;
-    }
-    if (tok_eqi(mn,"ret"))  {
-        i32 rn=reg64(l->cur); lex_next(l);
-        emit32(em,a64_ret((u32)rn)); return;
     }
     /* movz/movk/movn rd, #imm [, lsl #hw*16] */
     if (tok_eqi(mn,"movz")||tok_eqi(mn,"movk")||tok_eqi(mn,"movn")) {
@@ -333,16 +337,12 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
             emit32(em,w);
         } else {
             i32 rm=reg64(l->cur); lex_next(l);
-            u32 sf2=(u32)sf;
-            /* data-proc 2-source: sf|opc|01011|shift|0|rm|imm6|rn|rd */
-            u32 opc;
-            if (tok_eqi(mn,"add"))      opc=0x8Bu;
-            else if (tok_eqi(mn,"sub")) opc=0xCBu;
-            else if (tok_eqi(mn,"and")) opc=0x8Au|(sf2<<31)^(0x8Au);
-            else if (tok_eqi(mn,"orr")) opc=0xAAu;
-            else                        opc=0xCAu; /* eor */
-            /* simplified: encode as add/sub shifted reg */
-            u32 w=(sf2<<31)|(opc<<21)|(0u<<22)|((u32)rm<<16)|(0u<<10)|((u32)rn<<5)|(u32)rd;
+            u32 w;
+            if      (tok_eqi(mn,"add")) w=a64_add_reg((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+            else if (tok_eqi(mn,"sub")) w=a64_sub_reg((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+            else if (tok_eqi(mn,"and")) w=a64_and_reg((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+            else if (tok_eqi(mn,"orr")) w=a64_orr_reg((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+            else                        w=a64_eor_reg((u32)rd,(u32)rn,(u32)rm,(u32)sf);
             emit32(em,w);
         }
         return;
@@ -476,7 +476,7 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
         int post=0;
         if (l->cur.kind==TK_COMMA) { lex_next(l); off=(i32)lex_imm(l); post=1; }
         if (post) emit32(em,a64_ldp_post((u32)r1,(u32)r2,(u32)rn,off,(u32)sf));
-        else      emit32(em,a64_stp((u32)r1,(u32)r2,(u32)rn,off,(u32)sf)); /* fallback */
+        else      emit32(em,a64_ldp((u32)r1,(u32)r2,(u32)rn,off,(u32)sf));
         return;
     }
     /* .word — raw 32-bit literal */
@@ -484,7 +484,8 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
         u32 v=(u32)lex_imm(l);
         emit32(em,v); return;
     }
-    /* unknown — emit NOP */
+    /* unknown mnemonic — emit NOP placeholder so label offsets stay correct */
+    pr_err("apkc: unknown ARM64 mnemonic\n");
     emit32(em,A64_NOP);
 }
 
@@ -558,7 +559,7 @@ static void asm_insn32(Emit *em, Tok mn, Lex *l) {
             }
         } else {
             i32 rm=reg32a(l->cur); lex_next(l);
-            emit32(em,a32_mov_reg((u32)rd,(u32)rm,A32_AL));
+            emit32(em,a32_mov_reg((u32)rd,(u32)rm,0u,A32_AL));
         }
         return;
     }
@@ -574,8 +575,8 @@ static void asm_insn32(Emit *em, Tok mn, Lex *l) {
             emit32(em,w);
         } else {
             i32 rm=reg32a(l->cur); lex_next(l);
-            u32 w=tok_eqi(mn,"add")?a32_add_reg((u32)rd,(u32)rn,(u32)rm,0,0,A32_AL)
-                                    :a32_sub_reg((u32)rd,(u32)rn,(u32)rm,0,0,A32_AL);
+            u32 w=tok_eqi(mn,"add")?a32_add_reg((u32)rd,(u32)rn,(u32)rm,0u,A32_AL)
+                                    :a32_sub_reg((u32)rd,(u32)rn,(u32)rm,0u,A32_AL);
             emit32(em,w);
         }
         return;
@@ -628,6 +629,8 @@ static void asm_insn32(Emit *em, Tok mn, Lex *l) {
         u32 v=(u32)lex_imm(l);
         emit32(em,v); return;
     }
+    /* unknown mnemonic — emit NOP placeholder so label offsets stay correct */
+    pr_err("apkc: unknown ARM32 mnemonic\n");
     emit32(em,A32_NOP);
 }
 

@@ -29,6 +29,8 @@
 #define CC_CC 0x3u
 #define CC_MI 0x4u
 #define CC_PL 0x5u
+#define CC_VS 0x6u
+#define CC_VC 0x7u
 #define CC_HI 0x8u
 #define CC_LS 0x9u
 #define CC_GE 0xAu
@@ -191,6 +193,12 @@ static inline u32 a64_stp(u8 t1, u8 t2, u8 rn, i8 off7, u8 sf) {
 static inline u32 a64_stp_pre(u8 t1, u8 t2, u8 rn, i8 off7, u8 sf) {
     u8 opc = sf ? 2u : 0u;
     return ((u32)opc<<30)|(0x15u<<26)|(3u<<23)|
+           (((u32)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
+}
+/* LDP signed-offset */
+static inline u32 a64_ldp(u8 t1, u8 t2, u8 rn, i8 off7, u8 sf) {
+    u8 opc = sf ? 2u : 0u;
+    return ((u32)opc<<30)|(0x15u<<26)|(2u<<23)|
            (((u32)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
 }
 /* LDP post-index */

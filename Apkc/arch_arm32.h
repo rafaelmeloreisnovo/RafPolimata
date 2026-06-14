@@ -11,6 +11,8 @@
 #define A32_CC 0x3u
 #define A32_MI 0x4u
 #define A32_PL 0x5u
+#define A32_VS 0x6u
+#define A32_VC 0x7u
 #define A32_HI 0x8u
 #define A32_LS 0x9u
 #define A32_GE 0xAu
