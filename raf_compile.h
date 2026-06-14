@@ -6,8 +6,9 @@
 
 #define RAF_ARCH_X86_64 0
 #define RAF_ARCH_ARM64 1
-#define RAF_ARCH_RV64 2
-#define RAF_ARCH_UNKNOWN 3
+#define RAF_ARCH_ARM32 2
+#define RAF_ARCH_RV64 3
+#define RAF_ARCH_UNKNOWN 4
 
 #define RAF_LANG_C 0
 #define RAF_LANG_CPP 1
@@ -71,6 +72,11 @@ typedef struct {
   char out_asm[256];
   char out_hex[256];
   char out_bin[256];
+  char out_ops[256];
+  char flags[128];
+  uint64_t src_hash;
+  uint64_t ops_signature;
+  int rollback_code;
   uint64_t elapsed_ns;
 } RafCtx;
 
