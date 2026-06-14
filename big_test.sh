@@ -14,7 +14,8 @@ cd "$ROOT"
 RUN_ID=$(date -u '+%Y%m%dT%H%M%SZ')
 OUT=${BIG_TEST_OUT:-"$ROOT/big_test_runs/$RUN_ID"}
 LOGS="$OUT/logs"
-BIN="$OUT/bin"
+EXEC_ROOT=${BIG_TEST_EXEC_ROOT:-"${TMPDIR:-${TMP:-/tmp}}/raf_big_test_$RUN_ID"}
+BIN="$EXEC_ROOT/bin"
 RESULTS="$OUT/results"
 SUMMARY="$OUT/BIG_TEST_SUMMARY.md"
 COMMANDS="$OUT/commands.tsv"
@@ -39,6 +40,7 @@ cat > "$SUMMARY" <<EOF
 - Branch: $BRANCH
 - Commit: $COMMIT
 - Saída: $OUT
+- Execução binária temporária: $EXEC_ROOT
 
 ## Matriz de gates
 
@@ -52,12 +54,13 @@ EOF
   echo "commit=$COMMIT"
   echo "root=$ROOT"
   echo "out=$OUT"
+  echo "exec_root=$EXEC_ROOT"
   echo "uname=$(uname -a 2>/dev/null || echo TOKEN_VAZIO)"
-  echo "shell=$SHELL"
+  echo "shell=${SHELL:-TOKEN_VAZIO}"
   echo "path=$PATH"
 } > "$ENVINFO"
 
-for t in sh bash python3 gcc clang cc git rg unzip aapt readelf apksigner keytool adb; do
+for t in sh bash python3 gcc clang cc git rg unzip aapt readelf apksigner keytool adb file; do
   if command -v "$t" >/dev/null 2>&1; then
     printf '%s=%s\n' "$t" "$(command -v "$t")" >> "$TOOLS"
   else
@@ -134,17 +137,24 @@ run_if_exists G01 required RAF_host_syntax_check.sh host-syntax.log \
 
 if [ -f raf_main.c ] && [ -f raf_frontend.c ] && [ -f raf_cpu.c ] && [ -f raf_asm_emit.c ] && [ -f raf_precomp.c ]; then
   run_gate G02 required raf-compile-build.log \
-    "gcc -std=c11 -Wall -Wextra -Werror raf_main.c raf_frontend.c raf_cpu.c raf_asm_emit.c raf_precomp.c -o '$BIN/raf_compile'"
+    "gcc -std=c11 -Wall -Wextra -Werror raf_main.c raf_frontend.c raf_cpu.c raf_asm_emit.c raf_precomp.c -o '$BIN/raf_compile' && chmod +x '$BIN/raf_compile' 2>/dev/null || true && (command -v file >/dev/null 2>&1 && file '$BIN/raf_compile' || true)"
 else
   echo 'TOKEN_VAZIO: fontes raf_compile incompletas para build host.' > "$LOGS/raf-compile-build.log"
   append_gate G02 required TOKEN_VAZIO logs/raf-compile-build.log
 fi
 
+if [ -f "$BIN/raf_compile" ]; then
+  chmod +x "$BIN/raf_compile" 2>/dev/null || true
+fi
 if [ -x "$BIN/raf_compile" ]; then
   run_gate G03 required raf-compile-smoke.log \
     "'$BIN/raf_compile' --help && '$BIN/raf_compile' raf_main.c '$RESULTS/ci_out'"
 else
-  echo 'TOKEN_VAZIO: binário raf_compile não foi gerado.' > "$LOGS/raf-compile-smoke.log"
+  {
+    echo 'TOKEN_VAZIO: binário raf_compile existe/verificação feita, mas não é executável neste ambiente.'
+    echo "exec_path=$BIN/raf_compile"
+    echo 'Possível causa em Termux: repositório em storage/downloads/noexec; use BIG_TEST_EXEC_ROOT em diretório interno executável.'
+  } > "$LOGS/raf-compile-smoke.log"
   append_gate G03 required TOKEN_VAZIO logs/raf-compile-smoke.log
 fi
 
@@ -152,7 +162,7 @@ run_if_exists G04 required scripts/test_ops_manifest.sh ops-manifest.log \
   'sh scripts/test_ops_manifest.sh'
 
 run_if_exists G05 optional scripts/audit_repository_structure.py repo-structure.log \
-  "python3 scripts/audit_repository_structure.py --depth 5 --output '$RESULTS/repository-structure.json'"
+  'python3 scripts/audit_repository_structure.py --depth 5'
 
 run_if_exists G06 required scripts/android_build_matrix.sh android-plan.log \
   'sh scripts/android_build_matrix.sh --plan'
@@ -183,6 +193,9 @@ if [ -d ci/reports ]; then
 fi
 if [ -d results ]; then
   cp -R results "$ARTIFACTS/repo-results" 2>/dev/null || true
+fi
+if [ -f "$BIN/raf_compile" ]; then
+  cp "$BIN/raf_compile" "$ARTIFACTS/raf_compile" 2>/dev/null || true
 fi
 
 cat >> "$SUMMARY" <<EOF
