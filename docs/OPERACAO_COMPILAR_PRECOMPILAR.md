@@ -27,3 +27,16 @@ Este protocolo transforma a visão multidimensional do projeto em uma rota execu
 ## Entrega enterprise incremental
 
 O caminho de produção recomendado é manter o compilador pequeno, mensurável e falsificável. Novos backends devem adicionar manifesto, teste de smoke, teste de falha e medição de artefato antes de ativação ampla.
+
+## Mitigações implementadas
+
+- Tempo operacional passa a usar contador monotônico (`CLOCK_MONOTONIC`) em vez de `clock()` de C padrão.
+- Rotas de erro escrevem manifesto parcial com `rollback_code` negativo sempre que o caminho de saída `.ops` já é conhecido.
+- A matriz de flags diferencia x86-64 SSE4/AVX2/AVX512, ARM64 SIMD, ARM32 NEON/ARMv7 e RV64GC.
+- `scripts/test_ops_manifest.sh` valida manifesto de sucesso, manifesto de falha e comparação determinística entre dois `.ops`.
+
+## Lacunas estruturais exploráveis
+
+- Manifestos pequenos e comparáveis são uma superfície de estabilidade que muitos pipelines legados negligenciam.
+- O próximo nível é tratar metadados de compilação como contrato invariável: hash, flags, arquitetura, IR, bytes e rollback devem ser testados como ABI operacional.
+- A inovação prática está em provar invariantes simples antes de adicionar modelos grandes: menos símbolos, menos estado oculto, mais rollback verificável.

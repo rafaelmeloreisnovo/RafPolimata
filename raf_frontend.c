@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include "raf_compile.h"
 
 #include <stdio.h>
@@ -14,6 +16,12 @@ static int read_src(RafCtx *ctx, const char *path) {
   ctx->src = buf;
   ctx->src_len = n;
   return 0;
+}
+
+static uint64_t raf_now_ns(void) {
+  struct timespec ts;
+  if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) return 0;
+  return ((uint64_t)ts.tv_sec * UINT64_C(1000000000)) + (uint64_t)ts.tv_nsec;
 }
 
 static uint64_t raf_fnv1a64(const uint8_t *buf, size_t len) {
@@ -40,21 +48,13 @@ void raf_ctx_report(const RafCtx *ctx) {
          (unsigned long long)ctx->src_hash, ctx->flags);
 }
 
-static int write_outputs(RafCtx *ctx, const char *out_base) {
+static void prepare_manifest(RafCtx *ctx, const char *out_base) {
   snprintf(ctx->out_asm, sizeof(ctx->out_asm), "%s.s", out_base);
   snprintf(ctx->out_hex, sizeof(ctx->out_hex), "%s.hex", out_base);
   snprintf(ctx->out_ops, sizeof(ctx->out_ops), "%s.ops", out_base);
+}
 
-  FILE *fa = fopen(ctx->out_asm, "w");
-  if (!fa) return -10;
-  for (uint32_t i = 0; i < ctx->asm_out.n; ++i) fprintf(fa, "%s\n", ctx->asm_out.lines[i]);
-  fclose(fa);
-
-  FILE *fh = fopen(ctx->out_hex, "w");
-  if (!fh) return -11;
-  for (uint32_t i = 0; i < ctx->bin.n; ++i) fprintf(fh, "%02X%s", ctx->bin.bytes[i], ((i + 1u) % 16u) ? " " : "\n");
-  fclose(fh);
-
+static int write_ops_manifest(const RafCtx *ctx) {
   FILE *fo = fopen(ctx->out_ops, "w");
   if (!fo) return -12;
   fprintf(fo, "arch=%u\nbrand=%s\nlang=%u\nopt=%u\nfeat=0x%08x\nflags=%s\nsrc_len=%zu\nsrc_hash=%016llx\nir=%u\nasm=%u\nbin=%u\nelapsed_ns=%llu\nrollback_code=%d\n",
@@ -66,21 +66,48 @@ static int write_outputs(RafCtx *ctx, const char *out_base) {
   return 0;
 }
 
+static int write_artifacts(RafCtx *ctx) {
+  FILE *fa = fopen(ctx->out_asm, "w");
+  if (!fa) return -10;
+  for (uint32_t i = 0; i < ctx->asm_out.n; ++i) {
+    fprintf(fa, "%s\n", ctx->asm_out.lines[i]);
+  }
+  fclose(fa);
+
+  FILE *fh = fopen(ctx->out_hex, "w");
+  if (!fh) return -11;
+  for (uint32_t i = 0; i < ctx->bin.n; ++i) {
+    fprintf(fh, "%02X%s", ctx->bin.bytes[i], ((i + 1u) % 16u) ? " " : "\n");
+  }
+  fclose(fh);
+  return write_ops_manifest(ctx);
+}
+
+static int fail_with_manifest(RafCtx *ctx, int code, uint64_t t0) {
+  uint64_t t1 = raf_now_ns();
+  ctx->rollback_code = code;
+  ctx->elapsed_ns = t1 >= t0 ? t1 - t0 : 0;
+  (void)write_ops_manifest(ctx);
+  return code;
+}
+
 int raf_compile_file(RafCtx *ctx, const char *src_path, const char *out_base,
                      int do_native) {
   (void)do_native;
-  if (read_src(ctx, src_path) != 0) return -1;
-  clock_t t0 = clock();
+  prepare_manifest(ctx, out_base);
+  uint64_t t0 = raf_now_ns();
   ctx->lang = raf_lang_from_ext(src_path);
   ctx->feat = ctx->cpu.feat;
-  ctx->src_hash = raf_fnv1a64((const uint8_t *)ctx->src, ctx->src_len);
   raf_flag_matrix_get(ctx->cpu.arch, ctx->lang, ctx->opt, ctx->feat, ctx->flags,
                       (int)sizeof(ctx->flags));
-  if (raf_ir_lower(ctx) != 0) { ctx->rollback_code = -2; return -2; }
-  if (raf_asm_emit(ctx) != 0) { ctx->rollback_code = -3; return -3; }
-  if (raf_hex_encode(ctx) != 0) { ctx->rollback_code = -4; return -4; }
+  if (read_src(ctx, src_path) != 0) return fail_with_manifest(ctx, -1, t0);
+  ctx->src_hash = raf_fnv1a64((const uint8_t *)ctx->src, ctx->src_len);
+  if (raf_ir_lower(ctx) != 0) return fail_with_manifest(ctx, -2, t0);
+  if (raf_asm_emit(ctx) != 0) return fail_with_manifest(ctx, -3, t0);
+  if (raf_hex_encode(ctx) != 0) return fail_with_manifest(ctx, -4, t0);
 
-  ctx->elapsed_ns = (uint64_t)((clock() - t0) * (1000000000.0 / CLOCKS_PER_SEC));
+  uint64_t t1 = raf_now_ns();
+  ctx->elapsed_ns = t1 >= t0 ? t1 - t0 : 0;
   ctx->rollback_code = 0;
-  return write_outputs(ctx, out_base);
+  return write_artifacts(ctx);
 }

@@ -30,6 +30,9 @@ jobs:
           ./raf_compile --help
           ./raf_compile raf_main.c ci_out
 
+      - name: Validate operational manifest
+        run: bash scripts/test_ops_manifest.sh
+
       - name: Generate P(k) falsifiability report (non-blocking verdict)
         run: |
           python3 scripts/first_test_pk.py --output results/first_test_report.json

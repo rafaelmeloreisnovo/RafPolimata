@@ -6,8 +6,9 @@
 
 #define RAF_ARCH_X86_64 0
 #define RAF_ARCH_ARM64 1
-#define RAF_ARCH_RV64 2
-#define RAF_ARCH_UNKNOWN 3
+#define RAF_ARCH_ARM32 2
+#define RAF_ARCH_RV64 3
+#define RAF_ARCH_UNKNOWN 4
 
 #define RAF_LANG_C 0
 #define RAF_LANG_CPP 1
