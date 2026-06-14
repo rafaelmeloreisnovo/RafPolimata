@@ -22,6 +22,8 @@ Este repositório passa a incluir uma documentação de referência de nível av
 - [`docs/RELEASE_NOTES_PENDING.md`](docs/RELEASE_NOTES_PENDING.md): registro de pendências de release (pending only).
 - [`docs/EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md`](docs/EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md): metodologia operacional para governança, GPU/SIMD, cache, paralelismo, fail-safe/failover/rollback e evidência auditável.
 
+- [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md`](docs/MAPA_ESTRUTURAL_REPOSITORIO.md): mapa profissional da disposição por tags/diretórios, estados (`VOID`/`PENDING`/`AUDIT`/`RUNTIME`/`REFERENCE`) e varredura estrutural em 5 níveis.
+
 ## Aviso importante
 
 > Este material é técnico-acadêmico e **não substitui parecer jurídico profissional**.

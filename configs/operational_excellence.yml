@@ -26,6 +26,7 @@ governance_gates:
   - id: OE1; command: gcc -std=c11 -Wall -Wextra -Werror tools/raf_validate_operational_excellence.c -o build_operational_validate && ./build_operational_validate; blocks_release: true
   - id: OE2; command: gcc -std=c11 -Wall -Wextra -Werror -IBenchmark Benchmark/raf_runtime_router_test.c -o build_runtime_router_test && ./build_runtime_router_test; blocks_release: true
   - id: OE3; command: gcc -std=c11 -Wall -Wextra -Werror -D_POSIX_C_SOURCE=200809L -IBenchmark Benchmark/raf_runtime_benchmark.c -o build_runtime_benchmark && ./build_runtime_benchmark; blocks_release: true
+  - id: OE4; command: python3 scripts/audit_repository_structure.py --depth 5; blocks_release: true
 
 thresholds:
   min_batch_gpu: 64
@@ -54,6 +55,7 @@ benchmark_policy:
   test: Benchmark/raf_runtime_benchmark.c
 
 audit_docs:
+  structural_map: docs/MAPA_ESTRUTURAL_REPOSITORIO.md
   operational_routine: docs/ROTINA_OPERACIONAL_BENCHMARKS.md
   logo_60col: docs/LOGOTIPO_RAFAELIA_60COL.md
 
