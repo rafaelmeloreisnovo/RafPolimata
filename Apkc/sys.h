@@ -75,6 +75,35 @@ static inline __attribute__((noreturn)) void os_exit(i32 c) {
     _sc1(_NR_exit,(i64)c); __builtin_unreachable();
 }
 
+/* ── Process control (ARM64 Linux) ────────────────────────────────────── */
+/* ARM64 has no fork(2); use clone(SIGCHLD=17, 0, NULL, NULL, 0) */
+#define _NR_clone   220
+#define _NR_execve  221
+#define _NR_wait4   260
+static __attribute__((always_inline)) i64
+_sc5(i64 n, i64 a, i64 b, i64 c, i64 d, i64 e) {
+    register i64 x8 __asm__("x8") = n;
+    register i64 x0 __asm__("x0") = a;
+    register i64 x1 __asm__("x1") = b;
+    register i64 x2 __asm__("x2") = c;
+    register i64 x3 __asm__("x3") = d;
+    register i64 x4 __asm__("x4") = e;
+    __asm__ volatile("svc #0" : "+r"(x0) : "r"(x8),"r"(x1),"r"(x2),"r"(x3),"r"(x4) : "memory","cc");
+    return x0;
+}
+/* os_fork: clone(SIGCHLD, 0, NULL, NULL, 0) — returns child PID in parent, 0 in child */
+static inline i32 os_fork(void) {
+    return (i32)_sc5(_NR_clone, 17LL, 0LL, 0LL, 0LL, 0LL);
+}
+/* os_execve: execve(path, argv, envp) */
+static inline i32 os_execve(const char *p, char *const argv[], char *const envp[]) {
+    return (i32)_sc3(_NR_execve, (i64)(uptr)p, (i64)(uptr)argv, (i64)(uptr)envp);
+}
+/* os_waitpid: wait4(pid, status, options, NULL) */
+static inline i32 os_waitpid(i32 pid, i32 *st, i32 opts) {
+    return (i32)_sc4(_NR_wait4, (i64)pid, (i64)(uptr)st, (i64)opts, 0LL);
+}
+
 /* ═══════════════════════════ ARM32 ════════════════════════════════════════ */
 #else
 
