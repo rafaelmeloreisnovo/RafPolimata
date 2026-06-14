@@ -76,3 +76,4 @@ pipeline_gates:
   - id: G2; command: bash RAF_host_syntax_check.sh; blocks_release: true
   - id: G3; command: gcc -std=c11 -Wall -Wextra -Werror raf_main.c raf_frontend.c raf_cpu.c raf_asm_emit.c raf_precomp.c -o raf_compile; blocks_release: true
   - id: G4; command: python3 scripts/first_test_pk.py --output results/first_test_report.json; blocks_release: false
+  - id: G5; command: python3 scripts/validate_operational_excellence.py; blocks_release: true

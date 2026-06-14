@@ -1,0 +1,34 @@
+# Manifesto operacional auditável para excelência computacional RafPolimata.
+operational_excellence:
+  id: rafpolimata.operational_excellence.v1
+  version: 1
+  traversal_depth: 5
+  evidence_policy: token_vazio_over_false_claim
+  default_state: VOID
+
+states:
+  - VOID
+  - BASELINE
+  - CANDIDATE
+  - VALIDATED
+  - ROLLBACK
+
+architectures:
+  - id: generic_c; required_fallback: true; hot_path: portable; metric: correctness_latency
+  - id: branchless_integer; required_fallback: true; hot_path: predictable_control; metric: p95_p99_size
+  - id: arm32_neon; required_fallback: true; hot_path: vector_legacy_android; metric: cycles_per_element
+  - id: arm64_neon; required_fallback: true; hot_path: vector_android_modern; metric: throughput_energy
+  - id: gpu_batch; required_fallback: true; hot_path: massive_parallel_batch; metric: end_to_end_latency
+  - id: syscall_direct; required_fallback: true; hot_path: minimal_kernel_boundary; metric: latency_compatibility
+  - id: storage_buffer; required_fallback: true; hot_path: binary_log_batch; metric: lossless_checksum
+
+governance_gates:
+  - id: OE1; command: python3 scripts/validate_operational_excellence.py; blocks_release: true
+  - id: OE2; command: python3 scripts/validate_coherence_protocol.py; blocks_release: true
+  - id: OE3; command: bash RAF_host_syntax_check.sh; blocks_release: true
+
+risk_controls:
+  fail_safe: baseline_correctness_first
+  failover: runtime_backend_selector_with_fallback
+  rollback: disable_candidate_restore_validated
+  mitigation: reduce_batch_parallelism_preserve_integrity
