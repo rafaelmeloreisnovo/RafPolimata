@@ -23,11 +23,9 @@ architectures:
   - id: storage_buffer; required_fallback: true; hot_path: binary_log_batch; metric: lossless_checksum
 
 governance_gates:
-  - id: OE1; command: python3 scripts/validate_operational_excellence.py; blocks_release: true
-  - id: OE2; command: python3 scripts/validate_coherence_protocol.py; blocks_release: true
-  - id: OE3; command: bash RAF_host_syntax_check.sh; blocks_release: true
-  - id: OE4; command: sh scripts/test_runtime_router.sh; blocks_release: true
-  - id: OE5; command: sh scripts/test_runtime_benchmark.sh; blocks_release: true
+  - id: OE1; command: gcc -std=c11 -Wall -Wextra -Werror tools/raf_validate_operational_excellence.c -o build_operational_validate && ./build_operational_validate; blocks_release: true
+  - id: OE2; command: gcc -std=c11 -Wall -Wextra -Werror -IBenchmark Benchmark/raf_runtime_router_test.c -o build_runtime_router_test && ./build_runtime_router_test; blocks_release: true
+  - id: OE3; command: gcc -std=c11 -Wall -Wextra -Werror -D_POSIX_C_SOURCE=200809L -IBenchmark Benchmark/raf_runtime_benchmark.c -o build_runtime_benchmark && ./build_runtime_benchmark; blocks_release: true
 
 thresholds:
   min_batch_gpu: 64
@@ -43,7 +41,7 @@ risk_controls:
 
 runtime_router:
   implementation: Benchmark/raf_runtime_router.h
-  test: scripts/test_runtime_router.sh
+  test: Benchmark/raf_runtime_router_test.c
   fallback_backend: generic_c
 
 benchmark_policy:
@@ -53,7 +51,7 @@ benchmark_policy:
   median_index: 15
   p95_index: 29
   p99_index: 30
-  test: scripts/test_runtime_benchmark.sh
+  test: Benchmark/raf_runtime_benchmark.c
 
 audit_docs:
   iso_sigma: docs/AUDITORIA_ISO_SIGMA_BENCHMARKS.md

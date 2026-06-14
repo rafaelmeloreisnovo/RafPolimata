@@ -1,10 +1,4 @@
-#!/usr/bin/env sh
-set -eu
-cc="${CC:-gcc}"
-build_dir="build_runtime_router"
-mkdir -p "$build_dir"
-cat > "$build_dir/test_runtime_router.c" <<'C_EOF'
-#include "Benchmark/raf_runtime_router.h"
+#include "raf_runtime_router.h"
 
 static int expect_u32(u32 got, u32 want) {
     return got == want ? 0 : 1;
@@ -37,7 +31,3 @@ int main(void) {
     fail |= expect_u32(d4.rollback, 1u);
     return fail;
 }
-C_EOF
-"$cc" -std=c11 -Wall -Wextra -Werror -I. "$build_dir/test_runtime_router.c" -o "$build_dir/test_runtime_router"
-"$build_dir/test_runtime_router"
-echo "runtime_router=PASS"

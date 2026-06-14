@@ -1,10 +1,4 @@
-#!/usr/bin/env sh
-set -eu
-cc="${CC:-gcc}"
-build_dir="build_runtime_benchmark"
-mkdir -p "$build_dir"
-cat > "$build_dir/test_runtime_benchmark.c" <<'C_EOF'
-#include "Benchmark/raf_runtime_router.h"
+#include "raf_runtime_router.h"
 #include <time.h>
 
 #define RAF_BENCH_PREWARM 16u
@@ -35,12 +29,8 @@ int main(void) {
     RafRouteInput in = {RAF_CAP_ARM64_NEON | RAF_CAP_GPU_BATCH, 0u, 64u, 128u, RAF_ROUTE_STATE_VALIDATED};
     RafRouteDecision out;
     u32 i;
-    for (i = 0u; i < RAF_BENCH_PREWARM; i++) {
-        out = raf_runtime_route(in);
-    }
-    for (i = 0u; i < RAF_BENCH_WARMUP; i++) {
-        out = raf_runtime_route(in);
-    }
+    for (i = 0u; i < RAF_BENCH_PREWARM; i++) out = raf_runtime_route(in);
+    for (i = 0u; i < RAF_BENCH_WARMUP; i++) out = raf_runtime_route(in);
     for (i = 0u; i < RAF_BENCH_SAMPLES; i++) {
         unsigned long long t0 = tick_ns();
         out = raf_runtime_route(in);
@@ -52,7 +42,3 @@ int main(void) {
     if (samples[29] > samples[30]) return 3;
     return 0;
 }
-C_EOF
-"$cc" -std=c11 -Wall -Wextra -Werror -D_POSIX_C_SOURCE=200809L -I. "$build_dir/test_runtime_benchmark.c" -o "$build_dir/test_runtime_benchmark"
-"$build_dir/test_runtime_benchmark"
-echo "runtime_benchmark=PASS prewarm=16 warmup=64 samples=31 median_index=15 p95_index=29"

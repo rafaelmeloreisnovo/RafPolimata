@@ -76,6 +76,6 @@ pipeline_gates:
   - id: G2; command: bash RAF_host_syntax_check.sh; blocks_release: true
   - id: G3; command: gcc -std=c11 -Wall -Wextra -Werror raf_main.c raf_frontend.c raf_cpu.c raf_asm_emit.c raf_precomp.c -o raf_compile; blocks_release: true
   - id: G4; command: python3 scripts/first_test_pk.py --output results/first_test_report.json; blocks_release: true
-  - id: G5; command: python3 scripts/validate_operational_excellence.py; blocks_release: true
-  - id: G6; command: sh scripts/test_runtime_router.sh; blocks_release: true
-  - id: G7; command: sh scripts/test_runtime_benchmark.sh; blocks_release: true
+  - id: G5; command: gcc -std=c11 -Wall -Wextra -Werror tools/raf_validate_operational_excellence.c -o build_operational_validate && ./build_operational_validate; blocks_release: true
+  - id: G6; command: gcc -std=c11 -Wall -Wextra -Werror -IBenchmark Benchmark/raf_runtime_router_test.c -o build_runtime_router_test && ./build_runtime_router_test; blocks_release: true
+  - id: G7; command: gcc -std=c11 -Wall -Wextra -Werror -D_POSIX_C_SOURCE=200809L -IBenchmark Benchmark/raf_runtime_benchmark.c -o build_runtime_benchmark && ./build_runtime_benchmark; blocks_release: true

@@ -39,9 +39,9 @@ A orquestração viva está em `configs/semantic_coherence.yml` e expõe sete ga
 2. `G2`: executa checagem sintática de C no host.
 3. `G3`: compila o núcleo do compilador com `-Wall -Wextra -Werror`.
 4. `G4`: gera o relatório de falsificabilidade `P(k)` e bloqueia release quando o modelo calibrado/congelado reprova.
-5. `G5`: valida o manifesto de excelência operacional.
-6. `G6`: compila e executa o teste do seletor runtime com fail-safe, failover e rollback.
-7. `G7`: executa benchmark estrutural do roteador com prewarm, warmup, mediana e p95.
+5. `G5`: compila e executa validador C nativo do manifesto de excelência operacional.
+6. `G6`: compila e executa teste C nativo do seletor runtime com fail-safe, failover e rollback.
+7. `G7`: compila e executa benchmark C nativo do roteador com prewarm, warmup, mediana e p95.
 
 ## Benchmark mutável com invariantes fixos
 

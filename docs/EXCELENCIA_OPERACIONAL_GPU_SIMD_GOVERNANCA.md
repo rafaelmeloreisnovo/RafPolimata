@@ -85,4 +85,4 @@ A ordem operacional é: `generic_c` como baseline, `arm32_neon`/`arm64_neon` qua
 
 ## 9. Testes automáticos de rota
 
-O teste `scripts/test_runtime_router.sh` compila um programa C mínimo, sem heap e sem dependências externas, cobrindo baseline, seleção ARM64 NEON, promoção GPU por lote, failover de GPU degradada para ARM64 e rollback para `generic_c`.
+O teste `Benchmark/raf_runtime_router_test.c` compila um programa C mínimo, sem heap e sem dependências externas, cobrindo baseline, seleção ARM64 NEON, promoção GPU por lote, failover de GPU degradada para ARM64 e rollback para `generic_c`.
