@@ -1,0 +1,58 @@
+# Manifesto operacional auditável para excelência computacional RafPolimata.
+operational_excellence:
+  id: rafpolimata.operational_excellence.v1
+  version: 1
+  traversal_depth: 5
+  evidence_policy: token_vazio_over_false_claim
+  default_state: VOID
+
+states:
+  - VOID
+  - BASELINE
+  - CANDIDATE
+  - VALIDATED
+  - ROLLBACK
+
+architectures:
+  - id: generic_c; required_fallback: true; hot_path: portable; metric: correctness_latency
+  - id: branchless_integer; required_fallback: true; hot_path: predictable_control; metric: p95_p99_size
+  - id: arm32_neon; required_fallback: true; hot_path: vector_legacy_android; metric: cycles_per_element
+  - id: arm64_neon; required_fallback: true; hot_path: vector_android_modern; metric: throughput_energy
+  - id: gpu_batch; required_fallback: true; hot_path: massive_parallel_batch; metric: end_to_end_latency
+  - id: syscall_direct; required_fallback: true; hot_path: minimal_kernel_boundary; metric: latency_compatibility
+  - id: storage_buffer; required_fallback: true; hot_path: binary_log_batch; metric: lossless_checksum
+
+governance_gates:
+  - id: OE1; command: gcc -std=c11 -Wall -Wextra -Werror tools/raf_validate_operational_excellence.c -o build_operational_validate && ./build_operational_validate; blocks_release: true
+  - id: OE2; command: gcc -std=c11 -Wall -Wextra -Werror -IBenchmark Benchmark/raf_runtime_router_test.c -o build_runtime_router_test && ./build_runtime_router_test; blocks_release: true
+  - id: OE3; command: gcc -std=c11 -Wall -Wextra -Werror -D_POSIX_C_SOURCE=200809L -IBenchmark Benchmark/raf_runtime_benchmark.c -o build_runtime_benchmark && ./build_runtime_benchmark; blocks_release: true
+
+thresholds:
+  min_batch_gpu: 64
+  max_p95_regression_milli: 5000
+  max_binary_growth_milli: 1500
+  require_hash_match: true
+
+risk_controls:
+  fail_safe: baseline_correctness_first
+  failover: runtime_backend_selector_with_fallback
+  rollback: disable_candidate_restore_validated
+  mitigation: reduce_batch_parallelism_preserve_integrity
+
+runtime_router:
+  implementation: Benchmark/raf_runtime_router.h
+  test: Benchmark/raf_runtime_router_test.c
+  fallback_backend: generic_c
+
+benchmark_policy:
+  prewarm_iterations: 16
+  warmup_iterations: 64
+  samples: 31
+  median_index: 15
+  p95_index: 29
+  p99_index: 30
+  test: Benchmark/raf_runtime_benchmark.c
+
+audit_docs:
+  operational_routine: docs/ROTINA_OPERACIONAL_BENCHMARKS.md
+  logo_60col: docs/LOGOTIPO_RAFAELIA_60COL.md

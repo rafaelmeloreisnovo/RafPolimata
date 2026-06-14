@@ -4,7 +4,7 @@ Este documento operacionaliza o primeiro teste "prova ou queda" com um único ob
 
 ## Objetivo
 
-Comparar **dado observado vs modelo cru** sem ajuste fino iterativo.
+Comparar **dado observado vs modelo calibrado e congelado** sem ajuste fino durante a execução do gate.
 
 ## Regra de congelamento
 
@@ -13,6 +13,10 @@ Antes de executar, congelar:
 2. parâmetros do modelo,
 3. faixa de k,
 4. critérios de aprovação/reprovação.
+
+## Parâmetros calibrados atuais
+
+Os defaults versionados do script foram calibrados offline sobre `data/pk_observado.csv` e ficam congelados para detectar regressões: `a=81724.04434517458`, `n=1.295421709172559`, `kd=0.06846530735536861`. Qualquer novo dataset deve registrar novos parâmetros, critérios e relatório antes de promover o gate.
 
 ## Script
 

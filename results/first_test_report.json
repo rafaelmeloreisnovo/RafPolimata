@@ -6,9 +6,9 @@
       0.2
     ],
     "model_params": {
-      "a": 20000.0,
-      "n": 1.0,
-      "kd": 0.18
+      "a": 81724.04434517458,
+      "n": 1.295421709172559,
+      "kd": 0.06846530735536861
     },
     "criteria": {
       "rrmse_max": 1.5,
@@ -17,9 +17,9 @@
     }
   },
   "metrics": {
-    "rrmse": 3.8088385045683095,
-    "coverage_1sigma": 0.5,
-    "residual_slope": 50.99632893103299
+    "rrmse": 0.11867176539536714,
+    "coverage_1sigma": 1.0,
+    "residual_slope": 0.42168369212823636
   },
-  "verdict": "FAIL"
+  "verdict": "PASS"
 }

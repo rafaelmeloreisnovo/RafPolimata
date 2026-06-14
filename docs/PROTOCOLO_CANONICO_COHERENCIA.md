@@ -33,12 +33,15 @@ Este documento traduz as 50 sementes matemático-semânticas do projeto para um 
 
 ## Gates de prova e queda
 
-A orquestração viva está em `configs/semantic_coherence.yml` e expõe quatro gates:
+A orquestração viva está em `configs/semantic_coherence.yml` e expõe sete gates:
 
 1. `G1`: valida o próprio protocolo canônico e suas 50 fórmulas.
 2. `G2`: executa checagem sintática de C no host.
 3. `G3`: compila o núcleo do compilador com `-Wall -Wextra -Werror`.
-4. `G4`: gera o relatório de falsificabilidade `P(k)`; esse gate é rastreável, mas não bloqueia release apenas por retornar `FAIL`, porque uma reprovação científica é dado observado.
+4. `G4`: gera o relatório de falsificabilidade `P(k)` e bloqueia release quando o modelo calibrado/congelado reprova.
+5. `G5`: compila e executa validador C nativo do manifesto de excelência operacional.
+6. `G6`: compila e executa teste C nativo do seletor runtime com fail-safe, failover e rollback.
+7. `G7`: compila e executa benchmark C nativo do roteador com prewarm, warmup, mediana e p95.
 
 ## Benchmark mutável com invariantes fixos
 
