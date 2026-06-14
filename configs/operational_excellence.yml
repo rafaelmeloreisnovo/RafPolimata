@@ -27,6 +27,7 @@ governance_gates:
   - id: OE2; command: python3 scripts/validate_coherence_protocol.py; blocks_release: true
   - id: OE3; command: bash RAF_host_syntax_check.sh; blocks_release: true
   - id: OE4; command: sh scripts/test_runtime_router.sh; blocks_release: true
+  - id: OE5; command: sh scripts/test_runtime_benchmark.sh; blocks_release: true
 
 thresholds:
   min_batch_gpu: 64
@@ -44,3 +45,16 @@ runtime_router:
   implementation: Benchmark/raf_runtime_router.h
   test: scripts/test_runtime_router.sh
   fallback_backend: generic_c
+
+benchmark_policy:
+  prewarm_iterations: 16
+  warmup_iterations: 64
+  samples: 31
+  median_index: 15
+  p95_index: 29
+  p99_index: 30
+  test: scripts/test_runtime_benchmark.sh
+
+audit_docs:
+  iso_sigma: docs/AUDITORIA_ISO_SIGMA_BENCHMARKS.md
+  logo_60col: docs/LOGOTIPO_RAFAELIA_60COL.md
