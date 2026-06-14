@@ -26,9 +26,21 @@ governance_gates:
   - id: OE1; command: python3 scripts/validate_operational_excellence.py; blocks_release: true
   - id: OE2; command: python3 scripts/validate_coherence_protocol.py; blocks_release: true
   - id: OE3; command: bash RAF_host_syntax_check.sh; blocks_release: true
+  - id: OE4; command: sh scripts/test_runtime_router.sh; blocks_release: true
+
+thresholds:
+  min_batch_gpu: 64
+  max_p95_regression_milli: 5000
+  max_binary_growth_milli: 1500
+  require_hash_match: true
 
 risk_controls:
   fail_safe: baseline_correctness_first
   failover: runtime_backend_selector_with_fallback
   rollback: disable_candidate_restore_validated
   mitigation: reduce_batch_parallelism_preserve_integrity
+
+runtime_router:
+  implementation: Benchmark/raf_runtime_router.h
+  test: scripts/test_runtime_router.sh
+  fallback_backend: generic_c

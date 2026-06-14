@@ -75,3 +75,14 @@ Um módulo só deve ser tratado como enterprise-ready quando tiver:
 - matriz de arquitetura preenchida;
 - decisão de governança documentada;
 - plano de rollback acionável.
+
+
+## 8. Seletor runtime e morph-on-runtime
+
+O seletor runtime implementado em `Benchmark/raf_runtime_router.h` é deliberadamente pequeno: recebe capacidades detectadas, recursos degradados, tamanho de lote e estado de governança; devolve backend, fallback e flags de fail-safe/failover/rollback/mitigação. O fallback obrigatório é `generic_c`, para que GPU/NEON/syscall/storage sejam acelerações condicionais e nunca dependência única.
+
+A ordem operacional é: `generic_c` como baseline, `arm32_neon`/`arm64_neon` quando SIMD estiver disponível e validado, `gpu_batch` somente quando o lote superar o limiar de transferência, e retorno automático ao baseline quando o estado for `VOID` ou `ROLLBACK`.
+
+## 9. Testes automáticos de rota
+
+O teste `scripts/test_runtime_router.sh` compila um programa C mínimo, sem heap e sem dependências externas, cobrindo baseline, seleção ARM64 NEON, promoção GPU por lote, failover de GPU degradada para ARM64 e rollback para `generic_c`.

@@ -51,7 +51,19 @@ def main() -> None:
     if len(architectures) < 7:
         raise SystemExit(f"insufficient_architectures: {len(architectures)}")
 
-    required_terms = ["Fail-safe", "Failover", "Rollback", "Mitigação", "TOKEN_VAZIO"]
+    min_batch = re.search(r"^\s*min_batch_gpu:\s*(\d+)\b", manifest, re.MULTILINE)
+    if not min_batch or int(min_batch.group(1)) < 1:
+        raise SystemExit("invalid_min_batch_gpu")
+
+    for key in ("implementation", "test"):
+        match = re.search(rf"^\s*{key}:\s*(\S+)\s*$", manifest, re.MULTILINE)
+        if not match:
+            raise SystemExit(f"missing_runtime_router_{key}")
+        target = ROOT / match.group(1)
+        if not target.exists():
+            raise SystemExit(f"missing_runtime_router_{key}_file: {match.group(1)}")
+
+    required_terms = ["Fail-safe", "Failover", "Rollback", "Mitigação", "TOKEN_VAZIO", "morph-on-runtime"]
     missing_terms = [term for term in required_terms if term not in doc]
     if missing_terms:
         raise SystemExit("missing_doc_terms: " + ", ".join(missing_terms))
@@ -61,6 +73,7 @@ def main() -> None:
         "doc": str(DOC.relative_to(ROOT)),
         "states": len(states),
         "architectures": len(architectures),
+        "min_batch_gpu": int(min_batch.group(1)),
         "verdict": "PASS",
     })
 
