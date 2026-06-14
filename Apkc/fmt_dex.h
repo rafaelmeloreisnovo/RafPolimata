@@ -52,10 +52,11 @@ static inline void sha1_update(SHA1Ctx *c, const u8 *data, sz len) {
     }
 }
 static inline void sha1_final(SHA1Ctx *c, u8 out[20]) {
+    u64 orig_bits = c->bits; /* save before padding increments c->bits */
     u8 b80=0x80u;
     sha1_update(c,&b80,1u);
     while(c->blen!=56u){u8 z=0;sha1_update(c,&z,1u);}
-    for(i32 i=7;i>=0;i--){u8 b=(u8)(c->bits>>(u32)(i*8));sha1_update(c,&b,1u);}
+    for(i32 i=7;i>=0;i--){u8 b=(u8)(orig_bits>>(u32)(i*8));sha1_update(c,&b,1u);}
     for(i32 i=0;i<5;i++){
         out[i*4]  =(u8)(c->h[i]>>24); out[i*4+1]=(u8)(c->h[i]>>16);
         out[i*4+2]=(u8)(c->h[i]>>8);  out[i*4+3]=(u8)c->h[i];
@@ -97,7 +98,8 @@ static inline u32 dex_build(u8 *out) {
     /* link_size, link_off = 0 (already zeroed) */
     w32(out+48, MAP_OFF);        /* map_off */
     /* string/type/proto/field/method/class counts+offs = 0 */
-    /* data_size, data_off = 0 */
+    w32(out+104, 28u);           /* data_size = map list size */
+    w32(out+108, MAP_OFF);       /* data_off  = start of data section */
 
     /* Map list at offset MAP_OFF */
     u8 *mp = out + MAP_OFF;
