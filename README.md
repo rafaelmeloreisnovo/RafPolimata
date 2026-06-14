@@ -53,6 +53,7 @@ Ver:
 - `docs/APKC_STRUCTURE.md`
 - `docs/APKC_PROTOCOL.md`
 - `docs/APKC_VALUE_AND_GAPS.md`
+- `docs/CI_COMPILER_EXCELLENCE/README.md`
 - `Apkc/proofs/`
 
 | Gate | Status |

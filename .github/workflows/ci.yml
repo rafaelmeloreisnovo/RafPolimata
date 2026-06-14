@@ -39,6 +39,9 @@ jobs:
       - name: Validate Android ABI plan
         run: bash scripts/android_build_matrix.sh --plan
 
+      - name: Audit ApkC freestanding invariants
+        run: bash scripts/ci_freestanding_audit.sh
+
       - name: Validate ApkC proof protocol
         run: bash scripts/apkc_validate.sh
 

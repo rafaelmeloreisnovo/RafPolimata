@@ -1,7 +1,7 @@
 # ApkC validation summary
 
-- Data UTC: 2026-06-14T08:56:34Z
-- Commit: 8aef89a
+- Data UTC: 2026-06-14T09:10:46Z
+- Commit: 750a1a5
 
 | Gate | Status | Evidência/observação |
 |---|---|---|
