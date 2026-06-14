@@ -29,5 +29,17 @@ int main(void) {
     RafRouteDecision d4 = raf_runtime_route(rollback);
     fail |= expect_u32(d4.backend, RAF_BACKEND_GENERIC_C);
     fail |= expect_u32(d4.rollback, 1u);
+
+    RafRouteInput mixed_neon = {RAF_CAP_ARM32_NEON | RAF_CAP_ARM64_NEON, 0u, 64u, 16u, RAF_ROUTE_STATE_VALIDATED};
+    RafRouteDecision d5 = raf_runtime_route(mixed_neon);
+    fail |= expect_u32(d5.backend, RAF_BACKEND_ARM64_NEON);
+
+    RafRouteInput mixed_fallback = {RAF_CAP_STORAGE_BUFFER | RAF_CAP_SYSCALL_DIRECT | RAF_CAP_ARM64_NEON, 0u, 64u, 16u, RAF_ROUTE_STATE_VALIDATED};
+    RafRouteDecision d6 = raf_runtime_route(mixed_fallback);
+    fail |= expect_u32(d6.backend, RAF_BACKEND_ARM64_NEON);
+
+    RafRouteInput mixed_storage_syscall = {RAF_CAP_STORAGE_BUFFER | RAF_CAP_SYSCALL_DIRECT, 0u, 64u, 16u, RAF_ROUTE_STATE_VALIDATED};
+    RafRouteDecision d7 = raf_runtime_route(mixed_storage_syscall);
+    fail |= expect_u32(d7.backend, RAF_BACKEND_SYSCALL_DIRECT);
     return fail;
 }
