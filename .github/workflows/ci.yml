@@ -62,13 +62,16 @@ jobs:
           path: Apkc/proofs/out/
           if-no-files-found: warn
 
-      - name: Generate P(k) falsifiability report (non-blocking verdict)
+      - name: Generate P(k) falsifiability report
         run: |
           python3 scripts/first_test_pk.py --output results/first_test_report.json
           python3 - <<'PY'
-          import json
+          import json, sys
           from pathlib import Path
           report = json.loads(Path('results/first_test_report.json').read_text(encoding='utf-8'))
-          assert report['verdict'] in {'PASS', 'FAIL'}
-          print('P(k) verdict:', report['verdict'])
+          verdict = report['verdict']
+          assert verdict in {'PASS', 'FAIL'}
+          print('P(k) verdict:', verdict)
+          if verdict == 'FAIL':
+              raise SystemExit('P(k) gate FAIL')
           PY
