@@ -1364,7 +1364,8 @@ static i32 _write_apk(ZipWr *zw, const char *outpath) {
         if (n<=0) break;
         written+=(sz)n;
     }
-    os_close(fd);
+    if (os_close(fd)<0) { pr_err("close output failed\n"); return -1; }
+    if (written!=total) { pr_err("partial APK write\n"); return -1; }
     pr("wrote "); pr_dec((u64)total); pr(" bytes to "); pr(outpath); pr_nl();
     return 0;
 }
@@ -1515,9 +1516,8 @@ static i32 build_apk(
                 dex_buf_ptr = _fork_out;
                 dexsz = dexout;
             } else {
-                /* d8 not installed: use the JAR bytes as classes.dex fallback */
-                m_cpy(_dex_buf, _fork_out, outsz < sizeof(_dex_buf) ? outsz : sizeof(_dex_buf));
-                dexsz = outsz < sizeof(_dex_buf) ? outsz : sizeof(_dex_buf);
+                pr_err("d8 failed; refusing to package JAR bytes as classes.dex\n");
+                return -1;
             }
 
         } else if (prof->dex_output) {
@@ -1547,20 +1547,20 @@ static i32 build_apk(
 
     if (prof->dex_output && dexsz > 200) {
         /* Kotlin/Java: real DEX from compiler or d8 */
-        zip_add(&zw, "classes.dex", dex_buf_ptr, (u32)dexsz);
+        if (zip_add(&zw, "classes.dex", dex_buf_ptr, (u32)dexsz)<0) { pr_err("zip_add classes.dex failed\n"); return -1; }
     } else {
         /* native .so output */
         if (do64 && so64sz) {
             u8 p64[80]; _make_so_path(p64, "arm64-v8a", libname);
-            zip_add(&zw, (const char*)p64, _so64_buf, (u32)so64sz);
+            if (zip_add(&zw, (const char*)p64, _so64_buf, (u32)so64sz)<0) { pr_err("zip_add arm64 lib failed\n"); return -1; }
         }
         if (do32 && so32sz) {
             u8 p32[80]; _make_so_path(p32, "armeabi-v7a", libname);
-            zip_add(&zw, (const char*)p32, _so32_buf, (u32)so32sz);
+            if (zip_add(&zw, (const char*)p32, _so32_buf, (u32)so32sz)<0) { pr_err("zip_add arm32 lib failed\n"); return -1; }
         }
-        zip_add(&zw, "classes.dex", dex_buf_ptr, (u32)dexsz);
+        if (zip_add(&zw, "classes.dex", dex_buf_ptr, (u32)dexsz)<0) { pr_err("zip_add classes.dex failed\n"); return -1; }
     }
-    zip_add(&zw, "AndroidManifest.xml", _axml_buf, (u32)axsz);
+    if (zip_add(&zw, "AndroidManifest.xml", _axml_buf, (u32)axsz)<0) { pr_err("zip_add manifest failed\n"); return -1; }
 
     i32 rc = _write_apk(&zw, outpath);
     if (rc == 0) {
