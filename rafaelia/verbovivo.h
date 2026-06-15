@@ -101,7 +101,10 @@ int   vv_monobit(const vv_u8 hash[32]);
  * phi_weight: importância da coerência semântica vs. diversidade de Hamming [0..1].
  *   phi_weight → 1.0 : prioriza similaridade vetorial (cosine) — regime coerente.
  *   phi_weight → 0.0 : prioriza diversidade estrutural (Hamming) — regime caótico.
- * Recomendado: phi_weight = (vv_recall phi from T^7 pipeline) / 65536.0
+ * phi_weight recomendado:
+ *   Layer 2 (T^7):   leia t7.phi após t7_step(); use (float)t7.phi / 65536.0f
+ *   Layer 1 (Fiber-H): use vv->total_bytes ? 0.5f : 0.0f, ou passe phi_fst() resultado
+ *   Padrão conservador: 0.5f (pesos iguais entre semântica e estrutura)
  * Retorna: número de engrams preenchidos em out[] (0 se buffer vazio).
  * out[] deve ter capacidade >= top_n.
  * Sem malloc — usa stack interno de VV_MEM_SIZE=64 scores. */

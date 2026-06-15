@@ -503,14 +503,34 @@ int main(int argc, char **argv) {
         /* T^7 mode: verbovivo <apk_or_elf> [out.svg] */
         return verbovivo_main(argv[1], argc >= 3 ? argv[2] : NULL) == 0 ? 0 : 1;
     }
-    /* Fiber-H / Trinity mode: verbovivo [-s] < binary */
+    /* Fiber-H / Trinity mode: verbovivo [-s] [-r N] < binary */
     VerbVivoState vv;
     vv_init(&vv);
     int do_svg = 0;
-    for (int i=1;i<argc;i++)
-        if (argv[i][0]=='-'&&argv[i][1]=='s') do_svg=1;
+    int recall_n = 0;
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-' && argv[i][1] == 's') do_svg = 1;
+        if (argv[i][0] == '-' && argv[i][1] == 'r' && i + 1 < argc) {
+            recall_n = (int)strtol(argv[++i], NULL, 10);
+            if (recall_n < 0) recall_n = 0;
+        }
+    }
     vv_scan(&vv, stdin);
     vv_audit(&vv);
+    if (recall_n > 0) {
+        /* auto-recall: query = accumulated context_vec, phi_weight = 0.5 */
+        VVEngram results[VV_MEM_SIZE];
+        int got = vv_recall(&vv, &vv.context_vec, NULL, 0.5f, recall_n, results);
+        fprintf(stderr, "[RECALL top=%d phi_w=0.5 (auto-context)]\n", recall_n);
+        for (int k = 0; k < got; k++) {
+            fprintf(stderr,
+                "  [%d] id=%-4u hash=%08x attn=%.3f hdiv=%.3f type=%s\n",
+                k, results[k].id, results[k].content_hash,
+                (double)results[k].attention, (double)results[k].hamming_div,
+                results[k].type_flag ? "binary" : "text");
+        }
+        if (got == 0) fprintf(stderr, "  (0 engrams recalled — buffer empty)\n");
+    }
     if (do_svg) vv_svg(&vv);
     return 0;
 }

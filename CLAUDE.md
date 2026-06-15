@@ -56,7 +56,7 @@ Fields or comments marked:
 | `Apkc/sys.h` | Freestanding syscalls: read/write/open/fork/execve/waitpid |
 | `raf_compile.h` | RafCtx struct + CPU/language detection + APKc bridge |
 | `rafaelia/verbovivo.c` | Convergence engine: Fiber-H + T^7 toroid + SVG engram |
-| `rafaelia/verbovivo.h` | VerbVivoState, VVHyperVec, FiberHash, VVEngram types |
+| `rafaelia/verbovivo.h` | VerbVivoState, VVHyperVec, FiberHash, VVEngram types; API: vv_init/scan/scan_buf/audit/svg/recall |
 | `docs/MULTI_AI_METHODOLOGY.md` | How AI systems should collaborate on this repo |
 | `docs/IA_AGENTE_HUMANOS_TECNICO_FORMALIDADE.md` | AI-human protocol |
 | `docs/MAPA_ESTRUTURAL_REPOSITORIO.md` | Canonical repo map |
@@ -116,6 +116,10 @@ gcc -std=c11 -O2 -I. -IBenchmark -DVERBOVIVO_MAIN rafaelia/verbovivo.c -lm -o ve
 
 # Fiber-H pipeline (stdin → audit + SVG):
 ./verbovivo -s < out.apk > graph.svg
+
+# Recall mode (top-N engrams most resonant with accumulated context):
+./verbovivo -r 3 < out.apk
+# Prints audit + top-3 engrams by recall score (phi_w=0.5, query=context_vec)
 ```
 
 ## Geometric coherence invariant
