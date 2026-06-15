@@ -48,6 +48,9 @@ jobs:
       - name: Validate ApkC proof protocol
         run: bash scripts/apkc_validate.sh
 
+      - name: ApkC language coverage (asm + script modes)
+        run: bash scripts/apkc_lang_coverage.sh
+
       - name: Try ApkC debug signing proof (TOKEN_VAZIO allowed)
         run: bash scripts/apkc_sign_debug.sh
 
