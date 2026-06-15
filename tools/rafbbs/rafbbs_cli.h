@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "rafbbs_pipeline.h"
 #include "rafbbs_filepicker.h"
+#include "rafbbs_baremetal.h"
 
 static void raf_print_help(void) {
     puts("RafBBS Operator Console\nuso:\n  rafbbs              abre menu BBS\n  rafbbs --help       mostra ajuda\n  rafbbs list         lista pipelines\n  rafbbs run <id>     executa pipeline\n  rafbbs logs         mostra logs recentes\n  rafbbs manifest     mostra manifestos recentes\n  rafbbs files        mostra entradas conhecidas");
@@ -24,6 +25,7 @@ static void raf_init_context(RafContext *ctx, const char *pipeline) {
     mkdir("tools/rafbbs/logs", 0777);
     snprintf(ctx->log_path, sizeof(ctx->log_path), "tools/rafbbs/logs/run-%s.txt", ctx->run_id);
     snprintf(ctx->manifest_path, sizeof(ctx->manifest_path), "tools/rafbbs/logs/manifest-%s.txt", ctx->run_id);
+    snprintf(ctx->bin_manifest_path, sizeof(ctx->bin_manifest_path), "tools/rafbbs/logs/manifest-%s.bin", ctx->run_id);
     snprintf(ctx->pipeline, sizeof(ctx->pipeline), "%s", pipeline);
     ctx->watchdog = raf_watchdog_start(RAFBBS_WATCHDOG_DEFAULT_TICKS);
     snprintf(ctx->host, sizeof(ctx->host), "posix");
@@ -46,6 +48,7 @@ static int raf_execute_pipeline(const char *id) {
     raf_init_context(&ctx, id);
     raf_log(&ctx, RAF_INFO, "rafbbs", "iniciando pipeline %s", id);
     ctx.final_status = p->run(&ctx);
+    ctx.hash_state = raf_hash_failover_state((uint32_t)(ctx.input_sha256[0] != 0), (uint32_t)(ctx.input_crc32 != 0));
     if (ctx.failed) ctx.final_status = RAF_FAIL;
     raf_log(&ctx, ctx.final_status == RAF_FAIL ? RAF_FAIL : RAF_DONE, "rafbbs", "pipeline finalizado status=%s", raf_status_name(ctx.final_status));
     if (raf_write_manifest(&ctx) != 0) fprintf(stderr, "manifesto nao gravado\n");

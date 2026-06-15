@@ -22,3 +22,16 @@ Este perfil descreve os 10 passos operacionais pedidos para reduzir fricção, e
 ## Regra de verdade
 
 `TOKEN_VAZIO` não é falha moral e não é sucesso técnico. É ausência de evidência. O RafBBS só promove para `PASS` quando a prova existe.
+
+## Próximo ciclo implementado
+
+1. O manifesto binário agora tem gravador host (`rafbbs_manifest_bin.h`).
+2. A saída bare-metal tem porta de flush por callback byte-a-byte.
+3. `raf_arch_flags()` usa tabela constante indexada, reduzindo condicionais.
+4. O build tem alvo `commandless` para compilar o operador com `RAFBBS_FREESTANDING_MODE`.
+5. O harness testa fixture binária do manifesto.
+6. O harness testa overflow de buffer bare-metal e contador `dropped`.
+7. O manifesto TXT registra `hash_state` e caminho do manifesto binário.
+8. O log TXT registra `hash_state` e manifesto binário associado.
+9. O failover de hash permanece `SHA256_OK`, `CRC32_OK` ou `TOKEN_VAZIO`.
+10. Os artefatos gerados continuam ignorados/revertidos para não poluir prova fonte.

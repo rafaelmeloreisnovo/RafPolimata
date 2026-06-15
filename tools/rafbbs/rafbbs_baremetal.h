@@ -45,6 +45,21 @@ typedef struct {
     uint32_t watchdog_budget;
 } RafArchFlags;
 
+typedef void (*RafBaremetalSink)(uint8_t byte, void *user);
+
+typedef struct {
+    RafBaremetalSink sink;
+    void *user;
+} RafBaremetalPort;
+
+static const RafArchFlags raf_arch_flag_table[] = {
+    {0x00000001u, 1u, 1u, 0u, 64u, RAFBBS_WATCHDOG_DEFAULT_TICKS},
+    {0x00000032u, 1u, 1u, 0u, 32u, RAFBBS_WATCHDOG_DEFAULT_TICKS},
+    {0x0000AAE0u, 1u, 1u, 1u, 32u, RAFBBS_WATCHDOG_DEFAULT_TICKS},
+    {0x00000064u, 1u, 1u, 1u, 64u, RAFBBS_WATCHDOG_DEFAULT_TICKS},
+    {0x00008664u, 1u, 1u, 0u, 64u, RAFBBS_WATCHDOG_DEFAULT_TICKS}
+};
+
 static inline void raf_baremetal_out_init(RafBaremetalOut *o) {
     o->pos = 0u;
     o->dropped = 0u;
@@ -61,6 +76,12 @@ static inline void raf_baremetal_write(RafBaremetalOut *o, const char *s) {
         raf_baremetal_putc(o, (uint8_t)*s);
         s++;
     }
+}
+
+static inline void raf_baremetal_flush(RafBaremetalOut *o, RafBaremetalPort port) {
+    uint32_t i;
+    if (!port.sink) return;
+    for (i = 0u; i < o->pos; i++) port.sink(o->buf[i], port.user);
 }
 
 static inline RafBinManifest raf_bin_manifest_make(uint32_t status, uint32_t arch, uint32_t in_crc, uint32_t out_crc, uint32_t hash_state, uint32_t gaps) {
@@ -87,17 +108,9 @@ static inline uint32_t raf_hash_failover_state(uint32_t sha_ok, uint32_t crc_ok)
 }
 
 static inline RafArchFlags raf_arch_flags(RafArchProfile arch) {
-    RafArchFlags f;
-    f.no_heap = 1u;
-    f.no_syscall = 1u;
-    f.watchdog_budget = RAFBBS_WATCHDOG_DEFAULT_TICKS;
-    f.cflags = 0x00000001u;
-    f.simd = 0u;
-    f.cache_line = 64u;
-    if (arch == RAF_ARCH_ARM32) { f.cflags = 0x00000032u; f.cache_line = 32u; }
-    if (arch == RAF_ARCH_ARM32_NEON) { f.cflags = 0x0000AAE0u; f.simd = 1u; f.cache_line = 32u; }
-    if (arch == RAF_ARCH_ARM64) { f.cflags = 0x00000064u; f.simd = 1u; f.cache_line = 64u; }
-    if (arch == RAF_ARCH_X86_64) { f.cflags = 0x00008664u; f.cache_line = 64u; }
-    return f;
+    uint32_t idx = (uint32_t)arch;
+    uint32_t max = (uint32_t)(sizeof(raf_arch_flag_table) / sizeof(raf_arch_flag_table[0]));
+    idx = (idx < max) ? idx : 0u;
+    return raf_arch_flag_table[idx];
 }
 #endif

@@ -108,3 +108,7 @@ sh tools/rafbbs/rafbbs_build.sh host
 sh tools/rafbbs/rafbbs_build.sh freestanding
 sh tools/rafbbs/rafbbs_test.sh
 ```
+
+## Próximo ciclo recorrente implementado
+
+Este ciclo adiciona manifesto binário gravável, callback byte-a-byte para saída bare-metal, tabela constante de flags por arquitetura, alvo `commandless`, fixture binária, teste de overflow do buffer, `hash_state` em log/manifest e reforço do failover `SHA256 → CRC32 → TOKEN_VAZIO`.

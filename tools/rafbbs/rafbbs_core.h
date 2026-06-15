@@ -9,6 +9,7 @@ typedef struct {
     char run_id[32];
     char log_path[256];
     char manifest_path[256];
+    char bin_manifest_path[256];
     char pipeline[64];
     char input[256];
     char output[256];
@@ -24,6 +25,7 @@ typedef struct {
     RafRollbackRing rollback;
     uint32_t input_crc32;
     uint32_t output_crc32;
+    uint32_t hash_state;
     RafStatus final_status;
     int limited;
     int failed;

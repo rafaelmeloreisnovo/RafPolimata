@@ -37,11 +37,11 @@ static int raf_write_log(RafContext *ctx) {
     int i;
     FILE *f = fopen(ctx->log_path, "w");
     if (!f) return -1;
-    fprintf(f, "# RafBBS Run Log\n\nrun_id=%s\npipeline=%s\nstatus=%s\nhost=%s\narch=%s\ncommit=%s\nbranch=%s\nmanifest=%s\n\n[SYSLOG]\n",
-            ctx->run_id, ctx->pipeline, raf_status_name(ctx->final_status), ctx->host, ctx->arch, ctx->commit, ctx->branch, ctx->manifest_path);
+    fprintf(f, "# RafBBS Run Log\n\nrun_id=%s\npipeline=%s\nstatus=%s\nhost=%s\narch=%s\ncommit=%s\nbranch=%s\nmanifest=%s\nbin_manifest=%s\n\n[SYSLOG]\n",
+            ctx->run_id, ctx->pipeline, raf_status_name(ctx->final_status), ctx->host, ctx->arch, ctx->commit, ctx->branch, ctx->manifest_path, ctx->bin_manifest_path);
     for (i = 0; i < ctx->syslog_count; i++) fprintf(f, "%s\n", rafbbs_lines[i]);
-    fprintf(f, "\n[ARTIFACTS]\ninput=%s\noutput=%s\ninput_crc32=%08x\noutput_crc32=%08x\ninput_sha256=%s\noutput_sha256=%s\n\n[GAPS]\n%s\n",
-            ctx->input, ctx->output, ctx->input_crc32, ctx->output_crc32, ctx->input_sha256, ctx->output_sha256, ctx->gaps[0] ? ctx->gaps : "none=TOKEN_VAZIO");
+    fprintf(f, "\n[ARTIFACTS]\ninput=%s\noutput=%s\ninput_crc32=%08x\noutput_crc32=%08x\ninput_sha256=%s\noutput_sha256=%s\nhash_state=%08x\n\n[GAPS]\n%s\n",
+            ctx->input, ctx->output, ctx->input_crc32, ctx->output_crc32, ctx->input_sha256, ctx->output_sha256, ctx->hash_state, ctx->gaps[0] ? ctx->gaps : "none=TOKEN_VAZIO");
     fclose(f);
     return 0;
 }
