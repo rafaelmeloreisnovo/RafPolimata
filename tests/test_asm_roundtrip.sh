@@ -3,9 +3,10 @@
 #
 # This test is intentionally honest:
 # - it always runs the pure Python ARM64 encoder golden tests;
+# - on ARM hosts it also compiles/runs the C encoder reference test;
 # - it only executes the APK generation roundtrip on ARM hosts where apkc.c
 #   can produce a native freestanding executable with its _start entry.
-# - on non-ARM hosts it exits 0 after the encoder tests with a SKIP note,
+# - on non-ARM hosts it exits 0 after the Python encoder tests with a SKIP note,
 #   because x86_64 syntax checks are not Android runtime proof.
 
 set -eu
@@ -26,7 +27,7 @@ case "$ARCH" in
     ;;
   *)
     echo "SKIP: apkc freestanding roundtrip needs ARM host; current arch=$ARCH"
-    echo "PASS: encoder golden tests completed; APK roundtrip remains TOKEN_VAZIO on this host."
+    echo "PASS: Python encoder golden tests completed; APK/C roundtrip remains TOKEN_VAZIO on this host."
     exit 0
     ;;
 esac
@@ -52,9 +53,19 @@ WORK="$TMPDIR_ROOT/rafpolimata_asm_roundtrip_$$"
 mkdir -p "$WORK"
 trap 'rm -rf "$WORK"' EXIT HUP INT TERM
 
+ENC_C="$WORK/test_arm64_encoders"
 APKC="$WORK/apkc"
 APK="$WORK/hello-arm64.apk"
 LOG="$WORK/apkc-generate.txt"
+
+if [ -f tests/test_arm64_encoders.c ]; then
+  echo "BUILD: $CC -std=c11 -Wall -Wextra -Werror -I Apkc tests/test_arm64_encoders.c -o $ENC_C"
+  "$CC" -std=c11 -Wall -Wextra -Werror -I Apkc tests/test_arm64_encoders.c -o "$ENC_C"
+  echo "RUN: $ENC_C"
+  "$ENC_C"
+else
+  echo "TOKEN_VAZIO: tests/test_arm64_encoders.c missing; C encoder test skipped"
+fi
 
 echo "BUILD: $CC -std=c11 -Wall -Wextra -Wno-unused-function -nostdlib -Wl,-e,_start Apkc/apkc.c -o $APKC"
 "$CC" -std=c11 -Wall -Wextra -Wno-unused-function -nostdlib -Wl,-e,_start Apkc/apkc.c -o "$APKC"
