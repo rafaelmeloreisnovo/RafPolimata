@@ -1,1 +1,19 @@
-TOKEN_VAZIO: apksigner ausente; instale Android build-tools.
+# apksigner verify proof
+
+Source: uploaded APK_PROOF_INSTALL_OPEN.txt
+APK_PROOF_DATE: 2026-06-14T10:56:26Z
+Unsigned APK SHA-256: a331d0248d01d8e7030291e93905c2e2f046cf7cb5ba4ecaf02609cec273c024
+Signed APK SHA-256: 063c1b61c35e45f3cf253d42c99bfcd58910162c46ba6c5160846b56651dcc28
+
+Verification summary:
+- v1 JAR signing: true
+- v2 APK Signature Scheme: true
+- v3 APK Signature Scheme: true
+- v3.1: false
+- v4: false
+- SourceStamp: false
+- number of signers: 1
+- certificate DN: CN=ApkC Debug, O=Rafael, C=BR
+- certificate SHA-256: 32fb9b6af9112b60a1cd95f1543ab4a6fc02e4ba8ce72c0f9d730ae8734e7992
+- key algorithm: RSA
+- key size: 2048
