@@ -64,21 +64,27 @@ typedef struct {
     sz      pos;
     ZipEnt  ent[ZIP_MAX];
     u32     n;
+    i32     err;
 } ZipWr;
 
 static inline void zip_init(ZipWr *z, u8 *buf, sz cap) {
-    z->buf = buf; z->cap = cap; z->pos = 0; z->n = 0;
+    z->buf = buf; z->cap = cap; z->pos = 0; z->n = 0; z->err = 0;
 }
 
 /* internal: raw append */
-static inline void _zp(ZipWr *z, const void *src, sz n) {
+static inline i32 _zp(ZipWr *z, const void *src, sz n) {
+    if (z->err) return -1;
+    if (n > z->cap || z->pos > z->cap - n) { z->err = -1; return -1; }
     m_cpy(z->buf + z->pos, src, n); z->pos += n;
+    return 0;
 }
-static inline void _z16(ZipWr *z, u16 v){ u8 b[2]; w16(b,v); _zp(z,b,2); }
-static inline void _z32(ZipWr *z, u32 v){ u8 b[4]; w32(b,v); _zp(z,b,4); }
+static inline i32 _z16(ZipWr *z, u16 v){ u8 b[2]; w16(b,v); return _zp(z,b,2); }
+static inline i32 _z32(ZipWr *z, u32 v){ u8 b[4]; w32(b,v); return _zp(z,b,4); }
 
 /* Add a file to the archive (STORE, no compression) */
-static inline void zip_add(ZipWr *z, const char *name, const u8 *data, u32 size) {
+static inline i32 zip_add(ZipWr *z, const char *name, const u8 *data, u32 size) {
+    if (z->err) return -1;
+    if (z->n >= ZIP_MAX) { z->err = -1; return -1; }
     u32  crc     = crc32(data, (sz)size);
     u16  namelen = (u16)s_len(name);
     ZipEnt *e   = &z->ent[z->n++];
@@ -102,10 +108,12 @@ static inline void zip_add(ZipWr *z, const char *name, const u8 *data, u32 size)
     _z16(z, 0u);            /* extra len */
     _zp(z, name, (sz)namelen);
     _zp(z, data, (sz)size);
+    return z->err ? -1 : 0;
 }
 
 /* Finalise: write Central Directory + EOCD.  Returns total byte count. */
 static inline sz zip_finish(ZipWr *z) {
+    if (z->err) return 0;
     u32 cd_off = (u32)z->pos;
     for (u32 i = 0; i < z->n; i++) {
         ZipEnt *e   = &z->ent[i];
@@ -129,6 +137,7 @@ static inline sz zip_finish(ZipWr *z) {
         _z32(z, e->lfh_off);   /* LFH offset */
         _zp(z, e->name, (sz)namelen);
     }
+    if (z->err) return 0;
     u32 cd_size = (u32)z->pos - cd_off;
     /* End of Central Directory */
     _z32(z, 0x06054B50u);
@@ -139,5 +148,6 @@ static inline sz zip_finish(ZipWr *z) {
     _z32(z, cd_size);
     _z32(z, cd_off);
     _z16(z, 0u);               /* comment len */
+    if (z->err) return 0;
     return z->pos;
 }
