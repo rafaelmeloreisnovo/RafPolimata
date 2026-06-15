@@ -1,0 +1,1 @@
+TOKEN_VAZIO: generation was not executed in this run because the required local executable was absent.

@@ -1,0 +1,1 @@
+TOKEN_VAZIO: hello.apk ausente; readelf arm64 nao executado.

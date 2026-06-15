@@ -1,0 +1,10 @@
+02c80c42fab7176dc21c6e513dd223be671034f6bf3b9868c3fe4de61ae84367  validation-summary.md  bytes=744
+1bad62958566e923f01d7a3e4d211f59ec97a0298cfa7adbe014f78d4fb00fd9  unzip.txt  bytes=54
+5a46d624c97b1705b480971f6a4c32bc4acc0bd97ccc98469a97fe2e7a51fcf1  readelf-arm64.txt  bytes=62
+becd0c02a147a406ffa34e957fc76326b1a62379e19e8145adbe50494140c577  readelf-arm32.txt  bytes=62
+53adcca5d27983e6e4c39f1096592944f8ef883d187f18d3d799ed87c9cd04c4  logcat-nativeactivity.txt  bytes=48
+91df5d2a6406bf816db353de6e500bf3ecbbae99126f1c297cde680560fbcac9  dex-sha1.txt  bytes=58
+f5153ee9df95ebaa1981f5d36529db310128f852ed3783e2feeb1d8b567a1a4a  apksigner-verify.txt  bytes=61
+3e15c3c99711cb742214566e7712a8f0ec4df6ab3d0e9c81edf9016a88965bda  apkc-generate.txt  bytes=127
+32daf03f836272633b10e06801f5e1b733ebf077e4be3a338a926bb8d45e61ce  adb-install.txt  bytes=58
+b683d4ca2d18d62ce21838f849045d022ec4ef3083d13b673bc065630807ec35  aapt-xmltree.txt  bytes=53
