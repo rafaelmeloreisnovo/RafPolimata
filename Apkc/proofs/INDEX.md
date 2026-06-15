@@ -19,6 +19,10 @@
 - [Android install log](out/adb-install.txt)
 - [Runtime log](out/logcat-nativeactivity.txt)
 
+## Split runs
+
+- [2026-06-14 TV run](runs/2026-06-14-tv/INDEX.md)
+
 ## Current state
 
 PASS: generated APK, ZIP parse, AXML parse, DEX hash, ARM32 ELF, signature check.
