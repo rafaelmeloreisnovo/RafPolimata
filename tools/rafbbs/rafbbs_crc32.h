@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-static uint32_t raf_crc32_update(uint32_t crc, const unsigned char *buf, unsigned long len) {
+static inline uint32_t raf_crc32_update(uint32_t crc, const unsigned char *buf, unsigned long len) {
     unsigned long i;
     int bit;
     crc = ~crc;
@@ -17,7 +17,7 @@ static uint32_t raf_crc32_update(uint32_t crc, const unsigned char *buf, unsigne
     return ~crc;
 }
 
-static int raf_crc32_file(const char *path, uint32_t *out) {
+static inline int raf_crc32_file(const char *path, uint32_t *out) {
     unsigned char buf[4096];
     uint32_t crc = 0;
     FILE *f = fopen(path, "rb");

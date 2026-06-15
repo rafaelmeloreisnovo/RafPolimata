@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <time.h>
 #include "rafbbs_status.h"
+#include "rafbbs_freestanding.h"
 
 typedef struct {
     char run_id[32];
@@ -17,6 +18,10 @@ typedef struct {
     char host[128];
     char arch[64];
     char gaps[512];
+    char input_sha256[65];
+    char output_sha256[65];
+    RafWatchdog watchdog;
+    RafRollbackRing rollback;
     uint32_t input_crc32;
     uint32_t output_crc32;
     RafStatus final_status;

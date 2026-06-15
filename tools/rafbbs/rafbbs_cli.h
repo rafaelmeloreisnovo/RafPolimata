@@ -5,9 +5,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "rafbbs_pipeline.h"
+#include "rafbbs_filepicker.h"
 
 static void raf_print_help(void) {
-    puts("RafBBS Operator Console\nuso:\n  rafbbs              abre menu BBS\n  rafbbs --help       mostra ajuda\n  rafbbs list         lista pipelines\n  rafbbs run <id>     executa pipeline\n  rafbbs logs         mostra logs recentes\n  rafbbs manifest     mostra manifestos recentes");
+    puts("RafBBS Operator Console\nuso:\n  rafbbs              abre menu BBS\n  rafbbs --help       mostra ajuda\n  rafbbs list         lista pipelines\n  rafbbs run <id>     executa pipeline\n  rafbbs logs         mostra logs recentes\n  rafbbs manifest     mostra manifestos recentes\n  rafbbs files        mostra entradas conhecidas");
 }
 static void raf_list_pipelines(void) {
     int i;
@@ -24,6 +25,7 @@ static void raf_init_context(RafContext *ctx, const char *pipeline) {
     snprintf(ctx->log_path, sizeof(ctx->log_path), "tools/rafbbs/logs/run-%s.txt", ctx->run_id);
     snprintf(ctx->manifest_path, sizeof(ctx->manifest_path), "tools/rafbbs/logs/manifest-%s.txt", ctx->run_id);
     snprintf(ctx->pipeline, sizeof(ctx->pipeline), "%s", pipeline);
+    ctx->watchdog = raf_watchdog_start(RAFBBS_WATCHDOG_DEFAULT_TICKS);
     snprintf(ctx->host, sizeof(ctx->host), "posix");
 #if defined(__x86_64__)
     snprintf(ctx->arch, sizeof(ctx->arch), "x86_64");
@@ -57,6 +59,7 @@ static int raf_cli(int argc, char **argv) {
     if (strcmp(argv[1], "run") == 0 && argc > 2) return raf_execute_pipeline(argv[2]);
     if (strcmp(argv[1], "logs") == 0) return system("find tools/rafbbs/logs -maxdepth 1 -name 'run-*.txt' -type f | sort | tail -10");
     if (strcmp(argv[1], "manifest") == 0) return system("find tools/rafbbs/logs -maxdepth 1 -name 'manifest-*.txt' -type f | sort | tail -10");
+    if (strcmp(argv[1], "files") == 0) { RafFilePicker fp; raf_filepicker_init(&fp); raf_filepicker_print(&fp); return 0; }
     raf_print_help();
     return 2;
 }

@@ -63,3 +63,25 @@ O manifesto registra pipeline, data lógica via `run_id`, commit, branch, host, 
 - `apkc_validate`: chama `sh scripts/apkc_validate.sh`.
 
 Também existem registros placeholder honestos para `proof_chain`, `lang_matrix`, `verbovivo` e `export_manifest`, marcados como `TOKEN_VAZIO` até integração real.
+
+## Núcleo freestanding, failsafe e rollback
+
+A camada nova separa primitivas de operação em `rafbbs_freestanding.h`: watchdog por ticks, anel fixo de rollback, flags low-level e contrato explícito `NO_HEAP/NO_GC`. Esse núcleo não chama sistema operacional e pode ser compilado como objeto `-ffreestanding -fno-builtin` para validar compatibilidade bare-metal.
+
+O executável POSIX continua existindo apenas como adaptador operacional para chamar scripts reais do repositório. Quando `RAFBBS_FREESTANDING_MODE` é definido, comandos externos não são executados e viram `TOKEN_VAZIO`, preservando honestidade de prova.
+
+## File picker mínimo
+
+`rafbbs files` e a opção `F` na TUI mostram entradas conhecidas em tabela estática, sem varredura dinâmica nem heap. A fase seguinte pode trocar essa lista por uma tabela gerada em build-time.
+
+## SHA256 autoral
+
+Além de CRC32, o RafBBS calcula SHA256 por implementação local sem dependência externa para entradas conhecidas. SHA256 não remove `TOKEN_VAZIO`: ele só assina evidência existente.
+
+## Testes operacionais
+
+```sh
+sh tools/rafbbs/rafbbs_test.sh
+```
+
+O teste cobre build, help, listagem, file picker, TUI, watchdog, rollback, SHA256 conhecido e compilação do núcleo freestanding.
