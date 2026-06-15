@@ -1103,6 +1103,7 @@ static i32 build_apk(
     AsmResult r32_; r32_.size=0; r32_.sym1_va=0; r32_.sym2_va=0; r32_.has_sym1=0; r32_.has_sym2=0;
     sz so64sz=0, so32sz=0;
     sz dexsz=0;
+    const u8 *dex_buf_ptr = _dex_buf; /* points to whichever buffer holds the DEX */
 
     if (prof->use_asm) {
         /* internal ARM assembler */
@@ -1141,28 +1142,61 @@ static i32 build_apk(
 
     } else if (prof->use_fork) {
         /* fork+exec external compiler */
-        /* build argv: [compiler, ...cc_args, inpath, outfile, NULL] */
-        static const char _tmpout[] = "/tmp/apkc_out.so";
+        /* JSX babel writes to /tmp/jsx_out.js; all others write to /tmp/apkc_out.so */
+        static const char _tmpout_so[]  = "/tmp/apkc_out.so";
+        static const char _tmpout_jsx[] = "/tmp/jsx_out.js";
+        const char *_tmpout = prof->jsx_node ? _tmpout_jsx : _tmpout_so;
+
         char *args[32];
         int na = 0;
         args[na++] = (char*)prof->compiler;
         for (int j = 0; j < 10 && prof->cc_args[j]; j++)
             args[na++] = (char*)prof->cc_args[j];
-        /* for compilers that write -o <outfile> */
         args[na++] = (char*)_tmpout;
-        args[na++] = (char*)inpath;  /* source file */
+        args[na++] = (char*)inpath;
         args[na] = NULL;
 
         sz outsz = fork_exec_wait(prof->compiler, args, _tmpout,
                                   _fork_out, sizeof(_fork_out));
         if (!outsz) { pr_err("fork+exec produced no output\n"); return -1; }
 
-        if (prof->dex_output) {
-            /* Kotlin/Java: output is a DEX/JAR — store directly */
+        if (prof->jsx_node) {
+            /* JSX two-stage: babel JS output → node execve bootstrap */
+            sz scsz = gen_script_code64("/usr/bin/node", "-e",
+                                        (const char*)_fork_out, _code64, sizeof(_code64));
+            if (!scsz) { pr_err("jsx node codegen failed\n"); return -1; }
+            ElfSym _jssyms[2] = {{"ANativeActivity_onCreate",0u},{"android_main",4u}};
+            so64sz = elf64_build_so(_so64_buf, _code64, (u32)scsz, _jssyms, 2, NULL, 0u);
+
+        } else if (prof->use_d8 && prof->dex_output) {
+            /* Kotlin/Java: step 1 produced a JAR; step 2 runs d8 to get real DEX */
+            static const char _d8_out[] = "/tmp/classes.dex";
+            char *d8args[8];
+            int nd = 0;
+            d8args[nd++] = "d8";
+            d8args[nd++] = "--output";
+            d8args[nd++] = "/tmp/";
+            d8args[nd++] = (char*)_tmpout_so;   /* JAR produced by kotlinc/javac */
+            d8args[nd]   = NULL;
+            sz dexout = fork_exec_wait("d8", d8args, _d8_out,
+                                       _fork_out, sizeof(_fork_out));
+            if (dexout) {
+                /* d8 succeeded: use _fork_out directly (avoids 200B _dex_buf limit) */
+                dex_buf_ptr = _fork_out;
+                dexsz = dexout;
+            } else {
+                /* d8 not installed: use the JAR bytes as classes.dex fallback */
+                m_cpy(_dex_buf, _fork_out, outsz < sizeof(_dex_buf) ? outsz : sizeof(_dex_buf));
+                dexsz = outsz < sizeof(_dex_buf) ? outsz : sizeof(_dex_buf);
+            }
+
+        } else if (prof->dex_output) {
+            /* dex_output but no d8 step: store JAR/DEX directly */
             m_cpy(_dex_buf, _fork_out, outsz < sizeof(_dex_buf) ? outsz : sizeof(_dex_buf));
             dexsz = outsz < sizeof(_dex_buf) ? outsz : sizeof(_dex_buf);
+
         } else {
-            /* C/C++/Rust: output is .so — copy directly to ZIP */
+            /* C/C++/Rust: output is a native .so */
             m_cpy(_so64_buf, _fork_out, outsz < sizeof(_so64_buf) ? outsz : sizeof(_so64_buf));
             so64sz = outsz < sizeof(_so64_buf) ? outsz : sizeof(_so64_buf);
         }
@@ -1182,8 +1216,8 @@ static i32 build_apk(
     zip_init(&zw, _apk_buf, sizeof(_apk_buf));
 
     if (prof->dex_output && dexsz > 200) {
-        /* Kotlin/Java: dex from compiler */
-        zip_add(&zw, "classes.dex", _dex_buf, (u32)dexsz);
+        /* Kotlin/Java: real DEX from compiler or d8 */
+        zip_add(&zw, "classes.dex", dex_buf_ptr, (u32)dexsz);
     } else {
         /* native .so output */
         if (do64 && so64sz) {
@@ -1194,7 +1228,7 @@ static i32 build_apk(
             u8 p32[80]; _make_so_path(p32, "armeabi-v7a", libname);
             zip_add(&zw, (const char*)p32, _so32_buf, (u32)so32sz);
         }
-        zip_add(&zw, "classes.dex", _dex_buf, (u32)dexsz);
+        zip_add(&zw, "classes.dex", dex_buf_ptr, (u32)dexsz);
     }
     zip_add(&zw, "AndroidManifest.xml", _axml_buf, (u32)axsz);
 
