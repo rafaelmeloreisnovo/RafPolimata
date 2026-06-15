@@ -1,0 +1,44 @@
+# Manifesto operacional simples, auditável por stdlib, para o protocolo de dois ciclos ômega.
+protocol:
+  id: rafpolimata.two_cycle_omega.v1
+  version: 1
+  depth_limit: 5
+  empty_token: TOKEN_VAZIO
+  cycles: 2
+
+canonical_fields:
+  - matrix_id
+  - row
+  - col
+  - cell_id
+  - value
+  - layer
+  - state
+  - tag14
+  - rafbit10
+  - epoch
+  - cycle
+  - timestamp
+
+semantic_layers:
+  - portuguese
+  - english
+  - chinese
+  - japanese
+  - hebrew
+  - aramaic
+  - greek
+
+technical_invariants:
+  - no_heap_hot_path
+  - no_gc_runtime
+  - explicit_arch_flags
+  - fail_safe
+  - failover
+  - rollback_ready
+  - token_vazio_allowed
+
+gates:
+  - id: O1; cycle: semantic; status: SEMANTIC_READY; evidence: docs/PROTOCOLO_DOIS_CICLOS_OMEGA.md
+  - id: O2; cycle: technical; status: ROLLBACK_READY; evidence: docs/PROTOCOLO_DOIS_CICLOS_OMEGA.md
+  - id: O3; cycle: technical; status: EXEC_PASS; evidence: scripts/validate_two_cycle_omega.py
