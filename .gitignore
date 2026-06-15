@@ -13,6 +13,9 @@ Benchmark/raf_enterprise_*
 __pycache__/
 *.py[cod]
 
+# Test run artifacts (compiled binaries and logs)
+tests/results/
+
 # ApkC generated/local proof artifacts
 Apkc/proofs/*.keystore
 Apkc/proofs/out/*.apk
