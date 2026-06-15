@@ -261,6 +261,33 @@ static inline u32 a64_ldp_post(u8 t1, u8 t2, u8 rn, i8 off7, u8 sf) {
     u32 base = sf ? 0xA8C00000u : 0x28C00000u;
     return base|(((u32)(u8)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
 }
+/* UDIV Xd, Xn, Xm */
+static inline u32 a64_udiv(u8 rd, u8 rn, u8 rm, u8 sf) {
+    return ((u32)sf<<31)|0x1AC00800u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+/* LSL/LSR/ASR register forms (variable shift) */
+static inline u32 a64_lslv(u8 rd, u8 rn, u8 rm, u8 sf) {
+    return ((u32)sf<<31)|0x1AC02000u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+static inline u32 a64_lsrv(u8 rd, u8 rn, u8 rm, u8 sf) {
+    return ((u32)sf<<31)|0x1AC02400u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+static inline u32 a64_asrv(u8 rd, u8 rn, u8 rm, u8 sf) {
+    return ((u32)sf<<31)|0x1AC02800u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+
+/* ── Test-and-branch ────────────────────────────────────────────────── */
+/* TBZ  Rt, #bit, #imm14  (off14 in instruction units from PC) */
+static inline u32 a64_tbz(u8 rt, u8 bit, i16 off14) {
+    u32 b5=(bit>>5)&1u, b40=bit&0x1Fu;
+    return (b5<<31)|0x36000000u|(b40<<19)|(((u32)(u16)off14&0x3FFFu)<<5)|(u32)rt;
+}
+/* TBNZ Rt, #bit, #imm14 */
+static inline u32 a64_tbnz(u8 rt, u8 bit, i16 off14) {
+    u32 b5=(bit>>5)&1u, b40=bit&0x1Fu;
+    return (b5<<31)|0x37000000u|(b40<<19)|(((u32)(u16)off14&0x3FFFu)<<5)|(u32)rt;
+}
+
 /* ADR  Xd, #byte_offset (PC-relative) */
 static inline u32 a64_adr(u8 rd, i32 off) {
     return 0x10000000u|(((u32)off&3u)<<29)|(((u32)off>>2)&0x7FFFFu)<<5|(u32)rd;
