@@ -1,0 +1,137 @@
+# CONVERGENCIA_UNICA_CHECKLIST.yml
+# Data: 2026-06-15
+# Regra: claim sem origem/teste/hash/ambiente permanece TOKEN_VAZIO ou PENDING.
+
+meta:
+  project: RafPolimata
+  convergence: "RafPolimata × ChipQuantum × Vectras"
+  status_model:
+    - PASS
+    - FAIL
+    - NOT_RUN
+    - PENDING
+    - AUDIT
+    - RUNTIME
+    - REFERENCE
+    - TOKEN_VAZIO
+  invariant: "fonte -> linguagem -> arquitetura -> artefato -> execução -> métrica -> prova -> retroalimentação"
+
+blocks:
+  - id: B1
+    name: "Assembler strict error propagation"
+    status: PENDING
+    target_files:
+      - "Apkc/apkc.c"
+    reason: "Unknown ARM64/ARM32 mnemonic currently logs error but still emits NOP placeholder. This is acceptable only in permissive/audit mode, not strict build mode."
+    actions:
+      - "Add error counter/status to Emit or AsmResult."
+      - "Set error on unknown mnemonic for ARM64 and ARM32."
+      - "Propagate failure from assemble() into APK generation."
+      - "Create negative test with invalid mnemonic."
+    promotion_gate: "Invalid assembly returns non-zero or explicit AUDIT status; no silent successful APK in strict mode."
+
+  - id: B2
+    name: "Architecture x language support matrix"
+    status: PENDING
+    target_files:
+      - "raf_compile.h"
+      - "Apkc/lang_profile.h"
+      - "docs/APKC_FLAGS_LIMITS_AND_COMMANDS.md"
+    reason: "raf_compile.h and lang_profile.h contain partial policy, but the final matrix is not explicit enough for audit."
+    actions:
+      - "Define output class per language: ASM_INTERNAL, NATIVE_SO, DEX, SCRIPT_BOOTSTRAP, JSX_BOOTSTRAP."
+      - "Define ARM64/ARM32/X86_64/RV64 support per language."
+      - "Mark external tools: clang, clang++, rustc, kotlinc, javac, d8, npx/babel, node, perl, php."
+    promotion_gate: "Each language has deterministic support status and a test row."
+
+  - id: B3
+    name: "ARM64 encoder gap closure"
+    status: PENDING
+    target_files:
+      - "Apkc/arch_arm64.h"
+      - "Apkc/apkc.c"
+    candidate_encoders:
+      - "LDRSW"
+      - "LDR literal / PC-relative load"
+      - "LD2"
+      - "LD3"
+      - "LD4"
+    actions:
+      - "Search global symbols before implementing."
+      - "Add encoder helpers only if absent."
+      - "Wire parser cases in asm_insn64()."
+      - "Compare machine words against assembler/objdump reference."
+    promotion_gate: "Every new encoder has at least one reference-byte test."
+
+  - id: B4
+    name: "VerbVivo hosted/freestanding separation"
+    status: PENDING
+    target_files:
+      - "rafaelia/verbovivo.c"
+      - "rafaelia/verbovivo.h"
+    reason: "Fiber-H/Trinity core is mostly stack/static, but verbovivo_main() allocates trajectory SVG with malloc/free."
+    actions:
+      - "Document verbovivo_main() as hosted visualization path."
+      - "Add static-buffer or caller-provided-buffer mode for no-heap builds."
+      - "Optionally introduce VERBOVIVO_NO_HEAP build flag."
+    promotion_gate: "No-heap build compiles without malloc/free references."
+
+  - id: B5
+    name: "T7 Q16 C freestanding reference port"
+    status: PENDING
+    target_files:
+      - "rafaelia/t7_q16.h"
+      - "rafaelia/t7_q16.c"
+      - "tests/test_t7_q16.c"
+    source_reference:
+      - "ChipQuantum/src/toroidal_engine_baremetal.py"
+    actions:
+      - "Port q16_wrap, ema_quarter, phi_gate_q16, step_state_branchless_q16, xor_acc, fnv1a64, coprime_stride, rolling_attractor42."
+      - "Create fixed vectors and bit-exact comparison against Python reference."
+      - "Emit proof manifest with hash, commit and runner."
+    promotion_gate: "C output equals Python reference for fixed vectors."
+
+  - id: B6
+    name: "Minimal RafPolimata orchestrator"
+    status: PENDING
+    target_files:
+      - "scripts/raf_orchestrate.sh"
+      - "proofs/"
+    actions:
+      - "Detect source language from extension/profile."
+      - "Select architecture mode."
+      - "Build/generate APK or output artifact."
+      - "Run available validation commands."
+      - "Write proofs/<timestamp>/manifest.json."
+    promotion_gate: "One command produces artifact + validation manifest."
+
+  - id: B7
+    name: "Claim traceability binding"
+    status: PENDING
+    target_files:
+      - "docs/CONVERGENCIA_UNICA_METODOLOGICA.md"
+      - "docs/CONVERGENCIA_UNICA_CHECKLIST.yml"
+    actions:
+      - "Bind every strong claim to file/path/line/test/hash when possible."
+      - "Mark unsupported claims as TOKEN_VAZIO."
+      - "Do not promote metaphor to mechanism without experiment."
+    promotion_gate: "No undocumented claim remains in PASS state."
+
+execution_order:
+  - B1
+  - B2
+  - B4
+  - B5
+  - B3
+  - B6
+  - B7
+
+retrofeedback:
+  F_ok:
+    - "Three-repo convergence is now documented in RafPolimata."
+    - "Methodology separates code, runtime, proof, hypothesis and TOKEN_VAZIO."
+  F_gap:
+    - "Implementation patches still pending."
+    - "No new tests executed by this checklist creation."
+  F_next:
+    - "Patch B1 first because silent NOP is the highest technical integrity gap."
