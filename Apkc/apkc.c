@@ -3,6 +3,7 @@
  * Technological determinism — source extension drives the whole pipeline. */
 #include "sys.h"
 #include "mem.h"
+#include "coherence.h"
 #include "arch_arm64.h"
 #include "arch_arm32.h"
 #include "lang_script.h"
@@ -805,6 +806,202 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
     if (tok_eqi(mn,"dmb")) { lex_next(l); emit32(em,A64_DMB_ISH); return; }
     if (tok_eqi(mn,"dsb")) { lex_next(l); emit32(em,A64_DSB_ISH); return; }
     if (tok_eqi(mn,"isb")) {              emit32(em,A64_ISB);      return; }
+
+    /* ── FMA: fmla / fmls ── */
+    if (tok_eqi(mn,"fmla")||tok_eqi(mn,"fmls")) {
+        int sub=tok_eqi(mn,"fmls");
+        i32 vd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vn=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vm=reg_neon(l->cur); lex_next(l);
+        emit32(em, sub ? a64_fmls_4s((u8)vd,(u8)vn,(u8)vm)
+                       : a64_fmla_4s((u8)vd,(u8)vn,(u8)vm));
+        return;
+    }
+    /* ── Widening multiply: umull / smull / umlal / smlal ── */
+    if (tok_eqi(mn,"umull")||tok_eqi(mn,"smull")||
+        tok_eqi(mn,"umlal")||tok_eqi(mn,"smlal")) {
+        int sign=tok_eqi(mn,"smull")||tok_eqi(mn,"smlal");
+        int acc =tok_eqi(mn,"umlal")||tok_eqi(mn,"smlal");
+        i32 vd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vn=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vm=reg_neon(l->cur); lex_next(l);
+        u32 w;
+        if (acc)  w = sign ? a64_smlal_2d((u8)vd,(u8)vn,(u8)vm)
+                           : a64_umlal_2d((u8)vd,(u8)vn,(u8)vm);
+        else      w = sign ? a64_smull_2d((u8)vd,(u8)vn,(u8)vm)
+                           : a64_umull_2d((u8)vd,(u8)vn,(u8)vm);
+        emit32(em,w); return;
+    }
+    /* ── dup ── */
+    if (tok_eqi(mn,"dup")) {
+        i32 vd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        /* heuristic: if reg64 parses OK it's a GPR, else treat as NEON */
+        i32 gpr=reg64(l->cur);
+        if (gpr>=0) { lex_next(l); emit32(em, a64_dup_4s_gpr((u8)vd,(u8)gpr)); }
+        else {
+            i32 vn=reg_neon(l->cur); lex_next(l);
+            emit32(em, a64_dup_4s_lane0((u8)vd,(u8)vn));
+        }
+        return;
+    }
+    /* ── Bit manipulation: clz / cls / rbit / rev / rev32 ── */
+    if (tok_eqi(mn,"clz")||tok_eqi(mn,"cls")||tok_eqi(mn,"rbit")||
+        tok_eqi(mn,"rev")||tok_eqi(mn,"rev32")) {
+        i32 rd=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg64(l->cur); lex_next(l);
+        u32 w;
+        if      (tok_eqi(mn,"clz"))   w=a64_clz((u8)rd,(u8)rn);
+        else if (tok_eqi(mn,"cls"))   w=a64_cls((u8)rd,(u8)rn);
+        else if (tok_eqi(mn,"rbit"))  w=a64_rbit((u8)rd,(u8)rn);
+        else if (tok_eqi(mn,"rev32")) w=a64_rev32((u8)rd,(u8)rn);
+        else                          w=a64_rev((u8)rd,(u8)rn);
+        emit32(em,w); return;
+    }
+    /* ── extr xd, xn, xm, #lsb ── */
+    if (tok_eqi(mn,"extr")) {
+        i32 rd=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rm=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        u32 lsb=(u32)lex_imm(l);
+        emit32(em, a64_extr((u8)rd,(u8)rn,(u8)rm,(u8)lsb)); return;
+    }
+    /* ── Polynomial multiply: pmull / pmull2 ── */
+    if (tok_eqi(mn,"pmull")||tok_eqi(mn,"pmull2")) {
+        int hi=tok_eqi(mn,"pmull2");
+        i32 vd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vn=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vm=reg_neon(l->cur); lex_next(l);
+        emit32(em, hi ? a64_pmull2((u8)vd,(u8)vn,(u8)vm)
+                      : a64_pmull ((u8)vd,(u8)vn,(u8)vm));
+        return;
+    }
+    /* ── Dot product: sdot / udot ── */
+    if (tok_eqi(mn,"sdot")||tok_eqi(mn,"udot")) {
+        int u=tok_eqi(mn,"udot");
+        i32 vd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vn=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vm=reg_neon(l->cur); lex_next(l);
+        emit32(em, u ? a64_udot_4s((u8)vd,(u8)vn,(u8)vm)
+                     : a64_sdot_4s((u8)vd,(u8)vn,(u8)vm));
+        return;
+    }
+    /* ── Interleave: zip2 / uzp1 / uzp2 / trn1 / trn2 ── */
+    if (tok_eqi(mn,"zip2")||tok_eqi(mn,"uzp1")||tok_eqi(mn,"uzp2")||
+        tok_eqi(mn,"trn1")||tok_eqi(mn,"trn2")) {
+        i32 vd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vn=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vm=reg_neon(l->cur); lex_next(l);
+        u32 w;
+        if      (tok_eqi(mn,"zip2")) w=a64_zip2_4s((u8)vd,(u8)vn,(u8)vm);
+        else if (tok_eqi(mn,"uzp1")) w=a64_uzp1_4s((u8)vd,(u8)vn,(u8)vm);
+        else if (tok_eqi(mn,"uzp2")) w=a64_uzp2_4s((u8)vd,(u8)vn,(u8)vm);
+        else if (tok_eqi(mn,"trn1")) w=a64_trn1_4s((u8)vd,(u8)vn,(u8)vm);
+        else                         w=a64_trn2_4s((u8)vd,(u8)vn,(u8)vm);
+        emit32(em,w); return;
+    }
+    /* ── Table lookup: tbl / tbx ── */
+    if (tok_eqi(mn,"tbl")||tok_eqi(mn,"tbx")) {
+        int is_tbx=tok_eqi(mn,"tbx");
+        i32 vd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        if (l->cur.kind==TK_LBRK) lex_next(l); /* optional { */
+        i32 vn=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_RBRK) lex_next(l); /* optional } */
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vm=reg_neon(l->cur); lex_next(l);
+        emit32(em, is_tbx ? a64_tbx_16b((u8)vd,(u8)vn,(u8)vm)
+                           : a64_tbl_16b((u8)vd,(u8)vn,(u8)vm));
+        return;
+    }
+    /* ── Vector extract: ext vd.16b, vn.16b, vm.16b, #imm ── */
+    if (tok_eqi(mn,"ext")) {
+        i32 vd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vn=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vm=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        u32 imm=(u32)lex_imm(l);
+        emit32(em, a64_ext_16b((u8)vd,(u8)vn,(u8)vm,(u8)imm)); return;
+    }
+    /* ── Scalar FP: fadd/fsub/fmul/fdiv (sd,sn,sm) ── */
+    if (tok_eqi(mn,"fadd")||tok_eqi(mn,"fsub")||
+        tok_eqi(mn,"fmul")||tok_eqi(mn,"fdiv")) {
+        i32 rd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rm=reg_neon(l->cur); lex_next(l);
+        u32 w;
+        if      (tok_eqi(mn,"fadd")) w=a64_fadd_s((u8)rd,(u8)rn,(u8)rm);
+        else if (tok_eqi(mn,"fsub")) w=a64_fsub_s((u8)rd,(u8)rn,(u8)rm);
+        else if (tok_eqi(mn,"fmul")) w=a64_fmul_s((u8)rd,(u8)rn,(u8)rm);
+        else                         w=a64_fdiv_s((u8)rd,(u8)rn,(u8)rm);
+        emit32(em,w); return;
+    }
+    /* ── fsqrt / fabs / fneg (sd, sn) ── */
+    if (tok_eqi(mn,"fsqrt")||tok_eqi(mn,"fabs")||tok_eqi(mn,"fneg")) {
+        i32 rd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg_neon(l->cur); lex_next(l);
+        u32 w;
+        if      (tok_eqi(mn,"fsqrt")) w=a64_fsqrt_s((u8)rd,(u8)rn);
+        else if (tok_eqi(mn,"fabs"))  w=a64_fabs_s((u8)rd,(u8)rn);
+        else                          w=a64_fneg_s((u8)rd,(u8)rn);
+        emit32(em,w); return;
+    }
+    /* ── fcvtzs xd, sn / scvtf sd, xn ── */
+    if (tok_eqi(mn,"fcvtzs")) {
+        i32 rd=reg64(l->cur);    lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg_neon(l->cur); lex_next(l);
+        emit32(em, a64_fcvtzs((u8)rd,(u8)rn)); return;
+    }
+    if (tok_eqi(mn,"scvtf")) {
+        i32 rd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg64(l->cur);    lex_next(l);
+        emit32(em, a64_scvtf((u8)rd,(u8)rn)); return;
+    }
+    /* ── fcmp sn, sm ── */
+    if (tok_eqi(mn,"fcmp")) {
+        i32 rn=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rm=reg_neon(l->cur); lex_next(l);
+        emit32(em, a64_fcmp_s((u8)rn,(u8)rm)); return;
+    }
+    /* ── fmov: fmov vd, xn (gpr→fp)  or  fmov xd, vn (fp→gpr) ── */
+    if (tok_eqi(mn,"fmov")) {
+        /* if reg64 succeeds on first tok → fp→gpr direction; else gpr→fp */
+        i32 r0=reg64(l->cur);
+        if (r0>=0) {
+            lex_next(l);
+            if (l->cur.kind==TK_COMMA) lex_next(l);
+            i32 vn=reg_neon(l->cur); lex_next(l);
+            emit32(em, a64_fmov_s_to_gpr((u8)r0,(u8)vn));
+        } else {
+            i32 vd=reg_neon(l->cur); lex_next(l);
+            if (l->cur.kind==TK_COMMA) lex_next(l);
+            i32 xn=reg64(l->cur); lex_next(l);
+            emit32(em, a64_fmov_gpr_to_s((u8)vd,(u8)xn));
+        }
+        return;
+    }
     /* unknown mnemonic — emit NOP placeholder so label offsets stay correct */
     pr_err("apkc: unknown ARM64 mnemonic\n");
     emit32(em,A64_NOP);
@@ -1365,7 +1562,23 @@ static i32 build_apk(
     }
     zip_add(&zw, "AndroidManifest.xml", _axml_buf, (u32)axsz);
 
-    return _write_apk(&zw, outpath);
+    i32 rc = _write_apk(&zw, outpath);
+    if (rc == 0) {
+        /* Compute and print geometric coherence (T^7 phi_fst invariant) */
+        sz apksz = zip_finish(&zw); /* re-query size after write */
+        u32 phi = phi_fst(_apk_buf, (u32)(apksz < 0x100000u ? apksz : 0x100000u));
+        u32 phi_int  = phi >> 16;
+        u32 phi_frac = (u32)(((u64)(phi & 0xFFFFu) * 10000u) >> 16);
+        u32 attr     = phi_attractor(phi);
+        pr("[phi="); pr_dec((u64)phi_int); pr(".");
+        /* 4-digit zero-padded fraction */
+        if (phi_frac < 1000u) pr("0");
+        if (phi_frac <  100u) pr("0");
+        if (phi_frac <   10u) pr("0");
+        pr_dec((u64)phi_frac);
+        pr(" attractor="); pr_dec((u64)attr); pr("]\n");
+    }
+    return rc;
 }
 
 /* ── CLI ──────────────────────────────────────────────────────────── */
