@@ -48,6 +48,19 @@ jobs:
       - name: Validate ApkC proof protocol
         run: bash scripts/apkc_validate.sh
 
+      - name: ApkC language coverage (asm + script modes)
+        run: bash scripts/apkc_lang_coverage.sh
+
+      - name: Build and smoke-test verbovivo (T7 toroid + Fiber-H engine)
+        run: |
+          gcc -std=c11 -O2 -I. -IBenchmark -DVERBOVIVO_MAIN \
+            rafaelia/verbovivo.c -lm -o verbovivo_ci
+          echo 'RAFAELIA test vector' | ./verbovivo_ci /dev/stdin /dev/null 2>&1 | \
+            grep -E 'verbovivo:.*phi=' || true
+          ls -la Apkc/hello.apk 2>/dev/null && \
+            ./verbovivo_ci Apkc/hello.apk /dev/null 2>&1 | \
+            grep -E 'verbovivo:.*phi=' || echo 'TOKEN_VAZIO: hello.apk ausente'
+
       - name: Try ApkC debug signing proof (TOKEN_VAZIO allowed)
         run: bash scripts/apkc_sign_debug.sh
 
@@ -59,13 +72,16 @@ jobs:
           path: Apkc/proofs/out/
           if-no-files-found: warn
 
-      - name: Generate P(k) falsifiability report (non-blocking verdict)
+      - name: Generate P(k) falsifiability report
         run: |
           python3 scripts/first_test_pk.py --output results/first_test_report.json
           python3 - <<'PY'
-          import json
+          import json, sys
           from pathlib import Path
           report = json.loads(Path('results/first_test_report.json').read_text(encoding='utf-8'))
-          assert report['verdict'] in {'PASS', 'FAIL'}
-          print('P(k) verdict:', report['verdict'])
+          verdict = report['verdict']
+          assert verdict in {'PASS', 'FAIL'}
+          print('P(k) verdict:', verdict)
+          if verdict == 'FAIL':
+              raise SystemExit('P(k) gate FAIL')
           PY
