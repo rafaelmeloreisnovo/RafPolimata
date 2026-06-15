@@ -403,8 +403,7 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
             u32 w=tok_eqi(mn,"adr")?a64_adr((u32)rd,off):a64_adrp((u32)rd,off);
             emit32(em,w); return;
         }
-        /* placeholder */
-        emit32(em,a64_adr((u32)rd,0)); return;
+        emit32(em,tok_eqi(mn,"adrp")?a64_adrp((u32)rd,0):a64_adr((u32)rd,0)); return;
     }
     /* b / bl / b.cond */
     if (tok_eqi(mn,"b")||tok_eqi(mn,"bl")) {
@@ -742,7 +741,12 @@ static AsmResult assemble(const u8 *src, sz src_len, int arch, u8 *out_code) {
                 insn=(insn&0xFF00001Fu)|(((u32)(delta/4)&0x7FFFFu)<<5);
             } else if ((insn&0x7E000000u)==0x34000000u) { /* CBZ/CBNZ */
                 insn=(insn&0xFF00001Fu)|(((u32)(delta/4)&0x7FFFFu)<<5);
-            } else { /* ADR fallback */
+            } else if (insn&0x80000000u) { /* ADRP: page-granular (delta in 4KiB pages) */
+                i32 pdelta=delta>>12;
+                u32 immlo=(u32)(pdelta)&3u;
+                u32 immhi=(u32)(pdelta>>2)&0x7FFFFu;
+                insn=(insn&0x9F00001Fu)|(immlo<<29)|(immhi<<5);
+            } else { /* ADR: byte-granular */
                 u32 immlo=(u32)(delta)&3u;
                 u32 immhi=(u32)(delta>>2)&0x7FFFFu;
                 insn=(insn&0x9F00001Fu)|(immlo<<29)|(immhi<<5);
