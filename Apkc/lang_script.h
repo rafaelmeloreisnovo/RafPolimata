@@ -40,8 +40,8 @@ static sz gen_script_code64(
     sz arg1_len   = arg1 ? scrip_slen(arg1) : 0;
     sz script_len = scrip_slen(script);
 
-    /* instructions: sub,adr,add,add,str×4,movz,str,str,orr,add,add,movz,svc,movz,ret = 17 insns */
-#define SCRIP_INSN_COUNT 17u
+    /* instructions: sub,adr,add,add,str×4,movz,str,str,orr,add,add,movz,svc,add,movz,ret = 18 insns */
+#define SCRIP_INSN_COUNT 18u
     sz pool_start = (sz)(SCRIP_INSN_COUNT * 4u);
     sz off_interp = pool_start;
     sz off_arg1   = off_interp + interp_len + 1u;
@@ -79,7 +79,8 @@ static sz gen_script_code64(
     WI(a64_add_imm(2, RSP, 32, 0, 1));          /* x2 = envp (NULL) */
     WI(a64_movz(8, 221, 0, 1));                  /* x8 = __NR_execve */
     WI(a64_svc(0));
-    /* fallback return 0 if execve fails */
+    /* fallback: restore stack and return 0 if execve fails */
+    WI(a64_add_imm(RSP, RSP, 48, 0, 1)); /* add sp, sp, #48 */
     WI(a64_movz(0, 0, 0, 1));
     WI(A64_RET);
 

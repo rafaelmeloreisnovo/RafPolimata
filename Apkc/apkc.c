@@ -1258,6 +1258,7 @@ static i32 apkc_main(i32 argc, char **argv) {
     const LangProfile *prof = lang_override
         ? lang_profile_find(lang_override)
         : lang_profile_from_path(inpath);
+    if (!prof) { pr_err("unknown -lang value\n"); return 1; }
 
     /* arm64-only languages can't build arm32 */
     if (prof->arm64_only) do32 = 0;
