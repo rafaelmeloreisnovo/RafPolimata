@@ -1,0 +1,75 @@
+{
+  "schema": "rafpolimata.android_proof_chain.v1",
+  "status": "TEMPLATE",
+  "date_utc": "TOKEN_VAZIO",
+  "operator": "Rafael Melo Reis",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "branch": "main-1st",
+  "git_commit": "TOKEN_VAZIO",
+  "device": {
+    "model": "TOKEN_VAZIO",
+    "android_sdk": "TOKEN_VAZIO",
+    "abi": "TOKEN_VAZIO",
+    "kernel": "TOKEN_VAZIO",
+    "termux_prefix": "TOKEN_VAZIO"
+  },
+  "toolchain": {
+    "cc": "TOKEN_VAZIO",
+    "cc_version": "TOKEN_VAZIO",
+    "readelf": "TOKEN_VAZIO",
+    "adb_or_pm": "TOKEN_VAZIO",
+    "apksigner": "TOKEN_VAZIO"
+  },
+  "inputs": {
+    "source": "Apkc/hello.s.txt",
+    "package": "com.rafael.teste",
+    "label": "RafaelTeste",
+    "lib": "hello",
+    "arch": "-both"
+  },
+  "artifacts": {
+    "apkc_binary": {
+      "path": "out/apkc",
+      "sha256": "TOKEN_VAZIO",
+      "compile_log": "01_compile_apkc.txt"
+    },
+    "apk": {
+      "path": "hello-both.apk",
+      "sha256": "TOKEN_VAZIO",
+      "generate_log": "02_generate_apk.txt",
+      "zip_list": "03_unzip_list.txt"
+    },
+    "arm32_elf": {
+      "path": "lib-hello-arm32.so",
+      "readelf_log": "04_readelf_arm32.txt",
+      "status": "TOKEN_VAZIO"
+    },
+    "arm64_elf": {
+      "path": "lib-hello-arm64.so",
+      "readelf_log": "05_readelf_arm64.txt",
+      "status": "TOKEN_VAZIO"
+    },
+    "install": {
+      "log": "08_adb_install.txt or 08_pm_install.txt",
+      "status": "TOKEN_VAZIO"
+    },
+    "launch": {
+      "log": "09_launch.txt",
+      "status": "TOKEN_VAZIO"
+    },
+    "logcat": {
+      "log": "10_logcat_nativeactivity.txt",
+      "fatal_exception": "TOKEN_VAZIO",
+      "dlopen_failure": "TOKEN_VAZIO",
+      "status": "TOKEN_VAZIO"
+    }
+  },
+  "promotion": {
+    "source_to_binary": "TOKEN_VAZIO",
+    "binary_to_apk": "TOKEN_VAZIO",
+    "arm64_real": "TOKEN_VAZIO",
+    "android_runtime": "TOKEN_VAZIO",
+    "single_run_reproducibility": "TOKEN_VAZIO"
+  },
+  "rule": "Do not replace TOKEN_VAZIO by PASS without log evidence in the same run."
+}
