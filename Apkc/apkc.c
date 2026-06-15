@@ -1111,11 +1111,21 @@ static i32 build_apk(
 
         if (do64) {
             u8 *txt = r64.size ? _code64 : (u8*)0;
-            so64sz = elf64_build_so(_so64_buf, txt, (u32)r64.size, r64.sym1_va, r64.sym2_va);
+            ElfSym _es64[2] = {
+                {"ANativeActivity_onCreate", r64.sym1_va},
+                {"android_main", r64.has_sym2 ? r64.sym2_va
+                                              : (r64.sym1_va ? r64.sym1_va+4u : 4u)}
+            };
+            so64sz = elf64_build_so(_so64_buf, txt, (u32)r64.size, _es64, 2, NULL, 0u);
         }
         if (do32) {
             u8 *txt = r32_.size ? _code32 : (u8*)0;
-            so32sz = elf32_build_so(_so32_buf, txt, (u32)r32_.size, r32_.sym1_va, r32_.sym2_va);
+            ElfSym _es32[2] = {
+                {"ANativeActivity_onCreate", r32_.sym1_va},
+                {"android_main", r32_.has_sym2 ? r32_.sym2_va
+                                               : (r32_.sym1_va ? r32_.sym1_va+4u : 4u)}
+            };
+            so32sz = elf32_build_so(_so32_buf, txt, (u32)r32_.size, _es32, 2);
         }
 
     } else if (prof->use_script) {
@@ -1125,7 +1135,8 @@ static i32 build_apk(
         sz scsz = gen_script_code64(ipath, arg1, (const char*)src, _code64, sizeof(_code64));
         if (!scsz) { pr_err("script codegen failed\n"); return -1; }
         r64.size = scsz;
-        so64sz = elf64_build_so(_so64_buf, _code64, (u32)scsz, 0, 0);
+        ElfSym _scsyms[2] = {{"ANativeActivity_onCreate",0u},{"android_main",4u}};
+        so64sz = elf64_build_so(_so64_buf, _code64, (u32)scsz, _scsyms, 2, NULL, 0u);
         do32 = 0; /* script bootstrap is arm64-only */
 
     } else if (prof->use_fork) {
@@ -1159,7 +1170,8 @@ static i32 build_apk(
     }
 
     /* build AndroidManifest.xml */
-    sz axsz = axml_build(pkg, label, libname, min_sdk, tgt_sdk, _axml_buf, sizeof(_axml_buf));
+    sz axsz = axml_build(pkg, label, libname, min_sdk, tgt_sdk,
+                         NULL, 0, NULL, 0, _axml_buf, sizeof(_axml_buf));
     if (!axsz) { pr_err("axml_build failed\n"); return -1; }
 
     /* build classes.dex if not already produced by fork+exec */
