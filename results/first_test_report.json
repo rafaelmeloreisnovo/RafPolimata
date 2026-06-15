@@ -19,7 +19,7 @@
   "metrics": {
     "rrmse": 0.11867176539536714,
     "coverage_1sigma": 1.0,
-    "residual_slope": 0.42168369212823636
+    "residual_slope": 0.4216836921282363
   },
   "verdict": "PASS"
 }
