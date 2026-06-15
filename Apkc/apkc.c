@@ -1,9 +1,12 @@
-/* apkc.c — freestanding APK compiler, no libc, no heap, no abstractions */
+/* apkc.c — freestanding APK compiler, no libc, no heap, no abstractions.
+ * Unified pipeline: 12 languages via declarative LangProfile table.
+ * Technological determinism — source extension drives the whole pipeline. */
 #include "sys.h"
 #include "mem.h"
 #include "arch_arm64.h"
 #include "arch_arm32.h"
 #include "lang_script.h"
+#include "lang_profile.h"
 #include "fmt_zip.h"
 #include "fmt_dex.h"
 #include "fmt_axml.h"
@@ -50,8 +53,8 @@ static void lex_next(Lex *l) {
     char c=*l->s;
     if (c=='\n') { t.kind=TK_NL; t.len=1; l->s++; l->cur=t; return; }
     if (c==',') { t.kind=TK_COMMA; t.len=1; l->s++; l->cur=t; return; }
-    if (c=='[') { t.kind=TK_LBRK; t.len=1; l->s++; l->cur=t; return; }
-    if (c==']') { t.kind=TK_RBRK; t.len=1; l->s++; l->cur=t; return; }
+    if (c=='['||c=='{') { t.kind=TK_LBRK; t.len=1; l->s++; l->cur=t; return; }
+    if (c==']'||c=='}') { t.kind=TK_RBRK; t.len=1; l->s++; l->cur=t; return; }
     if (c=='!') { t.kind=TK_BANG; t.len=1; l->s++; l->cur=t; return; }
     if (c=='#') { t.kind=TK_HASH; t.len=1; l->s++; l->cur=t; return; }
     if (c==':') { t.kind=TK_COLON; t.len=1; l->s++; l->cur=t; return; }
@@ -172,6 +175,17 @@ static int reg64_sf(Tok t) { /* 0=w, 1=x */
     if (t.kind!=TK_IDENT||t.len<1) return 1;
     char lo=(t.p[0]>='A'&&t.p[0]<='Z')?(char)(t.p[0]+32):t.p[0];
     return lo=='w'?0:1;
+}
+
+/* reg_neon: parse vN or qN or vN.size — returns 0..31, -1 on fail */
+static i32 reg_neon(Tok t) {
+    if (t.kind!=TK_IDENT||t.len<2) return -1;
+    char lo=(t.p[0]>='A'&&t.p[0]<='Z')?(char)(t.p[0]+32):t.p[0];
+    if (lo!='v'&&lo!='q') return -1;
+    u32 n=0;
+    sz i=1;
+    while (i<t.len && t.p[i]>='0' && t.p[i]<='9') { n=n*10+(u32)(t.p[i]-'0'); i++; }
+    return (i32)n;
 }
 
 static i32 reg32a(Tok t) {
@@ -576,6 +590,221 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
         u32 v=(u32)lex_imm(l);
         emit32(em,v); return;
     }
+    /* ── tbz / tbnz ── */
+    if (tok_eqi(mn,"tbz")||tok_eqi(mn,"tbnz")) {
+        i32 rt=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        u32 bit=(u32)lex_imm(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        if (l->cur.kind==TK_IDENT) {
+            pat_add(pos,l->cur,64); lex_next(l);
+            emit32(em,tok_eqi(mn,"tbz")?a64_tbz((u32)rt,(u8)bit,0)
+                                       :a64_tbnz((u32)rt,(u8)bit,0));
+        } else {
+            i32 off=(i32)lex_imm(l);
+            emit32(em,tok_eqi(mn,"tbz")?a64_tbz((u32)rt,(u8)bit,(i16)(off/4))
+                                       :a64_tbnz((u32)rt,(u8)bit,(i16)(off/4)));
+        }
+        return;
+    }
+    /* ── mul / sdiv / udiv ── */
+    if (tok_eqi(mn,"mul")||tok_eqi(mn,"sdiv")||tok_eqi(mn,"udiv")) {
+        int sf=reg64_sf(l->cur);
+        i32 rd=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rm=reg64(l->cur); lex_next(l);
+        u32 w;
+        if      (tok_eqi(mn,"mul"))  w=a64_mul((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+        else if (tok_eqi(mn,"sdiv")) w=a64_sdiv((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+        else                         w=a64_udiv((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+        emit32(em,w); return;
+    }
+    /* ── lsl / lsr / asr (imm or register) ── */
+    if (tok_eqi(mn,"lsl")||tok_eqi(mn,"lsr")||tok_eqi(mn,"asr")) {
+        int sf=reg64_sf(l->cur);
+        i32 rd=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        u32 w;
+        if (l->cur.kind==TK_HASH||l->cur.kind==TK_INT) {
+            u32 sh=(u32)lex_imm(l);
+            if      (tok_eqi(mn,"lsl")) w=a64_lsl_imm((u32)rd,(u32)rn,(u8)sh,(u32)sf);
+            else if (tok_eqi(mn,"lsr")) w=a64_lsr_imm((u32)rd,(u32)rn,(u8)sh,(u32)sf);
+            else                        w=a64_asr_imm((u32)rd,(u32)rn,(u8)sh,(u32)sf);
+        } else {
+            i32 rm=reg64(l->cur); lex_next(l);
+            if      (tok_eqi(mn,"lsl")) w=a64_lslv((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+            else if (tok_eqi(mn,"lsr")) w=a64_lsrv((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+            else                        w=a64_asrv((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+        }
+        emit32(em,w); return;
+    }
+    /* ── ldrb / strb / ldrh / strh ── */
+    if (tok_eqi(mn,"ldrb")||tok_eqi(mn,"strb")) {
+        i32 rt=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        lex_next(l); /* [ */
+        i32 rn=reg64(l->cur); lex_next(l);
+        u32 off=0;
+        if (l->cur.kind==TK_COMMA) { lex_next(l); off=(u32)lex_imm(l); }
+        lex_next(l); /* ] */
+        emit32(em,tok_eqi(mn,"ldrb")?a64_ldrb((u32)rt,(u32)rn,(u16)off)
+                                     :a64_strb((u32)rt,(u32)rn,(u16)off));
+        return;
+    }
+    if (tok_eqi(mn,"ldrh")||tok_eqi(mn,"strh")) {
+        i32 rt=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        lex_next(l); /* [ */
+        i32 rn=reg64(l->cur); lex_next(l);
+        u32 off=0;
+        if (l->cur.kind==TK_COMMA) { lex_next(l); off=(u32)lex_imm(l); }
+        lex_next(l); /* ] */
+        emit32(em,tok_eqi(mn,"ldrh")?a64_ldrh((u32)rt,(u32)rn,(u16)off)
+                                     :a64_strh((u32)rt,(u32)rn,(u16)off));
+        return;
+    }
+    /* ── NEON: ld1 {vt.size}, [xn] / st1 ── */
+    if (tok_eqi(mn,"ld1")||tok_eqi(mn,"st1")) {
+        lex_next(l); /* skip { */
+        i32 vt=reg_neon(l->cur); lex_next(l);
+        lex_next(l); /* skip } */
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        lex_next(l); /* skip [ */
+        i32 rn=reg64(l->cur); lex_next(l);
+        lex_next(l); /* skip ] */
+        emit32(em,tok_eqi(mn,"ld1")?a64_ld1_16b((u32)vt,(u32)rn)
+                                   :a64_st1_16b((u32)vt,(u32)rn));
+        return;
+    }
+    /* ── NEON vector arithmetic: add/sub/mul/fmul/fadd/eor/and/orr (v/q registers) ── */
+    if ((tok_eqi(mn,"add")||tok_eqi(mn,"sub")||tok_eqi(mn,"mul")||
+         tok_eqi(mn,"fmul")||tok_eqi(mn,"fadd")||
+         tok_eqi(mn,"eor")||tok_eqi(mn,"and")||tok_eqi(mn,"orr")) &&
+        reg_neon(l->cur)>=0) {
+        i32 vd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vn=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vm=reg_neon(l->cur); lex_next(l);
+        u32 w;
+        if      (tok_eqi(mn,"add"))  w=a64_add_4s((u32)vd,(u32)vn,(u32)vm);
+        else if (tok_eqi(mn,"sub"))  w=a64_sub_4s((u32)vd,(u32)vn,(u32)vm);
+        else if (tok_eqi(mn,"mul"))  w=a64_mul_4s((u32)vd,(u32)vn,(u32)vm);
+        else if (tok_eqi(mn,"fmul")) w=a64_fmul_4s((u32)vd,(u32)vn,(u32)vm);
+        else if (tok_eqi(mn,"fadd")) w=a64_fadd_4s((u32)vd,(u32)vn,(u32)vm);
+        else if (tok_eqi(mn,"eor"))  w=a64_eor_16b((u32)vd,(u32)vn,(u32)vm);
+        else if (tok_eqi(mn,"and"))  w=a64_and_16b((u32)vd,(u32)vn,(u32)vm);
+        else                         w=a64_orr_16b((u32)vd,(u32)vn,(u32)vm);
+        emit32(em,w); return;
+    }
+    /* ── NEON: cnt, addv (2-operand) ── */
+    if (tok_eqi(mn,"cnt")||tok_eqi(mn,"addv")||tok_eqi(mn,"rev64")) {
+        i32 vd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vn=reg_neon(l->cur); lex_next(l);
+        u32 w;
+        if      (tok_eqi(mn,"cnt"))   w=a64_cnt_16b((u32)vd,(u32)vn);
+        else if (tok_eqi(mn,"addv"))  w=a64_addv_4s((u32)vd,(u32)vn);
+        else                          w=a64_rev64_16b((u32)vd,(u32)vn);
+        emit32(em,w); return;
+    }
+    /* ── CRC32 ── */
+    if (tok_eqi(mn,"crc32b")||tok_eqi(mn,"crc32h")||
+        tok_eqi(mn,"crc32w")||tok_eqi(mn,"crc32x")||
+        tok_eqi(mn,"crc32cb")||tok_eqi(mn,"crc32ch")||
+        tok_eqi(mn,"crc32cw")||tok_eqi(mn,"crc32cx")) {
+        i32 rd=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rm=reg64(l->cur); lex_next(l);
+        u32 w;
+        if      (tok_eqi(mn,"crc32b"))  w=a64_crc32b((u32)rd,(u32)rn,(u32)rm);
+        else if (tok_eqi(mn,"crc32h"))  w=a64_crc32h((u32)rd,(u32)rn,(u32)rm);
+        else if (tok_eqi(mn,"crc32w"))  w=a64_crc32w((u32)rd,(u32)rn,(u32)rm);
+        else if (tok_eqi(mn,"crc32x"))  w=a64_crc32x((u32)rd,(u32)rn,(u32)rm);
+        else if (tok_eqi(mn,"crc32cb")) w=a64_crc32cb((u32)rd,(u32)rn,(u32)rm);
+        else if (tok_eqi(mn,"crc32ch")) w=a64_crc32ch((u32)rd,(u32)rn,(u32)rm);
+        else if (tok_eqi(mn,"crc32cw")) w=a64_crc32cw((u32)rd,(u32)rn,(u32)rm);
+        else                            w=a64_crc32cx((u32)rd,(u32)rn,(u32)rm);
+        emit32(em,w); return;
+    }
+    /* ── SHA256 ── */
+    if (tok_eqi(mn,"sha256h")||tok_eqi(mn,"sha256h2")||
+        tok_eqi(mn,"sha256su0")||tok_eqi(mn,"sha256su1")) {
+        i32 qd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 qn=reg_neon(l->cur); lex_next(l);
+        if (tok_eqi(mn,"sha256su0")) { emit32(em,a64_sha256su0((u32)qd,(u32)qn)); return; }
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vm=reg_neon(l->cur); lex_next(l);
+        u32 w;
+        if      (tok_eqi(mn,"sha256h"))   w=a64_sha256h((u32)qd,(u32)qn,(u32)vm);
+        else if (tok_eqi(mn,"sha256h2"))  w=a64_sha256h2((u32)qd,(u32)qn,(u32)vm);
+        else                              w=a64_sha256su1((u32)qd,(u32)qn,(u32)vm);
+        emit32(em,w); return;
+    }
+    /* ── AES ── */
+    if (tok_eqi(mn,"aese")||tok_eqi(mn,"aesd")||
+        tok_eqi(mn,"aesmc")||tok_eqi(mn,"aesimc")) {
+        i32 vd=reg_neon(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 vn=reg_neon(l->cur); lex_next(l);
+        u32 w;
+        if      (tok_eqi(mn,"aese"))   w=a64_aese((u32)vd,(u32)vn);
+        else if (tok_eqi(mn,"aesd"))   w=a64_aesd((u32)vd,(u32)vn);
+        else if (tok_eqi(mn,"aesmc"))  w=a64_aesmc((u32)vd,(u32)vn);
+        else                           w=a64_aesimc((u32)vd,(u32)vn);
+        emit32(em,w); return;
+    }
+    /* ── Acquire/release atomics ── */
+    if (tok_eqi(mn,"ldar")||tok_eqi(mn,"stlr")||
+        tok_eqi(mn,"ldaxr")||tok_eqi(mn,"ldxr")) {
+        i32 rt=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        lex_next(l); /* [ */
+        i32 rn=reg64(l->cur); lex_next(l);
+        lex_next(l); /* ] */
+        u32 w;
+        if      (tok_eqi(mn,"ldar"))  w=a64_ldar((u32)rt,(u32)rn);
+        else if (tok_eqi(mn,"stlr"))  w=a64_stlr((u32)rt,(u32)rn);
+        else if (tok_eqi(mn,"ldaxr")) w=a64_ldaxr((u32)rt,(u32)rn);
+        else                          w=a64_ldxr((u32)rt,(u32)rn);
+        emit32(em,w); return;
+    }
+    if (tok_eqi(mn,"stlxr")||tok_eqi(mn,"stxr")) {
+        i32 rs=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rt=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        lex_next(l); /* [ */
+        i32 rn=reg64(l->cur); lex_next(l);
+        lex_next(l); /* ] */
+        emit32(em,tok_eqi(mn,"stlxr")?a64_stlxr((u32)rs,(u32)rt,(u32)rn)
+                                      :a64_stxr((u32)rs,(u32)rt,(u32)rn));
+        return;
+    }
+    /* ── prfm pldl1keep|pldl2keep, [xn, #off] ── */
+    if (tok_eqi(mn,"prfm")) {
+        int l2 = tok_eqi(l->cur,"pldl2keep")||tok_eqi(l->cur,"pldl2strm");
+        lex_next(l); /* skip prefetch type */
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        lex_next(l); /* [ */
+        i32 rn=reg64(l->cur); lex_next(l);
+        u32 off=0;
+        if (l->cur.kind==TK_COMMA) { lex_next(l); off=(u32)lex_imm(l); }
+        lex_next(l); /* ] */
+        emit32(em,l2?a64_prfm_l2((u32)rn,(u16)off):a64_prfm_l1((u32)rn,(u16)off));
+        return;
+    }
+    /* ── dmb / dsb / isb ── */
+    if (tok_eqi(mn,"dmb")) { lex_next(l); emit32(em,A64_DMB_ISH); return; }
+    if (tok_eqi(mn,"dsb")) { lex_next(l); emit32(em,A64_DSB_ISH); return; }
+    if (tok_eqi(mn,"isb")) {              emit32(em,A64_ISB);      return; }
     /* unknown mnemonic — emit NOP placeholder so label offsets stay correct */
     pr_err("apkc: unknown ARM64 mnemonic\n");
     emit32(em,A64_NOP);
@@ -844,7 +1073,7 @@ static AsmResult assemble(const u8 *src, sz src_len, int arch, u8 *out_code) {
                     }
                     if (mn2.p[0]=='.') {
                         if (tok_eq(mn2,".word"))  { lex_imm(&l2); em.pos+=4; }
-                        else if (tok_eq(mn2,".byte"))  { lex_imm(&l2); em.pos+=1; }
+                        else if (tok_eq(mn2,".byte")) { lex_imm(&l2); em.pos+=1; }
                         else if (tok_eq(mn2,".ascii")||tok_eq(mn2,".asciz")) {
                             int z=tok_eq(mn2,".asciz");
                             if (l2.cur.kind==TK_STR) { em.pos+=l2.cur.len+(sz)z; lex_next(&l2); }
@@ -912,123 +1141,24 @@ static u8 _axml_buf[0x4000];
 static u8 _dex_buf[200];
 static u8 _so64_buf[0x8000];
 static u8 _so32_buf[0x8000];
+static u8 _fork_out[0x100000]; /* fork+exec output buffer */
 
-static i32 build_apk(
-    const u8 *src, sz src_len,
-    const char *pkg, const char *label, const char *libname,
-    u32 min_sdk, u32 tgt_sdk,
-    int do64, int do32,
-    const char *outpath,
-    LangMode lang,
-    const char *interp,        /* for LANG_SH / LANG_PY */
-    const char *bin_path)      /* for LANG_RS: pre-compiled .so */
-{
-    AsmResult r64; r64.size=0; r64.sym1_va=0; r64.sym2_va=0; r64.has_sym1=0; r64.has_sym2=0;
-    AsmResult r32_; r32_.size=0; r32_.sym1_va=0; r32_.sym2_va=0; r32_.has_sym1=0; r32_.has_sym2=0;
+/* Build a ZIP path like "lib/arm64-v8a/lib<name>.so" */
+static sz _make_so_path(u8 *out, const char *abi, const char *name) {
+    sz i=0;
+    const char *p="lib/"; while(*p) out[i++]=(u8)*p++;
+    while(*abi) out[i++]=(u8)*abi++;
+    const char *s="/lib"; while(*s) out[i++]=(u8)*s++;
+    while(*name) out[i++]=(u8)*name++;
+    const char *e=".so"; while(*e) out[i++]=(u8)*e++;
+    out[i]=0; return i;
+}
 
-    if (lang==LANG_SH||lang==LANG_PY) {
-        /* generate ARM64 execve bootstrap; ARM32 not supported for script mode */
-        const char *ipath = interp ? interp : (lang==LANG_SH ? "/system/bin/sh" : "/usr/bin/python3");
-        const char *arg1  = "-c";
-        sz scsz = gen_script_code64(ipath, arg1, (const char*)src, _code64, sizeof(_code64));
-        if (!scsz) { pr_err("script code gen failed\n"); return -1; }
-        r64.size = scsz; r64.has_sym1=0; r64.has_sym2=0;
-        do32=0; /* script mode: 64-bit only */
-    } else if (lang==LANG_RS) {
-        /* pre-compiled binary: read .so from bin_path */
-        if (!bin_path) { pr_err("-bin required for -lang rs\n"); return -1; }
-        i32 bfd=os_open(bin_path,0,0);
-        if (bfd<0) { pr_err("cannot open bin: "); pr_err(bin_path); pr_err("\n"); return -1; }
-        sz bsz=0;
-        while (bsz<sizeof(_so64_buf)) {
-            i32 n=os_read(bfd,_so64_buf+bsz,sizeof(_so64_buf)-bsz);
-            if (n<=0) break; bsz+=(sz)n;
-        }
-        os_close(bfd);
-        /* write directly to zip as lib/arm64-v8a/lib<name>.so */
-        sz axsz=axml_build(pkg,label,libname,min_sdk,tgt_sdk,_axml_buf,sizeof(_axml_buf));
-        if (!axsz) { pr_err("axml_build failed\n"); return -1; }
-        sz dexsz=dex_build(_dex_buf);
-        ZipWr zw; zip_init(&zw,_apk_buf,sizeof(_apk_buf));
-        u8 p64[64]; sz pi=0;
-        const char *pf="lib/arm64-v8a/lib"; while(*pf) p64[pi++]=(u8)*pf++;
-        const char *lp=libname; while(*lp) p64[pi++]=(u8)*lp++;
-        const char *sx=".so"; while(*sx) p64[pi++]=(u8)*sx++;
-        p64[pi]=0;
-        zip_add(&zw,(const char*)p64,_so64_buf,bsz);
-        zip_add(&zw,"AndroidManifest.xml",_axml_buf,axsz);
-        zip_add(&zw,"classes.dex",_dex_buf,dexsz);
-        sz total=zip_finish(&zw);
-        if (!total) { pr_err("zip_finish failed\n"); return -1; }
-        i32 fd=os_open(outpath,0x241,0x1A4);
-        if (fd<0) { pr_err("open output failed\n"); return -1; }
-        sz written=0;
-        while (written<total) {
-            sz chunk=total-written; if(chunk>0x8000) chunk=0x8000;
-            i32 n=os_write(fd,_apk_buf+written,chunk); if(n<=0) break;
-            written+=(sz)n;
-        }
-        os_close(fd);
-        pr("wrote "); pr_dec((u64)total); pr(" bytes to "); pr(outpath); pr_nl();
-        return 0;
-    } else {
-        /* LANG_ASM: assemble source */
-        if (do64) r64=assemble(src,src_len,64,_code64);
-        if (do32) r32_=assemble(src,src_len,32,_code32);
-    }
-
-    /* for LANG_SH/PY the code is already in _code64 but not wrapped in ELF yet */
-    /* fall through to shared ELF+ZIP path */
-
-    /* build AndroidManifest.xml */
-    sz axsz=axml_build(pkg,label,libname,min_sdk,tgt_sdk,_axml_buf,sizeof(_axml_buf));
-    if (axsz==0) { pr_err("axml_build failed\n"); return -1; }
-
-    /* build classes.dex */
-    sz dexsz=dex_build(_dex_buf);
-
-    /* build .so files */
-    sz so64sz=0, so32sz=0;
-    if (do64) {
-        u8 *txt=r64.size?_code64:(u8*)0;
-        so64sz=(sz)elf64_build_so(_so64_buf,txt,(u32)r64.size,r64.sym1_va,r64.sym2_va);
-    }
-    if (do32) {
-        u8 *txt=r32_.size?_code32:(u8*)0;
-        so32sz=(sz)elf32_build_so(_so32_buf,txt,(u32)r32_.size,r32_.sym1_va,r32_.sym2_va);
-    }
-
-    /* assemble ZIP */
-    ZipWr zw;
-    zip_init(&zw,_apk_buf,sizeof(_apk_buf));
-
-    /* lib/arm64-v8a/lib<name>.so */
-    if (do64&&so64sz) {
-        /* build path */
-        u8 p64[64];
-        sz pi=0;
-        const char *pf="lib/arm64-v8a/lib"; while(*pf) p64[pi++]=(u8)*pf++;
-        const char *lp=libname; while(*lp) p64[pi++]=(u8)*lp++;
-        const char *sx=".so"; while(*sx) p64[pi++]=(u8)*sx++;
-        p64[pi]=0;
-        zip_add(&zw,(const char*)p64,_so64_buf,so64sz);
-    }
-    if (do32&&so32sz) {
-        u8 p32[64]; sz pi=0;
-        const char *pf="lib/armeabi-v7a/lib"; while(*pf) p32[pi++]=(u8)*pf++;
-        const char *lp=libname; while(*lp) p32[pi++]=(u8)*lp++;
-        const char *sx=".so"; while(*sx) p32[pi++]=(u8)*sx++;
-        p32[pi]=0;
-        zip_add(&zw,(const char*)p32,_so32_buf,so32sz);
-    }
-    zip_add(&zw,"AndroidManifest.xml",_axml_buf,axsz);
-    zip_add(&zw,"classes.dex",_dex_buf,dexsz);
-
-    sz total=zip_finish(&zw);
+/* Write APK to outpath from ZIP writer */
+static i32 _write_apk(ZipWr *zw, const char *outpath) {
+    sz total=zip_finish(zw);
     if (!total) { pr_err("zip_finish failed\n"); return -1; }
-
-    /* write output file */
-    i32 fd=os_open(outpath,0x241,0x1A4); /* O_WRONLY|O_CREAT|O_TRUNC, 0644 */
+    i32 fd=os_open(outpath,0x241,0x1A4);
     if (fd<0) { pr_err("open output failed\n"); return -1; }
     sz written=0;
     while (written<total) {
@@ -1042,6 +1172,202 @@ static i32 build_apk(
     return 0;
 }
 
+/*
+ * fork_exec_wait: fork, exec compiler with args, read output file.
+ * compiler: path or name of compiler to exec
+ * args:     NULL-terminated argv (args[0] should be compiler name)
+ * outfile:  path where compiler writes its output
+ * outbuf/outsz: buffer to receive output bytes
+ * Returns bytes read into outbuf, or 0 on error.
+ *
+ * NOTE: This is ARM64-only (uses os_fork/os_execve/os_waitpid from sys.h).
+ */
+#ifdef __aarch64__
+static sz fork_exec_wait(const char *compiler, char *const args[],
+                         const char *outfile, u8 *outbuf, sz outbuf_cap)
+{
+    i32 pid = os_fork();
+    if (pid < 0) { pr_err("fork failed\n"); return 0; }
+    if (pid == 0) {
+        /* child: exec compiler */
+        char *const envp[] = { NULL };
+        os_execve(compiler, args, envp);
+        os_exit(127); /* exec failed */
+    }
+    /* parent: wait for child */
+    i32 status = 0;
+    os_waitpid(pid, &status, 0);
+    if (((status >> 8) & 0xFF) != 0) {
+        pr_err("compiler exited with error\n"); return 0;
+    }
+    /* read output file */
+    i32 fd = os_open(outfile, 0, 0);
+    if (fd < 0) { pr_err("cannot open compiler output\n"); return 0; }
+    sz total = 0;
+    while (total < outbuf_cap) {
+        i32 n = os_read(fd, outbuf + total, outbuf_cap - total);
+        if (n <= 0) break;
+        total += (sz)n;
+    }
+    os_close(fd);
+    return total;
+}
+#else
+static sz fork_exec_wait(const char *compiler, char *const args[],
+                         const char *outfile, u8 *outbuf, sz outbuf_cap)
+{
+    (void)compiler; (void)args; (void)outfile; (void)outbuf; (void)outbuf_cap;
+    pr_err("fork_exec_wait: not supported on ARM32\n");
+    return 0;
+}
+#endif
+
+/* Table-driven build_apk: LangProfile drives the entire pipeline */
+static i32 build_apk(
+    const u8 *src, sz src_len,
+    const char *pkg, const char *label, const char *libname,
+    u32 min_sdk, u32 tgt_sdk,
+    int do64, int do32,
+    const char *outpath,
+    const LangProfile *prof,
+    const char *inpath)  /* for fork+exec: write src to /tmp */
+{
+    AsmResult r64; r64.size=0; r64.sym1_va=0; r64.sym2_va=0; r64.has_sym1=0; r64.has_sym2=0;
+    AsmResult r32_; r32_.size=0; r32_.sym1_va=0; r32_.sym2_va=0; r32_.has_sym1=0; r32_.has_sym2=0;
+    sz so64sz=0, so32sz=0;
+    sz dexsz=0;
+    const u8 *dex_buf_ptr = _dex_buf; /* points to whichever buffer holds the DEX */
+
+    if (prof->use_asm) {
+        /* internal ARM assembler */
+        if (do64) r64  = assemble(src, src_len, 64, _code64);
+        if (do32) r32_ = assemble(src, src_len, 32, _code32);
+
+        if (do64) {
+            u8 *txt = r64.size ? _code64 : (u8*)0;
+            ElfSym _es64[2] = {
+                {"ANativeActivity_onCreate", r64.sym1_va},
+                {"android_main", r64.has_sym2 ? r64.sym2_va
+                                              : (r64.sym1_va ? r64.sym1_va+4u : 4u)}
+            };
+            so64sz = elf64_build_so(_so64_buf, txt, (u32)r64.size, _es64, 2, NULL, 0u);
+        }
+        if (do32) {
+            u8 *txt = r32_.size ? _code32 : (u8*)0;
+            ElfSym _es32[2] = {
+                {"ANativeActivity_onCreate", r32_.sym1_va},
+                {"android_main", r32_.has_sym2 ? r32_.sym2_va
+                                               : (r32_.sym1_va ? r32_.sym1_va+4u : 4u)}
+            };
+            so32sz = elf32_build_so(_so32_buf, txt, (u32)r32_.size, _es32, 2);
+        }
+
+    } else if (prof->use_script) {
+        /* inline execve bootstrap: interpreter runs source at app start */
+        const char *ipath  = prof->compiler;
+        const char *arg1   = prof->arg1;
+        sz scsz = gen_script_code64(ipath, arg1, (const char*)src, _code64, sizeof(_code64));
+        if (!scsz) { pr_err("script codegen failed\n"); return -1; }
+        r64.size = scsz;
+        ElfSym _scsyms[2] = {{"ANativeActivity_onCreate",0u},{"android_main",4u}};
+        so64sz = elf64_build_so(_so64_buf, _code64, (u32)scsz, _scsyms, 2, NULL, 0u);
+        do32 = 0; /* script bootstrap is arm64-only */
+
+    } else if (prof->use_fork) {
+        /* fork+exec external compiler */
+        /* JSX babel writes to /tmp/jsx_out.js; all others write to /tmp/apkc_out.so */
+        static const char _tmpout_so[]  = "/tmp/apkc_out.so";
+        static const char _tmpout_jsx[] = "/tmp/jsx_out.js";
+        const char *_tmpout = prof->jsx_node ? _tmpout_jsx : _tmpout_so;
+
+        char *args[32];
+        int na = 0;
+        args[na++] = (char*)prof->compiler;
+        for (int j = 0; j < 10 && prof->cc_args[j]; j++)
+            args[na++] = (char*)prof->cc_args[j];
+        args[na++] = (char*)_tmpout;
+        args[na++] = (char*)inpath;
+        args[na] = NULL;
+
+        sz outsz = fork_exec_wait(prof->compiler, args, _tmpout,
+                                  _fork_out, sizeof(_fork_out));
+        if (!outsz) { pr_err("fork+exec produced no output\n"); return -1; }
+
+        if (prof->jsx_node) {
+            /* JSX two-stage: babel JS output → node execve bootstrap */
+            sz scsz = gen_script_code64("/usr/bin/node", "-e",
+                                        (const char*)_fork_out, _code64, sizeof(_code64));
+            if (!scsz) { pr_err("jsx node codegen failed\n"); return -1; }
+            ElfSym _jssyms[2] = {{"ANativeActivity_onCreate",0u},{"android_main",4u}};
+            so64sz = elf64_build_so(_so64_buf, _code64, (u32)scsz, _jssyms, 2, NULL, 0u);
+
+        } else if (prof->use_d8 && prof->dex_output) {
+            /* Kotlin/Java: step 1 produced a JAR; step 2 runs d8 to get real DEX */
+            static const char _d8_out[] = "/tmp/classes.dex";
+            char *d8args[8];
+            int nd = 0;
+            d8args[nd++] = "d8";
+            d8args[nd++] = "--output";
+            d8args[nd++] = "/tmp/";
+            d8args[nd++] = (char*)_tmpout_so;   /* JAR produced by kotlinc/javac */
+            d8args[nd]   = NULL;
+            sz dexout = fork_exec_wait("d8", d8args, _d8_out,
+                                       _fork_out, sizeof(_fork_out));
+            if (dexout) {
+                /* d8 succeeded: use _fork_out directly (avoids 200B _dex_buf limit) */
+                dex_buf_ptr = _fork_out;
+                dexsz = dexout;
+            } else {
+                /* d8 not installed: use the JAR bytes as classes.dex fallback */
+                m_cpy(_dex_buf, _fork_out, outsz < sizeof(_dex_buf) ? outsz : sizeof(_dex_buf));
+                dexsz = outsz < sizeof(_dex_buf) ? outsz : sizeof(_dex_buf);
+            }
+
+        } else if (prof->dex_output) {
+            /* dex_output but no d8 step: store JAR/DEX directly */
+            m_cpy(_dex_buf, _fork_out, outsz < sizeof(_dex_buf) ? outsz : sizeof(_dex_buf));
+            dexsz = outsz < sizeof(_dex_buf) ? outsz : sizeof(_dex_buf);
+
+        } else {
+            /* C/C++/Rust: output is a native .so */
+            m_cpy(_so64_buf, _fork_out, outsz < sizeof(_so64_buf) ? outsz : sizeof(_so64_buf));
+            so64sz = outsz < sizeof(_so64_buf) ? outsz : sizeof(_so64_buf);
+        }
+        do32 = 0;
+    }
+
+    /* build AndroidManifest.xml */
+    sz axsz = axml_build(pkg, label, libname, min_sdk, tgt_sdk,
+                         NULL, 0, NULL, 0, _axml_buf, sizeof(_axml_buf));
+    if (!axsz) { pr_err("axml_build failed\n"); return -1; }
+
+    /* build classes.dex if not already produced by fork+exec */
+    if (!dexsz) dexsz = dex_build(_dex_buf);
+
+    /* assemble ZIP */
+    ZipWr zw;
+    zip_init(&zw, _apk_buf, sizeof(_apk_buf));
+
+    if (prof->dex_output && dexsz > 200) {
+        /* Kotlin/Java: real DEX from compiler or d8 */
+        zip_add(&zw, "classes.dex", dex_buf_ptr, (u32)dexsz);
+    } else {
+        /* native .so output */
+        if (do64 && so64sz) {
+            u8 p64[80]; _make_so_path(p64, "arm64-v8a", libname);
+            zip_add(&zw, (const char*)p64, _so64_buf, (u32)so64sz);
+        }
+        if (do32 && so32sz) {
+            u8 p32[80]; _make_so_path(p32, "armeabi-v7a", libname);
+            zip_add(&zw, (const char*)p32, _so32_buf, (u32)so32sz);
+        }
+        zip_add(&zw, "classes.dex", dex_buf_ptr, (u32)dexsz);
+    }
+    zip_add(&zw, "AndroidManifest.xml", _axml_buf, (u32)axsz);
+
+    return _write_apk(&zw, outpath);
+}
+
 /* ── CLI ──────────────────────────────────────────────────────────── */
 static u8 _src_local[0x100000];
 
@@ -1051,81 +1377,75 @@ static int _str_eq(const char *a, const char *b) {
 }
 
 static i32 apkc_main(i32 argc, char **argv) {
-    const char *inpath=0;
-    const char *outpath="out.apk";
-    const char *pkg="com.example.app";
-    const char *label="App";
-    const char *libname="main";
-    const char *interp=0;
-    const char *bin_path=0;
-    u32 min_sdk=21;
-    u32 tgt_sdk=33;
-    int do64=1, do32=1;
-    LangMode lang=LANG_ASM;
+    const char *inpath  = 0;
+    const char *outpath = "out.apk";
+    const char *pkg     = "com.example.app";
+    const char *label   = "App";
+    const char *libname = "main";
+    const char *lang_override = 0;
+    u32 min_sdk = 21;
+    u32 tgt_sdk = 33;
+    int do64 = 1, do32 = 1;
 
-    for (i32 i=1;i<argc;i++) {
-        char *a=argv[i];
+    for (i32 i=1; i<argc; i++) {
+        char *a = argv[i];
         if (a[0]=='-'&&a[1]=='o'&&a[2]==0 && i+1<argc) { outpath=argv[++i]; continue; }
         if (a[0]=='-'&&a[1]=='p'&&a[2]==0 && i+1<argc) { pkg=argv[++i]; continue; }
         if (a[0]=='-'&&a[1]=='l'&&a[2]==0 && i+1<argc) { label=argv[++i]; continue; }
         if (a[0]=='-'&&a[1]=='n'&&a[2]==0 && i+1<argc) { libname=argv[++i]; continue; }
-        if (a[0]=='-'&&a[1]=='m'&&a[2]==0 && i+1<argc) { min_sdk=(u32)0; { char*s=argv[++i]; while(*s) min_sdk=min_sdk*10+(u32)(*s++-'0'); } continue; }
-        if (a[0]=='-'&&a[1]=='t'&&a[2]==0 && i+1<argc) { tgt_sdk=(u32)0; { char*s=argv[++i]; while(*s) tgt_sdk=tgt_sdk*10+(u32)(*s++-'0'); } continue; }
+        if (a[0]=='-'&&a[1]=='m'&&a[2]==0 && i+1<argc) {
+            min_sdk=0; char*s=argv[++i]; while(*s) min_sdk=min_sdk*10+(u32)(*s++-'0'); continue;
+        }
+        if (a[0]=='-'&&a[1]=='t'&&a[2]==0 && i+1<argc) {
+            tgt_sdk=0; char*s=argv[++i]; while(*s) tgt_sdk=tgt_sdk*10+(u32)(*s++-'0'); continue;
+        }
         if (a[0]=='-'&&a[1]=='6'&&a[2]=='4'&&a[3]==0) { do64=1; do32=0; continue; }
         if (a[0]=='-'&&a[1]=='3'&&a[2]=='2'&&a[3]==0) { do64=0; do32=1; continue; }
         if (a[0]=='-'&&a[1]=='b'&&a[2]=='o') { do64=1; do32=1; continue; }
-        /* -lang asm|sh|py|rs */
-        if (_str_eq(a,"-lang") && i+1<argc) {
-            char *lv=argv[++i];
-            if (_str_eq(lv,"sh"))  lang=LANG_SH;
-            else if (_str_eq(lv,"py"))  lang=LANG_PY;
-            else if (_str_eq(lv,"rs"))  lang=LANG_RS;
-            else                        lang=LANG_ASM;
-            continue;
-        }
-        /* -interp /path/to/interpreter */
-        if (_str_eq(a,"-interp") && i+1<argc) { interp=argv[++i]; continue; }
-        /* -bin /path/to/precompiled.so */
-        if (_str_eq(a,"-bin") && i+1<argc) { bin_path=argv[++i]; continue; }
+        if (_str_eq(a,"-lang") && i+1<argc) { lang_override=argv[++i]; continue; }
         if (a[0]!='-') { inpath=a; continue; }
         pr_err("unknown flag: "); pr_err(a); pr_err("\n");
     }
 
-    if (!inpath && lang!=LANG_RS) {
+    if (!inpath) {
         pr_err("usage: apkc [options] source\n");
-        pr_err("  -o <file>      output APK (default: out.apk)\n");
-        pr_err("  -p <pkg>       package name\n");
-        pr_err("  -l <label>     app label\n");
-        pr_err("  -n <name>      native lib name\n");
-        pr_err("  -m <sdk>       minSdkVersion\n");
-        pr_err("  -t <sdk>       targetSdkVersion\n");
-        pr_err("  -64            arm64 only\n");
-        pr_err("  -32            arm32 only\n");
-        pr_err("  -both          both arches (default)\n");
-        pr_err("  -lang asm      ARM assembly (default)\n");
-        pr_err("  -lang sh       shell script via execve\n");
-        pr_err("  -lang py       python script via execve\n");
-        pr_err("  -lang rs       pre-compiled .so (requires -bin)\n");
-        pr_err("  -interp path   custom interpreter path\n");
-        pr_err("  -bin path      pre-compiled .so (for -lang rs)\n");
+        pr_err("  -o <file>   output APK (default: out.apk)\n");
+        pr_err("  -p <pkg>    package name\n");
+        pr_err("  -l <label>  app label\n");
+        pr_err("  -n <name>   native lib name\n");
+        pr_err("  -m <sdk>    minSdkVersion\n");
+        pr_err("  -t <sdk>    targetSdkVersion\n");
+        pr_err("  -64/-32/-both  architecture filter\n");
+        pr_err("  -lang <name>   force language (asm/c/cpp/rs/kt/java/py/sh/pl/js/php/jsx)\n");
+        pr_err("  (auto-detected from file extension otherwise)\n");
         return 1;
     }
 
-    sz src_len=0;
-    if (inpath) {
-        i32 fd=os_open(inpath,0,0);
-        if (fd<0) { pr_err("cannot open: "); pr_err(inpath); pr_err("\n"); return 1; }
-        while (src_len<sizeof(_src_local)-1) {
-            i32 n=os_read(fd,_src_local+src_len,(sz)sizeof(_src_local)-src_len-1);
-            if (n<=0) break;
-            src_len+=(sz)n;
-        }
-        os_close(fd);
-        _src_local[src_len]=0;
-    }
+    /* detect language from extension or override */
+    const LangProfile *prof = lang_override
+        ? lang_profile_find(lang_override)
+        : lang_profile_from_path(inpath);
+    if (!prof) { pr_err("unknown -lang value\n"); return 1; }
 
-    return build_apk(_src_local,src_len,pkg,label,libname,min_sdk,tgt_sdk,
-                     do64,do32,outpath,lang,interp,bin_path);
+    /* arm64-only languages can't build arm32 */
+    if (prof->arm64_only) do32 = 0;
+
+    /* read source */
+    sz src_len = 0;
+    i32 fd = os_open(inpath, 0, 0);
+    if (fd<0) { pr_err("cannot open: "); pr_err(inpath); pr_err("\n"); return 1; }
+    while (src_len < sizeof(_src_local)-1) {
+        i32 n = os_read(fd, _src_local+src_len, sizeof(_src_local)-src_len-1);
+        if (n<=0) break;
+        src_len += (sz)n;
+    }
+    os_close(fd);
+    _src_local[src_len] = 0;
+
+    pr("apkc: lang="); pr(prof->name); pr(" src="); pr(inpath); pr_nl();
+
+    return build_apk(_src_local, src_len, pkg, label, libname,
+                     min_sdk, tgt_sdk, do64, do32, outpath, prof, inpath);
 }
 
 /* ── freestanding entry ───────────────────────────────────────────── */

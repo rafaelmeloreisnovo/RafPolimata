@@ -1,10 +1,28 @@
 /* fmt_zip.h — ZIP archive writer (STORE method, no compression).
- * CRC-32 computed with Sarwate table (generated at first use).
+ * CRC-32: hardware via __builtin_arm_crc32b when __ARM_FEATURE_CRC32 is set
+ * (confirmed available on host), Sarwate table fallback otherwise.
  * No heap. Writes into caller-supplied buffer. */
 #pragma once
 #include "mem.h"
 
 /* ── CRC-32 (ISO 3309 / ZIP)  poly = 0xEDB88320 (bit-reversed) ────────── */
+
+#ifdef __ARM_FEATURE_CRC32
+/* Hardware CRC32 path — one intrinsic per byte */
+static inline u32 crc32(const u8 *buf, sz len) {
+    u32 c = 0xFFFFFFFFu;
+    sz i = 0;
+    /* process 4 bytes at a time when aligned */
+    for (; i + 4 <= len; i += 4) {
+        u32 word = (u32)buf[i]|((u32)buf[i+1]<<8)|((u32)buf[i+2]<<16)|((u32)buf[i+3]<<24);
+        c = __builtin_arm_crc32w(c, word);
+    }
+    for (; i < len; i++)
+        c = __builtin_arm_crc32b(c, buf[i]);
+    return c ^ 0xFFFFFFFFu;
+}
+#else
+/* Software Sarwate table — generated once in BSS */
 static u32 _crc_tab[256];
 static u8  _crc_rdy = 0;
 
@@ -12,7 +30,6 @@ static inline void _crc_init(void) {
     if (_crc_rdy) return;
     for (u32 i = 0; i < 256u; i++) {
         u32 c = i;
-        /* 8 iterations, branchless via arithmetic mask */
         for (u32 j = 0; j < 8u; j++) {
             u32 mask = (u32)(-(i32)(c & 1u));
             c = (c >> 1) ^ (0xEDB88320u & mask);
@@ -28,6 +45,7 @@ static inline u32 crc32(const u8 *buf, sz len) {
         c = _crc_tab[(u8)(c ^ buf[i])] ^ (c >> 8);
     return c ^ 0xFFFFFFFFu;
 }
+#endif /* __ARM_FEATURE_CRC32 */
 
 /* ── ZIP writer ──────────────────────────────────────────────────────── */
 #define ZIP_MAX  64u
