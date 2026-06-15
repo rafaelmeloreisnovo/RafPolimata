@@ -6,6 +6,7 @@
 #include "rafbbs_crc32.h"
 #include "rafbbs_manifest.h"
 #include "rafbbs_sha256.h"
+#include "rafbbs_host.h"
 
 typedef struct {
     const char *id;
@@ -34,7 +35,7 @@ static RafStatus raf_run_cmd(RafContext *ctx, const char *module, const char *cm
     raf_log(ctx, RAF_TOKEN_VAZIO, module, "modo freestanding: comando externo nao executado");
     return RAF_TOKEN_VAZIO;
 #else
-    rc = system(cmd);
+    rc = raf_host_exec(cmd);
 #endif
     if (rc == 0) { raf_log(ctx, RAF_PASS, module, "comando finalizado rc=0"); return RAF_PASS; }
     if (optional) { ctx->limited = 1; raf_log(ctx, RAF_SKIP, module, "comando opcional indisponivel rc=%d", rc); return RAF_SKIP; }

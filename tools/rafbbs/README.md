@@ -85,3 +85,26 @@ sh tools/rafbbs/rafbbs_test.sh
 ```
 
 O teste cobre build, help, listagem, file picker, TUI, watchdog, rollback, SHA256 conhecido e compilação do núcleo freestanding.
+
+## Entrega dos 10 passos enterprise/bare-metal
+
+Os 10 passos solicitados foram materializados em `ENTERPRISE_BAREMETAL.md` e em módulos de código:
+
+1. separação `rafbbs_host.h`/`rafbbs_baremetal.h`;
+2. saída byte-a-byte por buffer fixo;
+3. failover SHA256 → CRC32 → `TOKEN_VAZIO`;
+4. file picker por tabela estática;
+5. `proof_chain` real com `AUDIT/PASS_LIMITED`;
+6. watchdog preventivo;
+7. rollback paliativo;
+8. manifesto binário compacto;
+9. flags por arquitetura;
+10. testes failsafe/failover/freestanding/no-heap.
+
+Use:
+
+```sh
+sh tools/rafbbs/rafbbs_build.sh host
+sh tools/rafbbs/rafbbs_build.sh freestanding
+sh tools/rafbbs/rafbbs_test.sh
+```
