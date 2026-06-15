@@ -93,4 +93,39 @@ int raf_compile_file(RafCtx *ctx, const char *src_path, const char *out_base,
                      int do_native);
 void raf_ctx_report(const RafCtx *ctx);
 
+/* ── APKc bridge ──────────────────────────────────────────────────────────
+ * These two inline helpers let any caller bridge RafCtx → APKc dispatch
+ * without including any Apkc/ headers directly.
+ * Usage:
+ *   #include "raf_compile.h"
+ *   #include "Apkc/lang_profile.h"
+ *   const LangProfile *prof =
+ *       lang_profile_find(raf_lang_to_apkc_name(ctx.lang));
+ *   int do64, do32;
+ *   raf_cpu_to_apkc_modes(&ctx.cpu, &do64, &do32);
+ * ─────────────────────────────────────────────────────────────────────── */
+
+/* Maps RAF_LANG_* to the APKc lang_profile name string.
+ * Returns NULL for values without an APKc mapping. */
+static inline const char *raf_lang_to_apkc_name(uint8_t lang) {
+    switch (lang) {
+    case RAF_LANG_C:    return "c";
+    case RAF_LANG_CPP:  return "cpp";
+    case RAF_LANG_S:    return "asm";
+    case RAF_LANG_PY:   return "py";
+    case RAF_LANG_RS:   return "rs";
+    case RAF_LANG_KT:   return "kt";
+    case RAF_LANG_JAVA: return "java";
+    default:            return (const char *)0;
+    }
+}
+
+/* Maps RafCPU arch + feat flags to APKc do64/do32 output mode. */
+static inline void raf_cpu_to_apkc_modes(const RafCPU *cpu,
+                                          int *do64, int *do32) {
+    *do64 = (cpu->arch == RAF_ARCH_ARM64)
+         || (cpu->arch == RAF_ARCH_UNKNOWN && (cpu->feat & RAF_FEAT_NEON));
+    *do32 = (cpu->arch == RAF_ARCH_ARM32);
+}
+
 #endif
