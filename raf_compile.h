@@ -17,6 +17,12 @@
 #define RAF_LANG_RS 4
 #define RAF_LANG_KT 5
 #define RAF_LANG_JAVA 6
+#define RAF_LANG_SH 7
+#define RAF_LANG_PL 8
+#define RAF_LANG_JS 9
+#define RAF_LANG_PHP 10
+#define RAF_LANG_JSX 11
+#define RAF_LANG_COUNT 12
 
 #define RAF_OPT_0 0
 #define RAF_OPT_1 1
@@ -93,6 +99,36 @@ int raf_compile_file(RafCtx *ctx, const char *src_path, const char *out_base,
                      int do_native);
 void raf_ctx_report(const RafCtx *ctx);
 
+/* ── Language × Architecture capability matrix ───────────────────────────
+ * RAF_CAP_MATRIX[lang][arch]: 1 = can produce valid APK on this host arch.
+ * use_script langs (py/sh/pl/js/php): any host with apkc binary → 1 on x86+arm
+ * use_asm (asm/S): internal 2-pass assembler, no external toolchain needed
+ * use_fork langs (c/cpp/rs/kt/java/jsx): fork_exec_wait is arm64-only → 0 on x86
+ *
+ * Columns: [0]=x86_64 [1]=arm64 [2]=arm32 [3]=rv64 [4]=unknown
+ * Rows:    C CPP ASM PY RS KT JAVA SH PL JS PHP JSX  (RAF_LANG_* order) */
+static const uint8_t RAF_CAP_MATRIX[RAF_LANG_COUNT][5] = {
+ /* lang        x86_64 arm64 arm32 rv64  unk  */
+ /* C    fork */  { 0,   1,   0,   0,   0 },
+ /* CPP  fork */  { 0,   1,   0,   0,   0 },
+ /* ASM  asm  */  { 1,   1,   1,   0,   0 },
+ /* PY   scr  */  { 1,   1,   1,   0,   1 },
+ /* RS   fork */  { 0,   1,   0,   0,   0 },
+ /* KT   fork */  { 0,   1,   0,   0,   0 },
+ /* JAVA fork */  { 0,   1,   0,   0,   0 },
+ /* SH   scr  */  { 1,   1,   1,   0,   1 },
+ /* PL   scr  */  { 1,   1,   1,   0,   1 },
+ /* JS   scr  */  { 1,   1,   1,   0,   1 },
+ /* PHP  scr  */  { 1,   1,   1,   0,   1 },
+ /* JSX  fork */  { 0,   1,   0,   0,   0 },
+};
+
+/* Query helper: returns 1 if host_arch can compile lang to valid APK, 0 otherwise. */
+static inline int raf_cap_query(uint8_t lang, uint8_t arch) {
+    if (lang >= RAF_LANG_COUNT || arch > RAF_ARCH_UNKNOWN) return 0;
+    return (int)RAF_CAP_MATRIX[lang][arch];
+}
+
 /* ── APKc bridge ──────────────────────────────────────────────────────────
  * These two inline helpers let any caller bridge RafCtx → APKc dispatch
  * without including any Apkc/ headers directly.
@@ -116,6 +152,11 @@ static inline const char *raf_lang_to_apkc_name(uint8_t lang) {
     case RAF_LANG_RS:   return "rs";
     case RAF_LANG_KT:   return "kt";
     case RAF_LANG_JAVA: return "java";
+    case RAF_LANG_SH:   return "sh";
+    case RAF_LANG_PL:   return "pl";
+    case RAF_LANG_JS:   return "js";
+    case RAF_LANG_PHP:  return "php";
+    case RAF_LANG_JSX:  return "jsx";
     default:            return (const char *)0;
     }
 }

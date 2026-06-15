@@ -567,3 +567,55 @@ static inline u32 a64_fmov_gpr_to_s(u8 vd, u8 xn) {
 static inline u32 a64_fmov_s_to_gpr(u8 rd, u8 vn) {
     return 0x9E260000u|((u32)vn<<5)|(u32)rd;
 }
+
+/* ── Load/Store extensions ───────────────────────────────────────────────── */
+/* LDRSW Xt, [Xn, #imm12*4]  — load 32-bit, sign-extend to 64-bit */
+static inline u32 a64_ldrsw_imm(u8 rt, u8 rn, u32 imm12) {
+    return 0xB9800000u|((imm12&0xFFFu)<<10)|((u32)rn<<5)|(u32)rt;
+}
+/* LDR Xt, label  — PC-relative 64-bit load; imm19 = byte_delta/4 */
+static inline u32 a64_ldr_lit(u8 rt, i32 imm19) {
+    return 0x58000000u|(((u32)(imm19)&0x7FFFFu)<<5)|(u32)rt;
+}
+
+/* ── Multi-register structure loads/stores (ASIMD, Q=1, size=S/32-bit) ───── */
+/* LD2 {Vt.4S, Vt2.4S}, [Xn]  — load two 128-bit regs, 4×32-bit lanes */
+static inline u32 a64_ld2_4s(u8 vt, u8 rn) {
+    return 0x4C808800u|((u32)rn<<5)|(u32)vt;
+}
+/* LD3 {Vt.4S, Vt2.4S, Vt3.4S}, [Xn] */
+static inline u32 a64_ld3_4s(u8 vt, u8 rn) {
+    return 0x4C804800u|((u32)rn<<5)|(u32)vt;
+}
+/* LD4 {Vt.4S, Vt2.4S, Vt3.4S, Vt4.4S}, [Xn] */
+static inline u32 a64_ld4_4s(u8 vt, u8 rn) {
+    return 0x4C800800u|((u32)rn<<5)|(u32)vt;
+}
+/* ST2 {Vt.4S, Vt2.4S}, [Xn] */
+static inline u32 a64_st2_4s(u8 vt, u8 rn) {
+    return 0x4C008800u|((u32)rn<<5)|(u32)vt;
+}
+/* ST3 {Vt.4S, Vt2.4S, Vt3.4S}, [Xn] */
+static inline u32 a64_st3_4s(u8 vt, u8 rn) {
+    return 0x4C004800u|((u32)rn<<5)|(u32)vt;
+}
+/* ST4 {Vt.4S, Vt2.4S, Vt3.4S, Vt4.4S}, [Xn] */
+static inline u32 a64_st4_4s(u8 vt, u8 rn) {
+    return 0x4C000800u|((u32)rn<<5)|(u32)vt;
+}
+
+/* ── System register access ──────────────────────────────────────────────── */
+/* Packed 15-bit sysreg: [14]=o0 [13:11]=op1 [10:7]=CRn [6:3]=CRm [2:0]=op2 */
+#define A64_SR_NZCV   0x5A10u  /* op0=3,op1=3,CRn=4,CRm=2,op2=0 */
+#define A64_SR_DAIF   0x5A11u  /* op0=3,op1=3,CRn=4,CRm=2,op2=1 */
+#define A64_SR_FPCR   0x5A20u  /* op0=3,op1=3,CRn=4,CRm=4,op2=0 */
+#define A64_SR_FPSR   0x5A21u  /* op0=3,op1=3,CRn=4,CRm=4,op2=1 */
+#define A64_SR_TPIDR  0x5E82u  /* op0=3,op1=3,CRn=13,CRm=0,op2=2 (EL0 thread ptr) */
+/* MRS Xt, sysreg — read system register into GPR */
+static inline u32 a64_mrs(u8 rt, u32 sr15) {
+    return 0xD5300000u|((sr15&0x7FFFu)<<5)|(u32)rt;
+}
+/* MSR sysreg, Xt — write GPR into system register */
+static inline u32 a64_msr(u32 sr15, u8 rt) {
+    return 0xD5100000u|((sr15&0x7FFFu)<<5)|(u32)rt;
+}
