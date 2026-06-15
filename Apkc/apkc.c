@@ -250,6 +250,7 @@ typedef struct {
     u8 *buf; sz cap; sz pos;
     u32 sym1_va; u32 sym2_va;
     int has_sym1; int has_sym2;
+    int err; /* count of unknown/invalid mnemonics encountered */
 } Emit;
 
 static void emit32(Emit *e, u32 w) {
@@ -403,11 +404,16 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
         emit32(em,a64_csel((u32)rd,(u32)rn,(u32)rm,cc,(u32)sf));
         return;
     }
-    /* ldr/str rd, [rn, #off] */
+    /* ldr/str rd, [rn, #off]  or  ldr rd, label (PC-relative literal) */
     if (tok_eqi(mn,"ldr")||tok_eqi(mn,"str")) {
         int sf=reg64_sf(l->cur);
         i32 rd=reg64(l->cur); lex_next(l);
         if (l->cur.kind==TK_COMMA) lex_next(l);
+        /* ldr x0, label — PC-relative literal load (no bracket) */
+        if (tok_eqi(mn,"ldr") && l->cur.kind==TK_IDENT && reg64(l->cur)<0) {
+            pat_add(pos,l->cur,64); lex_next(l);
+            emit32(em, a64_ldr_lit((u8)rd, 0)); return;
+        }
         lex_next(l); /* skip [ */
         i32 rn=reg64(l->cur); lex_next(l);
         i32 off=0;
@@ -1001,9 +1007,65 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
         }
         return;
     }
-    /* unknown mnemonic — emit NOP placeholder so label offsets stay correct */
+    /* ── ldrsw xt, [xn, #imm*4] ── */
+    if (tok_eqi(mn,"ldrsw")) {
+        i32 rt=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        lex_next(l); /* [ */
+        i32 rn=reg64(l->cur); lex_next(l);
+        u32 imm=0;
+        if (l->cur.kind==TK_COMMA) { lex_next(l); imm=(u32)lex_imm(l)/4u; }
+        lex_next(l); /* ] */
+        emit32(em, a64_ldrsw_imm((u8)rt,(u8)rn,imm)); return;
+    }
+    /* ── ld2/ld3/ld4/st2/st3/st4 {vt.4s,...}, [xn] ── */
+    if (tok_eqi(mn,"ld2")||tok_eqi(mn,"ld3")||tok_eqi(mn,"ld4")||
+        tok_eqi(mn,"st2")||tok_eqi(mn,"st3")||tok_eqi(mn,"st4")) {
+        int nreg=(tok_eqi(mn,"ld2")||tok_eqi(mn,"st2"))?2
+                :(tok_eqi(mn,"ld3")||tok_eqi(mn,"st3"))?3:4;
+        int sto=tok_eqi(mn,"st2")||tok_eqi(mn,"st3")||tok_eqi(mn,"st4");
+        if (l->cur.kind==TK_LBRK) lex_next(l); /* { */
+        i32 vt=reg_neon(l->cur); if (vt<0) vt=0;
+        while (l->cur.kind!=TK_RBRK&&l->cur.kind!=TK_NL&&l->cur.kind!=TK_EOF) lex_next(l);
+        if (l->cur.kind==TK_RBRK) lex_next(l); /* } */
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        lex_next(l); /* [ */
+        i32 rn=reg64(l->cur); lex_next(l);
+        lex_next(l); /* ] */
+        u32 w;
+        if (sto) w=nreg==2?a64_st2_4s((u8)vt,(u8)rn):nreg==3?a64_st3_4s((u8)vt,(u8)rn):a64_st4_4s((u8)vt,(u8)rn);
+        else     w=nreg==2?a64_ld2_4s((u8)vt,(u8)rn):nreg==3?a64_ld3_4s((u8)vt,(u8)rn):a64_ld4_4s((u8)vt,(u8)rn);
+        emit32(em, w); return;
+    }
+    /* ── mrs xt, sysreg  /  msr sysreg, xt ── */
+    if (tok_eqi(mn,"mrs")) {
+        i32 rt=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        u32 sr=A64_SR_NZCV;
+        if      (tok_eqi(l->cur,"nzcv"))     sr=A64_SR_NZCV;
+        else if (tok_eqi(l->cur,"daif"))     sr=A64_SR_DAIF;
+        else if (tok_eqi(l->cur,"fpcr"))     sr=A64_SR_FPCR;
+        else if (tok_eqi(l->cur,"fpsr"))     sr=A64_SR_FPSR;
+        else if (tok_eqi(l->cur,"tpidr_el0")) sr=A64_SR_TPIDR;
+        lex_next(l);
+        emit32(em, a64_mrs((u8)rt,sr)); return;
+    }
+    if (tok_eqi(mn,"msr")) {
+        u32 sr=A64_SR_NZCV;
+        if      (tok_eqi(l->cur,"nzcv"))     sr=A64_SR_NZCV;
+        else if (tok_eqi(l->cur,"daif"))     sr=A64_SR_DAIF;
+        else if (tok_eqi(l->cur,"fpcr"))     sr=A64_SR_FPCR;
+        else if (tok_eqi(l->cur,"fpsr"))     sr=A64_SR_FPSR;
+        else if (tok_eqi(l->cur,"tpidr_el0")) sr=A64_SR_TPIDR;
+        lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rt=reg64(l->cur); lex_next(l);
+        emit32(em, a64_msr(sr,(u8)rt)); return;
+    }
+    /* unknown mnemonic — emit BRK so execution traps; mark assembly error */
     pr_err("apkc: unknown ARM64 mnemonic\n");
-    emit32(em,A64_NOP);
+    emit32(em, 0xD4200020u); /* BRK #1 — traps on execution, not silent */
+    em->err++;
 }
 
 /* ── ARM32 assembler ──────────────────────────────────────────────── */
@@ -1167,13 +1229,14 @@ static void asm_insn32(Emit *em, Tok mn, Lex *l) {
         u32 v=(u32)lex_imm(l);
         emit32(em,v); return;
     }
-    /* unknown mnemonic — emit NOP placeholder so label offsets stay correct */
+    /* unknown mnemonic — emit UNDEF so execution faults; mark assembly error */
     pr_err("apkc: unknown ARM32 mnemonic\n");
-    emit32(em,A32_NOP);
+    emit32(em, 0xE7F000F0u); /* UNDEF instruction — architecturally undefined, not silent NOP */
+    em->err++;
 }
 
 /* ── two-pass assembler ───────────────────────────────────────────── */
-typedef struct { sz size; u32 sym1_va; u32 sym2_va; int has_sym1; int has_sym2; } AsmResult;
+typedef struct { sz size; u32 sym1_va; u32 sym2_va; int has_sym1; int has_sym2; int err; } AsmResult;
 
 static u8 _code64[0x10000];
 static u8 _code32[0x10000];
@@ -1311,6 +1374,8 @@ static AsmResult assemble(const u8 *src, sz src_len, int arch, u8 *out_code) {
                 insn=(insn&0xFF00001Fu)|(((u32)(delta/4)&0x7FFFFu)<<5);
             } else if ((insn&0x7E000000u)==0x34000000u) { /* CBZ/CBNZ */
                 insn=(insn&0xFF00001Fu)|(((u32)(delta/4)&0x7FFFFu)<<5);
+            } else if ((insn&0xFF000000u)==0x58000000u) { /* LDR Xt, literal */
+                insn=(insn&0xFF00001Fu)|(((u32)(delta/4)&0x7FFFFu)<<5);
             } else if (insn&0x80000000u) { /* ADRP: page-granular (delta in 4KiB pages) */
                 i32 pdelta=delta>>12;
                 u32 immlo=(u32)(pdelta)&3u;
@@ -1332,6 +1397,7 @@ static AsmResult assemble(const u8 *src, sz src_len, int arch, u8 *out_code) {
     res.size=em.pos;
     res.sym1_va=em.sym1_va; res.sym2_va=em.sym2_va;
     res.has_sym1=em.has_sym1; res.has_sym2=em.has_sym2;
+    res.err=em.err;
     return res;
 }
 

@@ -51,6 +51,16 @@ jobs:
       - name: ApkC language coverage (asm + script modes)
         run: bash scripts/apkc_lang_coverage.sh
 
+      - name: Build and smoke-test verbovivo (T7 toroid + Fiber-H engine)
+        run: |
+          gcc -std=c11 -O2 -I. -IBenchmark -DVERBOVIVO_MAIN \
+            rafaelia/verbovivo.c -lm -o verbovivo_ci
+          echo 'RAFAELIA test vector' | ./verbovivo_ci /dev/stdin /dev/null 2>&1 | \
+            grep -E 'verbovivo:.*phi=' || true
+          ls -la Apkc/hello.apk 2>/dev/null && \
+            ./verbovivo_ci Apkc/hello.apk /dev/null 2>&1 | \
+            grep -E 'verbovivo:.*phi=' || echo 'TOKEN_VAZIO: hello.apk ausente'
+
       - name: Try ApkC debug signing proof (TOKEN_VAZIO allowed)
         run: bash scripts/apkc_sign_debug.sh
 

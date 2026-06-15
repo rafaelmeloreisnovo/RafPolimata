@@ -427,7 +427,7 @@ int verbovivo_main(const char *apk_path, const char *svg_out) {
     T7State t7;
     t7_init(&t7);
 
-    Pt    *traj  = (Pt *)malloc(MAX_TRAJ * sizeof(Pt));
+    Pt     traj[MAX_TRAJ]; /* stack-allocated; MAX_TRAJ=4096, Pt=8B → 32KB */
     int    ntraj = 0;
     size_t nbytes = 0;
 
@@ -468,7 +468,6 @@ int verbovivo_main(const char *apk_path, const char *svg_out) {
 
     if (!nbytes) {
         fprintf(stderr, "verbovivo: empty file %s\n", apk_path);
-        free(traj);
         return -1;
     }
 
@@ -481,7 +480,6 @@ int verbovivo_main(const char *apk_path, const char *svg_out) {
     FILE *fout = svg_out ? fopen(svg_out, "w") : stdout;
     if (!fout) {
         fprintf(stderr, "verbovivo: cannot write %s\n", svg_out ? svg_out : "(stdout)");
-        free(traj);
         return -1;
     }
     svg_write_t7(fout, traj, ntraj, phi, (int)t7.attractor, hamming);
@@ -492,7 +490,6 @@ int verbovivo_main(const char *apk_path, const char *svg_out) {
         "hamming=%.4f  hdc[0]=%08x\n",
         nbytes, phi, t7.attractor, hamming, hdc[0]);
 
-    free(traj);
     return 0;
 }
 
