@@ -96,3 +96,18 @@ void  vv_audit(const VerbVivoState *vv);
 void  vv_svg(const VerbVivoState *vv);
 int   vv_hamming_256(const vv_u8 a[32], const vv_u8 b[32]);
 int   vv_monobit(const vv_u8 hash[32]);
+
+/* Recupera os top_n engrams mais ressonantes com a query.
+ * phi_weight: importância da coerência semântica vs. diversidade de Hamming [0..1].
+ *   phi_weight → 1.0 : prioriza similaridade vetorial (cosine) — regime coerente.
+ *   phi_weight → 0.0 : prioriza diversidade estrutural (Hamming) — regime caótico.
+ * Recomendado: phi_weight = (vv_recall phi from T^7 pipeline) / 65536.0
+ * Retorna: número de engrams preenchidos em out[] (0 se buffer vazio).
+ * out[] deve ter capacidade >= top_n.
+ * Sem malloc — usa stack interno de VV_MEM_SIZE=64 scores. */
+int   vv_recall(const VerbVivoState *vv,
+                const VVHyperVec    *query_vec,
+                const FiberHash     *query_hash,
+                vv_f32               phi_weight,
+                int                  top_n,
+                VVEngram            *out);

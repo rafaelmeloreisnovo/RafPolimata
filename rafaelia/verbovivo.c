@@ -282,6 +282,64 @@ void vv_svg(const VerbVivoState *vv) {
     printf("</svg>\n");
 }
 
+/* ── vv_recall: geometric attention-based engram retrieval ─────────────── */
+/*
+ * recall_score(q, e) = phi_w * cos(q.vec, e.vec)
+ *                    + (1 - phi_w) * (1 - fiber_hamming(q.hash, e.hash) / 256)
+ *
+ * When phi_w is high (coherent stream): cosine similarity dominates — the system
+ * retrieves engrams that are semantically close to the query.
+ * When phi_w is low (chaotic stream): Hamming complement dominates — the system
+ * retrieves the most structurally distinct engrams, learning by divergence.
+ *
+ * This is the GEOMETRIC gate: no gradient, no backprop. The gate is computed
+ * from the stream itself via phi_ethica = (1-H)*C, seed {40503}.
+ */
+int vv_recall(const VerbVivoState *vv,
+              const VVHyperVec    *query_vec,
+              const FiberHash     *query_hash,
+              vv_f32               phi_weight,
+              int                  top_n,
+              VVEngram            *out)
+{
+    if (!vv || !query_vec || !out || top_n <= 0) return 0;
+
+    vv_u32 n = vv->chunk_count < VV_MEM_SIZE ? vv->chunk_count : VV_MEM_SIZE;
+    if (n == 0) return 0;
+
+    if (phi_weight < 0.0f) phi_weight = 0.0f;
+    if (phi_weight > 1.0f) phi_weight = 1.0f;
+
+    /* score each engram — stack only, no heap */
+    vv_f32 scores[VV_MEM_SIZE];
+    int    idx[VV_MEM_SIZE];
+    for (vv_u32 i = 0; i < n; i++) {
+        const VVEngram *e = &vv->memory[i];
+        vv_f32 cos_sim = _cosine(query_vec, &e->vec);
+        /* cos_sim in [-1,1]; map to [0,1] for scoring */
+        vv_f32 sem = (cos_sim + 1.0f) * 0.5f;
+        vv_f32 ham_div = 0.0f;
+        if (query_hash) {
+            int hd = _fiber_hamming(query_hash, &e->fiber_hash);
+            ham_div = 1.0f - (vv_f32)hd / 256.0f;  /* 1 = identical, 0 = maximally different */
+        }
+        scores[i] = phi_weight * sem + (1.0f - phi_weight) * ham_div;
+        idx[i]    = (int)i;
+    }
+
+    /* partial selection sort — top_n passes, O(n * top_n), n<=64 */
+    int out_count = top_n < (int)n ? top_n : (int)n;
+    for (int k = 0; k < out_count; k++) {
+        int best = k;
+        for (int j = k + 1; j < (int)n; j++)
+            if (scores[idx[j]] > scores[idx[best]]) best = j;
+        /* swap */
+        int tmp = idx[k]; idx[k] = idx[best]; idx[best] = tmp;
+        out[k] = vv->memory[idx[k]];
+    }
+    return out_count;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
  * LAYER 2 — T^7 toroid pipeline (verbovivo_main)
  * ══════════════════════════════════════════════════════════════════════════ */
