@@ -13,6 +13,9 @@
 #include "fmt_axml.h"
 #include "fmt_elf.h"
 
+/* language modes */
+typedef enum { LANG_ASM=0, LANG_SH=1, LANG_PY=2, LANG_RS=3 } LangMode;
+
 /* ── token kinds ─────────────────────────────────────────────────── */
 typedef enum {
     TK_EOF=0, TK_NL, TK_IDENT, TK_INT, TK_STR, TK_COMMA,
@@ -252,6 +255,16 @@ typedef struct {
 static void emit32(Emit *e, u32 w) {
     if (e->pos+4>e->cap) return;
     w32(e->buf+e->pos,w); e->pos+=4;
+}
+static void emit8(Emit *e, u8 b) {
+    if (e->pos<e->cap) e->buf[e->pos++]=b;
+}
+static void emit_bytes(Emit *e, const u8 *src, sz n) {
+    for (sz i=0;i<n;i++) emit8(e,(u8)src[i]);
+}
+static void emit_align(Emit *e, u32 pow2) {
+    sz mask=(sz)((1u<<pow2)-1u);
+    while (e->pos & mask) emit8(e,0);
 }
 
 /* ── ARM64 assembler ──────────────────────────────────────────────── */
@@ -493,6 +506,84 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
         if (l->cur.kind==TK_COMMA) { lex_next(l); off=(i32)lex_imm(l); post=1; }
         if (post) emit32(em,a64_ldp_post((u32)r1,(u32)r2,(u32)rn,off,(u32)sf));
         else      emit32(em,a64_ldp((u32)r1,(u32)r2,(u32)rn,off,(u32)sf));
+        return;
+    }
+    /* mul/sdiv/udiv rd, rn, rm */
+    if (tok_eqi(mn,"mul")||tok_eqi(mn,"sdiv")||tok_eqi(mn,"udiv")) {
+        int sf=reg64_sf(l->cur);
+        i32 rd=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rm=reg64(l->cur); lex_next(l);
+        u32 w;
+        if      (tok_eqi(mn,"mul"))  w=a64_mul((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+        else if (tok_eqi(mn,"sdiv")) w=a64_sdiv((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+        else                         w=a64_udiv((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+        emit32(em,w); return;
+    }
+    /* lsl/lsr/asr — immediate or register form */
+    if (tok_eqi(mn,"lsl")||tok_eqi(mn,"lsr")||tok_eqi(mn,"asr")) {
+        int sf=reg64_sf(l->cur);
+        i32 rd=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        u32 w;
+        if (l->cur.kind==TK_HASH||l->cur.kind==TK_INT) {
+            u32 sh=(u32)lex_imm(l);
+            if      (tok_eqi(mn,"lsl")) w=a64_lsl_imm((u32)rd,(u32)rn,(u8)sh,(u32)sf);
+            else if (tok_eqi(mn,"lsr")) w=a64_lsr_imm((u32)rd,(u32)rn,(u8)sh,(u32)sf);
+            else                        w=a64_asr_imm((u32)rd,(u32)rn,(u8)sh,(u32)sf);
+        } else {
+            i32 rm=reg64(l->cur); lex_next(l);
+            if      (tok_eqi(mn,"lsl")) w=a64_lslv((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+            else if (tok_eqi(mn,"lsr")) w=a64_lsrv((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+            else                        w=a64_asrv((u32)rd,(u32)rn,(u32)rm,(u32)sf);
+        }
+        emit32(em,w); return;
+    }
+    /* ldrb/strb rt, [rn, #off] */
+    if (tok_eqi(mn,"ldrb")||tok_eqi(mn,"strb")) {
+        i32 rt=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        lex_next(l); /* [ */
+        i32 rn=reg64(l->cur); lex_next(l);
+        u32 off=0;
+        if (l->cur.kind==TK_COMMA) { lex_next(l); off=(u32)lex_imm(l); }
+        lex_next(l); /* ] */
+        u32 w=tok_eqi(mn,"ldrb")?a64_ldrb((u32)rt,(u32)rn,(u16)off)
+                                 :a64_strb((u32)rt,(u32)rn,(u16)off);
+        emit32(em,w); return;
+    }
+    /* ldrh/strh rt, [rn, #off] */
+    if (tok_eqi(mn,"ldrh")||tok_eqi(mn,"strh")) {
+        i32 rt=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        lex_next(l); /* [ */
+        i32 rn=reg64(l->cur); lex_next(l);
+        u32 off=0;
+        if (l->cur.kind==TK_COMMA) { lex_next(l); off=(u32)lex_imm(l); }
+        lex_next(l); /* ] */
+        u32 w=tok_eqi(mn,"ldrh")?a64_ldrh((u32)rt,(u32)rn,(u16)off)
+                                 :a64_strh((u32)rt,(u32)rn,(u16)off);
+        emit32(em,w); return;
+    }
+    /* tbz/tbnz rt, #bit, label */
+    if (tok_eqi(mn,"tbz")||tok_eqi(mn,"tbnz")) {
+        i32 rt=reg64(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        u32 bit=(u32)lex_imm(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        if (l->cur.kind==TK_IDENT) {
+            pat_add(pos,l->cur,64); lex_next(l);
+            emit32(em,tok_eqi(mn,"tbz")?a64_tbz((u32)rt,(u8)bit,0)
+                                       :a64_tbnz((u32)rt,(u8)bit,0));
+        } else {
+            i32 off=(i32)lex_imm(l);
+            emit32(em,tok_eqi(mn,"tbz")?a64_tbz((u32)rt,(u8)bit,(i16)(off/4))
+                                       :a64_tbnz((u32)rt,(u8)bit,(i16)(off/4)));
+        }
         return;
     }
     /* .word — raw 32-bit literal */
@@ -990,20 +1081,29 @@ static void asm_insn32(Emit *em, Tok mn, Lex *l) {
         }
         return;
     }
-    if (tok_eqi(mn,"add")||tok_eqi(mn,"sub")) {
+    if (tok_eqi(mn,"add")||tok_eqi(mn,"sub")||
+        tok_eqi(mn,"and")||tok_eqi(mn,"orr")||tok_eqi(mn,"eor")) {
         i32 rd=reg32a(l->cur); lex_next(l);
         if (l->cur.kind==TK_COMMA) lex_next(l);
         i32 rn=reg32a(l->cur); lex_next(l);
         if (l->cur.kind==TK_COMMA) lex_next(l);
         if (l->cur.kind==TK_HASH||l->cur.kind==TK_INT) {
             u32 imm=(u32)lex_imm(l);
-            u32 w=tok_eqi(mn,"add")?a32_add_imm((u32)rd,(u32)rn,imm,0,0,A32_AL)
-                                    :a32_sub_imm((u32)rd,(u32)rn,imm,0,0,A32_AL);
+            u32 w;
+            if      (tok_eqi(mn,"add")) w=a32_add_imm((u32)rd,(u32)rn,(u8)imm,0,0,A32_AL);
+            else if (tok_eqi(mn,"sub")) w=a32_sub_imm((u32)rd,(u32)rn,(u8)imm,0,0,A32_AL);
+            else if (tok_eqi(mn,"and")) w=a32_and_imm((u32)rd,(u32)rn,(u8)imm,0,0,A32_AL);
+            else if (tok_eqi(mn,"orr")) w=a32_orr_imm((u32)rd,(u32)rn,(u8)imm,0,0,A32_AL);
+            else                        w=a32_eor_imm((u32)rd,(u32)rn,(u8)imm,0,0,A32_AL);
             emit32(em,w);
         } else {
             i32 rm=reg32a(l->cur); lex_next(l);
-            u32 w=tok_eqi(mn,"add")?a32_add_reg((u32)rd,(u32)rn,(u32)rm,0u,A32_AL)
-                                    :a32_sub_reg((u32)rd,(u32)rn,(u32)rm,0u,A32_AL);
+            u32 w;
+            if      (tok_eqi(mn,"add")) w=a32_add_reg((u32)rd,(u32)rn,(u32)rm,0u,A32_AL);
+            else if (tok_eqi(mn,"sub")) w=a32_sub_reg((u32)rd,(u32)rn,(u32)rm,0u,A32_AL);
+            else if (tok_eqi(mn,"and")) w=a32_and_reg((u32)rd,(u32)rn,(u32)rm,0u,A32_AL);
+            else if (tok_eqi(mn,"orr")) w=a32_orr_reg((u32)rd,(u32)rn,(u32)rm,0u,A32_AL);
+            else                        w=a32_eor_reg((u32)rd,(u32)rn,(u32)rm,0u,A32_AL);
             emit32(em,w);
         }
         return;
@@ -1031,7 +1131,9 @@ static void asm_insn32(Emit *em, Tok mn, Lex *l) {
         i32 off=(i32)lex_imm(l);
         emit32(em,is_bl?a32_bl(off/4,cc):a32_b(off/4,cc)); return;
     }
-    if (tok_eqi(mn,"ldr")||tok_eqi(mn,"str")) {
+    if (tok_eqi(mn,"ldr")||tok_eqi(mn,"str")||
+        tok_eqi(mn,"ldrh")||tok_eqi(mn,"strh")||
+        tok_eqi(mn,"ldrb")||tok_eqi(mn,"strb")) {
         i32 rd=reg32a(l->cur); lex_next(l);
         if (l->cur.kind==TK_COMMA) lex_next(l);
         lex_next(l); /* [ */
@@ -1040,8 +1142,18 @@ static void asm_insn32(Emit *em, Tok mn, Lex *l) {
         if (l->cur.kind==TK_COMMA) { lex_next(l); off=(i32)lex_imm(l); }
         lex_next(l); /* ] */
         u32 w;
-        if (tok_eqi(mn,"ldr")) w=a32_ldr_imm((u32)rd,(u32)rn,(u32)off,(u32)(off>=0),A32_AL);
-        else                   w=a32_str_imm((u32)rd,(u32)rn,(u32)(off>=0?off:-off),(u32)(off>=0),A32_AL);
+        if (tok_eqi(mn,"ldr"))
+            w=a32_ldr_imm((u32)rd,(u32)rn,(u16)(off>=0?off:-off),(u32)(off>=0),A32_AL);
+        else if (tok_eqi(mn,"str"))
+            w=a32_str_imm((u32)rd,(u32)rn,(u16)(off>=0?off:-off),(u32)(off>=0),A32_AL);
+        else if (tok_eqi(mn,"ldrh"))
+            w=a32_ldrh_imm((u32)rd,(u32)rn,(u8)(off>=0?off:-off),A32_AL);
+        else if (tok_eqi(mn,"strh"))
+            w=a32_strh_imm((u32)rd,(u32)rn,(u8)(off>=0?off:-off),A32_AL);
+        else if (tok_eqi(mn,"ldrb"))
+            w=a32_ldrb_imm((u32)rd,(u32)rn,(u16)(off>=0?off:-off),(u32)(off>=0),A32_AL);
+        else
+            w=a32_strb_imm((u32)rd,(u32)rn,(u16)(off>=0?off:-off),(u32)(off>=0),A32_AL);
         emit32(em,w); return;
     }
     if (tok_eqi(mn,"mul")) {
@@ -1094,17 +1206,38 @@ static AsmResult assemble(const u8 *src, sz src_len, int arch, u8 *out_code) {
                 }
                 /* directive .section .text .globl .type etc — skip line */
                 if (mn.p[0]=='.') {
-                    /* .sym1/.sym2 handled in asm_insn */
                     if (tok_eq(mn,".sym1")||tok_eq(mn,".sym2")) {
                         if (pass==1) {
                             if (tok_eq(mn,".sym1")) { em.sym1_va=(u32)em.pos; em.has_sym1=1; }
                             else                    { em.sym2_va=(u32)em.pos; em.has_sym2=1; }
                         }
                     } else if (tok_eq(mn,".word")) {
-                        if (pass==1) { u32 v=(u32)lex_imm(&l); emit32(&em,v); } else lex_imm(&l);
+                        if (pass==1) { u32 v=(u32)lex_imm(&l); emit32(&em,v); }
+                        else         { lex_imm(&l); em.pos+=4; }
+                        continue;
+                    } else if (tok_eq(mn,".byte")) {
+                        if (pass==1) { emit8(&em,(u8)lex_imm(&l)); }
+                        else         { lex_imm(&l); em.pos+=1; }
+                        continue;
+                    } else if (tok_eq(mn,".ascii")||tok_eq(mn,".asciz")) {
+                        int zterm=tok_eq(mn,".asciz");
+                        if (l.cur.kind==TK_STR) {
+                            sz slen=l.cur.len;
+                            if (pass==1) { emit_bytes(&em,(const u8*)l.cur.p,slen); if(zterm) emit8(&em,0); }
+                            else         { em.pos+=slen+(sz)zterm; }
+                            lex_next(&l);
+                        }
+                        continue;
+                    } else if (tok_eq(mn,".align")) {
+                        u32 pow2=(u32)lex_imm(&l);
+                        if (pass==1) emit_align(&em,pow2);
+                        else {
+                            sz mask=(sz)((1u<<pow2)-1u);
+                            while (em.pos & mask) em.pos++;
+                        }
                         continue;
                     }
-                    /* skip rest of line */
+                    /* skip rest of line for unknown directives */
                     while (l.cur.kind!=TK_NL&&l.cur.kind!=TK_EOF) lex_next(&l);
                     continue;
                 }
