@@ -73,6 +73,15 @@ static inline u32 a64_cbz (u8 rn, i32 off4, u8 sf) {
 static inline u32 a64_cbnz(u8 rn, i32 off4, u8 sf) {
     return ((u32)sf<<31)|0x35000000u|((((u32)off4)&0x7FFFFu)<<5)|(u32)rn;
 }
+/* TBZ/TBNZ Rt, #bit, #imm14 */
+static inline u32 a64_tbz(u8 rt, u8 bit, i16 off14) {
+    u32 b5=(bit>>5)&1u, b40=bit&0x1Fu;
+    return (b5<<31)|0x36000000u|(b40<<19)|(((u32)(u16)off14&0x3FFFu)<<5)|(u32)rt;
+}
+static inline u32 a64_tbnz(u8 rt, u8 bit, i16 off14) {
+    u32 b5=(bit>>5)&1u, b40=bit&0x1Fu;
+    return (b5<<31)|0x37000000u|(b40<<19)|(((u32)(u16)off14&0x3FFFu)<<5)|(u32)rt;
+}
 /* SVC #imm16 */
 static inline u32 a64_svc(u16 imm) { return 0xD4000001u|((u32)imm<<5); }
 
@@ -169,9 +178,32 @@ static inline u32 a64_asr_imm(u8 rd, u8 rn, u8 sh, u8 sf) {
     return ((u32)sf<<31)|(0x13u<<23)|((u32)sf<<22)|
            ((u32)sh<<16)|((u32)bsz<<10)|((u32)rn<<5)|(u32)rd;
 }
+/* Variable shifts (register form) */
+static inline u32 a64_lslv(u8 rd, u8 rn, u8 rm, u8 sf) {
+    return ((u32)sf<<31)|0x1AC02000u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+static inline u32 a64_lsrv(u8 rd, u8 rn, u8 rm, u8 sf) {
+    return ((u32)sf<<31)|0x1AC02400u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+static inline u32 a64_asrv(u8 rd, u8 rn, u8 rm, u8 sf) {
+    return ((u32)sf<<31)|0x1AC02800u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+
+/* ── Multiply / Divide ───────────────────────────────────────────────── */
+/* MUL Xd, Xn, Xm  (MADD with Ra=XZR) */
+static inline u32 a64_mul(u8 rd, u8 rn, u8 rm, u8 sf) {
+    return ((u32)sf<<31)|0x1B007C00u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+/* SDIV / UDIV */
+static inline u32 a64_sdiv(u8 rd, u8 rn, u8 rm, u8 sf) {
+    return ((u32)sf<<31)|0x1AC00C00u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+static inline u32 a64_udiv(u8 rd, u8 rn, u8 rm, u8 sf) {
+    return ((u32)sf<<31)|0x1AC00800u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
 
 /* ── Load / Store ────────────────────────────────────────────────────── */
-/* LDR Xt, [Xn, #off]  unsigned offset (off must be multiple of 8 for 64-bit) */
+/* LDR Xt, [Xn, #off]  unsigned offset (multiple of 8 for 64-bit) */
 static inline u32 a64_ldr(u8 rt, u8 rn, u16 off, u8 sf) {
     u8 sz = sf ? 3u : 2u;
     u16 sc = sf ? (off>>3) : (off>>2);
@@ -183,29 +215,51 @@ static inline u32 a64_str(u8 rt, u8 rn, u16 off, u8 sf) {
     u16 sc = sf ? (off>>3) : (off>>2);
     return ((u32)sz<<30)|(0x39u<<24)|((u32)sc<<10)|((u32)rn<<5)|(u32)rt;
 }
-/* STP Xt1, Xt2, [Xn, #off7*8]  signed-offset form */
+/* LDRB Wt, [Xn, #off]  — byte load (off not scaled) */
+static inline u32 a64_ldrb(u8 rt, u8 rn, u16 off) {
+    return 0x39400000u|((u32)(off&0xFFFu)<<10)|((u32)rn<<5)|(u32)rt;
+}
+/* STRB Wt, [Xn, #off] */
+static inline u32 a64_strb(u8 rt, u8 rn, u16 off) {
+    return 0x39000000u|((u32)(off&0xFFFu)<<10)|((u32)rn<<5)|(u32)rt;
+}
+/* LDRH Wt, [Xn, #off]  — halfword (off scaled /2) */
+static inline u32 a64_ldrh(u8 rt, u8 rn, u16 off) {
+    return 0x79400000u|((u32)((off>>1)&0xFFFu)<<10)|((u32)rn<<5)|(u32)rt;
+}
+/* STRH Wt, [Xn, #off] */
+static inline u32 a64_strh(u8 rt, u8 rn, u16 off) {
+    return 0x79000000u|((u32)((off>>1)&0xFFFu)<<10)|((u32)rn<<5)|(u32)rt;
+}
+/* STP Xt1, Xt2, [Xn, #off7*8]  signed-offset — base 0xA9000000 */
 static inline u32 a64_stp(u8 t1, u8 t2, u8 rn, i8 off7, u8 sf) {
-    u8 opc = sf ? 2u : 0u;
-    return ((u32)opc<<30)|(0x15u<<26)|(2u<<23)|
-           (((u32)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
+    u32 base = sf ? 0xA9000000u : 0x29000000u;
+    return base|(((u32)(u8)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
 }
-/* STP pre-index */
+/* STP pre-index [Xn, #off7*8]! — base 0xA9800000 */
 static inline u32 a64_stp_pre(u8 t1, u8 t2, u8 rn, i8 off7, u8 sf) {
-    u8 opc = sf ? 2u : 0u;
-    return ((u32)opc<<30)|(0x15u<<26)|(3u<<23)|
-           (((u32)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
+    u32 base = sf ? 0xA9800000u : 0x29800000u;
+    return base|(((u32)(u8)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
 }
-/* LDP signed-offset */
+/* STP post-index [Xn], #off7*8 — base 0xA8800000 */
+static inline u32 a64_stp_post(u8 t1, u8 t2, u8 rn, i8 off7, u8 sf) {
+    u32 base = sf ? 0xA8800000u : 0x28800000u;
+    return base|(((u32)(u8)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
+}
+/* LDP signed-offset — base 0xA9400000 */
 static inline u32 a64_ldp(u8 t1, u8 t2, u8 rn, i8 off7, u8 sf) {
-    u8 opc = sf ? 2u : 0u;
-    return ((u32)opc<<30)|(0x15u<<26)|(2u<<23)|
-           (((u32)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
+    u32 base = sf ? 0xA9400000u : 0x29400000u;
+    return base|(((u32)(u8)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
 }
-/* LDP post-index */
+/* LDP pre-index — base 0xA9C00000 */
+static inline u32 a64_ldp_pre(u8 t1, u8 t2, u8 rn, i8 off7, u8 sf) {
+    u32 base = sf ? 0xA9C00000u : 0x29C00000u;
+    return base|(((u32)(u8)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
+}
+/* LDP post-index — base 0xA8C00000 */
 static inline u32 a64_ldp_post(u8 t1, u8 t2, u8 rn, i8 off7, u8 sf) {
-    u8 opc = sf ? 2u : 0u;
-    return ((u32)opc<<30)|(0x15u<<26)|(1u<<23)|
-           (((u32)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
+    u32 base = sf ? 0xA8C00000u : 0x28C00000u;
+    return base|(((u32)(u8)off7&0x7Fu)<<15)|((u32)t2<<10)|((u32)rn<<5)|(u32)t1;
 }
 /* ADR  Xd, #byte_offset (PC-relative) */
 static inline u32 a64_adr(u8 rd, i32 off) {
@@ -214,4 +268,302 @@ static inline u32 a64_adr(u8 rd, i32 off) {
 /* ADRP Xd, #page_offset (page = 4 KiB) */
 static inline u32 a64_adrp(u8 rd, i32 pg) {
     return 0x90000000u|(((u32)pg&3u)<<29)|(((u32)(pg>>2))&0x7FFFFu)<<5|(u32)rd;
+}
+
+/* ── NEON / Advanced SIMD (V-registers 0-31, 128-bit) ────────────────── */
+/* LD1 {Vt.16B}, [Xn] */
+static inline u32 a64_ld1_16b(u8 vt, u8 rn) { return 0x4C407000u|((u32)rn<<5)|(u32)vt; }
+/* ST1 {Vt.16B}, [Xn] */
+static inline u32 a64_st1_16b(u8 vt, u8 rn) { return 0x4C007000u|((u32)rn<<5)|(u32)vt; }
+/* ADD Vd.4S, Vn.4S, Vm.4S */
+static inline u32 a64_add_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x4EA08400u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* SUB Vd.4S, Vn.4S, Vm.4S */
+static inline u32 a64_sub_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x6EA08400u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* MUL Vd.4S, Vn.4S, Vm.4S */
+static inline u32 a64_mul_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x4E209C00u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* FMUL Vd.4S, Vn.4S, Vm.4S */
+static inline u32 a64_fmul_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x6E20DC00u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* FADD Vd.4S, Vn.4S, Vm.4S */
+static inline u32 a64_fadd_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x4E20D400u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* CNT Vd.16B, Vn.16B — popcount per byte */
+static inline u32 a64_cnt_16b(u8 vd, u8 vn) { return 0x4E205800u|((u32)vn<<5)|(u32)vd; }
+/* ADDV Sd, Vn.4S — horizontal add, result in scalar */
+static inline u32 a64_addv_4s(u8 vd, u8 vn) { return 0x4EB1B800u|((u32)vn<<5)|(u32)vd; }
+/* EOR Vd.16B, Vn.16B, Vm.16B */
+static inline u32 a64_eor_16b(u8 vd, u8 vn, u8 vm) {
+    return 0x6E201C00u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* AND Vd.16B, Vn.16B, Vm.16B */
+static inline u32 a64_and_16b(u8 vd, u8 vn, u8 vm) {
+    return 0x4E201C00u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* ORR Vd.16B, Vn.16B, Vm.16B */
+static inline u32 a64_orr_16b(u8 vd, u8 vn, u8 vm) {
+    return 0x4EA01C00u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* ZIP1 Vd.16B, Vn.16B, Vm.16B — interleave low halves */
+static inline u32 a64_zip1_16b(u8 vd, u8 vn, u8 vm) {
+    return 0x4E003800u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* REV64 Vd.16B, Vn.16B */
+static inline u32 a64_rev64_16b(u8 vd, u8 vn) { return 0x4E200800u|((u32)vn<<5)|(u32)vd; }
+
+/* ── CRC32 (ARMv8.0 CRC32 extension) ────────────────────────────────── */
+/* ISO 3309 poly: CRC32B/H/W/X */
+static inline u32 a64_crc32b(u8 rd, u8 rn, u8 rm) {
+    return 0x1AC04000u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+static inline u32 a64_crc32h(u8 rd, u8 rn, u8 rm) {
+    return 0x1AC04400u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+static inline u32 a64_crc32w(u8 rd, u8 rn, u8 rm) {
+    return 0x1AC04800u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+static inline u32 a64_crc32x(u8 rd, u8 rn, u8 rm) {
+    return 0x9AC04C00u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+/* Castagnoli poly: CRC32CB/CH/CW/CX */
+static inline u32 a64_crc32cb(u8 rd, u8 rn, u8 rm) {
+    return 0x1AC05000u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+static inline u32 a64_crc32ch(u8 rd, u8 rn, u8 rm) {
+    return 0x1AC05400u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+static inline u32 a64_crc32cw(u8 rd, u8 rn, u8 rm) {
+    return 0x1AC05800u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+static inline u32 a64_crc32cx(u8 rd, u8 rn, u8 rm) {
+    return 0x9AC05C00u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+
+/* ── SHA-256 (ARMv8.0 Crypto extension) ─────────────────────────────── */
+static inline u32 a64_sha256h  (u8 qd, u8 qn, u8 vm) {
+    return 0x5E004000u|((u32)vm<<16)|((u32)qn<<5)|(u32)qd;
+}
+static inline u32 a64_sha256h2 (u8 qd, u8 qn, u8 vm) {
+    return 0x5E005000u|((u32)vm<<16)|((u32)qn<<5)|(u32)qd;
+}
+static inline u32 a64_sha256su0(u8 vd, u8 vn) {
+    return 0x5E282800u|((u32)vn<<5)|(u32)vd;
+}
+static inline u32 a64_sha256su1(u8 vd, u8 vn, u8 vm) {
+    return 0x5E006000u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+
+/* ── AES (ARMv8.0 Crypto extension) ─────────────────────────────────── */
+static inline u32 a64_aese  (u8 vd, u8 vn) { return 0x4E284800u|((u32)vn<<5)|(u32)vd; }
+static inline u32 a64_aesd  (u8 vd, u8 vn) { return 0x4E285800u|((u32)vn<<5)|(u32)vd; }
+static inline u32 a64_aesmc (u8 vd, u8 vn) { return 0x4E286800u|((u32)vn<<5)|(u32)vd; }
+static inline u32 a64_aesimc(u8 vd, u8 vn) { return 0x4E287800u|((u32)vn<<5)|(u32)vd; }
+
+/* ── Acquire-release / Exclusive atomics (ARMv8.0) ───────────────────── */
+/* LDAR Xt, [Xn]  — load-acquire */
+static inline u32 a64_ldar (u8 rt, u8 rn) { return 0xC8DFFC00u|((u32)rn<<5)|(u32)rt; }
+/* STLR Xt, [Xn]  — store-release */
+static inline u32 a64_stlr (u8 rt, u8 rn) { return 0xC89FFC00u|((u32)rn<<5)|(u32)rt; }
+/* LDAXR Xt, [Xn] — load-acquire exclusive */
+static inline u32 a64_ldaxr(u8 rt, u8 rn) { return 0xC85FFC00u|((u32)rn<<5)|(u32)rt; }
+/* STLXR Ws, Xt, [Xn] — store-release exclusive */
+static inline u32 a64_stlxr(u8 rs, u8 rt, u8 rn) {
+    return 0xC8008000u|((u32)rs<<16)|((u32)rn<<5)|(u32)rt;
+}
+/* LDXR Xt, [Xn] — load exclusive */
+static inline u32 a64_ldxr (u8 rt, u8 rn) { return 0xC85F7C00u|((u32)rn<<5)|(u32)rt; }
+/* STXR Ws, Xt, [Xn] — store exclusive */
+static inline u32 a64_stxr (u8 rs, u8 rt, u8 rn) {
+    return 0xC8007C00u|((u32)rs<<16)|((u32)rn<<5)|(u32)rt;
+}
+/* CAS Xs, Xt, [Xn]  — compare-and-swap (ARMv8.1 LSE) */
+static inline u32 a64_cas(u8 rs, u8 rt, u8 rn) {
+    return 0xC8A07C00u|((u32)rs<<16)|((u32)rn<<5)|(u32)rt;
+}
+/* Memory barriers */
+#define A64_DMB_ISH  0xD5033BBFu
+#define A64_DSB_ISH  0xD5033B9Fu
+#define A64_ISB      0xD5033FDFu
+
+/* ── Cache / prefetch hints ──────────────────────────────────────────── */
+/* PRFM PLDL1KEEP, [Xn, #off*8] */
+static inline u32 a64_prfm_l1(u8 rn, u16 off) {
+    return 0xF9800000u|((u32)((off>>3)&0xFFFu)<<10)|((u32)rn<<5)|0u;
+}
+/* PRFM PLDL2KEEP, [Xn, #off*8] */
+static inline u32 a64_prfm_l2(u8 rn, u16 off) {
+    return 0xF9800000u|((u32)((off>>3)&0xFFFu)<<10)|((u32)rn<<5)|2u;
+}
+/* DC CIVAC, Xt  — clean+invalidate cache line */
+static inline u32 a64_dc_civac(u8 rt) { return 0xD50B7E20u|(u32)rt; }
+/* DC CVAC, Xt   — clean to PoC */
+static inline u32 a64_dc_cvac (u8 rt) { return 0xD50B7C20u|(u32)rt; }
+
+/* ── Fused Multiply-Accumulate (FMA) ─────────────────────────────────── */
+/* FMLA Vd.4S, Vn.4S, Vm.4S  (Vd += Vn*Vm, float32×4) */
+static inline u32 a64_fmla_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x4E20CC00u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* FMLS Vd.4S, Vn.4S, Vm.4S  (Vd -= Vn*Vm, float32×4) */
+static inline u32 a64_fmls_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x4EA0CC00u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* FMLA Vd.2D, Vn.2D, Vm.2D  (float64×2) */
+static inline u32 a64_fmla_2d(u8 vd, u8 vn, u8 vm) {
+    return 0x4E60CC00u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+
+/* ── Widening Multiply ───────────────────────────────────────────────── */
+/* UMULL Vd.2D, Vn.2S, Vm.2S  (unsigned 32→64) */
+static inline u32 a64_umull_2d(u8 vd, u8 vn, u8 vm) {
+    return 0x2E60C000u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* SMULL Vd.2D, Vn.2S, Vm.2S  (signed 32→64) */
+static inline u32 a64_smull_2d(u8 vd, u8 vn, u8 vm) {
+    return 0x0E60C000u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* UMLAL Vd.2D, Vn.2S, Vm.2S  (unsigned widening accumulate) */
+static inline u32 a64_umlal_2d(u8 vd, u8 vn, u8 vm) {
+    return 0x2E608000u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* SMLAL Vd.2D, Vn.2S, Vm.2S  (signed widening accumulate) */
+static inline u32 a64_smlal_2d(u8 vd, u8 vn, u8 vm) {
+    return 0x0E608000u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+
+/* ── Vector Broadcast ────────────────────────────────────────────────── */
+/* DUP Vd.4S, Xn  (broadcast 32-bit GPR to all 4 lanes) */
+static inline u32 a64_dup_4s_gpr(u8 vd, u8 xn) {
+    return 0x4E040C00u|((u32)xn<<5)|(u32)vd;
+}
+/* DUP Vd.4S, Vn.S[0]  (broadcast lane 0 to all 4 lanes) */
+static inline u32 a64_dup_4s_lane0(u8 vd, u8 vn) {
+    return 0x4E040400u|((u32)0x8u<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* DUP Vd.16B, Xn  (broadcast byte from GPR) */
+static inline u32 a64_dup_16b_gpr(u8 vd, u8 xn) {
+    return 0x4E000C00u|((u32)xn<<5)|(u32)vd;
+}
+
+/* ── Bit Manipulation (scalar, 64-bit) ───────────────────────────────── */
+/* CLZ Xd, Xn  — count leading zeros */
+static inline u32 a64_clz(u8 rd, u8 rn) { return 0xDAC01000u|((u32)rn<<5)|(u32)rd; }
+/* CLS Xd, Xn  — count leading sign bits */
+static inline u32 a64_cls(u8 rd, u8 rn) { return 0xDAC01400u|((u32)rn<<5)|(u32)rd; }
+/* RBIT Xd, Xn  — reverse all 64 bits */
+static inline u32 a64_rbit(u8 rd, u8 rn) { return 0xDAC00000u|((u32)rn<<5)|(u32)rd; }
+/* REV Xd, Xn  — reverse byte order (bswap64) */
+static inline u32 a64_rev(u8 rd, u8 rn) { return 0xDAC00C00u|((u32)rn<<5)|(u32)rd; }
+/* REV32 Xd, Xn  — swap bytes within each 32-bit word */
+static inline u32 a64_rev32(u8 rd, u8 rn) { return 0xDAC00800u|((u32)rn<<5)|(u32)rd; }
+/* EXTR Xd, Xn, Xm, #lsb  — bit-field extract across two registers */
+static inline u32 a64_extr(u8 rd, u8 rn, u8 rm, u8 lsb) {
+    return 0x93C00000u|((u32)rm<<16)|((u32)(lsb&63u)<<10)|((u32)rn<<5)|(u32)rd;
+}
+
+/* ── Polynomial Multiply (GF(2^128)) ─────────────────────────────────── */
+/* PMULL Vd.1Q, Vn.1D, Vm.1D  — lower-half GF(2^64) product */
+static inline u32 a64_pmull(u8 vd, u8 vn, u8 vm) {
+    return 0x0EE0E000u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* PMULL2 Vd.1Q, Vn.2D, Vm.2D  — upper-half GF(2^64) product */
+static inline u32 a64_pmull2(u8 vd, u8 vn, u8 vm) {
+    return 0x4EE0E000u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+
+/* ── Integer Dot Product (ML inference) ──────────────────────────────── */
+/* SDOT Vd.4S, Vn.16B, Vm.16B  — signed 4×int8 dot → int32 */
+static inline u32 a64_sdot_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x4E809400u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* UDOT Vd.4S, Vn.16B, Vm.16B  — unsigned 4×int8 dot → uint32 */
+static inline u32 a64_udot_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x6E809400u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+
+/* ── Vector Interleave / Deinterleave ────────────────────────────────── */
+/* ZIP2 Vd.4S, Vn.4S, Vm.4S  — interleave upper halves */
+static inline u32 a64_zip2_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x4E807800u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* UZP1 Vd.4S, Vn.4S, Vm.4S  — deinterleave even elements */
+static inline u32 a64_uzp1_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x4E801800u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* UZP2 Vd.4S, Vn.4S, Vm.4S  — deinterleave odd elements */
+static inline u32 a64_uzp2_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x4E805800u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* TRN1 Vd.4S, Vn.4S, Vm.4S  — transpose even lanes */
+static inline u32 a64_trn1_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x4E802800u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* TRN2 Vd.4S, Vn.4S, Vm.4S  — transpose odd lanes */
+static inline u32 a64_trn2_4s(u8 vd, u8 vn, u8 vm) {
+    return 0x4E806800u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+
+/* ── Table Lookup ────────────────────────────────────────────────────── */
+/* TBL Vd.16B, {Vn.16B}, Vm.16B  — 1-reg table lookup, OOB→0 */
+static inline u32 a64_tbl_16b(u8 vd, u8 vn, u8 vm) {
+    return 0x4E000000u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+/* TBX Vd.16B, {Vn.16B}, Vm.16B  — table lookup, OOB→unchanged */
+static inline u32 a64_tbx_16b(u8 vd, u8 vn, u8 vm) {
+    return 0x4E001000u|((u32)vm<<16)|((u32)vn<<5)|(u32)vd;
+}
+
+/* ── Vector Extract ──────────────────────────────────────────────────── */
+/* EXT Vd.16B, Vn.16B, Vm.16B, #imm  — extract starting at byte imm */
+static inline u32 a64_ext_16b(u8 vd, u8 vn, u8 vm, u8 imm) {
+    return 0x6E000000u|((u32)vm<<16)|((u32)(imm&0xFu)<<11)|((u32)vn<<5)|(u32)vd;
+}
+
+/* ── Scalar Floating-Point (S/D-register) ────────────────────────────── */
+/* FADD Sd, Sn, Sm */
+static inline u32 a64_fadd_s(u8 rd, u8 rn, u8 rm) {
+    return 0x1E202800u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+/* FSUB Sd, Sn, Sm */
+static inline u32 a64_fsub_s(u8 rd, u8 rn, u8 rm) {
+    return 0x1E203800u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+/* FMUL Sd, Sn, Sm */
+static inline u32 a64_fmul_s(u8 rd, u8 rn, u8 rm) {
+    return 0x1E200800u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+/* FDIV Sd, Sn, Sm */
+static inline u32 a64_fdiv_s(u8 rd, u8 rn, u8 rm) {
+    return 0x1E201800u|((u32)rm<<16)|((u32)rn<<5)|(u32)rd;
+}
+/* FSQRT Sd, Sn */
+static inline u32 a64_fsqrt_s(u8 rd, u8 rn) {
+    return 0x1E21C000u|((u32)rn<<5)|(u32)rd;
+}
+/* FABS Sd, Sn */
+static inline u32 a64_fabs_s(u8 rd, u8 rn) { return 0x1E20C000u|((u32)rn<<5)|(u32)rd; }
+/* FNEG Sd, Sn */
+static inline u32 a64_fneg_s(u8 rd, u8 rn) { return 0x1E214000u|((u32)rn<<5)|(u32)rd; }
+/* FCVTZS Xd, Sn  — float32→int64 truncate */
+static inline u32 a64_fcvtzs(u8 rd, u8 rn) { return 0x9E380000u|((u32)rn<<5)|(u32)rd; }
+/* SCVTF Sd, Xn  — int64→float32 */
+static inline u32 a64_scvtf(u8 rd, u8 rn) { return 0x9E220000u|((u32)rn<<5)|(u32)rd; }
+/* FCMP Sn, Sm  — set FP condition flags */
+static inline u32 a64_fcmp_s(u8 rn, u8 rm) {
+    return 0x1E202000u|((u32)rm<<16)|((u32)rn<<5);
+}
+/* FMOV Sd, Xn  — move integer bits into FP register */
+static inline u32 a64_fmov_gpr_to_s(u8 vd, u8 xn) {
+    return 0x9E270000u|((u32)xn<<5)|(u32)vd;
+}
+/* FMOV Xd, Sn  — move FP bits to integer register */
+static inline u32 a64_fmov_s_to_gpr(u8 rd, u8 vn) {
+    return 0x9E260000u|((u32)vn<<5)|(u32)rd;
 }

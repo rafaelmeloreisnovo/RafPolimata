@@ -145,6 +145,20 @@ static inline u32 a32_mul(u8 rd,u8 rm,u8 rs,u8 s,u8 cc){
     return ((u32)cc<<28)|0x00000090u|((u32)s<<20)|((u32)rd<<16)|((u32)rs<<8)|(u32)rm;
 }
 
+/* AND/ORR/EOR immediate */
+static inline u32 a32_and_imm(u8 rd, u8 rn, u8 imm8, u8 rot, u8 s, u8 cc) {
+    return ((u32)cc<<28)|0x02000000u|((u32)s<<20)|((u32)rn<<16)|((u32)rd<<12)|
+           ((u32)(rot&0xFu)<<8)|(u32)imm8;
+}
+static inline u32 a32_orr_imm(u8 rd, u8 rn, u8 imm8, u8 rot, u8 s, u8 cc) {
+    return ((u32)cc<<28)|0x03800000u|((u32)s<<20)|((u32)rn<<16)|((u32)rd<<12)|
+           ((u32)(rot&0xFu)<<8)|(u32)imm8;
+}
+static inline u32 a32_eor_imm(u8 rd, u8 rn, u8 imm8, u8 rot, u8 s, u8 cc) {
+    return ((u32)cc<<28)|0x02200000u|((u32)s<<20)|((u32)rn<<16)|((u32)rd<<12)|
+           ((u32)(rot&0xFu)<<8)|(u32)imm8;
+}
+
 /* ── Load / Store ────────────────────────────────────────────────────── */
 /* LDR  Rd, [Rn, #+off12]  (U=1: add, U=0: sub) */
 static inline u32 a32_ldr_imm(u8 rd,u8 rn,u16 off12,u8 u,u8 cc){
@@ -157,6 +171,20 @@ static inline u32 a32_str_imm(u8 rd,u8 rn,u16 off12,u8 u,u8 cc){
 /* LDRB  Rd, [Rn, #+off] */
 static inline u32 a32_ldrb_imm(u8 rd,u8 rn,u16 off,u8 u,u8 cc){
     return ((u32)cc<<28)|0x05500000u|((u32)u<<23)|((u32)rn<<16)|((u32)rd<<12)|(u32)(off&0xFFFu);
+}
+/* STRB Rd, [Rn, #+off] */
+static inline u32 a32_strb_imm(u8 rd, u8 rn, u16 off, u8 u, u8 cc) {
+    return ((u32)cc<<28)|0x05400000u|((u32)u<<23)|((u32)rn<<16)|((u32)rd<<12)|(u32)(off&0xFFFu);
+}
+/* LDRH  Rd, [Rn, #+off8]  extra load/store halfword (split immediate) */
+static inline u32 a32_ldrh_imm(u8 rd, u8 rn, u8 off8, u8 cc) {
+    return ((u32)cc<<28)|0x01D000B0u|((u32)rn<<16)|((u32)rd<<12)|
+           (((u32)(off8>>4))<<8)|(u32)(off8&0xFu);
+}
+/* STRH  Rd, [Rn, #+off8] */
+static inline u32 a32_strh_imm(u8 rd, u8 rn, u8 off8, u8 cc) {
+    return ((u32)cc<<28)|0x01C000B0u|((u32)rn<<16)|((u32)rd<<12)|
+           (((u32)(off8>>4))<<8)|(u32)(off8&0xFu);
 }
 /* PUSH {reglist}  = STMDB SP!, {reglist} */
 static inline u32 a32_push(u16 regs,u8 cc){
