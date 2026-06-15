@@ -45,6 +45,12 @@ jobs:
       - name: Audit ApkC freestanding invariants
         run: bash scripts/ci_freestanding_audit.sh
 
+      - name: ARM64 encoder golden tests
+        run: python3 tests/test_arm64_encoders.py
+
+      - name: APKc assembler roundtrip smoke test
+        run: sh tests/test_asm_roundtrip.sh
+
       - name: Validate ApkC proof protocol
         run: bash scripts/apkc_validate.sh
 
