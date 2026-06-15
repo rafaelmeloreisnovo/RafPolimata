@@ -1,0 +1,16 @@
+# ApkC uploaded artifact SHA-256 ledger
+
+Scope: user-provided local artifacts mounted in the analysis sandbox on 2026-06-15.
+Policy: local binaries and private debug material are not committed; only hashes and text proofs are versioned.
+
+```text
+f7fbebbd43825011a92f0ccfbd051d31b63f23f9930ae9ed9aa3f70900e0277f  readelf_apk.txt  bytes=84
+a8f07dae58baf40d8f0f8571e5c344301d75ccfffa6a40d14861d740ba85b2d9  libhello.so  bytes=660
+a331d0248d01d8e7030291e93905c2e2f046cf7cb5ba4ecaf02609cec273c024  hello.apk  bytes=3012
+decf3567516958ddfa0db03db1e27d85d9e7347ce7eb05b1141edf6cd7293e7a  hello-signed.apk.idsig  bytes=5546
+063c1b61c35e45f3cf253d42c99bfcd58910162c46ba6c5160846b56651dcc28  hello-signed.apk  bytes=12704
+6f957db799abe812ac9e4eec54f54a5cddfcf58941e0aceae15221584e92bf3a  generate.log  bytes=1165
+3d2ac064c26b8ca5be02a74238f877c3e0f9fb1d16dd4bc7da7f0e758042723c  apkc  bytes=40656
+9f3e239fa40a2ed6ba40f33c3648288e9d79502597a1ca40bdd00115cca46669  APK_PROOF_INSTALL_OPEN.txt  bytes=1381
+f599c99008c34d12456ffeb57719a0e57f675ef5ee2b3592029b708a9b6cc9a8  aapt.txt  bytes=1314
+```

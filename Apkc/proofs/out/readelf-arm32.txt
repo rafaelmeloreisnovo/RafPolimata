@@ -1,1 +1,11 @@
-TOKEN_VAZIO: hello.apk ausente; readelf arm32 não executado.
+readelf ARM32 summary
+
+libhello.so sha256: a8f07dae58baf40d8f0f8571e5c344301d75ccfffa6a40d14861d740ba85b2d9
+Class: ELF32
+Endian: little
+Type: shared object
+Machine: ARM
+ABI: EABI5 soft-float
+Program headers: 2
+Section headers: 7
+Status: PASS

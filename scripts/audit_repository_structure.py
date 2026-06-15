@@ -26,6 +26,9 @@ ROOT_ALLOWED_FILES = {
     "Arm64 Mixer leve criptografia.md",
     "L1.md",
     "RASBERY.MD",
+    "CHANGELOG.md",
+    "CLAUDE.md",
+    "big_test.sh",
 }
 ROOT_PREFIXES = (
     "RAF_",

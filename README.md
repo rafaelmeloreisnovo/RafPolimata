@@ -37,7 +37,9 @@ Este repositório passa a incluir uma documentação de referência de nível av
 
 - [`docs/PROTOCOLO_FALSIFICABILIDADE_PK.md`](docs/PROTOCOLO_FALSIFICABILIDADE_PK.md): protocolo mínimo de falsificabilidade em P(k) com execução automática.
 - [`docs/PROTOCOLO_CANONICO_COHERENCIA.md`](docs/PROTOCOLO_CANONICO_COHERENCIA.md): contrato canônico que liga as 50 sementes matemáticas a invariantes, arquivos e gates de prova/queda.
+- [`docs/PROTOCOLO_DOIS_CICLOS_OMEGA.md`](docs/PROTOCOLO_DOIS_CICLOS_OMEGA.md): protocolo enterprise de dois ciclos para coerência semântica, execução técnica, fail-safe/failover/rollback e uso honesto de `TOKEN_VAZIO`.
 - [`configs/semantic_coherence.yml`](configs/semantic_coherence.yml): YAML operacional para orquestração mutável de coerência, benchmark e falsificabilidade.
+- [`configs/two_cycle_omega.yml`](configs/two_cycle_omega.yml): manifesto auditável dos campos canônicos, camadas linguísticas e invariantes técnicos dos dois ciclos.
 - [`configs/operational_excellence.yml`](configs/operational_excellence.yml): manifesto verificável da rota de excelência operacional, estados, arquiteturas e controles de risco.
 - [`docs/ROTINA_OPERACIONAL_BENCHMARKS.md`](docs/ROTINA_OPERACIONAL_BENCHMARKS.md): rotina operacional de auditoria, benchmark com prewarm/warmup e top 20 modelos.
 - [`docs/LOGOTIPO_RAFAELIA_60COL.md`](docs/LOGOTIPO_RAFAELIA_60COL.md): logotipo ASCII de 60 colunas com variante colorida ANSI.

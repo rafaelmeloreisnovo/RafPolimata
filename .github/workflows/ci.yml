@@ -16,6 +16,9 @@ jobs:
       - name: Validate canonical coherence protocol
         run: python3 scripts/validate_coherence_protocol.py
 
+      - name: Validate two-cycle omega protocol
+        run: python3 scripts/validate_two_cycle_omega.py
+
       - name: Host C syntax check
         run: bash RAF_host_syntax_check.sh
 

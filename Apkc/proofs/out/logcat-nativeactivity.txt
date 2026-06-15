@@ -1,1 +1,1 @@
-TOKEN_VAZIO: adb ausente; logcat indisponível.
+TOKEN_VAZIO: no logcat or NativeActivity runtime transcript was present in the uploaded evidence. Package visibility is not runtime success.
