@@ -225,7 +225,29 @@ O QUE MUDOU:
   + Explicação das diferenças qualitativas/quantitativas
 
 O QUE PERMANECE COMO TOKEN_VAZIO:
-  - O tema específico desta sessão (aguarda input do Rafael)
-  - A tarefa técnica concreta a ser executada
-  - O próximo arquivo C a ser escrito ou bug a ser corrigido
+  - O tema específico desta sessão (aguarda input do Rafael)  ← FECHADO (ver adendo)
+  - A tarefa técnica concreta a ser executada                 ← FECHADO (ver adendo)
+  - O próximo arquivo C a ser escrito ou bug a ser corrigido  ← FECHADO (ver adendo)
+```
+
+---
+
+## ADENDO — Fechamento desta sessão
+
+> Este adendo não reescreve o texto acima — a trilha histórica é intacta.
+> O TOKEN_VAZIO do tema foi preenchido. Ver:
+> [`docs/COERENCIA_FECHAMENTO_SESSAO_APKC.md`](COERENCIA_FECHAMENTO_SESSAO_APKC.md)
+
+```
+TEMA ESTABELECIDO:
+  Determinismo tecnológico do APKc — ISA depth + geometric coherence invariant
+
+ENTREGUES (trilha auditável):
+  PR #26 — +44 encoders ARM64 + phi_fst + verbovivo.c (T^7 pipeline)
+  PR #28 — dedup arch_arm64 (6 redefinições) + verbovivo unificado (Fiber-H + T^7)
+  PR #30 — CLAUDE.md atualizado com todos os novos arquivos e build commands
+
+PRINCÍPIO OPERATIVO CONFIRMADO:
+  Ruído entendido vira sinal · Erro medido vira engenharia
+  Lacuna marcada vira ciência · TOKEN_VAZIO protegido vira verdade futura
 ```
