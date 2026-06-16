@@ -1,4 +1,4 @@
-#include "../include/RAF_rafaelia_common.h"
+#include "RAF_rafaelia_common.h"
 
 /*
  * Método M052: Probe de hot path no QEMU/TCG

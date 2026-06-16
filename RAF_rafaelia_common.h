@@ -1,6 +1,13 @@
 #ifndef RAFAELIA_COMMON_H
 #define RAFAELIA_COMMON_H
 
+/* expose clock_gettime/CLOCK_MONOTONIC under strict -std=c11 (POSIX.1-2008) */
+#if defined(__linux__) || defined(__ANDROID__)
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 

@@ -31,6 +31,7 @@ typedef unsigned long   uptr;
 #define _NR_close         3
 #define _NR_ioctl        16
 #define _NR_fork         57
+#define _NR_dup2         33
 #define _NR_execve       59
 #define _NR_wait4        61
 #define _NR_getcwd       79
@@ -79,6 +80,7 @@ static inline i32  os_execve(const char *p,char*const av[],char*const ev[]) {
     return (i32)_sc3(_NR_execve,(i64)(uptr)p,(i64)(uptr)av,(i64)(uptr)ev);
 }
 static inline i32  os_wait4 (i32 pid,i32 *st,i32 opts)    { return (i32)_sc4(_NR_wait4,(i64)pid,(i64)(uptr)st,(i64)opts,0); }
+static inline i32  os_dup2  (i32 oldfd,i32 newfd)         { return (i32)_sc2(_NR_dup2,(i64)oldfd,(i64)newfd); }
 static inline __attribute__((noreturn)) void os_exit(i32 c) {
     _sc1(_NR_exit_group,(i64)c); __builtin_unreachable();
 }

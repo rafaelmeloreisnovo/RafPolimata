@@ -1,4 +1,4 @@
-#include "../include/RAF_rafaelia_common.h"
+#include "RAF_rafaelia_common.h"
 
 /*
  * Método M001: Acesso direto a DDRx PORTx PINx

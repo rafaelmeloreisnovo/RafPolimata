@@ -1,4 +1,4 @@
-#include "../include/RAF_rafaelia_common.h"
+#include "RAF_rafaelia_common.h"
 
 /*
  * Método M006: Input Capture para medir pulso

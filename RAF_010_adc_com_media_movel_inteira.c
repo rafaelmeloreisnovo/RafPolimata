@@ -1,4 +1,4 @@
-#include "../include/RAF_rafaelia_common.h"
+#include "RAF_rafaelia_common.h"
 
 /*
  * Método M010: ADC com média móvel inteira
