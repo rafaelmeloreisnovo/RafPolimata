@@ -89,9 +89,13 @@ typedef struct {
 } VerbVivoState;
 
 /* ── public API ──────────────────────────────────────────────────── */
+/* relmat is optional (NULL = disabled, zero cost): pass a FiberRelMat*
+ * (see fiber_relmat.h) to additionally accumulate the bit relational
+ * matrix while scanning. Opt-in — existing callers passing NULL are
+ * unaffected. */
 void  vv_init(VerbVivoState *vv);
-void  vv_scan(VerbVivoState *vv, FILE *stream);
-void  vv_scan_buf(VerbVivoState *vv, const vv_u8 *buf, vv_sz len);
+void  vv_scan(VerbVivoState *vv, FILE *stream, void *relmat);
+void  vv_scan_buf(VerbVivoState *vv, const vv_u8 *buf, vv_sz len, void *relmat);
 void  vv_audit(const VerbVivoState *vv);
 void  vv_svg(const VerbVivoState *vv);
 int   vv_hamming_256(const vv_u8 a[32], const vv_u8 b[32]);
