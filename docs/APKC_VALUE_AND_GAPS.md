@@ -19,10 +19,10 @@
 
 ## Gaps técnicos
 
-| Gap | Evidência necessária | Status inicial |
+| Gap | Evidência necessária | Status |
 |---|---|---|
-| Assinatura APK | `apksigner verify --verbose` | TOKEN_VAZIO |
-| Instalação real | `adb install -r` em device autorizado | TOKEN_VAZIO |
+| Assinatura APK | `apksigner verify --verbose` | PASS (v1/v2/v3 true; debug key; ver `Apkc/proofs/out/apksigner-verify.txt`) |
+| Instalação real | `adb install -r` em device autorizado | PASS_LIMITED (package:com.rafael.teste visível; stdout completo de `adb install -r` ausente) |
 | Runtime NativeActivity | `logcat` filtrado sem crash | TOKEN_VAZIO |
 | Compatibilidade Android ampla | matriz API/ABI | NOT_RUN |
 | Testes regressivos de formatos | corpus de APKs e validadores | NOT_RUN |
