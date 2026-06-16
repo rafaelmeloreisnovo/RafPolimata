@@ -16,7 +16,7 @@ Uma sessão de modelo de linguagem é:
 ```
 ARQUITETURA TÉCNICA DE UMA SESSÃO:
   contexto = [system_prompt + histórico + mensagem_atual]
-  tokens_máximos ≈ 200k (Claude Sonnet)
+  tokens_máximos até 1M (Claude Sonnet 4.6 / Opus 4.x) / 200K (Claude Haiku 4.5)
   memória_entre_sessões = 0 (sem persistência nativa)
   estado_interno = inferência estatística sobre tokens
 ```
@@ -123,7 +123,7 @@ CRC32C = 0x6E5DD6D2       hash de integridade reprodutível
 stride = 7, gcd(7,1000)=1 cobertura toroidal completa
 74KB                      tamanho do RAFAELIA_MASTER_DOC.txt
 56                        arquivos de método no repositório
-200k tokens               capacidade de contexto da sessão
+1M tokens                 capacidade de contexto (Claude Sonnet 4.6 / Opus 4.x)
 6                         camadas de leitura
 21                        tradições nas parábolas
 7                         dimensões do toro T^7
