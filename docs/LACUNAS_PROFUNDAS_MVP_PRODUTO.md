@@ -280,32 +280,46 @@ excelente, mas não é compilador funcional.
 
 ---
 
-### L14 — verbovivo: contradição heap vs sem-heap
+### L14 — verbovivo: contradição heap vs sem-heap — ✅ RESOLVIDO (reconferido 2026-06-16)
 
-**O gap:** `verbovivo.h` afirma "No heap: all state is caller-allocated".
-`verbovivo_main()` usa `malloc()` para a trajetória e depois `free()`.
+**O gap original:** `verbovivo.h` afirma "No heap: all state is caller-allocated".
+`verbovivo_main()` usava `malloc()` para a trajetória e depois `free()`.
 
-Não invalida o ApkC, mas cria contradição interna no módulo. Para produto:
+Não invalida o ApkC, mas criava contradição interna no módulo. Para produto:
 ou a promessa muda para "sem heap nos hot paths / ApkC", ou `verbovivo_main()`
 migra para buffer estático.
 
+**Estado reconferido:** o fix já está em `main` desde o commit `9e04439`
+("verbovivo heap fix"), anterior à escrita deste documento.
+
+| Evidência | Estado |
+|---|---|
+| `grep -n "malloc\|free\|calloc" rafaelia/verbovivo.c` | PASS — 0 ocorrências |
+| `rafaelia/verbovivo.h:15` | "No heap: all state is caller-allocated." |
+| `rafaelia/verbovivo.h:114` | "Sem malloc — usa stack interno de VV_MEM_SIZE=64 scores." |
+
+Doc e código agora estão alinhados; sem ação adicional pendente.
+
 ---
 
-### L15 — verbovivo sem CI automatizado
+### L15 — verbovivo sem CI automatizado — ✅ RESOLVIDO (reconferido 2026-06-16)
 
-**O gap:** CLI documentada em `CLAUDE.md` mas não testada em CI:
+**O gap original:** CLI documentada em `CLAUDE.md` mas não testada em CI:
 modo T^7 (APK/ELF→SVG), modo Fiber-H (stdin→audit+SVG), recall top-N.
 
-**Próximo passo:**
-```yaml
-- name: Build and smoke-test verbovivo
-  run: |
-    gcc -std=c11 -O2 -I. -IBenchmark -DVERBOVIVO_MAIN \
-        rafaelia/verbovivo.c -lm -o /tmp/verbovivo
-    echo "test" | /tmp/verbovivo -s > /tmp/graph.svg
-    grep -q '<svg' /tmp/graph.svg
-    echo "verbovivo: OK"
+**Estado reconferido:** o step já existe em
+`.github/workflows/ci.yml:63-72` ("Build and smoke-test verbovivo (T7 toroid
++ Fiber-H engine)"). Reproduzido nesta sessão:
+
 ```
+$ gcc -std=c11 -O2 -I. -IBenchmark -DVERBOVIVO_MAIN \
+      rafaelia/verbovivo.c rafaelia/fiber_relmat.c -lm -o /tmp/verbovivo_ci
+$ echo 'RAFAELIA test vector' | /tmp/verbovivo_ci /dev/stdin /dev/null
+verbovivo: 21 bytes  phi=0.2289  attractor=10  hamming=0.5048  hdc[0]=0000b048
+```
+
+PASS — build limpo (exit 0), execução sem crash, saída `phi=`/`attractor=`
+presente como esperado.
 
 ---
 
@@ -429,6 +443,32 @@ ASM + py + sh + pl + js + php testados. use_fork TOKEN_VAZIO (ARM64-only).
 
 **Correção:** `.github/workflows/ci.yml` — `raise SystemExit('P(k) gate FAIL')`
 quando `verdict == 'FAIL'`. Veredicto atual: `PASS` (rrmse=0.119, coverage=1.0).
+
+---
+
+### ✅ L14 fechado: heap fix do verbovivo já em `main` — commit `9e04439`
+
+**Problema:** este documento (sessão 2026-06-15) listava L14 como gap aberto,
+mas o fix ("verbovivo heap fix") já havia sido commitado antes da escrita do
+documento — inconsistência de cadeia de custódia entre doc e código.
+
+**Correção (reconferida 2026-06-16):** `grep -n "malloc\|free\|calloc"
+rafaelia/verbovivo.c` → 0 ocorrências. `rafaelia/verbovivo.h:15,114` já
+documentam o caminho sem heap. Seção L14 atualizada para `✅ RESOLVIDO`.
+
+---
+
+### ✅ L15 fechado: CI do verbovivo já existe — `.github/workflows/ci.yml:63-72`
+
+**Problema:** este documento listava L15 ("verbovivo sem CI automatizado")
+como gap aberto, mas o step de build+smoke-test do verbovivo já estava no
+workflow — mesma classe de inconsistência doc↔código do item anterior.
+
+**Correção (reconferida 2026-06-16):** reexecutado localmente o comando do
+step de CI (`gcc ... -DVERBOVIVO_MAIN rafaelia/verbovivo.c
+rafaelia/fiber_relmat.c -lm -o /tmp/verbovivo_ci`) — build limpo, execução
+sem crash, saída `phi=`/`attractor=` presente. Seção L15 atualizada para
+`✅ RESOLVIDO`.
 
 ---
 
