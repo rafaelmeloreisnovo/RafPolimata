@@ -16,6 +16,11 @@ __pycache__/
 # Test run artifacts (compiled binaries and logs)
 tests/results/
 
+# raf_shell orchestrator build artifacts
+raf_orchestrator
+raf_bench.log
+*.sig
+
 # ApkC generated/local proof artifacts
 Apkc/proofs/*.keystore
 Apkc/proofs/out/*.apk
