@@ -24,9 +24,9 @@
 - [ ] S20 — Usar ring buffer para fluxo contínuo
 - [ ] S21 — Criar teste de tamanho binário
 - [ ] S22 — Criar teste de latência por operação
-- [ ] S23 — Criar teste de throughput por barramento
+- [x] S23 — Criar teste de throughput por barramento (Benchmark/raf_bus_throughput_benchmark.c)
 - [ ] S24 — Criar teste de jitter temporal
-- [ ] S25 — Criar teste de consumo energético
+- [x] S25 — Criar teste de consumo energético (proxy IPC/cache-miss via scripts/raf_watt_proxy_probe.sh quando RAPL/perf indisponível; nunca fabrica watts reais)
 - [ ] S26 — Criar teste de estabilidade por 1h, 6h e 24h
 - [ ] S27 — Criar tabela de ciclos estimados vs ciclos medidos
 - [ ] S28 — Gerar CSV/JSON em todo benchmark

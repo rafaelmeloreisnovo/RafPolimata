@@ -30,6 +30,7 @@
 #include <time.h>
 
 #include "verbovivo.h"
+#include "fiber_relmat.h"
 #include "../Benchmark/raf_toroid.h"
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -153,7 +154,8 @@ void vv_init(VerbVivoState *vv) {
         vv->W_proj[i] = ((vv_f32)(_rng(&seed)%100u)/100.0f) - 0.5f;
 }
 
-static void _process_chunk(VerbVivoState *vv, const vv_u8 *buf, vv_sz len, vv_u32 cid) {
+static void _process_chunk(VerbVivoState *vv, const vv_u8 *buf, vv_sz len, vv_u32 cid,
+                            FiberRelMat *relmat) {
     vv_sz start=0;
     for (vv_sz i=0;i<len;i++) {
         if (buf[i]=='\n') {
@@ -166,6 +168,7 @@ static void _process_chunk(VerbVivoState *vv, const vv_u8 *buf, vv_sz len, vv_u3
 
     vv_u32 hash = _djb2_chunk(buf,len);
     FiberHash fh; _fiber_hash(buf,len,&fh);
+    if (relmat) relmat_update(relmat,&fh);
     VVHyperVec vec; _gen_vec(hash,&vec);
     vv_f32 attn = _attention(vv,&vec);
     vv_f32 hdiv = _hamming_diversity_vv(vv,&fh);
@@ -194,20 +197,20 @@ static void _process_chunk(VerbVivoState *vv, const vv_u8 *buf, vv_sz len, vv_u3
     vv->chunk_count++;
 }
 
-void vv_scan(VerbVivoState *vv, FILE *stream) {
+void vv_scan(VerbVivoState *vv, FILE *stream, void *relmat) {
     if (!vv||!stream) return;
     static vv_u8 buf[VV_CHUNK];
     vv_sz n; vv_u32 cid=0;
     while ((n=fread(buf,1,VV_CHUNK,stream))>0)
-        _process_chunk(vv,buf,n,cid++);
+        _process_chunk(vv,buf,n,cid++,(FiberRelMat*)relmat);
 }
 
-void vv_scan_buf(VerbVivoState *vv, const vv_u8 *buf, vv_sz len) {
+void vv_scan_buf(VerbVivoState *vv, const vv_u8 *buf, vv_sz len, void *relmat) {
     if (!vv||!buf||!len) return;
     vv_sz off=0; vv_u32 cid=0;
     while (off<len) {
         vv_sz chunk = len-off; if (chunk>VV_CHUNK) chunk=VV_CHUNK;
-        _process_chunk(vv,buf+off,chunk,cid++);
+        _process_chunk(vv,buf+off,chunk,cid++,(FiberRelMat*)relmat);
         off+=chunk;
     }
 }
@@ -500,20 +503,25 @@ int main(int argc, char **argv) {
         /* T^7 mode: verbovivo <apk_or_elf> [out.svg] */
         return verbovivo_main(argv[1], argc >= 3 ? argv[2] : NULL) == 0 ? 0 : 1;
     }
-    /* Fiber-H / Trinity mode: verbovivo [-s] [-r N] < binary */
+    /* Fiber-H / Trinity mode: verbovivo [-s] [-r N] [-m] < binary */
     VerbVivoState vv;
     vv_init(&vv);
     int do_svg = 0;
     int recall_n = 0;
+    int do_relmat = 0;
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] == '-' && argv[i][1] == 's') do_svg = 1;
+        if (argv[i][0] == '-' && argv[i][1] == 'm') do_relmat = 1;
         if (argv[i][0] == '-' && argv[i][1] == 'r' && i + 1 < argc) {
             recall_n = (int)strtol(argv[++i], NULL, 10);
             if (recall_n < 0) recall_n = 0;
         }
     }
-    vv_scan(&vv, stdin);
+    static FiberRelMat relmat;
+    if (do_relmat) relmat_init(&relmat);
+    vv_scan(&vv, stdin, do_relmat ? &relmat : NULL);
     vv_audit(&vv);
+    if (do_relmat) relmat_audit(&relmat, 10);
     if (recall_n > 0) {
         /* auto-recall: query = accumulated context_vec, phi_weight = 0.5 */
         VVEngram results[VV_MEM_SIZE];

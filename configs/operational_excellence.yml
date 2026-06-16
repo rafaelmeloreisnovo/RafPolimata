@@ -27,6 +27,8 @@ governance_gates:
   - id: OE2; command: gcc -std=c11 -Wall -Wextra -Werror -IBenchmark Benchmark/raf_runtime_router_test.c -o build_runtime_router_test && ./build_runtime_router_test; blocks_release: true
   - id: OE3; command: gcc -std=c11 -Wall -Wextra -Werror -D_POSIX_C_SOURCE=200809L -IBenchmark Benchmark/raf_runtime_benchmark.c -o build_runtime_benchmark && ./build_runtime_benchmark; blocks_release: true
   - id: OE4; command: python3 scripts/audit_repository_structure.py --depth 5; blocks_release: true
+  - id: OE5; command: gcc -std=c11 -Wall -Wextra -Werror -IBenchmark Benchmark/raf_bus_throughput_test.c -o build_bus_throughput_test && ./build_bus_throughput_test; blocks_release: true
+  - id: OE6; command: bash scripts/raf_watt_proxy_probe.sh; blocks_release: false
 
 thresholds:
   min_batch_gpu: 64

@@ -57,12 +57,33 @@ jobs:
       - name: Build and smoke-test verbovivo (T7 toroid + Fiber-H engine)
         run: |
           gcc -std=c11 -O2 -I. -IBenchmark -DVERBOVIVO_MAIN \
-            rafaelia/verbovivo.c -lm -o verbovivo_ci
+            rafaelia/verbovivo.c rafaelia/fiber_relmat.c -lm -o verbovivo_ci
           echo 'RAFAELIA test vector' | ./verbovivo_ci /dev/stdin /dev/null 2>&1 | \
             grep -E 'verbovivo:.*phi=' || true
           ls -la Apkc/hello.apk 2>/dev/null && \
             ./verbovivo_ci Apkc/hello.apk /dev/null 2>&1 | \
             grep -E 'verbovivo:.*phi=' || echo 'TOKEN_VAZIO: hello.apk ausente'
+          echo 'RAFAELIA relmat smoke test' | ./verbovivo_ci -s -m < /dev/stdin > /dev/null 2>&1 || true
+
+      - name: Bus throughput test (S23)
+        run: |
+          gcc -std=c11 -Wall -Wextra -Werror -IBenchmark \
+            Benchmark/raf_bus_throughput_test.c -o build_bus_throughput_test
+          ./build_bus_throughput_test
+          gcc -std=c11 -Wall -Wextra -Werror -D_POSIX_C_SOURCE=200809L -IBenchmark \
+            Benchmark/raf_bus_throughput_benchmark.c -o build_bus_throughput_benchmark
+          ./build_bus_throughput_benchmark
+
+      - name: Processing-per-watt proxy (S25, TOKEN_VAZIO allowed)
+        run: bash scripts/raf_watt_proxy_probe.sh
+
+      - name: Upload watt-proxy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: watt-proxy-report
+          path: ci/reports/watt-proxy.md
+          if-no-files-found: warn
 
       - name: Try ApkC debug signing proof (TOKEN_VAZIO allowed)
         run: bash scripts/apkc_sign_debug.sh
