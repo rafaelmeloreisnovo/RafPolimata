@@ -148,15 +148,14 @@ static inline int pipe_run(int idx, const char *src, const char *out_apk, const 
     }
     else if(idx==2) { /* fiberh — stdin mode */
         log_push("fiberh: fiber-H scan (stdin)");
-        /* reopen src as stdin for child */
         i32 pid=os_fork();
         if(pid==0){
             i32 fd=os_open(src,O_RDONLY,0);
-            if(fd>=0){ /* dup2 via close+open trick not available; use redirect */
-                /* crude: just pass as arg instead */
-                os_close(fd);
+            if(fd>=0){
+                os_dup2(fd,0);   /* redirect child's stdin to src */
+                if(fd!=0) os_close(fd);
             }
-            const char *av[]={"./verbovivo","-s",src,NULL};
+            const char *av[]={"./verbovivo","-s",NULL};
             os_execve("./verbovivo",(char*const*)av,(char*const*)_pipe_envp);
             os_exit(127);
         }
@@ -165,11 +164,16 @@ static inline int pipe_run(int idx, const char *src, const char *out_apk, const 
         _cat(msg,&p,LOG_COLS,"fiberh: exit="); char nb[22]; _itoa(nb,rc); _cat(msg,&p,LOG_COLS,nb);
         log_push(msg);
     }
-    else if(idx==3) { /* recall */
+    else if(idx==3) { /* recall — verbovivo reads stdin in -r mode */
         log_push("recall: top-3 engram resonance");
         i32 pid=os_fork();
         if(pid==0){
-            const char *av[]={"./verbovivo","-r","3",src,NULL};
+            i32 fd=os_open(src,O_RDONLY,0);
+            if(fd>=0){
+                os_dup2(fd,0);
+                if(fd!=0) os_close(fd);
+            }
+            const char *av[]={"./verbovivo","-r","3",NULL};
             os_execve("./verbovivo",(char*const*)av,(char*const*)_pipe_envp);
             os_exit(127);
         }

@@ -1,4 +1,4 @@
-#include "../include/RAF_rafaelia_common.h"
+#include "RAF_rafaelia_common.h"
 
 #if defined(__linux__) || defined(__ANDROID__)
 #include <time.h>
