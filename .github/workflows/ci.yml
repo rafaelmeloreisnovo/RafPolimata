@@ -65,6 +65,12 @@ jobs:
             grep -E 'verbovivo:.*phi=' || echo 'TOKEN_VAZIO: hello.apk ausente'
           echo 'RAFAELIA relmat smoke test' | ./verbovivo_ci -s -m < /dev/stdin > /dev/null 2>&1 || true
 
+      - name: Codegen equivalence-family test (deterministic multi-encoding MOV family)
+        run: |
+          gcc -std=c11 -Wall -Wextra -Werror \
+            tools/raf_codegen_select_test.c -o build_codegen_select_test
+          ./build_codegen_select_test
+
       - name: Bus throughput test (S23)
         run: |
           gcc -std=c11 -Wall -Wextra -Werror -IBenchmark \
