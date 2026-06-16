@@ -342,6 +342,18 @@ tests/fixtures/with-permissions.apk ← INTERNET + CAMERA no manifest
 tests/fixtures/negative/bad-zip.apk ← ZIP corrompido → deve falhar
 ```
 
+**Sub-gap fechado:** a dimensão "matriz API/ABI ampla" (minSdkVersion ×
+targetSdkVersion × arquitetura) está coberta por
+`scripts/apkc_api_abi_matrix.sh` (gate de CI), que gera um APK para cada
+combinação de minSdkVersion ∈ {21,24,28,29,30,31,33,34} × as 6 linguagens
+sem toolchain externa, e prova — lendo os bytes binários do
+`AndroidManifest.xml` dentro do APK — que o valor de minSdkVersion pedido
+foi de fato codificado no AXML (não apenas que o build não falhou). Sem
+toolchain ARM no host, todas as células ficam `TOKEN_VAZIO` honestamente
+(mesmo padrão de `apkc_lang_coverage.sh`). As demais dimensões de L17
+(permissões múltiplas, DEX maior, libs com nomes diferentes, alinhamento
+ZIP não-padrão, seções ELF extras, testes negativos) permanecem abertas.
+
 ---
 
 ### L18 — Assinatura de release, não só debug
