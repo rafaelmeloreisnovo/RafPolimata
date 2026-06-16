@@ -31,6 +31,7 @@ Three integrated layers:
 - **Add an ARM64 instruction**: 1 `static inline u32` in `Apkc/arch_arm64.h` + 1 `case` in `asm_insn64()` in `Apkc/apkc.c`
 - **Add an AXML element**: extend `Apkc/fmt_axml.h` with new SI_ constant and emitter; pass arrays through `axml_build()`
 - **Add ELF section**: extend `Apkc/fmt_elf.h`; update section index cross-references (sh_link, e_shstrndx)
+- **Add an equivalence family** (multiple bit-distinct encodings for one logical operation, e.g. `MOV Xd,Xm` ≡ `ORR Xd,XZR,Xm` ≡ `ADD Xd,Xm,#0` ≡ `SUB Xd,Xm,#0`): verify all N candidate encodings are semantically identical (same destination value, no extra flag/side effects) before adding a family — this is additive to, not a replacement for, the "1 inline + 1 case" rule for genuinely new instructions. Dispatch via `codegen_select(em->buf, em->pos, N)` (`Apkc/codegen_select.h`), which deterministically picks a variant from the bytes already emitted using `phi_fst`/`phi_attractor` (same source → same prior bytes → same choice, every build — reproducible, not randomized). Log the chosen variant only during the real-emission pass (see `_codegen_log_on` in `Apkc/apkc.c`) so sizing/label passes don't double-count, and print a one-line summary alongside the `[phi=... attractor=...]` line so the choice is auditable.
 
 ## Canonical states
 

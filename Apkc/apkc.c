@@ -4,6 +4,7 @@
 #include "sys.h"
 #include "mem.h"
 #include "coherence.h"
+#include "codegen_select.h"
 #include "arch_arm64.h"
 #include "arch_arm32.h"
 #include "lang_script.h"
@@ -268,6 +269,23 @@ static void emit_align(Emit *e, u32 pow2) {
     while (e->pos & mask) emit8(e,0);
 }
 
+/* ── codegen equivalence-family audit trail ──────────────────────────
+ * Records which encoder variant codegen_select() picked for each
+ * instance of the MOV equivalence family, but only during the final
+ * real-emission pass (pass==1 in assemble()) — the sizing/label passes
+ * call asm_insn64() speculatively and would otherwise double-count. */
+static u8  _codegen_variant_log[256];
+static u32 _codegen_variant_log_n = 0;
+static u32 _codegen_variant_count[3] = {0,0,0};
+static int _codegen_log_on = 0;
+
+static void codegen_log_variant(u32 variant) {
+    if (!_codegen_log_on) return;
+    if (variant < 3u) _codegen_variant_count[variant]++;
+    if (_codegen_variant_log_n < sizeof(_codegen_variant_log))
+        _codegen_variant_log[_codegen_variant_log_n++] = (u8)variant;
+}
+
 /* ── ARM64 assembler ──────────────────────────────────────────────── */
 static void asm_insn64(Emit *em, Tok mn, Lex *l) {
     lex_next(l); /* advance past mnemonic */
@@ -342,11 +360,25 @@ static void asm_insn64(Emit *em, Tok mn, Lex *l) {
             if (np==0) parts[np++]=a64_movz((u32)rd,0,0,(u32)sf);
             for(int i=0;i<np;i++) emit32(em,parts[i]);
         } else {
-            /* mov rd, rn — ORR rd, xzr, rn */
+            /* mov rd, rn — equivalence family: ORR rd,xzr,rn / ADD rd,rn,#0 /
+             * SUB rd,rn,#0 all leave rd==rn with no flag side effects.
+             * codegen_select() deterministically picks among them from the
+             * bytes already emitted, so the same source always picks the
+             * same variant (reproducible, auditable — see
+             * _codegen_variant_log). */
             i32 rn=reg64(l->cur); lex_next(l);
-            /* ORR (shifted reg): sf|01010|shift2|0|rm5|imm6|rn5|rd5 */
             u32 sf2=(u32)sf;
-            u32 w=((sf2)<<31)|(0x2Au<<24)|((u32)rn<<16)|(31u<<5)|(u32)rd;
+            u32 variant = codegen_select(em->buf, (u32)em->pos, 3u);
+            u32 w;
+            switch (variant) {
+            case 0:
+                /* ORR (shifted reg): sf|01010|shift2|0|rm5|imm6|rn5|rd5 */
+                w=((sf2)<<31)|(0x2Au<<24)|((u32)rn<<16)|(31u<<5)|(u32)rd;
+                break;
+            case 1: w=a64_add_imm((u32)rd,(u32)rn,0u,0,sf2); break;
+            default: w=a64_sub_imm((u32)rd,(u32)rn,0u,0,sf2); break;
+            }
+            codegen_log_variant(variant);
             emit32(em,w);
         }
         return;
@@ -1252,6 +1284,13 @@ static AsmResult assemble(const u8 *src, sz src_len, int arch, u8 *out_code) {
     /* two passes: 1=labels, 2=code */
     for (int pass=0; pass<2; pass++) {
         em.pos=0;
+        /* only the final real-emission pass (pass==1) is logged — the
+         * sizing/label passes call asm_insn64() speculatively. */
+        if (pass==1) {
+            _codegen_variant_log_n=0;
+            _codegen_variant_count[0]=_codegen_variant_count[1]=_codegen_variant_count[2]=0;
+        }
+        _codegen_log_on = (pass==1);
         Lex l; l.s=(const char*)src; l.e=(const char*)(src+src_len);
         lex_next(&l);
         while (l.cur.kind!=TK_EOF) {
@@ -1645,6 +1684,13 @@ static i32 build_apk(
         if (phi_frac <   10u) pr("0");
         pr_dec((u64)phi_frac);
         pr(" attractor="); pr_dec((u64)attr); pr("]\n");
+        if (_codegen_variant_log_n) {
+            pr("[codegen mov_family: total="); pr_dec((u64)_codegen_variant_log_n);
+            pr(" orr="); pr_dec((u64)_codegen_variant_count[0]);
+            pr(" add0="); pr_dec((u64)_codegen_variant_count[1]);
+            pr(" sub0="); pr_dec((u64)_codegen_variant_count[2]);
+            pr("]\n");
+        }
     }
     return rc;
 }
