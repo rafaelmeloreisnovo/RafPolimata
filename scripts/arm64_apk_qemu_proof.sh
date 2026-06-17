@@ -165,6 +165,10 @@ fi
 APK_ALIGNED="/tmp/hello-arm64-aligned.apk"
 APK_SIGNED="/tmp/hello-arm64-signed.apk"
 KEYSTORE="/tmp/apkc_debug_proof.keystore"
+SIGN_SUCCEEDED=0
+# Remove stale signed outputs before any signing attempt so aapt (Stage 5)
+# never reads a stale file when signing is skipped or the tools are absent.
+rm -f "$APK_ALIGNED" "$APK_SIGNED"
 
 if command -v zipalign >/dev/null 2>&1 && command -v apksigner >/dev/null 2>&1; then
     # Generate ephemeral debug keystore (never committed, /tmp only).
@@ -195,7 +199,10 @@ if command -v zipalign >/dev/null 2>&1 && command -v apksigner >/dev/null 2>&1; 
                   echo "[SIGN] STATUS: PASS (debug-signed APK, v1/v2/v3 verified; keystore ephemeral /tmp)"
                 } >> "$TRANSCRIPT"
                 # APK stays in /tmp (debug-signed, ephemeral, not committed per policy).
+                # Save canonical F7 signature-evidence artifact.
+                printf '%s\n' "$VERIFY_OUT" > "$OUT/apksigner-verify.txt"
                 PASS=$((PASS+1))
+                SIGN_SUCCEEDED=1
             else
                 echo "[SIGN] STATUS: FAIL (apksigner verify exit ${VERIFY_EXIT})" >> "$TRANSCRIPT"
                 printf '%s\n' "$VERIFY_OUT" | head -5 >> "$TRANSCRIPT"
@@ -218,8 +225,14 @@ fi
 if command -v aapt >/dev/null 2>&1; then
     # Use xmltree to get the parsed manifest — test_format_fixtures.py checks
     # for the word "manifest" which appears in xmltree output (not badging).
-    AAPT_OUT="$(aapt dump xmltree "$APK_SIGNED" AndroidManifest.xml 2>/dev/null \
-               || aapt dump xmltree "$APK_OUT" AndroidManifest.xml 2>/dev/null \
+    # Use the signed APK only when signing succeeded to avoid reading a stale
+    # /tmp file when signing was skipped or the tools were absent.
+    if [ "$SIGN_SUCCEEDED" -eq 1 ]; then
+        AAPT_SRC="$APK_SIGNED"
+    else
+        AAPT_SRC="$APK_OUT"
+    fi
+    AAPT_OUT="$(aapt dump xmltree "$AAPT_SRC" AndroidManifest.xml 2>/dev/null \
                || echo TOKEN_VAZIO)"
     {
       echo ""
@@ -252,6 +265,7 @@ if [ -f "$VSUM" ] && [ "$PASS" -ge 2 ]; then
       echo "|---|---|---|"
       echo "| F2 | PASS | hello-arm64-proof.apk gerado via qemu (${APK_SZ} bytes) |"
       echo "| F3 | PASS | unzip.txt regenerado do APK qemu |"
+      echo "| F4 | PASS | aapt-xmltree.txt: NativeActivity + lib_name confirmados |"
       if [ "$DEX_PROVEN" -eq 1 ]; then
           echo "| F5 | PASS | dex-sha1.txt + internal SHA-1 confirmado |"
       else
