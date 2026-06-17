@@ -54,6 +54,22 @@ if [ "$BUILD_MODE" = TOKEN_VAZIO ] && command -v aarch64-linux-gnu-gcc >/dev/nul
   fi
 fi
 
+# qemu-aarch64-static fallback: cross-compile with clang, wrap with qemu.
+# Activated when no native/cross-gcc path works but clang + lld + qemu are present.
+if [ "$BUILD_MODE" = TOKEN_VAZIO ] && \
+   command -v clang >/dev/null 2>&1 && \
+   command -v qemu-aarch64-static >/dev/null 2>&1; then
+  APKC_ELF="$EXEC_ROOT/apkc.elf"
+  if try_build clang -ffreestanding -nostdlib -nostdinc -I . \
+       -target aarch64-linux-gnu -static -fuse-ld=lld -Wl,-e,_start -O2 \
+       apkc.c -o "$APKC_ELF"; then
+    # Create a thin wrapper so test_lang can call "$EXE src -o out" transparently.
+    printf '#!/bin/sh\nexec qemu-aarch64-static "%s" "$@"\n' "$APKC_ELF" > "$EXE"
+    chmod +x "$EXE"
+    BUILD_MODE=qemu
+  fi
+fi
+
 if [ "$BUILD_MODE" = TOKEN_VAZIO ]; then
   log 'TOKEN_VAZIO: não há binário apkc executável neste host; instale toolchain ARM/Linux.'
   for lang in asm py sh pl js php; do
@@ -114,5 +130,5 @@ for lang in c cpp rs kt java jsx; do
 done
 
 log ''
-log "Conclusão: ${PASS_COUNT}/6 testes PASS, ${FAIL_COUNT} FAIL; use_fork TOKEN_VAZIO (ARM64-only)."
+log "Conclusão: ${PASS_COUNT}/6 testes PASS, ${FAIL_COUNT} FAIL (modo=${BUILD_MODE}); use_fork TOKEN_VAZIO (ARM64-only)."
 if [ "$FAIL_COUNT" -gt 0 ]; then exit 1; fi
