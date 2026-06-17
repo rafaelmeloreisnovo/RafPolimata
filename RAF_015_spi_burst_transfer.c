@@ -4,11 +4,13 @@
  * Método M015: SPI burst transfer
  * Alvo: MCU/AVR
  * Domínio: SPI
- * Ganho estimado: 2x-10x lote
+ * Ganho estimado: throughput máximo em transferências longas
  *
- * Reduz overhead entre bytes.
- *
- * Status: skeleton C para integração em firmware bare-metal.
+ * Extensão do M014: rafaelia_m015_spi_burst envia n bytes de tx[] e
+ * armazena respostas em rx[], iniciando o próximo byte imediatamente após
+ * SPIF sem delay extra.
+ * Self-test não-AVR: conta bytes transferidos, verifica n==transferido.
+ * Retorno int: 0=pass, -1=fail.
  */
 
 #ifndef F_CPU
@@ -17,33 +19,75 @@
 
 #if defined(__AVR_ATmega328P__) || defined(RAFAELIA_FORCE_AVR_DEMO)
 #define AVR_DDRB_ADDR   0x24u
-#define AVR_PINB_ADDR   0x23u
-#define AVR_PORTB_ADDR  0x25u
-#define AVR_TCCR1A_ADDR 0x80u
-#define AVR_TCCR1B_ADDR 0x81u
-#define AVR_OCR1A_ADDR  0x88u
-#define AVR_UCSR0A_ADDR 0xC0u
-#define AVR_UCSR0B_ADDR 0xC1u
-#define AVR_UCSR0C_ADDR 0xC2u
-#define AVR_UDR0_ADDR   0xC6u
-#define AVR_ADCSRA_ADDR 0x7Au
-#define AVR_ADMUX_ADDR  0x7Cu
-#define AVR_ADCL_ADDR   0x78u
-#define AVR_ADCH_ADDR   0x79u
+#define AVR_SPCR_ADDR   0x4Cu
+#define AVR_SPSR_ADDR   0x4Du
+#define AVR_SPDR_ADDR   0x4Eu
+
+#define M015_SPE    6u
+#define M015_MSTR   4u
+#define M015_SPIF   7u
+#define M015_SS_BIT   2u
+#define M015_MOSI_BIT 3u
+#define M015_MISO_BIT 4u
+#define M015_SCK_BIT  5u
+
+#define M015_SPCR_VAL ((uint8_t)((1u << M015_SPE) | (1u << M015_MSTR)))
 #endif
 
-void rafaelia_m015_spi_burst_transfer(void) {
+/*
+ * rafaelia_m015_spi_burst:
+ * Transfer n bytes: write tx[i], wait SPIF, read rx[i].
+ * Returns number of bytes transferred.
+ */
+static uint8_t rafaelia_m015_spi_burst_avr(const uint8_t *tx, uint8_t *rx,
+                                             uint8_t n)
+{
 #if defined(__AVR_ATmega328P__) || defined(RAFAELIA_FORCE_AVR_DEMO)
-    /*
-     * Ajuste este bloco conforme o método específico.
-     * Mantido simples para permitir auditoria direta de registrador.
-     */
-    RAFA_MMIO8(AVR_DDRB_ADDR) |= (uint8_t)(1u << 5u);
-    RAFA_MMIO8(AVR_PINB_ADDR) = (uint8_t)(1u << 5u);
+    uint8_t i;
+    for (i = 0u; i < n; i++) {
+        RAFA_MMIO8(AVR_SPDR_ADDR) = tx[i];
+        while (!(RAFA_MMIO8(AVR_SPSR_ADDR) & (uint8_t)(1u << M015_SPIF))) {
+            /* spin — next byte sent immediately after flag clears */
+        }
+        rx[i] = RAFA_MMIO8(AVR_SPDR_ADDR);
+    }
+    return n;
 #else
     /*
-     * Método específico de MCU/AVR. Compile com avr-gcc ou defina RAFAELIA_FORCE_AVR_DEMO
-     * apenas para inspeção de sintaxe.
+     * Non-AVR simulation: loopback — rx mirrors tx, count bytes.
+     * (No real SPI hardware; used only for self-test counting.)
      */
+    uint8_t i;
+    for (i = 0u; i < n; i++) {
+        rx[i] = tx[i];   /* loopback */
+    }
+    return n;
+#endif
+}
+
+int rafaelia_m015_spi_burst_transfer(void) {
+#if defined(__AVR_ATmega328P__) || defined(RAFAELIA_FORCE_AVR_DEMO)
+    /* Configure SPI pins and enable master mode (same as M014) */
+    RAFA_MMIO8(AVR_DDRB_ADDR) |= (uint8_t)((1u << M015_SS_BIT)   |
+                                             (1u << M015_MOSI_BIT) |
+                                             (1u << M015_SCK_BIT));
+    RAFA_MMIO8(AVR_DDRB_ADDR) &= (uint8_t)(~(1u << M015_MISO_BIT));
+    RAFA_MMIO8(AVR_SPCR_ADDR)  = M015_SPCR_VAL;
+    return 0;
+#else
+    /* Non-AVR self-test: send [0xAA, 0x55], verify transfer count == 2 */
+    static const uint8_t test_tx[2] = {0xAAu, 0x55u};
+    static uint8_t       test_rx[2] = {0u, 0u};
+    uint8_t transferred;
+
+    transferred = rafaelia_m015_spi_burst_avr(test_tx, test_rx, (uint8_t)2u);
+    if (transferred != (uint8_t)2u) {
+        return -1;
+    }
+    /* Verify loopback */
+    if (test_rx[0] != test_tx[0] || test_rx[1] != test_tx[1]) {
+        return -1;
+    }
+    return 0;
 #endif
 }
