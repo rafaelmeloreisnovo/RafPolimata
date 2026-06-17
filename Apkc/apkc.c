@@ -1347,7 +1347,7 @@ static AsmResult assemble(const u8 *src, sz src_len, int arch, u8 *out_code) {
 
     lbl_reset();
     Emit em; em.buf=out_code; em.cap=0x10000; em.pos=0;
-    em.sym1_va=0; em.sym2_va=0; em.has_sym1=0; em.has_sym2=0;
+    em.sym1_va=0; em.sym2_va=0; em.has_sym1=0; em.has_sym2=0; em.err=0;
 
     /* two passes: 1=labels, 2=code */
     for (int pass=0; pass<2; pass++) {

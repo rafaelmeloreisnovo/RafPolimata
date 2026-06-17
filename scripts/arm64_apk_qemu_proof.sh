@@ -28,6 +28,7 @@ SIGNV="$(apksigner --version 2>/dev/null || echo TOKEN_VAZIO)"
 PASS=0; TZ=0
 log() { printf '%s\n' "$*"; }
 
+# Truncate transcript at the start of each run so prior runs don't pollute evidence.
 {
   echo ""
   echo "=================================================================="
@@ -37,7 +38,7 @@ log() { printf '%s\n' "$*"; }
   echo "clang:       ${CLANGV}"
   echo "qemu:        ${QEMUV}"
   echo "apksigner:   ${SIGNV}"
-} >> "$TRANSCRIPT"
+} > "$TRANSCRIPT"
 
 # ── Stage 1: cross-compile apkc as static AArch64 ELF ─────────────────────
 APKC_ELF="/tmp/apkc_a64_qemu.elf"
@@ -80,6 +81,11 @@ if command -v qemu-aarch64-static >/dev/null 2>&1; then
     } >> "$TRANSCRIPT"
     if [ $APKC_EXIT -eq 0 ]; then
         PASS=$((PASS+1))
+        # Generate ZIP member listing and DEX sha1 for L17 corpus evidence.
+        unzip -l "$APK_OUT" > "$OUT/unzip.txt" 2>/dev/null || true
+        if unzip -p "$APK_OUT" classes.dex > /tmp/_apkc_proof_dex.bin 2>/dev/null; then
+            sha1sum /tmp/_apkc_proof_dex.bin | awk '{print $1"  classes.dex"}' > "$OUT/dex-sha1.txt"
+        fi
     else
         TZ=$((TZ+1))
         log "FAIL: qemu apkc run"; exit 1
@@ -89,12 +95,21 @@ else
     TZ=$((TZ+1)); log "TOKEN_VAZIO: qemu absent"; exit 0
 fi
 
-# ── Stage 3: extract lib/arm64-v8a/libmain.so and read ELF header ─────────
+# ── Stage 3: extract lib/arm64-v8a/libmain.so and validate ELF header ─────
 SO_OUT="/tmp/libmain_arm64_proof.so"
-if unzip -p "$APK_OUT" lib/arm64-v8a/libmain.so > "$SO_OUT" 2>/dev/null; then
+if unzip -p "$APK_OUT" lib/arm64-v8a/libmain.so > "$SO_OUT" 2>/dev/null && [ -s "$SO_OUT" ]; then
     MAGIC="$(od -An -tx1 -N4 "$SO_OUT" | tr -d ' \n')"
-    ELF_HDR="$(readelf -h "$SO_OUT" | grep -E 'Class|Data|Machine|Type' | sed 's/^/    /')"
+    ELF_HDR="$(readelf -h "$SO_OUT" 2>/dev/null | grep -E 'Class|Data|Machine|Type' | sed 's/^/    /')"
     SHA_SO="$(sha256sum "$SO_OUT" | awk '{print $1}')"
+    # Validate ELF64 AArch64 DYN before declaring PASS.
+    ELF_CLASS="$(readelf -h "$SO_OUT" 2>/dev/null | grep 'Class:' | grep -c 'ELF64' || true)"
+    ELF_MACHINE="$(readelf -h "$SO_OUT" 2>/dev/null | grep 'Machine:' | grep -c 'AArch64' || true)"
+    ELF_TYPE="$(readelf -h "$SO_OUT" 2>/dev/null | grep 'Type:' | grep -c 'DYN' || true)"
+    if [ "${ELF_CLASS:-0}" -gt 0 ] && [ "${ELF_MACHINE:-0}" -gt 0 ] && [ "${ELF_TYPE:-0}" -gt 0 ]; then
+        ELF_VERDICT="PASS (ELF64 AArch64 DYN — arm64-v8a .so inside generated APK)"
+    else
+        ELF_VERDICT="FAIL (unexpected ELF class/machine/type — not ELF64 AArch64 DYN)"
+    fi
     {
       echo ""
       echo "[ELF-SO] archive member: lib/arm64-v8a/libmain.so"
@@ -102,14 +117,19 @@ if unzip -p "$APK_OUT" lib/arm64-v8a/libmain.so > "$SO_OUT" 2>/dev/null; then
       echo "[ELF-SO] sha256:  ${SHA_SO}"
       echo "[ELF-SO] readelf:"
       echo "$ELF_HDR"
-      echo "[ELF-SO] STATUS:  PASS (ELF64 AArch64 DYN — arm64-v8a .so inside generated APK)"
+      echo "[ELF-SO] STATUS:  ${ELF_VERDICT}"
     } >> "$TRANSCRIPT"
     { echo "# lib/arm64-v8a/libmain.so ELF header — ARM64 APK proof (L4), ${DATE_UTC}, commit ${SHORT}";
       readelf -h "$SO_OUT"; } > "$OUT/readelf-arm64.txt"
-    PASS=$((PASS+1))
+    if [ "$ELF_VERDICT" = "PASS (ELF64 AArch64 DYN — arm64-v8a .so inside generated APK)" ]; then
+        PASS=$((PASS+1))
+    else
+        log "FAIL: libmain.so ELF header validation: ${ELF_VERDICT}"; exit 1
+    fi
 else
+    # libmain.so is the core of the L4 proof — its absence is a hard failure.
     echo "[ELF-SO] STATUS: FAIL — lib/arm64-v8a/libmain.so not in APK" >> "$TRANSCRIPT"
-    TZ=$((TZ+1))
+    log "FAIL: libmain.so not in APK"; exit 1
 fi
 
 # ── Stage 4: zipalign + apksigner (debug, ephemeral keystore) ─────────────
@@ -128,8 +148,11 @@ if command -v zipalign >/dev/null 2>&1 && command -v apksigner >/dev/null 2>&1; 
         zipalign -f 4 "$APK_OUT" "$APK_ALIGNED" 2>/dev/null
         apksigner sign --ks "$KEYSTORE" --ks-pass pass:android --key-pass pass:android \
             --out "$APK_SIGNED" "$APK_ALIGNED" 2>/dev/null
-        if apksigner verify --verbose "$APK_SIGNED" 2>&1 | grep -q "Verified"; then
-            SIG_LINES="$(apksigner verify --verbose "$APK_SIGNED" 2>&1 | grep -E 'Verified|v1|v2|v3' | head -5)"
+        # Use exit status of apksigner verify as the ground truth, not text grep.
+        VERIFY_OUT="$(apksigner verify --verbose "$APK_SIGNED" 2>&1)"
+        VERIFY_EXIT=$?
+        if [ $VERIFY_EXIT -eq 0 ]; then
+            SIG_LINES="$(printf '%s\n' "$VERIFY_OUT" | grep -E 'Verified|v1|v2|v3' | head -5)"
             SHA_SIGNED="$(sha256sum "$APK_SIGNED" | awk '{print $1}')"
             {
               echo ""
@@ -142,7 +165,8 @@ if command -v zipalign >/dev/null 2>&1 && command -v apksigner >/dev/null 2>&1; 
             # APK stays in /tmp (debug-signed, ephemeral, not committed per policy).
             PASS=$((PASS+1))
         else
-            echo "[SIGN] STATUS: FAIL (verify failed)" >> "$TRANSCRIPT"
+            echo "[SIGN] STATUS: FAIL (apksigner verify exit ${VERIFY_EXIT})" >> "$TRANSCRIPT"
+            printf '%s\n' "$VERIFY_OUT" | head -5 >> "$TRANSCRIPT"
             TZ=$((TZ+1))
         fi
     else
