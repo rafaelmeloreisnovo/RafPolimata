@@ -48,8 +48,22 @@ jobs:
       - name: ARM64 encoder golden tests
         run: python3 tests/test_arm64_encoders.py
 
+      - name: ARM32 encoder golden tests (L5 mnemonic coverage)
+        run: python3 tests/test_arm32_encoders.py
+
       - name: APKc assembler roundtrip smoke test
         run: sh tests/test_asm_roundtrip.sh
+
+      - name: Format regression fixtures + ZIP negative test (L17)
+        run: |
+          python3 tests/test_format_fixtures.py
+          python3 tests/test_zip_negative.py
+
+      - name: Reproducible source->binary transcript (L1)
+        run: bash tools/raf_source_to_binary_proof.sh
+
+      - name: Clean single proof run (L6)
+        run: bash tools/raf_clean_proof_run.sh
 
       - name: Validate ApkC proof protocol
         run: bash scripts/apkc_validate.sh
@@ -106,6 +120,14 @@ jobs:
         with:
           name: apkc-proofs-out
           path: Apkc/proofs/out/
+          if-no-files-found: warn
+
+      - name: Upload clean-proof-run snapshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkc-proof-runs
+          path: Apkc/proofs/runs/
           if-no-files-found: warn
 
       - name: Generate P(k) falsifiability report
