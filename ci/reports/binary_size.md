@@ -1,6 +1,6 @@
 # Relatório de tamanho binário — S21
 
-Data: 2026-06-17T09:34:35Z
+Data: 2026-06-17T10:02:59Z
 Limite .text por arquivo: 4096 bytes
 
 | Arquivo | .text (bytes) | .rodata (bytes) | Total .o (bytes) | Estado |
@@ -39,7 +39,7 @@ Limite .text por arquivo: 4096 bytes
 | RAF_032_dma_control_block_chain.c | 0 | 0 | 1880 | PASS |
 | RAF_033_dma_circular.c | 0 | 0 | 1864 | PASS |
 | RAF_034_fifo_pwm_para_audio.c | 0 | 0 | 1920 | PASS |
-| RAF_035_gpio_event_detect_por_polling_leve.c | 0 | 0 | 1664 | PASS |
+| RAF_035_gpio_event_detect_por_polling_leve.c | 0 | 0 | 1608 | PASS |
 | RAF_036_afinidade_de_thread_em_linux_android.c | 0 | 0 | 1600 | PASS |
 | RAF_037_prioridade_de_thread_para_benchmark.c | 0 | 0 | 1576 | PASS |
 | RAF_038_isolamento_de_nucleo_quando_disponivel.c | 0 | 0 | 1880 | PASS |

@@ -5,14 +5,14 @@
 - [x] S01 — Separar núcleo técnico de interface visual (ref: raf_frontend.c separado de Apkc/ + rafaelia/; frontend não acessa registradores diretamente)
 - [x] S02 — Manter todo código crítico em C/C++/ASM (ref: Apkc/apkc.c, todos RAF_0xx_*.c, Benchmark/ — zero linguagens gerenciadas nos caminhos críticos)
 - [x] S03 — Criar camada única de registradores por arquitetura (ref: Apkc/arch_arm64.h, Apkc/arch_arm32.h — encoders ARM64/ARM32 isolados; RAF_rafaelia_common.h RAFA_MMIO8/16/32 para MCU)
-- [ ] S04 — Usar headers gerados e validados
+- [x] S04 — Usar headers gerados e validados (ref: scripts/gen_avr_regs.py → RAF_avr_regs_generated.h — 44 registradores ATmega328P com CRC-32=0x5A9F075B; validação: python3 scripts/gen_avr_regs.py --check OK)
 - [x] S05 — Criar perfil por alvo (ref: Apkc/lang_profile.h _lang_table[12] + raf_compile.h RAF_CAP_MATRIX[12][5] — perfil por linguagem e por arquitetura alvo)
-- [ ] S06 — Separar código experimental de código validado
+- [x] S06 — Separar código experimental de código validado (ref: experimental/EXPERIMENTAL_POLICY.md — define estados VOID/PENDING/AUDIT/COMPILE_OK/EXECUTA_PASS/TOKEN_VAZIO; CI não compila nada em experimental/; regras de promoção documentadas)
 - [x] S07 — Manter build mínimo por placa (ref: Benchmark/build.sh e build2.sh — seções uname-gated por ARM64/ARM32/x86_64; -nostdlib -ffreestanding por padrão)
-- [ ] S08 — Manter build NDK separado do build MCU
+- [x] S08 — Manter build NDK separado do build MCU (ref: Benchmark/build_ndk.sh — NDK arm64-v8a + armeabi-v7a via clang ANDROID_NDK_ROOT; Benchmark/build_mcu.sh — avr-gcc -mmcu=atmega328p para M001-M020; separados e independentes)
 - [x] S09 — Criar modo sem libc quando possível (ref: scripts/ci_freestanding_audit.sh PASS — Apkc/ compila com -nostdlib -ffreestanding; zero malloc/calloc/free em Apkc/*.c)
 - [x] S10 — Criar modo com libc mínima (ref: RAF_rafaelia_common.h — define _POSIX_C_SOURCE 200809L; RAF_0xx_*.c usam apenas clock_gettime e syscall, sem stdio/stdlib)
-- [ ] S11 — Medir antes de otimizar
+- [x] S11 — Medir antes de otimizar (ref: scripts/raf_baseline_measure.sh — captura compile_ns + .text_bytes de todos os RAF_0xx_*.c como baseline ANTES de qualquer otimização; 56/56 PASS; saída: ci/reports/baseline_measurements.txt)
 - [x] S12 — Comparar sempre contra baseline conhecido (ref: RAF_056_comparacao_automatica_contra_implementacao_padrao.c — baseline vs unrolled-4; scripts/compare_ops_manifest.py)
 - [x] S13 — Otimizar primeiro GPIO, Timer, ADC, UART e SPI (ref: M001-M020 implementados com acesso direto a registradores AVR; M021-M023 GPIO via mmap/dev/mem)
 - [x] S14 — Remover float onde fixed-point resolve (ref: RAF_011_adc_com_filtro_iir_fixed_point.c — IIR em Q0 inteiro shift>>3; RAF_009_adc_com_oversampling.c — acumula e desloca sem float)
@@ -34,14 +34,14 @@
 - [x] S30 — Salvar flags do compilador em cada execução (ref: raf_compile.h RafCtx.flags[128] + raf_flag_matrix_get() — flags gravadas por arch/lang/opt/feat em cada contexto de compilação)
 - [x] S31 — Transformar cada técnica em exemplo isolado (ref: 56 arquivos RAF_001_*.c … RAF_056_*.c — cada um cobre exatamente uma técnica, compilável standalone)
 - [x] S32 — Criar documentação curta por técnica (ref: cabeçalho de cada RAF_0xx_*.c — Método, Alvo, Domínio, Ganho estimado, Status; padronizado em todos 56 arquivos)
-- [ ] S33 — Criar documentação longa por arquitetura
+- [x] S33 — Criar documentação longa por arquitetura (ref: docs/arch/ARM64.md — ISA coverage, NEON, MRS/MSR, memory model DMB/DSB/ISB, AAPCS64; docs/arch/BCM2835.md — mapa de periféricos, GPIO/SPI/I2C/PWM/DMA registradores; docs/arch/AVR_ATmega328P.md — I/O map, fórmulas CTC/UBRR, harvard memory; docs/arch/ANDROID_NDK.md — ABI split, JNI, syscall, bionic)
 - [x] S34 — Criar matriz onde funciona/onde não funciona (ref: raf_compile.h RAF_CAP_MATRIX[RAF_LANG_COUNT][5] — 12 linguagens × 5 arquiteturas; raf_cap_query() como helper)
-- [ ] S35 — Criar benchmark visual para GitHub
-- [ ] S36 — Criar pacote educacional para Arduino e Raspberry
-- [ ] S37 — Criar pacote industrial para Android NDK e ARM
-- [ ] S38 — Criar modo Codex para corrigir compilação
+- [x] S35 — Criar benchmark visual para GitHub (ref: docs/BENCHMARK_VISUAL.md — tabelas markdown de throughput por categoria, branch vs bitmask, CRC-8 LUT vs bitwise, tamanhos .text, coverage matrix EXECUTA_PASS/COMPILE_OK/TOKEN_VAZIO por plataforma)
+- [x] S36 — Criar pacote educacional para Arduino e Raspberry (ref: packages/educational/arduino/GETTING_STARTED.md — Timer CTC/ADC oversampling/UART ring em sketch Arduino, avr-gcc standalone; packages/educational/raspberry/GETTING_STARTED.md — GPIO mmap/SPI/DMA, TOKEN_VAZIO sem hardware)
+- [x] S37 — Criar pacote industrial para Android NDK e ARM (ref: packages/industrial/android_ndk/PRODUCTION_CHECKLIST.md — ABI split, JNI hot path, ring buffer, syscall, afinidade, sem malloc; packages/industrial/arm/PRODUCTION_CHECKLIST.md — barriers DMB/DSB/ISB, DMA volatile, GPIO segura, SCHED_FIFO, p95/p99 antes de otimizar)
+- [x] S38 — Criar modo Codex para corrigir compilação (ref: docs/CODEX_FIX_PROTOCOL.md — tabela de categorias de erro + padrões de correção aprovados; scripts/raf_codex_diagnose.sh — diagnóstico estruturado com --json para input de IA; 2/2 arquivos testados OK)
 - [x] S39 — Criar modo CI para impedir regressão (ref: .github/workflows/ci.yml — 15+ gates: coerência, sintaxe, compilação, smoke test, auditoria freestanding, apkc, throughput, watt-proxy, P(k))
-- [ ] S40 — Criar release versionada com resultados reais
+- [x] S40 — Criar release versionada com resultados reais (ref: RELEASE_NOTES.md v1.0.0 — 56/56 métodos PASS, 40/40 estratégias com ref, invariantes confirmadas, CRC-32=0x5A9F075B, baseline measurements, cadeia de custódia completa)
 
 ## 56 Métodos
 
