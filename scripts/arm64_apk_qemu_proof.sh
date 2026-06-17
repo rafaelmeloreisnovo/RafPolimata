@@ -192,7 +192,7 @@ if command -v zipalign >/dev/null 2>&1 && command -v apksigner >/dev/null 2>&1; 
         else
             echo "[SIGN] STATUS: FAIL (apksigner verify exit ${VERIFY_EXIT})" >> "$TRANSCRIPT"
             printf '%s\n' "$VERIFY_OUT" | head -5 >> "$TRANSCRIPT"
-            TZ=$((TZ+1))
+            log "FAIL: apksigner verify failed (tools present; bad APK or sign step)"; exit 1
         fi
     else
         echo "[SIGN] STATUS: TOKEN_VAZIO (keytool failed to generate keystore)" >> "$TRANSCRIPT"
@@ -216,7 +216,10 @@ if command -v aapt >/dev/null 2>&1; then
       echo "$AAPT_OUT" | head -15 | sed 's/^/    /'
     } >> "$TRANSCRIPT"
     echo "$AAPT_OUT" > "$OUT/aapt-xmltree.txt"
-    if echo "$AAPT_OUT" | grep -iq "manifest"; then
+    # Require the concrete ARM64 APK markers: NativeActivity + lib_name metadata.
+    if echo "$AAPT_OUT" | grep -iq "manifest" && \
+       echo "$AAPT_OUT" | grep -iq "NativeActivity" && \
+       echo "$AAPT_OUT" | grep -iq "lib_name"; then
         PASS=$((PASS+1))
     fi
 fi

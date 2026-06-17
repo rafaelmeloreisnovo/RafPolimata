@@ -48,9 +48,19 @@ for c in cc gcc clang; do
   fi
 done
 if [ "$BUILD_MODE" = TOKEN_VAZIO ] && command -v aarch64-linux-gnu-gcc >/dev/null 2>&1; then
+  CROSS_ELF="$EXEC_ROOT/apkc-cross.elf"
   if try_build aarch64-linux-gnu-gcc -std=c11 -Wall -Wextra -Wno-unused-function \
-         -nostdlib -static -Wl,-e,_start apkc.c -o "$EXE"; then
-    BUILD_MODE=cross
+         -nostdlib -static -Wl,-e,_start apkc.c -o "$CROSS_ELF"; then
+    # On x86_64 CI there is no binfmt registration for AArch64, so the ELF
+    # cannot be exec'd directly.  Wrap with qemu if available.
+    if command -v qemu-aarch64-static >/dev/null 2>&1; then
+      printf '#!/bin/sh\nexec qemu-aarch64-static "%s" "$@"\n' "$CROSS_ELF" > "$EXE"
+      chmod +x "$EXE"
+      BUILD_MODE=qemu
+    else
+      cp "$CROSS_ELF" "$EXE"
+      BUILD_MODE=cross
+    fi
   fi
 fi
 
