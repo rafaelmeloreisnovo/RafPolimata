@@ -1,0 +1,1 @@
+verbovivo: 15 bytes  phi=0.2409  attractor=25  hamming=0.4965  hdc[0]=000080df
