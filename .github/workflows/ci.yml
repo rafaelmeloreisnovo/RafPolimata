@@ -111,6 +111,9 @@ jobs:
           path: ci/reports/watt-proxy.md
           if-no-files-found: warn
 
+      - name: Java/DEX pipeline probe (L11, TOKEN_VAZIO allowed for d8)
+        run: bash scripts/java_dex_pipeline_probe.sh
+
       - name: Try ApkC debug signing proof (TOKEN_VAZIO allowed)
         run: bash scripts/apkc_sign_debug.sh
 
