@@ -3,6 +3,9 @@ build_host_check/
 raf_compile
 ci_out*
 
+# Compiled object files (generated during local builds/tests)
+*.o
+
 # Big Test orchestration artefacts
 big_test_runs/
 
