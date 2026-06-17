@@ -114,6 +114,13 @@ jobs:
       - name: Java/DEX pipeline probe (L11, TOKEN_VAZIO allowed for d8)
         run: bash scripts/java_dex_pipeline_probe.sh
 
+      - name: ARM64 APK qemu proof (L4 — install qemu if absent, TOKEN_VAZIO if install fails)
+        run: |
+          if ! command -v qemu-aarch64-static >/dev/null 2>&1; then
+            sudo apt-get install -y qemu-user-static 2>/dev/null || true
+          fi
+          bash scripts/arm64_apk_qemu_proof.sh
+
       - name: Try ApkC debug signing proof (TOKEN_VAZIO allowed)
         run: bash scripts/apkc_sign_debug.sh
 
