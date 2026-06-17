@@ -1,0 +1,6 @@
+freestanding-syntax    PASS         clang aarch64 -fsyntax-only clean -> g1_syntax.txt
+cross-object-a64       PASS         Class=ELF64 Machine=AArch64 sha256=dafe768653199043bc993f7e1474c93332bbe084e46ad1f823a21e48a34f0e4d
+verbovivo-build-smoke  PASS         build+smoke; phi line -> g3_verbovivo.txt
+arm32-encoders         PASS         PASS: 16 ARM32 encoder golden cases.
+arm64-encoders         PASS         PASS: 9 ARM64 encoder golden cases.
+apk-generation         TOKEN_VAZIO  requires ARM/NDK/device -> g6_apk_generation.txt
