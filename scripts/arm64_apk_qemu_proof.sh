@@ -25,7 +25,7 @@ CLANGV="$(clang --version 2>/dev/null | head -1 || echo TOKEN_VAZIO)"
 QEMUV="$(qemu-aarch64-static --version 2>/dev/null | head -1 || echo TOKEN_VAZIO)"
 SIGNV="$(apksigner --version 2>/dev/null || echo TOKEN_VAZIO)"
 
-PASS=0; TZ=0
+PASS=0; TZ=0; DEX_PROVEN=0
 log() { printf '%s\n' "$*"; }
 
 # Truncate transcript at the start of each run so prior runs don't pollute evidence.
@@ -105,6 +105,7 @@ sys.exit(0 if stored == computed else 1)
 PYEOF
                 then
                     DEX_INTERNAL_STATUS="PASS (dex[12:32] == sha1(dex[32:]))"
+                    DEX_PROVEN=1
                 else
                     DEX_INTERNAL_STATUS="FAIL (internal SHA-1 mismatch)"
                 fi
@@ -231,6 +232,9 @@ if command -v aapt >/dev/null 2>&1; then
        echo "$AAPT_OUT" | grep -iq "NativeActivity" && \
        echo "$AAPT_OUT" | grep -iq "lib_name"; then
         PASS=$((PASS+1))
+    else
+        echo "[AAPT] STATUS: FAIL (NativeActivity or lib_name markers absent)" >> "$TRANSCRIPT"
+        log "FAIL: aapt manifest missing NativeActivity or lib_name"; exit 1
     fi
 fi
 
@@ -248,7 +252,11 @@ if [ -f "$VSUM" ] && [ "$PASS" -ge 2 ]; then
       echo "|---|---|---|"
       echo "| F2 | PASS | hello-arm64-proof.apk gerado via qemu (${APK_SZ} bytes) |"
       echo "| F3 | PASS | unzip.txt regenerado do APK qemu |"
-      echo "| F5 | PASS | dex-sha1.txt + internal SHA-1 confirmado |"
+      if [ "$DEX_PROVEN" -eq 1 ]; then
+          echo "| F5 | PASS | dex-sha1.txt + internal SHA-1 confirmado |"
+      else
+          echo "| F5 | TOKEN_VAZIO | classes.dex ausente ou python3 ausente |"
+      fi
       echo "| F6 | PASS | readelf-arm64.txt: ELF64 AArch64 DYN |"
     } >> "$VSUM"
 fi

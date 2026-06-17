@@ -123,6 +123,9 @@ jobs:
       - name: ARM64 APK qemu proof (L4)
         run: bash scripts/arm64_apk_qemu_proof.sh
 
+      - name: Rerun format fixtures after ARM64 qemu proof (L4+L17)
+        run: python3 tests/test_format_fixtures.py
+
       - name: Try ApkC debug signing proof (TOKEN_VAZIO allowed)
         run: bash scripts/apkc_sign_debug.sh
 

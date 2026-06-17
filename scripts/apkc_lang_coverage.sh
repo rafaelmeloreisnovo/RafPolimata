@@ -106,8 +106,14 @@ test_lang(){
   if "$EXE" "$src" -o "$outapk" -64 > "$EXEC_ROOT/${lang}.txt" 2>&1; then
     if [ -s "$outapk" ]; then
       size=$(wc -c < "$outapk" | tr -d ' ')
-      row "$lang" "$pipeline" PASS "APK gerado: ${size} bytes"
-      PASS_COUNT=$((PASS_COUNT+1))
+      # Validate the ELF bootstrap is present (use_asm and use_script always produce libmain.so).
+      if unzip -p "$outapk" lib/arm64-v8a/libmain.so > /dev/null 2>&1; then
+        row "$lang" "$pipeline" PASS "APK gerado: ${size} bytes"
+        PASS_COUNT=$((PASS_COUNT+1))
+      else
+        row "$lang" "$pipeline" FAIL "APK gerado (${size} bytes) mas lib/arm64-v8a/libmain.so ausente"
+        FAIL_COUNT=$((FAIL_COUNT+1))
+      fi
     else
       row "$lang" "$pipeline" FAIL 'APK vazio após execução'
       FAIL_COUNT=$((FAIL_COUNT+1))
