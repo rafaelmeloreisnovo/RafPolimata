@@ -83,8 +83,33 @@ if command -v qemu-aarch64-static >/dev/null 2>&1; then
         PASS=$((PASS+1))
         # Generate ZIP member listing and DEX sha1 for L17 corpus evidence.
         unzip -l "$APK_OUT" > "$OUT/unzip.txt" 2>/dev/null || true
-        if unzip -p "$APK_OUT" classes.dex > /tmp/_apkc_proof_dex.bin 2>/dev/null; then
+        if unzip -p "$APK_OUT" classes.dex > /tmp/_apkc_proof_dex.bin 2>/dev/null \
+           && [ -s /tmp/_apkc_proof_dex.bin ]; then
             sha1sum /tmp/_apkc_proof_dex.bin | awk '{print $1"  classes.dex"}' > "$OUT/dex-sha1.txt"
+            # Validate the internal DEX SHA-1 field (dex[12:32] == sha1(dex[32:])).
+            # fmt_dex.h computes this correctly; a mismatch means apkc produced a
+            # malformed DEX, which is a hard failure for the L17 proof.
+            DEX_INTERNAL_STATUS="TOKEN_VAZIO (python3 absent)"
+            if command -v python3 >/dev/null 2>&1; then
+                if python3 - /tmp/_apkc_proof_dex.bin <<'PYEOF'
+import hashlib, sys
+data = open(sys.argv[1], 'rb').read()
+if len(data) < 32:
+    sys.exit(1)
+stored   = data[12:32]
+computed = hashlib.sha1(data[32:]).digest()
+sys.exit(0 if stored == computed else 1)
+PYEOF
+                then
+                    DEX_INTERNAL_STATUS="PASS (dex[12:32] == sha1(dex[32:]))"
+                else
+                    DEX_INTERNAL_STATUS="FAIL (internal SHA-1 mismatch)"
+                fi
+            fi
+            echo "[DEX-INTERNAL-SHA1] ${DEX_INTERNAL_STATUS}" >> "$TRANSCRIPT"
+            if [ "$DEX_INTERNAL_STATUS" = "FAIL (internal SHA-1 mismatch)" ]; then
+                log "FAIL: classes.dex internal SHA-1 field is invalid"; exit 1
+            fi
         fi
     else
         TZ=$((TZ+1))
