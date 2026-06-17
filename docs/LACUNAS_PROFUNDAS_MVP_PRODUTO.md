@@ -31,11 +31,12 @@ source → build reproduzível → APK → assinatura → install → launch →
 | ARM64 ELF validado | ◐ ELF AArch64 provado | `.so` em APK gerado segue TOKEN_VAZIO (apkc-on-ARM) |
 | ARM32 assembler completo | ✅ +11 mnemonics + strict gate | mnemônicos restantes sob demanda |
 | Matriz de linguagens provadas | ◐ asm+5 scripts | `use_fork` gated por toolchain ARM |
-| CI artifact verde | ◐ +5 gates, +1 upload | run verde real é RUNTIME (GitHub) |
+| CI artifact verde | ◐ +6 gates, +1 upload | run verde real é RUNTIME (GitHub) |
 | Coerência de artefatos | ✅ rodada única limpa | `tools/raf_clean_proof_run.sh` |
+| Java/DEX pipeline | ◐ javac PASS, d8 TOKEN_VAZIO | `scripts/java_dex_pipeline_probe.sh` |
 
-> **Atualização 2026-06-17:** ver **Parte VII** para o estado verificado das 18
-> lacunas (10 PASS, 4 AVANÇADO, 4 TOKEN_VAZIO honesto com caminho scriptado).
+> **Atualização 2026-06-17 (rodada 2):** ver **Parte VII** para o estado verificado das 18
+> lacunas (10 PASS, 5 AVANÇADO, 3 TOKEN_VAZIO honesto com caminho scriptado).
 
 ---
 
@@ -491,8 +492,8 @@ sem crash, saída `phi=`/`attractor=` presente. Seção L15 atualizada para
 | Estado | Lacunas | Contagem |
 |--------|---------|---------:|
 | ✅ PASS (código/prova/doc) | L1, L5, L6, L10, L12, L13, L16, L18, L19, L20 | 10 |
-| ◐ AVANÇADO (parcial, prova host) | L4, L7, L9, L17 | 4 |
-| ⊘ TOKEN_VAZIO (hardware ausente, caminho scriptado) | L2, L3, L8, L11 | 4 |
+| ◐ AVANÇADO (parcial, prova host) | L4, L7, L9, L11, L17 | 5 |
+| ⊘ TOKEN_VAZIO (hardware ausente, caminho scriptado) | L2, L3, L8 | 3 |
 
 ### Detalhe por lacuna
 
@@ -508,7 +509,7 @@ sem crash, saída `phi=`/`attractor=` presente. Seção L15 atualizada para
 | **L8** NDK --build | ⊘ TOKEN_VAZIO | Requer `ANDROID_NDK_HOME`. Caminho: `scripts/android_build_matrix.sh` (modo `--build`). |
 | **L9** matriz multilíngua | ◐ AVANÇADO | `scripts/apkc_lang_coverage.sh` cobre asm+5 scripts; intérpretes presentes no host; `use_fork` (c/cpp/rs/kt/java/jsx) segue gated por toolchain ARM. |
 | **L10** caminhos de intérprete | ✅ PASS (doc) | `docs/APKC_TARGET_ENVIRONMENTS.md` — alvo canônico do `use_script` = **Termux/proot/dev-lab**, não Android stock (paths reais citados de `Apkc/lang_profile.h`). |
-| **L11** Java/Kotlin DEX | ⊘ TOKEN_VAZIO | `javac` presente, `d8/kotlinc` ausentes → DEX real não gerável aqui. |
+| **L11** Java/Kotlin DEX | ◐ AVANÇADO | `scripts/java_dex_pipeline_probe.sh`: **javac stage PASS** — `Hello.class` 240 bytes, magic=`0xcafebabe`, sha256=`04e299529e…` (2026-06-17, javac 21.0.10, `--release 11`). Transcript em `Apkc/proofs/out/java-pipeline.txt`. `d8 → classes.dex` TOKEN_VAZIO (build-tools ausentes; closure: `d8 /tmp/cls/Hello.class --output /tmp/dex/ --min-api 21`). `apkc fork_exec_wait()` TOKEN_VAZIO (`#ifdef __aarch64__`). |
 | **L12** catálogo 56 RAF | ✅ PASS | `RAF_INDEX.md` realinhado aos arquivos reais `RAF_NNN_*.c` (raiz, layout flat). Loop de compilação: **56/56 PASS**. |
 | **L13** raf_compile IR | ✅ PASS (reposicionado) | `raf_precomp.c` documentado como **âncora determinística de manifesto/reprodutibilidade** (não front-end). Estado: REFERENCE, não PENDING — faz exatamente o que declara. |
 | **L16** erro bloqueante vs degradação | ✅ PASS | `Apkc/apkc.c`: `--strict` (default) → mnemônico desconhecido falha o build (`exit 1`, sem APK); `--allow-undef`/`--allow-nop-placeholder` = modo experimental. Gate em `build_apk` sobre `res.err`. |
@@ -525,6 +526,7 @@ python3 tests/test_format_fixtures.py        # L17 → 3 PASS, 4 TOKEN_VAZIO
 python3 tests/test_zip_negative.py           # L17 → PASS
 bash tools/raf_source_to_binary_proof.sh     # L1  → 2 PASS, 1 TOKEN_VAZIO
 bash tools/raf_clean_proof_run.sh            # L6  → 5 PASS, 1 TOKEN_VAZIO
+bash scripts/java_dex_pipeline_probe.sh      # L11 → 1 PASS (javac), 2 TOKEN_VAZIO (d8, apkc-fork)
 make encoders verbovivo-demo syntax          # L19 → todos PASS
 for f in RAF_*.c; do gcc -c -I. "$f" -o /tmp/$(basename "$f" .c).o || echo FAIL $f; done  # L12 → 56/56
 ```
@@ -534,7 +536,7 @@ for f in RAF_*.c; do gcc -c -I. "$f" -o /tmp/$(basename "$f" .c).o || echo FAIL 
 - Sem `malloc/free/calloc` em `Apkc/` (encoders novos são `static inline` puros).
 - Sem libc em `Apkc/` — `clang -fsyntax-only -nostdlib -nostdinc -ffreestanding` PASS.
 - Regra "1 inline em `arch_arm32.h` + 1 case em `asm_insn32()`" seguida para cada mnemônico.
-- `TOKEN_VAZIO` nunca convertido em `PASS` por omissão (L2/L3/L8/L11 explícitos).
+- `TOKEN_VAZIO` nunca convertido em `PASS` por omissão (L2/L3/L8 hardware; L11 parcial avançado).
 
 ---
 

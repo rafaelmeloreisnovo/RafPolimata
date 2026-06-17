@@ -1,0 +1,55 @@
+
+==================================================================
+JAVA/DEX PIPELINE PROBE  (L11)  2026-06-17T07:46:30Z
+==================================================================
+commit:  28d9ea9ab7859f6b5c571ae0494274fa481ad941
+javac:   javac 21.0.10
+d8:      
+[JAVAC] STATUS: TOKEN_VAZIO (javac failed)
+warning: [options] bootstrap class path not set in conjunction with -source 8
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+
+[D8] STATUS: TOKEN_VAZIO
+[D8]   d8 binary absent on this host (requires Android build-tools).
+[D8]   One-command closure when build-tools are available:
+[D8]     d8 /tmp/apkc_java_probe_cls/Hello.class \
+[D8]        --output /tmp/apkc_dex/ --min-api 21
+[D8]     xxd /tmp/apkc_dex/classes.dex | head -4  # expect 64 65 78 0a 30 33 35
+[D8]   Full pipeline (mirrors LP_JAVA in Apkc/lang_profile.h):
+[D8]     javac -source 8 -target 8 -d /tmp/cls Hello.java
+[D8]     d8 /tmp/cls/Hello.class --output /tmp/dex/
+[D8]     # → /tmp/dex/classes.dex → zip_add('classes.dex') in apkc
+
+[APKC-FORK] STATUS: TOKEN_VAZIO
+[APKC-FORK]   fork_exec_wait() in apkc.c is #ifdef __aarch64__ only.
+[APKC-FORK]   Requires apkc running on ARM/Termux to invoke javac/d8.
+
+==================================================================
+JAVA/DEX PIPELINE PROBE  (L11)  2026-06-17T07:48:02Z
+==================================================================
+commit:  28d9ea9ab7859f6b5c571ae0494274fa481ad941
+javac:   javac 21.0.10
+d8:      
+
+[JAVAC] command: javac --release 11 -d /tmp/cls/ Hello.java
+[JAVAC] output:  Hello.class  240 bytes
+[JAVAC] magic:   0xcafebabe
+[JAVAC] sha256:  04e299529e659043bc80f6b4798a0002e39afa1472e6082a20c3e4ffc6034e1c
+[JAVAC] STATUS:  PASS — valid Java .class (CAFEBABE magic 0xcafebabe)
+
+[D8] STATUS: TOKEN_VAZIO
+[D8]   d8 binary absent on this host (requires Android build-tools).
+[D8]   One-command closure when build-tools are available:
+[D8]     d8 /tmp/apkc_java_probe_cls/Hello.class \
+[D8]        --output /tmp/apkc_dex/ --min-api 21
+[D8]     xxd /tmp/apkc_dex/classes.dex | head -4  # expect magic: 64 65 78 0a
+[D8]   Full pipeline (mirrors LP_JAVA in Apkc/lang_profile.h):
+[D8]     javac --release 11 -d /tmp/cls/ Hello.java
+[D8]     d8 /tmp/cls/Hello.class --output /tmp/dex/ --min-api 21
+[D8]     # → /tmp/dex/classes.dex → zip_add('classes.dex') in apkc
+
+[APKC-FORK] STATUS: TOKEN_VAZIO
+[APKC-FORK]   fork_exec_wait() in Apkc/apkc.c is #ifdef __aarch64__ only.
+[APKC-FORK]   Requires apkc running on ARM/Termux to invoke javac/d8.
+[APKC-FORK]   Closure: run 'apkc Hello.java -o hello.apk' on ARM device.

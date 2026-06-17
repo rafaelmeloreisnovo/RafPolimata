@@ -34,3 +34,4 @@ Apkc/proofs/runs/**/*.o
 Apkc/proofs/runs/**/verbovivo_ci
 Apkc/proofs/runs/**/*.svg
 verbovivo_ci
+javac.*.args
