@@ -1347,7 +1347,7 @@ static AsmResult assemble(const u8 *src, sz src_len, int arch, u8 *out_code) {
 
     lbl_reset();
     Emit em; em.buf=out_code; em.cap=0x10000; em.pos=0;
-    em.sym1_va=0; em.sym2_va=0; em.has_sym1=0; em.has_sym2=0; em.err=0;
+    em.sym1_va=0; em.sym2_va=0; em.has_sym1=0; em.has_sym2=0;
 
     /* two passes: 1=labels, 2=code */
     for (int pass=0; pass<2; pass++) {
@@ -1605,8 +1605,8 @@ static i32 build_apk(
     const LangProfile *prof,
     const char *inpath)  /* for fork+exec: write src to /tmp */
 {
-    AsmResult r64 = {0};
-    AsmResult r32_ = {0};
+    AsmResult r64; r64.size=0; r64.sym1_va=0; r64.sym2_va=0; r64.has_sym1=0; r64.has_sym2=0;
+    AsmResult r32_; r32_.size=0; r32_.sym1_va=0; r32_.sym2_va=0; r32_.has_sym1=0; r32_.has_sym2=0;
     sz so64sz=0, so32sz=0;
     sz dexsz=0;
     const u8 *dex_buf_ptr = _dex_buf; /* points to whichever buffer holds the DEX */
