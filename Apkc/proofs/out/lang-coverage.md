@@ -1,22 +1,21 @@
 # ApkC language coverage
 
-- Data UTC: 2026-06-16T04:13:06Z
-- Commit: d73aa5f
+- Data UTC: 2026-06-17T22:10:49Z
+- Commit: 650e199
 
 | Lang | Pipeline | Status | Evidência |
 |------|----------|--------|-----------|
-TOKEN_VAZIO: não há binário apkc executável neste host; instale toolchain ARM/Linux.
-| asm | use_asm/use_script | TOKEN_VAZIO | apkc não executável neste host |
-| py | use_asm/use_script | TOKEN_VAZIO | apkc não executável neste host |
-| sh | use_asm/use_script | TOKEN_VAZIO | apkc não executável neste host |
-| pl | use_asm/use_script | TOKEN_VAZIO | apkc não executável neste host |
-| js | use_asm/use_script | TOKEN_VAZIO | apkc não executável neste host |
-| php | use_asm/use_script | TOKEN_VAZIO | apkc não executável neste host |
-| c | use_fork | TOKEN_VAZIO | fork_exec_wait ARM64-only; apkc não executável |
-| cpp | use_fork | TOKEN_VAZIO | fork_exec_wait ARM64-only; apkc não executável |
-| rs | use_fork | TOKEN_VAZIO | fork_exec_wait ARM64-only; apkc não executável |
-| kt | use_fork | TOKEN_VAZIO | fork_exec_wait ARM64-only; apkc não executável |
-| java | use_fork | TOKEN_VAZIO | fork_exec_wait ARM64-only; apkc não executável |
-| jsx | use_fork | TOKEN_VAZIO | fork_exec_wait ARM64-only; apkc não executável |
+| asm | use_asm | PASS | APK gerado: 3626 bytes |
+| py | use_script | PASS | APK gerado: 3706 bytes |
+| sh | use_script | PASS | APK gerado: 3690 bytes |
+| pl | use_script | PASS | APK gerado: 3706 bytes |
+| js | use_script | PASS | APK gerado: 3706 bytes |
+| php | use_script | PASS | APK gerado: 3706 bytes |
+| c | use_fork | TOKEN_VAZIO | fork_exec_wait é ARM64-only; testado em Termux/ARM64 |
+| cpp | use_fork | TOKEN_VAZIO | fork_exec_wait é ARM64-only; testado em Termux/ARM64 |
+| rs | use_fork | TOKEN_VAZIO | fork_exec_wait é ARM64-only; testado em Termux/ARM64 |
+| kt | use_fork | TOKEN_VAZIO | fork_exec_wait é ARM64-only; testado em Termux/ARM64 |
+| java | use_fork | TOKEN_VAZIO | fork_exec_wait é ARM64-only; testado em Termux/ARM64 |
+| jsx | use_fork | TOKEN_VAZIO | fork_exec_wait é ARM64-only; testado em Termux/ARM64 |
 
-Conclusão: sem binário apkc executável; todos os gates são TOKEN_VAZIO.
+Conclusão: 6/6 testes PASS, 0 FAIL (modo=qemu); use_fork TOKEN_VAZIO (ARM64-only).

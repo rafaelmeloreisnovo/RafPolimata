@@ -13,6 +13,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install cross-compile + emulation tools (qemu, apksigner, aapt, zipalign)
+        run: |
+          sudo apt-get install -y qemu-user-static android-sdk-build-tools 2>/dev/null || true
+          command -v qemu-aarch64-static && qemu-aarch64-static --version | head -1 || echo 'TOKEN_VAZIO: qemu absent'
+          command -v apksigner && apksigner --version || echo 'TOKEN_VAZIO: apksigner absent'
+
       - name: Validate canonical coherence protocol
         run: python3 scripts/validate_coherence_protocol.py
 
@@ -113,6 +119,12 @@ jobs:
 
       - name: Java/DEX pipeline probe (L11, TOKEN_VAZIO allowed for d8)
         run: bash scripts/java_dex_pipeline_probe.sh
+
+      - name: ARM64 APK qemu proof (L4)
+        run: bash scripts/arm64_apk_qemu_proof.sh
+
+      - name: Rerun format fixtures after ARM64 qemu proof (L4+L17)
+        run: python3 tests/test_format_fixtures.py
 
       - name: Try ApkC debug signing proof (TOKEN_VAZIO allowed)
         run: bash scripts/apkc_sign_debug.sh
