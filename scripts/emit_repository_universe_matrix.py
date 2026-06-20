@@ -1,114 +1,235 @@
 #!/usr/bin/env python3
-"""Emit repository evidence/governance universe matrix using stdlib only."""
+"""Emit an evidence-first repository universe matrix for RafPolimata.
+
+Stdlib-only scanner. It does not promote runtime/benchmark/device claims; missing
+preconditions are represented as TOKEN_VAZIO/SKIPPED/DEVICE_REQUIRED.
+"""
 from __future__ import annotations
-import json, re
+
+import json
+import re
 from pathlib import Path
+from typing import Dict, List
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT_JSON = ROOT / "results" / "repository_universe_matrix.json"
-OUT_MD = ROOT / "docs" / "REPOSITORY_UNIVERSE_MATRIX.md"
-EXPECTED = ["README.md","docs","configs","scripts","Benchmark","Apkc","data","results","tools",".github/workflows","RAF_INDEX.md","RAF_rafaelia_common.h","raf_compile.h","raf_precomp.c"]
-ROOT_ALLOWED = {".gitignore","README.md","README_RAFAELIA_ROOT_OPTIMIZER.md","CHANGELOG.md","CLAUDE.md","RAFAELIA_MASTER_DOC.txt","RAFAELIA_COMPLETE_v4.zip","Arduíno.txt","Arm64 Mixer leve criptografia.md","L1.md","RASBERY.MD","big_test.sh"}
-ROOT_PREFIXES = ("RAF_","raf_","raiz_")
+MAX_DEPTH = 5
+IGNORED_DIRS = {".git", "__pycache__", "build_host_check"}
+EXPECTED_DIRS = ["docs", "configs", "scripts", "Benchmark", "Apkc", "data", "results", "tools", ".github/workflows"]
+ALLOWED_ROOT_FILES = {
+    ".gitignore", "README.md", "CHANGELOG.md", "Makefile", "RAF_INDEX.md", "RAF_56_METHODS.md",
+    "RAF_40_STRATEGIES.md", "RAF_BENCHMARK_MATRIX.md", "RAF_VALIDATION_PROTOCOL.md",
+    "RAF_CODEX_INTEGRATE_96_56_BENCH.md", "RAF_CHECKLIST_96_ITEMS.md", "RAF_host_syntax_check.sh",
+    "RAF_list_tree.sh", "RAF_rafaelia_common.h", "raf_compile.h", "raf_precomp.c", "raf_main.c",
+    "raf_frontend.c", "raf_cpu.c", "raf_asm_emit.c", "raiz_example.c", "raf_c_to_asm_root_optimizer.py",
+    "README_RAFAELIA_ROOT_OPTIMIZER.md", "RELEASE_NOTES.md", "CLAUDE.md", "RAFAELIA_MASTER_DOC.txt",
+    "big_test.sh", "RAF_benchmark_matrix.csv", "RAF_avr_regs_generated.h", "RASBERY.MD",
+    "Arduíno.txt", "Arm64 Mixer leve criptografia.md", "L1.md", "RAFAELIA_COMPLETE_v4.zip",
+    "raiz_audit_arm64.json", "raiz_audit_x86_64.json", "raiz_output_arm64.s", "raiz_output_x86_64.asm",
+}
+RAF_RE = re.compile(r"^RAF_(\d{3})_.*\.c$")
+MD_LINK_RE = re.compile(r"\[[^\]]+\]\((?!https?://|mailto:|#)([^)]+)\)")
 
 
-def rel(p: Path) -> str: return p.relative_to(ROOT).as_posix()
-def exists(path: str) -> bool: return (ROOT / path).exists()
-def classify(path: str) -> str:
-    p=ROOT/path
-    if path.startswith(".github/workflows") or path.startswith("configs") or p.suffix in {".yml",".yaml"}: return "CONFIG"
-    if path.startswith("data"): return "DATA"
-    if path.startswith("results") or "proof" in path: return "RESULT"
-    if path == "scripts" or path.startswith("scripts/") or path == "Apkc" or path.startswith("Apkc/") or path == "tools" or path.startswith("tools/") or p.suffix in {".c",".h",".py",".sh"}: return "RUNTIME"
-    return "REFERENCE"
-def state(path: str) -> str:
-    if not exists(path): return "TOKEN_VAZIO"
-    t=classify(path)
-    if path.startswith("Apkc/proofs") or path.startswith("results"): return "AUDIT"
-    return t
-def gate(path: str) -> str:
-    if path == "README.md": return "manual_review"
-    if path.startswith("scripts/") and path.endswith(".py"): return f"python3 {path}"
-    if path.startswith("scripts/") and path.endswith(".sh"): return f"sh {path}"
-    if path.startswith(".github/workflows"): return "github_actions"
-    if re.match(r"RAF_\d{3}_.*\.c", Path(path).name): return "bash RAF_host_syntax_check.sh"
-    if path.startswith("Apkc"): return "sh scripts/apkc_validate.sh"
-    if path.startswith("Benchmark"): return "TOKEN_VAZIO: benchmark requires baseline/hardware"
-    return "review"
-def invariant(path: str) -> str:
-    if path.startswith("Apkc"): return "freestanding/no_false_PASS/android_runtime_requires_evidence"
-    if path.startswith("Benchmark"): return "no_benchmark_without_baseline"
-    if path.startswith("docs") or path == "README.md": return "claim_evidence_lock"
-    if path.startswith("configs"): return "canonical_contract"
-    if re.match(r"RAF_\d{3}_.*\.c", Path(path).name): return "RAF_INDEX_1_to_1_and_host_syntax"
-    return "origin_to_structure_to_evidence_to_rollback"
-def evidence(path: str) -> str:
-    p=ROOT/path
-    if not p.exists(): return "TOKEN_VAZIO"
-    if p.is_dir(): return f"present; entries={len([x for x in p.iterdir() if x.name != '.git'])}"
-    return f"present; bytes={p.stat().st_size}"
-def gap(path: str) -> str:
-    if not exists(path): return "TOKEN_VAZIO"
-    if path.startswith("Apkc") and "proof" not in path: return "Android install+launch+logcat DEVICE_REQUIRED"
-    if path.startswith("Benchmark"): return "baseline/p95/p99/raw log TOKEN_VAZIO unless present"
-    if path.startswith("results") and not any((ROOT/path).glob("*")) if (ROOT/path).is_dir() else False: return "experiment outputs TOKEN_VAZIO"
-    return "none_or_documented_in_matrix"
-def next_action(path: str) -> str:
-    if not exists(path): return "create_or_mark_TOKEN_VAZIO"
-    if path.startswith("Apkc"): return "capture Android runtime proof when device exists"
-    if path.startswith("Benchmark"): return "run benchmark with hardware+flags+raw logs"
-    if re.match(r"RAF_\d{3}_.*\.c", Path(path).name): return "compile host syntax and classify hardware dependency"
-    return "keep evidence gate current"
-def rollback(path: str) -> str:
-    if path.startswith("Apkc"): return "revert artifact; preserve TOKEN_VAZIO logs"
-    if path.startswith(".github"): return "revert workflow step or mark manual/device-required"
-    return "git revert scoped file; preserve audit trail"
-def row(path: str, kind: str|None=None) -> dict[str,str]:
-    return {"path":path,"type":kind or classify(path),"function":function(path),"state":state(path),"invariant":invariant(path),"gate":gate(path),"evidence":evidence(path),"gap":gap(path),"next_action":next_action(path),"risk":risk(path),"rollback":rollback(path)}
-def function(path: str) -> str:
-    if path == "README.md": return "project entry and evidence discipline summary"
-    if path == "RAF_INDEX.md": return "index for RAF methods"
-    if re.match(r"RAF_\d{3}_.*\.c", Path(path).name): return "RAF method implementation"
-    if path.startswith("docs"): return "documentation/protocol/governance reference"
-    if path.startswith("scripts"): return "automation/evidence gate"
-    if path.startswith("Apkc"): return "Android/APKc toolchain/proof area"
-    return "repository component"
-def risk(path: str) -> str:
-    if not exists(path): return "missing_expected_component"
-    if path.startswith("Apkc"): return "false Android PASS without device/logcat"
-    if path.startswith("Benchmark"): return "benchmark claim without reproducible baseline"
-    if path.startswith("docs"): return "claim stronger than evidence"
-    return "drift_without_gate"
 
-def broken_links() -> list[str]:
-    out=[]; pat=re.compile(r"\[[^\]]+\]\(([^)#:]+)(?:#[^)]+)?\)")
-    for md in sorted((ROOT/"docs").glob("*.md")) + [ROOT/"README.md"]:
-        text=md.read_text(encoding="utf-8", errors="ignore")
-        for target in pat.findall(text):
-            if "://" in target or target.startswith("mailto:"): continue
-            cand=(md.parent/target).resolve()
-            try: cand.relative_to(ROOT)
-            except ValueError: out.append(f"{rel(md)} -> {target} (outside_root)"); continue
-            if not cand.exists(): out.append(f"{rel(md)} -> {target}")
-    return out
+def visible_children(path: Path) -> List[Path]:
+    return sorted(
+        (child for child in path.iterdir() if child.name not in IGNORED_DIRS),
+        key=lambda item: item.as_posix(),
+    )
+
+
+def walk_depth(max_depth: int = MAX_DEPTH) -> List[Path]:
+    paths: List[Path] = []
+    stack = [(ROOT, 0)]
+    while stack:
+        current, depth = stack.pop()
+        if depth > max_depth:
+            continue
+        if current != ROOT:
+            paths.append(current)
+        if current.is_dir() and depth < max_depth:
+            for child in reversed(visible_children(current)):
+                stack.append((child, depth + 1))
+    return paths
+
+def rel(p: Path) -> str:
+    return p.relative_to(ROOT).as_posix()
+
+
+def read_index_files() -> List[str]:
+    idx = ROOT / "RAF_INDEX.md"
+    if not idx.exists():
+        return []
+    return sorted(set(re.findall(r"`(RAF_\d{3}_[^`]+?\.c)`", idx.read_text(encoding="utf-8", errors="replace"))))
+
+
+def state_for(path: str) -> str:
+    p = ROOT / path
+    if path.startswith(".github/workflows") or path.startswith("configs/"):
+        return "CONFIG"
+    if path.startswith("data/"):
+        return "DATA"
+    if path.startswith("results/") or "proof" in path.lower() or path.endswith(".json"):
+        return "RESULT"
+    if path.startswith("docs/") or path.endswith(".md") or path.endswith(".txt"):
+        return "REFERENCE"
+    if path.startswith("Apkc/"):
+        return "DEVICE_REQUIRED" if ("android" in path.lower() or "proof" in path.lower()) else "RUNTIME"
+    if path.endswith((".c", ".h", ".sh", ".py")):
+        return "RUNTIME"
+    if not p.exists():
+        return "TOKEN_VAZIO"
+    return "AUDIT"
+
+
+def type_for(path: str) -> str:
+    if path.endswith(".md"):
+        return "documento"
+    if path.endswith(".yml") or path.endswith(".yaml"):
+        return "configuração"
+    if path.endswith(".py") or path.endswith(".sh"):
+        return "script"
+    if path.endswith(".c") or path.endswith(".h"):
+        return "código C"
+    if path.endswith(".json"):
+        return "resultado JSON"
+    if path.endswith(".csv"):
+        return "dado CSV"
+    if (ROOT / path).is_dir():
+        return "diretório"
+    return "artefato"
+
+
+def row(path: str, function: str, invariant: str, gate: str, evidence: str, gap: str, next_action: str, risk: str, rollback: str) -> Dict[str, str]:
+    return {
+        "origin": "repository-scan-depth-5",
+        "path": path,
+        "type": type_for(path),
+        "function": function,
+        "state": state_for(path),
+        "invariant": invariant,
+        "gate": gate,
+        "evidence": evidence,
+        "gap": gap,
+        "next_action": next_action,
+        "risk": risk,
+        "rollback": rollback,
+    }
+
+
+def markdown_link_issues() -> List[str]:
+    issues: List[str] = []
+    for md in ROOT.rglob("*.md"):
+        if ".git" in md.parts:
+            continue
+        text = md.read_text(encoding="utf-8", errors="replace")
+        for match in MD_LINK_RE.finditer(text):
+            target = match.group(1).split()[0].split("#", 1)[0]
+            if not target:
+                continue
+            t = (md.parent / target).resolve()
+            try:
+                t.relative_to(ROOT)
+            except ValueError:
+                issues.append(f"{rel(md)} -> {target} (fora do repositório)")
+                continue
+            if not t.exists():
+                issues.append(f"{rel(md)} -> {target}")
+    return issues
+
+
+
+def function_for_scanned_path(path: str) -> str:
+    if path.startswith("docs/"):
+        return "Documento/protocolo dentro da varredura estrutural em 5 níveis"
+    if path.startswith("scripts/"):
+        return "Script operacional dentro da varredura estrutural em 5 níveis"
+    if path.startswith("Benchmark/"):
+        return "Benchmark ou suporte de medição dentro da varredura estrutural em 5 níveis"
+    if path.startswith("Apkc/"):
+        return "Artefato ApkC dentro da varredura estrutural em 5 níveis"
+    if path.startswith("configs/"):
+        return "Configuração canônica dentro da varredura estrutural em 5 níveis"
+    if path.startswith("data/"):
+        return "Entrada versionada dentro da varredura estrutural em 5 níveis"
+    if path.startswith("results/"):
+        return "Resultado versionado dentro da varredura estrutural em 5 níveis"
+    if path.startswith("tools/"):
+        return "Ferramenta auxiliar dentro da varredura estrutural em 5 níveis"
+    if path.startswith(".github/workflows/"):
+        return "Workflow de CI dentro da varredura estrutural em 5 níveis"
+    return "Arquivo/diretório detectado na varredura estrutural em 5 níveis"
+
+
+def generic_row(path: str) -> Dict[str, str]:
+    return row(
+        path,
+        function_for_scanned_path(path),
+        "origem→estrutura→integridade→evidência",
+        "python3 scripts/emit_repository_universe_matrix.py",
+        "detectado por varredura depth=5" if (ROOT / path).exists() else "TOKEN_VAZIO",
+        "prova runtime não inferida pela presença do arquivo",
+        "Vincular claim específico a comando, log, dataset, hardware ou rollback",
+        "claim sem evidência se promovido manualmente",
+        "Reverter arquivo ou rebaixar claim para TOKEN_VAZIO/PASS_LIMITED",
+    )
 
 def main() -> int:
-    rows=[]
-    for item in EXPECTED: rows.append(row(item))
-    for p in sorted(ROOT.glob("RAF_[0-9][0-9][0-9]_*.c")): rows.append(row(rel(p), "RUNTIME"))
-    for extra in ["RAF_56_METHODS.md","RAF_BENCHMARK_MATRIX.md","RAF_benchmark_matrix.csv","RAF_host_syntax_check.sh","docs/PROTOCOLO_CANONICO_COHERENCIA.md","docs/PROTOCOLO_DOIS_CICLOS_OMEGA.md","docs/MATRIZ_JURIDICO_TECNOLOGICA.md","Apkc/proofs/out","ci","tests","rafaelia"]:
-        rows.append(row(extra))
-    loose=[]
-    for c in sorted(ROOT.iterdir(), key=lambda p:p.name):
-        if c.is_file() and c.name not in ROOT_ALLOWED and not c.name.startswith(ROOT_PREFIXES): loose.append(c.name)
-    report={"schema":"rafpolimata.repository_universe_matrix.v1","rows":rows,"summary":{"row_count":len(rows),"raf_method_files":len(list(ROOT.glob('RAF_[0-9][0-9][0-9]_*.c'))),"root_loose_files":loose,"broken_markdown_links":broken_links(),"data_files":[rel(p) for p in sorted((ROOT/'data').glob('*')) if p.is_file()],"result_files":[rel(p) for p in sorted((ROOT/'results').glob('*')) if p.is_file()],"workflows":[rel(p) for p in sorted((ROOT/'.github/workflows').glob('*')) if p.is_file()]}}
-    OUT_JSON.parent.mkdir(parents=True, exist_ok=True); OUT_JSON.write_text(json.dumps(report, indent=2, ensure_ascii=False)+"\n", encoding="utf-8")
-    lines=["# Repository Universe Matrix", "", "Estado: `AUDIT`", "", "Regra: nenhum PASS sem evidência; lacunas ficam como `TOKEN_VAZIO`, `SKIPPED`, `PENDING`, `PASS_LIMITED` ou `DEVICE_REQUIRED`.", "", "| Caminho | Tipo | Função | Estado atual | Invariante protegida | Gate ou comando | Evidência | Lacuna | Próxima ação | Risco | Rollback/Mitigação |", "|---|---|---|---|---|---|---|---|---|---|---|"]
-    for r in rows:
-        vals=[r[k].replace("|","/") for k in ("path","type","function","state","invariant","gate","evidence","gap","next_action","risk","rollback")]
-        lines.append("| " + " | ".join(vals) + " |")
-    lines += ["", "## Summary", "", f"- RAF method files: `{report['summary']['raf_method_files']}`", f"- Root loose files: `{len(loose)}`", f"- Broken markdown links: `{len(report['summary']['broken_markdown_links'])}`", f"- Workflows: `{len(report['summary']['workflows'])}`", "", "JSON source: `results/repository_universe_matrix.json`"]
-    OUT_MD.write_text("\n".join(lines)+"\n", encoding="utf-8")
-    print(f"wrote {OUT_JSON.relative_to(ROOT)} and {OUT_MD.relative_to(ROOT)} rows={len(rows)}")
-    return 0
-if __name__ == "__main__": raise SystemExit(main())
+    index_files = read_index_files()
+    raf_files = sorted(p.name for p in ROOT.glob("RAF_[0-9][0-9][0-9]_*.c"))
+    workflows = sorted(rel(p) for p in (ROOT / ".github/workflows").glob("*")) if (ROOT / ".github/workflows").exists() else []
+    root_unexpected = sorted(p.name for p in ROOT.iterdir() if p.is_file() and not RAF_RE.match(p.name) and p.name not in ALLOWED_ROOT_FILES)
+    md_issues = markdown_link_issues()
+
+    rows: List[Dict[str, str]] = []
+    for d in EXPECTED_DIRS:
+        exists = (ROOT / d).exists()
+        rows.append(row(d, "Bloco esperado do universo do repositório", "origem→estrutura→integridade", "test -d " + d, "presente" if exists else "TOKEN_VAZIO", "TOKEN_VAZIO" if not exists else "nenhuma lacuna estrutural básica", "Criar diretório ou documentar remoção" if not exists else "Manter varredura em 5 níveis", "perda de cobertura" if not exists else "baixo", "Restaurar diretório a partir do histórico ou criar marcador auditável"))
+
+    fixed = ["README.md", "RAF_INDEX.md", "RAF_rafaelia_common.h", "raf_compile.h", "raf_precomp.c", "RAF_VALIDATION_PROTOCOL.md", "RAF_BENCHMARK_MATRIX.md"]
+    for f in fixed:
+        rows.append(row(f, "Arquivo canônico de navegação, protocolo, código ou benchmark", "claim↔evidência; índice 1:1; sem heap em hot path", "test -e " + f, "presente" if (ROOT / f).exists() else "TOKEN_VAZIO", "runtime/claim forte exige prova específica" if (ROOT / f).exists() else "TOKEN_VAZIO", "Cruzar com scripts de emissão e gates CI", "claim excessivo se não houver artefato", "Reverter alteração documental ou restaurar arquivo canônico"))
+
+    for f in raf_files:
+        n = int(RAF_RE.match(f).group(1)) if RAF_RE.match(f) else 0
+        gap = "fora do índice RAF_INDEX.md" if f not in index_files else "runtime/hardware não provado por este scanner"
+        rows.append(row(f, f"Método RAF {n:03d}", "1:1 RAF_INDEX.md↔RAF_###; compilação separada; sem sucesso runtime inventado", f"gcc -c -I. {f}", "listado em RAF_INDEX.md" if f in index_files else "TOKEN_VAZIO", gap, "Executar status por método e prova de hardware quando aplicável", "hardware/device pode ser requerido", "Manter arquivo e índice sincronizados; rollback por git"))
+
+    rows.extend([
+        row("data/", "Entradas versionadas", "dataset real com hash quando claim científico existir", "find data -type f", "arquivos presentes" if any((ROOT/"data").glob("**/*")) else "TOKEN_VAZIO", "hash/baseline por dataset pode faltar", "Registrar hashes e métodos por experimento", "claim científico sem dataset", "Marcar claim como TOKEN_VAZIO ou restaurar dataset"),
+        row("results/", "Saídas de experimentos e auditorias", "resultado não substitui comando/raw log", "find results -type f", "arquivos presentes" if any((ROOT/"results").glob("**/*")) else "TOKEN_VAZIO", "raw log/hardware/flags podem faltar", "Acoplar resultados aos comandos de origem", "PASS falso por artefato órfão", "Invalidar resultado sem cadeia de custódia"),
+        row("Apkc/proofs/", "Provas Android/ApkC", "Android runtime PASS exige install+launch+logcat", "bash scripts/apkc_validate.sh", "diretório presente" if (ROOT/"Apkc/proofs").exists() else "TOKEN_VAZIO", "device/logcat podem faltar", "Executar plano manual device-required", "claim runtime sem device", "Rebaixar para DEVICE_REQUIRED/TOKEN_VAZIO"),
+    ])
+
+    seen = {item["path"] for item in rows}
+    for scanned in walk_depth(MAX_DEPTH):
+        scanned_rel = rel(scanned)
+        if scanned_rel not in seen:
+            rows.append(generic_row(scanned_rel))
+            seen.add(scanned_rel)
+
+    summary = {
+        "schema": "repository_universe_matrix.v1",
+        "generated_by": "scripts/emit_repository_universe_matrix.py",
+        "depth_policy": MAX_DEPTH,
+        "raf_index_entries": len(index_files),
+        "raf_c_files": len(raf_files),
+        "raf_c_files_001_056": len([f for f in raf_files if 1 <= int(RAF_RE.match(f).group(1)) <= 56]),
+        "raf_index_missing_files": sorted(set(index_files) - set(raf_files)),
+        "raf_files_not_in_index": sorted(f for f in set(raf_files) - set(index_files) if 1 <= int(RAF_RE.match(f).group(1)) <= 56),
+        "raf_extension_files_not_in_index": sorted(f for f in set(raf_files) - set(index_files) if int(RAF_RE.match(f).group(1)) > 56),
+        "expected_dirs_missing": [d for d in EXPECTED_DIRS if not (ROOT / d).exists()],
+        "unexpected_root_files": root_unexpected,
+        "markdown_broken_links": md_issues,
+        "data_files_present": any(p.is_file() for p in (ROOT / "data").glob("**/*")) if (ROOT / "data").exists() else False,
+        "result_files_present": any(p.is_file() for p in (ROOT / "results").glob("**/*")) if (ROOT / "results").exists() else False,
+        "workflows": workflows,
+        "items": rows,
+    }
+    OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
+    OUT_JSON.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return 1 if summary["expected_dirs_missing"] or summary["raf_index_missing_files"] or summary["raf_files_not_in_index"] else 0
+
+if __name__ == "__main__":
+    raise SystemExit(main())
