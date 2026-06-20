@@ -1646,7 +1646,7 @@ static i32 build_apk(
     if (!axsz) { pr_err("axml_build failed\n"); return -1; }
 
     /* build classes.dex if not already produced by fork+exec */
-    if (!dexsz) dexsz = dex_build(_dex_buf);
+    if (!dexsz) dexsz = dex_build(_dex_buf, sizeof(_dex_buf));
 
     /* assemble ZIP */
     ZipWr zw;

@@ -80,10 +80,11 @@ static inline void sha1_final(SHA1Ctx *c, u8 out[20]) {
  * Caller must supply a buffer of at least 140 bytes.
  * Returns actual size written.
  */
-static inline u32 dex_build(u8 *out) {
+static inline u32 dex_build(u8 *out, sz cap) {
     const u32 TOTAL    = DEX_HEADER_SZ + 28u; /* 140 = 0x8C */
     const u32 MAP_OFF  = DEX_HEADER_SZ;       /* 0x70 */
 
+    if (cap < (sz)TOTAL) return 0; /* OVERFLOW */
     m_set(out, 0, (sz)TOTAL);
 
     /* magic: "dex\n035\0" */

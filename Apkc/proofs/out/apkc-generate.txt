@@ -1,8 +1,1 @@
-# ApkC generation transcript summary
-
-Source: uploaded generate.log.
-Observation: 39 occurrences of `apkc: unknown ARM32 mnemonic` were emitted before APK generation completed.
-Final line: `wrote 3012 bytes to out/hello.apk`.
-Status consequence: generation PASS, ARM32 mnemonic coverage GAP.
-
-Raw uploaded log hash: 6f957db799abe812ac9e4eec54f54a5cddfcf58941e0aceae15221584e92bf3a
+TOKEN_VAZIO: não há binário apkc executável neste ambiente; instale linker/toolchain ARM compatível ou rode em ARM/Linux.

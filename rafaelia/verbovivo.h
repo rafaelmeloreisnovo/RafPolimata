@@ -27,53 +27,17 @@
 #include <stdio.h>
 #include <time.h>
 
+/* ── sub-layer headers (B4: separated for independent use) ─────────── */
+#include "fiber_h.h"       /* FiberHash, fiber_hash_init/update/distance  */
+#include "trinity_core.h"  /* VVHyperVec, VVEngram, VVCtrl, TrinityState  */
+#include "t7_toroid.h"     /* T7State, T7_DIM, t7_step, t7_hdc_expand     */
+
 typedef uint8_t  vv_u8;
 typedef uint16_t vv_u16;
 typedef uint32_t vv_u32;
 typedef uint64_t vv_u64;
 typedef float    vv_f32;
 typedef size_t   vv_sz;
-
-/* ── dimensions ────────────────────────────────────────────────────── */
-#define VV_DIM       1024   /* HDC hypervector dimensionality            */
-#define VV_MEM_SIZE  64     /* max engrams in ring buffer                */
-#define VV_CHUNK     4096   /* stream chunk size                         */
-#define VV_SEED      0x524146u  /* "RAF"                                 */
-
-/* ── compliance flags (from trinity_core.c) ──────────────────────── */
-#define VV_ISO_27001    0x01u
-#define VV_ISO_25010    0x02u
-#define VV_NIST_800_53  0x04u
-#define VV_IEEE_12207   0x08u
-
-/* ── Fiber-H 256-bit hash state ───────────────────────────────────── */
-typedef struct {
-    vv_u64 a, b, c, d;   /* 4 × 64-bit = 256 bits */
-} FiberHash;
-
-/* ── HDC hypervector ──────────────────────────────────────────────── */
-typedef struct {
-    vv_f32 values[VV_DIM];
-} VVHyperVec;
-
-/* ── engram: one stored memory unit ──────────────────────────────── */
-typedef struct {
-    vv_u32    id;
-    vv_u32    content_hash;   /* djb2 hash of chunk                   */
-    FiberHash fiber_hash;     /* structural 256-bit fingerprint        */
-    VVHyperVec vec;           /* HDC vector for this chunk            */
-    vv_f32    attention;      /* combined attention score [0,1]       */
-    vv_f32    hamming_div;    /* Hamming diversity vs existing engrams */
-    vv_u8     type_flag;      /* 1=binary/image, 0=text               */
-} VVEngram;
-
-/* ── Trinity Control metrics ─────────────────────────────────────── */
-typedef struct {
-    vv_sz  ingested_messages;
-    vv_sz  ingested_bytes;
-    vv_sz  svg_requests;
-    clock_t start_time;
-} VVCtrl;
 
 /* ── unified VerbVivo state ──────────────────────────────────────── */
 typedef struct {
