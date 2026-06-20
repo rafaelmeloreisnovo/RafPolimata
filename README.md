@@ -45,6 +45,10 @@ Este repositório passa a incluir uma documentação de referência de nível av
 - [`docs/LOGOTIPO_RAFAELIA_60COL.md`](docs/LOGOTIPO_RAFAELIA_60COL.md): logotipo ASCII de 60 colunas com variante colorida ANSI.
 - [`assets/raf_operational_seal.svg`](assets/raf_operational_seal.svg): selo visual local dos gates operacionais, sem alegação de certificação.
 
+## Evidence Discipline
+
+RafPolimata separa hipótese, analogia, prova parcial, prova de compilação, prova runtime e prova em device real. `TOKEN_VAZIO` é estado válido quando falta ferramenta, dataset, hardware, log ou execução. O CI funciona como compilador de evidências: emite matrizes, executa gates e preserva lacunas sem promovê-las a `PASS`. A trilha auditável fica em [`docs/REPOSITORY_UNIVERSE_MATRIX.md`](docs/REPOSITORY_UNIVERSE_MATRIX.md) e [`docs/CLAIM_EVIDENCE_LOCK.md`](docs/CLAIM_EVIDENCE_LOCK.md).
+
 ## ApkC — micro-toolchain Android freestanding
 
 Resumo: `Apkc/` contém um micro-toolchain experimental em C para gerar APK nativo mínimo por escrita direta de ZIP/APK, AndroidManifest AXML, DEX e ELF `.so`, com backends ARM64 e ARM32.

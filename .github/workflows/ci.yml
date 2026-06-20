@@ -39,6 +39,17 @@ jobs:
       - name: Audit repository structure
         run: python3 scripts/audit_repository_structure.py --depth 5
 
+      - name: Emit repository universe matrix
+        run: python3 scripts/emit_repository_universe_matrix.py
+
+      - name: Emit RAF methods status
+        run: python3 scripts/emit_raf_methods_status.py
+
+      - name: Validate evidence matrix outputs
+        run: |
+          test -s results/repository_universe_matrix.json
+          test -s results/raf_methods_status.json
+
       - name: Validate Android ABI plan
         run: bash scripts/android_build_matrix.sh --plan
 

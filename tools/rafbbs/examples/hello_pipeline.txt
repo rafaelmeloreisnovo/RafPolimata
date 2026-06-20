@@ -1,0 +1,5 @@
+# RafBBS exemplo mínimo
+rafbbs list
+rafbbs run encoders
+rafbbs run roundtrip
+rafbbs run apkc_validate
