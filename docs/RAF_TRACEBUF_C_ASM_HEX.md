@@ -13,9 +13,20 @@ Modulo autoral para codificar eventos do proprio processo em buffer fornecido pe
 - Hexadecimal fixo para tag, code, value e tick.
 - Inline ASM seguro apenas para barreira de compilador e leitura de tick ARM64 quando disponivel.
 
-## Arquivo
+## Arquivo agregador
 
 - `Benchmark/raf_tracebuf.h`
+
+## Blocos de especialidade
+
+| Bloco | Arquivo | Especialidade | Criterio de uso |
+|---|---|---|---|
+| Flags e feature gates | `Benchmark/raf_trace_flags.h` | macros, magic, estados, inline e deteccao ARM64 | incluir em qualquer modulo TraceBuf |
+| Buffer | `Benchmark/raf_trace_buffer.h` | buffer do chamador, room check, truncamento explicito | hot path sem heap e sem overflow silencioso |
+| HEX | `Benchmark/raf_trace_hex.h` | hexadecimal fixo 32/64-bit | quando precisar saida textual deterministica |
+| Evento | `Benchmark/raf_trace_event.h` | struct de evento, barreira, tick ARM64 opcional | quando tag/code/value precisam virar unidade auditavel |
+| Emissao | `Benchmark/raf_trace_emit.h` | encode binario e textual | quando converter evento para buffer |
+| Agregador | `Benchmark/raf_tracebuf.h` | inclui todos os blocos | compatibilidade e uso simples |
 
 ## Modelo operacional
 
@@ -42,6 +53,18 @@ gcc -std=c11 -Wall -Wextra -Werror -ffreestanding -fno-builtin \
   -fno-stack-protector -fvisibility=hidden -Os -I. -S <arquivo.c> -o out.s
 ```
 
+## Flags de especializacao
+
+| Flag | Uso | Observacao |
+|---|---|---|
+| `-Os` | reduzir tamanho do hot path | preferivel em Android/Termux restrito |
+| `-O2` | medir throughput quando o tamanho nao for gargalo | comparar contra `-Os` antes de promover |
+| `-ffreestanding` | evitar pressupostos hosted | mantem disciplina de baixo nivel |
+| `-fno-builtin` | nao substituir funcoes por builtins implicitos | reforca controle autoral |
+| `-fno-stack-protector` | reduzir prologo/epilogo em microteste | usar apenas em modulo controlado |
+| `-fvisibility=hidden` | reduzir superficie exportada | util para `.so` e JNI futuro |
+| `-S` | gerar assembly | inspecao de instrucoes e regressao |
+
 ## Criterios de desempenho
 
 1. Hot path sem heap.
@@ -54,4 +77,4 @@ gcc -std=c11 -Wall -Wextra -Werror -ffreestanding -fno-builtin \
 
 ## Limite de claim
 
-Este modulo prova codificacao local de evento em buffer. Nao prova runtime Android completo, nao prova coleta externa e nao substitui logcat/device proof.
+Este modulo prova codificacao local de evento em buffer. Nao prova runtime Android completo, nao prova coleta externa e nao substitui prova de device/runtime.
