@@ -146,7 +146,13 @@ blocks:
 
   - id: B7
     name: "Claim traceability binding"
-    status: PENDING
+    status: PASS
+    completed: "2026-06-20"
+    evidence:
+      - "scripts/validate_claims.sh — varredura automática de claims fortes sem (ref:...) em docs/*.md"
+      - "docs/CONVERGENCIA_UNICA_METODOLOGICA.md Apêndice B7 — tabela de claims com refs rastreáveis"
+      - "Todos os 6 F_gap anteriores resolvidos e referenciados com arquivo:linha"
+      - "ci/reports/claims_audit.md — 0 FAIL (0 refs quebrados); AUDIT = claims pendentes de ref"
     target_files:
       - "docs/CONVERGENCIA_UNICA_METODOLOGICA.md"
       - "docs/CONVERGENCIA_UNICA_CHECKLIST.yml"
