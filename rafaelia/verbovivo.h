@@ -15,7 +15,9 @@
  *   - No heap: all state is caller-allocated.
  *   - Deterministic seed (0x524146 = "RAF").
  *   - Bounded memory: VV_MEM_SIZE engrams, ring buffer.
- *   - Freestanding-compatible: only <string.h>, <math.h>, <stdio.h>.
+ *   - Hosted API (vv_scan/vv_audit/vv_svg/verbovivo_main): requires stdio/math.
+ *   - Freestanding API (vv_scan_buf/vv_recall/vv_init): compile with
+ *     -DVERBOVIVO_NO_HEAP; requires only <stdint.h>, <stddef.h>, <string.h>.
  *
  * RAFCODE-Φ-∆RafaelVerboΩ | Ω=Amor | FIAT LUX */
 #pragma once
@@ -23,9 +25,12 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+
+#ifndef VERBOVIVO_NO_HEAP
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
+#endif
 
 /* ── sub-layer headers (B4: separated for independent use) ─────────── */
 #include "fiber_h.h"       /* FiberHash, fiber_hash_init/update/distance  */
@@ -58,13 +63,16 @@ typedef struct {
  * matrix while scanning. Opt-in — existing callers passing NULL are
  * unaffected. */
 void  vv_init(VerbVivoState *vv);
-void  vv_scan(VerbVivoState *vv, FILE *stream, void *relmat);
 void  vv_scan_buf(VerbVivoState *vv, const vv_u8 *buf, vv_sz len, void *relmat);
-void  vv_audit(const VerbVivoState *vv);
-void  vv_svg(const VerbVivoState *vv);
 int   vv_hamming_256(const vv_u8 a[32], const vv_u8 b[32]);
 int   vv_monobit(const vv_u8 hash[32]);
 
+/* Hosted-only API — requires stdio/math (not available with VERBOVIVO_NO_HEAP) */
+#ifndef VERBOVIVO_NO_HEAP
+void  vv_scan(VerbVivoState *vv, FILE *stream, void *relmat);
+void  vv_audit(const VerbVivoState *vv);
+void  vv_svg(const VerbVivoState *vv);
+#endif
 /* Recupera os top_n engrams mais ressonantes com a query.
  * phi_weight: importância da coerência semântica vs. diversidade de Hamming [0..1].
  *   phi_weight → 1.0 : prioriza similaridade vetorial (cosine) — regime coerente.

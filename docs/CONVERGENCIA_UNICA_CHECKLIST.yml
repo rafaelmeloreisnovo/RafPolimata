@@ -86,23 +86,28 @@ blocks:
 
   - id: B4
     name: "VerbVivo hosted/freestanding separation"
-    status: AUDIT
+    status: PASS
     completed: "2026-06-20"
     evidence:
       - "rafaelia/fiber_h.h — Fiber-H 256-bit Hamming standalone (no malloc/stdio)"
-      - "rafaelia/trinity_core.h — HDC hypervectors + engram ring standalone"
+      - "rafaelia/trinity_core.h — HDC hypervectors + engram ring standalone; clock_t gated; sqrtf/expf/fabsf fallbacks under VERBOVIVO_NO_HEAP (trinity_core.h:46-66)"
       - "rafaelia/t7_toroid.h — T^7 7-dim toroid standalone (re-exports Benchmark/raf_toroid.h)"
-      - "rafaelia/verbovivo.h updated to include 3 sub-headers (backward compatible)"
-    gap: "verbovivo_main() still uses stdio/printf for SVG; VERBOVIVO_NO_HEAP flag pending (B5)"
+      - "rafaelia/verbovivo.h — VERBOVIVO_NO_HEAP gates out stdio/math/time includes; vv_scan/vv_audit/vv_svg declarations gated"
+      - "rafaelia/verbovivo.c — hosted path (vv_scan/vv_audit/vv_svg/verbovivo_main) gated under #ifndef VERBOVIVO_NO_HEAP; freestanding path (vv_init/vv_scan_buf/vv_recall) has zero malloc/stdio/time/math references"
+      - "nm -u vv_free.o → 0 hosted symbols (clean — no stdio/printf/malloc/clock/sqrt)"
+      - "gcc -DVERBOVIVO_NO_HEAP -ffreestanding -fno-builtin -nostdlib -c verbovivo.c → COMPILE_OK"
+      - "vv_scan_buf() already provided caller-buffer API (no FILE* required)"
+    gap: "none — VERBOVIVO_NO_HEAP flag implemented and verified"
     target_files:
       - "rafaelia/verbovivo.c"
       - "rafaelia/verbovivo.h"
-    reason: "Fiber-H/Trinity core is mostly stack/static, but verbovivo_main() allocates trajectory SVG with malloc/free."
+      - "rafaelia/trinity_core.h"
+    reason: "VERBOVIVO_NO_HEAP preprocessor flag now gates all stdio/math/time/stdlib paths; freestanding layer (vv_init/vv_scan_buf/vv_recall) compiles with zero hosted symbols."
     actions:
-      - "Document verbovivo_main() as hosted visualization path."
-      - "Add static-buffer or caller-provided-buffer mode for no-heap builds."
-      - "Optionally introduce VERBOVIVO_NO_HEAP build flag."
-    promotion_gate: "No-heap build compiles without malloc/free references."
+      - "Document verbovivo_main() as hosted visualization path. DONE."
+      - "Add static-buffer or caller-provided-buffer mode for no-heap builds. DONE (vv_scan_buf)."
+      - "Introduce VERBOVIVO_NO_HEAP build flag. DONE."
+    promotion_gate: "No-heap build compiles without malloc/free references. MET — zero hosted symbols verified."
 
   - id: B5
     name: "T7 Q16 C freestanding reference port"
