@@ -1,31 +1,29 @@
 # Claim Evidence Lock
 
-Política: claim forte exige evidência forte. A ausência honesta de ferramenta, device, dataset, hardware, raw log, revisão ou execução deve ser registrada como `TOKEN_VAZIO`, `SKIPPED`, `PENDING`, `PASS_LIMITED` ou `DEVICE_REQUIRED`, nunca como PASS inventado.
+Estado: `REFERENCE` / `AUDIT`
 
-## Regras de trava
+Regra máxima: claim forte exige evidência forte. Hipótese, metáfora, analogia, prova parcial e runtime real são estados diferentes. `TOKEN_VAZIO` é melhor do que sucesso inventado.
 
-- Claim de Android runtime exige: build, APK, assinatura, install, launch e logcat sem crash.
-- Claim de benchmark exige: comando, hardware, flags, baseline, mediana, p95, p99 e raw log.
-- Claim de segurança exige: ameaça formal, escopo, revisão e possibilidade de FAIL; não declarar segurança criptográfica sem revisão formal.
-- Claim científico exige: dataset real, hash, método, baseline e possibilidade explícita de FAIL.
-- Claim de compilador exige: entrada, IR/lowering quando aplicável, output e teste.
-- Claim multi-linguagem exige: build/run/status por linguagem e por ambiente.
-- Hipótese deve ficar marcada como hipótese.
-- Analogia/metáfora/parábola deve ficar marcada como analogia didática, não prova literal.
-- Ausência deve ficar marcada como `TOKEN_VAZIO`.
+| Nível | Significado | Evidência mínima | Gate | Lacuna honesta |
+|---|---|---|---|---|
+| `CLAIM_DOC` | Apenas documentação ou hipótese | Arquivo e escopo | revisão textual | `TOKEN_VAZIO` para execução |
+| `CLAIM_AUDIT` | Há relatório/registro | log, manifesto, hash ou matriz | script de auditoria | `PASS_LIMITED` se parcial |
+| `CLAIM_COMPILE` | Compila | comando + flags + saída | compilador retorna 0 | runtime `TOKEN_VAZIO` |
+| `CLAIM_RUNTIME` | Executa | comando + entrada + saída + exit code | teste reprodutível | device externo `TOKEN_VAZIO` |
+| `CLAIM_DEVICE` | Executa em hardware/device real | device-info + install/run/log | gate manual/device | `DEVICE_REQUIRED` |
+| `CLAIM_EXTERNAL` | Reproduzido fora do ambiente local | ambiente externo documentado | relatório assinado/hash | `AUDIT` |
+| `CLAIM_REVIEWED` | Revisão qualificada | parecer/review rastreável | aprovação explícita | `PENDING` |
 
-## Níveis de claim
+## Políticas por domínio
 
-| Nível | Significado | Evidência mínima | Limite |
-|---|---|---|---|
-| `CLAIM_DOC` | Apenas documentação | Arquivo e seção rastreáveis | Não prova execução |
-| `CLAIM_AUDIT` | Há relatório/registro | Relatório, data, comando ou checklist | Pode ser parcial |
-| `CLAIM_COMPILE` | Compila | Comando, flags, saída e ambiente | Não prova runtime |
-| `CLAIM_RUNTIME` | Executa | Comando de execução, retorno, stdout/stderr/log | Não prova hardware específico |
-| `CLAIM_DEVICE` | Executa em hardware/device real | Device info, install/launch/logs, artifacts | Escopo limitado ao device |
-| `CLAIM_EXTERNAL` | Reproduzido externamente | Registro independente e versão | Depende da qualidade externa |
-| `CLAIM_REVIEWED` | Revisado por terceiro qualificado | Identidade/qualificação, escopo e parecer | Não substitui nova execução |
+- Android runtime: exige build, APK, assinatura/verificação quando aplicável, install, launch e logcat. Sem isso: `TOKEN_VAZIO` ou `DEVICE_REQUIRED`.
+- Benchmark: exige comando, hardware, flags, baseline, mediana, p95, p99 e raw log. Sem baseline: `PASS_LIMITED` ou `TOKEN_VAZIO`.
+- Segurança criptográfica: exige modelo de ameaça e revisão formal. Sem revisão: não declarar segurança forte.
+- Ciência/dados: exige dataset real, hash, método, baseline e possibilidade de `FAIL`.
+- Compilador: exige entrada, transformação/IR/lowering quando aplicável, output e teste.
+- Multi-linguagem: exige build/run/status por linguagem.
+- Metáfora/parábola: deve ser traduzida para variável, protocolo, arquivo, teste, limite, evidência ou `TOKEN_VAZIO`.
 
-## Gate de rebaixamento
+## Rollback
 
-Se qualquer evidência mínima faltar, o claim deve ser rebaixado para o maior nível comprovável. Exemplo: APK gerado e assinado sem logcat é `CLAIM_AUDIT`/`PASS_LIMITED`, não `CLAIM_RUNTIME`.
+Se um claim exceder a evidência, rebaixar o nível do claim e preservar o log original. Nunca apagar lacuna para parecer completo.

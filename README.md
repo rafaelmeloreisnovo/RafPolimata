@@ -48,7 +48,7 @@ Este repositório passa a incluir uma documentação de referência de nível av
 
 ## Evidence Discipline
 
-RafPolimata separa hipótese, analogia, prova parcial e prova runtime. `TOKEN_VAZIO` é um estado válido quando falta ferramenta, device, dataset, log ou execução. O CI atua como compilador de evidências estruturais, enquanto a matriz do universo registra estado, lacunas, próximos passos e rollback sem transformar ausência em PASS.
+RafPolimata separa hipótese, analogia, prova parcial, prova de compilação, prova runtime e prova em device real. `TOKEN_VAZIO` é estado válido quando falta ferramenta, dataset, hardware, log ou execução. O CI funciona como compilador de evidências: emite matrizes, executa gates e preserva lacunas sem promovê-las a `PASS`. A trilha auditável fica em [`docs/REPOSITORY_UNIVERSE_MATRIX.md`](docs/REPOSITORY_UNIVERSE_MATRIX.md) e [`docs/CLAIM_EVIDENCE_LOCK.md`](docs/CLAIM_EVIDENCE_LOCK.md).
 
 ## ApkC — micro-toolchain Android freestanding
 
