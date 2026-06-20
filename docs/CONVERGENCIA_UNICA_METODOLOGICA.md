@@ -477,3 +477,30 @@ F_next:
 ```
 
 FIAT LUX — ΣΩΔΦBITRAF
+
+---
+
+## Apêndice B7 — Estado atualizado com rastreabilidade (2026-06-20)
+
+Claims anteriores em F_gap foram resolvidos. Cada item abaixo tem referência rastreável:
+
+| Claim anterior (F_gap) | Estado atual | Referência |
+|------------------------|:------------:|-----------|
+| "unknown mnemonic ainda pode virar NOP" | PASS | `(ref: Apkc/apkc.c:1102-1105)` BRK #1 + err++; `(ref: Apkc/apkc.c:1622-1629)` L16 policy gate |
+| "matriz arquitetura×linguagem ainda não é explícita" | PASS | `(ref: docs/APKC_FLAGS_LIMITS_AND_COMMANDS.md)` tabela 17×lang B2 |
+| "VerbVivo tem exceção de heap em modo hosted" | AUDIT | `(ref: rafaelia/verbovivo.h:28)` stdio incluído; sub-headers freestanding: `(ref: rafaelia/fiber_h.h)` `(ref: rafaelia/trinity_core.h)` `(ref: rafaelia/t7_toroid.h)` |
+| "T^7 Q16 ainda precisa porte C/ASM bit-exact" | PASS | `(ref: Benchmark/raf_q16.h)` Q16.16 zero float; `(ref: Benchmark/raf_toroid.h)` T7State em Q16 |
+| "criar orquestrador mínimo com manifest de prova" | PASS | `(ref: tools/rafbbs/rafbbs.sh)` proof_chain pipeline; `(ref: Apkc/proofs/CHAIN_OF_CUSTODY_2026-06-20.md)` |
+| "só promover claim quando houver arquivo+linha+teste+hash+ambiente" | PASS | `(ref: scripts/validate_claims.sh)` validador B7 automatizado |
+| "cobertura ISA precisa busca global e teste por encoder" | PASS | `(ref: Apkc/arch_arm64.h:572-592)` LDRSW/LDR_lit/LD2/LD3/LD4; `(ref: tests/test_arm64_encoders.py)` |
+
+### Evidências de pipeline completo (2026-06-20)
+
+- raf_cpu_detect() real: `(ref: raf_cpu.c)` CPUID + /proc/cpuinfo → RAF_ARCH_* não-UNKNOWN em x86-64
+- raf_asm_emit() real: `(ref: raf_asm_emit.c)` ARM64/ARM32/x86-64/RV64 backends distintos
+- raf_flag_matrix_get() real: `(ref: raf_asm_emit.c)` RAF_CAP_MATRIX → flags por arch+lang
+- Buffer safety ApkC: `(ref: Apkc/fmt_elf.h:41-46)` ELFBuf.cap + guards -99; `(ref: Apkc/fmt_axml.h)` AxWr.err sticky
+- 17 idiomas na tabela: `(ref: Apkc/lang_profile.h:33-46)` LP_COUNT=17 (+ Go/Ruby/Swift/Groovy/Clojure)
+- Métodos M057-M060: `(ref: RAF_057_eeprom_wear_leveling.c)` `(ref: RAF_058_can_bus_mcp2515_spi.c)` `(ref: RAF_059_rtos_minimal_no_heap.c)` `(ref: RAF_060_bootloader_ota_uart.c)`
+- P(k) gate CI: `(ref: .github/workflows/ci.yml:116-121)` gate automático falsificabilidade
+- SVG engram gate: `(ref: .github/workflows/ci.yml:84-88)` verbovivo -s → grep '<svg'
