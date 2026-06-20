@@ -101,3 +101,10 @@
 - [x] M054 — Batching de operações repetidas (Todos / Performance) (ref: RAF_054_batching_de_operacoes_repetidas.c — asserts batched dispatch count < per-item dispatch count; compiled and ran, rc=0)
 - [x] M055 — Cache local de resultado técnico (Todos / Cache) (ref: RAF_055_cache_local_de_resultado_tecnico.c — 16-slot direct-mapped cache, asserts recompute count stays 1 on repeated key; compiled and ran, rc=0)
 - [x] M056 — Comparação automática contra implementação padrão (Todos / Benchmark) (ref: RAF_056_comparacao_automatica_contra_implementacao_padrao.c — unrolled-by-4 vs baseline sum, asserts equal result with fewer counted ops; compiled and ran, rc=0)
+
+## Métodos Expandidos (M057-M060) — adicionados em 2026-06-20
+
+- [x] M057 — EEPROM wear-leveling por endereço circular (MCU/AVR / EEPROM) (ref: RAF_057_eeprom_wear_leveling.c — ponteiro circular _m057_write_addr avança por 1024 slots; AVR-gated real writes EECR/EEDR/EEARL/EEARH; host: shadow array _m057_shadow[1024] + _m057_write_count[]; selftest: 1024 writes, verifica wrap e exatamente 1 write por slot; EXECUTA_PASS rc=0)
+- [x] M058 — CAN bus via SPI + MCP2515 (MCU/AVR / CAN) (ref: RAF_058_can_bus_mcp2515_spi.c — comandos MCP2515: RESET=0xC0, READ=0x03, WRITE=0x02, RTS=0x80+, READ_STATUS=0xA0; spi_base==NULL→TOKEN_VAZIO=0; selftest: 4 comandos com spi_base=NULL→0; EXECUTA_PASS rc=0)
+- [x] M059 — RTOS mínimo cooperativo sem heap (Todos / RTOS) (ref: RAF_059_rtos_minimal_no_heap.c — tabela _m059_tasks[4] round-robin; register retorna -1 se cheio; run(iterations) executa N rodadas; zero malloc; selftest: 2 tasks×4 iter=8 total, cada counter==4, 5ª reg falha; EXECUTA_PASS rc=0)
+- [x] M060 — Bootloader OTA via UART (MCU/AVR / Bootloader) (ref: RAF_060_bootloader_ota_uart.c — protocolo [0xAA][size_lo][size_hi][payload...][CRC-8 XOR]; AVR: polls UCSR0A.RXC0 com deadline; host: TOKEN_VAZIO=0; selftest: monta packet em buffer estático, parseia, verifica start/size/CRC/payload; EXECUTA_PASS rc=0)
