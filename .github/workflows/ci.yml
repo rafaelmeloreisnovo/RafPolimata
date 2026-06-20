@@ -49,6 +49,12 @@ jobs:
           python3 scripts/emit_raf_methods_status.py
           test -s results/raf_methods_status.json
 
+      - name: Emit concept structural audit
+        run: |
+          python3 scripts/emit_concept_structural_audit.py
+          test -s results/concept_structural_audit.json
+          test -s docs/CONCEPT_STRUCTURAL_AUDIT.md
+
       - name: Validate Android ABI plan
         run: bash scripts/android_build_matrix.sh --plan
 
