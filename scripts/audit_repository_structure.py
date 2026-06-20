@@ -27,6 +27,8 @@ ROOT_ALLOWED_FILES = {
     "L1.md",
     "RASBERY.MD",
     "CHANGELOG.md",
+    "Makefile",
+    "RELEASE_NOTES.md",
     "CLAUDE.md",
     "big_test.sh",
 }
