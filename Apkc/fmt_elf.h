@@ -38,31 +38,42 @@
 #define SHT_ARM_ATTRIBUTES  0x70000003u
 
 /* ── ELF buffer writer ───────────────────────────────────────────────────── */
-typedef struct { u8 *p; sz pos; } ELFBuf;
-static inline void _eb8 (ELFBuf *b, u8  v){ b->p[b->pos++]=v; }
-static inline void _eb16(ELFBuf *b, u16 v){ w16(b->p+b->pos,v); b->pos+=2; }
-static inline void _eb32(ELFBuf *b, u32 v){ w32(b->p+b->pos,v); b->pos+=4; }
-static inline void _eb64(ELFBuf *b, u64 v){ w64(b->p+b->pos,v); b->pos+=8; }
-static inline void _epad(ELFBuf *b, sz n) { for(sz i=0;i<n;i++) b->p[b->pos++]=0; }
+typedef struct { u8 *p; sz pos; sz cap; } ELFBuf;
+static inline i32 _eb8 (ELFBuf *b, u8  v){ if(b->pos>=b->cap) return -99; b->p[b->pos++]=v; return 0; }
+static inline i32 _eb16(ELFBuf *b, u16 v){ if(b->pos+2>b->cap) return -99; w16(b->p+b->pos,v); b->pos+=2; return 0; }
+static inline i32 _eb32(ELFBuf *b, u32 v){ if(b->pos+4>b->cap) return -99; w32(b->p+b->pos,v); b->pos+=4; return 0; }
+static inline i32 _eb64(ELFBuf *b, u64 v){ if(b->pos+8>b->cap) return -99; w64(b->p+b->pos,v); b->pos+=8; return 0; }
+static inline i32 _epad(ELFBuf *b, sz n) { if(b->pos+n>b->cap) return -99; for(sz i=0;i<n;i++) b->p[b->pos++]=0; return 0; }
 
 /* ── Symbol descriptor ───────────────────────────────────────────────────── */
 /* va = byte offset from the start of the .text code buffer */
 typedef struct { const char *name; u32 va; } ElfSym;
 
 /* ── Stack-built .dynstr ─────────────────────────────────────────────────── */
-/* sym_name_off[i] = byte offset of syms[i].name within the dynstr buffer. */
+/* sym_name_off[i] = byte offset of syms[i].name within the dynstr buffer.
+ * buf is always the 512-byte _ds[] stack array; cap = 512. */
+#define _DYNSTR_CAP 512u
 static inline u32 _build_dynstr(const ElfSym *syms, int nsyms,
                                   u8 *buf, u32 *sym_name_off) {
     u32 pos = 0;
+    if (pos >= _DYNSTR_CAP) return 0; /* OVERFLOW */
     buf[pos++] = 0; /* leading null */
     for (int i = 0; i < nsyms; i++) {
         sym_name_off[i] = pos;
         const char *n = syms[i].name ? syms[i].name : "";
-        while (*n) buf[pos++] = (u8)*n++;
+        while (*n) {
+            if (pos >= _DYNSTR_CAP - 1u) return 0; /* OVERFLOW */
+            buf[pos++] = (u8)*n++;
+        }
+        if (pos >= _DYNSTR_CAP) return 0; /* OVERFLOW */
         buf[pos++] = 0;
     }
+    if (pos >= _DYNSTR_CAP) return 0; /* OVERFLOW */
     buf[pos++] = 0; /* trailing null */
-    while (pos & 3u) buf[pos++] = 0; /* align to 4 */
+    while (pos & 3u) {
+        if (pos >= _DYNSTR_CAP) return 0; /* OVERFLOW */
+        buf[pos++] = 0; /* align to 4 */
+    }
     return pos;
 }
 
@@ -170,7 +181,7 @@ static sz elf64_build_so(u8 *out, const u8 *text, u32 text_sz,
     u32 TOTAL       = SHT_OFF + A64SO_NSECT*64u;
 
     m_set(out, 0, (sz)TOTAL);
-    ELFBuf B; B.p = out; B.pos = 0;
+    ELFBuf B; B.p = out; B.pos = 0; B.cap = (sz)TOTAL;
 
     /* ELF header (64 bytes) */
     _eb8(&B,0x7F);_eb8(&B,'E');_eb8(&B,'L');_eb8(&B,'F');
@@ -307,7 +318,7 @@ static sz elf32_build_so(u8 *out, const u8 *text, u32 text_sz,
     u32 TOTAL       = SHT_OFF + A32SO_NSECT*40u;
 
     m_set(out, 0, (sz)TOTAL);
-    ELFBuf B; B.p = out; B.pos = 0;
+    ELFBuf B; B.p = out; B.pos = 0; B.cap = (sz)TOTAL;
 
     /* ELF header (52 bytes) */
     _eb8(&B,0x7F);_eb8(&B,'E');_eb8(&B,'L');_eb8(&B,'F');

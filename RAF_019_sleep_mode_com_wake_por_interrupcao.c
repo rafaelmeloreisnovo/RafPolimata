@@ -1,14 +1,14 @@
-#include "../include/RAF_rafaelia_common.h"
+#include "RAF_rafaelia_common.h"
 
 /*
  * Método M019: Sleep mode com wake por interrupção
  * Alvo: MCU/AVR
- * Domínio: Power
- * Ganho estimado: até 90%+ energia
+ * Domínio: Power Management
+ * Ganho estimado: redução drástica de consumo
  *
- * Dorme e acorda por evento.
- *
- * Status: skeleton C para integração em firmware bare-metal.
+ * SMCR: SM1=0, SM0=0 => Idle sleep mode. SE=1 habilita sleep.
+ * Sequência: sei (habilita interrupções globais), set SE,
+ *            executa instrução SLEEP, limpa SE ao acordar.
  */
 
 #ifndef F_CPU
@@ -16,34 +16,38 @@
 #endif
 
 #if defined(__AVR_ATmega328P__) || defined(RAFAELIA_FORCE_AVR_DEMO)
-#define AVR_DDRB_ADDR   0x24u
-#define AVR_PINB_ADDR   0x23u
-#define AVR_PORTB_ADDR  0x25u
-#define AVR_TCCR1A_ADDR 0x80u
-#define AVR_TCCR1B_ADDR 0x81u
-#define AVR_OCR1A_ADDR  0x88u
-#define AVR_UCSR0A_ADDR 0xC0u
-#define AVR_UCSR0B_ADDR 0xC1u
-#define AVR_UCSR0C_ADDR 0xC2u
-#define AVR_UDR0_ADDR   0xC6u
-#define AVR_ADCSRA_ADDR 0x7Au
-#define AVR_ADMUX_ADDR  0x7Cu
-#define AVR_ADCL_ADDR   0x78u
-#define AVR_ADCH_ADDR   0x79u
+#define AVR_SMCR_ADDR  0x53u
+
+/* SMCR bits */
+#define M019_SE   0u   /* Sleep Enable */
+#define M019_SM0  1u   /* Sleep Mode Select bit 0 */
+#define M019_SM1  2u   /* Sleep Mode Select bit 1 */
+#define M019_SM2  3u   /* Sleep Mode Select bit 2 */
+/* SM2:SM1:SM0 = 000 => Idle */
 #endif
 
 void rafaelia_m019_sleep_mode_com_wake_por_interrupcao(void) {
 #if defined(__AVR_ATmega328P__) || defined(RAFAELIA_FORCE_AVR_DEMO)
-    /*
-     * Ajuste este bloco conforme o método específico.
-     * Mantido simples para permitir auditoria direta de registrador.
-     */
-    RAFA_MMIO8(AVR_DDRB_ADDR) |= (uint8_t)(1u << 5u);
-    RAFA_MMIO8(AVR_PINB_ADDR) = (uint8_t)(1u << 5u);
+    /* Ensure Idle mode: SM2:SM1:SM0 = 000 */
+    RAFA_MMIO8(AVR_SMCR_ADDR) &= (uint8_t)(~((1u << M019_SM2) |
+                                               (1u << M019_SM1) |
+                                               (1u << M019_SM0)));
+
+    /* Enable global interrupts so the MCU can wake on interrupt */
+    __asm__ __volatile__("sei" ::: "memory");
+
+    /* Set Sleep Enable bit */
+    RAFA_MMIO8(AVR_SMCR_ADDR) |= (uint8_t)(1u << M019_SE);
+
+    /* Execute SLEEP instruction — MCU halts here until interrupt fires */
+    __asm__ __volatile__("sleep" ::: "memory");
+
+    /* Clear Sleep Enable immediately after waking (good practice) */
+    RAFA_MMIO8(AVR_SMCR_ADDR) &= (uint8_t)(~(1u << M019_SE));
 #else
     /*
-     * Método específico de MCU/AVR. Compile com avr-gcc ou defina RAFAELIA_FORCE_AVR_DEMO
-     * apenas para inspeção de sintaxe.
+     * Método específico de MCU/AVR. Compile com avr-gcc ou defina
+     * RAFAELIA_FORCE_AVR_DEMO apenas para inspeção de sintaxe.
      */
 #endif
 }

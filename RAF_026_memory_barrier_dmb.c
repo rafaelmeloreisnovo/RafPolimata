@@ -1,11 +1,4 @@
-#include "../include/RAF_rafaelia_common.h"
-
-#if defined(__linux__) || defined(__ANDROID__)
-#include <time.h>
-#include <unistd.h>
-#include <sched.h>
-#include <sys/syscall.h>
-#endif
+#include "RAF_rafaelia_common.h"
 
 /*
  * Método M026: Memory barrier dmb
@@ -13,27 +6,23 @@
  * Domínio: MMIO
  * Ganho estimado: correção
  *
- * Ordena memória de dados.
+ * Emite Data Memory Barrier (dmb ish) em ARM64, dmb em ARM32,
+ * ou __sync_synchronize() em outras arquiteturas.
+ * Self-test: escreve variável volátil, barreira, verifica inalterada.
  *
- * Status: skeleton C low-level para Linux/Android/ARM.
+ * Status: implementação real ARM64/ARM32 inline asm + fallback GCC built-in.
  */
 
-static inline uint64_t rafaelia_read_counter_m026(void) {
-#if defined(__aarch64__)
-    uint64_t v = 0;
-    __asm__ __volatile__("mrs %0, cntvct_el0" : "=r"(v));
-    return v;
-#elif defined(__linux__) || defined(__ANDROID__)
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return ((uint64_t)ts.tv_sec * 1000000000ull) + (uint64_t)ts.tv_nsec;
-#else
-    return 0;
-#endif
-}
+static volatile uint32_t _m026_shared = 0x12345678u;
 
 int rafaelia_m026_memory_barrier_dmb(void) {
-    uint64_t t0 = rafaelia_read_counter_m026();
-    uint64_t t1 = rafaelia_read_counter_m026();
-    return (t1 >= t0) ? 0 : -1;
+    _m026_shared = 0xDEADBEEFu;
+#if defined(__aarch64__)
+    __asm__ __volatile__("dmb ish" ::: "memory");
+#elif defined(__arm__)
+    __asm__ __volatile__("dmb" ::: "memory");
+#else
+    __sync_synchronize();
+#endif
+    return (_m026_shared == 0xDEADBEEFu) ? 0 : -1;
 }

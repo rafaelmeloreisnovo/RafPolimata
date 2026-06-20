@@ -118,12 +118,12 @@ static const char *const _ax_lit[SI_COUNT_EX] = {
 };
 
 /* ── AXML writer ─────────────────────────────────────────────────────────── */
-typedef struct { u8 *buf; sz cap; sz pos; } AxWr;
+typedef struct { u8 *buf; sz cap; sz pos; i32 err; } AxWr;
 
-static inline void _ax16(AxWr *a, u16 v){ u8 b[2]; w16(b,v); m_cpy(a->buf+a->pos,b,2); a->pos+=2; }
-static inline void _ax32(AxWr *a, u32 v){ u8 b[4]; w32(b,v); m_cpy(a->buf+a->pos,b,4); a->pos+=4; }
-static inline void _axb (AxWr *a, const void *src, sz n){ m_cpy(a->buf+a->pos,src,n); a->pos+=n; }
-static inline void _ax_patch32(AxWr *a, sz off, u32 v){ w32(a->buf+off,v); }
+static inline void _ax16(AxWr *a, u16 v){ if(a->err||a->pos+2>a->cap){a->err=-99;return;} u8 b[2]; w16(b,v); m_cpy(a->buf+a->pos,b,2); a->pos+=2; }
+static inline void _ax32(AxWr *a, u32 v){ if(a->err||a->pos+4>a->cap){a->err=-99;return;} u8 b[4]; w32(b,v); m_cpy(a->buf+a->pos,b,4); a->pos+=4; }
+static inline void _axb (AxWr *a, const void *src, sz n){ if(a->err||a->pos+n>a->cap){a->err=-99;return;} m_cpy(a->buf+a->pos,src,n); a->pos+=n; }
+static inline void _ax_patch32(AxWr *a, sz off, u32 v){ if(off+4>a->cap)return; w32(a->buf+off,v); }
 
 static inline u32 _ax_utf16(u8 *out, const char *s) {
     u32 n = (u32)s_len(s);
@@ -147,7 +147,7 @@ static sz axml_build(const char *pkg, const char *label,
                      const char *const *feats, int nfeats,
                      u8 *out, sz cap)
 {
-    AxWr A; A.buf = out; A.cap = cap; A.pos = 0;
+    AxWr A; A.buf = out; A.cap = cap; A.pos = 0; A.err = 0;
 
     if (nperms < 0) nperms = 0;
     if (nfeats < 0) nfeats = 0;
@@ -193,10 +193,15 @@ static sz axml_build(const char *pkg, const char *label,
     sz str_data_start = A.pos;
     for (u32 i = 0; i < total_strs; i++) {
         const char *s = sv[i] ? sv[i] : "";
-        u32 n = _ax_utf16(A.buf + A.pos, s);
-        A.pos += n;
+        u32 sn = (u32)s_len(s);
+        u32 need = 2u + sn*2u + 2u;
+        if (!A.err && A.pos + need > A.cap) { A.err = -99; }
+        if (!A.err) { u32 n = _ax_utf16(A.buf + A.pos, s); A.pos += n; }
     }
-    while ((A.pos - str_data_start) < str_data_sz) A.buf[A.pos++] = 0;
+    while (!A.err && (A.pos - str_data_start) < str_data_sz) {
+        if (A.pos >= A.cap) { A.err = -99; break; } /* OVERFLOW */
+        A.buf[A.pos++] = 0;
+    }
 
     /* ---- Resource map chunk ---- */
     _ax16(&A, 0x0180u); _ax16(&A, 8u); _ax32(&A, rm_chunk_sz);
@@ -214,7 +219,9 @@ static sz axml_build(const char *pkg, const char *label,
 
 #define _ATTR(ns,nm,rv,dt,data) do { \
     _ax32(&A,(u32)(ns)); _ax32(&A,(u32)(nm)); _ax32(&A,(u32)(rv)); \
-    _ax16(&A,8u); A.buf[A.pos++]=0; A.buf[A.pos++]=(u8)(dt); \
+    _ax16(&A,8u); \
+    if(!A.err&&A.pos+2>A.cap){A.err=-99;} \
+    else{A.buf[A.pos++]=0; A.buf[A.pos++]=(u8)(dt);} \
     _ax32(&A,(u32)(data)); \
 } while(0)
 
@@ -332,5 +339,6 @@ static sz axml_build(const char *pkg, const char *label,
 #undef _ATTR
 #undef _END
 
+    if (A.err) return (sz)A.err; /* OVERFLOW: return -99 */
     return A.pos;
 }

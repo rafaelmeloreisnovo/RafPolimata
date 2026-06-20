@@ -1,0 +1,7 @@
+# P(k) RRMSE Temporal Trend
+# Generated: 2026-06-20T04:05:19Z
+# Source: /home/user/RafPolimata/results/pk_test_*.json
+
+| date       | rrmse    | verdict | delta_vs_prev |
+|------------|----------|---------|---------------|
+| 2026-06-17 | 0.118672 | PASS    | —             |

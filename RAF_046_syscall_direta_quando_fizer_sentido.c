@@ -1,11 +1,4 @@
-#include "../include/RAF_rafaelia_common.h"
-
-#if defined(__linux__) || defined(__ANDROID__)
-#include <time.h>
-#include <unistd.h>
-#include <sched.h>
-#include <sys/syscall.h>
-#endif
+#include "RAF_rafaelia_common.h"
 
 /*
  * Método M046: Syscall direta quando fizer sentido
@@ -13,27 +6,25 @@
  * Domínio: Syscall
  * Ganho estimado: 1.2x-5x pontual
  *
- * Evita wrapper em pontos críticos.
+ * Chama syscall(SYS_gettid) diretamente, sem wrapper libc.
+ * Demonstra o caminho direto para syscalls críticas de latência.
  *
- * Status: skeleton C low-level para Linux/Android/ARM.
+ * Status: implementação real syscall(SYS_gettid) + verificação TID > 0.
  */
 
-static inline uint64_t rafaelia_read_counter_m046(void) {
-#if defined(__aarch64__)
-    uint64_t v = 0;
-    __asm__ __volatile__("mrs %0, cntvct_el0" : "=r"(v));
-    return v;
-#elif defined(__linux__) || defined(__ANDROID__)
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return ((uint64_t)ts.tv_sec * 1000000000ull) + (uint64_t)ts.tv_nsec;
-#else
-    return 0;
-#endif
-}
+#if defined(__linux__) || defined(__ANDROID__)
+#include <sys/syscall.h>
+#include <unistd.h>
 
 int rafaelia_m046_syscall_direta_quando_fizer_sentido(void) {
-    uint64_t t0 = rafaelia_read_counter_m046();
-    uint64_t t1 = rafaelia_read_counter_m046();
-    return (t1 >= t0) ? 0 : -1;
+    long tid = syscall(SYS_gettid);
+    return (tid > 0) ? 0 : -1;
 }
+
+#else
+
+int rafaelia_m046_syscall_direta_quando_fizer_sentido(void) {
+    return 0;
+}
+
+#endif

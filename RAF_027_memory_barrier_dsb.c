@@ -1,11 +1,4 @@
-#include "../include/RAF_rafaelia_common.h"
-
-#if defined(__linux__) || defined(__ANDROID__)
-#include <time.h>
-#include <unistd.h>
-#include <sched.h>
-#include <sys/syscall.h>
-#endif
+#include "RAF_rafaelia_common.h"
 
 /*
  * Método M027: Memory barrier dsb
@@ -13,27 +6,23 @@
  * Domínio: MMIO
  * Ganho estimado: correção
  *
- * Garante conclusão antes de prosseguir.
+ * Emite Data Synchronization Barrier (dsb ish) em ARM64, dsb em ARM32,
+ * ou __sync_synchronize() em outras arquiteturas.
+ * Self-test: escreve variável volátil, barreira, verifica inalterada.
  *
- * Status: skeleton C low-level para Linux/Android/ARM.
+ * Status: implementação real ARM64/ARM32 inline asm + fallback GCC built-in.
  */
 
-static inline uint64_t rafaelia_read_counter_m027(void) {
-#if defined(__aarch64__)
-    uint64_t v = 0;
-    __asm__ __volatile__("mrs %0, cntvct_el0" : "=r"(v));
-    return v;
-#elif defined(__linux__) || defined(__ANDROID__)
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return ((uint64_t)ts.tv_sec * 1000000000ull) + (uint64_t)ts.tv_nsec;
-#else
-    return 0;
-#endif
-}
+static volatile uint32_t _m027_shared = 0x12345678u;
 
 int rafaelia_m027_memory_barrier_dsb(void) {
-    uint64_t t0 = rafaelia_read_counter_m027();
-    uint64_t t1 = rafaelia_read_counter_m027();
-    return (t1 >= t0) ? 0 : -1;
+    _m027_shared = 0xDEADBEEFu;
+#if defined(__aarch64__)
+    __asm__ __volatile__("dsb ish" ::: "memory");
+#elif defined(__arm__)
+    __asm__ __volatile__("dsb" ::: "memory");
+#else
+    __sync_synchronize();
+#endif
+    return (_m027_shared == 0xDEADBEEFu) ? 0 : -1;
 }

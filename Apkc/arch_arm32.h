@@ -159,6 +159,41 @@ static inline u32 a32_eor_imm(u8 rd, u8 rn, u8 imm8, u8 rot, u8 s, u8 cc) {
            ((u32)(rot&0xFu)<<8)|(u32)imm8;
 }
 
+/* MVN  Rd, Rm  (bitwise NOT, register; opcode 1111) */
+static inline u32 a32_mvn_reg(u8 rd, u8 rm, u8 s, u8 cc) {
+    return ((u32)cc<<28)|0x01E00000u|((u32)s<<20)|((u32)rd<<12)|(u32)rm;
+}
+/* RSB  Rd, Rn, #imm8rot  (reverse subtract; opcode 0011) — NEG = RSB Rd,Rn,#0 */
+static inline u32 a32_rsb_imm(u8 rd,u8 rn,u8 imm8,u8 rot,u8 s,u8 cc){
+    return ((u32)cc<<28)|0x02600000u|((u32)s<<20)|((u32)rn<<16)|((u32)rd<<12)|
+           ((u32)(rot&0xFu)<<8)|(u32)imm8;
+}
+/* RSB  Rd, Rn, Rm */
+static inline u32 a32_rsb_reg(u8 rd,u8 rn,u8 rm,u8 s,u8 cc){
+    return ((u32)cc<<28)|0x00600000u|((u32)s<<20)|((u32)rn<<16)|((u32)rd<<12)|(u32)rm;
+}
+/* BIC  Rd, Rn, #imm8rot  (bit clear = AND NOT; opcode 1110) */
+static inline u32 a32_bic_imm(u8 rd,u8 rn,u8 imm8,u8 rot,u8 s,u8 cc){
+    return ((u32)cc<<28)|0x03C00000u|((u32)s<<20)|((u32)rn<<16)|((u32)rd<<12)|
+           ((u32)(rot&0xFu)<<8)|(u32)imm8;
+}
+/* BIC  Rd, Rn, Rm */
+static inline u32 a32_bic_reg(u8 rd,u8 rn,u8 rm,u8 s,u8 cc){
+    return ((u32)cc<<28)|0x01C00000u|((u32)s<<20)|((u32)rn<<16)|((u32)rd<<12)|(u32)rm;
+}
+/* TST  Rn, Rm  (AND, S=1, no destination; opcode 1000) */
+static inline u32 a32_tst_reg(u8 rn,u8 rm,u8 cc){
+    return ((u32)cc<<28)|0x01100000u|((u32)rn<<16)|(u32)rm;
+}
+/* TEQ  Rn, Rm  (EOR, S=1, no destination; opcode 1001) */
+static inline u32 a32_teq_reg(u8 rn,u8 rm,u8 cc){
+    return ((u32)cc<<28)|0x01300000u|((u32)rn<<16)|(u32)rm;
+}
+/* CMN  Rn, Rm  (ADD, S=1, no destination; opcode 1011) */
+static inline u32 a32_cmn_reg(u8 rn,u8 rm,u8 cc){
+    return ((u32)cc<<28)|0x01700000u|((u32)rn<<16)|(u32)rm;
+}
+
 /* ── Load / Store ────────────────────────────────────────────────────── */
 /* LDR  Rd, [Rn, #+off12]  (U=1: add, U=0: sub) */
 static inline u32 a32_ldr_imm(u8 rd,u8 rn,u16 off12,u8 u,u8 cc){

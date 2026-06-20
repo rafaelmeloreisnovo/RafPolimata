@@ -12,7 +12,7 @@
 - `raf_crc32c.h`: CRC32C por ISA (ARM64/x86 hardware, ARM32 software branchless por XOR/máscara).
 - `raf_hash.h`: FNV1a + PHI64 + corrente tipo Merkle/HashVivo, sem heap.
 - `raf_main.c`: orquestra benchmark, sem malloc/GC.
-- `build.sh` e `build2.sh`: rotas de compilação para host nativo e ARM32/ARM64.
+- `build.sh` e `build2.sh`: ambos compilam para ARM64/x86-64/ARM32 nativo (uname-gated) mais ARM32 cross via `arm-linux-gnueabihf-gcc` se presente. Diferença real é a ABI de float do ARM32 nativo: `build.sh` usa `-mfloat-abi=hard -mfpu=neon-vfpv4` (hard-float); `build2.sh` usa `-mfloat-abi=softfp -mfpu=neon` (softfp, compatível com a EABI padrão do Termux) e gera o binário cross hard-float com sufixo separado (`raf_enterprise_a32_hf`) em vez de sobrescrever o nativo. Prefira `build2.sh` em Termux/Android puro; `build.sh` em alvos ARM32 com hard-float garantido.
 
 ## Compilar no Termux ARM32
 

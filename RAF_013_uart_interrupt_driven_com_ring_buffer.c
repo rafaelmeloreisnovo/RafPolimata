@@ -1,14 +1,14 @@
-#include "../include/RAF_rafaelia_common.h"
+#include "RAF_rafaelia_common.h"
 
 /*
  * Método M013: UART interrupt-driven com ring buffer
  * Alvo: MCU/AVR
- * Domínio: UART
- * Ganho estimado: CPU livre
+ * Domínio: UART/Serial
+ * Ganho estimado: não bloqueia CPU em RX
  *
- * Fila circular por interrupção.
- *
- * Status: skeleton C para integração em firmware bare-metal.
+ * Ring buffer de 16 bytes para RX via interrupção.
+ * Self-test não-AVR: push 5 bytes, pop 5 bytes, verificar ordem FIFO.
+ * Retorno int: 0=pass, -1=fail.
  */
 
 #ifndef F_CPU
@@ -16,34 +16,92 @@
 #endif
 
 #if defined(__AVR_ATmega328P__) || defined(RAFAELIA_FORCE_AVR_DEMO)
-#define AVR_DDRB_ADDR   0x24u
-#define AVR_PINB_ADDR   0x23u
-#define AVR_PORTB_ADDR  0x25u
-#define AVR_TCCR1A_ADDR 0x80u
-#define AVR_TCCR1B_ADDR 0x81u
-#define AVR_OCR1A_ADDR  0x88u
-#define AVR_UCSR0A_ADDR 0xC0u
-#define AVR_UCSR0B_ADDR 0xC1u
-#define AVR_UCSR0C_ADDR 0xC2u
-#define AVR_UDR0_ADDR   0xC6u
-#define AVR_ADCSRA_ADDR 0x7Au
-#define AVR_ADMUX_ADDR  0x7Cu
-#define AVR_ADCL_ADDR   0x78u
-#define AVR_ADCH_ADDR   0x79u
+#define AVR_UCSR0B_ADDR  0xC1u
+
+/* UCSR0B bits */
+#define M013_RXCIE0  7u   /* RX Complete Interrupt Enable */
+#define M013_RXEN0   4u
+#define M013_TXEN0   3u
 #endif
 
-void rafaelia_m013_uart_interrupt_driven_com_ring_buffer(void) {
+/* Ring buffer — always compiled for self-test */
+#define M013_BUF_SIZE 16u
+#define M013_BUF_MASK ((uint8_t)(M013_BUF_SIZE - 1u))
+
+static volatile uint8_t _m013_rxbuf[M013_BUF_SIZE];
+static volatile uint8_t _m013_head = 0u;  /* write index (ISR writes) */
+static volatile uint8_t _m013_tail = 0u;  /* read  index (caller reads) */
+
+/*
+ * rafaelia_m013_rx_push: called from ISR (or test code) to enqueue a byte.
+ * Silently drops byte if buffer is full (head+1 == tail).
+ */
+void rafaelia_m013_rx_push(uint8_t b) {
+    uint8_t next = (uint8_t)((_m013_head + 1u) & M013_BUF_MASK);
+    if (next != _m013_tail) {           /* buffer not full */
+        _m013_rxbuf[_m013_head] = b;
+        _m013_head = next;
+    }
+}
+
+/*
+ * rafaelia_m013_rx_pop: dequeue one byte into *b.
+ * Returns 0 on success, -1 if buffer empty.
+ */
+int rafaelia_m013_rx_pop(uint8_t *b) {
+    if (_m013_head == _m013_tail) {
+        return -1;                      /* empty */
+    }
+    *b = _m013_rxbuf[_m013_tail];
+    _m013_tail = (uint8_t)((_m013_tail + 1u) & M013_BUF_MASK);
+    return 0;
+}
+
+/*
+ * ISR stub (comment only — real AVR ISR would be:
+ *   ISR(USART_RX_vect) {
+ *       rafaelia_m013_rx_push(RAFA_MMIO8(AVR_UDR0_ADDR));
+ *   }
+ * Cannot register real vectors in hosted/non-avr-gcc compilation.
+ */
+
+int rafaelia_m013_uart_interrupt_driven_com_ring_buffer(void) {
 #if defined(__AVR_ATmega328P__) || defined(RAFAELIA_FORCE_AVR_DEMO)
-    /*
-     * Ajuste este bloco conforme o método específico.
-     * Mantido simples para permitir auditoria direta de registrador.
-     */
-    RAFA_MMIO8(AVR_DDRB_ADDR) |= (uint8_t)(1u << 5u);
-    RAFA_MMIO8(AVR_PINB_ADDR) = (uint8_t)(1u << 5u);
+    /* Enable USART RX Complete interrupt (requires RX already enabled) */
+    RAFA_MMIO8(AVR_UCSR0B_ADDR) |= (uint8_t)((1u << M013_RXCIE0) |
+                                               (1u << M013_RXEN0)  |
+                                               (1u << M013_TXEN0));
+    return 0;
 #else
-    /*
-     * Método específico de MCU/AVR. Compile com avr-gcc ou defina RAFAELIA_FORCE_AVR_DEMO
-     * apenas para inspeção de sintaxe.
-     */
+    /* Non-AVR self-test: push 5 bytes, pop 5 bytes, verify FIFO order */
+    static const uint8_t test_data[5] = {0x01u, 0x23u, 0x45u, 0x67u, 0x89u};
+    uint8_t i;
+    uint8_t popped;
+
+    /* Reset ring buffer */
+    _m013_head = 0u;
+    _m013_tail = 0u;
+
+    /* Push 5 bytes */
+    for (i = 0u; i < 5u; i++) {
+        rafaelia_m013_rx_push(test_data[i]);
+    }
+
+    /* Pop 5 bytes and verify order */
+    for (i = 0u; i < 5u; i++) {
+        if (rafaelia_m013_rx_pop(&popped) != 0) {
+            return -1;
+        }
+        if (popped != test_data[i]) {
+            return -1;
+        }
+    }
+
+    /* Buffer must be empty now */
+    if (rafaelia_m013_rx_pop(&popped) != -1) {
+        return -1;
+    }
+
+    return 0;
 #endif
 }
