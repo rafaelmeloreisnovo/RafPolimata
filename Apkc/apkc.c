@@ -279,6 +279,11 @@ static u32 _codegen_variant_log_n = 0;
 static u32 _codegen_variant_count[3] = {0,0,0};
 static int _codegen_log_on = 0;
 
+/* Policy gate (L16): by default an assembly error (unknown mnemonic → UNDEF
+ * placeholder) makes build_apk() refuse to write the APK. --allow-undef flips
+ * this to experimental "degradation permitted" mode. Default = strict. */
+static int _apkc_allow_undef = 0;
+
 static void codegen_log_variant(u32 variant) {
     if (!_codegen_log_on) return;
     if (variant < 3u) _codegen_variant_count[variant]++;
@@ -1257,11 +1262,74 @@ static void asm_insn32(Emit *em, Tok mn, Lex *l) {
         i32 rm=reg32a(l->cur); lex_next(l);
         emit32(em,a32_mul((u32)rd,(u32)rn,(u32)rm,0,A32_AL)); return;
     }
+    if (tok_eqi(mn,"mvn")) {
+        i32 rd=reg32a(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        if (l->cur.kind==TK_HASH||l->cur.kind==TK_INT) {
+            u32 imm=(u32)lex_imm(l);
+            emit32(em,a32_mvn_imm((u32)rd,(u8)imm,0,A32_AL));
+        } else {
+            i32 rm=reg32a(l->cur); lex_next(l);
+            emit32(em,a32_mvn_reg((u32)rd,(u32)rm,0u,A32_AL));
+        }
+        return;
+    }
+    if (tok_eqi(mn,"neg")) {
+        /* NEG Rd, Rm  ==  RSB Rd, Rm, #0 */
+        i32 rd=reg32a(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rm=reg32a(l->cur); lex_next(l);
+        emit32(em,a32_rsb_imm((u32)rd,(u32)rm,0,0,0,A32_AL)); return;
+    }
+    if (tok_eqi(mn,"rsb")||tok_eqi(mn,"bic")) {
+        i32 rd=reg32a(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rn=reg32a(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        int is_rsb=tok_eqi(mn,"rsb");
+        if (l->cur.kind==TK_HASH||l->cur.kind==TK_INT) {
+            u32 imm=(u32)lex_imm(l);
+            emit32(em, is_rsb ? a32_rsb_imm((u32)rd,(u32)rn,(u8)imm,0,0,A32_AL)
+                              : a32_bic_imm((u32)rd,(u32)rn,(u8)imm,0,0,A32_AL));
+        } else {
+            i32 rm=reg32a(l->cur); lex_next(l);
+            emit32(em, is_rsb ? a32_rsb_reg((u32)rd,(u32)rn,(u32)rm,0u,A32_AL)
+                              : a32_bic_reg((u32)rd,(u32)rn,(u32)rm,0u,A32_AL));
+        }
+        return;
+    }
+    if (tok_eqi(mn,"tst")||tok_eqi(mn,"teq")||tok_eqi(mn,"cmn")) {
+        i32 rn=reg32a(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rm=reg32a(l->cur); lex_next(l);
+        u32 w = tok_eqi(mn,"tst") ? a32_tst_reg((u32)rn,(u32)rm,A32_AL)
+              : tok_eqi(mn,"teq") ? a32_teq_reg((u32)rn,(u32)rm,A32_AL)
+              :                     a32_cmn_reg((u32)rn,(u32)rm,A32_AL);
+        emit32(em,w); return;
+    }
+    if (tok_eqi(mn,"lsl")||tok_eqi(mn,"lsr")||tok_eqi(mn,"asr")) {
+        i32 rd=reg32a(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        i32 rm=reg32a(l->cur); lex_next(l);
+        if (l->cur.kind==TK_COMMA) lex_next(l);
+        u32 sh=(u32)lex_imm(l);
+        u32 w = tok_eqi(mn,"lsl") ? a32_lsl_imm((u32)rd,(u32)rm,(u8)sh,0,A32_AL)
+              : tok_eqi(mn,"lsr") ? a32_lsr_imm((u32)rd,(u32)rm,(u8)sh,0,A32_AL)
+              :                     a32_asr_imm((u32)rd,(u32)rm,(u8)sh,0,A32_AL);
+        emit32(em,w); return;
+    }
+    if (tok_eqi(mn,"blx")) {
+        i32 rm=reg32a(l->cur); lex_next(l);
+        emit32(em,a32_blx((u32)rm)); return;
+    }
     if (tok_eq(mn,".word")||tok_eqi(mn,".word")) {
         u32 v=(u32)lex_imm(l);
         emit32(em,v); return;
     }
-    /* unknown mnemonic — emit UNDEF so execution faults; mark assembly error */
+    /* unknown mnemonic — emit UNDEF so execution faults; mark assembly error.
+     * The UNDEF (not a silent NOP) guarantees a hard fault if it ever executes;
+     * build_apk() additionally refuses to emit the APK unless --allow-undef is
+     * set (see _apkc_allow_undef), so unknown mnemonics fail the build by default. */
     pr_err("apkc: unknown ARM32 mnemonic\n");
     emit32(em, 0xE7F000F0u); /* UNDEF instruction — architecturally undefined, not silent NOP */
     em->err++;
@@ -1548,6 +1616,19 @@ static i32 build_apk(
         if (do64) r64  = assemble(src, src_len, 64, _code64);
         if (do32) r32_ = assemble(src, src_len, 32, _code32);
 
+        /* L16 policy gate: refuse to ship UNDEF placeholders unless explicitly
+         * allowed. Default behaviour is a hard FAIL (exit 1), so an unknown
+         * mnemonic can never be silently packaged into a distributable APK. */
+        if (r64.err || r32_.err) {
+            pr_err("apkc: assembly produced "); pr_dec((u64)(r64.err + r32_.err));
+            pr_err(" UNDEF placeholder(s) for unsupported instruction(s)\n");
+            if (!_apkc_allow_undef) {
+                pr_err("apkc: refusing to emit APK (use --allow-undef for experimental mode)\n");
+                return 1;
+            }
+            pr_err("apkc: --allow-undef set; emitting UNDEF placeholders (EXPERIMENTAL)\n");
+        }
+
         if (do64) {
             u8 *txt = r64.size ? _code64 : (u8*)0;
             ElfSym _es64[2] = {
@@ -1730,6 +1811,8 @@ static i32 apkc_main(i32 argc, char **argv) {
         if (a[0]=='-'&&a[1]=='3'&&a[2]=='2'&&a[3]==0) { do64=0; do32=1; continue; }
         if (a[0]=='-'&&a[1]=='b'&&a[2]=='o') { do64=1; do32=1; continue; }
         if (_str_eq(a,"-lang") && i+1<argc) { lang_override=argv[++i]; continue; }
+        if (_str_eq(a,"--allow-undef") || _str_eq(a,"--allow-nop-placeholder")) { _apkc_allow_undef=1; continue; }
+        if (_str_eq(a,"--strict")) { _apkc_allow_undef=0; continue; }
         if (a[0]!='-') { inpath=a; continue; }
         pr_err("unknown flag: "); pr_err(a); pr_err("\n");
     }
@@ -1744,6 +1827,8 @@ static i32 apkc_main(i32 argc, char **argv) {
         pr_err("  -t <sdk>    targetSdkVersion\n");
         pr_err("  -64/-32/-both  architecture filter\n");
         pr_err("  -lang <name>   force language (asm/c/cpp/rs/kt/java/py/sh/pl/js/php/jsx)\n");
+        pr_err("  --strict       fail build on unknown mnemonic (default)\n");
+        pr_err("  --allow-undef  emit UNDEF placeholder for unknown mnemonic (experimental)\n");
         pr_err("  (auto-detected from file extension otherwise)\n");
         return 1;
     }

@@ -31,3 +31,10 @@ Apkc/proofs/out/*.sig
 Apkc/proofs/out/*.so
 Apkc/proofs/out/apkc
 Apkc/proofs/out/apkc.o
+
+# Reproducible proof-run binaries (text custody evidence is committed, blobs are not)
+Apkc/proofs/runs/**/*.o
+Apkc/proofs/runs/**/verbovivo_ci
+Apkc/proofs/runs/**/*.svg
+verbovivo_ci
+javac.*.args
