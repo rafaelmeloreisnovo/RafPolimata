@@ -9,6 +9,8 @@
 # What this proves (PASS) and what it does NOT (TOKEN_VAZIO):
 #   PASS  — Apkc/apkc.c compiles+links to a valid AArch64 ELF and to an ARM32
 #           relocatable object, from committed source, with logged provenance.
+#   REPRO — Two independent builds of the same source/commit produce identical
+#           SHA-256 hashes (determinism gate; CI exits nonzero on mismatch).
 #   TZ    — running apkc to *generate an APK* (and the arm64-v8a .so inside it,
 #           L4 on-device) requires an ARM runtime/Termux/qemu; not done here.
 #
@@ -24,10 +26,13 @@ SHORT="$(git rev-parse --short HEAD 2>/dev/null || echo TOKEN_VAZIO)"
 DATE_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 HOST_ARCH="$(uname -m)"
 CLANGV="$(clang --version 2>/dev/null | head -1 || echo 'clang: TOKEN_VAZIO')"
+LLDV="$(ld.lld --version 2>/dev/null | head -1 || lld --version 2>/dev/null | head -1 || echo 'lld: TOKEN_VAZIO')"
 
 A64_ELF="/tmp/apkc_a64.elf"
+A64_ELF2="/tmp/apkc_a64_run2.elf"
 A64_OBJ="/tmp/apkc_a64.o"
 A32_OBJ="/tmp/apkc_a32.o"
+A32_OBJ2="/tmp/apkc_a32_run2.o"
 SRC="Apkc/apkc.c"
 CC_BASE="clang -ffreestanding -nostdlib -nostdinc -I Apkc"
 
@@ -44,17 +49,18 @@ TRANSCRIPT="$OUT/apkc-compile.txt"
   echo "commit:      ${COMMIT}"
   echo "host_arch:   ${HOST_ARCH}"
   echo "toolchain:   ${CLANGV}"
+  echo "lld:         ${LLDV}"
   echo "source:      ${SRC}"
 } >> "$TRANSCRIPT"
 
 # 1) AArch64 freestanding ELF (prefer a fully-linked executable via lld)
 if $CC_BASE -target aarch64-linux-gnu -Wl,-e,_start -fuse-ld=lld "$SRC" -o "$A64_ELF" 2>/tmp/_l64.err; then
-    SHA="$(sha256sum "$A64_ELF" | awk '{print $1}')"
+    SHA1="$(sha256sum "$A64_ELF" | awk '{print $1}')"
     HDR="$(readelf -h "$A64_ELF" | grep -E 'Class|Data|Machine|Type|Entry' | sed 's/^/    /')"
     {
       echo ""
       echo "[A64-ELF] command: ${CC_BASE} -target aarch64-linux-gnu -Wl,-e,_start -fuse-ld=lld ${SRC} -o apkc_a64.elf"
-      echo "[A64-ELF] sha256:  ${SHA}"
+      echo "[A64-ELF] sha256:  ${SHA1}"
       echo "[A64-ELF] readelf:"
       echo "$HDR"
       echo "[A64-ELF] STATUS:  PASS (AArch64 ELF built from committed source)"
@@ -62,6 +68,24 @@ if $CC_BASE -target aarch64-linux-gnu -Wl,-e,_start -fuse-ld=lld "$SRC" -o "$A64
     { echo "# apkc compiler binary — AArch64 ELF (source->binary L1), ${DATE_UTC}, commit ${SHORT}";
       readelf -h "$A64_ELF"; } > "$OUT/apkc-binary-arm64.txt"
     PASS=$((PASS+1))
+    # Determinism gate: rebuild and compare SHA-256; CI exits nonzero on mismatch.
+    if $CC_BASE -target aarch64-linux-gnu -Wl,-e,_start -fuse-ld=lld "$SRC" -o "$A64_ELF2" 2>/dev/null; then
+        SHA2="$(sha256sum "$A64_ELF2" | awk '{print $1}')"
+        if [ "$SHA1" = "$SHA2" ]; then
+            echo "[REPRO-A64] STATUS: PASS (run1 sha256 == run2 sha256; build is deterministic)" >> "$TRANSCRIPT"
+            PASS=$((PASS+1))
+        else
+            {
+              echo "[REPRO-A64] STATUS: FAIL (non-deterministic build)"
+              echo "[REPRO-A64] run1: ${SHA1}"
+              echo "[REPRO-A64] run2: ${SHA2}"
+            } >> "$TRANSCRIPT"
+            log "FAIL: A64 ELF build is non-deterministic (SHA-256 differs between run1 and run2)"; exit 1
+        fi
+    else
+        echo "[REPRO-A64] STATUS: TOKEN_VAZIO (second compile failed)" >> "$TRANSCRIPT"
+        TZ=$((TZ+1))
+    fi
 else
     echo "[A64-ELF] STATUS:  TOKEN_VAZIO (link failed; see below)" >> "$TRANSCRIPT"
     head -3 /tmp/_l64.err >> "$TRANSCRIPT"
@@ -75,12 +99,12 @@ fi
 
 # 2) ARM32 relocatable object (ELF32 ARM) — structural proof of A32 codegen path
 if $CC_BASE -target arm-linux-gnueabihf -c "$SRC" -o "$A32_OBJ" 2>/tmp/_a32.err; then
-    SHA="$(sha256sum "$A32_OBJ" | awk '{print $1}')"
+    SHA1="$(sha256sum "$A32_OBJ" | awk '{print $1}')"
     HDR="$(readelf -h "$A32_OBJ" | grep -E 'Class|Data|Machine|Type' | sed 's/^/    /')"
     {
       echo ""
       echo "[A32-OBJ] command: ${CC_BASE} -target arm-linux-gnueabihf -c ${SRC} -o apkc_a32.o"
-      echo "[A32-OBJ] sha256:  ${SHA}"
+      echo "[A32-OBJ] sha256:  ${SHA1}"
       echo "[A32-OBJ] readelf:"
       echo "$HDR"
       echo "[A32-OBJ] STATUS:  PASS (ELF32 ARM object built from committed source)"
@@ -88,6 +112,24 @@ if $CC_BASE -target arm-linux-gnueabihf -c "$SRC" -o "$A32_OBJ" 2>/tmp/_a32.err;
     { echo "# apkc compiler binary — ELF32 ARM object (L1), ${DATE_UTC}, commit ${SHORT}";
       readelf -h "$A32_OBJ"; } > "$OUT/apkc-binary-arm32.txt"
     PASS=$((PASS+1))
+    # Determinism gate: rebuild and compare SHA-256; CI exits nonzero on mismatch.
+    if $CC_BASE -target arm-linux-gnueabihf -c "$SRC" -o "$A32_OBJ2" 2>/dev/null; then
+        SHA2="$(sha256sum "$A32_OBJ2" | awk '{print $1}')"
+        if [ "$SHA1" = "$SHA2" ]; then
+            echo "[REPRO-A32] STATUS: PASS (run1 sha256 == run2 sha256; build is deterministic)" >> "$TRANSCRIPT"
+            PASS=$((PASS+1))
+        else
+            {
+              echo "[REPRO-A32] STATUS: FAIL (non-deterministic build)"
+              echo "[REPRO-A32] run1: ${SHA1}"
+              echo "[REPRO-A32] run2: ${SHA2}"
+            } >> "$TRANSCRIPT"
+            log "FAIL: A32 object build is non-deterministic (SHA-256 differs between run1 and run2)"; exit 1
+        fi
+    else
+        echo "[REPRO-A32] STATUS: TOKEN_VAZIO (second compile failed)" >> "$TRANSCRIPT"
+        TZ=$((TZ+1))
+    fi
 else
     echo "[A32-OBJ] STATUS:  TOKEN_VAZIO (compile failed)" >> "$TRANSCRIPT"
     TZ=$((TZ+1))
