@@ -1,0 +1,37 @@
+# Repository Universe Matrix
+
+Esta matriz é a camada navegável de evidência do RafPolimata. Ela não transforma ausência de ferramenta, device, dataset, log ou execução em sucesso: usa `TOKEN_VAZIO`, `SKIPPED`, `PASS_LIMITED` ou `DEVICE_REQUIRED` quando a prova ainda não existe.
+
+Invariante: origem → estrutura → integridade → execução → métrica → evidência → governança → rollback.
+
+Fonte automática: `python3 scripts/emit_repository_universe_matrix.py` gera `results/repository_universe_matrix.json` com varredura stdlib, diretórios esperados, arquivos RAF, workflows, dados/resultados e links Markdown locais.
+
+| Caminho | Tipo | Função | Estado atual | Invariante protegida | Gate ou comando de validação | Evidência existente | Lacuna | Próxima ação | Risco | Rollback/Mitigação |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `README.md` | documento | Entrada principal e navegação curta | REFERENCE | claim↔evidência | `test -f README.md` | Presente | Pode conter claims resumidos sem logs completos | Manter links para matriz e trava de evidência | Leitor confundir hipótese com prova | Rebaixar claim para `TOKEN_VAZIO` ou apontar artefato |
+| `docs/` | diretório | Governança, protocolos, arquitetura, jurídico/tecnológico | REFERENCE | semântica↔governança | `python3 scripts/audit_repository_structure.py --depth 5` | Presente | Nem todo documento é prova runtime | Classificar analogia/hipótese/prova | Claim forte documental | Trava `docs/CLAIM_EVIDENCE_LOCK.md` |
+| `configs/` | diretório | Contratos canônicos YAML | CONFIG | configuração auditável | `python3 scripts/validate_two_cycle_omega.py` | Presente | Validação semântica parcial | Expandir campos de evidência quando necessário | Drift entre docs e config | Reverter config ou marcar lacuna |
+| `scripts/` | diretório | Geração, auditoria, ApkC, CI | RUNTIME | execução reproduzível | `python3 scripts/emit_repository_universe_matrix.py` | Scripts presentes | Ferramentas externas podem faltar | Registrar `SKIPPED` em vez de PASS | Gate falso por ambiente incompleto | Falhar só em erro estrutural crítico |
+| `Benchmark/` | diretório | Benchmarks e headers de medição | RUNTIME | métrica exige baseline | `bash Benchmark/build.sh` quando aplicável | Código presente | Hardware/flags/raw logs podem faltar | Registrar hardware, flags, mediana/p95/p99 | Otimização sem medição | Rebaixar para `PASS_LIMITED` |
+| `Apkc/` | diretório | Micro-toolchain Android/ApkC | DEVICE_REQUIRED | sem heap oculto; runtime Android exige logcat | `bash scripts/apkc_validate.sh` | Artefatos e provas parciais existentes | Install+launch+logcat podem faltar | Seguir `docs/APKC_ANDROID_RUNTIME_PROOF_PLAN.md` | PASS falso de runtime | `DEVICE_REQUIRED`/`TOKEN_VAZIO` |
+| `data/` | diretório | Entradas versionadas | DATA | dataset com origem/hash | `find data -type f` | `data/pk_observado.csv` | Hash/método por dataset pode faltar | Registrar hashes em relatórios | Claim científico sem dataset | Marcar claim `TOKEN_VAZIO` |
+| `results/` | diretório | Saídas de experimentos | RESULT | resultado precisa comando/raw log | `find results -type f` | JSONs presentes, incluindo esta matriz | Raw logs nem sempre presentes | Acoplar comando, flags e ambiente | Artefato órfão | Invalidar resultado sem cadeia |
+| `tools/` | diretório | Ferramentas auxiliares | RUNTIME | ferramentas auditáveis | `find tools -maxdepth 5 -type f` | Código presente | Cobertura de teste variável | Adicionar smoke tests graduais | Regressão por ferramenta periférica | Reverter ferramenta isolada |
+| `.github/workflows/` | diretório | CI e gates comuns | CONFIG | CI como compilador de evidências | `python3 scripts/emit_repository_universe_matrix.py` | `ci.yml` presente | Device Android não deve ser exigido no CI comum | Manter gates device-required separados | CI virar falso runtime PASS | Gate manual/device-required |
+| `RAF_INDEX.md` | documento | Índice 1:1 dos métodos 001-056 | CONFIG | relação 1:1 índice↔arquivos | `python3 scripts/emit_repository_universe_matrix.py` | 56 entradas 001-056 | Arquivos 057-060 são extensão fora do escopo 56 | Decidir se haverá índice separado | Quebra de rastreabilidade | Não promover extensão sem índice |
+| `RAF_001_*.c`–`RAF_056_*.c` | código C | Métodos RAF canônicos | RUNTIME | compilar sem declarar runtime falso | `bash RAF_host_syntax_check.sh` | Arquivos presentes | Runtime/hardware por método em `TOKEN_VAZIO` quando não executado | Usar `docs/RAF_METHODS_STATUS.md` | Hardware específico ausente | Reverter método/índice juntos |
+| `RAF_rafaelia_common.h` | código C | Cabeçalho comum dos métodos | RUNTIME | ABI comum e compilação separada | `gcc -c -I. RAF_001_acesso_direto_a_ddrx_portx_pinx.c` | Presente | Runtime não provado por header | Manter compatibilidade | Quebra ampla de build | Rollback imediato do header |
+| `raf_compile.h` | código C | Interface do compilador local | RUNTIME | contrato de compilação | `gcc -std=c11 -Wall -Wextra -Werror ...` | Presente | Provas de IR/lowering dependem de testes | Registrar entrada→output | Claim de compilador excessivo | Rebaixar para `CLAIM_COMPILE` |
+| `raf_precomp.c` | código C | Núcleo/precompilação do compilador local | RUNTIME | build estrito e smoke test | `./raf_compile --help` | Presente | Cobertura formal incompleta | Ampliar testes de lowering | Regressão silenciosa | Build estrito em CI |
+| `docs/PROTOCOLO_CANONICO_COHERENCIA.md` | documento | Protocolo de coerência | CONFIG | metáfora→variável/protocolo/gate | `python3 scripts/validate_coherence_protocol.py` | Documento e validador presentes | Não substitui prova runtime | Cruzar claims com lock | Mistura hipótese/prova | Marcar analogias explicitamente |
+| `docs/MATRIZ_JURIDICO_TECNOLOGICA.md` | documento | Governança jurídica/tecnológica | REFERENCE | governança e limites jurídicos | revisão documental | Presente | Não é parecer jurídico | Manter aviso e evidência separada | Claim legal indevido | Solicitar revisão qualificada |
+| `docs/APKC_PROTOCOL.md` e `docs/APKC_*` | documentos | Protocolos ApkC | AUDIT | device/logcat para runtime | `bash scripts/apkc_validate.sh` | Provas parciais | Runtime Android pode estar `TOKEN_VAZIO` | Executar plano de proof chain | Confundir APK válido com app executado | `DEVICE_REQUIRED` |
+| `RAF_BENCHMARK_MATRIX.md` / `Benchmark/*` | documento/código | Benchmarks e matriz | AUDIT | benchmark exige baseline | comando+hardware+flags+raw log | Presente | Mediana/p95/p99 podem faltar | Rodar rotina operacional | Otimização não falsificável | Rebaixar claim |
+| `proofs/` / `Apkc/proofs/` | artefatos | Cadeia de custódia e provas | RESULT | artefato ligado a comando | manifestos e scripts | Presente | Device real nem sempre disponível | Produzir artifacts esperados | Evidência incompleta | Não declarar PASS |
+
+## Estados `TOKEN_VAZIO` / limites atuais
+
+- Runtime Android/NativeActivity permanece `TOKEN_VAZIO` sem install + launch + logcat do device.
+- Retorno 0 dos métodos RAF permanece `TOKEN_VAZIO` até execução registrada por método/ambiente.
+- Benchmarks sem hardware, flags, baseline, mediana/p95/p99 e raw log são no máximo `PASS_LIMITED`.
+- Arquivos `RAF_057_*.c` a `RAF_060_*.c` existem como extensão fora da relação canônica 001-056; não entram no PASS 1:1 do índice.
