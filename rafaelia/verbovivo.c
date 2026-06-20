@@ -22,12 +22,18 @@
  * phi_ethica = (1-H)*C: 0 = pure noise, Q16_ONE = perfect coherence.
  * RAFCODE-Φ-∆RafaelVerboΩ | Ω=Amor | FIAT LUX */
 
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
+
+#ifndef VERBOVIVO_NO_HEAP
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
-#include <math.h>
 #include <time.h>
+#include <math.h>
+#endif
+/* sqrtf / expf / fabsf: in VERBOVIVO_NO_HEAP mode these are provided as
+ * macros by trinity_core.h (included via verbovivo.h below). */
 
 #include "verbovivo.h"
 #include "fiber_relmat.h"
@@ -148,7 +154,9 @@ void vv_init(VerbVivoState *vv) {
     memset(vv,0,sizeof(*vv));
     memcpy(vv->signature,"RAFAELIA_VV_V1",14);
     vv->compliance_flags = VV_ISO_27001|VV_ISO_25010|VV_NIST_800_53|VV_IEEE_12207;
+#ifndef VERBOVIVO_NO_HEAP
     vv->ctrl.start_time  = clock();
+#endif
     vv_u32 seed = VV_SEED;
     for (int i=0;i<VV_DIM;i++)
         vv->W_proj[i] = ((vv_f32)(_rng(&seed)%100u)/100.0f) - 0.5f;
@@ -197,6 +205,7 @@ static void _process_chunk(VerbVivoState *vv, const vv_u8 *buf, vv_sz len, vv_u3
     vv->chunk_count++;
 }
 
+#ifndef VERBOVIVO_NO_HEAP
 void vv_scan(VerbVivoState *vv, FILE *stream, void *relmat) {
     if (!vv||!stream) return;
     static vv_u8 buf[VV_CHUNK];
@@ -204,6 +213,7 @@ void vv_scan(VerbVivoState *vv, FILE *stream, void *relmat) {
     while ((n=fread(buf,1,VV_CHUNK,stream))>0)
         _process_chunk(vv,buf,n,cid++,(FiberRelMat*)relmat);
 }
+#endif /* VERBOVIVO_NO_HEAP */
 
 void vv_scan_buf(VerbVivoState *vv, const vv_u8 *buf, vv_sz len, void *relmat) {
     if (!vv||!buf||!len) return;
@@ -215,6 +225,7 @@ void vv_scan_buf(VerbVivoState *vv, const vv_u8 *buf, vv_sz len, void *relmat) {
     }
 }
 
+#ifndef VERBOVIVO_NO_HEAP
 void vv_audit(const VerbVivoState *vv) {
     if (!vv) return;
     double elapsed=(double)(clock()-vv->ctrl.start_time)/(double)CLOCKS_PER_SEC;
@@ -242,6 +253,9 @@ void vv_audit(const VerbVivoState *vv) {
     fprintf(stderr,"  SVG requests : %lu\n", (unsigned long)vv->ctrl.svg_requests);
 }
 
+#endif /* VERBOVIVO_NO_HEAP — vv_audit */
+
+#ifndef VERBOVIVO_NO_HEAP
 void vv_svg(const VerbVivoState *vv) {
     if (!vv) return;
     ((VerbVivoState*)vv)->ctrl.svg_requests++;
@@ -284,6 +298,7 @@ void vv_svg(const VerbVivoState *vv) {
            "blue=novel  green=familiar  size=attention</text>\n");
     printf("</svg>\n");
 }
+#endif /* VERBOVIVO_NO_HEAP — vv_svg */
 
 /* ── vv_recall: geometric attention-based engram retrieval ─────────────── */
 /*
@@ -343,8 +358,9 @@ int vv_recall(const VerbVivoState *vv,
     return out_count;
 }
 
+#ifndef VERBOVIVO_NO_HEAP
 /* ══════════════════════════════════════════════════════════════════════════
- * LAYER 2 — T^7 toroid pipeline (verbovivo_main)
+ * LAYER 2 — T^7 toroid pipeline (verbovivo_main) — hosted only
  * ══════════════════════════════════════════════════════════════════════════ */
 
 #define HDC_DIM 1024
@@ -495,9 +511,10 @@ int verbovivo_main(const char *apk_path, const char *svg_out) {
 
     return 0;
 }
+#endif /* VERBOVIVO_NO_HEAP — Layer 2 T^7 */
 
 /* ── CLI wrapper (build with -DVERBOVIVO_MAIN) ──────────────────────────── */
-#ifdef VERBOVIVO_MAIN
+#if defined(VERBOVIVO_MAIN) && !defined(VERBOVIVO_NO_HEAP)
 int main(int argc, char **argv) {
     if (argc >= 2 && argv[1][0] != '-') {
         /* T^7 mode: verbovivo <apk_or_elf> [out.svg] */

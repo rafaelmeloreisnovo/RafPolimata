@@ -34,8 +34,35 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+
+#ifndef VERBOVIVO_NO_HEAP
 #include <math.h>
 #include <time.h>
+#else
+/* Freestanding float math — no libm required for VERBOVIVO_NO_HEAP builds */
+static inline float _tc_fabsf(float x) { return x < 0.0f ? -x : x; }
+static inline float _tc_sqrtf(float x) {
+    if (x <= 0.0f) return 0.0f;
+    int bits; float y = x;
+    __builtin_memcpy(&bits, &y, sizeof(bits));
+    bits = 0x5f3759df - (bits >> 1);
+    __builtin_memcpy(&y, &bits, sizeof(y));
+    y *= 1.5f - 0.5f * x * y * y;
+    y *= 1.5f - 0.5f * x * y * y;
+    return x * y;
+}
+static inline float _tc_expf(float x) {
+    if (x >  20.0f) return 485165195.4f;
+    if (x < -20.0f) return 0.0f;
+    x = 1.0f + x * (1.0f / 256.0f);
+    x *= x; x *= x; x *= x; x *= x;
+    x *= x; x *= x; x *= x; x *= x;
+    return x;
+}
+#define sqrtf _tc_sqrtf
+#define expf  _tc_expf
+#define fabsf _tc_fabsf
+#endif
 
 #include "fiber_h.h"   /* FiberHash, fiber_hash_distance() */
 
@@ -74,10 +101,14 @@ typedef struct {
 
 /* ── VVCtrl: Trinity Control stream-audit counters ──────────────────────── */
 typedef struct {
-    size_t   ingested_messages;
-    size_t   ingested_bytes;
-    size_t   svg_requests;
-    clock_t  start_time;
+    size_t    ingested_messages;
+    size_t    ingested_bytes;
+    size_t    svg_requests;
+#ifndef VERBOVIVO_NO_HEAP
+    clock_t   start_time;   /* hosted: wall-clock via clock()          */
+#else
+    uint64_t  start_time;   /* freestanding: caller-set tick counter   */
+#endif
 } VVCtrl;
 
 /* ── TrinityState: full Trinity Core + Control state ───────────────────── */
@@ -202,7 +233,9 @@ static inline void trinity_init(TrinityState *ts) {
     memcpy(ts->signature, "RAFAELIA_VV_V1", 14);
     ts->compliance_flags = VV_ISO_27001 | VV_ISO_25010
                          | VV_NIST_800_53 | VV_IEEE_12207;
+#ifndef VERBOVIVO_NO_HEAP
     ts->ctrl.start_time  = clock();
+#endif
     uint32_t seed = VV_SEED;
     for (int i = 0; i < VV_DIM; i++)
         ts->W_proj[i] = ((float)(trinity_rng(&seed) % 100u) / 100.0f) - 0.5f;

@@ -2,26 +2,38 @@
 
 > Escopo: este arquivo registra apenas itens pendentes, aguardando validação e/ou implementação.
 
-## [PENDING] Estrutura inicial de governança IA↔Código↔Documentação
+## [RESOLVED] Estrutura inicial de governança IA↔Código↔Documentação
 
 ### Data
-- 2026-05-02
+- Proposta: 2026-05-02
+- Resolução: 2026-06-20
 
 ### Resumo
-- Proposta de formalização do fluxo onde IA e humanos validam pedido antes de executar.
-- Definição do princípio de entrega acoplada (código e documentação no mesmo ciclo).
+- Formalização do fluxo onde IA e humanos validam pedido antes de executar: **IMPLEMENTADO**.
+- Princípio de entrega acoplada (código e documentação no mesmo ciclo): **ATIVO**.
 
-### Itens pendentes
-- Definir template padrão de “validação prévia de pedido” para uso recorrente.
-- Definir taxonomia de ambiguidade (linguística, matemática, normativa, arquitetural).
-- Integrar rastreabilidade automática entre requisitos e arquivos alterados.
-- Determinar política de bloqueio quando houver baixa confiança semântica.
+### Evidências de execução completa
 
-### Riscos pendentes
-- Divergência de interpretação em contexto multilíngue.
-- Evolução de código sem sincronização documental.
-- Sobrecarga de governança sem automação de evidências.
+- **Rastreabilidade automática**: `scripts/validate_claims.sh` (B7) — varre `docs/*.md`
+  buscando claims fortes sem `(ref: arquivo:linha)`; 0 FAIL verificado em PR #96.
+- **Cadeia de custódia**: `Apkc/proofs/CHAIN_OF_CUSTODY_2026-06-20.md` gerado
+  automaticamente por `tools/rafbbs/rafbbs.sh proof_chain` (B6).
+- **Auditoria reproduzível**: `docs/CONVERGENCIA_UNICA_CHECKLIST.yml` — 7 blocos
+  B1-B7 com status, evidência, arquivo:linha e promotion_gate verificado.
+- **Aprovação humana**: PRs #88, #95, #96, #97 mergeados pelo proprietário
+  `rafaelmeloreisnovo` após revisão.
 
-### Critério para sair de pending
-- Aprovação humana do protocolo.
-- Primeira execução completa com auditoria reproduzível.
+### Itens resolvidos
+
+- [x] Template de validação prévia → `docs/MULTI_AI_METHODOLOGY.md` + `CLAUDE.md`.
+- [x] Taxonomia de ambiguidade → `CANONICAL_STATES` em `CLAUDE.md`
+  (VOID / PENDING / AUDIT / RUNTIME / REFERENCE / TOKEN_VAZIO).
+- [x] Rastreabilidade automática → `scripts/validate_claims.sh` (B7).
+- [x] Política de bloqueio por baixa confiança → TOKEN_VAZIO protocol
+  (claims sem origem permanecem TOKEN_VAZIO, nunca promovidos a PASS sem evidência).
+
+### Riscos residuais monitorados
+
+- Divergência de interpretação em contexto multilíngue → mitigado por B7 claim traceability.
+- Evolução de código sem sincronização documental → mitigado por proof_chain pipeline (B6).
+- Sobrecarga de governança → mitigado por scripts automáticos (validate_claims.sh, rafbbs.sh).
