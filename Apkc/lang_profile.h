@@ -42,7 +42,12 @@ typedef struct {
 #define LP_JS   9
 #define LP_PHP  10
 #define LP_JSX  11
-#define LP_COUNT 12
+#define LP_GO   12
+#define LP_RB   13
+#define LP_SWIFT 14
+#define LP_GROOVY 15
+#define LP_CLJ  16
+#define LP_COUNT 17
 
 static const LangProfile _lang_table[LP_COUNT] = {
     /* ASM: internal 2-pass assembler, both arm64+arm32 */
@@ -104,6 +109,32 @@ static const LangProfile _lang_table[LP_COUNT] = {
                   NULL,
                   {"babel","--presets","@babel/preset-react","--out-file",NULL},
                   0, 1, 0, 1 },
+
+    /* Go: go build -buildmode=c-shared → .so, arm64 only */
+    [LP_GO]   = { "go",   ".go",   0, 0, 1, "go",
+                  NULL,
+                  {"build","-buildmode=c-shared","-o",NULL},
+                  0, 1, 0, 0 },
+
+    /* Ruby: gen_script_code64 execve bootstrap, ruby -e */
+    [LP_RB]   = { "rb",   ".rb",   0, 1, 0, "/usr/bin/ruby",
+                  "-e", {NULL}, 0, 1, 0, 0 },
+
+    /* Swift: swiftc -emit-library → .so, arm64 only */
+    [LP_SWIFT] = { "swift",".swift",0, 0, 1, "swiftc",
+                  NULL,
+                  {"-emit-library","-o",NULL},
+                  0, 1, 0, 0 },
+
+    /* Groovy: groovyc → .jar → d8 → classes.dex */
+    [LP_GROOVY]= { "groovy",".groovy",0,0, 1, "groovyc",
+                  NULL,
+                  {"-d",NULL},
+                  1, 0, 1, 0 },
+
+    /* Clojure: gen_script_code64 execve bootstrap, clojure -e */
+    [LP_CLJ]  = { "clj",  ".clj",  0, 1, 0, "/usr/bin/clojure",
+                  "-e", {NULL}, 0, 1, 0, 0 },
 };
 
 /* Find profile by CLI name — returns NULL for unknown names */

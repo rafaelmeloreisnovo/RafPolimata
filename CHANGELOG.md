@@ -1,5 +1,34 @@
 # Changelog
 
+## v1.0.0 — 2026-06-20
+
+Release de maturidade completa: todos os métodos implementados, todas as estratégias
+evidenciadas, checklist 96/96 verificado.
+
+### Adicionado
+
+- **56 métodos M001–M056** implementados, todos compilando e host-runnable com selftest
+  integrado (`scripts/raf_baseline_measure.sh`).
+- **40 estratégias S01–S40** evidenciadas em `RAF_CHECKLIST_96_ITEMS.md`.
+- Artefatos arquiteturais novos: `docs/arch/` (diagramas de fluxo do pipeline).
+- Pacotes educacionais e industriais: `packages/educational/`, `packages/industrial/`.
+- Script de medição de baseline: `scripts/raf_baseline_measure.sh`.
+- Notas de release: `RELEASE_NOTES.md` v1.0.0.
+
+### PRs mergeados
+
+- **#80** — Reconciliação do checklist RAF_CHECKLIST_96_ITEMS.md.
+- **#83** — 56 métodos M (M001–M056) + estratégias S16–S28.
+- **#84** — Checklist 96/96 completo: todas as lacunas fechadas.
+
+### Invariantes confirmadas
+
+- Zero `malloc`/`calloc`/`free` em `Apkc/` (freestanding preservado).
+- 56/56 métodos com `.text` < 4096 bytes (medido via `raf_binary_size_test.sh`).
+- CRC-32 header AVR = `0x5A9F075B` (verificado em `ci/reports/baseline_measurements.txt`).
+
+---
+
 ## v0.1.0-apkc-termux-arm32-proof — 2026-06-14
 
 Primeira release funcional provada do ApkC.
