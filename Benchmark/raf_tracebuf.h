@@ -6,5 +6,6 @@
 #include "Benchmark/raf_trace_hex.h"
 #include "Benchmark/raf_trace_event.h"
 #include "Benchmark/raf_trace_emit.h"
+#include "Benchmark/raf_trace_sink.h"
 
 #endif

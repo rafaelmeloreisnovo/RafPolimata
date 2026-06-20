@@ -61,6 +61,15 @@ jobs:
       - name: Audit ApkC freestanding invariants
         run: bash scripts/ci_freestanding_audit.sh
 
+      - name: RAF TraceBuf freestanding smoke gate
+        run: |
+          gcc -std=c11 -Wall -Wextra -Werror \
+            -ffreestanding -fno-builtin -fno-stack-protector \
+            -fvisibility=hidden -Os -I. \
+            tools/raf_tracebuf_smoke.c \
+            -o build_raf_tracebuf_smoke
+          ./build_raf_tracebuf_smoke
+
       - name: ARM64 encoder golden tests
         run: python3 tests/test_arm64_encoders.py
 
