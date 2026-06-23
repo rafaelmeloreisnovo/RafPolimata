@@ -1,1 +1,2 @@
-command: clang --target=aarch64-linux-android21 -std=c11 -Wall -Wextra -Wno-unused-function -c apkc.c -o /home/user/RafPolimata/Apkc/proofs/out/apkc.o
+TOKEN_VAZIO: no source-to-binary compile transcript was provided. Uploaded binary apkc exists and hashes to 3d2ac064c26b8ca5be02a74238f877c3e0f9fb1d16dd4bc7da7f0e758042723c, but the exact compiler command, source commit and build environment for that binary were not present in the uploaded evidence.
+
