@@ -351,3 +351,41 @@ apksigner verify --verbose --print-certs out/hello-signed.apk
 ```sh
 cmd package list packages | grep com.rafael.teste
 ```
+
+---
+
+## Matriz de Suporte Arquitetura × Linguagem (B2 — 2026-06-20)
+
+Tabela derivada diretamente de `Apkc/lang_profile.h` (_lang_table, LP_COUNT=17).
+
+| Lang | ID | Pipeline | ARM64 | ARM32 | Ferramenta externa | Saída |
+|------|:--:|----------|:-----:|:-----:|-------------------|-------|
+| asm | LP_ASM=0 | ASM_INTERNAL | ✓ | ✓ | nenhuma | lib/arm64-v8a/ + lib/armeabi-v7a/ |
+| c | LP_C=1 | NATIVE_SO | ✓ | — | clang aarch64-linux-android | lib/arm64-v8a/ |
+| cpp | LP_CPP=2 | NATIVE_SO | ✓ | — | clang++ aarch64-linux-android | lib/arm64-v8a/ |
+| rs | LP_RS=3 | NATIVE_SO | ✓ | — | rustc aarch64-linux-android | lib/arm64-v8a/ |
+| kt | LP_KT=4 | DEX (d8) | ✓ | ✓ | kotlinc + d8 | classes.dex |
+| java | LP_JAVA=5 | DEX (d8) | ✓ | ✓ | javac + d8 | classes.dex |
+| py | LP_PY=6 | SCRIPT_BOOTSTRAP | ✓ | — | /usr/bin/python3 (runtime) | lib/arm64-v8a/ |
+| sh | LP_SH=7 | SCRIPT_BOOTSTRAP | ✓ | — | /bin/sh (runtime) | lib/arm64-v8a/ |
+| pl | LP_PL=8 | SCRIPT_BOOTSTRAP | ✓ | — | /usr/bin/perl (runtime) | lib/arm64-v8a/ |
+| js | LP_JS=9 | SCRIPT_BOOTSTRAP | ✓ | — | /usr/bin/node (runtime) | lib/arm64-v8a/ |
+| php | LP_PHP=10 | SCRIPT_BOOTSTRAP | ✓ | — | /usr/bin/php (runtime) | lib/arm64-v8a/ |
+| jsx | LP_JSX=11 | JSX_BOOTSTRAP | ✓ | — | npx/babel + node (runtime) | lib/arm64-v8a/ |
+| go | LP_GO=12 | NATIVE_SO | ✓ | — | go build -buildmode=c-shared | lib/arm64-v8a/ |
+| rb | LP_RB=13 | SCRIPT_BOOTSTRAP | ✓ | — | /usr/bin/ruby (runtime) | lib/arm64-v8a/ |
+| swift | LP_SWIFT=14 | NATIVE_SO | ✓ | — | swiftc -emit-library | lib/arm64-v8a/ |
+| groovy | LP_GROOVY=15 | DEX (d8) | ✓ | ✓ | groovyc + d8 | classes.dex |
+| clj | LP_CLJ=16 | SCRIPT_BOOTSTRAP | ✓ | — | /usr/bin/clojure (runtime) | lib/arm64-v8a/ |
+
+### Legenda
+
+- **ASM_INTERNAL**: montador ARM de 2 passes embutido no ApkC (nenhuma ferramenta externa necessária)
+- **NATIVE_SO**: fork+exec do compilador nativo → ELF64 .so
+- **DEX**: fork+exec compilador JVM → d8 → classes.dex (JVM runtime independente de ABI nativa)
+- **SCRIPT_BOOTSTRAP**: gen_script_code64() gera ELF64 .so que executa o intérprete passando o fonte inline
+- **JSX_BOOTSTRAP**: Babel pré-processa JSX → JS → gen_script_code64() com Node.js
+
+### Nota sobre ARM32
+
+Somente `asm` (ASM_INTERNAL) gera `lib/armeabi-v7a/`. Idiomas DEX (kt/java/groovy) são ABI-neutros por rodarem na JVM. Todos os outros são `arm64_only=1` na tabela.

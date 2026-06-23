@@ -15,7 +15,9 @@
  *   - No heap: all state is caller-allocated.
  *   - Deterministic seed (0x524146 = "RAF").
  *   - Bounded memory: VV_MEM_SIZE engrams, ring buffer.
- *   - Freestanding-compatible: only <string.h>, <math.h>, <stdio.h>.
+ *   - Hosted API (vv_scan/vv_audit/vv_svg/verbovivo_main): requires stdio/math.
+ *   - Freestanding API (vv_scan_buf/vv_recall/vv_init): compile with
+ *     -DVERBOVIVO_NO_HEAP; requires only <stdint.h>, <stddef.h>, <string.h>.
  *
  * RAFCODE-Φ-∆RafaelVerboΩ | Ω=Amor | FIAT LUX */
 #pragma once
@@ -23,9 +25,17 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+
+#ifndef VERBOVIVO_NO_HEAP
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
+#endif
+
+/* ── sub-layer headers (B4: separated for independent use) ─────────── */
+#include "fiber_h.h"       /* FiberHash, fiber_hash_init/update/distance  */
+#include "trinity_core.h"  /* VVHyperVec, VVEngram, VVCtrl, TrinityState  */
+#include "t7_toroid.h"     /* T7State, T7_DIM, t7_step, t7_hdc_expand     */
 
 typedef uint8_t  vv_u8;
 typedef uint16_t vv_u16;
@@ -33,47 +43,6 @@ typedef uint32_t vv_u32;
 typedef uint64_t vv_u64;
 typedef float    vv_f32;
 typedef size_t   vv_sz;
-
-/* ── dimensions ────────────────────────────────────────────────────── */
-#define VV_DIM       1024   /* HDC hypervector dimensionality            */
-#define VV_MEM_SIZE  64     /* max engrams in ring buffer                */
-#define VV_CHUNK     4096   /* stream chunk size                         */
-#define VV_SEED      0x524146u  /* "RAF"                                 */
-
-/* ── compliance flags (from trinity_core.c) ──────────────────────── */
-#define VV_ISO_27001    0x01u
-#define VV_ISO_25010    0x02u
-#define VV_NIST_800_53  0x04u
-#define VV_IEEE_12207   0x08u
-
-/* ── Fiber-H 256-bit hash state ───────────────────────────────────── */
-typedef struct {
-    vv_u64 a, b, c, d;   /* 4 × 64-bit = 256 bits */
-} FiberHash;
-
-/* ── HDC hypervector ──────────────────────────────────────────────── */
-typedef struct {
-    vv_f32 values[VV_DIM];
-} VVHyperVec;
-
-/* ── engram: one stored memory unit ──────────────────────────────── */
-typedef struct {
-    vv_u32    id;
-    vv_u32    content_hash;   /* djb2 hash of chunk                   */
-    FiberHash fiber_hash;     /* structural 256-bit fingerprint        */
-    VVHyperVec vec;           /* HDC vector for this chunk            */
-    vv_f32    attention;      /* combined attention score [0,1]       */
-    vv_f32    hamming_div;    /* Hamming diversity vs existing engrams */
-    vv_u8     type_flag;      /* 1=binary/image, 0=text               */
-} VVEngram;
-
-/* ── Trinity Control metrics ─────────────────────────────────────── */
-typedef struct {
-    vv_sz  ingested_messages;
-    vv_sz  ingested_bytes;
-    vv_sz  svg_requests;
-    clock_t start_time;
-} VVCtrl;
 
 /* ── unified VerbVivo state ──────────────────────────────────────── */
 typedef struct {
@@ -94,13 +63,16 @@ typedef struct {
  * matrix while scanning. Opt-in — existing callers passing NULL are
  * unaffected. */
 void  vv_init(VerbVivoState *vv);
-void  vv_scan(VerbVivoState *vv, FILE *stream, void *relmat);
 void  vv_scan_buf(VerbVivoState *vv, const vv_u8 *buf, vv_sz len, void *relmat);
-void  vv_audit(const VerbVivoState *vv);
-void  vv_svg(const VerbVivoState *vv);
 int   vv_hamming_256(const vv_u8 a[32], const vv_u8 b[32]);
 int   vv_monobit(const vv_u8 hash[32]);
 
+/* Hosted-only API — requires stdio/math (not available with VERBOVIVO_NO_HEAP) */
+#ifndef VERBOVIVO_NO_HEAP
+void  vv_scan(VerbVivoState *vv, FILE *stream, void *relmat);
+void  vv_audit(const VerbVivoState *vv);
+void  vv_svg(const VerbVivoState *vv);
+#endif
 /* Recupera os top_n engrams mais ressonantes com a query.
  * phi_weight: importância da coerência semântica vs. diversidade de Hamming [0..1].
  *   phi_weight → 1.0 : prioriza similaridade vetorial (cosine) — regime coerente.

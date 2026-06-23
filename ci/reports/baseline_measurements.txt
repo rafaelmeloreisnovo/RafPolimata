@@ -1,0 +1,68 @@
+# RAF Baseline Measurements — Compile Time + Code Size
+# Purpose: capture state BEFORE optimization passes (S11)
+# Generated: 2026-06-17T10:03:05Z
+# Host: x86_64 Linux
+# Compiler: gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+# CFLAGS: -std=c11 -O2 -Wall -I.
+#
+# Format: status | method | compile_ns | text_bytes
+#
+PASS | RAF_001_acesso_direto_a_ddrx_portx_pinx | 21130726 | 5
+PASS | RAF_002_toggle_por_escrita_em_pinx | 15775832 | 5
+PASS | RAF_003_timer_ctc_para_evento_periodico | 15304749 | 5
+PASS | RAF_004_timer_fast_pwm_por_registrador | 15080123 | 5
+PASS | RAF_005_timer_phase_correct_pwm_para_controle_motor | 15684914 | 5
+PASS | RAF_006_input_capture_para_medir_pulso | 15896692 | 12
+PASS | RAF_007_output_compare_para_gerar_onda_sem_cpu | 15453002 | 5
+PASS | RAF_008_adc_free_running | 16352871 | 5
+PASS | RAF_009_adc_com_oversampling | 18676094 | 29
+PASS | RAF_010_adc_com_media_movel_inteira | 24396206 | 223
+PASS | RAF_011_adc_com_filtro_iir_fixed_point | 20705473 | 99
+PASS | RAF_012_uart_polling_minimo | 16087567 | 5
+PASS | RAF_013_uart_interrupt_driven_com_ring_buffer | 25941816 | 372
+PASS | RAF_014_spi_full_duplex_por_registrador | 17727134 | 5
+PASS | RAF_015_spi_burst_transfer | 17284621 | 19
+PASS | RAF_016_i2c_twi_com_timeout | 17153363 | 7
+PASS | RAF_017_watchdog_como_recuperacao_de_travamento | 18720778 | 21
+PASS | RAF_018_watchdog_como_base_temporal_aproximada | 16506135 | 12
+PASS | RAF_019_sleep_mode_com_wake_por_interrupcao | 19137543 | 5
+PASS | RAF_020_brown_out_flag_como_diagnostico_de_alimentacao | 18106426 | 7
+PASS | RAF_021_gpio_por_mmap | 25218250 | 115
+PASS | RAF_022_gpio_por_dev_gpiomem | 23817166 | 112
+PASS | RAF_023_gpio_por_dev_mem_controlado | 29936219 | 141
+PASS | RAF_024_leitura_de_contador_arm64_cntvct_el0 | 32312397 | 114
+PASS | RAF_025_uso_de_cntfrq_el0_para_converter_ciclos_em_tempo | 19148369 | 118
+PASS | RAF_026_memory_barrier_dmb | 16993216 | 40
+PASS | RAF_027_memory_barrier_dsb | 16674702 | 40
+PASS | RAF_028_memory_barrier_isb | 16658028 | 34
+PASS | RAF_029_spi_por_registrador_bcm | 15746239 | 7
+PASS | RAF_030_i2c_por_registrador_bcm | 16449768 | 7
+PASS | RAF_031_pwm_por_clock_manager | 16563692 | 7
+PASS | RAF_032_dma_control_block_chain | 18381212 | 100
+PASS | RAF_033_dma_circular | 18240036 | 112
+PASS | RAF_034_fifo_pwm_para_audio | 19597500 | 104
+PASS | RAF_035_gpio_event_detect_por_polling_leve | 19847422 | 94
+PASS | RAF_036_afinidade_de_thread_em_linux_android | 22613922 | 106
+PASS | RAF_037_prioridade_de_thread_para_benchmark | 17037822 | 77
+PASS | RAF_038_isolamento_de_nucleo_quando_disponivel | 22974174 | 106
+PASS | RAF_039_medicao_de_p95_e_p99_de_latencia | 26961189 | 282
+PASS | RAF_040_medicao_de_jitter_por_amostra | 24516861 | 246
+PASS | RAF_041_jni_bridge_minimo | 16396018 | 23
+PASS | RAF_042_cmake_separado_por_abi | 22784800 | 110
+PASS | RAF_043_build_arm64_v8a | 15270774 | 7
+PASS | RAF_044_build_armeabi_v7a | 15143590 | 7
+PASS | RAF_045_deteccao_de_abi_em_runtime | 15327381 | 7
+PASS | RAF_046_syscall_direta_quando_fizer_sentido | 23064524 | 35
+PASS | RAF_047_ring_buffer_nativo_exposto_ao_kotlin_java | 17235310 | 46
+PASS | RAF_048_log_binario_em_vez_de_log_textual_pesado | 16632523 | 7
+PASS | RAF_049_benchmark_via_termux_cli | 26607446 | 338
+PASS | RAF_050_exportacao_de_resultado_em_json | 29946112 | 404
+PASS | RAF_051_hook_de_teste_para_vectras | 18743019 | 77
+PASS | RAF_052_probe_de_hot_path_no_qemu_tcg | 17113481 | 19
+PASS | RAF_053_medicao_de_traducao_vs_execucao_no_qemu | 26352927 | 315
+PASS | RAF_054_batching_de_operacoes_repetidas | 21462732 | 101
+PASS | RAF_055_cache_local_de_resultado_tecnico | 21076989 | 124
+PASS | RAF_056_comparacao_automatica_contra_implementacao_padrao | 26839161 | 299
+#
+# Summary: PASS=56 FAIL=0
+# Compare against a post-optimization run to measure improvement.

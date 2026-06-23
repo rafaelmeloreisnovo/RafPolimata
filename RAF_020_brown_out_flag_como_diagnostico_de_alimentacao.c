@@ -3,12 +3,12 @@
 /*
  * Método M020: Brown-out flag como diagnóstico de alimentação
  * Alvo: MCU/AVR
- * Domínio: Power/Safety
- * Ganho estimado: diagnóstico
+ * Domínio: Power/Diagnóstico
+ * Ganho estimado: detecção de reset por queda de tensão
  *
- * Detecta queda de tensão/reset.
- *
- * Status: skeleton C para integração em firmware bare-metal.
+ * Lê BORF (bit 2) de MCUSR para detectar brown-out reset.
+ * Limpa MCUSR após leitura (necessário para WDT funcionar corretamente).
+ * Non-AVR: retorna 0 (sem diagnóstico real disponível em x86).
  */
 
 #ifndef F_CPU
@@ -16,34 +16,46 @@
 #endif
 
 #if defined(__AVR_ATmega328P__) || defined(RAFAELIA_FORCE_AVR_DEMO)
-#define AVR_DDRB_ADDR   0x24u
-#define AVR_PINB_ADDR   0x23u
-#define AVR_PORTB_ADDR  0x25u
-#define AVR_TCCR1A_ADDR 0x80u
-#define AVR_TCCR1B_ADDR 0x81u
-#define AVR_OCR1A_ADDR  0x88u
-#define AVR_UCSR0A_ADDR 0xC0u
-#define AVR_UCSR0B_ADDR 0xC1u
-#define AVR_UCSR0C_ADDR 0xC2u
-#define AVR_UDR0_ADDR   0xC6u
-#define AVR_ADCSRA_ADDR 0x7Au
-#define AVR_ADMUX_ADDR  0x7Cu
-#define AVR_ADCL_ADDR   0x78u
-#define AVR_ADCH_ADDR   0x79u
+#define AVR_MCUSR_ADDR   0x54u
+
+/* MCUSR bits */
+#define M020_BORF  2u   /* Brown-out Reset Flag */
+#define M020_EXTRF 1u   /* External Reset Flag */
+#define M020_PORF  0u   /* Power-on Reset Flag */
+#define M020_WDRF  3u   /* Watchdog Reset Flag */
 #endif
 
-void rafaelia_m020_brown_out_flag_como_diagnostico_de_alimentacao(void) {
 #if defined(__AVR_ATmega328P__) || defined(RAFAELIA_FORCE_AVR_DEMO)
+/*
+ * rafaelia_m020_was_brown_out:
+ * Returns 1 if the last reset was caused by a brown-out, 0 otherwise.
+ * Clears MCUSR after reading (required before enabling WDT).
+ */
+uint8_t rafaelia_m020_was_brown_out(void) {
+    uint8_t borf_set;
+
+    borf_set = (uint8_t)((RAFA_MMIO8(AVR_MCUSR_ADDR) >> M020_BORF) & 1u);
+
+    /* Clear all reset flags in MCUSR */
+    RAFA_MMIO8(AVR_MCUSR_ADDR) &= (uint8_t)(~((1u << M020_BORF)  |
+                                                (1u << M020_WDRF)  |
+                                                (1u << M020_EXTRF) |
+                                                (1u << M020_PORF)));
+    return borf_set;
+}
+#endif
+
+int rafaelia_m020_brown_out_flag_como_diagnostico_de_alimentacao(void) {
+#if defined(__AVR_ATmega328P__) || defined(RAFAELIA_FORCE_AVR_DEMO)
+    uint8_t was_bor = rafaelia_m020_was_brown_out();
     /*
-     * Ajuste este bloco conforme o método específico.
-     * Mantido simples para permitir auditoria direta de registrador.
+     * Caller can inspect was_bor:
+     *   1 => last reset was a brown-out (power supply dip below BOD level)
+     *   0 => normal POR, external reset, or WDT reset
      */
-    RAFA_MMIO8(AVR_DDRB_ADDR) |= (uint8_t)(1u << 5u);
-    RAFA_MMIO8(AVR_PINB_ADDR) = (uint8_t)(1u << 5u);
+    return (int)was_bor;
 #else
-    /*
-     * Método específico de MCU/AVR. Compile com avr-gcc ou defina RAFAELIA_FORCE_AVR_DEMO
-     * apenas para inspeção de sintaxe.
-     */
+    /* Non-AVR: no BOD hardware available — return 0 (no brown-out detected) */
+    return 0;
 #endif
 }

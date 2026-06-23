@@ -21,8 +21,10 @@ Este repositório passa a incluir uma documentação de referência de nível av
 - [`docs/ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md`](docs/ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md): roadmap para evolução conjunta de código e documentação.
 - [`docs/RELEASE_NOTES_PENDING.md`](docs/RELEASE_NOTES_PENDING.md): registro de pendências de release (pending only).
 - [`docs/EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md`](docs/EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md): metodologia operacional para governança, GPU/SIMD, cache, paralelismo, fail-safe/failover/rollback e evidência auditável.
+- [`docs/RAFAELIA_PAPER_MARKET_7_VECTORS.md`](docs/RAFAELIA_PAPER_MARKET_7_VECTORS.md): tradução mercadológica e técnica do paper RAFAELIA em 7 vetores, com gates de claim, monetização responsável e próximos experimentos reproduzíveis.
 
 - [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md`](docs/MAPA_ESTRUTURAL_REPOSITORIO.md): mapa profissional da disposição por tags/diretórios, estados (`VOID`/`PENDING`/`AUDIT`/`RUNTIME`/`REFERENCE`) e varredura estrutural em 5 níveis.
+- [`docs/CONCEPT_STRUCTURAL_AUDIT.md`](docs/CONCEPT_STRUCTURAL_AUDIT.md): auditoria reproduzível que liga conceitos a arquivos âncora, estado, lacuna e próxima ação.
 
 ## Aviso importante
 
@@ -44,6 +46,10 @@ Este repositório passa a incluir uma documentação de referência de nível av
 - [`docs/ROTINA_OPERACIONAL_BENCHMARKS.md`](docs/ROTINA_OPERACIONAL_BENCHMARKS.md): rotina operacional de auditoria, benchmark com prewarm/warmup e top 20 modelos.
 - [`docs/LOGOTIPO_RAFAELIA_60COL.md`](docs/LOGOTIPO_RAFAELIA_60COL.md): logotipo ASCII de 60 colunas com variante colorida ANSI.
 - [`assets/raf_operational_seal.svg`](assets/raf_operational_seal.svg): selo visual local dos gates operacionais, sem alegação de certificação.
+
+## Evidence Discipline
+
+RafPolimata separa hipótese, analogia, prova parcial e prova runtime. `TOKEN_VAZIO` é um estado válido quando falta ferramenta, device, dataset, log ou execução. O CI atua como compilador de evidências estruturais, enquanto a matriz do universo registra estado, lacunas, próximos passos e rollback sem transformar ausência em PASS.
 
 ## ApkC — micro-toolchain Android freestanding
 

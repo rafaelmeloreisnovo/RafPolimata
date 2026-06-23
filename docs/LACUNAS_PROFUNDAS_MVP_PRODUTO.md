@@ -28,15 +28,15 @@ source → build reproduzível → APK → assinatura → install → launch →
 | Código/arquitetura | ✅ Sólido | Manter invariantes |
 | Prova source→binary | ✅ PASS (2026-06-17) | `tools/raf_source_to_binary_proof.sh` — ELF AArch64+ARM32 reprodutível |
 | Runtime NativeActivity | ⊘ TOKEN_VAZIO | logcat sem crash (requer device) |
-| ARM64 ELF validado | ✅ PASS (2026-06-17) | `scripts/arm64_apk_qemu_proof.sh` — apkc via qemu → APK → `libmain.so` ELF64 AArch64 DYN, v1/v2/v3 assinado |
+| ARM64 ELF validado | ◐ ELF AArch64 provado | `.so` em APK gerado segue TOKEN_VAZIO (apkc-on-ARM) |
 | ARM32 assembler completo | ✅ +11 mnemonics + strict gate | mnemônicos restantes sob demanda |
 | Matriz de linguagens provadas | ◐ asm+5 scripts | `use_fork` gated por toolchain ARM |
-| CI artifact verde | ◐ +7 gates, +1 upload | run verde real é RUNTIME (GitHub) |
+| CI artifact verde | ◐ +6 gates, +1 upload | run verde real é RUNTIME (GitHub) |
 | Coerência de artefatos | ✅ rodada única limpa | `tools/raf_clean_proof_run.sh` |
 | Java/DEX pipeline | ◐ javac PASS, d8 TOKEN_VAZIO | `scripts/java_dex_pipeline_probe.sh` |
 
-> **Atualização 2026-06-17 (rodada 4):** ver **Parte VII** para o estado verificado das 18
-> lacunas (12 PASS, 3 AVANÇADO, 3 TOKEN_VAZIO honesto com caminho scriptado).
+> **Atualização 2026-06-17 (rodada 2):** ver **Parte VII** para o estado verificado das 18
+> lacunas (10 PASS, 5 AVANÇADO, 3 TOKEN_VAZIO honesto com caminho scriptado).
 
 ---
 
@@ -491,8 +491,8 @@ sem crash, saída `phi=`/`attractor=` presente. Seção L15 atualizada para
 
 | Estado | Lacunas | Contagem |
 |--------|---------|---------:|
-| ✅ PASS (código/prova/doc) | L1, L4, L5, L6, L10, L12, L13, L16, **L17**, L18, L19, L20 | 12 |
-| ◐ AVANÇADO (parcial, prova host) | L7, L9, L11 | 3 |
+| ✅ PASS (código/prova/doc) | L1, L5, L6, L10, L12, L13, L16, L18, L19, L20 | 10 |
+| ◐ AVANÇADO (parcial, prova host) | L4, L7, L9, L11, L17 | 5 |
 | ⊘ TOKEN_VAZIO (hardware ausente, caminho scriptado) | L2, L3, L8 | 3 |
 
 ### Detalhe por lacuna
@@ -502,18 +502,18 @@ sem crash, saída `phi=`/`attractor=` presente. Seção L15 atualizada para
 | **L1** source→binary | ✅ PASS | `tools/raf_source_to_binary_proof.sh` — build reprodutível do fonte versionado: AArch64 ELF PIE (`Class=ELF64 Machine=AArch64`) + objeto ELF32 ARM, sha256 + commit + toolchain logados em `Apkc/proofs/out/apkc-compile.txt` e `apkc-binary-arm{32,64}.txt`. O binário embute as strings `--allow-undef`/`--strict` (traço fonte→binário). |
 | **L2** NativeActivity logcat | ⊘ TOKEN_VAZIO | Requer device. Caminho de fechamento já scriptado: `scripts/apkc_install_android.sh` / `scripts/capture_android_proof_chain.sh`. |
 | **L3** adb install stdout | ⊘ TOKEN_VAZIO | Requer device. Mesmos scripts de L2. |
-| **L4** ARM64 real | ✅ PASS | `scripts/arm64_apk_qemu_proof.sh`: apkc cross-compilado (AArch64 static ELF, sha256 `3c56d35f…`) rodado sob `qemu-aarch64-static` → APK 3626 bytes, `[phi=0.4531 attractor=24]`. `lib/arm64-v8a/libmain.so` = ELF64 AArch64 DYN (sha256 `bf4d5169…`). Debug-signed v1/v2/v3 PASS. `aapt dump badging`: `native-code: 'arm64-v8a'`. Artefatos: `Apkc/proofs/out/arm64-apk-proof.txt` + `readelf-arm64.txt` + `aapt-xmltree.txt` + `hello-arm64-debug-signed.apk`. Bugfix: `r32_.err` não inicializado em modo `-64` causava gate L16 falso-positivo — corrigido (`AsmResult r32_ = {0}`). |
+| **L4** ARM64 real | ◐ AVANÇADO | Emissão ELF64 AArch64 **provada** (compilador gera ELF AArch64 válido, L1). O `.so` arm64-v8a *dentro* de um APK gerado segue TOKEN_VAZIO (exige apkc rodando em ARM). |
 | **L5** 39 mnemonics ARM32 | ✅ PASS | `Apkc/arch_arm32.h` + `asm_insn32()`: encoders `mvn/neg/rsb/bic/tst/teq/cmn/lsl/lsr/asr/blx` ligados (regra "1 inline + 1 case"). Mnemônico desconhecido → `UNDEF` + `err++`. 16 casos golden contra a ARM ARM: `tests/test_arm32_encoders.py` PASS. |
 | **L6** artefatos inconsistentes | ✅ PASS | `tools/raf_clean_proof_run.sh` — rodada única datada (header `commit/date_utc/host_arch/toolchain`) → `Apkc/proofs/runs/<UTC>/`. Saída: `5 PASS, 1 TOKEN_VAZIO`. |
 | **L7** CI verde + artifacts | ◐ AVANÇADO | `.github/workflows/ci.yml`: +5 gates (ARM32 encoders, format-fixtures, zip-negative, source→binary, clean-proof-run) +1 upload (`apkc-proof-runs`). Run verde real é RUNTIME (GitHub). |
 | **L8** NDK --build | ⊘ TOKEN_VAZIO | Requer `ANDROID_NDK_HOME`. Caminho: `scripts/android_build_matrix.sh` (modo `--build`). |
-| **L9** matriz multilíngua | ◐ AVANÇADO | `scripts/apkc_lang_coverage.sh` (modo=qemu): **6/6 APKs PASS** (asm+py+sh+pl+js+php — todos com `libmain.so` ELF64 AArch64 DYN). `use_fork` (c/cpp/rs/kt/java/jsx) TOKEN_VAZIO — `fork_exec_wait()` é `#ifdef __aarch64__` e não executa em emulação. |
+| **L9** matriz multilíngua | ◐ AVANÇADO | `scripts/apkc_lang_coverage.sh` cobre asm+5 scripts; intérpretes presentes no host; `use_fork` (c/cpp/rs/kt/java/jsx) segue gated por toolchain ARM. |
 | **L10** caminhos de intérprete | ✅ PASS (doc) | `docs/APKC_TARGET_ENVIRONMENTS.md` — alvo canônico do `use_script` = **Termux/proot/dev-lab**, não Android stock (paths reais citados de `Apkc/lang_profile.h`). |
 | **L11** Java/Kotlin DEX | ◐ AVANÇADO | `scripts/java_dex_pipeline_probe.sh`: **javac stage PASS** — `Hello.class` 240 bytes, magic=`0xcafebabe`, sha256=`04e299529e…` (2026-06-17, javac 21.0.10, `--release 11`). Transcript em `Apkc/proofs/out/java-pipeline.txt`. `d8 → classes.dex` TOKEN_VAZIO (build-tools ausentes; closure: `d8 /tmp/cls/Hello.class --output /tmp/dex/ --min-api 21`). `apkc fork_exec_wait()` TOKEN_VAZIO (`#ifdef __aarch64__`). |
 | **L12** catálogo 56 RAF | ✅ PASS | `RAF_INDEX.md` realinhado aos arquivos reais `RAF_NNN_*.c` (raiz, layout flat). Loop de compilação: **56/56 PASS**. |
 | **L13** raf_compile IR | ✅ PASS (reposicionado) | `raf_precomp.c` documentado como **âncora determinística de manifesto/reprodutibilidade** (não front-end). Estado: REFERENCE, não PENDING — faz exatamente o que declara. |
 | **L16** erro bloqueante vs degradação | ✅ PASS | `Apkc/apkc.c`: `--strict` (default) → mnemônico desconhecido falha o build (`exit 1`, sem APK); `--allow-undef`/`--allow-nop-placeholder` = modo experimental. Gate em `build_apk` sobre `res.err`. |
-| **L17** corpus regressivo | ✅ PASS | `tests/test_format_fixtures.py`: **7 PASS, 0 SKIP, 0 FAIL**. Cobertura: readelf-arm32, readelf-arm64, unzip-members, aapt-xmltree, dex-sha1, sha256-ledger (out+run). Artefatos gerados por `arm64_apk_qemu_proof.sh` e `apkc_lang_coverage.sh` (modo qemu). `tests/test_zip_negative.py`: PASS (ZIP corrompido rejeitado). |
+| **L17** corpus regressivo | ◐ AVANÇADO | `tests/fixtures/README.md` (plano 10 casos), `tests/test_format_fixtures.py` (3 PASS, 4 TOKEN_VAZIO), `tests/test_zip_negative.py` (PASS — EOCD/central-dir corrompido é rejeitado). Casos ARM-dependentes seguem TOKEN_VAZIO. |
 | **L18** assinatura release | ✅ PASS (política) | `docs/APKC_SIGNING_POLICY.md` — debug (nunca commitar) \| release (CI secrets/HSM) \| SourceStamp. APK release-assinado real segue PENDING (secrets). |
 | **L19** release navegável | ✅ PASS | `Makefile` raiz: `proof`, `verbovivo-demo`, `encoders`, `syntax`, `audit`, `report`, `clean` — reusa scripts existentes. |
 | **L20** valuation→gates | ✅ PASS (doc) | `docs/APKC_VALUE_AND_GAPS.md` § "Valuation amarrada a gates verificáveis" — cada faixa heurística amarrada a gates reais do CI. |
@@ -522,14 +522,11 @@ sem crash, saída `phi=`/`attractor=` presente. Seção L15 atualizada para
 
 ```sh
 python3 tests/test_arm32_encoders.py        # L5  → 16 PASS
-python3 tests/test_format_fixtures.py        # L17 → 3 PASS, 4 TOKEN_VAZIO (2 cases now PASS from L4 artifacts)
+python3 tests/test_format_fixtures.py        # L17 → 3 PASS, 4 TOKEN_VAZIO
 python3 tests/test_zip_negative.py           # L17 → PASS
 bash tools/raf_source_to_binary_proof.sh     # L1  → 2 PASS, 1 TOKEN_VAZIO
 bash tools/raf_clean_proof_run.sh            # L6  → 5 PASS, 1 TOKEN_VAZIO
-bash scripts/arm64_apk_qemu_proof.sh         # L4  → 5 PASS, 0 TOKEN_VAZIO (requires qemu-aarch64-static)
-bash scripts/apkc_lang_coverage.sh           # L9  → 6/6 PASS (modo=qemu: asm+py+sh+pl+js+php)
 bash scripts/java_dex_pipeline_probe.sh      # L11 → 1 PASS (javac), 2 TOKEN_VAZIO (d8, apkc-fork)
-python3 tests/test_format_fixtures.py        # L17 → 7 PASS, 0 SKIP, 0 FAIL
 make encoders verbovivo-demo syntax          # L19 → todos PASS
 for f in RAF_*.c; do gcc -c -I. "$f" -o /tmp/$(basename "$f" .c).o || echo FAIL $f; done  # L12 → 56/56
 ```
