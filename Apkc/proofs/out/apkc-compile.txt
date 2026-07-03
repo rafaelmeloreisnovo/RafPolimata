@@ -1,2 +1,495 @@
-TOKEN_VAZIO: no source-to-binary compile transcript was provided. Uploaded binary apkc exists and hashes to 3d2ac064c26b8ca5be02a74238f877c3e0f9fb1d16dd4bc7da7f0e758042723c, but the exact compiler command, source commit and build environment for that binary were not present in the uploaded evidence.
-
+gcc: error: unrecognized command-line option '-target'
+In file included from Apkc/apkc.c:4:
+Apkc/sys.h: In function 'os_read':
+Apkc/sys.h:134:93: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+  134 | static inline i32  os_read (i32 fd, void *b, sz n)       { return _sc3_32(_NR_read, fd,(i32)(uptr)b,(i32)n); }
+      |                                                                                             ^
+Apkc/sys.h: In function 'os_write':
+Apkc/sys.h:135:93: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+  135 | static inline i32  os_write(i32 fd, const void *b, sz n) { return _sc3_32(_NR_write,fd,(i32)(uptr)b,(i32)n); }
+      |                                                                                             ^
+Apkc/sys.h: In function 'os_open':
+Apkc/sys.h:136:89: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+  136 | static inline i32  os_open (const char *p, i32 f, i32 m) { return _sc3_32(_NR_open,(i32)(uptr)p,f,m); }
+      |                                                                                         ^
+Apkc/sys.h: At top level:
+Apkc/sys.h:125:1: warning: 'always_inline' function might not be inlinable [-Wattributes]
+  125 | _sc3_32(i32 n, i32 a, i32 b, i32 c) {
+      | ^~~~~~~
+Apkc/sys.h:118:1: warning: 'always_inline' function might not be inlinable [-Wattributes]
+  118 | _sc1_32(i32 n, i32 a) {
+      | ^~~~~~~
+In file included from Apkc/apkc.c:5:
+Apkc/mem.h:14:21: warning: '_src_pos' defined but not used [-Wunused-variable]
+   14 | static sz _apk_pos, _src_pos, _tmp_pos;
+      |                     ^~~~~~~~
+Apkc/mem.h:12:11: warning: '_src_buf' defined but not used [-Wunused-variable]
+   12 | static u8 _src_buf[SRC_CAP];
+      |           ^~~~~~~~
+Apkc/sys.h: In function 'pr':
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h: In function 'pr_err':
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h: In function 'pr_dec':
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/apkc.c: In function 'build_apk.constprop':
+Apkc/apkc.c:1608:15: warning: 'r64.err' may be used uninitialized [-Wmaybe-uninitialized]
+ 1608 |     AsmResult r64; r64.size=0; r64.sym1_va=0; r64.sym2_va=0; r64.has_sym1=0; r64.has_sym2=0;
+      |               ^~~
+Apkc/apkc.c:1609:15: warning: 'r32_.err' may be used uninitialized [-Wmaybe-uninitialized]
+ 1609 |     AsmResult r32_; r32_.size=0; r32_.sym1_va=0; r32_.sym2_va=0; r32_.has_sym1=0; r32_.has_sym2=0;
+      |               ^~~~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:119:18: error: invalid register name for 'r7'
+  119 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:120:18: error: invalid register name for 'r0'
+  120 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h: In function 'apkc_entry':
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:119:18: error: invalid register name for 'r7'
+  119 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:120:18: error: invalid register name for 'r0'
+  120 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
+Apkc/sys.h:126:18: error: invalid register name for 'r7'
+  126 |     register i32 r7 __asm__("r7") = n;
+      |                  ^~
+Apkc/sys.h:127:18: error: invalid register name for 'r0'
+  127 |     register i32 r0 __asm__("r0") = a;
+      |                  ^~
+Apkc/sys.h:128:18: error: invalid register name for 'r1'
+  128 |     register i32 r1 __asm__("r1") = b;
+      |                  ^~
+Apkc/sys.h:129:18: error: invalid register name for 'r2'
+  129 |     register i32 r2 __asm__("r2") = c;
+      |                  ^~
