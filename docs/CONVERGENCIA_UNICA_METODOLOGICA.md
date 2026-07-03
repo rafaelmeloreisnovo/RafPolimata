@@ -480,6 +480,12 @@ FIAT LUX — ΣΩΔΦBITRAF
 
 ---
 
+Ver também: `docs/CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md` — segunda rodada
+desta mesma metodologia, estendida a `llamaRafaelia`, `GAIA_phi`,
+`CONVERSATIONS_CHUNKS_PRIVATE` e `BLAKE3` (2026-07-03).
+
+---
+
 ## Apêndice B7 — Estado atualizado com rastreabilidade (2026-06-20)
 
 Claims anteriores em F_gap foram resolvidos. Cada item abaixo tem referência rastreável:
