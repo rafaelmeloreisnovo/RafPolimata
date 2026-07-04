@@ -16,7 +16,11 @@ typedef struct {
     q16_t C;         /* coerência IIR acumulada                              */
     q16_t phi;       /* phi_ethica = (1-H)*C — Eq.8                         */
     u32  step;       /* contador de passos                                   */
-    u32  attractor;  /* índice do atrator ativo [0..41]                     */
+    u32  attractor;  /* índice do atrator ativo [0..41] — evolui via Eq.EVO */
+    /* ── campos de topologia evolutiva (Darwinismo Quântico) ─────────────── */
+    u32 phase_acc;    /* Φ: fase acumulada, Φ_{t+1}=Φ_t+Obs_t, nunca reseta */
+    u32 delta;        /* Δ=dist circular(atrator, fase%42): incoerência struct */
+    u32 omega_inv[3]; /* Ω: I₁=ψ(s,φ) I₂=ψ(1,t) I₃=ψ(2,t) — checksums traj */
 } T7State;
 
 /* Indices das dimensões — sem enumeração, trabalha com matriz de índices    */
@@ -60,7 +64,7 @@ static void t7_map_input(T7State *t, const T7Input *x) {
     }
 }
 
-/* Step: aplica spiral decay + update phi_ethica                             */
+/* Step: aplica spiral decay + update phi_ethica + topologia evolutiva       */
 static void t7_step(T7State *t, q16_t H_in, q16_t C_in) {
     /* H e C via IIR alpha=0.25 — Eq.5-6                                    */
     t->H   = q16_iir(t->H, H_in);
@@ -71,8 +75,31 @@ static void t7_step(T7State *t, q16_t H_in, q16_t C_in) {
     t->s[5] = (u32)q16_spiral((q16_t)t->s[5]) & 0xFFFFU;
     /* Psi (intenção=2) cresce com coerência — integração ética              */
     t->s[2] = (t->s[2] + (u32)(t->phi >> 8)) & 0xFFFFU;
-    /* Atrator: índice = (u XOR v) % 42 — Eq.10: |A|=42                    */
-    t->attractor = (t->s[0] ^ t->s[1]) % 42;
+
+    /* ── Topologia evolutiva (Darwinismo Quântico) ───────────────────────── */
+    /* ω: phi_ethica → frequência angular [0,6]; ω=6 em máxima coerência   */
+    u32 omega = (u32)((u64)(u32)t->phi * 6u >> 16);
+    /* u_t: perturbação de entropia IIR [0,6]                               */
+    u32 u_t   = ((u32)t->H >> 13) % 7u;
+    /* φ(t+1) = (φ_t + ω + u_t) mod 42 — Eq.EVO: atrator evolui, não salta */
+    t->attractor = (t->attractor + omega + u_t) % 42u;
+    /* Φ_{t+1} = Φ_t + Obs_t — fase acumula, nunca reseta                   */
+    t->phase_acc = (t->phase_acc + (u32)(u16)t->H + (u32)(u16)t->C) & 0xFFFFu;
+    /* Δ = dist circular(atrator, fase%42) — incoerência estrutural          */
+    u32 phi42 = t->phase_acc % 42u;
+    u32 raw_d = (t->attractor > phi42) ? (t->attractor - phi42)
+                                        : (phi42 - t->attractor);
+    if (raw_d > 21u) raw_d = 42u - raw_d; /* distância circular wrap        */
+    t->delta = raw_d;
+    /* Colapso: |Δ| > T7_LIMIAR → salto (fase fica, só lente atrator muda)  */
+    if (raw_d > T7_LIMIAR) {
+        t->attractor = phi42;
+        t->delta     = 0u;
+    }
+    /* Ω-invariantes: checksums XOR da trajetória I₁,I₂,I₃                  */
+    t->omega_inv[0] ^= t->s[2] ^ (u32)(u16)t->phi; /* I₁ = ψ(s,φ)         */
+    t->omega_inv[1] ^= t->s[1];                      /* I₂ = ψ(1,t) coer.   */
+    t->omega_inv[2] ^= t->s[3];                      /* I₃ = ψ(2,t) obs.    */
     t->step++;
 }
 

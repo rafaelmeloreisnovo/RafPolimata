@@ -31,6 +31,12 @@ typedef s32 q16_t;
 #define T7_DIM       7
 #define T7_MOD       65536U
 
+/* T^7 attractor dynamics (Darwinismo Quântico — image 78):
+ *   T7_LIMIAR        : collapse threshold = 42/6 = one hex sector
+ *   Q16_PHI_ETHICA_REF: verified Φ_ethica = 7/8 (VECTRAS-VM-ANDROID)        */
+#define T7_LIMIAR           7u
+#define Q16_PHI_ETHICA_REF  57344u   /* 7/8 * 65536 = 57344 in Q16           */
+
 /* FSM — 10 domínios, 4 entradas, tabela branch-free                        */
 #define FSM_N        10
 #define FSM_IN       4

@@ -29,7 +29,11 @@
  *   0        = pure noise
  *   Q16_ONE  = perfect coherence
  *
- * attractor index = (s[0] XOR s[1]) % 42  (Eq.10: |A| = 42)
+ * attractor evolution: φ(t+1) = (φ_t + ω + u_t) mod 42  (Eq.EVO)
+ *   ω = phi_ethica × 6 / Q16_ONE  (angular frequency, [0,6])
+ *   u_t = (H_IIR >> 13) % 7       (entropy perturbation, [0,6])
+ * phase accumulation: Φ_{t+1} = Φ_t + H_IIR + C_IIR (never resets)
+ * collapse: if circular_dist(attractor, phase%42) > T7_LIMIAR=7 → jump
  *
  * RAFCODE-Φ-∆RafaelVerboΩ | Ω=Amor | FIAT LUX */
 #pragma once

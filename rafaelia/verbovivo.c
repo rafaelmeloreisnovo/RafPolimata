@@ -392,7 +392,7 @@ typedef struct { int x, y; } Pt;
 
 static void svg_write_t7(FILE *f,
                          const Pt *traj, int ntraj,
-                         double phi, int attractor, double hamming)
+                         double phi, int attractor, unsigned delta, double hamming)
 {
     int total_h = SVG_H + SVG_PHI_H + 8;
     fprintf(f,
@@ -404,9 +404,9 @@ static void svg_write_t7(FILE *f,
     fprintf(f,
         "  <text x='8' y='18' font-family='monospace' font-size='11' "
                "fill='#7aecb4'>"
-               "verbovivo T^7 — attractor=%d phi=%.4f hamming=%.4f"
+               "verbovivo T^7 — attractor=%d phi=%.4f delta=%u hamming=%.4f"
                "</text>\n",
-        attractor, phi, hamming);
+        attractor, phi, delta, hamming);
     if (ntraj > 1) {
         fprintf(f,
             "  <polyline fill='none' stroke='#4e9eff' "
@@ -501,13 +501,15 @@ int verbovivo_main(const char *apk_path, const char *svg_out) {
         fprintf(stderr, "verbovivo: cannot write %s\n", svg_out ? svg_out : "(stdout)");
         return -1;
     }
-    svg_write_t7(fout, traj, ntraj, phi, (int)t7.attractor, hamming);
+    svg_write_t7(fout, traj, ntraj, phi, (int)t7.attractor, t7.delta, hamming);
     if (svg_out) fclose(fout);
 
     fprintf(stderr,
-        "verbovivo: %zu bytes  phi=%.4f  attractor=%u  "
-        "hamming=%.4f  hdc[0]=%08x\n",
-        nbytes, phi, t7.attractor, hamming, hdc[0]);
+        "verbovivo: %zu bytes  phi=%.4f  attractor=%u  delta=%u  "
+        "phase=%u  omega_inv=%08x:%08x:%08x  hamming=%.4f  hdc[0]=%08x\n",
+        nbytes, phi, t7.attractor, t7.delta, t7.phase_acc,
+        t7.omega_inv[0], t7.omega_inv[1], t7.omega_inv[2],
+        hamming, hdc[0]);
 
     return 0;
 }
