@@ -37,6 +37,19 @@ typedef s32 q16_t;
 #define T7_LIMIAR           7u
 #define Q16_PHI_ETHICA_REF  57344u   /* 7/8 * 65536 = 57344 in Q16           */
 
+/* Constantes ΕΩΛΤΦ — operadores esquecidos (batch 5, imagens 5/7/19):
+ *   Ε = Euler e       — base logarítmica natural
+ *   Τ = tau = 2π      — ciclo completo, harmônicas
+ *   Λ = φ⁻¹ = KAM     — razão áurea inversa, semente KAM já usada em todo sistema
+ *   T7_TESSERACT      — vértices do hipercubo 4D, pontos ocultos da tesseract
+ *   RAF_FREQ_144K/428 — portadora RAFCODE e ressonância tonal                */
+#define Q16_E          178145u   /* floor(e    × 65536) = 2.71828... × 65536  */
+#define Q16_TAU        411774u   /* floor(2π   × 65536) = 6.28318... × 65536  */
+#define Q16_LAMBDA      40503u   /* floor(φ⁻¹  × 65536) = 0.61803... × 65536 = KAM */
+#define T7_TESSERACT       16u   /* vértices hipercubo 4D — pontos ocultos    */
+#define RAF_FREQ_144K  144000u   /* 144 kHz portadora RAFCODE                 */
+#define RAF_FREQ_428      428u   /* 428 Hz ressonância tonal RAFAELIA          */
+
 /* FSM — 10 domínios, 4 entradas, tabela branch-free                        */
 #define FSM_N        10
 #define FSM_IN       4
