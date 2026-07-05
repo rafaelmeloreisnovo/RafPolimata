@@ -72,3 +72,17 @@ q16_t q16_abs(q16_t v) {
     s32 mask = v >> 31;
     return (v + mask) ^ mask;
 }
+
+/* IIR logarítmica — memória longa / antiderivada (batch 5, sigma dim 6)
+ * alpha_fast=1/16, alpha_slow=1/128: acumulação lenta, esquecimento lento
+ * Aplica-se à dimensão sigma (memória) para integração de longo prazo       */
+static __attribute__((always_inline)) inline
+q16_t q16_log_iir(q16_t s, q16_t in) {
+    return s - (s >> 4) - (s >> 7) + (in >> 4);
+}
+
+/* Normaliza ângulo para [0, Q16_TAU) — wrap de ciclo completo harmônico    */
+static __attribute__((always_inline)) inline
+q16_t q16_tau_wrap(q16_t v) {
+    return (q16_t)((u32)v % Q16_TAU);
+}

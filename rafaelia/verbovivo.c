@@ -506,8 +506,9 @@ int verbovivo_main(const char *apk_path, const char *svg_out) {
 
     fprintf(stderr,
         "verbovivo: %zu bytes  phi=%.4f  attractor=%u  delta=%u  "
-        "phase=%u  omega_inv=%08x:%08x:%08x  hamming=%.4f  hdc[0]=%08x\n",
-        nbytes, phi, t7.attractor, t7.delta, t7.phase_acc,
+        "perm=%02x  dir=%u  phase=%u  omega_inv=%08x:%08x:%08x  hamming=%.4f  hdc[0]=%08x\n",
+        nbytes, phi, t7.attractor, t7.delta,
+        t7.perm_class, t7.delta_dir, t7.phase_acc,
         t7.omega_inv[0], t7.omega_inv[1], t7.omega_inv[2],
         hamming, hdc[0]);
 

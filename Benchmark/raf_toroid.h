@@ -21,10 +21,20 @@ typedef struct {
     u32 phase_acc;    /* Φ: fase acumulada, Φ_{t+1}=Φ_t+Obs_t, nunca reseta */
     u32 delta;        /* Δ=dist circular(atrator, fase%42): incoerência struct */
     u32 omega_inv[3]; /* Ω: I₁=ψ(s,φ) I₂=ψ(1,t) I₃=ψ(2,t) — checksums traj */
+    /* ── operadores esquecidos (batch 5): lateral, antiderivada, harmônica ── */
+    u32 delta_dir;   /* 1=atrator à frente da fase, 0=atrás — CHAVE DE REVERSÃO */
+    u32 perm_class;  /* [7:4]=setor hex S₆ [0..5], [3:0]=nível Fibonacci C₇ [0..6] */
 } T7State;
 
 /* Indices das dimensões — sem enumeração, trabalha com matriz de índices    */
 /* 0=u 1=v 2=psi 3=chi 4=rho 5=delta 6=sigma                                */
+
+/* Classe de permutação lateral S₆×C₇ — setor hexagonal e nível Fibonacci
+ * High nibble: attractor/7 ∈ [0..5] — 6 sectores do hexágono toroidal
+ * Low  nibble: attractor%7 ∈ [0..6] — 7 níveis Fibonacci por sector        */
+static inline u32 t7_perm_class(u32 attractor) {
+    return ((attractor / 7u) << 4) | (attractor % 7u);
+}
 
 /* Entrada para o toroide — Eq.4: x=(dados,entropia,hash,estado)             */
 typedef struct {
@@ -75,6 +85,8 @@ static void t7_step(T7State *t, q16_t H_in, q16_t C_in) {
     t->s[5] = (u32)q16_spiral((q16_t)t->s[5]) & 0xFFFFU;
     /* Psi (intenção=2) cresce com coerência — integração ética              */
     t->s[2] = (t->s[2] + (u32)(t->phi >> 8)) & 0xFFFFU;
+    /* Sigma (memória=6): IIR logarítmica — acumulação longa / antiderivada  */
+    t->s[6] = (u32)q16_log_iir((q16_t)t->s[6], (q16_t)(t->s[0] ^ t->s[2])) & 0xFFFFu;
 
     /* ── Topologia evolutiva (Darwinismo Quântico) ───────────────────────── */
     /* ω: phi_ethica → frequência angular [0,6]; ω=6 em máxima coerência   */
@@ -87,6 +99,8 @@ static void t7_step(T7State *t, q16_t H_in, q16_t C_in) {
     t->phase_acc = (t->phase_acc + (u32)(u16)t->H + (u32)(u16)t->C) & 0xFFFFu;
     /* Δ = dist circular(atrator, fase%42) — incoerência estrutural          */
     u32 phi42 = t->phase_acc % 42u;
+    /* Direção do Δ: 1=atrator à frente da fase, 0=atrás — CHAVE DE REVERSÃO */
+    t->delta_dir = (t->attractor >= phi42) ? 1u : 0u;
     u32 raw_d = (t->attractor > phi42) ? (t->attractor - phi42)
                                         : (phi42 - t->attractor);
     if (raw_d > 21u) raw_d = 42u - raw_d; /* distância circular wrap        */
@@ -95,7 +109,10 @@ static void t7_step(T7State *t, q16_t H_in, q16_t C_in) {
     if (raw_d > T7_LIMIAR) {
         t->attractor = phi42;
         t->delta     = 0u;
+        t->delta_dir = 0u;                  /* pós-colapso: sem direção      */
     }
+    /* Classe de permutação S₆×C₇ — lateral, pós-colapso                    */
+    t->perm_class = t7_perm_class(t->attractor);
     /* Ω-invariantes: checksums XOR da trajetória I₁,I₂,I₃                  */
     t->omega_inv[0] ^= t->s[2] ^ (u32)(u16)t->phi; /* I₁ = ψ(s,φ)         */
     t->omega_inv[1] ^= t->s[1];                      /* I₂ = ψ(1,t) coer.   */
