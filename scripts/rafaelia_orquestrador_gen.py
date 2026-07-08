@@ -3,9 +3,12 @@
 rafaelia_orquestrador_gen.py — AllStar Matrix generator
 Spec: docs/RAFAELIA_ORQUESTRADOR_ASCII_UTF.md
 
+M(s) — 12 dimensions: b, c, f, τ, ω, g, Γ, B, F, T, E, P
+  + metadata: state, state_name, neighbors
+
 Star(c) = [code, char, sound, timbre, shape, base2, base10, base20, base64_utf8,
-           fib_direct, fib_inverse, is_prime, prime_residue_6k, state, state_name,
-           neighbors, meaning, proof_sha256_16]
+           fib_direct, fib_inverse, trib_direct, is_prime, prime_residue_6k,
+           wave, freq_hz, state, state_name, neighbors, meaning, proof_sha256_16]
 
 Outputs: output/allstar_matrix.csv + output/allstar_matrix.json
 """
@@ -35,6 +38,19 @@ FIB_SET = _build_fib_set(0x10FFFF)
 
 # Build an ordered list for inverse lookup (deduped, ascending)
 _FIB_LIST = sorted(FIB_SET)
+
+# ── Tribonacci Rafael: T_n = T_{n-1} + T_{n-2} + T_{n-3} ─────────────────────
+# T_R = (0, 0, 0, 1, 1, 2, 4, 7, 13, 24, 44, 81, 149, 274, ...)
+def _build_tribonacci_set(limit: int) -> set:
+    s = {0}
+    a, b, c = 0, 0, 1
+    while c <= limit:
+        s.add(c)
+        a, b, c = b, c, a + b + c
+    return s
+
+TRIBONACCI_SET = _build_tribonacci_set(0x10FFFF)
+_TRIBONACCI_LIST = sorted(TRIBONACCI_SET)
 
 def fib_inverse(code: int) -> str:
     """Return 'parent+grandparent' decomposition for a Fibonacci code, or TOKEN_VAZIO."""
@@ -192,6 +208,36 @@ _TIMBRE: dict = {
     48: "grave",  # '0' — toro
 }
 
+# ── Wave/frequency classification (Hz ranges per ASCII/state) ─────────────
+# Maps code → frequency label or Hz range
+# Harmonic series: fundamental (428 Hz), octaves, overtones
+def wave_classification(code: int) -> str:
+    """Classify symbol by harmonic frequency band."""
+    if code < 32:
+        return "subsonic"  # control: sub-20Hz
+    if code < 65:  # 32-64
+        return "low"  # 20-200 Hz bass
+    if code < 91:  # 65-90
+        return "mid"  # 200-2000 Hz midrange
+    if code < 97:  # 91-96
+        return "high"  # 2-4 kHz presence
+    if code < 123:  # 97-122
+        return "treble"  # 4-8 kHz upper
+    return "brilliant"  # 123+ ultrasonics
+
+def freq_hz_range(code: int) -> str:
+    """Return Hz frequency range based on harmonic series."""
+    wc = wave_classification(code)
+    ranges = {
+        "subsonic": "10-20",
+        "low": "28-220",
+        "mid": "220-2200",
+        "high": "2200-4400",
+        "treble": "4400-8800",
+        "brilliant": "8800+",
+    }
+    return ranges.get(wc, TOKEN_VAZIO)
+
 # ── Semantic meaning per ASCII codepoint ──────────────────────────────────
 _CTRL: dict = {
     0:  "nulo/silêncio-marcado",         1:  "início-cabeçalho",
@@ -277,8 +323,12 @@ def make_star(code: int, char: str | None = None, sound: str | None = None,
 
     fib  = code in FIB_SET
     fibv = fib_inverse(code)
+    trib = code in TRIBONACCI_SET
     prim = is_prime(code)
     pr6k = prime_residue_6k(code) if prim else TOKEN_VAZIO
+
+    wc   = wave_classification(code)
+    fhz  = freq_hz_range(code)
 
     nbrs = []
     if code > 0:       nbrs.append(code - 1)
@@ -299,8 +349,11 @@ def make_star(code: int, char: str | None = None, sound: str | None = None,
         "base64_utf8":      b64,
         "fib_direct":       fib,
         "fib_inverse":      fibv,
+        "trib_direct":      trib,
         "is_prime":         prim,
         "prime_residue_6k": pr6k,
+        "wave":             wc,
+        "freq_hz":          fhz,
         "state":            state,
         "state_name":       state_name,
         "neighbors":        neighbors,
@@ -469,7 +522,8 @@ def verify_proofs(entries: list) -> bool:
 FIELDS = [
     "code", "char", "sound", "timbre", "shape",
     "base2", "base10", "base20", "base64_utf8",
-    "fib_direct", "fib_inverse", "is_prime", "prime_residue_6k",
+    "fib_direct", "fib_inverse", "trib_direct", "is_prime", "prime_residue_6k",
+    "wave", "freq_hz",
     "state", "state_name", "neighbors", "meaning", "proof_sha256_16",
 ]
 
