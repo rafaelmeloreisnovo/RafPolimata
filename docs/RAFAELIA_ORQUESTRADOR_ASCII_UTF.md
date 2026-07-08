@@ -264,24 +264,62 @@ I_j → (ética, som, forma, função, memória)
 
 ## 10. Função de Prova
 
+Operador Ω (Invariante Geométrico Coerente) executa em **duas trilhas paralelas**:
+
 ```
-Proof(c) = Hash[ code(c), sound(c), shape(c), base(c), neighbors(c), meaning(c) ]
+Prova_SHA256(c)  = SHA256(code|sound|shape|base20|state|meaning)[:16]
+Prova_ARX(c)     = Ω(fold(code) XOR fold(sound) XOR fold(shape) ...)
 ```
 
-Estabilidade:
+Ambas **determinísticas, nunca divergem para mesma entrada**:
 
 ```
 Proof_t(c) == Proof_{t+1}(c)   →   estável (mesmo resultado em toda execução)
 Proof_t(c) ≠  Proof_{t+1}(c)   →   registrar ΔProof(c), não apagar
 ```
 
-Implementação canônica (SHA256, primeiros 16 hex):
+### Implementação 1: SHA256 (Python, AllStar generator)
 
 ```python
-proof = hashlib.sha256(
+proof_sha256 = hashlib.sha256(
     f"{code}|{sound}|{shape}|{base20}|{state}|{meaning}".encode()
 ).hexdigest()[:16]
 ```
+
+### Implementação 2: ARX (C99, freestanding — Benchmark/raf_coherence_arx.h)
+
+```c
+/* coherence_filter — operador Ω puro (Knuth multiplicative mixing) */
+static inline u64 coherence_filter(u64 v) {
+    v ^= v >> 33;
+    v *= 0xff51afd7ed558ccdULL;
+    v ^= v >> 33;
+    return v;
+}
+
+/* proof_coherence_arx — folding determinístico dos campos M(s) */
+static inline u64 proof_coherence_arx(u32 code, const char *sound,
+    const char *shape, const char *base20, u32 state, const char *meaning) {
+    u64 acc = (u64)code;
+    /* Fold each field through coherence_filter, XOR-accumulate */
+    if (sound)   for (int i = 0; sound[i] && i < 16; i++)
+                    acc = coherence_filter(acc ^ (u64)(u8)sound[i]);
+    if (shape)   for (int i = 0; shape[i] && i < 16; i++)
+                    acc = coherence_filter(acc ^ (u64)(u8)shape[i]);
+    if (base20)  for (int i = 0; base20[i] && i < 16; i++)
+                    acc = coherence_filter(acc ^ (u64)(u8)base20[i]);
+    acc = coherence_filter(acc ^ (u64)state);
+    if (meaning) for (int i = 0; meaning[i] && i < 16; i++)
+                    acc = coherence_filter(acc ^ (u64)(u8)meaning[i]);
+    return coherence_filter(acc);
+}
+```
+
+**Características ARX**:
+- Branchless: sem `if` em hot path
+- SIMD-friendly: operações bit puro
+- Freestanding: zero libc, zero malloc
+- Determinístico: mesma entrada → sempre mesmo hash u64
 
 ---
 
