@@ -1,5 +1,12 @@
 # RafPolimata — Context for AI Agents
 
+## Session start → read `docs/AGENTES.md` first
+
+Any agent (AI or human) opening a new session should read `docs/AGENTES.md`
+before writing code. It covers the startup checklist, non-collision rules, CI
+gates, and escalation protocol in under 10 minutes. Per-session checklist:
+`docs/AGENTES_CHECKLIST.md`. Conflict log: `docs/AGENTES_DECISAO_LOG.md`.
+
 ## What this project is
 
 Three integrated layers:
