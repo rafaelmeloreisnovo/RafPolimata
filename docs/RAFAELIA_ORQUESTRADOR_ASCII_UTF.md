@@ -59,10 +59,10 @@ AllStar_ASCII/UTF = ⋃_{c∈C} Star(c)
 
 ---
 
-## 3. A Matriz M(s) — nove dimensões relacionais
+## 3. A Matriz M(s) — doze dimensões relacionais
 
 ```
-M(s) = [ b(s), c(s), f(s), τ(s), ω(s), g(s), Γ(s), B(s), P(s) ]
+M(s) = [ b(s), c(s), f(s), τ(s), ω(s), g(s), Γ(s), B(s), F(s), T(s), E(s), P(s) ]
 ```
 
 | Dimensão | Símbolo | Pergunta | Exemplo |
@@ -75,7 +75,10 @@ M(s) = [ b(s), c(s), f(s), τ(s), ω(s), g(s), Γ(s), B(s), P(s) ]
 | Geometria    | g(s) | Qual forma associa? | ponto, linha, espiral |
 | Grafo relac. | Γ(s) | Com quem se conecta? | A→Ω, 0→1, φ→espiral |
 | Base numérica| B(s) | Em qual base opera? | 2, 10, 20, 64 |
-| Prova        | P(s) | Como valida? | SHA256, checksum |
+| Frequência Hz | F(s) | Em qual banda espectral? | 28-220 Hz (low), 220-2200 Hz (mid) |
+| Tribonacci   | T(s) | Pertence à sequência Rafael triádica? | 0,1,2,4,7,13,24,44… |
+| Entropia     | E(s) | Qual nível de desordem de bits? | PENDING — integração com q16_entropy_milli |
+| Prova        | P(s) | Como valida? | SHA256[:16] |
 
 Quando um campo não puder ser preenchido:
 
