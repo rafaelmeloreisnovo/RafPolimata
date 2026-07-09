@@ -1,5 +1,10 @@
 # Rotina operacional de auditoria e benchmark estrutural
 
+> **Entrada canônica:** `docs/AGENTES.md` §5 resume o pipeline de excelência
+> operacional (VOID → BASELINE → CANDIDATE → VALIDATED → ROLLBACK) e o critério
+> de parada da rotina de auditoria. Este documento detalha as condições e sequências
+> de benchmark estrutural.
+
 Este guia descreve como o agente deve trabalhar: conferir arquivos, validar dados, medir caminhos de execução e só promover uma otimização quando a evidência for melhor que a alternativa simples. Ele não declara certificação, conformidade formal ou selo normativo do software.
 
 ## Rotina de auditoria obrigatória do agente

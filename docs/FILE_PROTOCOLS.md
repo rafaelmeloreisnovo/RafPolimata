@@ -1,5 +1,8 @@
 # Protocolos de arquivo do repositório
 
+> Para o ciclo completo de sessão de agente (startup, execução, shutdown), consulte
+> `docs/AGENTES_CHECKLIST.md`. Este documento cobre padrões de nome e checklist de evidência.
+
 | Padrão | Uso |
 |---|---|
 | `*.md` | documentação humana/auditável |
