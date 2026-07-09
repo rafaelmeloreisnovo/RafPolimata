@@ -6,8 +6,10 @@ This document defines how Claude, Codex/Copilot, ChatGPT, and other AI coding
 systems should collaborate on this repository. Any AI can pick up the codebase
 and continue without reading 30+ documents.
 
-**Start here**: Read `CLAUDE.md` at the repo root. It covers architecture,
-invariants, key files, and buffer limits in under 80 lines.
+**Start here**: Read `docs/AGENTES.md`. It consolidates architecture,
+invariants, key files, CI gates, non-collision rules, escalation protocol,
+and per-session checklist in one document. `CLAUDE.md` at repo root has a
+pointer to it with per-session checklist and conflict log references.
 
 ---
 

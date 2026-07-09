@@ -11,6 +11,14 @@ Este repositório passa a incluir uma documentação de referência de nível av
 
 ## Documentação principal
 
+### Colaboração entre agentes (AI e humanos)
+
+- [`docs/AGENTES.md`](docs/AGENTES.md): guia operacional unificado — taxonomia, ciclo de sessão, regras de não-colisão, anti-padrões, CI gates e entradas canônicas por subsistema. **Leia antes de qualquer mudança de código.**
+- [`docs/AGENTES_CHECKLIST.md`](docs/AGENTES_CHECKLIST.md): checklist executável por sessão (startup 5 passos, execução, shutdown, critério de encerramento).
+- [`docs/AGENTES_DECISAO_LOG.md`](docs/AGENTES_DECISAO_LOG.md): log de conflitos e decisões entre agentes, com template e critérios de escalação obrigatória.
+
+### Arquitetura, semântica e governança
+
 - [`docs/ARQUITETURA_21_NIVEIS.md`](docs/ARQUITETURA_21_NIVEIS.md): modelo em 21 níveis/camadas para contextualização e fluxo de sentido.
 - [`docs/DEZ_DIMENSOES_SEMANTICAS.md`](docs/DEZ_DIMENSOES_SEMANTICAS.md): 10 dimensões semânticas e dinâmicas do sentido.
 - [`docs/MATRIZ_JURIDICO_TECNOLOGICA.md`](docs/MATRIZ_JURIDICO_TECNOLOGICA.md): trilha jurídico-tecnológica com análise supralegal e risco.

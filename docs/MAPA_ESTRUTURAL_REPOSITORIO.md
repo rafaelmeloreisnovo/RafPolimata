@@ -28,6 +28,19 @@ Este documento organiza a leitura técnica do repositório em até **5 níveis d
 | `root-methods` | `RAF_001_*.c` … `RAF_056_*.c` | 56 métodos C de baixo nível. | Catálogo operacional de técnicas bare-metal/registrador/syscall/Android. | `PENDING` |
 | `root-compiler` | `raf_*.c`, `raf_*.h`, `raiz_*` | Compilador/otimizador raiz e exemplos/auditorias geradas. | Núcleo compilável do projeto; preservar smoke test antes de refatorar. | `RUNTIME` |
 
+### Documentos de colaboração de agentes (destaque dentro de `docs/`)
+
+Os três arquivos abaixo formam a trilha de entrada obrigatória para qualquer
+agente (AI ou humano) que abra uma sessão neste repositório:
+
+| Arquivo | Papel | Estado |
+|---|---|---|
+| `docs/AGENTES.md` | Guia unificado — leitura antes de codificar (taxonomia, ciclo, regras, CI gates, escalação) | `REFERENCE` |
+| `docs/AGENTES_CHECKLIST.md` | Checklist executável por sessão (startup, execução, shutdown) | `REFERENCE` |
+| `docs/AGENTES_DECISAO_LOG.md` | Log de conflitos e decisões entre agentes — template + histórico | `AUDIT` |
+
+Cadeia de entrada: `CLAUDE.md` → `docs/AGENTES.md` → documentos de profundidade.
+
 ## Diferenças entre tags de conteúdo
 
 - **`REFERENCE` não prova execução**: documentação deve apontar para `scripts/`, `configs/`, `Benchmark/` ou arquivos C quando declarar comportamento verificável.
