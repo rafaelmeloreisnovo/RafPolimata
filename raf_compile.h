@@ -81,6 +81,15 @@ typedef struct {
   char out_ops[256];
   char flags[128];
   uint64_t src_hash;
+
+  /* Deterministic RMR-CTI/Omega source profile. These fields classify the
+   * source byte stream for routing and audit; they do not claim semantic truth. */
+  uint32_t omega_entropy_milli;
+  uint32_t omega_phi_q16;
+  uint32_t omega_attractor;
+  uint32_t omega_flags;
+  uint8_t omega_path;
+
   uint64_t ops_signature;
   int rollback_code;
   uint64_t elapsed_ns;
