@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "raf_compile.h"
+#include "Apkc/omega_classifier.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -52,6 +53,11 @@ static uint64_t raf_ops_signature(const RafCtx *ctx) {
   h = raf_hash_update(h, (const uint8_t *)ctx->flags, strlen(ctx->flags));
   h = raf_hash_u64(h, (uint64_t)ctx->src_len);
   h = raf_hash_u64(h, ctx->src_hash);
+  h = raf_hash_u64(h, ctx->omega_entropy_milli);
+  h = raf_hash_u64(h, ctx->omega_phi_q16);
+  h = raf_hash_u64(h, ctx->omega_attractor);
+  h = raf_hash_u64(h, ctx->omega_flags);
+  h = raf_hash_u64(h, ctx->omega_path);
   h = raf_hash_u64(h, ctx->ir.n);
   h = raf_hash_u64(h, ctx->asm_out.n);
   h = raf_hash_u64(h, ctx->bin.n);
@@ -69,9 +75,13 @@ void raf_ctx_init(RafCtx *ctx) {
 }
 
 void raf_ctx_report(const RafCtx *ctx) {
-  printf("[raf] arch=%u brand=%s ir=%u asm=%u bin=%u src_hash=%016llx flags=%s\n",
+  printf("[raf] arch=%u brand=%s ir=%u asm=%u bin=%u src_hash=%016llx "
+         "omega=%s/%u phi=%u entropy=%u flags=%s\n",
          ctx->cpu.arch, ctx->cpu.brand, ctx->ir.n, ctx->asm_out.n, ctx->bin.n,
-         (unsigned long long)ctx->src_hash, ctx->flags);
+         (unsigned long long)ctx->src_hash,
+         raf_omega_path_name((RafOmegaPath)ctx->omega_path),
+         ctx->omega_attractor, ctx->omega_phi_q16,
+         ctx->omega_entropy_milli, ctx->flags);
 }
 
 static void prepare_manifest(RafCtx *ctx, const char *out_base) {
@@ -84,9 +94,33 @@ static int write_ops_manifest(RafCtx *ctx) {
   ctx->ops_signature = raf_ops_signature(ctx);
   FILE *fo = fopen(ctx->out_ops, "w");
   if (!fo) return -12;
-  fprintf(fo, "ops_schema=1\narch=%u\nbrand=%s\nlang=%u\nopt=%u\nfeat=0x%08x\nflags=%s\nsrc_len=%zu\nsrc_hash=%016llx\nir=%u\nasm=%u\nbin=%u\nelapsed_ns=%llu\nrollback_code=%d\nops_signature=%016llx\n",
+  fprintf(fo,
+          "ops_schema=2\n"
+          "arch=%u\n"
+          "brand=%s\n"
+          "lang=%u\n"
+          "opt=%u\n"
+          "feat=0x%08x\n"
+          "flags=%s\n"
+          "src_len=%zu\n"
+          "src_hash=%016llx\n"
+          "omega_entropy_milli=%u\n"
+          "omega_phi_q16=%u\n"
+          "omega_attractor=%u\n"
+          "omega_flags=0x%08x\n"
+          "omega_path=%u\n"
+          "omega_path_name=%s\n"
+          "ir=%u\n"
+          "asm=%u\n"
+          "bin=%u\n"
+          "elapsed_ns=%llu\n"
+          "rollback_code=%d\n"
+          "ops_signature=%016llx\n",
           ctx->cpu.arch, ctx->cpu.brand, ctx->lang, ctx->opt, ctx->feat,
           ctx->flags, ctx->src_len, (unsigned long long)ctx->src_hash,
+          ctx->omega_entropy_milli, ctx->omega_phi_q16,
+          ctx->omega_attractor, ctx->omega_flags, ctx->omega_path,
+          raf_omega_path_name((RafOmegaPath)ctx->omega_path),
           ctx->ir.n, ctx->asm_out.n, ctx->bin.n,
           (unsigned long long)ctx->elapsed_ns, ctx->rollback_code,
           (unsigned long long)ctx->ops_signature);
@@ -130,6 +164,17 @@ int raf_compile_file(RafCtx *ctx, const char *src_path, const char *out_base,
                       (int)sizeof(ctx->flags));
   if (read_src(ctx, src_path) != 0) return fail_with_manifest(ctx, -1, t0);
   ctx->src_hash = raf_fnv1a64((const uint8_t *)ctx->src, ctx->src_len);
+
+  {
+    RafOmegaMetrics omega = raf_omega_classify(
+        (const raf_omega_u8 *)ctx->src, (raf_omega_u32)ctx->src_len);
+    ctx->omega_entropy_milli = omega.entropy_milli;
+    ctx->omega_phi_q16 = omega.phi_q16;
+    ctx->omega_attractor = omega.attractor;
+    ctx->omega_flags = omega.flags;
+    ctx->omega_path = (uint8_t)omega.path;
+  }
+
   if (raf_ir_lower(ctx) != 0) return fail_with_manifest(ctx, -2, t0);
   if (raf_asm_emit(ctx) != 0) return fail_with_manifest(ctx, -3, t0);
   if (raf_hex_encode(ctx) != 0) return fail_with_manifest(ctx, -4, t0);
