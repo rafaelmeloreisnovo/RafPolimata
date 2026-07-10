@@ -1,23 +1,28 @@
 /* codegen_select.h — deterministic multi-encoding instruction selection.
  *
- * Some ARM64 instructions admit multiple bit-distinct encodings that are
- * semantically identical (e.g. MOV Xd,Xm == ORR Xd,XZR,Xm == ADD Xd,Xm,#0
- * == SUB Xd,Xm,#0 — all leave Xd == Xm with no flag side effects). Rather
- * than hardcoding a single encoder per logical operation, an "equivalence
- * family" picks among N verified-equivalent encoders.
+ * Multiple bit-distinct encodings may be used only after semantic equivalence
+ * has been proven. The chosen encoding is a pure function of bytes already
+ * emitted. The Omega bridge enriches the key with deterministic transition,
+ * entropy-proxy, fold occupancy, path and 42-attractor metrics.
  *
- * Selection is a pure function of the bytes already emitted, reusing
- * phi_fst/phi_attractor (coherence.h) as the deterministic "observer":
- * same source -> same prior bytes -> same phi -> same choice, every
- * build, on every host. This is reproducibility, not randomness — the
- * variant log (see RafCtx in raf_compile.h) makes the choice auditable.
+ * Same source -> same emitted prefix -> same choice on every build.
+ * This is reproducibility, not randomness.
  */
 #pragma once
 #include "sys.h"
-#include "coherence.h"
+#include "omega_classifier.h"
 
-static inline u32 codegen_select(const u8 *emitted_buf, u32 emitted_len, u32 num_variants) {
-    if (num_variants <= 1u) return 0u;
-    u32 phi = phi_fst(emitted_buf, emitted_len);
-    return phi_attractor(phi) % num_variants;
+static inline u32 codegen_select(const u8 *emitted_buf,
+                                 u32 emitted_len,
+                                 u32 num_variants) {
+    return (u32)raf_omega_codegen_index(
+        (const raf_omega_u8 *)emitted_buf,
+        (raf_omega_u32)emitted_len,
+        (raf_omega_u32)num_variants);
+}
+
+static inline RafOmegaMetrics codegen_classify(const u8 *emitted_buf,
+                                                u32 emitted_len) {
+    return raf_omega_classify((const raf_omega_u8 *)emitted_buf,
+                              (raf_omega_u32)emitted_len);
 }
