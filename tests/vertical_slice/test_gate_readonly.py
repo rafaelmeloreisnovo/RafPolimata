@@ -3,22 +3,15 @@ import json
 import subprocess
 import tempfile
 from pathlib import Path
+from intent_factory import make_valid_intent
 
 ROOT = Path(__file__).resolve().parents[2]
 FLOW = ROOT / "scripts/vertical_slice/run_readonly_flow.sh"
 
-intent = {
-    "schema": "rafaelia.intent.v1",
-    "intent_id": "intent-gate-001",
-    "action": "inspect_repo",
-    "target": {},
-    "inputs": [],
-    "constraints": [],
-    "evidence_refs": ["chunk-2"],
-    "requested_capabilities": ["git.read", "network.write"],
-    "risk": "medium",
-    "execution_gate": "allow",
-}
+intent = make_valid_intent("intent-gate-001")
+intent["evidence_refs"] = ["chunk-2"]
+intent["requested_capabilities"] = ["git.read", "network.write"]
+intent["risk"] = "medium"
 
 with tempfile.TemporaryDirectory() as td:
     td_path = Path(td)

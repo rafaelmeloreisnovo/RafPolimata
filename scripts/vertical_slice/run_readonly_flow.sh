@@ -10,13 +10,18 @@ if [[ -z "$INTENT_PATH" ]]; then
   exit 64
 fi
 
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "erro: python3 não encontrado no ambiente" >&2
+  exit 69
+fi
+
 mkdir -p "$OUT_DIR"
 PLAN_PATH="$OUT_DIR/execution_plan.json"
 RESULT_PATH="$OUT_DIR/execution_result.json"
 STDOUT_PATH="$OUT_DIR/stdout.log"
 STDERR_PATH="$OUT_DIR/stderr.log"
 
-python3 - "$ROOT_DIR" "$INTENT_PATH" "$PLAN_PATH" <<'PY'
+if ! python3 - "$ROOT_DIR" "$INTENT_PATH" "$PLAN_PATH" <<'PY'
 import json
 import sys
 from datetime import datetime, timezone
@@ -94,6 +99,10 @@ except ValidationError as exc:
 with open(plan_path, "w", encoding="utf-8") as f:
     json.dump(plan, f, ensure_ascii=False, indent=2)
 PY
+then
+  echo "erro: falha ao validar intent/schema ou gerar execution_plan" >&2
+  exit 65
+fi
 
 STARTED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 set +e
@@ -111,7 +120,7 @@ ENDED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 STDOUT_SHA256="$(sha256sum "$STDOUT_PATH" | awk '{print $1}')"
 STDERR_SHA256="$(sha256sum "$STDERR_PATH" | awk '{print $1}')"
 
-python3 - "$INTENT_PATH" "$RESULT_PATH" "$ROOT_DIR" "$STARTED_AT" "$ENDED_AT" "$EXIT_CODE" "$STDOUT_SHA256" "$STDERR_SHA256" <<'PY'
+if ! python3 - "$INTENT_PATH" "$RESULT_PATH" "$ROOT_DIR" "$STARTED_AT" "$ENDED_AT" "$EXIT_CODE" "$STDOUT_SHA256" "$STDERR_SHA256" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -168,6 +177,10 @@ except ValidationError as exc:
 with open(result_path, "w", encoding="utf-8") as f:
     json.dump(result, f, ensure_ascii=False, indent=2)
 PY
+then
+  echo "erro: falha ao validar/gerar execution_result" >&2
+  exit 66
+fi
 
 echo "execution_plan=$PLAN_PATH"
 echo "execution_result=$RESULT_PATH"

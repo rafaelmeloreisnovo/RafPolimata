@@ -5,23 +5,14 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 from jsonschema import Draft202012Validator
+from intent_factory import make_valid_intent
 
 ROOT = Path(__file__).resolve().parents[2]
 FLOW = ROOT / "scripts/vertical_slice/run_readonly_flow.sh"
 RESULT_SCHEMA = ROOT / "docs/contracts/execution_result.schema.json"
 
-intent = {
-    "schema": "rafaelia.intent.v1",
-    "intent_id": "intent-result-001",
-    "action": "inspect_repo",
-    "target": {},
-    "inputs": [],
-    "constraints": [],
-    "evidence_refs": ["chunk-3", "chunk-4"],
-    "requested_capabilities": ["git.read", "git.diff", "filesystem.read"],
-    "risk": "low",
-    "execution_gate": "allow",
-}
+intent = make_valid_intent("intent-result-001")
+intent["evidence_refs"] = ["chunk-3", "chunk-4"]
 
 required_fields = [
     "intent_id",

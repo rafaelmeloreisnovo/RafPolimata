@@ -3,6 +3,7 @@ import json
 import subprocess
 import tempfile
 from pathlib import Path
+from intent_factory import make_valid_intent
 
 ROOT = Path(__file__).resolve().parents[2]
 FLOW = ROOT / "scripts/vertical_slice/run_readonly_flow.sh"
@@ -23,18 +24,7 @@ def run_flow(intent: dict):
         return proc, result_exists
 
 
-valid_intent = {
-    "schema": "rafaelia.intent.v1",
-    "intent_id": "intent-valid-001",
-    "action": "inspect_repo",
-    "target": {},
-    "inputs": [],
-    "constraints": [],
-    "evidence_refs": ["chunk-1"],
-    "requested_capabilities": ["git.read", "git.diff", "filesystem.read"],
-    "risk": "low",
-    "execution_gate": "allow",
-}
+valid_intent = make_valid_intent("intent-valid-001")
 
 proc_ok, result_exists = run_flow(valid_intent)
 assert proc_ok.returncode == 0, proc_ok.stderr
