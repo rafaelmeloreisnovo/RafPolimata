@@ -44,6 +44,6 @@ invalid_intent = dict(valid_intent)
 del invalid_intent["action"]
 proc_bad, _ = run_flow(invalid_intent)
 assert proc_bad.returncode != 0
-assert "campo ausente 'action'" in proc_bad.stderr
+assert "intent_ir inválido" in proc_bad.stderr
 
 print("PASS: test_intent_ir_validation")

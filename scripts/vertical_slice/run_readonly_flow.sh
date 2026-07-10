@@ -19,8 +19,9 @@ STDERR_PATH="$OUT_DIR/stderr.log"
 python3 - "$ROOT_DIR" "$INTENT_PATH" "$PLAN_PATH" <<'PY'
 import json
 import sys
-from pathlib import Path
 from datetime import datetime, timezone
+from jsonschema import Draft202012Validator
+from jsonschema.exceptions import ValidationError
 
 root_dir, intent_path, plan_path = sys.argv[1:4]
 
@@ -30,21 +31,16 @@ with open(f"{root_dir}/internal/governance/capabilities.json", "r", encoding="ut
     caps = json.load(f)
 with open(f"{root_dir}/internal/governance/policy.json", "r", encoding="utf-8") as f:
     policy = json.load(f)
+with open(f"{root_dir}/docs/contracts/intent_ir.schema.json", "r", encoding="utf-8") as f:
+    intent_schema = json.load(f)
+with open(f"{root_dir}/docs/contracts/execution_plan.schema.json", "r", encoding="utf-8") as f:
+    plan_schema = json.load(f)
 
-required = [
-    "schema", "intent_id", "action", "target", "inputs", "constraints",
-    "evidence_refs", "requested_capabilities", "risk", "execution_gate"
-]
-for key in required:
-    if key not in intent:
-        raise SystemExit(f"intent_ir inválido: campo ausente '{key}'")
-
-if intent["schema"] != "rafaelia.intent.v1":
-    raise SystemExit("intent_ir inválido: schema deve ser rafaelia.intent.v1")
-if intent["risk"] not in {"low", "medium", "high", "critical"}:
-    raise SystemExit("intent_ir inválido: risk fora do enum")
-if intent["execution_gate"] not in {"allow", "sandbox_only", "human_review", "blocked"}:
-    raise SystemExit("intent_ir inválido: execution_gate fora do enum")
+try:
+    Draft202012Validator(intent_schema).validate(intent)
+except ValidationError as exc:
+    path = ".".join([str(p) for p in exc.absolute_path]) or "root"
+    raise SystemExit(f"intent_ir inválido em '{path}': {exc.message}")
 
 cap_map = caps.get("capabilities", {})
 default_gate = caps.get("default_policy", policy.get("default_gate", "blocked"))
@@ -89,6 +85,12 @@ for cmd in plan["commands"]:
     if key not in allowed:
         raise SystemExit("policy inválida: plano contém comando não permitido")
 
+try:
+    Draft202012Validator(plan_schema).validate(plan)
+except ValidationError as exc:
+    path = ".".join([str(p) for p in exc.absolute_path]) or "root"
+    raise SystemExit(f"execution_plan inválido em '{path}': {exc.message}")
+
 with open(plan_path, "w", encoding="utf-8") as f:
     json.dump(plan, f, ensure_ascii=False, indent=2)
 PY
@@ -113,6 +115,8 @@ python3 - "$INTENT_PATH" "$RESULT_PATH" "$ROOT_DIR" "$STARTED_AT" "$ENDED_AT" "$
 import json
 import sys
 from pathlib import Path
+from jsonschema import Draft202012Validator
+from jsonschema.exceptions import ValidationError
 
 (
     intent_path,
@@ -127,6 +131,8 @@ from pathlib import Path
 
 with open(intent_path, "r", encoding="utf-8") as f:
     intent = json.load(f)
+with open(f"{root_dir}/docs/contracts/execution_result.schema.json", "r", encoding="utf-8") as f:
+    result_schema = json.load(f)
 
 result_dir = Path(result_path).parent
 
@@ -152,6 +158,12 @@ result = {
     "rollback_available": False,
     "source_chunk_refs": intent.get("evidence_refs", [])
 }
+
+try:
+    Draft202012Validator(result_schema).validate(result)
+except ValidationError as exc:
+    path = ".".join([str(p) for p in exc.absolute_path]) or "root"
+    raise SystemExit(f"execution_result inválido em '{path}': {exc.message}")
 
 with open(result_path, "w", encoding="utf-8") as f:
     json.dump(result, f, ensure_ascii=False, indent=2)
