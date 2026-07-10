@@ -1,5 +1,9 @@
 # IA, Agentes e Humanos — Protocolo Técnico de Formalidade
 
+> **Ponto de entrada unificado:** `docs/AGENTES.md` consolida taxonomia, ciclo de
+> sessão, regras de não-colisão, CI gates e escalação em um único documento.
+> Este arquivo aprofunda o protocolo formal de validação prévia e execução acoplada.
+
 ## Objetivo
 
 Estabelecer um protocolo operacional para garantir que **código e documentação evoluam em conjunto**, com validação explícita de requisitos antes de qualquer execução técnica.
@@ -32,7 +36,7 @@ Estabelecer um protocolo operacional para garantir que **código e documentaçã
 
 ### Fase 3 — Execução acoplada
 - Implementar alterações com sincronização documental na mesma unidade de trabalho.
-- Evitar padrão “codificar agora, documentar depois”.
+- Evitar padrão "codificar agora, documentar depois".
 
 ### Fase 4 — Auditoria técnica
 - Conferir rastreabilidade entre requisito, implementação e documento.
@@ -60,11 +64,11 @@ As equações propostas descrevem um arcabouço híbrido que combina:
 
 Interpretação operacional: o sistema representa entradas heterogêneas (dados, entropia, estado) em uma geometria comum, mantendo rastreabilidade criptográfica e acoplamento semântico entre camadas.
 
-## Critério de “vazio melhor que invenção”
+## Critério de "vazio melhor que invenção"
 
 Quando não houver base suficiente:
 
-- declarar explicitamente “informação insuficiente para inferência segura”;
+- declarar explicitamente "informação insuficiente para inferência segura";
 - manter estado `PENDING` no requisito;
 - bloquear decisões irreversíveis até validação humana.
 

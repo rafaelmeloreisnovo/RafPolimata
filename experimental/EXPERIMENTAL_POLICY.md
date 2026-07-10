@@ -8,7 +8,7 @@ custódia do projeto.
 
 ## Estados canônicos
 
-O projeto usa os seguintes estados (definidos em `CLAUDE.md`):
+O projeto usa os seguintes estados (definidos em `CLAUDE.md` e detalhados em `docs/AGENTES.md` §3):
 
 | Estado | Significado |
 |--------|-------------|

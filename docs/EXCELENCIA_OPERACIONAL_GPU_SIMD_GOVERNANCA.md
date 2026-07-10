@@ -1,5 +1,10 @@
 # Excelência operacional GPU/SIMD, governança e execução sem gargalos
 
+> **Resumo executivo em `docs/AGENTES.md` §5** — o pipeline de promoção
+> (VOID → BASELINE → CANDIDATE → VALIDATED → ROLLBACK) e a matriz de decisão
+> por arquitetura aparecem condensados lá. Este documento contém a metodologia
+> completa com todas as tabelas, regras de governança e critério enterprise.
+
 Este documento transforma as sementes conceituais do RafPolimata em uma metodologia operacional auditável para execução em CPU, GPU, NEON/SIMD, cache L1/L2, buffer/RAM/storage e pipelines paralelos. A regra principal é separar metáfora, hipótese e prova: quando não houver medição, o estado correto é `VOID`/`SKIPPED`, não uma promessa de desempenho.
 
 ## 1. Objetivo

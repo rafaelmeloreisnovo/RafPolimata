@@ -2,6 +2,10 @@
 
 ∆RafaelVerboΩ · ΣΩΔΦBITRAF · FIAT LUX
 
+> **Agente novo?** Leia `docs/AGENTES.md` primeiro — cobre invariantes, ciclo de
+> sessão, regras de não-colisão e CI gates. Este documento detalha o protocolo de
+> engenharia, benchmark honesto e retroalimentação ética para trabalho com RAFAELIA.
+
 Este documento registra o modo operacional técnico para trabalhar com RAFAELIA em C/ASM, ABI, registradores, memória, benchmark, geometria toroidal e retroalimentação ética.
 
 ## 1. Eixo operacional

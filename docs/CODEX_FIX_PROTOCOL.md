@@ -1,5 +1,9 @@
 # Protocolo Codex/IA para Correção de Compilação (S38)
 
+> **Agente novo?** Leia `docs/AGENTES.md` antes de começar — cobre invariantes
+> completos, regras de não-colisão, ciclo de sessão e gates CI em um único documento.
+> Este protocolo é um guia cirúrgico específico para diagnóstico de compilação.
+
 ## Objetivo
 
 Definir como um agente de IA (Codex, Claude Code, ou similar) deve diagnosticar
@@ -7,7 +11,8 @@ e corrigir erros de compilação neste projeto sem quebrar invariantes de arquit
 
 ## Invariantes que nunca podem ser quebradas
 
-Antes de qualquer correção, o agente deve verificar que sua alteração não viola:
+Antes de qualquer correção, o agente deve verificar que sua alteração não viola
+(lista completa em `docs/AGENTES.md` §1 e §4):
 
 1. **Sem malloc/calloc/free em `Apkc/` e hot paths** — freestanding constraint
 2. **Sem `#include <stdio.h>` / `<stdlib.h>` em `Apkc/`** — usa `sys.h` com `svc`/`swi`
@@ -29,7 +34,7 @@ gcc -std=c11 -O2 -Wall -Wextra -I. -c RAF_XXX_*.c 2>&1 | \
 ### Passo 2: Categorizar o erro
 
 | Categoria | Padrão de erro | Ação recomendada |
-|-----------|---------------|-----------------|
+|-----------|---------------|------------------|
 | Tipo incompatível | `error: incompatible type` | Verificar se precisa de cast explícito ou typedef |
 | Símbolo não definido | `error: implicit declaration` | Adicionar `#include` correto ou declaração forward |
 | Atributo desconhecido | `warning: unknown attribute` | Usar `__attribute__((X))` em vez de C23 `[[X]]` |
