@@ -1,0 +1,34 @@
+{
+  "schema": "rafaelia.q16.dual-artifact-vectors.v1",
+  "author": "Rafael Melo Reis",
+  "date": "2026-07-10",
+  "original": {
+    "file": "rafaelia_node",
+    "size": 5608,
+    "sha256": "9cb04542b7385081310c31e276f17e336e99e639a4367b5774282a6a5c8b8030",
+    "exit": 0
+  },
+  "stripped": {
+    "file": "rafaelia_node.stripped",
+    "size": 4352,
+    "sha256": "82bdd4b70352de3301777808023c152938398d3cf8d9ebb2d8716fbff62191ac",
+    "exit": 0
+  },
+  "expected": {
+    "result_48": 1516200,
+    "result_96": 1517719,
+    "error": 44,
+    "fixed_count": 7,
+    "fixed_min": 1517719,
+    "fixed_max": 1517725,
+    "first_fixed_iteration": 90,
+    "fixed_value": 1517719
+  },
+  "contract": {
+    "run_both": true,
+    "compare_stdout_with_cmp": true,
+    "require_equal_stdout": true,
+    "require_zero_exit_for_both": true,
+    "require_vector_match": true
+  }
+}
