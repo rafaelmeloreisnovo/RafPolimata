@@ -68,7 +68,7 @@ final_gate = max_cap_gate if gate_rank[max_cap_gate] > gate_rank[intent_gate] el
 
 unknown = [cap for cap, _ in resolved if cap not in cap_map]
 if unknown:
-    raise SystemExit(f"gate bloqueado: capability fora da allowlist: {', '.join(unknown)}")
+    raise SystemExit(f"gate bloqueado: capabilities fora da allowlist: {', '.join(unknown)}")
 if final_gate == "blocked":
     raise SystemExit("gate bloqueado: execution_gate final = blocked")
 

@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rafaelia.execution_plan.v1",
+  "$comment": "v1 intentionally restricts plan commands to read-only git status and git diff --stat.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema", "plan_id", "intent_id", "gate", "commands", "created_at"],

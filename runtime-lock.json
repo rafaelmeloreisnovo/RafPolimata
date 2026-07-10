@@ -32,7 +32,8 @@
       "name": "rafaelmeloreisnovo/RafPolimata",
       "url": "https://github.com/rafaelmeloreisnovo/RafPolimata.git",
       "branch": "TOKEN_VAZIO",
-      "commit": "b5552195242f4b3cbe949509f45d86177e647e8b"
+      "commit": "b5552195242f4b3cbe949509f45d86177e647e8b",
+      "pin_reason": "workspace_local_commit"
     }
   ],
   "abi": [
