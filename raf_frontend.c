@@ -70,6 +70,7 @@ int raf_ir_lower(RafCtx *ctx) { return raf_precompile(ctx); }
 void raf_ctx_init(RafCtx *ctx) {
   memset(ctx, 0, sizeof(*ctx));
   ctx->opt = RAF_OPT_2;
+  ctx->omega_path = (uint8_t)RAF_OMEGA_VOID;
   raf_cpu_detect(&ctx->cpu);
   ctx->feat = ctx->cpu.feat;
 }
