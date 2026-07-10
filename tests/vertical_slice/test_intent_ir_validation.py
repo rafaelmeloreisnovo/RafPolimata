@@ -21,18 +21,23 @@ def run_flow(intent: dict):
             check=False,
         )
         result_exists = (td_path / "execution_result.json").exists()
-        return proc, result_exists
+        result_data = None
+        if result_exists:
+            result_data = json.loads((td_path / "execution_result.json").read_text(encoding="utf-8"))
+        return proc, result_exists, result_data
 
 
 valid_intent = make_valid_intent("intent-valid-001")
 
-proc_ok, result_exists = run_flow(valid_intent)
+proc_ok, result_exists, result_data = run_flow(valid_intent)
 assert proc_ok.returncode == 0, proc_ok.stderr
 assert result_exists
+assert result_data["intent_id"] == valid_intent["intent_id"]
+assert result_data["final_state"] == "success"
 
 invalid_intent = dict(valid_intent)
 del invalid_intent["action"]
-proc_bad, _ = run_flow(invalid_intent)
+proc_bad, _, _ = run_flow(invalid_intent)
 assert proc_bad.returncode != 0
 assert "intent_ir inválido" in proc_bad.stderr
 

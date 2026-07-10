@@ -1,7 +1,7 @@
 {
   "schema": "rafaelia.runtime_lock.v1",
   "generated_at": "TOKEN_VAZIO",
-  "placeholder_policy": "Campos TOKEN_VAZIO devem ser substituídos por valores reais na etapa de geração/integração em RafGitTools.",
+  "placeholder_policy": "Campos TOKEN_VAZIO devem ser substituídos por valores reais na etapa de geração/integração em RafGitTools; o commit de RafPolimata está pinado por ser o workspace local desta execução.",
   "integration_repository": "rafaelmeloreisnovo/RafGitTools",
   "repositories": [
     {

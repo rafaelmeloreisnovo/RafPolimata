@@ -25,5 +25,6 @@ with tempfile.TemporaryDirectory() as td:
     )
     assert proc.returncode != 0
     assert "fora da allowlist" in proc.stderr
+    assert not (td_path / "execution_result.json").exists()
 
 print("PASS: test_gate_readonly")
