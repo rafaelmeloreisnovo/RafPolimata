@@ -19,6 +19,7 @@ STDERR_PATH="$OUT_DIR/stderr.log"
 python3 - "$ROOT_DIR" "$INTENT_PATH" "$PLAN_PATH" <<'PY'
 import json
 import sys
+from pathlib import Path
 from datetime import datetime, timezone
 
 root_dir, intent_path, plan_path = sys.argv[1:4]
@@ -54,12 +55,10 @@ if not isinstance(requested_caps, list):
     raise SystemExit("intent_ir inválido: requested_capabilities deve ser array")
 
 resolved = []
+max_cap_gate = "allow"
 for capability in requested_caps:
     gate = cap_map.get(capability, default_gate)
     resolved.append((capability, gate))
-
-max_cap_gate = "allow"
-for _, gate in resolved:
     if gate_rank[gate] > gate_rank[max_cap_gate]:
         max_cap_gate = gate
 
@@ -113,6 +112,7 @@ STDERR_SHA256="$(sha256sum "$STDERR_PATH" | awk '{print $1}')"
 python3 - "$INTENT_PATH" "$RESULT_PATH" "$ROOT_DIR" "$STARTED_AT" "$ENDED_AT" "$EXIT_CODE" "$STDOUT_SHA256" "$STDERR_SHA256" <<'PY'
 import json
 import sys
+from pathlib import Path
 
 (
     intent_path,
@@ -128,6 +128,8 @@ import sys
 with open(intent_path, "r", encoding="utf-8") as f:
     intent = json.load(f)
 
+result_dir = Path(result_path).parent
+
 result = {
     "schema": "rafaelia.execution_result.v1",
     "intent_id": intent["intent_id"],
@@ -142,9 +144,9 @@ result = {
     "stdout_sha256": stdout_sha256,
     "stderr_sha256": stderr_sha256,
     "artifacts": [
-        result_path.replace("execution_result.json", "execution_plan.json"),
-        result_path.replace("execution_result.json", "stdout.log"),
-        result_path.replace("execution_result.json", "stderr.log")
+        str(result_dir / "execution_plan.json"),
+        str(result_dir / "stdout.log"),
+        str(result_dir / "stderr.log")
     ],
     "final_state": "success" if int(exit_code) == 0 else "failed",
     "rollback_available": False,

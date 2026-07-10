@@ -17,6 +17,7 @@ Fluxo implementado:
 - Plano compilado contém somente:
   - `git status`
   - `git diff --stat`
+- `termux.command.safe` está reservado para execução sandboxed futura (v2) com comandos previamente compilados e sem texto livre.
 
 ## Lacunas atuais
 

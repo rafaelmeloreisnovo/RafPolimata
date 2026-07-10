@@ -64,6 +64,6 @@ with tempfile.TemporaryDirectory() as td:
     for key in ("stdout_sha256", "stderr_sha256"):
         value = result[key]
         assert len(value) == 64
-        int(value, 16)
+        assert int(value, 16) >= 0
 
 print("PASS: test_execution_result_schema")
