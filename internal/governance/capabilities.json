@@ -1,0 +1,10 @@
+{
+  "schema": "rafaelia.capabilities.v1",
+  "default_policy": "blocked",
+  "capabilities": {
+    "git.read": "allow",
+    "git.diff": "allow",
+    "filesystem.read": "allow",
+    "termux.command.safe": "sandbox_only"
+  }
+}

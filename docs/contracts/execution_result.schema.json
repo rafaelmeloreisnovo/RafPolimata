@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rafaelia.execution_result.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "intent_id",
+    "executed_command",
+    "args",
+    "working_directory",
+    "started_at",
+    "ended_at",
+    "exit_code",
+    "stdout_truncated",
+    "stderr_truncated",
+    "stdout_sha256",
+    "stderr_sha256",
+    "artifacts",
+    "final_state",
+    "rollback_available",
+    "source_chunk_refs"
+  ],
+  "properties": {
+    "schema": { "const": "rafaelia.execution_result.v1" },
+    "intent_id": { "type": "string" },
+    "executed_command": { "type": "string" },
+    "args": {
+      "type": "array",
+      "items": { "type": "array", "items": { "type": "string" } }
+    },
+    "working_directory": { "type": "string" },
+    "started_at": { "type": "string", "format": "date-time" },
+    "ended_at": { "type": "string", "format": "date-time" },
+    "exit_code": { "type": "integer" },
+    "stdout_truncated": { "type": "boolean" },
+    "stderr_truncated": { "type": "boolean" },
+    "stdout_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "stderr_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "artifacts": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "final_state": { "type": "string", "enum": ["success", "failed", "blocked"] },
+    "rollback_available": { "type": "boolean" },
+    "source_chunk_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

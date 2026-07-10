@@ -1,0 +1,53 @@
+{
+  "schema": "rafaelia.runtime_lock.v1",
+  "generated_at": "TOKEN_VAZIO",
+  "integration_repository": "rafaelmeloreisnovo/RafGitTools",
+  "repositories": [
+    {
+      "name": "rafaelmeloreisnovo/termux-app-rafacodephi",
+      "url": "https://github.com/rafaelmeloreisnovo/termux-app-rafacodephi.git",
+      "branch": "TOKEN_VAZIO",
+      "commit": "TOKEN_VAZIO"
+    },
+    {
+      "name": "rafaelmeloreisnovo/CONVERSATIONS_CHUNKS_PRIVATE",
+      "url": "https://github.com/rafaelmeloreisnovo/CONVERSATIONS_CHUNKS_PRIVATE.git",
+      "branch": "TOKEN_VAZIO",
+      "commit": "TOKEN_VAZIO"
+    },
+    {
+      "name": "rafaelmeloreisnovo/RafGitTools",
+      "url": "https://github.com/rafaelmeloreisnovo/RafGitTools.git",
+      "branch": "TOKEN_VAZIO",
+      "commit": "TOKEN_VAZIO"
+    },
+    {
+      "name": "rafaelmeloreisnovo/llamaRafaelia",
+      "url": "https://github.com/rafaelmeloreisnovo/llamaRafaelia.git",
+      "branch": "TOKEN_VAZIO",
+      "commit": "TOKEN_VAZIO"
+    },
+    {
+      "name": "rafaelmeloreisnovo/RafPolimata",
+      "url": "https://github.com/rafaelmeloreisnovo/RafPolimata.git",
+      "branch": "TOKEN_VAZIO",
+      "commit": "b5552195242f4b3cbe949509f45d86177e647e8b"
+    }
+  ],
+  "abi": [
+    "arm64-v8a",
+    "armeabi-v7a"
+  ],
+  "toolchain": {
+    "python": "TOKEN_VAZIO",
+    "bash": "TOKEN_VAZIO",
+    "git": "TOKEN_VAZIO"
+  },
+  "expected_hashes": {
+    "conversation_chunks": "TOKEN_VAZIO",
+    "context_bundle": "TOKEN_VAZIO",
+    "intent_ir": "TOKEN_VAZIO",
+    "execution_plan": "TOKEN_VAZIO",
+    "execution_result": "TOKEN_VAZIO"
+  }
+}
