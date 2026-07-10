@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rafaelia.execution_plan.v1",
+  "$comment": "v1 intentionally restricts plan commands to read-only git status and git diff --stat.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "plan_id", "intent_id", "gate", "commands", "created_at"],
+  "properties": {
+    "schema": { "const": "rafaelia.execution_plan.v1" },
+    "plan_id": { "type": "string" },
+    "intent_id": { "type": "string" },
+    "gate": { "type": "string", "enum": ["allow", "sandbox_only", "human_review", "blocked"] },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["command", "args", "read_only"],
+        "properties": {
+          "command": { "type": "string", "enum": ["git"] },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["status", "diff", "--stat"]
+            }
+          },
+          "read_only": { "type": "boolean", "const": true }
+        }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}
