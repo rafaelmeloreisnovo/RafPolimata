@@ -1,5 +1,9 @@
 # Protocolo de dois ciclos ômega
 
+> **Entrada canônica:** `docs/AGENTES.md` §5 resume o pipeline operacional
+> (VOID → BASELINE → CANDIDATE → VALIDATED → ROLLBACK) e o critério de shutdown.
+> Este documento detalha os dois ciclos acoplados — semântico e técnico.
+
 Este documento transforma o pedido multidisciplinar em uma rota operacional auditável. A ideia central é manter dois ciclos acoplados: um ciclo de **síntese semântica** para reduzir incoerência entre línguas, metáforas e modelos; e um ciclo de **execução técnica** para preservar invariantes de baixo nível sem heap no caminho crítico.
 
 O protocolo aceita `TOKEN_VAZIO` quando falta evidência. Um vazio explícito é melhor que uma alegação não testada.
