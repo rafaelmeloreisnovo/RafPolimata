@@ -1,5 +1,6 @@
 name: Conversation Indexer CI
 
+# Validation branch exercises the integrated scanner through pull_request.
 on:
   push:
     paths:
