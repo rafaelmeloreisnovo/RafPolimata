@@ -1,0 +1,63 @@
+name: Conversation Indexer CI
+
+on:
+  push:
+    paths:
+      - 'runtime/conversation_indexer/**'
+      - '.github/workflows/conversation-indexer-ci.yml'
+  pull_request:
+    paths:
+      - 'runtime/conversation_indexer/**'
+      - '.github/workflows/conversation-indexer-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Clang tests
+        working-directory: runtime/conversation_indexer
+        run: make clean all CC=clang
+      - name: GCC compatibility
+        working-directory: runtime/conversation_indexer
+        run: make clean test cli audit CC=gcc
+      - name: Sanitizers
+        working-directory: runtime/conversation_indexer
+        run: |
+          clang -O1 -g -std=c11 -Wall -Wextra -Werror -pedantic \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            raf_convscan.c test_convscan.c -o test_sanitized
+          ./test_sanitized
+      - name: ARM32 freestanding object
+        working-directory: runtime/conversation_indexer
+        run: make arm32
+      - name: ARM64 freestanding object
+        working-directory: runtime/conversation_indexer
+        run: make arm64
+      - name: Realistic fixture
+        working-directory: runtime/conversation_indexer
+        run: |
+          cat > fixture.json <<'JSON'
+          [{"id":"conv-1","title":"Teste","create_time":1,"update_time":2,"mapping":{"node":{"message":{"id":"m-1","author":{"role":"user"},"content":{"content_type":"text","parts":["ola"]}}}}}]
+          JSON
+          ./convscan fixture.json | tee fixture.report.json
+          grep -q '"state": "VERIFIED"' fixture.report.json
+          grep -q '"title": 1' fixture.report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conversation-indexer-artifacts
+          path: |
+            runtime/conversation_indexer/convscan
+            runtime/conversation_indexer/raf_convscan.o
+            runtime/conversation_indexer/raf_convscan-arm32.o
+            runtime/conversation_indexer/raf_convscan-arm64.o
+            runtime/conversation_indexer/fixture.report.json
+          if-no-files-found: error
+          retention-days: 14
