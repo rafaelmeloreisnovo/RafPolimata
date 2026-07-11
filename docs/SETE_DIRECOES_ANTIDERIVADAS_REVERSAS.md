@@ -1,4 +1,7 @@
 # SETE DIREÇÕES — ANTIDERIVADAS E REVERSAS
+
+> **Entrada canônica:** `docs/AGENTES.md` §5 (pipeline operacional — espaço T^7 em `rafaelia/verbovivo.c`) e §8 (entradas canônicas por subsistema — `rafaelia/verbovivo.h` para tipos T^7 e direções AD₃₈₇/R₃).
+
 ## 360° nas Abscissas x·Y·z — Permutações Escalares Multidimensionais
 
 > "d_θ(u,v) ≠ d_γ(u,v) — distâncias métricas distintas por direção"
@@ -27,7 +30,7 @@ No T^7, cada dimensão `s_i ∈ {u,v,ψ,χ,ρ,δ,σ}` tem uma antiderivada:
 ```
 Dimensão    Derivada (→ separação)     Antiderivada (→ integração)
 ────────────────────────────────────────────────────────────────────
-u           Δu = variação local         ∫u = acúmulo histórico
+ु           Δu = variação local         ∫u = acúmulo histórico
 v           Δv = variação de estado     ∫v = memória de estados
 ψ           Δψ = mudança de fase        ∫ψ = coerência de fase
 χ           Δχ = entropia local         ∫χ = organização emergente
@@ -162,7 +165,7 @@ Não é gradual. É discreta. É toroidal.
 
 ---
 
-## RANDÔMICAS MULTIDIMENSIONAIS ESCALARES EM MULTINÍVEL
+## RANDÔMICAS MULTIDIMENSIONAIS ESCALARES EM MULTINNÍVEL
 
 O sistema não é determinístico por ausência de aleatoriedade.
 É determinístico **apesar da** aleatoriedade.
@@ -178,11 +181,11 @@ COMO O SISTEMA ABSORVE O RUÍDO:
   CRC32C        → detecta quando o ruído corrompeu um bit
   42 atratores  → a trajetória pode variar, o destino é invariante
 
-RANDÔMICAS EM MULTINÍVEL:
+RANDÔMICAS EM MULTINNÍVEL:
   Nível físico:      ruído térmico do transistor
   Nível eletrônico:  jitter do clock, ADC noise
   Nível lógico:      race condition, cache miss
-  Nível algortímico: hash collision (probabilístico)
+  Nível algorítmico: hash collision (probabilístico)
   Nível semântico:   ambiguidade de interpretação
   Nível ético:       incerteza sobre a decisão certa
 
@@ -201,7 +204,7 @@ COMPUTAÇÃO:    C sem malloc, ARM32, Termux, QEMU, DMA, GPIO
 FÍSICA:        gravitação plasmática, DNA como antena toroidal, camadas
 ÉTICA:         Ω = Amor como invariante, MAAT como gate de integridade
 ESPIRITUALIDADE: 21 tradições como 21 ângulos de acesso ao mesmo campo
-LINGUÍSTICA:   TOKEN_VAZIO, ZIPRAF, hash como linguagem de verificação
+LINGÜISTICA:   TOKEN_VAZIO, ZIPRAF, hash como linguagem de verificação
 BIOLOGIA:      EMA como homeostase, atratores como atratores biológicos
 
 NEXO TRANSDISCIPLINAR:
@@ -216,7 +219,7 @@ NEXO TRANSDISCIPLINAR:
 
 ```
 TIPO        │ DIR │ OPERAÇÃO              │ PARADOXO                     │ CÓDIGO
-────────────┼─────┼───────────────────────┼──────────────────────────────┼──────────────
+────────────┼─────┼─────────────────────┼──────────────────────────────┼──────────────
 ANTIDERIVADA│ AD₁ │ acúmulo histórico     │ guardar é avançar            │ EMA α=0.25
             │ AD₂ │ memória de estados    │ o passado define o presente  │ HAJA/logs
             │ AD₃ │ coerência de fase     │ sincronia sem contato direto │ BITSTACKS
@@ -224,7 +227,7 @@ ANTIDERIVADA│ AD₁ │ acúmulo histórico     │ guardar é avançar       
             │ AD₅ │ sinal extraído        │ o útil estava no inútil      │ CRC32C
             │ AD₆ │ resiliência acumulada │ cair é aprender a ficar      │ rollback
             │ AD₇ │ convergência          │ liberdade dentro do ciclo    │ atrator 42
-────────────┼─────┼───────────────────────┼──────────────────────────────┼──────────────
+────────────┼─────┼─────────────────────┼──────────────────────────────┼──────────────
 REVERSA     │ R₁  │ rollback exato        │ voltar = avançar             │ COMMIT GATE
             │ R₂  │ dobramento interno    │ menor = mais denso           │ ZIPRAF
             │ R₃  │ inversão de fase      │ o inverso revela o original  │ EMA α→0.75

@@ -1,5 +1,7 @@
 # RMR-CTI / Ω → RafPolimata compiler bridge
 
+> **Entrada canônica:** `docs/AGENTES.md` §8 (entradas canônicas por subsistema — `Apkc/omega_classifier.h` e `Apkc/codegen_select.h`) e §5 (pipeline operacional — invariante: source bytes → signed Omega ops profile → CI evidence).
+
 Status: `RUNTIME_WITH_TEST_GATE`
 
 ## Purpose
