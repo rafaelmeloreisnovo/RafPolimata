@@ -1,5 +1,9 @@
 # Claim Evidence Lock
 
+> **Entrada canônica:** `docs/AGENTES.md` §3 define os estados canônicos (TOKEN_VAZIO, PENDING,
+> PASS_LIMITED) e §5 descreve o pipeline operacional. Este documento formaliza a política de
+> travamento claim-evidência — claim forte exige evidência forte, ausência honesta registra TOKEN_VAZIO.
+
 Política: claim forte exige evidência forte. A ausência honesta de ferramenta, device, dataset, hardware, raw log, revisão ou execução deve ser registrada como `TOKEN_VAZIO`, `SKIPPED`, `PENDING`, `PASS_LIMITED` ou `DEVICE_REQUIRED`, nunca como PASS inventado.
 
 ## Regras de trava

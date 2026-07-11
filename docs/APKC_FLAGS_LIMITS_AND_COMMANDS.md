@@ -1,5 +1,9 @@
 # ApkC — flags, comandos e limites atuais
 
+> **Entrada canônica:** `docs/AGENTES.md` §8 lista as entradas canônicas por subsistema
+> (`apkc_main()` como entry point) e `Apkc/PROTOCOL.md` detalha o pipeline de dispatch.
+> Este documento descreve flags CLI, limites de buffer estático e comandos operacionais do ApkC.
+
 Este documento descreve o estado atual do ApkC: como compilar, como gerar APK, quais opções existem na CLI e quais limites existem por ele ser um gerador freestanding/minimalista.
 
 ## Natureza do ApkC

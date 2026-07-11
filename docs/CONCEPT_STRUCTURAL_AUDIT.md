@@ -1,5 +1,9 @@
 # Concept Structural Audit
 
+> **Entrada canônica:** `docs/AGENTES.md` §5 descreve o pipeline VOID → VALIDATED e §3 define
+> os estados canônicos. Este documento audita o uso de conceitos como unidades estruturais —
+> conceito só avança quando possui arquivo-âncora, gate ou evidência, e lacuna explícita.
+
 Auditoria reproduzivel do uso de conceitos como unidades estruturais do RafPolimata.
 
 Regra: conceito so avanca quando possui arquivo ancora, uso estrutural, gate ou evidencia, lacuna explicita e proxima acao. Ausencia operacional permanece `TOKEN_VAZIO`, `PENDING` ou `DEVICE_REQUIRED`.

@@ -1,5 +1,9 @@
 # S27 — Tabela de ciclos estimados vs ciclos medidos
 
+> **Entrada canônica:** `docs/AGENTES.md` §5 cobre o pipeline operacional e
+> `docs/ROTINA_OPERACIONAL_BENCHMARKS.md` detalha prewarm, warmup e métricas p95/p99.
+> Este documento tabula ciclos estimados (ISA/fabricante) vs ciclos medidos (CLOCK_MONOTONIC) no host x86_64.
+
 Atualização: 2026-06-20. Host de referência: x86_64 Linux 6.18.5 gcc 13, -O2, 1M iterações, clock nominal ~3.0 GHz assumido para conversão ns→ciclos.
 
 ## Metodologia
