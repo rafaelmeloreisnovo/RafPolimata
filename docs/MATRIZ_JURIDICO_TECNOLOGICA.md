@@ -1,5 +1,7 @@
 # Matriz jurídico-tecnológica (com enfoque supralegal)
 
+> **Entrada canônica:** `docs/AGENTES.md` §6 (escalação e conflito — quando escalar para humano em decisões jurídicas) e `docs/BASES_SUPRALEGAIS_E_PADROES.md` (normas de referência: GDPR, LGPD, NIST, ISO).
+
 ## Objetivo
 Oferecer um roteiro para cruzar engenharia e Estado Democrático de Direito, incluindo controle de constitucionalidade material e parâmetros supralegais (direitos humanos, princípios constitucionais e tratados aplicáveis).
 
@@ -41,4 +43,4 @@ Oferecer um roteiro para cruzar engenharia e Estado Democrático de Direito, inc
 - **M4**: accountability robusta com revisão democrática recorrente.
 
 ## Conclusão
-A conformidade real não é apenas “estar licenciado”; é demonstrar, continuamente, que arquitetura, operação e impacto social permanecem alinhados aos direitos fundamentais.
+A conformidade real não é apenas "estar licenciado"; é demonstrar, continuamente, que arquitetura, operação e impacto social permanecem alinhados aos direitos fundamentais.

@@ -1,5 +1,7 @@
 # Logotipo RAFAELIA/RafPolimata — ASCII 60 colunas
 
+> **Entrada canônica:** `docs/AGENTES.md` §1 (leitura rápida — o que este repo faz e onde estão os invariantes) e §5 (pipeline operacional — saída visual via `vv_svg` para engram SVG).
+
 Arte ASCII com largura fixa de 60 colunas. A cor pode ser aplicada pelo terminal/renderer sem alterar os 60 caracteres úteis de cada linha.
 
 ```text

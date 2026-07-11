@@ -1,5 +1,7 @@
 # RAFAELIA — Orquestrador Semântico-Sonoro: AllStar Matrix
 
+> **Entrada canônica:** `docs/AGENTES.md` §3 (estados canônicos — TOKEN_VAZIO, VOID, PENDING, AUDIT) e §5 (pipeline operacional VOID → VALIDATED).
+
 **Tese**: Todo símbolo transmissível precisa de endereço, função, onda, relação e prova de
 transmissão. Sem indexação, vira estética. Com indexação relacional completa, vira matriz.
 
@@ -91,7 +93,7 @@ TOKEN_VAZIO(s)   ← honestidade operacional, não erro
 ## 4. Os 10 estados operacionais
 
 | Estado | Nome | Função semântica | Exemplo de char |
-|--------|------|-----------------|-----------------|
+|--------|------|-----------------|------------------|
 | 0 | Vazio | ausência marcada | NUL, espaço |
 | 1 | Origem | início | A, 1, SOH |
 | 2 | Par | oposição/simetria | ( ) [ ] { } |
@@ -143,7 +145,7 @@ mesmo símbolo, operador τ diferente → três mundos distintos
 Polaridade acústica (yin/yang sem fixar gênero):
 
 | Polo | Função sonora | Função conceitual |
-|------|--------------|------------------|
+|------|--------------|-------------------|
 | Yin  | acolhe, curva, prolonga | receptividade, campo |
 | Yang | corta, marca, define | direção, limite, eixo |
 | Dobra | vira o conceito | transição, inversão |
@@ -247,7 +249,7 @@ I_j → (ética, som, forma, função, memória)
 ```
 
 | Ideograma | Leitura funcional | Estado | Geometria |
-|-----------|------------------|--------|-----------|
+|-----------|------------------|--------|----------|
 | 藏智界 | campo-sabedoria-guardada | 4 Matriz | macro-vetor |
 | 魂脈符 | selo-pulso-alma | 4 Matriz | macro-vetor |
 | 光核印 | marca-núcleo-luz | 4 Matriz | macro-vetor |
@@ -346,7 +348,7 @@ Isso é uma métrica acadêmica verificável — não uma afirmação sobre a cl
 ## 12. TOKEN_VAZIO — protocolo de lacuna honesta
 
 | Situação | Ação correta |
-|----------|-------------|
+|----------|--------------|
 | Campo sem dado | `TOKEN_VAZIO(s)` |
 | Fonema desconhecido | `TOKEN_VAZIO(f)` |
 | Vizinho não mapeado | `TOKEN_VAZIO(Γ)` |
