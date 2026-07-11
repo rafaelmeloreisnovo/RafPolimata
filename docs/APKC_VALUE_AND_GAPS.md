@@ -1,5 +1,9 @@
 # ApkC — valor e gaps
 
+> **Entrada canônica:** `docs/AGENTES.md` §5 (pipeline operacional VOID → VALIDATED)
+> e §3 (estados canônicos — PENDING, TOKEN_VAZIO). Este documento avalia valor conservador
+> e lacunas técnicas do ApkC para priorização técnica/acadêmica.
+
 > Estas faixas são estimativas heurísticas para priorização técnica/acadêmica. Não são avaliação financeira formal, recomendação de investimento ou garantia de mercado.
 
 ## Valor conservador

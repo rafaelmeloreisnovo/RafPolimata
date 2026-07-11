@@ -1,5 +1,9 @@
 # ApkC Android Runtime Proof Plan
 
+> **Entrada canônica:** `docs/AGENTES.md` §8 lista as entradas canônicas por subsistema
+> (`apkc_main()` como entry point) e §3 define os estados canônicos (DEVICE_REQUIRED, TOKEN_VAZIO).
+> Este plano descreve o caminho mínimo source → APK → sign → install → launch → logcat → verdict.
+
 Caminho mínimo: source → build → APK → sign → install → launch → logcat → verdict → artifact.
 
 Este plano é `DEVICE_REQUIRED`. Sem `adb`, device/emulator, NDK, Android SDK ou `apksigner`, registrar `SKIPPED`/`TOKEN_VAZIO`, nunca PASS falso.

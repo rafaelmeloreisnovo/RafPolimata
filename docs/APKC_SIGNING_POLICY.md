@@ -1,5 +1,9 @@
 # ApkC — Política de assinatura (L18)
 
+> **Entrada canônica:** `docs/AGENTES.md` §7 (gates de CI — F7: APK assinado v1/v2/v3)
+> e §4 (regras de não-colisão — disciplina de evidência e trava de claim).
+> Este documento detalha a política de assinatura release (fecha lacuna L18) e cadeia de custódia.
+
 > **Cadeia de custódia documental — 2026-06-17**
 > Fecha a lacuna L18 de `docs/LACUNAS_PROFUNDAS_MVP_PRODUTO.md`
 > ("Assinatura de release, não só debug").
@@ -54,7 +58,7 @@ data `2026-06-14T10:56:26Z`).
 
 Leitura honesta: o que está `PASS` (v1/v2/v3) é assinatura **debug**, não de
 release. v3.1, v4 e SourceStamp estão `false` — portanto cadeia de proveniência
-comercial e os esquemas mais novos ainda não existem.
+comericial e os esquemas mais novos ainda não existem.
 
 ---
 
