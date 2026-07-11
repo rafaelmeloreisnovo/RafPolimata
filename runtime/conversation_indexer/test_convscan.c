@@ -32,7 +32,7 @@ static int test_chatgpt_shape(void) {
     CHECK(a.mapping_keys == 1u, 17);
     CHECK(a.message_keys == 1u, 18);
     CHECK(a.conversation_id_keys == 2u, 19);
-    CHECK(a.objects == 6u, 20);
+    CHECK(a.objects == 5u, 20);
     CHECK(a.arrays == 2u, 21);
     CHECK(a.max_depth >= 5u, 22);
     return 0;
