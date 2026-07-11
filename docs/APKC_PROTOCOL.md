@@ -1,5 +1,9 @@
 # Protocolo de validacao ApkC
 
+> **Entrada canônica:** `docs/AGENTES.md` §7 (gates de CI) e §8 (entradas canônicas —
+> `apkc_main()` como entry point). `Apkc/PROTOCOL.md` cobre o pipeline de dispatch.
+> Este documento registra o estado de validação do APKc gate a gate.
+
 | Fase | Gate | Estado atual | Evidencia |
 |---|---|---|---|
 | F0 | source exists | PASS | Apkc/hello.s.txt |

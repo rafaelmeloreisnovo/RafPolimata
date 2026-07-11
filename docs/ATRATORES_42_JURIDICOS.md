@@ -1,5 +1,9 @@
 # 42 Atratores Jurídicos com 4 níveis de profundidade
 
+> **Entrada canônica:** `docs/AGENTES.md` §5 descreve o pipeline operacional e os 42 atratores
+> do T^7 toroid em `rafaelia/verbovivo.c` (`phi_attractor() % 42`). Este documento mapeia os
+> 42 atratores como framework jurídico com 4 níveis de profundidade para auditoria e conformidade.
+
 **Escopo:** framework pós-doc para auditoria, fiscalização, sanções, supralegalidade e engenharia de conformidade.
 
 ## Estrutura metodológica

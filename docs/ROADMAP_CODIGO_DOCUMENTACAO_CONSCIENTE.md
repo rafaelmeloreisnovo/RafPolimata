@@ -1,5 +1,7 @@
 # Roadmap — Código & Documentação Consciente
 
+> **Entrada canônica:** `docs/AGENTES.md` §5 (pipeline operacional VOID → VALIDATED) e §3 (ciclo de sessão — código e documentação na mesma unidade de trabalho).
+
 ## Visão
 
 Estabelecer uma prática de engenharia em que IA e humanos mantenham **coerência simultânea** entre implementação, explicação técnica e auditoria formal.

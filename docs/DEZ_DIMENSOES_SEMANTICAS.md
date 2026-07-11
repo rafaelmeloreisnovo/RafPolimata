@@ -1,5 +1,9 @@
 # Dez dimensões semânticas e dinâmicas do sentido
 
+> **Entrada canônica:** `docs/AGENTES.md` §5 descreve o pipeline operacional e o espaço T^7
+> (`rafaelia/verbovivo.c`). Este documento organiza o problema semântico em 10 dimensões operacionais
+> — de topologia toroidal a governança normativa.
+
 Este documento organiza o problema descrito (multilíngue, matemático, físico, cognitivo e jurídico) em 10 dimensões operacionais.
 
 ## 1) Dimensão topológica (espaço de estados)
@@ -16,7 +20,7 @@ Este documento organiza o problema descrito (multilíngue, matemático, físico,
 ## 3) Dimensão informacional (entropia/sintropia)
 - Entropia aproximada por sinais discretos e transições.
 - Sintropia como vetor de convergência organizacional (coerência emergente).
-- Tensão produtiva: coerência vs variabilidade (não é “erro”, é gradiente de criação de sentido).
+- Tensão produtiva: coerência vs variabilidade (não é "erro", é gradiente de criação de sentido).
 
 ## 4) Dimensão criptográfica e integridade
 - Hash incremental, Merkle, CRC e acumuladores XOR como camadas de garantia.
@@ -54,4 +58,4 @@ Este documento organiza o problema descrito (multilíngue, matemático, físico,
 ---
 
 ## Síntese
-O “conhecimento que entendeu” é o que consegue **preservar sentido sob transformação** (linguística, matemática, jurídica e temporal), sem perder rastreabilidade, legitimidade e integridade.
+O "conhecimento que entendeu" é o que consegue **preservar sentido sob transformação** (linguística, matemática, jurídica e temporal), sem perder rastreabilidade, legitimidade e integridade.

@@ -1,5 +1,9 @@
 # Arquitetura de contextualização em 21 níveis/camadas
 
+> **Entrada canônica:** `docs/AGENTES.md` §2 (taxonomia de agentes por responsabilidade e escopo)
+> e §5 (pipeline operacional VOID → VALIDATED). Este documento descreve o modelo de referência
+> de 21 níveis para organizar informação, significado, decisão e responsabilidade.
+
 Modelo de referência para organizar informação, significado, decisão e responsabilidade.
 
 ## Camadas 1–7: Núcleo técnico-formal

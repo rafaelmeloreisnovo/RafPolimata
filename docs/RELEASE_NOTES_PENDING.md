@@ -1,5 +1,7 @@
 # Release Notes (Pending Only)
 
+> **Entrada canônica:** `docs/AGENTES.md` §3 (estados canônicos — PENDING, TOKEN_VAZIO) e §5 (pipeline operacional VOID → VALIDATED).
+
 > Escopo: este arquivo registra apenas itens pendentes, aguardando validação e/ou implementação.
 
 ## [RESOLVED] Estrutura inicial de governança IA↔Código↔Documentação

@@ -1,5 +1,9 @@
 # Protocolo mínimo de falsificabilidade em P(k)
 
+> **Entrada canônica:** `docs/AGENTES.md` §7 lista os gates de CI, incluindo G4 (relatório P(k)
+> — bloqueia release quando o modelo calibrado/congelado reprova). Este documento detalha o
+> protocolo de falsificabilidade: dado observado vs modelo congelado, sem ajuste durante o gate.
+
 Este documento operacionaliza o primeiro teste "prova ou queda" com um único observable: espectro de potência P(k).
 
 ## Objetivo

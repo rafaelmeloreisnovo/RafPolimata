@@ -1,5 +1,7 @@
 # PARADIGMA COMPUTACIONAL — ATENÇÃO GEOMÉTRICA vs. GRADIENTE
 
+> **Entrada canônica:** `docs/AGENTES.md` §8 (entradas canônicas por subsistema — `rafaelia/verbovivo.h` e `Apkc/coherence.h` como implementadores de `vv_recall` e `phi_fst`) e §5 (pipeline operacional).
+
 > "Não tem como se crê nisso em cima do paradigma computacional para realmente reconhecer"
 > — Rafael, sessão de convergência
 
@@ -77,7 +79,7 @@ static inline u32 phi_fst(const u8 *buf, u32 n) {
 **O que φ_w significa:**
 
 | φ_w → 1.0 | φ_w → 0.0 |
-|-----------|-----------|
+|-----------|----------|
 | Stream coerente (poucos bytes únicos, baixa entropia) | Stream caótico (alta entropia, máxima diversidade) |
 | Prioriza similaridade semântica (cosine) | Prioriza divergência estrutural (Hamming) |
 | "Recupera o que é parecido" | "Recupera o que é diferente — aprendizado por divergência" |

@@ -1,5 +1,9 @@
 # Benchmark Visual — RafPolimata
 
+> **Entrada canônica:** `docs/AGENTES.md` §5 (pipeline operacional VOID → VALIDATED) e
+> `docs/ROTINA_OPERACIONAL_BENCHMARKS.md` (metodologia: prewarm, warmup, medianas, p95/p99).
+> Este documento apresenta benchmarks visuais do RafPolimata com medianas de 31 amostras.
+
 > Medido em x86_64 host (Intel Core i7-8750H, gcc -O2 -march=native).
 > Todos os valores de latência são medianas de 31 amostras coletadas via
 > `raf_bench.h` (BENCH_K=31, mediana no índice [15] após insertion sort).
@@ -43,7 +47,7 @@ Frequencia TSC detectada em runtime via `raf_sys.h:raf_tsc_freq()`.
 ### phi64_mix hash chain 64 passos
 
 | Variante            | Latencia mediana | Notas                    |
-|---------------------|-----------------|--------------------------|
+|---------------------|-----------------|---------------------------|
 | phi64_mix x64       | 60–90 ns        | 64x MULQ + XOR, sem heap |
 
 ---
@@ -66,7 +70,7 @@ return flags & mask;
 ```
 
 | Metodo              | Ciclos/chamada (med) | Mispredictions/iter | Notas              |
-|---------------------|---------------------|---------------------|--------------------|
+|---------------------|---------------------|---------------------|-----------------|
 | raf_flags_branch    | 18–32               | 0–8 (data-dependent)| pior caso aleatorio|
 | raf_flags_bitmask   | 1–2                 | 0                   | AND + RET          |
 | Speedup (worst)     | 16–32x              | —                   | flags=0x55 aleatorio|
@@ -98,7 +102,7 @@ Tabela nibble: 16 entradas uint8_t, footprint 16 bytes em Flash/ROM.
 ### Custo por byte
 
 | Metodo              | Operacoes/byte          | Ciclos/byte (est.) | Flash/ROM |
-|---------------------|------------------------|-------------------|-----------|
+|---------------------|------------------------|-------------------|----------|
 | LUT nibble (S17)    | 2 lookups + 4 XOR/shift| 4–6               | 16 B      |
 | Bitwise loop        | 8x (compare+shift+XOR) | 12–20             | ~60 B     |
 | Speedup             | 3–4x                   | —                 | —         |

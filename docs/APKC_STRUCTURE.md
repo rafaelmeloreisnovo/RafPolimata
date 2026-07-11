@@ -1,5 +1,9 @@
 # ApkC — estrutura auditável
 
+> **Entrada canônica:** `docs/AGENTES.md` §8 lista as entradas canônicas por subsistema;
+> `Apkc/PROTOCOL.md` cobre o pipeline completo. Este documento descreve a árvore de arquivos
+> e a responsabilidade auditável de cada componente do APKc.
+
 ## Árvore visual
 
 ```text

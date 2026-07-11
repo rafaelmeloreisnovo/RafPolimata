@@ -1,5 +1,9 @@
 # ApkC — prova mínima em Termux/Android ARM32
 
+> **Entrada canônica:** `docs/AGENTES.md` §7 (gates de CI — F7 sign e F8 install/package visible)
+> e §8 (`apkc_main()` como entry point). Este documento registra a prova mínima observada
+> em 2026-06-14: build, sign, install e abertura de APK ARM32 no Termux.
+
 Este documento registra a prova mínima observada em 2026-06-14: o ApkC foi compilado e usado no próprio Termux/Android ARM32 para gerar, assinar, instalar e abrir um APK Android mínimo.
 
 ## Ambiente observado

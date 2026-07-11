@@ -1,6 +1,8 @@
 # Repository Universe Matrix
 
-Esta matriz é a camada navegável de evidência do RafPolimata. Ela não transforma ausência de ferramenta, device, dataset, log ou execução em sucesso: usa `TOKEN_VAZIO`, `SKIPPED`, `PASS_LIMITED` ou `DEVICE_REQUIRED` quando a prova ainda não existe.
+> **Entrada canônica:** `docs/AGENTES.md` §8 (entradas canônicas por subsistema — esta matriz é a camada navigável de evidência do repositório) e §3 (estados canônicos — TOKEN_VAZIO, PASS_LIMITED, DEVICE_REQUIRED).
+
+Esta matriz é a camada navigável de evidência do RafPolimata. Ela não transforma ausência de ferramenta, device, dataset, log ou execução em sucesso: usa `TOKEN_VAZIO`, `SKIPPED`, `PASS_LIMITED` ou `DEVICE_REQUIRED` quando a prova ainda não existe.
 
 Invariante: origem → estrutura → integridade → execução → métrica → evidência → governança → rollback.
 
@@ -23,7 +25,7 @@ Fonte automática: `python3 scripts/emit_repository_universe_matrix.py` gera `re
 | `RAF_001_*.c`–`RAF_056_*.c` | código C | Métodos RAF canônicos | RUNTIME | compilar sem declarar runtime falso | `bash RAF_host_syntax_check.sh` | Arquivos presentes | Runtime/hardware por método em `TOKEN_VAZIO` quando não executado | Usar `docs/RAF_METHODS_STATUS.md` | Hardware específico ausente | Reverter método/índice juntos |
 | `RAF_rafaelia_common.h` | código C | Cabeçalho comum dos métodos | RUNTIME | ABI comum e compilação separada | `gcc -c -I. RAF_001_acesso_direto_a_ddrx_portx_pinx.c` | Presente | Runtime não provado por header | Manter compatibilidade | Quebra ampla de build | Rollback imediato do header |
 | `raf_compile.h` | código C | Interface do compilador local | RUNTIME | contrato de compilação | `gcc -std=c11 -Wall -Wextra -Werror ...` | Presente | Provas de IR/lowering dependem de testes | Registrar entrada→output | Claim de compilador excessivo | Rebaixar para `CLAIM_COMPILE` |
-| `raf_precomp.c` | código C | Núcleo/precompilação do compilador local | RUNTIME | build estrito e smoke test | `./raf_compile --help` | Presente | Cobertura formal incompleta | Ampliar testes de lowering | Regressão silenciosa | Build estrito em CI |
+| `raf_precomp.c` | código C | Núcleo/pré-compilação do compilador local | RUNTIME | build estrito e smoke test | `./raf_compile --help` | Presente | Cobertura formal incompleta | Ampliar testes de lowering | Regressão silenciosa | Build estrito em CI |
 | `docs/PROTOCOLO_CANONICO_COHERENCIA.md` | documento | Protocolo de coerência | CONFIG | metáfora→variável/protocolo/gate | `python3 scripts/validate_coherence_protocol.py` | Documento e validador presentes | Não substitui prova runtime | Cruzar claims com lock | Mistura hipótese/prova | Marcar analogias explicitamente |
 | `docs/MATRIZ_JURIDICO_TECNOLOGICA.md` | documento | Governança jurídica/tecnológica | REFERENCE | governança e limites jurídicos | revisão documental | Presente | Não é parecer jurídico | Manter aviso e evidência separada | Claim legal indevido | Solicitar revisão qualificada |
 | `docs/APKC_PROTOCOL.md` e `docs/APKC_*` | documentos | Protocolos ApkC | AUDIT | device/logcat para runtime | `bash scripts/apkc_validate.sh` | Provas parciais | Runtime Android pode estar `TOKEN_VAZIO` | Executar plano de proof chain | Confundir APK válido com app executado | `DEVICE_REQUIRED` |

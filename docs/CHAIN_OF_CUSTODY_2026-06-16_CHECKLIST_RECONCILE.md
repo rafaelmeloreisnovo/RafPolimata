@@ -1,5 +1,9 @@
 # Cadeia de custódia — reconciliação de RAF_CHECKLIST_96_ITEMS.md (M0xx)
 
+> **Entrada canônica:** `docs/AGENTES.md` §3 (estados canônicos — PENDING, TOKEN_VAZIO, AUDIT)
+> e §4 (disciplina de evidência: `[x]` só onde o corpo da função executa a técnica, nunca por nome).
+> Este documento reconcilia os 56 itens M001–M056 contra os arquivos `RAF_0xx_*.c` existentes.
+
 Data: `2026-06-16`.
 Escopo: reconciliar os 56 itens M001–M056 de `RAF_CHECKLIST_96_ITEMS.md` contra os 56 arquivos `RAF_0xx_*.c` já existentes no repositório, marcando `[x]` apenas onde o corpo da função executa de fato a técnica descrita no nome do item — não onde apenas o nome/comentário/macro sugere isso.
 

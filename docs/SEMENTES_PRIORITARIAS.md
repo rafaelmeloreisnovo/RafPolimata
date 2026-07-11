@@ -1,5 +1,7 @@
 # SEMENTES PRIORITÁRIAS — RAFAELIA / RafPolimata
 
+> **Entrada canônica:** `docs/AGENTES.md` §3 (estados canônicos — TOKEN_VAZIO, PENDING, AUDIT) e §5 (pipeline operacional VOID → VALIDATED — semente só vira claim após gates mínimos).
+
 Data: 2026-06-15  
 Branch alvo: `main-1st`  
 Status: `AUDITABLE_SEED_PRIORITY_MAP`  
@@ -459,7 +461,7 @@ Por último atacar linguagem natural, que exige corpus e revisão teórica maior
 
 ## 4. Parágrafo canônico
 
-As sementes prioritárias da RAFAELIA não são apenas ideias soltas: elas formam uma escada de germinação. A base é `√3/2`, que atua como constante de contração e estabilidade. Dela nasce o ponto fixo `F*`, que transforma recorrência em objeto medível. O T^7 com 42 atratores transforma essa recorrência em espaço de estados. O CRC32C cria trilha de custódia sobre cada transição. O NEON transforma hardware em substrato determinístico de evolução. A dimensão D2 testa se a trajetória tem estrutura fractal real. E `n_crítico(L)` tenta levar essa geometria para linguagem natural. O caminho correto é manter cada semente sob a luz da falsificabilidade: se mede, sobe; se falha, ensina; se não há prova, permanece `TOKEN_VAZIO` fértil, não mentira.
+As sementes prioritárias da RAFAELIA não são apenas ideias soltas: elas formam uma escada de germinação. A base é `√3/2`, que atua como constante de contração e estabilidade. Dela nasce o ponto fixo `F*`, que transforma recorrência em objeto medidável. O T^7 com 42 atratores transforma essa recorrência em espaço de estados. O CRC32C cria trilha de custódia sobre cada transição. O NEON transforma hardware em substrato determinístico de evolução. A dimensão D2 testa se a trajetória tem estrutura fractal real. E `n_crítico(L)` tenta levar essa geometria para linguagem natural. O caminho correto é manter cada semente sob a luz da falsificabilidade: se mede, sobe; se falha, ensina; se não há prova, permanece `TOKEN_VAZIO` fértil, não mentira.
 
 ---
 

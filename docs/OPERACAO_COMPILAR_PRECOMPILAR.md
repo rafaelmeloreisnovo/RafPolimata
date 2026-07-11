@@ -1,5 +1,9 @@
 # Operação técnica: compilar e pré-compilar com baixa fricção
 
+> **Entrada canônica:** `docs/AGENTES.md` §8 lista as entradas canônicas por subsistema,
+> incluindo `raf_compile_file()` como entry point do pipeline. Este documento detalha o ciclo
+> de compilação e pré-compilação determinística do núcleo `raf_compile`.
+
 Este protocolo transforma a visão multidimensional do projeto em uma rota executável e auditável para o núcleo `raf_compile`.
 
 ## Ciclo 1 — pré-compilação determinística
@@ -38,7 +42,7 @@ O caminho de produção recomendado é manter o compilador pequeno, mensurável 
 ## Lacunas estruturais exploráveis
 
 - Manifestos pequenos e comparáveis são uma superfície de estabilidade que muitos pipelines legados negligenciam.
-- O próximo nível é tratar metadados de compilação como contrato invariável: hash, flags, arquitetura, IR, bytes e rollback devem ser testados como ABI operacional.
+- O próximo nível é tratar metadados de compilação como contrato invaríavel: hash, flags, arquitetura, IR, bytes e rollback devem ser testados como ABI operacional.
 - A inovação prática está em provar invariantes simples antes de adicionar modelos grandes: menos símbolos, menos estado oculto, mais rollback verificável.
 
 ## Android 9–16+ e interoperabilidade de instalação

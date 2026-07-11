@@ -1,5 +1,7 @@
 # Rollback, failsafe e mitigação
 
+> **Entrada canônica:** docs/AGENTES.md §5 (pipeline operacional — ROLLBACK como estado explícito no ciclo VOID → VALIDATED) e §7 (CI gates — exit não-zero para falha real, TOKEN_VAZIO para ausência de ferramenta).
+
 ## Failsafe
 
 | Evento | Ação | Exit |

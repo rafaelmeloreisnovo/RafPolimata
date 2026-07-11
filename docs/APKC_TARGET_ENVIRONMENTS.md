@@ -1,5 +1,9 @@
 # ApkC — Ambientes-alvo e caminhos de intérprete (L10)
 
+> **Entrada canônica:** `docs/AGENTES.md` §8 lista as entradas canônicas por subsistema;
+> `Apkc/lang_profile.h` é a fonte única de verdade para caminhos de intérprete por linguagem.
+> Este documento fecha lacuna L10 — caminhos de intérprete em APKs Android reais por ABI.
+
 > **Cadeia de custódia documental — 2026-06-17**
 > Fecha a lacuna L10 de `docs/LACUNAS_PROFUNDAS_MVP_PRODUTO.md`
 > ("Caminhos de intérprete em APKs Android reais").

@@ -1,5 +1,9 @@
 # Bases supralegais, constitucionais e padrões técnicos
 
+> **Entrada canônica:** `docs/AGENTES.md` §6 (escalação e conflito — quando escalar para humano)
+> e `docs/MAPA_ESTRUTURAL_REPOSITORIO.md` (mapa estrutural completo do repositório).
+> Este documento lista as bases supralegais, constitucionais e padrões técnicos de referência.
+
 ## Bloco A — Direitos humanos e infância
 - Carta da ONU (fundamentos de direitos e cooperação internacional).
 - Declaração Universal dos Direitos Humanos.

@@ -1,5 +1,9 @@
 # Estado Atual e Valor Conservador — RafPolimata
 
+> **Entrada canônica:** `docs/AGENTES.md` §3 (estados canônicos — TOKEN_VAZIO, PENDING, AUDIT)
+> e §5 (pipeline operacional VOID → VALIDATED). Este documento avalia o estado atual do RafPolimata
+> e valor conservador por estágio — sem inflar claim e sem apagar lacunas.
+
 Data: 2026-06-15  
 Status: `AUDITABLE_BUSINESS_TECH_STATE`  
 Escopo: avaliação conservadora do ativo técnico, sem inflar claim e sem apagar lacunas.

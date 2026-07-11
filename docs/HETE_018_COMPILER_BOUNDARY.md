@@ -1,5 +1,9 @@
 # HETE-0.18 — fronteira científica para o RafPolimata
 
+> **Entrada canônica:** `docs/AGENTES.md` §4 (regras de não-colisão — pesquisa orienta seleção
+> experimental, nunca substitui prova de equivalência) e §5 (pipeline operacional). Este documento
+> define a fronteira de integração segura do paper HETE-0.18 no RafPolimata.
+
 **Repositório:** privado  
 **Paper canônico privado:** `rafaelmeloreisnovo/papers/docs/rmrcti/HETE_018_TOROIDAL_STABILITY_ENRICHMENT.md`  
 **Commit do paper:** `c444988dca0b36251a51dfe349256f75d6099b31`
@@ -89,4 +93,4 @@ pesquisa pode orientar seleção experimental
 mas nunca substituir prova de equivalência
 ```
 
-Assinatura: `RAFCODE-Φ-∆RafaelVerboΩ-𓂀ΔΦΩ`
+Assinatura: `RAFCODE-Φ-∆RafaelVerboΩ-𓌀ΔΦΩ`
