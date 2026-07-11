@@ -1,5 +1,9 @@
 # Protocolo canônico de coerência, integridade e falsificabilidade
 
+> **Entrada canônica:** `docs/AGENTES.md` §5 descreve o pipeline VOID → VALIDATED e §7 lista
+> os gates de CI (G1–G7). Este documento expande os invariantes de coerência (phi, T^7, 42
+> atratores), integridade (FNV/CRC32C/Merkle) e falsificabilidade (P(k)).
+
 Este documento traduz as 50 sementes matemático-semânticas do projeto para um contrato operacional auditável. A função dele não é declarar verdade metafísica: é separar **metáfora útil**, **invariante implementável**, **medida observável** e **critério de queda**.
 
 ## Núcleo canônico

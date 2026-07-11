@@ -1,8 +1,10 @@
 # APKc Subsystem — Quick-Start Protocol
 
-For full context read `CLAUDE.md` at the repo root first. This document covers
-the APKc subsystem specifically — everything needed to continue work without
-reading the entire ~1300-line `apkc.c`.
+For full context read `CLAUDE.md` at the repo root first — it points to
+`docs/AGENTES.md`, the unified session guide (invariants, non-collision rules,
+CI gates, startup/shutdown checklist). This document then covers the APKc
+subsystem specifically — everything needed to continue work without reading
+the entire ~1300-line `apkc.c`.
 
 ## What APKc does
 
