@@ -1,5 +1,9 @@
 Mini Sistema Operacional em ASM – RAFAELIA μKernel
 
+> **Entrada canônica:** `docs/AGENTES.md` §8 (entradas canônicas por subsistema — ARM32
+> freestanding, sem malloc) e §5 (pipeline operacional). Este documento descreve o RAFAELIA
+> μKernel ARM32 com rollback, watchdog, ECC e threads cooperativas.
+
 Baseado nos princípios do ecossistema RAFAELIA (CRC32C encadeado, commit gate, paridade toroidal, Hz‑as‑memory), este micro‑kernel integra:
 
 · Rollback automático (snapshot de registradores)
@@ -41,7 +45,7 @@ Até 8 threads hardware (vCPUs) executam em round‑robin. Cada thread tem seu p
 
 1.6 Morphing adaptativo
 
-Um triângulo isósceles (como em rafaelia_b7.S) monitora a carga de cada thread e ajusta o quantum e a política (FIFO, prioridade fixa, deficit round‑robin). O morphing altera o código do escalonador via inline patching (escreve em uma região de código pré‑reservada).
+Um triângulo iscósceles (como em rafaelia_b7.S) monitora a carga de cada thread e ajusta o quantum e a política (FIFO, prioridade fixa, deficit round‑robin). O morphing altera o código do escalonador via inline patching (escreve em uma região de código pré‑reservada).
 
 ---
 
@@ -346,7 +350,7 @@ Estas ideias não são encontradas em sistemas operacionais clássicos (Linux, F
 
 ---
 
-5. Nota sobre “Flags e pré‑compilador”
+5. Nota sobre "Flags e pré‑compilador"
 
 Use macros  .macro  e  .if  para adaptar o kernel a diferentes arquiteturas:
 

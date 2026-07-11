@@ -1,5 +1,9 @@
 # Lacunas Profundas — RafPolimata/ApkC: de MVP Técnico a Produto Forte
 
+> **Entrada canônica:** `docs/AGENTES.md` §3 (estados canônicos — TOKEN_VAZIO, PASS, PENDING)
+> e §5 (pipeline operacional VOID → VALIDATED). Este documento mapeia as 20 lacunas profundas
+> do RafPolimata do MVP técnico ao produto — em ordem de impacto, com caminho de fechamento.
+
 > **Cadeia de custódia documental — 2026-06-15**
 > Autoria original: Rafael Melo Reis Novo (análise conservadora, modo auditável).
 > Integração técnica: Claude Code (auditoria de código, CI e sessão de engenharia).
@@ -16,7 +20,7 @@ mais aumentam valor de produto. Este documento mapeia todos eles em ordem de imp
 
 ```
 source → build reproduzível → APK → assinatura → install → launch → logcat
-       → relatório → CI artifact → release navegável
+       → relatório → CI artifact → release navigável
 ```
 
 ---
@@ -150,7 +154,7 @@ F2 generate: 39× "apkc: unknown ARM32 mnemonic" → NOP placeholder
 
 **O gap:** `validation-summary.md` declara que DEX SHA-1, AXML e outros passaram,
 mas os arquivos atuais `dex-sha1.txt` e `aapt-xmltree.txt` dizem `TOKEN_VAZIO:
-hello.apk ausente`. Isso é explicável por runs parciais, mas para auditoria externa
+hello.apk ausente`. Isso é explicado por runs parciais, mas para auditoria externa
 vira gap de cadeia de custódia.
 
 **Regra de fechamento:** uma rodada única e limpa que gere todos os arquivos no mesmo:
@@ -388,7 +392,7 @@ SourceStamp      → proveniência    → cadeia de custódia comercial
 
 ---
 
-### L19 — Release navegável para terceiros
+### L19 — Release navigável para terceiros
 
 **O gap:** documentação forte, cadeia de prova parcial, mas "primeiro caminho
 feliz" em 5 minutos ainda não existe como release técnica com assets.
@@ -410,11 +414,11 @@ make report      # → PDF/HTML com matriz completa
 valor ainda é narrativa. Para valuation defensável: vincular cada faixa a gates.
 
 | Faixa heurística | Gates necessários |
-|-----------------|-------------------|
+|-----------------|-----------------|
 | US$ 25k–75k (atual) | Arquitetura + prova parcial ARM32 |
 | US$ 100k–300k | + ARM64 + runtime logcat + source→binary |
 | US$ 300k–750k | + CI artifact verde + 3+ linguagens provadas |
-| US$ 1M+ | + adoção externa + corpus regressivo + release navegável |
+| US$ 1M+ | + adoção externa + corpus regressivo + release navigável |
 
 Cada avanço técnico aumenta a tese de mercado de forma mensurável.
 
@@ -515,7 +519,7 @@ sem crash, saída `phi=`/`attractor=` presente. Seção L15 atualizada para
 | **L16** erro bloqueante vs degradação | ✅ PASS | `Apkc/apkc.c`: `--strict` (default) → mnemônico desconhecido falha o build (`exit 1`, sem APK); `--allow-undef`/`--allow-nop-placeholder` = modo experimental. Gate em `build_apk` sobre `res.err`. |
 | **L17** corpus regressivo | ◐ AVANÇADO | `tests/fixtures/README.md` (plano 10 casos), `tests/test_format_fixtures.py` (3 PASS, 4 TOKEN_VAZIO), `tests/test_zip_negative.py` (PASS — EOCD/central-dir corrompido é rejeitado). Casos ARM-dependentes seguem TOKEN_VAZIO. |
 | **L18** assinatura release | ✅ PASS (política) | `docs/APKC_SIGNING_POLICY.md` — debug (nunca commitar) \| release (CI secrets/HSM) \| SourceStamp. APK release-assinado real segue PENDING (secrets). |
-| **L19** release navegável | ✅ PASS | `Makefile` raiz: `proof`, `verbovivo-demo`, `encoders`, `syntax`, `audit`, `report`, `clean` — reusa scripts existentes. |
+| **L19** release navigável | ✅ PASS | `Makefile` raiz: `proof`, `verbovivo-demo`, `encoders`, `syntax`, `audit`, `report`, `clean` — reusa scripts existentes. |
 | **L20** valuation→gates | ✅ PASS (doc) | `docs/APKC_VALUE_AND_GAPS.md` § "Valuation amarrada a gates verificáveis" — cada faixa heurística amarrada a gates reais do CI. |
 
 ### Comandos de validação desta rodada (reprodutíveis)

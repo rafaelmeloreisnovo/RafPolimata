@@ -1,5 +1,9 @@
 # Licenças e termos: comparação estratégica
 
+> **Entrada canônica:** `docs/AGENTES.md` §6 (escalação e conflito — quando escalar para humano)
+> e `docs/BASES_SUPRALEGAIS_E_PADROES.md` (normas e standards de referência). Este documento
+> compara estrategicamente licenças permissivas, copyleft e proprietárias para o ecossistema.
+
 > **Nota**: este documento é informativo e não constitui aconselhamento jurídico.
 
 ## 1) Ponto de partida: referência BLAKE3
