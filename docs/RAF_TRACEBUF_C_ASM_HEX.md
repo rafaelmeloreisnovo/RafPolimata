@@ -1,5 +1,7 @@
 # RAF TraceBuf C/ASM/HEX
 
+> **Entrada canônica:** `docs/AGENTES.md` §7 (CI gates — smoke gate de compilação e execução via `tools/raf_tracebuf_smoke.c`) e §4 (regras de não-colisão — sem heap, freestanding, sem overflow silencioso).
+
 Modulo autoral para codificar eventos do proprio processo em buffer fornecido pelo chamador.
 
 ## Escopo

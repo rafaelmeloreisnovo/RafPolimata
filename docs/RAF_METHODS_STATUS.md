@@ -1,5 +1,7 @@
 # RAF Methods Status
 
+> **Entrada canônica:** `docs/AGENTES.md` §3 (estados canônicos — TOKEN_VAZIO significa ausência honesta de prova runtime) e §7 (CI gates — compilação e execução por método).
+
 Status conservador dos métodos RAF 001-056. `TOKEN_VAZIO` significa ausência honesta de prova runtime; retorno 0 só vira `EXECUTA_PASS` após execução registrada.
 
 | Método | Arquivo | Domínio | Arquitetura | Hardware necessário | Compila host | Executa host | Retorno 0 | Benchmark | Risco | Próxima prova |
@@ -30,7 +32,7 @@ Status conservador dos métodos RAF 001-056. `TOKEN_VAZIO` significa ausência h
 | 024 | `RAF_024_leitura_de_contador_arm64_cntvct_el0.c` | Leitura de contador ARM64 cntvct_el0 | ARM64 counters/barriers | ARM64 real para semântica de contador/barreira | PENDING | TOKEN_VAZIO | TOKEN_VAZIO | false | DEVICE_REQUIRED | gcc -c -I. + execução em hardware/device quando aplicável; registrar logs brutos e rollback |
 | 025 | `RAF_025_uso_de_cntfrq_el0_para_converter_ciclos_em_tempo.c` | Uso de cntfrq_el0 para converter ciclos em tempo | ARM64 counters/barriers | ARM64 real para semântica de contador/barreira | PENDING | TOKEN_VAZIO | TOKEN_VAZIO | false | DEVICE_REQUIRED | gcc -c -I. + execução em hardware/device quando aplicável; registrar logs brutos e rollback |
 | 026 | `RAF_026_memory_barrier_dmb.c` | Memory barrier dmb | ARM64 counters/barriers | ARM64 real para semântica de contador/barreira | PENDING | TOKEN_VAZIO | TOKEN_VAZIO | false | DEVICE_REQUIRED | gcc -c -I. + execução em hardware/device quando aplicável; registrar logs brutos e rollback |
-| 027 | `RAF_027_memory_barrier_dsb.c` | Memory barrier dsb | ARM64 counters/barriers | ARM64 real para semântica de contador/barreira | PENDING | TOKEN_VAZIO | TOKEN_VAZIO | false | DEVICE_REQUIRED | gcc -c -I. + execução em hardware/device quando aplicável; registrar logs brutos e rollback |
+| 027 | `RAF_027_memory_barrier_dsb.md` | Memory barrier dsb | ARM64 counters/barriers | ARM64 real para semântica de contador/barreira | PENDING | TOKEN_VAZIO | TOKEN_VAZIO | false | DEVICE_REQUIRED | gcc -c -I. + execução em hardware/device quando aplicável; registrar logs brutos e rollback |
 | 028 | `RAF_028_memory_barrier_isb.c` | Memory barrier isb | ARM64 counters/barriers | ARM64 real para semântica de contador/barreira | PENDING | TOKEN_VAZIO | TOKEN_VAZIO | false | DEVICE_REQUIRED | gcc -c -I. + execução em hardware/device quando aplicável; registrar logs brutos e rollback |
 | 029 | `RAF_029_spi_por_registrador_bcm.c` | SPI por registrador BCM | Raspberry/Linux MMIO | Raspberry/Linux com /dev/mem ou /dev/gpiomem quando aplicável | PENDING | TOKEN_VAZIO | TOKEN_VAZIO | false | DEVICE_REQUIRED | gcc -c -I. + execução em hardware/device quando aplicável; registrar logs brutos e rollback |
 | 030 | `RAF_030_i2c_por_registrador_bcm.c` | I2C por registrador BCM | Raspberry/Linux MMIO | Raspberry/Linux com /dev/mem ou /dev/gpiomem quando aplicável | PENDING | TOKEN_VAZIO | TOKEN_VAZIO | false | DEVICE_REQUIRED | gcc -c -I. + execução em hardware/device quando aplicável; registrar logs brutos e rollback |

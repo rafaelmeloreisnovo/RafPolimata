@@ -1,5 +1,7 @@
 # RAFAELIA Paper — Mercado, Potencial e 7 Vetores de Aplicação
 
+> **Entrada canônica:** `docs/AGENTES.md` §5 (pipeline operacional — trilha de prova VOID → VALIDATED) e §3 (estados canônicos — TOKEN_VAZIO, AUDIT, REFERENCE para claims C0–C5).
+
 Status: `REFERENCE` + `AUDIT`
 
 Origem: análise derivada do documento `RAFAELIA_Paper_Formal.docx` enviado por Rafael Melo Reis / ∆RafaelVerboΩ.
