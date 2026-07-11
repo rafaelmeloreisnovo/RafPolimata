@@ -1,5 +1,9 @@
 # Branch protection policy — main
 
+> **Entrada canônica:** `docs/AGENTES.md` §4 (regras de não-colisão e disciplina de branch)
+> e §6 (escalação para humano). Este documento detalha a política de proteção da branch `main`
+> após a release `v0.1.0-apkc-termux-arm32-proof`.
+
 Esta política registra a proteção desejada para a branch `main` após a release funcional `v0.1.0-apkc-termux-arm32-proof`.
 
 ## Objetivo

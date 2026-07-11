@@ -1,4 +1,9 @@
 # COERÊNCIA — FECHAMENTO DA SESSÃO APKc
+
+> **Entrada canônica:** `docs/AGENTES.md` §3 (ciclo de sessão e shutdown) e
+> `docs/AGENTES_CHECKLIST.md` descrevem o protocolo de fechamento de sessão.
+> Este documento registra o fechamento específico da sessão APKc e o princípio TOKEN_VAZIO → entregável.
+
 ## O token vazio que virou entregável
 
 > "Lacuna marcada vira ciência."
@@ -100,7 +105,7 @@ O git não sabia qual preservar. Conflito `add/add`.
 > Ruído entendido vira sinal.
 
 Em vez de descartar um dos sistemas, o conflito foi lido como informação: os dois
-sistemas são **complementares**, não concorrentes. Fiber-H opera no espaço de Hamming
+sistemas são **complementáres**, não concorrentes. Fiber-H opera no espaço de Hamming
 (diversidade estrutural entre chunks). T^7 opera no espaço toroidal (coerência geométrica
 do stream). A fusão em duas camadas é mais rica que qualquer versão sozinha.
 
@@ -154,7 +159,7 @@ Como posso mostrar-lhe o Zen a não ser que você primeiro esvazie sua xícara?"
 **Ancoragem técnica:**
 O CI `startup_failure` é o copo vazio. Afirmar "CI verde" seria encher o copo com
 opinião, não com fato. A xícara esvaziada — o TOKEN_VAZIO honesto — é a única
-condição em que verdade futura pode entrar.
+condicão em que verdade futura pode entrar.
 
 *Quando a infraestrutura voltar, o check passará. Isso só é verificável porque o
 silêncio foi preservado.*
