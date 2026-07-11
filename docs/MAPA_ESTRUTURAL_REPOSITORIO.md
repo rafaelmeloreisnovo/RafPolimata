@@ -41,6 +41,12 @@ agente (AI ou humano) que abra uma sessão neste repositório:
 
 Cadeia de entrada: `CLAUDE.md` → `docs/AGENTES.md` → documentos de profundidade.
 
+### Documento de rastreabilidade informacional (destaque dentro de `docs/`)
+
+| Arquivo | Papel | Estado |
+|---|---|---|
+| `docs/INFO_DYNAMICS_INTERNAL_TRACEABILITY.md` | Framework filosófico-técnico que mapeia dinâmica evolutiva da informação para implementações concretas no código (arquivo:linha); substitui cadeia bibliográfica por rastreabilidade interna procedimental | `REFERENCE` |
+
 ## Diferenças entre tags de conteúdo
 
 - **`REFERENCE` não prova execução**: documentação deve apontar para `scripts/`, `configs/`, `Benchmark/` ou arquivos C quando declarar comportamento verificável.
