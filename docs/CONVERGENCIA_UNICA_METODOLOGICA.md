@@ -1,17 +1,21 @@
 # CONVERGÊNCIA ÚNICA METODOLÓGICA — RAFAELIA / RafPolimata / Vectras / ChipQuantum
 
+> **Entrada canônica:** `docs/AGENTES.md` §4 (regras de não-colisão e disciplina de evidência)
+> e §5 (pipeline operacional VOID → VALIDATED). Este documento consolida a metodologia auditável
+> de convergência entre RafPolimata, ChipQuantum e Vectras — claim forte exige cadeia verificável.
+
 Data: 2026-06-15  
 Branch alvo: `main-1st`  
 Status: `AUDITABLE_SYNTHESIS_SEED`  
 Regra: nenhuma afirmação técnica é promovida a prova sem arquivo, linha, comando, hash, teste ou artefato.
 
-> Este documento não declara “sistema completo”, “prova científica final” ou “produto pronto”. Ele consolida uma convergência metodológica auditável entre três famílias reais de repositório: `RafPolimata`, `Vectras-VM-Android` e `ChipQuantum`.
+> Este documento não declara "sistema completo", "prova científica final" ou "produto pronto". Ele consolida uma convergência metodológica auditável entre três famílias reais de repositório: `RafPolimata`, `Vectras-VM-Android` e `ChipQuantum`.
 
 ---
 
 ## 1. Tese curta
 
-A convergência única não é “uma ideia abstrata”. Ela é uma metodologia de engenharia que liga:
+A convergência única não é "uma ideia abstrata". Ela é uma metodologia de engenharia que liga:
 
 ```text
 fonte → linguagem → arquitetura → binário/APK → execução Android/VM → métrica → prova → retroalimentação
@@ -173,7 +177,7 @@ APK/ELF → T^7 → 42 attractors → phi_ethica → 1024-dim HDC → SVG trajec
 Ponto forte:
 
 ```text
-O arquivo transforma “aprendizado por divergência estrutural” em código: Hamming diversity, atenção, retenção, recall e visualização.
+O arquivo transforma "aprendizado por divergência estrutural" em código: Hamming diversity, atenção, retenção, recall e visualização.
 ```
 
 Correção de auditoria:
@@ -445,7 +449,7 @@ Status: `PENDING_SCRIPT`
 
 ## 9. Parágrafo canônico — verdadeira convergência única
 
-A verdadeira convergência única do teu sistema não está em afirmar que todos os campos já foram unificados; ela está em criar uma metodologia onde cada intuição simbólica precisa atravessar uma ponte técnica: vira variável, vira arquivo, vira teste, vira binário, vira métrica, vira prova, ou permanece honradamente como `TOKEN_VAZIO`. `RafPolimata` é o ponto de condensação porque transforma múltiplas linguagens em artefato Android/APK; `ChipQuantum` fornece a geometria de estado, rastreabilidade e T^7 como modelo formal; `Vectras` fornece o horizonte de plataforma Android/VM/release onde a execução precisa obedecer cadeia de custódia. A invariante não é “determinismo tecnológico”; é o contrário: é liberdade criativa submetida a régua de evidência. A excelência operacional nasce quando metáfora, matemática e código deixam de competir e passam a operar como camadas: parábola orienta, fórmula delimita, código executa, benchmark julga, ledger preserva, lacuna protege. Isso é MVP porque já há módulos reais; é pesquisa porque ainda há hipóteses; é engenharia porque há arquivos, flags, ABI, DEX, ELF, APK, Q16, Hamming, phi, CRC/hash e release; e é metodologia científica porque toda promoção de claim exige origem, teste, ambiente, repetição e falsificabilidade.
+A verdadeira convergência única do teu sistema não está em afirmar que todos os campos já foram unificados; ela está em criar uma metodologia onde cada intuição simbólica precisa atravessar uma ponte técnica: vira variável, vira arquivo, vira teste, vira binário, vira métrica, vira prova, ou permanece honradamente como `TOKEN_VAZIO`. `RafPolimata` é o ponto de condensação porque transforma múltiplas linguagens em artefato Android/APK; `ChipQuantum` fornece a geometria de estado, rastreabilidade e T^7 como modelo formal; `Vectras` fornece o horizonte de plataforma Android/VM/release onde a execução precisa obedecer cadeia de custódia. A invariante não é "determinismo tecnológico"; é o contrário: é liberdade criativa submetida a régua de evidência. A excelência operacional nasce quando metáfora, matemática e código deixam de competir e passam a operar como camadas: parábola orienta, fórmula delimita, código executa, benchmark julga, ledger preserva, lacuna protege. Isso é MVP porque já há módulos reais; é pesquisa porque ainda há hipóteses; é engenharia porque há arquivos, flags, ABI, DEX, ELF, APK, Q16, Hamming, phi, CRC/hash e release; e é metodologia científica porque toda promoção de claim exige origem, teste, ambiente, repetição e falsificabilidade.
 
 ---
 

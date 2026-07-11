@@ -1,5 +1,9 @@
 # ESTRUTURA DE APRENDIZADO — TODAS AS FORMAS DO SISTEMA RAFAELIA
 
+> **Entrada canônica:** `docs/AGENTES.md` §1 (leitura rápida — o que este repo faz e onde estão
+> os invariantes) e §3 (ciclo de sessão — startup/execução/shutdown). Este documento descreve a
+> estrutura de aprendizado progressivo do sistema RAFAELIA em todas as suas formas.
+
 > "Não comece pelas folhas. Comece pelos mapas."
 > — Ordem da Biblioteca, imagem da sessão
 

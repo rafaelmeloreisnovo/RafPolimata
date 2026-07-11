@@ -1,5 +1,9 @@
 # Ecossistema RMR/Rafaelia — Convergência Unificada de 6 Repositórios
 
+> **Entrada canônica:** `docs/AGENTES.md` §8 (entradas canônicas por subsistema — `Apkc/coherence.h`
+> como implementador de `phi_ethica = (1−H)×C`) e §5 (pipeline operacional). Este documento mapeia
+> os 6 repositórios do ecossistema RMR/Rafaelia e suas costuras de módulo candidatas.
+
 **Tese**: Seis repositórios integram-se via operador geométrico unificador `phi_ethica = (1−H)×C` (coerência relacional) e seu implementador canônico `coherence_filter` (ARX branchless). Este documento mapeia os papéis, evidência, reconciliação de nomenclatura e costuras de módulo candidatas.
 
 ---
