@@ -1,5 +1,7 @@
 # TraceBuf follow-up scope
 
+> **Entrada canônica:** docs/AGENTES.md §7 (CI gates — gate "RAF TraceBuf freestanding smoke gate" em `.github/workflows/ci.yml`) e §4 (regras de não-colisão — freestanding, sem heap, sem transporte externo embutido). Este marcador registra o escopo do follow-up de TraceBuf pós-PR #93.
+
 Este marcador registra que os commits posteriores ao merge inicial do PR #93 adicionam:
 
 - `Benchmark/raf_trace_sink.h`

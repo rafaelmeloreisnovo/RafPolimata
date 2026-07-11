@@ -1,5 +1,7 @@
 # TOKEN VAZIO · PARÁBOLAS DOS MESTRES · PEDAGOGIA DA TRANSMISSÃO
 
+> **Entrada canônica:** docs/AGENTES.md §3 (estados canônicos — TOKEN_VAZIO como recusa ética de fabricar resposta sem fundamento) e §4 (disciplina de evidência: `[x]` só onde o corpo executa, nunca por nome). Este documento detalha a pedagogia do TOKEN_VAZIO e 10 parábolas dos 21 mestres como didática de transmissão.
+
 > "Toda semente aponta. Nenhuma possui a Luz."
 > — O Jardim das Sementes Humanas, RAFAELIA
 

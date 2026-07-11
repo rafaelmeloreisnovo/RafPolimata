@@ -1,5 +1,7 @@
 # Matriz de flags — ApkC freestanding
 
+> **Entrada canônica:** docs/AGENTES.md §7 (CI gates — perfis de compilação freestanding para ApkC) e §4 (regras de não-colisão — TOKEN_VAZIO é honestidade, nunca promover para PASS sem artefato arquivado).
+
 | Perfil | Flags | Motivo | Risco | Status |
 |---|---|---|---|---|
 | host-syntax | `-std=c11 -Wall -Wextra -fsyntax-only` | provar sintaxe mínima sem link | não gera binário | PASS quando compilador host entende o código |
