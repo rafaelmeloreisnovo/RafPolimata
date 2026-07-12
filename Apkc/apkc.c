@@ -1785,9 +1785,19 @@ static i32 build_apk(
         gpu_asset_name = "lib/hexagon-v65/libcompute.so";
         gpu_stub_so    = 1;
         do32 = 0;
+
+    } else if (prof->use_npu) {
+        /* NPU/TFLite: embed model flatbuffer verbatim as assets/model.tflite.
+         * The Android TFLite runtime or NNAPI delegate selects NPU at runtime.
+         * APK layout: lib/arm64-v8a/libmain.so (NOP) + assets/model.tflite */
+        gpu_asset_buf  = src;
+        gpu_asset_sz   = src_len;
+        gpu_asset_name = "assets/model.tflite";
+        gpu_stub_so    = 1;
+        do32 = 0;
     }
 
-    /* GPU bootstrap: build NOP stub .so for GPU/DSP compute APKs.
+    /* GPU/DSP/NPU bootstrap: build NOP stub .so for hardware-offload APKs.
      * The real compute payload is packaged as an APK asset (see gpu_asset_name).
      * ANativeActivity_onCreate is a NOP; GPU dispatch happens via Java + NDK. */
     if (gpu_stub_so) {
@@ -1830,7 +1840,7 @@ static i32 build_apk(
         }
         if (zip_add(&zw, "classes.dex", dex_buf_ptr, (u32)dexsz)<0) { pr_err("zip_add classes.dex failed\n"); return -1; }
     }
-    /* GPU / DSP compute asset (SPIR-V blob, OpenCL source, WGSL, or DSP .so) */
+    /* GPU / DSP / NPU compute asset (SPIR-V, OpenCL, WGSL, DSP .so, TFLite) */
     if (gpu_asset_buf && gpu_asset_sz && gpu_asset_name) {
         if (zip_add(&zw, gpu_asset_name, gpu_asset_buf, (u32)gpu_asset_sz)<0)
             { pr_err("zip_add gpu asset failed\n"); return -1; }
@@ -1907,6 +1917,15 @@ static i32 apkc_main(i32 argc, char **argv) {
             pr("apkc: hw-probe: "); hw_caps_pr(&hw);
             return 0;
         }
+        if (_str_eq(a,"--hw-select") && i+1<argc) {
+            const char *wname = argv[++i];
+            HWProfile hw; hw_probe(&hw);
+            int wl      = hw_workload_id(wname);
+            int backend = hw_select_backend(&hw, wl);
+            pr("apkc: hw-select workload="); pr(wname);
+            pr(" backend="); pr(hw_backend_name(backend)); pr("\n");
+            return 0;
+        }
         if (a[0]!='-') { inpath=a; continue; }
         pr_err("unknown flag: "); pr_err(a); pr_err("\n");
     }
@@ -1922,10 +1941,14 @@ static i32 apkc_main(i32 argc, char **argv) {
         pr_err("  -64/-32/-both  architecture filter\n");
         pr_err("  -lang <name>   force language\n");
         pr_err("    CPU: asm c cpp rs kt java py sh pl js php jsx go rb swift groovy clj\n");
-        pr_err("    GPU: glsl cl hlsl wgsl dsp\n");
+        pr_err("    GPU: glsl cl hlsl wgsl\n");
+        pr_err("    DSP: dsp (hexagon-clang)\n");
+        pr_err("    NPU: tflite (TFLite model → assets/model.tflite)\n");
         pr_err("  --strict       fail build on unknown mnemonic (default)\n");
         pr_err("  --allow-undef  emit UNDEF placeholder for unknown mnemonic (experimental)\n");
-        pr_err("  --hw-probe     detect and print hardware capabilities (CPU/GPU/DSP/NPU)\n");
+        pr_err("  --hw-probe     detect and print hardware capabilities (CPU/GPU/DSP/NPU/SME)\n");
+        pr_err("  --hw-select <workload>  select optimal backend for workload and print it\n");
+        pr_err("    workloads: compute tensor signal crypto\n");
         pr_err("  (language auto-detected from file extension otherwise)\n");
         return 1;
     }

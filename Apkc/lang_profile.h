@@ -32,6 +32,7 @@ typedef struct {
     int         use_gpu_cl;  /* 1 = embed OpenCL C source as APK asset */
     int         use_gpu_wgsl;/* 1 = embed WebGPU/WGSL source as APK asset */
     int         use_dsp;     /* 1 = fork Hexagon DSP compiler → DSP .so asset */
+    int         use_npu;     /* 1 = embed model blob as assets/model.tflite */
 } LangProfile;
 
 /* ── Language ID constants ────────────────────────────────────────────── */
@@ -58,7 +59,8 @@ typedef struct {
 #define LP_HLSL   19   /* HLSL compute → glslc HLSL frontend → SPIR-V asset */
 #define LP_WGSL   20   /* WebGPU WGSL source → embedded as APK asset */
 #define LP_DSP    21   /* Hexagon DSP C → hexagon-clang → DSP .so asset */
-#define LP_COUNT  22
+#define LP_TFLITE 22   /* TFLite model blob → assets/model.tflite NPU offload */
+#define LP_COUNT  23
 
 static const LangProfile _lang_table[LP_COUNT] = {
     /* ASM: internal 2-pass assembler, both arm64+arm32 */
@@ -186,7 +188,17 @@ static const LangProfile _lang_table[LP_COUNT] = {
     [LP_DSP]  = { "dsp",  ".dsp",  0, 0, 0, "hexagon-clang",
                   NULL, {"-mv65", "-shared", "-o", NULL},
                   0, 1, 0, 0,
-                  0, 0, 0, 1 },
+                  0, 0, 0, 1, 0 },
+
+    /* TFLite model: binary blob embedded verbatim as assets/model.tflite.
+     * The Android TFLite runtime (or NNAPI delegate) loads and runs the model
+     * on the NPU / GPU / DSP at runtime — no on-host compilation needed.
+     * APK contains: lib/arm64-v8a/libmain.so (NOP stub) +
+     *               assets/model.tflite (TFLite flatbuffer) */
+    [LP_TFLITE] = { "tflite", ".tflite", 0, 0, 0, NULL,
+                    NULL, {NULL},
+                    0, 1, 0, 0,
+                    0, 0, 0, 0, 1 },
 };
 
 /* Find profile by CLI name — returns NULL for unknown names */

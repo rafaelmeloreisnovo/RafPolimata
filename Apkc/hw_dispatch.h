@@ -33,6 +33,8 @@
 #define HW_CAP_SM4      (1u<<13)   /* SM4 cipher hardware */
 #define HW_CAP_JSCVT    (1u<<14)   /* JS int↔float conversion */
 #define HW_CAP_FCMA     (1u<<15)   /* Complex number multiply-accumulate */
+#define HW_CAP_SME      (1u<<20)   /* ARM Scalable Matrix Extension (SME) */
+#define HW_CAP_SME2     (1u<<21)   /* ARM SME2 — widened outer-product tiles */
 /* GPU / accelerator presence — bit 16+ */
 #define HW_CAP_GPU_VK   (1u<<16)   /* Vulkan compute GPU detected */
 #define HW_CAP_GPU_CL   (1u<<17)   /* OpenCL GPU detected */
@@ -55,8 +57,9 @@
 #define HW_BACKEND_GPU_VULKAN   5  /* Vulkan compute (SPIR-V) */
 #define HW_BACKEND_GPU_WGSL     6  /* WebGPU (WGSL) */
 #define HW_BACKEND_DSP_HXN      7  /* Qualcomm Hexagon DSP (FastRPC) */
-#define HW_BACKEND_NPU          8  /* Neural accelerator offload */
-#define HW_BACKEND_COUNT        9
+#define HW_BACKEND_CPU_SME      9  /* ARM SME / SME2 outer-product tiles */
+#define HW_BACKEND_NPU          10 /* Neural accelerator offload */
+#define HW_BACKEND_COUNT        11
 
 /* ── Workload type for backend selection ─────────────────────────────────── */
 #define HW_WORK_COMPUTE  0   /* general GPGPU / parallel batch compute */
@@ -98,6 +101,8 @@ static const _HWFeatMap _hw_feat_map[] = {
     { "sm4",     HW_CAP_SM4     },
     { "jscvt",   HW_CAP_JSCVT  },
     { "fcma",    HW_CAP_FCMA    },
+    { "sme",     HW_CAP_SME    },
+    { "sme2",    HW_CAP_SME2   },
     { NULL, 0 }
 };
 
@@ -246,6 +251,8 @@ static int hw_select_backend(const HWProfile *hw, int workload) {
     if (workload == HW_WORK_TENSOR) {
         /* NPU > I8MM/SVE2 > Vulkan compute > OpenCL > SVE > NEON */
         if (hw->caps & HW_CAP_NPU)    cands[nc++] = HW_BACKEND_NPU;
+        if (hw->caps & HW_CAP_SME2)   cands[nc++] = HW_BACKEND_CPU_SME;
+        if (hw->caps & HW_CAP_SME)    cands[nc++] = HW_BACKEND_CPU_SME;
         if (hw->caps & HW_CAP_I8MM)   cands[nc++] = HW_BACKEND_CPU_I8MM;
         if (hw->caps & HW_CAP_GPU_VK) cands[nc++] = HW_BACKEND_GPU_VULKAN;
         if (hw->caps & HW_CAP_GPU_CL) cands[nc++] = HW_BACKEND_GPU_CL;
@@ -309,6 +316,8 @@ static void hw_caps_pr(const HWProfile *hw) {
     if (hw->caps & HW_CAP_ATOMICS) pr(" lse");
     if (hw->caps & HW_CAP_PMULL)   pr(" pmull");
     if (hw->caps & HW_CAP_FP16)    pr(" fp16");
+    if (hw->caps & HW_CAP_SME)     pr(" sme");
+    if (hw->caps & HW_CAP_SME2)    pr(" sme2");
     if (hw->caps & HW_CAP_GPU_VK)  pr(" vulkan");
     if (hw->caps & HW_CAP_GPU_CL)  pr(" opencl");
     if (hw->caps & HW_CAP_GPU_WGSL)pr(" wgsl");
@@ -319,4 +328,29 @@ static void hw_caps_pr(const HWProfile *hw) {
     if (hw->caps & HW_CAP_DSP_HXN) pr(" hxn-dsp");
     if (hw->caps & HW_CAP_NPU)     pr(" npu");
     pr("\n");
+}
+
+/* ── hw_backend_name: human-readable backend identifier ─────────────────── */
+static inline const char *hw_backend_name(int b) {
+    switch (b) {
+        case HW_BACKEND_CPU_SCALAR:  return "cpu-scalar";
+        case HW_BACKEND_CPU_NEON:    return "cpu-neon";
+        case HW_BACKEND_CPU_SVE:     return "cpu-sve";
+        case HW_BACKEND_CPU_I8MM:    return "cpu-i8mm";
+        case HW_BACKEND_CPU_SME:     return "cpu-sme";
+        case HW_BACKEND_GPU_CL:      return "gpu-cl";
+        case HW_BACKEND_GPU_VULKAN:  return "gpu-vulkan";
+        case HW_BACKEND_GPU_WGSL:    return "gpu-wgsl";
+        case HW_BACKEND_DSP_HXN:     return "dsp-hexagon";
+        case HW_BACKEND_NPU:         return "npu";
+        default:                     return "unknown";
+    }
+}
+
+/* ── hw_workload_id: parse workload name string → HW_WORK_* constant ─────── */
+static inline int hw_workload_id(const char *name) {
+    if (_hw_str_eq(name, "tensor"))  return HW_WORK_TENSOR;
+    if (_hw_str_eq(name, "signal"))  return HW_WORK_SIGNAL;
+    if (_hw_str_eq(name, "crypto"))  return HW_WORK_CRYPTO;
+    return HW_WORK_COMPUTE; /* default */
 }
