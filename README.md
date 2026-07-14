@@ -30,6 +30,7 @@ Este repositório passa a incluir uma documentação de referência de nível av
 - [`docs/RELEASE_NOTES_PENDING.md`](docs/RELEASE_NOTES_PENDING.md): registro de pendências de release (pending only).
 - [`docs/EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md`](docs/EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md): metodologia operacional para governança, GPU/SIMD, cache, paralelismo, fail-safe/failover/rollback e evidência auditável.
 - [`docs/RAFAELIA_PAPER_MARKET_7_VECTORS.md`](docs/RAFAELIA_PAPER_MARKET_7_VECTORS.md): tradução mercadológica e técnica do paper RAFAELIA em 7 vetores, com gates de claim, monetização responsável e próximos experimentos reproduzíveis.
+- [`docs/DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md`](docs/DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md): protocolo transversal que liga claim, fonte, modelo, ensaio, incerteza, IP, valuation, roteamento de repositório e retroalimentação. Configuração: [`configs/deeprafa2_evidence.yml`](configs/deeprafa2_evidence.yml).
 - [`docs/CONVERGENCIA_UNICA_METODOLOGICA.md`](docs/CONVERGENCIA_UNICA_METODOLOGICA.md) e [`docs/CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md`](docs/CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md): mapa auditável de convergência entre RafPolimata e os repositórios irmãos (ChipQuantum, Vectras, llamaRafaelia, GAIA_phi, CONVERSATIONS_CHUNKS_PRIVATE, BLAKE3).
 
 - [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md`](docs/MAPA_ESTRUTURAL_REPOSITORIO.md): mapa profissional da disposição por tags/diretórios, estados (`VOID`/`PENDING`/`AUDIT`/`RUNTIME`/`REFERENCE`) e varredura estrutural em 5 níveis.
