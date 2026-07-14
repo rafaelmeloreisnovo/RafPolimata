@@ -1,0 +1,99 @@
+version: "1.0"
+name: deeprafa2-evidence
+purpose: >-
+  Orquestrar claims multidomínio sem promover hipótese, simulação,
+  estimativa ou rótulo ilustrativo a prova.
+
+states:
+  - VOID
+  - TOKEN_VAZIO
+  - REFERENCE
+  - HYPOTHESIS
+  - DERIVED
+  - SIMULATED
+  - MEASURED
+  - REPLICATED
+  - IP_CANDIDATE
+  - PATENT_FILED
+  - PATENT_GRANTED
+  - VALUED
+
+claim_contract:
+  required:
+    - claim_id
+    - project_id
+    - domain
+    - statement
+    - state
+    - method
+    - limitations
+    - falsifier
+    - next_action
+    - repository_target
+  evidence_fields:
+    - artifacts
+    - hashes
+    - run_ids
+    - source_locator
+    - access_date
+    - uncertainty_method
+
+promotion_rules:
+  REFERENCE:
+    requires: [source_locator, access_date]
+  DERIVED:
+    requires: [premises, variables, units, derivation]
+  SIMULATED:
+    requires: [commit_sha, environment, inputs, outputs, seed, artifact_hash]
+  MEASURED:
+    requires: [run_id, instrument_ids, calibration_ids, raw_data_hash, uncertainty_method]
+  REPLICATED:
+    requires: [independent_run_id, comparison_report]
+  PATENT_FILED:
+    requires: [application_number, filing_date, jurisdiction]
+  PATENT_GRANTED:
+    requires: [grant_number, claims_locator, jurisdiction]
+  VALUED:
+    requires: [valuation_method, assumptions, discount_rate, scenario_table]
+
+operational_gates:
+  G0_identity_domain:
+    fail_on: [ambiguous_object, wrong_repository]
+  G1_source_attribution:
+    fail_on: [missing_source, unverifiable_locator]
+  G2_math_consistency:
+    fail_on: [undefined_symbol, dimensional_mismatch, hidden_assumption]
+  G3_experiment_design:
+    fail_on: [missing_target, missing_control, missing_instrument, missing_safety]
+  G4_statistics:
+    fail_on: [no_baseline, data_leakage, no_uncertainty, uncontrolled_multiple_testing]
+  G5_machine_learning:
+    fail_on: [no_need_justification, no_ood_test, no_drift_plan, no_fallback]
+  G6_reproducibility:
+    fail_on: [missing_commit, missing_environment, missing_hash, unavailable_procedure]
+  G7_intellectual_property:
+    fail_on: [formula_only_claim, no_technical_effect, no_prior_art_search]
+  G8_economics:
+    fail_on: [scenario_as_valuation, missing_costs, missing_probabilities]
+  G9_publication:
+    fail_on: [abstract_overclaims, hidden_limitations, artifacts_unlinked]
+
+repository_routing:
+  physics_and_experiment: rafaelmeloreisnovo/Fisica
+  cross_domain_methodology: rafaelmeloreisnovo/RafPolimata
+  portfolio_evidence_catalog: rafaelmeloreisnovo/RafaelCiencias
+  stable_manuscripts: rafaelmeloreisnovo/papers
+  sensitive_ip_drafts: private_repository_required
+
+naming_guards:
+  hall_thruster:
+    definition: electric_space_propulsion_plasma
+    forbidden_aliases: [bldc_motor, terrestrial_drive]
+  hall_sensor_motor:
+    definition: electromechanical_motor_with_hall_position_sensing
+    forbidden_aliases: [hall_effect_thruster]
+
+feedback:
+  schema: [F_ok, F_gap, F_next]
+  allow_background_work: false
+  missing_evidence_state: TOKEN_VAZIO
