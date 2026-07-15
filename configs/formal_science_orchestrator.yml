@@ -1,0 +1,114 @@
+# Registro auditável do Orquestrador Formal Científico.
+protocol:
+  id: rafpolimata.formal_science_orchestrator.v1
+  version: 1
+  equation_count: 32
+  domain_count: 12
+  proof_gate_count: 12
+  semantic_to_physical_direct_promotion: forbidden
+  time_provenance: utc_ntp_plus_monotonic
+
+allowed_claim_states:
+  - METAPHOR
+  - FORMALIZED
+  - METHOD_DEFINED
+  - SIMULATED
+  - EVIDENCE_LINKED
+  - REPLICATED
+  - CLAIM_ALLOWED
+  - TOKEN_VAZIO
+  - CONTRADICTION
+  - DECLARED_BY_AUTHOR
+
+domain_registry:
+  - dimensional_analysis
+  - classical_mechanics
+  - electrical_machines
+  - control_and_ai
+  - thermodynamics_combustion
+  - electrochemistry
+  - hall_thruster
+  - quantum_mechanics
+  - dynamical_systems
+  - fluid_dynamics
+  - graph_number_semantics
+  - statistics_and_time
+
+equation_registry:
+  - id: E01; domain: classical_mechanics; symbol: mechanical_power; expression: P=tau*omega; lhs_dim: M1L2T-3; rhs_dim: M1L2T-3; claim_state: ESTABLISHED; falsifier: dimensional_or_energy_mismatch
+  - id: E02; domain: classical_mechanics; symbol: longitudinal_dynamics; expression: m*dv_dt=F_trac-F_drag-F_roll-F_grade-F_aux; lhs_dim: M1L1T-2; rhs_dim: M1L1T-2; claim_state: ESTABLISHED; falsifier: force_balance_residual
+  - id: E03; domain: classical_mechanics; symbol: aerodynamic_power; expression: P_drag=0.5*rho*Cd*A*v^3; lhs_dim: M1L2T-3; rhs_dim: M1L2T-3; claim_state: ESTABLISHED; falsifier: coastdown_residual
+  - id: E04; domain: electrical_machines; symbol: dq_voltage_d; expression: vd=Rs*id+Ld*did_dt-we*Lq*iq; lhs_dim: M1L2T-3I-1; rhs_dim: M1L2T-3I-1; claim_state: ESTABLISHED; falsifier: dq_voltage_residual
+  - id: E05; domain: electrical_machines; symbol: dq_voltage_q; expression: vq=Rs*iq+Lq*diq_dt+we*(Ld*id+psi_f); lhs_dim: M1L2T-3I-1; rhs_dim: M1L2T-3I-1; claim_state: ESTABLISHED; falsifier: dq_voltage_residual
+  - id: E06; domain: electrical_machines; symbol: pmsm_torque; expression: tau=1.5*p*(psi_f*iq+(Ld-Lq)*id*iq); lhs_dim: M1L2T-2; rhs_dim: M1L2T-2; claim_state: ESTABLISHED; falsifier: torque_map_residual
+  - id: E07; domain: electrical_machines; symbol: star_phase_voltage; expression: Vphase=Vline/sqrt3; lhs_dim: M1L2T-3I-1; rhs_dim: M1L2T-3I-1; claim_state: ESTABLISHED; falsifier: phasor_measurement_mismatch
+  - id: E08; domain: electrical_machines; symbol: delta_line_current; expression: Iline=sqrt3*Iphase; lhs_dim: I1; rhs_dim: I1; claim_state: ESTABLISHED; falsifier: phasor_measurement_mismatch
+  - id: E09; domain: control_and_ai; symbol: constrained_action; expression: u=projection_safe_set(u_ai); lhs_dim: CONTROL; rhs_dim: CONTROL; claim_state: METHOD_DEFINED; falsifier: safety_constraint_violation
+  - id: E10; domain: control_and_ai; symbol: objective_function; expression: J=sum(weighted_energy_tracking_thermal_switching_emissions); lhs_dim: COST; rhs_dim: COST; claim_state: METHOD_DEFINED; falsifier: baseline_cost_not_improved
+  - id: E11; domain: electrochemistry; symbol: faraday_hydrogen_moles; expression: nH2=etaF*I*t/(2*F); lhs_dim: N1; rhs_dim: N1; claim_state: ESTABLISHED; falsifier: gas_mass_balance_mismatch
+  - id: E12; domain: electrochemistry; symbol: electrolyzer_efficiency; expression: eta_el=mdotH2*LHV/P_total; lhs_dim: D0; rhs_dim: D0; claim_state: ESTABLISHED; falsifier: energy_balance_mismatch
+  - id: E13; domain: thermodynamics_combustion; symbol: equivalence_ratio; expression: phi=AF_stoich/AF_real; lhs_dim: D0; rhs_dim: D0; claim_state: ESTABLISHED; falsifier: lambda_sensor_mismatch
+  - id: E14; domain: thermodynamics_combustion; symbol: hydrogen_energy_fraction; expression: xH2=PH2/(Pfuel+PH2); lhs_dim: D0; rhs_dim: D0; claim_state: METHOD_DEFINED; falsifier: calorimetry_mismatch
+  - id: E15; domain: thermodynamics_combustion; symbol: net_hydrogen_gain; expression: dPnet=dPice+Pregen+Pwaste-Pel-Pcompression-Pcontrol-Pconversion; lhs_dim: M1L2T-3; rhs_dim: M1L2T-3; claim_state: METHOD_DEFINED; falsifier: dPnet_le_zero
+  - id: E16; domain: thermodynamics_combustion; symbol: fuel_density_temperature; expression: rho=rho_ref/(1+beta*dT); lhs_dim: M1L-3; rhs_dim: M1L-3; claim_state: METHOD_DEFINED; falsifier: density_curve_residual
+  - id: E17; domain: thermodynamics_combustion; symbol: fuel_mass_flow; expression: mdot=rho*Vdot; lhs_dim: M1T-1; rhs_dim: M1T-1; claim_state: ESTABLISHED; falsifier: gravimetric_flow_mismatch
+  - id: E18; domain: hall_thruster; symbol: thrust; expression: F=mdot*ve; lhs_dim: M1L1T-2; rhs_dim: M1L1T-2; claim_state: ESTABLISHED; falsifier: thrust_stand_residual
+  - id: E19; domain: hall_thruster; symbol: thrust_efficiency; expression: etaT=F^2/(2*mdot*Pin); lhs_dim: D0; rhs_dim: D0; claim_state: ESTABLISHED; falsifier: power_balance_mismatch
+  - id: E20; domain: quantum_mechanics; symbol: schrodinger; expression: ihbar*dpsi_dt=H*psi; lhs_dim: ENERGY_STATE; rhs_dim: ENERGY_STATE; claim_state: ESTABLISHED; falsifier: nonunitary_or_spectral_mismatch
+  - id: E21; domain: quantum_mechanics; symbol: born_rule; expression: P=abs(inner(a,psi))^2; lhs_dim: D0; rhs_dim: D0; claim_state: ESTABLISHED; falsifier: probability_normalization_failure
+  - id: E22; domain: dynamical_systems; symbol: poincare_map; expression: x_next=P(x); lhs_dim: STATE; rhs_dim: STATE; claim_state: ESTABLISHED; falsifier: section_return_mismatch
+  - id: E23; domain: dynamical_systems; symbol: lyapunov_exponent; expression: lambda=lim(log(norm(dx_n)/norm(dx_0))/(n*dt)); lhs_dim: T-1; rhs_dim: T-1; claim_state: ESTABLISHED; falsifier: perturbation_growth_mismatch
+  - id: E24; domain: fluid_dynamics; symbol: navier_stokes; expression: rho*(du_dt+u_grad_u)=-grad_p+mu*laplacian_u+rho*g; lhs_dim: M1L-2T-2; rhs_dim: M1L-2T-2; claim_state: ESTABLISHED; falsifier: momentum_residual
+  - id: E25; domain: fluid_dynamics; symbol: reynolds; expression: Re=rho*v*L/mu; lhs_dim: D0; rhs_dim: D0; claim_state: ESTABLISHED; falsifier: dimensionless_group_mismatch
+  - id: E26; domain: fluid_dynamics; symbol: weber; expression: We=rho*v^2*L/sigma; lhs_dim: D0; rhs_dim: D0; claim_state: ESTABLISHED; falsifier: atomization_regime_mismatch
+  - id: E27; domain: graph_number_semantics; symbol: graph_laplacian; expression: L=D-A; lhs_dim: MATRIX; rhs_dim: MATRIX; claim_state: ESTABLISHED; falsifier: spectrum_or_degree_mismatch
+  - id: E28; domain: graph_number_semantics; symbol: graph_fourier; expression: xhat=transpose(U)*x; lhs_dim: SIGNAL; rhs_dim: SIGNAL; claim_state: ESTABLISHED; falsifier: reconstruction_error
+  - id: E29; domain: dimensional_analysis; symbol: quantization_error; expression: abs(eq)<=2^(-b-1); lhs_dim: D0; rhs_dim: D0; claim_state: ESTABLISHED; falsifier: fixed_point_error_bound_violation
+  - id: E30; domain: statistics_and_time; symbol: generalized_chi_square; expression: chi2=rT*invSigma*r; lhs_dim: D0; rhs_dim: D0; claim_state: ESTABLISHED; falsifier: covariance_or_residual_invalid
+  - id: E31; domain: statistics_and_time; symbol: ntp_offset; expression: theta=0.5*((T2-T1)+(T3-T4)); lhs_dim: T1; rhs_dim: T1; claim_state: ESTABLISHED; falsifier: timestamp_order_or_asymmetry_failure
+  - id: E32; domain: statistics_and_time; symbol: ntp_delay; expression: delta=(T4-T1)-(T3-T2); lhs_dim: T1; rhs_dim: T1; claim_state: ESTABLISHED; falsifier: negative_or_inconsistent_delay
+
+semantic_bridge:
+  source_state: METAPHOR
+  target_minimum_state: FORMALIZED
+  requires:
+    - typed_domain
+    - units_or_justified_dimensionless
+    - empirical_adapter
+    - falsifier
+    - uncertainty_budget
+  forbidden_edge: SEMANTICALLY_RELATED=>CAUSES_PHYSICAL_EFFECT
+
+number_theory_policy:
+  allowed_roles:
+    - hashing
+    - coprime_traversal
+    - sampling
+    - cycle_detection
+  forbidden_claim: prime_number_is_physical_mechanism_without_adapter
+
+time_model:
+  wall_clock: UTC_NTP
+  duration_clock: MONOTONIC
+  secure_sync: NTS_WHEN_AVAILABLE
+  required_metrics:
+    - offset
+    - delay
+    - jitter
+    - dispersion
+    - clock_source
+    - uncertainty
+
+proof_gates:
+  - G-DIM
+  - G-DOM
+  - G-NUM
+  - G-TIME
+  - G-DATA
+  - G-UNC
+  - G-STAT
+  - G-PHYS
+  - G-SAFE
+  - G-SEM
+  - G-REP
+  - G-CLAIM

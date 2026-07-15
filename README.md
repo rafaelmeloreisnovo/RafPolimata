@@ -32,6 +32,7 @@ Este repositório passa a incluir uma documentação de referência de nível av
 - [`docs/RAFAELIA_PAPER_MARKET_7_VECTORS.md`](docs/RAFAELIA_PAPER_MARKET_7_VECTORS.md): tradução mercadológica e técnica do paper RAFAELIA em 7 vetores, com gates de claim, monetização responsável e próximos experimentos reproduzíveis.
 - [`docs/DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md`](docs/DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md): protocolo transversal que liga claim, fonte, modelo, ensaio, incerteza, IP, valuation, roteamento de repositório e retroalimentação. Configuração: [`configs/deeprafa2_evidence.yml`](configs/deeprafa2_evidence.yml).
 - [`docs/CONVERGENCIA_UNICA_METODOLOGICA.md`](docs/CONVERGENCIA_UNICA_METODOLOGICA.md) e [`docs/CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md`](docs/CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md): mapa auditável de convergência entre RafPolimata e os repositórios irmãos (ChipQuantum, Vectras, llamaRafaelia, GAIA_phi, CONVERSATIONS_CHUNKS_PRIVATE, BLAKE3).
+- [`docs/ORQUESTRADOR_FORMAL_CIENTIFICO.md`](docs/ORQUESTRADOR_FORMAL_CIENTIFICO.md): orquestrador de física clássica/quântica, máquinas elétricas, combustão, eletrólise, fluidos, grafos, primos, estatística e NTP, com 12 gates contra sobreclaim e inconsistência dimensional.
 
 - [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md`](docs/MAPA_ESTRUTURAL_REPOSITORIO.md): mapa profissional da disposição por tags/diretórios, estados (`VOID`/`PENDING`/`AUDIT`/`RUNTIME`/`REFERENCE`) e varredura estrutural em 5 níveis.
 - [`docs/CONCEPT_STRUCTURAL_AUDIT.md`](docs/CONCEPT_STRUCTURAL_AUDIT.md): auditoria reproduzível que liga conceitos a arquivos âncora, estado, lacuna e próxima ação.
@@ -45,12 +46,14 @@ Este repositório passa a incluir uma documentação de referência de nível av
 ## Qualidade e automação
 
 - Pipeline GitHub Actions em `.github/workflows/ci.yml` com validação do protocolo canônico, checagem C host, build estrito (`-Wall -Wextra -Werror`), smoke test do binário e relatório P(k).
+- Workflow `.github/workflows/formal-science.yml` com registro de 32 equações, 12 domínios, 12 gates de prova, verificação dimensional e relatório auditável em JSON.
 - Hotfix de compilação aplicado no núcleo C para restaurar uma base compilável e facilitar futuras refatorações incrementais.
 
 - [`docs/PROTOCOLO_FALSIFICABILIDADE_PK.md`](docs/PROTOCOLO_FALSIFICABILIDADE_PK.md): protocolo mínimo de falsificabilidade em P(k) com execução automática.
 - [`docs/PROTOCOLO_CANONICO_COHERENCIA.md`](docs/PROTOCOLO_CANONICO_COHERENCIA.md): contrato canônico que liga as 50 sementes matemáticas a invariantes, arquivos e gates de prova/queda.
 - [`docs/PROTOCOLO_DOIS_CICLOS_OMEGA.md`](docs/PROTOCOLO_DOIS_CICLOS_OMEGA.md): protocolo enterprise de dois ciclos para coerência semântica, execução técnica, fail-safe/failover/rollback e uso honesto de `TOKEN_VAZIO`.
 - [`configs/semantic_coherence.yml`](configs/semantic_coherence.yml): YAML operacional para orquestração mutável de coerência, benchmark e falsificabilidade.
+- [`configs/formal_science_orchestrator.yml`](configs/formal_science_orchestrator.yml): registro de equações, dimensões, estados de claim, falsificadores e contratos de tempo/semântica.
 - [`configs/two_cycle_omega.yml`](configs/two_cycle_omega.yml): manifesto auditável dos campos canônicos, camadas linguísticas e invariantes técnicos dos dois ciclos.
 - [`configs/operational_excellence.yml`](configs/operational_excellence.yml): manifesto verificável da rota de excelência operacional, estados, arquiteturas e controles de risco.
 - [`docs/ROTINA_OPERACIONAL_BENCHMARKS.md`](docs/ROTINA_OPERACIONAL_BENCHMARKS.md): rotina operacional de auditoria, benchmark com prewarm/warmup e top 20 modelos.
