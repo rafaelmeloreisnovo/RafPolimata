@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rafaelmeloreisnovo/RafPolimata/schemas/formal_experiment_manifest.v1.schema.json",
+  "title": "RAFAELIA Formal Experiment Manifest v1",
+  "description": "Structural contract. Validation does not prove mathematics, runtime execution or scientific truth.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "manifest_id", "owner_repository", "claim_allowed", "claim", "formalization", "experiment", "evidence", "falsifier", "decision"],
+  "properties": {
+    "schema": {"const": "rafaelia.formal_experiment_manifest.v1"},
+    "manifest_id": {"type": "string", "minLength": 8},
+    "owner_repository": {"const": "rafaelmeloreisnovo/RafPolimata"},
+    "claim_allowed": {"const": false},
+    "claim": {"type": "object", "additionalProperties": false, "required": ["claim_id", "text", "source_status", "epistemic_status", "claim_gate"], "properties": {"claim_id": {"type": "string", "minLength": 3}, "text": {"type": "string", "minLength": 10}, "source_status": {"enum": ["VERIFIED", "VERIFIED_LIMITED", "DECLARED_BY_AUTHOR", "TOKEN_VAZIO", "CONTRADICTION"]}, "epistemic_status": {"enum": ["PROVED", "DERIVED", "FINITE_TEST", "HYPOTHESIS", "ANALOGY_ONLY", "TOKEN_VAZIO", "CONTRADICTION"]}, "claim_gate": {"enum": ["BLOCKED", "REVIEW_REQUIRED"]}}},
+    "formalization": {"type": "object", "additionalProperties": false, "required": ["definitions", "domain", "units", "equations", "assumptions", "proof_obligations"], "properties": {"definitions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}, "domain": {"type": "string", "minLength": 1}, "units": {"type": "object"}, "equations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}, "assumptions": {"type": "array", "items": {"type": "string"}}, "proof_obligations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}}},
+    "experiment": {"type": "object", "additionalProperties": false, "required": ["target_repository", "source_ref", "source_paths", "command", "inputs", "expected_artifacts"], "properties": {"target_repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"}, "source_ref": {"type": "string", "minLength": 1}, "source_paths": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}, "command": {"type": "string", "minLength": 1}, "inputs": {"type": "array", "items": {"type": "string"}}, "expected_artifacts": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}}},
+    "evidence": {"type": "object", "additionalProperties": false, "required": ["status", "artifact_sha256", "environment", "observed_at"], "properties": {"status": {"enum": ["VERIFIED", "TESTED", "PARTIAL", "TOKEN_VAZIO", "BLOCKED", "CONTRADICTION"]}, "artifact_sha256": {"type": "string", "pattern": "^(TOKEN_VAZIO|[0-9a-f]{64})$"}, "environment": {"type": "string", "minLength": 1}, "observed_at": {"type": "string", "minLength": 1}}},
+    "falsifier": {"type": "object", "additionalProperties": false, "required": ["condition", "result_if_met"], "properties": {"condition": {"type": "string", "minLength": 5}, "result_if_met": {"enum": ["CONTRADICTION", "CLAIM_REJECTED", "RECALIBRATION_REQUIRED"]}}},
+    "decision": {"type": "object", "additionalProperties": false, "required": ["status", "next_action", "rollback"], "properties": {"status": {"enum": ["BLOCKED", "REVIEW_REQUIRED", "TOKEN_VAZIO"]}, "next_action": {"type": "string", "minLength": 10}, "rollback": {"type": "string", "minLength": 5}}}
+  }
+}
