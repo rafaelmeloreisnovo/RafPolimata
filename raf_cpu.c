@@ -205,6 +205,12 @@ uint8_t raf_lang_from_ext(const char *path) {
     if (!strcmp(dot, ".js"))                    return RAF_LANG_JS;
     if (!strcmp(dot, ".php"))                   return RAF_LANG_PHP;
     if (!strcmp(dot, ".jsx"))                   return RAF_LANG_JSX;
+    if (!strcmp(dot, ".comp"))                  return RAF_LANG_GLSL;
+    if (!strcmp(dot, ".cl"))                    return RAF_LANG_CL;
+    if (!strcmp(dot, ".hlsl"))                  return RAF_LANG_HLSL;
+    if (!strcmp(dot, ".wgsl"))                  return RAF_LANG_WGSL;
+    if (!strcmp(dot, ".dsp"))                   return RAF_LANG_DSP;
+    if (!strcmp(dot, ".tflite"))                return RAF_LANG_TFLITE;
     return RAF_LANG_C;
 }
 
