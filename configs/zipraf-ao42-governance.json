@@ -1,0 +1,45 @@
+{
+  "contract": "ZIPRAF-AO42-GOVERNANCE-V1",
+  "claim_allowed": false,
+  "authorities": {
+    "formal_math": "rafaelmeloreisnovo/Matem-tica-",
+    "academic_synthesis": "rafaelmeloreisnovo/papers",
+    "container_runtime": "rafaelmeloreisnovo/ZIPRAF_OMEGA_FULL",
+    "binary_abi": "rafaelmeloreisnovo/ZIPRAF_CORE",
+    "matrix_kernel": "rafaelmeloreisnovo/ChipQuantum",
+    "governance": "rafaelmeloreisnovo/RafPolimata",
+    "custody": "rafaelmeloreisnovo/GAIA_phi"
+  },
+  "privacy": {
+    "mode": "POINTER_ONLY_OUTSIDE_AUTHORITY",
+    "forbidden_fields": ["payload", "body", "private_content", "secret", "token", "credential", "raw_private_bytes"],
+    "allowed_pointer_fields": ["repository", "commit", "path", "artifact_id", "sha256", "size_bytes", "generation"],
+    "public_mirror_may_copy_body": false
+  },
+  "geometry": {
+    "content_views": ["ZIP", "RAW", "GIF_PROXY", "JPEG_PROXY"],
+    "edge_count": 6,
+    "phases": ["DIRECT", "INVERSE", "REVERSE", "RESIDUAL", "PARITY", "HASH_CERTIFIED", "CACHE_RESOLVED"],
+    "hyperform_count": 42,
+    "transversal_layers": ["HASH_CERTIFICATION", "MATRIX_COMPUTATION_CACHE"]
+  },
+  "cache_promotion_gate": {
+    "required": ["operation_id", "input_hash", "parameters_hash", "result_hash", "code_hash", "abi", "version"],
+    "invalidate_on_any_mismatch": true,
+    "crc32c_is_cryptographic": false,
+    "sha256_required_for_custody": true
+  },
+  "append_gate": {
+    "prefix_preserved": true,
+    "latest_zip_directory_readable": true,
+    "manifest_chain_verified": true,
+    "rollback_pointer_required": true
+  },
+  "boundaries": {
+    "gif_proxy_standard_conformance": "NOT_CLAIMED",
+    "jpeg_proxy_standard_conformance": "NOT_CLAIMED",
+    "zip64_runtime": "TOKEN_VAZIO",
+    "42_superiority": "TOKEN_VAZIO",
+    "universal_compression_advantage": "NOT_CLAIMED"
+  }
+}
