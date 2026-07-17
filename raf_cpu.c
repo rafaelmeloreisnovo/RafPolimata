@@ -95,6 +95,41 @@ static int _feat_has(const char *feat_str, const char *word) {
     return 0;
 }
 
+/* Returns 1 if path can be opened O_RDONLY (node exists and is accessible). */
+static int _dev_ok(const char *path) {
+    int fd = open(path, O_RDONLY);
+    if (fd >= 0) { close(fd); return 1; }
+    return 0;
+}
+
+/* Probe /dev nodes for GPU, DSP, and NPU presence.
+ * Adds RAF_FEAT_GPU_VK / RAF_FEAT_GPU_CL / RAF_FEAT_DSP_HXN / RAF_FEAT_NPU
+ * to *feat_inout. Does NOT clear pre-existing bits. */
+static void _linux_detect_hw(uint32_t *feat_inout) {
+    /* Qualcomm Adreno (kgsl) — Vulkan + OpenCL capable */
+    if (_dev_ok("/dev/kgsl-3d0") || _dev_ok("/dev/kgsl3d"))
+        *feat_inout |= RAF_FEAT_GPU_VK | RAF_FEAT_GPU_CL;
+    /* ARM Mali — Vulkan + OpenCL capable */
+    if (_dev_ok("/dev/mali0") || _dev_ok("/dev/mali"))
+        *feat_inout |= RAF_FEAT_GPU_VK | RAF_FEAT_GPU_CL;
+    /* Imagination PowerVR — OpenCL capable (Vulkan support varies) */
+    if (_dev_ok("/dev/pvrsrvkm") || _dev_ok("/dev/rogue"))
+        *feat_inout |= RAF_FEAT_GPU_CL;
+    /* Generic DRM GPU (Mesa / Chromebook / PC) — Vulkan via Mesa */
+    if (_dev_ok("/dev/dri/card0") || _dev_ok("/dev/dri/renderD128"))
+        *feat_inout |= RAF_FEAT_GPU_VK;
+    /* Qualcomm Hexagon DSP — FastRPC device nodes */
+    if (_dev_ok("/dev/fastrpc-sdsp") || _dev_ok("/dev/fastrpc-cdsp") ||
+        _dev_ok("/dev/fastrpc-adsp") || _dev_ok("/dev/cdsp0") ||
+        _dev_ok("/dev/mdsp0"))
+        *feat_inout |= RAF_FEAT_DSP_HXN;
+    /* Neural accelerators — NPU device nodes (vendor-specific) */
+    if (_dev_ok("/dev/npu0")      || _dev_ok("/dev/hisi_hiai") ||
+        _dev_ok("/dev/mtk_mdla0") || _dev_ok("/dev/myriad_ion") ||
+        _dev_ok("/dev/qrtr") /* QNN/Qualcomm AI Engine */)
+        *feat_inout |= RAF_FEAT_NPU;
+}
+
 /* Detect additional feature flags from /proc/cpuinfo on Linux.
  * Adds bits to *feat_inout; does NOT clear pre-existing bits. */
 static void _linux_detect_features(uint8_t arch, uint32_t *feat_inout,
@@ -124,13 +159,15 @@ static void _linux_detect_features(uint8_t arch, uint32_t *feat_inout,
     _cpuinfo_get_features(cpuinfo, n, feat_line, (int)sizeof(feat_line));
 
     if (arch == RAF_ARCH_ARM64 || arch == RAF_ARCH_ARM32) {
-        /* ARM: neon / asimd → RAF_FEAT_NEON already set by macro; verify runtime */
         if (_feat_has(feat_line, "neon") || _feat_has(feat_line, "asimd"))
             *feat_inout |= RAF_FEAT_NEON;
-        /* AES, SHA2 — no new RAF_FEAT bits yet; reserved for future extension.
-         * (Do not invent bits that don't exist in raf_compile.h — TOKEN_VAZIO) */
+        if (_feat_has(feat_line, "sve") || _feat_has(feat_line, "sve2"))
+            *feat_inout |= RAF_FEAT_SVE;
+        if (_feat_has(feat_line, "i8mm") || _feat_has(feat_line, "svei8mm"))
+            *feat_inout |= RAF_FEAT_I8MM;
+        if (_feat_has(feat_line, "sme") || _feat_has(feat_line, "sme2"))
+            *feat_inout |= RAF_FEAT_SME;
     } else if (arch == RAF_ARCH_X86_64) {
-        /* x86-64: cross-check compiler flags against runtime CPUINFO */
         if (_feat_has(feat_line, "avx512f"))
             *feat_inout |= RAF_FEAT_AVX512;
         else if (_feat_has(feat_line, "avx2"))
@@ -178,11 +215,13 @@ void raf_cpu_detect(RafCPU *cpu) {
     snprintf(cpu->brand, sizeof(cpu->brand), "generic");
 #endif
 
-/* Step 2: Linux runtime /proc/cpuinfo — refines features and brand string.
- * Gated strictly: no-op on non-Linux. Only adds bits, never removes them. */
+/* Step 2: Linux runtime probes — refines ISA features, brand, and detects
+ * GPU/DSP/NPU accelerator presence. Gated strictly: no-op on non-Linux.
+ * Only adds bits, never removes them. */
 #if defined(__linux__)
     _linux_detect_features(cpu->arch, &cpu->feat,
                            cpu->brand, (int)sizeof(cpu->brand));
+    _linux_detect_hw(&cpu->feat);
 #endif
 
     cpu->cores = 1;
@@ -223,6 +262,16 @@ uint8_t raf_lang_from_ext(const char *path) {
  * Other arches/langs → generic opt + isa string (TOKEN_VAZIO for unknown arch) */
 void raf_flag_matrix_get(uint8_t arch, uint8_t lang, uint8_t opt, uint32_t feat,
                          char *out_flags, int cap) {
+    /* Compute / accelerator languages (GLSL, CL, HLSL, WGSL, DSP, TFLite):
+     * compiled by dedicated toolchains (glslc, dxc, tflite converter, etc.);
+     * GCC-style flags are not applicable → TOKEN_VAZIO (empty). */
+    if (lang == RAF_LANG_GLSL  || lang == RAF_LANG_CL   ||
+        lang == RAF_LANG_HLSL  || lang == RAF_LANG_WGSL  ||
+        lang == RAF_LANG_DSP   || lang == RAF_LANG_TFLITE) {
+        if (cap > 0) out_flags[0] = '\0';
+        return;
+    }
+
     /* Shorthand: is this a native compiled language (C or C++)? */
     int is_c_cpp = (lang == RAF_LANG_C || lang == RAF_LANG_CPP);
 
