@@ -1,24 +1,18 @@
 /* raf_cpu.c — CPU architecture detection and compiler flag matrix.
- * Uses POSIX open/read/close on Linux (no stdio FILE*) to read /proc/cpuinfo
- * for runtime feature discovery beyond compile-time macros.
- * No malloc/calloc/free. No stdio.h. */
+ * Uses POSIX open/read/close on Linux to read /proc/cpuinfo.
+ * No malloc/calloc/free. */
 
 #include "raf_compile.h"
 
-#include <string.h>   /* memset, strncpy, strcmp, strrchr, strstr */
+#include <string.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
 
-/* snprintf from <stdio.h> replaced by a minimal no-stdio helper below. */
-#include <stdio.h>   /* kept only for snprintf; no FILE* usage */
-
-/* ── /proc/cpuinfo reader (Linux only, no stdio) ────────────────────────── */
 #if defined(__linux__)
-#include <fcntl.h>    /* open, O_RDONLY */
-#include <unistd.h>   /* read, close */
+#include <fcntl.h>
+#include <unistd.h>
 
-/* Read at most buf_cap-1 bytes from path into buf; NUL-terminates.
- * Returns number of bytes read, or 0 on failure. */
 static int _read_procfile(const char *path, char *buf, int buf_cap) {
     int fd = open(path, O_RDONLY);
     if (fd < 0) return 0;
@@ -33,7 +27,6 @@ static int _read_procfile(const char *path, char *buf, int buf_cap) {
     return total;
 }
 
-/* Search needle in haystack (limit to len bytes). Returns pointer or NULL. */
 static const char *_memmem_c(const char *hay, int hlen,
                               const char *needle, int nlen) {
     if (nlen == 0) return hay;
@@ -45,26 +38,21 @@ static const char *_memmem_c(const char *hay, int hlen,
     return (const char *)0;
 }
 
-/* Find the value portion of a line like "Features\t: neon aes sha2 ..."
- * Writes the feature string into out (up to out_cap-1 chars). */
 static void _cpuinfo_get_features(const char *cpuinfo, int cpuinfo_len,
                                    char *out, int out_cap) {
     static const char key[] = "Features";
     const char *p = _memmem_c(cpuinfo, cpuinfo_len, key, (int)(sizeof(key)-1));
     if (!p) { out[0] = '\0'; return; }
-    /* advance past "Features" to the colon */
     p += sizeof(key) - 1;
     while (*p && *p != ':' && *p != '\n') p++;
     if (*p != ':') { out[0] = '\0'; return; }
-    p++; /* skip ':' */
+    p++;
     while (*p == ' ' || *p == '\t') p++;
-    /* copy until end of line */
     int i = 0;
     while (*p && *p != '\n' && i < out_cap - 1) out[i++] = *p++;
     out[i] = '\0';
 }
 
-/* Find the Hardware/model name line for the brand string. */
 static void _cpuinfo_get_brand(const char *cpuinfo, int cpuinfo_len,
                                 const char *field,
                                 char *out, int out_cap) {
@@ -81,7 +69,6 @@ static void _cpuinfo_get_brand(const char *cpuinfo, int cpuinfo_len,
     out[i] = '\0';
 }
 
-/* Check if word appears as a whole token in a space-delimited feature string. */
 static int _feat_has(const char *feat_str, const char *word) {
     int wlen = (int)strlen(word);
     const char *p = feat_str;
@@ -95,51 +82,41 @@ static int _feat_has(const char *feat_str, const char *word) {
     return 0;
 }
 
-/* Returns 1 if path can be opened O_RDONLY (node exists and is accessible). */
 static int _dev_ok(const char *path) {
     int fd = open(path, O_RDONLY);
     if (fd >= 0) { close(fd); return 1; }
     return 0;
 }
 
-/* Probe /dev nodes for GPU, DSP, and NPU presence.
- * Adds RAF_FEAT_GPU_VK / RAF_FEAT_GPU_CL / RAF_FEAT_DSP_HXN / RAF_FEAT_NPU
- * to *feat_inout. Does NOT clear pre-existing bits. */
-static void _linux_detect_hw(uint32_t *feat_inout) {
-    /* Qualcomm Adreno (kgsl) — Vulkan + OpenCL capable */
-    if (_dev_ok("/dev/kgsl-3d0") || _dev_ok("/dev/kgsl3d"))
-        *feat_inout |= RAF_FEAT_GPU_VK | RAF_FEAT_GPU_CL;
-    /* ARM Mali — Vulkan + OpenCL capable */
-    if (_dev_ok("/dev/mali0") || _dev_ok("/dev/mali"))
-        *feat_inout |= RAF_FEAT_GPU_VK | RAF_FEAT_GPU_CL;
-    /* Imagination PowerVR — OpenCL capable (Vulkan support varies) */
-    if (_dev_ok("/dev/pvrsrvkm") || _dev_ok("/dev/rogue"))
-        *feat_inout |= RAF_FEAT_GPU_CL;
-    /* Generic DRM GPU (Mesa / Chromebook / PC) — Vulkan via Mesa */
-    if (_dev_ok("/dev/dri/card0") || _dev_ok("/dev/dri/renderD128"))
-        *feat_inout |= RAF_FEAT_GPU_VK;
-    /* Qualcomm Hexagon DSP — FastRPC device nodes */
+/* Device nodes are presence evidence only. They must not be promoted directly
+ * to Vulkan/OpenCL/DSP/NPU execution capability. Dedicated API enumeration and
+ * a minimal kernel/runtime test are required before setting capability bits. */
+static void _linux_detect_hw_nodes(uint32_t *feat_inout) {
+    if (_dev_ok("/dev/kgsl-3d0") || _dev_ok("/dev/kgsl3d") ||
+        _dev_ok("/dev/mali0") || _dev_ok("/dev/mali") ||
+        _dev_ok("/dev/pvrsrvkm") || _dev_ok("/dev/rogue") ||
+        _dev_ok("/dev/dri/card0") || _dev_ok("/dev/dri/renderD128"))
+        *feat_inout |= RAF_FEAT_GPU_NODE;
+
     if (_dev_ok("/dev/fastrpc-sdsp") || _dev_ok("/dev/fastrpc-cdsp") ||
         _dev_ok("/dev/fastrpc-adsp") || _dev_ok("/dev/cdsp0") ||
         _dev_ok("/dev/mdsp0"))
-        *feat_inout |= RAF_FEAT_DSP_HXN;
-    /* Neural accelerators — NPU device nodes (vendor-specific) */
-    if (_dev_ok("/dev/npu0")      || _dev_ok("/dev/hisi_hiai") ||
+        *feat_inout |= RAF_FEAT_DSP_NODE;
+
+    if (_dev_ok("/dev/npu0") || _dev_ok("/dev/hisi_hiai") ||
         _dev_ok("/dev/mtk_mdla0") || _dev_ok("/dev/myriad_ion") ||
-        _dev_ok("/dev/qrtr") /* QNN/Qualcomm AI Engine */)
-        *feat_inout |= RAF_FEAT_NPU;
+        _dev_ok("/dev/qrtr"))
+        *feat_inout |= RAF_FEAT_NPU_NODE;
 }
 
-/* Detect additional feature flags from /proc/cpuinfo on Linux.
- * Adds bits to *feat_inout; does NOT clear pre-existing bits. */
 static void _linux_detect_features(uint8_t arch, uint32_t *feat_inout,
                                     char *brand_out, int brand_cap) {
     static char cpuinfo[4096];
     int n = _read_procfile("/proc/cpuinfo", cpuinfo, (int)sizeof(cpuinfo));
     if (n <= 0) return;
 
-    /* Grab brand/model name */
     static char tmp_brand[64];
+    tmp_brand[0] = '\0';
     if (arch == RAF_ARCH_ARM64 || arch == RAF_ARCH_ARM32) {
         _cpuinfo_get_brand(cpuinfo, n, "Hardware", tmp_brand, (int)sizeof(tmp_brand));
         if (tmp_brand[0] == '\0')
@@ -154,7 +131,6 @@ static void _linux_detect_features(uint8_t arch, uint32_t *feat_inout,
         brand_out[bcopy] = '\0';
     }
 
-    /* Feature flags from /proc/cpuinfo */
     static char feat_line[256];
     _cpuinfo_get_features(cpuinfo, n, feat_line, (int)sizeof(feat_line));
 
@@ -168,25 +144,19 @@ static void _linux_detect_features(uint8_t arch, uint32_t *feat_inout,
         if (_feat_has(feat_line, "sme") || _feat_has(feat_line, "sme2"))
             *feat_inout |= RAF_FEAT_SME;
     } else if (arch == RAF_ARCH_X86_64) {
-        if (_feat_has(feat_line, "avx512f"))
-            *feat_inout |= RAF_FEAT_AVX512;
-        else if (_feat_has(feat_line, "avx2"))
-            *feat_inout |= RAF_FEAT_AVX2;
-        else if (_feat_has(feat_line, "sse4_2"))
-            *feat_inout |= RAF_FEAT_SSE4;
+        if (_feat_has(feat_line, "avx512f")) *feat_inout |= RAF_FEAT_AVX512;
+        if (_feat_has(feat_line, "avx2")) *feat_inout |= RAF_FEAT_AVX2;
+        if (_feat_has(feat_line, "sse4_2")) *feat_inout |= RAF_FEAT_SSE4;
     }
 }
-#endif /* __linux__ */
-
-/* ── Public API ─────────────────────────────────────────────────────────── */
+#endif
 
 void raf_cpu_detect(RafCPU *cpu) {
     memset(cpu, 0, sizeof(*cpu));
 
-/* Step 1: compile-time architecture macros (always reliable) */
 #if defined(__aarch64__)
     cpu->arch = RAF_ARCH_ARM64;
-    cpu->feat = RAF_FEAT_NEON;    /* ARMv8-A mandates NEON/ASIMD */
+    cpu->feat = RAF_FEAT_NEON;
     snprintf(cpu->brand, sizeof(cpu->brand), "generic-arm64");
 #elif defined(__arm__)
     cpu->arch = RAF_ARCH_ARM32;
@@ -196,7 +166,10 @@ void raf_cpu_detect(RafCPU *cpu) {
     snprintf(cpu->brand, sizeof(cpu->brand), "generic-arm32");
 #elif defined(__x86_64__)
     cpu->arch = RAF_ARCH_X86_64;
-    cpu->feat = RAF_FEAT_SSE4;    /* baseline: SSE4.2 assumed on any modern x86-64 */
+    cpu->feat = 0u;
+#  if defined(__SSE4_2__)
+    cpu->feat |= RAF_FEAT_SSE4;
+#  endif
 #  if defined(__AVX2__)
     cpu->feat |= RAF_FEAT_AVX2;
 #  endif
@@ -215,67 +188,57 @@ void raf_cpu_detect(RafCPU *cpu) {
     snprintf(cpu->brand, sizeof(cpu->brand), "generic");
 #endif
 
-/* Step 2: Linux runtime probes — refines ISA features, brand, and detects
- * GPU/DSP/NPU accelerator presence. Gated strictly: no-op on non-Linux.
- * Only adds bits, never removes them. */
 #if defined(__linux__)
     _linux_detect_features(cpu->arch, &cpu->feat,
                            cpu->brand, (int)sizeof(cpu->brand));
-    _linux_detect_hw(&cpu->feat);
+    _linux_detect_hw_nodes(&cpu->feat);
+    long online = sysconf(_SC_NPROCESSORS_ONLN);
+    cpu->cores = online > 0 && online <= UINT32_MAX ? (uint32_t)online : 1u;
+#else
+    cpu->cores = 1u;
 #endif
-
-    cpu->cores = 1;
 }
-
-/* ── Language extension → RAF_LANG_* ────────────────────────────────────── */
 
 uint8_t raf_lang_from_ext(const char *path) {
     const char *dot = strrchr(path, '.');
-    if (!dot) return RAF_LANG_C;
-    if (!strcmp(dot, ".c"))                     return RAF_LANG_C;
+    if (!dot) return RAF_LANG_UNKNOWN;
+    if (!strcmp(dot, ".c"))                         return RAF_LANG_C;
     if (!strcmp(dot, ".cpp") || !strcmp(dot, ".cc")) return RAF_LANG_CPP;
-    if (!strcmp(dot, ".s") || !strcmp(dot, ".S"))    return RAF_LANG_S;
-    if (!strcmp(dot, ".py"))                    return RAF_LANG_PY;
-    if (!strcmp(dot, ".rs"))                    return RAF_LANG_RS;
-    if (!strcmp(dot, ".kt"))                    return RAF_LANG_KT;
-    if (!strcmp(dot, ".java"))                  return RAF_LANG_JAVA;
-    if (!strcmp(dot, ".sh"))                    return RAF_LANG_SH;
-    if (!strcmp(dot, ".pl"))                    return RAF_LANG_PL;
-    if (!strcmp(dot, ".js"))                    return RAF_LANG_JS;
-    if (!strcmp(dot, ".php"))                   return RAF_LANG_PHP;
-    if (!strcmp(dot, ".jsx"))                   return RAF_LANG_JSX;
-    if (!strcmp(dot, ".comp"))                  return RAF_LANG_GLSL;
-    if (!strcmp(dot, ".cl"))                    return RAF_LANG_CL;
-    if (!strcmp(dot, ".hlsl"))                  return RAF_LANG_HLSL;
-    if (!strcmp(dot, ".wgsl"))                  return RAF_LANG_WGSL;
-    if (!strcmp(dot, ".dsp"))                   return RAF_LANG_DSP;
-    if (!strcmp(dot, ".tflite"))                return RAF_LANG_TFLITE;
-    return RAF_LANG_C;
+    if (!strcmp(dot, ".s") || !strcmp(dot, ".S")) return RAF_LANG_S;
+    if (!strcmp(dot, ".py"))                        return RAF_LANG_PY;
+    if (!strcmp(dot, ".rs"))                        return RAF_LANG_RS;
+    if (!strcmp(dot, ".kt"))                        return RAF_LANG_KT;
+    if (!strcmp(dot, ".java"))                      return RAF_LANG_JAVA;
+    if (!strcmp(dot, ".sh"))                        return RAF_LANG_SH;
+    if (!strcmp(dot, ".pl"))                        return RAF_LANG_PL;
+    if (!strcmp(dot, ".js"))                        return RAF_LANG_JS;
+    if (!strcmp(dot, ".php"))                       return RAF_LANG_PHP;
+    if (!strcmp(dot, ".jsx"))                       return RAF_LANG_JSX;
+    if (!strcmp(dot, ".comp"))                      return RAF_LANG_GLSL;
+    if (!strcmp(dot, ".cl"))                        return RAF_LANG_CL;
+    if (!strcmp(dot, ".hlsl"))                      return RAF_LANG_HLSL;
+    if (!strcmp(dot, ".wgsl"))                      return RAF_LANG_WGSL;
+    if (!strcmp(dot, ".dsp"))                       return RAF_LANG_DSP;
+    if (!strcmp(dot, ".tflite"))                    return RAF_LANG_TFLITE;
+    return RAF_LANG_UNKNOWN;
 }
 
-/* ── Compiler flag matrix ────────────────────────────────────────────────── */
-
-/* Specced output for C/CPP per arch (task requirement, overrides generic path):
- *   ARM64 + C/CPP → "-march=armv8-a -mtune=generic -O2"
- *   ARM32 + C/CPP → "-march=armv7-a -mfloat-abi=softfp -mfpu=neon -O2"
- *   X86_64 + C/CPP → "-march=x86-64 -mtune=generic -O2"
- * Other arches/langs → generic opt + isa string (TOKEN_VAZIO for unknown arch) */
 void raf_flag_matrix_get(uint8_t arch, uint8_t lang, uint8_t opt, uint32_t feat,
                          char *out_flags, int cap) {
-    /* Compute / accelerator languages (GLSL, CL, HLSL, WGSL, DSP, TFLite):
-     * compiled by dedicated toolchains (glslc, dxc, tflite converter, etc.);
-     * GCC-style flags are not applicable → TOKEN_VAZIO (empty). */
-    if (lang == RAF_LANG_GLSL  || lang == RAF_LANG_CL   ||
-        lang == RAF_LANG_HLSL  || lang == RAF_LANG_WGSL  ||
-        lang == RAF_LANG_DSP   || lang == RAF_LANG_TFLITE) {
-        if (cap > 0) out_flags[0] = '\0';
+    if (cap <= 0) return;
+    if (lang == RAF_LANG_UNKNOWN) {
+        out_flags[0] = '\0';
         return;
     }
 
-    /* Shorthand: is this a native compiled language (C or C++)? */
-    int is_c_cpp = (lang == RAF_LANG_C || lang == RAF_LANG_CPP);
+    if (lang == RAF_LANG_GLSL || lang == RAF_LANG_CL ||
+        lang == RAF_LANG_HLSL || lang == RAF_LANG_WGSL ||
+        lang == RAF_LANG_DSP || lang == RAF_LANG_TFLITE) {
+        out_flags[0] = '\0';
+        return;
+    }
 
-    /* Canonical flag strings for C/CPP per architecture (spec-mandated) */
+    int is_c_cpp = (lang == RAF_LANG_C || lang == RAF_LANG_CPP);
     if (is_c_cpp) {
         const char *s = "";
         if (arch == RAF_ARCH_ARM64) {
@@ -285,32 +248,25 @@ void raf_flag_matrix_get(uint8_t arch, uint8_t lang, uint8_t opt, uint32_t feat,
         } else if (arch == RAF_ARCH_X86_64) {
             s = "-march=x86-64 -mtune=generic -O2";
         }
-        /* else RAF_ARCH_UNKNOWN / RV64 → TOKEN_VAZIO (empty string, return 0-equiv) */
-        if (cap > 0) {
-            strncpy(out_flags, s, (size_t)(cap - 1));
-            out_flags[cap - 1] = '\0';
-        }
+        strncpy(out_flags, s, (size_t)(cap - 1));
+        out_flags[cap - 1] = '\0';
         return;
     }
 
-    /* Non-C/CPP languages: build flags from opt + isa components */
     const char *base = "-O2";
-    const char *isa  = "";
+    const char *isa = "";
     const char *lang_flags = "";
 
-    /* Optimization level */
-    if      (opt == RAF_OPT_0) base = "-O0 -g";
+    if (opt == RAF_OPT_0) base = "-O0 -g";
     else if (opt == RAF_OPT_1) base = "-O1";
     else if (opt == RAF_OPT_3) base = "-O3";
     else if (opt == RAF_OPT_S) base = "-Os";
-    /* RAF_OPT_2 → default "-O2" */
 
-    /* Architecture ISA string */
     if (arch == RAF_ARCH_X86_64) {
-        if      ((feat & RAF_FEAT_AVX512) != 0u) isa = " -mavx512f";
-        else if ((feat & RAF_FEAT_AVX2)   != 0u) isa = " -mavx2";
-        else if ((feat & RAF_FEAT_SSE4)   != 0u) isa = " -msse4.2";
-        else                                      isa = " -march=x86-64";
+        if ((feat & RAF_FEAT_AVX512) != 0u) isa = " -mavx512f";
+        else if ((feat & RAF_FEAT_AVX2) != 0u) isa = " -mavx2";
+        else if ((feat & RAF_FEAT_SSE4) != 0u) isa = " -msse4.2";
+        else isa = " -march=x86-64";
     } else if (arch == RAF_ARCH_ARM64) {
         isa = " -march=armv8-a+simd";
     } else if (arch == RAF_ARCH_ARM32) {
@@ -318,20 +274,17 @@ void raf_flag_matrix_get(uint8_t arch, uint8_t lang, uint8_t opt, uint32_t feat,
     } else if (arch == RAF_ARCH_RV64) {
         isa = " -march=rv64gc";
     }
-    /* RAF_ARCH_UNKNOWN → isa="" → TOKEN_VAZIO (only base opt in output) */
 
-    /* Interpreter/JVM languages don't need freestanding flags */
     if (lang == RAF_LANG_S) {
         lang_flags = " -ffreestanding -fno-builtin";
     }
 
-    if (lang == RAF_LANG_PY  || lang == RAF_LANG_JAVA ||
-        lang == RAF_LANG_KT  || lang == RAF_LANG_SH   ||
-        lang == RAF_LANG_PL  || lang == RAF_LANG_JS    ||
+    if (lang == RAF_LANG_PY || lang == RAF_LANG_JAVA ||
+        lang == RAF_LANG_KT || lang == RAF_LANG_SH ||
+        lang == RAF_LANG_PL || lang == RAF_LANG_JS ||
         lang == RAF_LANG_PHP || lang == RAF_LANG_JSX) {
         lang_flags = "";
     }
 
     snprintf(out_flags, (size_t)cap, "%s%s%s", base, isa, lang_flags);
-    (void)feat; /* already used above */
 }
