@@ -5,6 +5,11 @@
 
 static RafCtx G;
 
+static int is_flag(const char *arg) {
+  return !strcmp(arg, "O0") || !strcmp(arg, "O1") || !strcmp(arg, "O2") ||
+         !strcmp(arg, "O3") || !strcmp(arg, "Os") || !strcmp(arg, "--native");
+}
+
 int main(int argc, char **argv) {
   raf_ctx_init(&G);
   if (argc < 2 || !strcmp(argv[1], "--help")) {
@@ -14,10 +19,16 @@ int main(int argc, char **argv) {
   }
 
   const char *src = argv[1];
-  const char *out = argc > 2 ? argv[2] : "raf_out";
+  const char *out = "raf_out";
+  int first_flag = 2;
   int do_native = 0;
 
-  for (int i = 3; i < argc; ++i) {
+  if (argc > 2 && !is_flag(argv[2])) {
+    out = argv[2];
+    first_flag = 3;
+  }
+
+  for (int i = first_flag; i < argc; ++i) {
     if (!strcmp(argv[i], "O0")) G.opt = RAF_OPT_0;
     else if (!strcmp(argv[i], "O1")) G.opt = RAF_OPT_1;
     else if (!strcmp(argv[i], "O2")) G.opt = RAF_OPT_2;
