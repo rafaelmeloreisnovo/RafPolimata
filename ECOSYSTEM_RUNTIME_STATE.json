@@ -1,6 +1,6 @@
 {
   "schema": "raf.ecosystem-runtime-state.v1",
-  "observed_at": "2026-07-18T18:43:58-03:00",
+  "observed_at": "2026-07-18T20:04:33-03:00",
   "ci_execution": {
     "state": "OUT_OF_SCOPE_NO_CREDIT",
     "reason": "GitHub Actions execution is excluded from this activity because the account currently has no Actions credit. Local commands are the only executable gate defined here."
@@ -52,15 +52,39 @@
       "evidence_state": "VERIFIED",
       "evidence": [
         "Explicit little-endian 64-byte header codec",
-        "CRC32C official 123456789 vector e3069283 passed in independent local compilation",
-        "Round-trip and corruption rejection passed with strict C warnings"
+        "CRC32C official 123456789 vector e3069283 passed in local strict compilation",
+        "Header round-trip and corruption rejection passed after the record extension"
       ],
       "gaps": [
-        "Conversation/message record writer, reader, extraction and checkpoint/resume are not completed by this cut",
         "BLAKE3 identity integration remains a separate cryptographic gate"
       ],
-      "next_action": "Implement fixed-size conversation/message record codecs and golden fixtures without changing the frozen 64-byte header.",
-      "commit": "00d4fbf9896eaaec68c7a17f871de4171dbe21a2"
+      "next_action": "Keep the frozen 64-byte header compatible while the streaming writer and checkpoint layer are implemented.",
+      "commit": "4ad946dd07118819f9a3982a89f8dc2ead59d843"
+    },
+    {
+      "id": "rafpolimata.segment-v1-records-reader",
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "path": "runtime/conversation_indexer/raf_segment_v1.h;runtime/conversation_indexer/raf_segment_v1.c;runtime/conversation_indexer/test_segment_v1.c",
+      "implementation_state": "IMPLEMENTED",
+      "evidence_state": "VERIFIED",
+      "evidence": [
+        "Conversation record codec is frozen at exactly 96 bytes and message record codec at exactly 128 bytes",
+        "Strict host build and test passed with -std=c11 -Wall -Wextra -Werror -pedantic",
+        "Conversation/message encode-decode round-trips passed",
+        "Bounded iteration across mixed records passed and terminates with RAF_SEG_END",
+        "Record, title, author and content CRC32C checks reject corruption",
+        "Truncated payload and out-of-range source/payload spans are rejected without overflow-prone addition",
+        "Invalid roles and contradictory empty/non-empty record layouts are rejected",
+        "Freestanding object compiled with no undefined or forbidden libc symbols",
+        "ARMv7-A soft-float and AArch64 freestanding object compilation passed"
+      ],
+      "gaps": [
+        "No streaming extractor currently converts a real conversations.json export into these records",
+        "No atomic segment file writer or checkpoint/resume journal exists in this cut",
+        "ID fields are opaque 128-bit values; BLAKE3 derivation is not yet integrated"
+      ],
+      "next_action": "Implement the streaming extractor and atomic segment writer, then add checkpoint/resume fixtures over interrupted input.",
+      "commit": "4ad946dd07118819f9a3982a89f8dc2ead59d843"
     },
     {
       "id": "rafpolimata.apkc-device-runtime",
@@ -91,7 +115,7 @@
         "Termux service transport and end-to-end job receipt are not executed here"
       ],
       "next_action": "Pin the paired PR head after review and implement the consumer without generic shell execution.",
-      "commit": "b6022e0797a67466de45dcfe74c47cc3aa7f14fd"
+      "commit": "aebabee3d0dc4ded95000b25a5972d03e0791404"
     }
   ]
 }
