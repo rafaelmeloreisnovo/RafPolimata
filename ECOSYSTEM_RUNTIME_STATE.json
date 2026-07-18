@@ -25,7 +25,7 @@
         "Local full-repository validation must be run with scripts/validate_runtime_truth_local.sh"
       ],
       "next_action": "Run the local validator in Termux or a host checkout and attach stdout, compiler version and artifact hashes.",
-      "commit": "dfd554dd329530b6523b6fb160709b5443b11233"
+      "commit": "7a7a421a6e11ea27c30182bf260ca9dcac47a04b"
     },
     {
       "id": "rafpolimata.accelerator-detection",
@@ -41,7 +41,7 @@
         "Vulkan/OpenCL/DSP/NPU API enumeration and minimal runtime kernels remain TOKEN_VAZIO"
       ],
       "next_action": "Add provider-specific probes that promote capability bits only after API enumeration and a minimal execution test.",
-      "commit": null
+      "commit": "88a1cbbfdb620f17811804c1fcb1fb08a318345a"
     },
     {
       "id": "rafpolimata.segment-v1-header",
@@ -59,7 +59,7 @@
         "BLAKE3 identity integration remains a separate cryptographic gate"
       ],
       "next_action": "Implement fixed-size conversation/message record codecs and golden fixtures without changing the frozen 64-byte header.",
-      "commit": null
+      "commit": "00d4fbf9896eaaec68c7a17f871de4171dbe21a2"
     },
     {
       "id": "rafpolimata.apkc-device-runtime",
@@ -82,15 +82,15 @@
       "repository": "rafaelmeloreisnovo/RafGitTools",
       "path": "contracts/job-v1.schema.json",
       "implementation_state": "REFERENCE",
-      "evidence_state": "TOKEN_VAZIO",
+      "evidence_state": "DECLARED_BY_AUTHOR",
       "evidence": [
-        "Typed job contract is being introduced in the paired RafGitTools audit branch"
+        "Typed job contract exists in the paired RafGitTools audit branch"
       ],
       "gaps": [
         "Termux service transport and end-to-end job receipt are not executed here"
       ],
-      "next_action": "Pin the paired PR commit after review and implement the consumer without generic shell execution.",
-      "commit": null
+      "next_action": "Pin the paired PR head after review and implement the consumer without generic shell execution.",
+      "commit": "b6022e0797a67466de45dcfe74c47cc3aa7f14fd"
     }
   ]
 }
