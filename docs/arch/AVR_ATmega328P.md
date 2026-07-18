@@ -1,5 +1,7 @@
 # AVR ATmega328P Architecture Reference
 
+> **Entrada canônica:** docs/AGENTES.md §8 (entradas canônicas por subsistema — RAF_001–RAF_020 implementam técnicas AVR via RAFA_MMIO8/16/32) e §7 (CI gates — COMPILE_OK em host x86_64, EXECUTA_PASS no hardware ATmega328P). Este documento é a referência de arquitetura AVR ATmega328P para o projeto.
+
 This document covers the ATmega328P register map, timer formulas, interrupt
 vectors, and the memory model as used in the RafPolimata project. All register
 addresses and bit constants are taken directly from the RAF_001–RAF_020 source
@@ -14,7 +16,7 @@ memory (SRAM + I/O space) are separate address spaces with different access
 mechanisms.
 
 | Space          | Size     | Address range  | Access |
-|----------------|----------|----------------|--------|
+|----------------|----------|----------------|---------|
 | Flash (program)| 32 KiB   | 0x0000–0x3FFF  | LPM, SPM |
 | SRAM (data)    | 2 KiB    | 0x0100–0x08FF  | LD/ST |
 | I/O registers  | 64 bytes | 0x0020–0x005F  | IN/OUT |
@@ -411,7 +413,7 @@ the two writes to prevent reordering.
 ### 8.2 WDP Prescaler Timeouts
 
 | WDP[3:0] | Timeout (approx.) |
-|----------|--------------------|
+|----------|-----------------|
 | 0b0000   | 16 ms |
 | 0b0001   | 32 ms |
 | 0b0010   | 64 ms |
