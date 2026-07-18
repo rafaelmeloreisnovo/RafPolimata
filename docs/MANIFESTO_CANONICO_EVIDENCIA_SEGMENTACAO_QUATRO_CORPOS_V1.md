@@ -3,7 +3,7 @@
 **Repositório de autoridade:** `rafaelmeloreisnovo/RafPolimata`  
 **Versão documental:** `1.0.0`  
 **Data canônica deste corte:** `2026-07-18`  
-**Estado:** `PARTIAL_VERIFIED`  
+**Estado documental:** `DECLARED_BY_AUTHOR` — contém um subescopo `VERIFIED` explicitamente delimitado  
 **PR de integração:** `#140` — draft, aberto e sem auto-merge  
 **Gate remoto:** `OUT_OF_SCOPE_NO_CREDIT`
 
