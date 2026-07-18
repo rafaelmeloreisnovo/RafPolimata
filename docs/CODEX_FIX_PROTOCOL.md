@@ -1,8 +1,6 @@
 # Protocolo Codex/IA para Correção de Compilação (S38)
 
-> **Agente novo?** Leia `docs/AGENTES.md` antes de começar — cobre invariantes
-> completos, regras de não-colisão, ciclo de sessão e gates CI em um único documento.
-> Este protocolo é um guia cirúrgico específico para diagnóstico de compilação.
+> **Entrada canônica:** docs/AGENTES.md §4 (regras de não-colisão — freestanding, sem NULL-deref, sintaxe obrigatória antes do commit) e §7 (CI gates — o que cada gate valida e o que significa falhar). Este protocolo é o guia cirúrgico específico para diagnóstico e correção de erros de compilação sem quebrar invariantes de arquitetura.
 
 ## Objetivo
 

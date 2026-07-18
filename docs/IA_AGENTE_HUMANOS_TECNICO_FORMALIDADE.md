@@ -1,8 +1,6 @@
 # IA, Agentes e Humanos — Protocolo Técnico de Formalidade
 
-> **Ponto de entrada unificado:** `docs/AGENTES.md` consolida taxonomia, ciclo de
-> sessão, regras de não-colisão, CI gates e escalação em um único documento.
-> Este arquivo aprofunda o protocolo formal de validação prévia e execução acoplada.
+> **Entrada canônica:** docs/AGENTES.md §2 (taxonomia de agentes — tipo × responsabilidade × escopo de decisão para Claude, Codex, ChatGPT e agente humano) e §6 (escalação e conflito — 4 critérios explícitos de quando escalar para humano). Este arquivo aprofunda o protocolo formal de validação prévia e execução acoplada.
 
 ## Objetivo
 
