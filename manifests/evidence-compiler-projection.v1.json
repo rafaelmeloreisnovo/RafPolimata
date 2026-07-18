@@ -1,0 +1,87 @@
+{
+  "schema": "raf.evidence-compiler-projection.v1",
+  "version": "1.0.0",
+  "date": "2026-07-18",
+  "authority": {
+    "repository": "rafaelmeloreisnovo/RafPolimata",
+    "role": "EVIDENCE_COMPILER",
+    "local_commit": "SELF",
+    "pull_request": 140
+  },
+  "control_authority": {
+    "repository": "rafaelmeloreisnovo/RafGitTools",
+    "manifest_path": "manifests/four-bodies-tail-r3.v1.json",
+    "branch": "audit/runtime-truth-local-validation-20260718",
+    "pull_request": 268
+  },
+  "tail": [
+    "origin",
+    "authorship",
+    "intent",
+    "license",
+    "evidence"
+  ],
+  "evidence_states": [
+    "VERIFIED",
+    "DECLARED_BY_AUTHOR",
+    "TOKEN_VAZIO",
+    "CONTRADICTION",
+    "OUT_OF_SCOPE_NO_CREDIT"
+  ],
+  "current_cut": {
+    "segment_v1_header": {
+      "state": "VERIFIED",
+      "scope": [
+        "crc32c_known_vector",
+        "encode_decode_roundtrip",
+        "corruption_rejection",
+        "invalid_offset_rejection"
+      ]
+    },
+    "root_compiler_corrections": "DECLARED_BY_AUTHOR",
+    "local_gate_script": "DECLARED_BY_AUTHOR",
+    "conversation_records": "TOKEN_VAZIO",
+    "message_records": "TOKEN_VAZIO",
+    "bounded_reader_writer": "TOKEN_VAZIO",
+    "blake3_checkpoint_resume": "TOKEN_VAZIO",
+    "apkc_device_runtime": "TOKEN_VAZIO",
+    "github_actions": "OUT_OF_SCOPE_NO_CREDIT"
+  },
+  "next_contract": {
+    "priority": [
+      "conversation_record",
+      "message_record",
+      "bounded_reader"
+    ],
+    "requirements": [
+      "explicit_little_endian",
+      "bounds_checks",
+      "overflow_checks",
+      "golden_fixtures",
+      "version_compatibility",
+      "tail_provenance"
+    ]
+  },
+  "r3": {
+    "ok": [
+      "frozen_64_byte_header",
+      "isolated_codec_verification",
+      "honest_capability_detection",
+      "oversize_rejection"
+    ],
+    "gap": [
+      "records",
+      "reader_writer",
+      "blake3",
+      "checkpoint_resume",
+      "streaming_export",
+      "device_runtime"
+    ],
+    "next": [
+      "implement_fixed_records",
+      "add_golden_fixtures",
+      "preserve_claim_boundaries"
+    ]
+  },
+  "claim_allowed": false
+}
