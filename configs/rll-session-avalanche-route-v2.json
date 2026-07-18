@@ -1,0 +1,58 @@
+{
+  "schema": "rafpolimata.rll_session_avalanche.route.v2",
+  "supersedes": "configs/rll-session-avalanche-route-v1.json",
+  "authorities": {
+    "physics": "instituto-Rafael/relativity-living-light",
+    "orchestration": "rafaelmeloreisnovo/RafPolimata",
+    "governance": "rafaelmeloreisnovo/RafGitTools",
+    "map": "rafaelmeloreisnovo/Mapa",
+    "editorial": "rafaelmeloreisnovo/papers"
+  },
+  "source_artifacts": {
+    "physics_module": "data/pipelines/strong_gravity/session_multiscale_avalanche.py",
+    "physics_contract": "data/contracts/session_multiscale_avalanche.v1.json",
+    "compression_radiation_module": "data/pipelines/strong_gravity/relativistic_compression_radiation_bridge.py",
+    "compression_radiation_contract": "data/contracts/relativistic_compression_radiation_bridge.v1.json",
+    "semantic_capsule": "configs/session-single-subtokenization-v2.json"
+  },
+  "stages": ["normalize", "permute", "prune", "score", "route", "evidence"],
+  "variants": {
+    "frequency_hz": [144000.0, 288000.0],
+    "thermal_regime": ["heating", "cooling", "quench", "fully_ionized"],
+    "magnetization_regime": ["collision_dominated", "transition", "magnetized"]
+  },
+  "scale_policy": {
+    "finite": true,
+    "max_jobs": 240,
+    "batch_size": 16,
+    "backends": ["scalar", "simd", "gpu", "dsp", "npu"],
+    "fallback": "scalar",
+    "hardware_evidence_required_for_non_scalar": true,
+    "do_not_expand_microphysics_axes_without_input_distributions": true
+  },
+  "gates": [
+    {"id": "authority", "required": true, "failure_state": "BLOCKED"},
+    {"id": "units", "required": true, "failure_state": "BLOCKED"},
+    {"id": "claim_boundary", "required": true, "failure_state": "BLOCKED"},
+    {"id": "input_hash", "required": true, "failure_state": "TOKEN_VAZIO"},
+    {"id": "opacity_model", "required": true, "failure_state": "TOKEN_VAZIO"},
+    {"id": "particle_distribution", "required": true, "failure_state": "TOKEN_VAZIO"},
+    {"id": "process_cross_sections", "required": true, "failure_state": "TOKEN_VAZIO"},
+    {"id": "runtime_evidence", "required": false, "failure_state": "TOKEN_VAZIO"}
+  ],
+  "avalanche_semantics": {
+    "computational": "controlled dependency fan-out after required gates",
+    "physical": "ionization cascade candidate owned by RLL and dependent on reduced field, species and cross sections",
+    "equivalence_claimed": false
+  },
+  "relativistic_compression_semantics": {
+    "compression_automatically_creates_subparticles": false,
+    "threshold_reached_equals_reaction_completed": false,
+    "photon_thrust_model": "coupling*power/c",
+    "eddington_benchmark": "radiative acceleration divided by gravity acceleration",
+    "stress_energy_proxy_is_gr_solution": false
+  },
+  "automatic_cross_repo_write": false,
+  "automatic_merge": false,
+  "claim_allowed": false
+}
