@@ -82,15 +82,23 @@ Esse comando compila o núcleo C, executa o codec `segment.v1`, verifica `.s/.he
 
 RafPolimata separa hipótese, analogia, prova parcial e prova runtime. `TOKEN_VAZIO` é um estado válido quando falta ferramenta, device, dataset, log ou execução. O CI atua como compilador de evidências estruturais, enquanto a matriz do universo registra estado, lacunas, próximos passos e rollback sem transformar ausência em PASS.
 
-## Conversation Indexer — header `segment.v1`
+## Conversation Indexer — `segment.v1`
 
-`runtime/conversation_indexer/` mantém o scanner streaming existente e passa a incluir:
+`runtime/conversation_indexer/` mantém o scanner streaming existente e inclui agora:
 
-- `raf_segment_v1.h`;
-- `raf_segment_v1.c`;
-- `test_segment_v1.c`.
+- header explícito de 64 bytes;
+- conversation record explícito de 96 bytes;
+- message record explícito de 128 bytes;
+- leitor limitado com iteração tipada;
+- CRC32C de header, records, título, autor e conteúdo;
+- rejeição de corrupção, truncamento, roles inválidos e ranges fora do buffer.
 
-Este corte implementa somente o header explícito de 64 bytes, little-endian, CRC32C e rejeição de corrupção. Writer/reader de registros, extração integral, BLAKE3 e checkpoint/resume continuam pendentes e não são declarados concluídos.
+O ensaio isolado host, a auditoria freestanding e a compilação cruzada ARM32/ARM64 foram executados e estão documentados em:
+
+- [`docs/RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md`](docs/RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md);
+- [`docs/MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md`](docs/MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md).
+
+Streaming extractor, writer atômico, checkpoint/resume, BLAKE3 e execução em device continuam pendentes e não são declarados concluídos.
 
 ## ApkC — micro-toolchain Android freestanding
 
