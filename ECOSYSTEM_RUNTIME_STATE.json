@@ -35,13 +35,14 @@
       "evidence_state": "DECLARED_BY_AUTHOR",
       "evidence": [
         "GPU/DSP/NPU device-node presence has separate *_NODE bits",
-        "presence-only bits are not selected as verified compute backends"
+        "presence-only bits are not selected as verified compute backends",
+        "Linux CPU feature parsing accepts ARM Features and x86 flags lines"
       ],
       "gaps": [
         "Vulkan/OpenCL/DSP/NPU API enumeration and minimal runtime kernels remain TOKEN_VAZIO"
       ],
       "next_action": "Add provider-specific probes that promote capability bits only after API enumeration and a minimal execution test.",
-      "commit": "88a1cbbfdb620f17811804c1fcb1fb08a318345a"
+      "commit": "07c8093eae08f499f4f29b4ecf74bf8c8fae7610"
     },
     {
       "id": "rafpolimata.segment-v1-header",
