@@ -1,0 +1,44 @@
+{
+  "schema": "rafpolimata.rll_session_avalanche.route.v1",
+  "authorities": {
+    "physics": "instituto-Rafael/relativity-living-light",
+    "orchestration": "rafaelmeloreisnovo/RafPolimata",
+    "governance": "rafaelmeloreisnovo/RafGitTools",
+    "map": "rafaelmeloreisnovo/Mapa",
+    "editorial": "rafaelmeloreisnovo/papers"
+  },
+  "source_artifacts": {
+    "physics_module": "data/pipelines/strong_gravity/session_multiscale_avalanche.py",
+    "physics_contract": "data/contracts/session_multiscale_avalanche.v1.json",
+    "semantic_capsule": "configs/session-single-subtokenization-v1.json"
+  },
+  "stages": ["normalize", "permute", "prune", "score", "route", "evidence"],
+  "variants": {
+    "frequency_hz": [144000.0, 288000.0],
+    "thermal_regime": ["heating", "cooling", "quench", "fully_ionized"],
+    "magnetization_regime": ["collision_dominated", "transition", "magnetized"]
+  },
+  "scale_policy": {
+    "finite": true,
+    "max_jobs": 240,
+    "batch_size": 16,
+    "backends": ["scalar", "simd", "gpu", "dsp", "npu"],
+    "fallback": "scalar",
+    "hardware_evidence_required_for_non_scalar": true
+  },
+  "gates": [
+    {"id": "authority", "required": true, "failure_state": "BLOCKED"},
+    {"id": "units", "required": true, "failure_state": "BLOCKED"},
+    {"id": "claim_boundary", "required": true, "failure_state": "BLOCKED"},
+    {"id": "input_hash", "required": true, "failure_state": "TOKEN_VAZIO"},
+    {"id": "runtime_evidence", "required": false, "failure_state": "TOKEN_VAZIO"}
+  ],
+  "avalanche_semantics": {
+    "computational": "controlled dependency fan-out after required gates",
+    "physical": "Townsend-like ionization candidate owned by RLL",
+    "equivalence_claimed": false
+  },
+  "automatic_cross_repo_write": false,
+  "automatic_merge": false,
+  "claim_allowed": false
+}
