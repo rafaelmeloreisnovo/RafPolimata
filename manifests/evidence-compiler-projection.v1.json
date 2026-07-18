@@ -1,18 +1,19 @@
 {
   "schema": "raf.evidence-compiler-projection.v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "date": "2026-07-18",
   "authority": {
     "repository": "rafaelmeloreisnovo/RafPolimata",
     "role": "EVIDENCE_COMPILER",
-    "local_commit": "SELF",
+    "local_commit": "4ad946dd07118819f9a3982a89f8dc2ead59d843",
     "pull_request": 140
   },
   "control_authority": {
     "repository": "rafaelmeloreisnovo/RafGitTools",
     "manifest_path": "manifests/four-bodies-tail-r3.v1.json",
     "branch": "audit/runtime-truth-local-validation-20260718",
-    "pull_request": 268
+    "pull_request": 268,
+    "commit": "aebabee3d0dc4ded95000b25a5972d03e0791404"
   },
   "tail": [
     "origin",
@@ -31,56 +32,101 @@
   "current_cut": {
     "segment_v1_header": {
       "state": "VERIFIED",
+      "size_bytes": 64,
       "scope": [
         "crc32c_known_vector",
         "encode_decode_roundtrip",
         "corruption_rejection",
-        "invalid_offset_rejection"
+        "invalid_layout_rejection"
+      ]
+    },
+    "conversation_record_codec": {
+      "state": "VERIFIED",
+      "size_bytes": 96,
+      "scope": [
+        "explicit_little_endian",
+        "record_crc32c",
+        "title_crc32c",
+        "source_range_validation",
+        "message_range_validation"
+      ]
+    },
+    "message_record_codec": {
+      "state": "VERIFIED",
+      "size_bytes": 128,
+      "scope": [
+        "explicit_little_endian",
+        "record_crc32c",
+        "author_crc32c",
+        "content_crc32c",
+        "role_validation",
+        "parent_and_index_validation"
+      ]
+    },
+    "bounded_reader": {
+      "state": "VERIFIED",
+      "scope": [
+        "mixed_record_iteration",
+        "overflow_safe_ranges",
+        "truncated_payload_rejection",
+        "unknown_type_rejection",
+        "exact_record_count_termination"
+      ]
+    },
+    "freestanding_build": {
+      "state": "VERIFIED",
+      "scope": [
+        "host_object_no_undefined_symbols",
+        "host_object_no_forbidden_libc_symbols",
+        "armv7_a_soft_float_compile",
+        "aarch64_compile"
       ]
     },
     "root_compiler_corrections": "DECLARED_BY_AUTHOR",
-    "local_gate_script": "DECLARED_BY_AUTHOR",
-    "conversation_records": "TOKEN_VAZIO",
-    "message_records": "TOKEN_VAZIO",
-    "bounded_reader_writer": "TOKEN_VAZIO",
-    "blake3_checkpoint_resume": "TOKEN_VAZIO",
+    "local_full_repository_gate": "DECLARED_BY_AUTHOR",
+    "streaming_extractor": "TOKEN_VAZIO",
+    "atomic_segment_writer": "TOKEN_VAZIO",
+    "checkpoint_resume": "TOKEN_VAZIO",
+    "blake3_identity": "TOKEN_VAZIO",
     "apkc_device_runtime": "TOKEN_VAZIO",
     "github_actions": "OUT_OF_SCOPE_NO_CREDIT"
   },
   "next_contract": {
     "priority": [
-      "conversation_record",
-      "message_record",
-      "bounded_reader"
+      "streaming_extractor",
+      "atomic_segment_writer",
+      "checkpoint_resume"
     ],
     "requirements": [
-      "explicit_little_endian",
-      "bounds_checks",
-      "overflow_checks",
+      "preserve_frozen_record_sizes",
+      "bounded_memory",
+      "atomic_publication",
+      "interruption_recovery",
       "golden_fixtures",
-      "version_compatibility",
       "tail_provenance"
     ]
   },
   "r3": {
     "ok": [
       "frozen_64_byte_header",
-      "isolated_codec_verification",
-      "honest_capability_detection",
-      "oversize_rejection"
+      "frozen_96_byte_conversation_record",
+      "frozen_128_byte_message_record",
+      "bounded_reader",
+      "strict_host_tests",
+      "freestanding_arm32_arm64_compile"
     ],
     "gap": [
-      "records",
-      "reader_writer",
+      "streaming_extractor",
+      "segment_file_writer",
       "blake3",
       "checkpoint_resume",
-      "streaming_export",
+      "real_export_fixture",
       "device_runtime"
     ],
     "next": [
-      "implement_fixed_records",
-      "add_golden_fixtures",
-      "preserve_claim_boundaries"
+      "extract_real_conversation_structure_without_loading_the_full_export",
+      "write_segments_atomically",
+      "resume_after_interruption_without_duplicate_records"
     ]
   },
   "claim_allowed": false
