@@ -12,7 +12,7 @@ cc -std=c11 -Wall -Wextra -Werror \
   raf_main.c raf_frontend.c raf_cpu.c raf_asm_emit.c raf_precomp.c \
   -o "$BUILD/raf_compile"
 
-printf '%s\n' '[2/7] segment v1 freestanding codec tests'
+printf '%s\n' '[2/7] segment v1 header, fixed records and bounded-reader tests'
 make -C runtime/conversation_indexer test-segment audit
 
 printf '%s\n' '[3/7] raw native output contract'
@@ -61,6 +61,8 @@ main = (root / 'raf_main.c').read_text()
 frontend = (root / 'raf_frontend.c').read_text()
 cpu = (root / 'raf_cpu.c').read_text()
 header = (root / 'raf_compile.h').read_text()
+segment_h = (root / 'runtime/conversation_indexer/raf_segment_v1.h').read_text()
+segment_c = (root / 'runtime/conversation_indexer/raf_segment_v1.c').read_text()
 
 checks = {
     'native forwarded': 'raf_compile_file(&G, src, out, do_native)' in main,
@@ -72,6 +74,10 @@ checks = {
     'presence-only accelerator flags': 'RAF_FEAT_GPU_NODE' in header and '_linux_detect_hw_nodes' in cpu,
     'runtime core count': '_SC_NPROCESSORS_ONLN' in cpu,
     'linux x86 flags parsed': 'static const char x86_key[] = "flags"' in cpu,
+    'conversation record frozen': 'RAF_SEGMENT_V1_CONVERSATION_SIZE 96u' in segment_h,
+    'message record frozen': 'RAF_SEGMENT_V1_MESSAGE_SIZE 128u' in segment_h,
+    'bounded reader present': 'raf_segment_reader_v1_next' in segment_h and 'range_within' in segment_c,
+    'payload CRCs verified': 'content_crc32c' in segment_h and 'author_crc32c' in segment_h,
 }
 for name, passed in checks.items():
     if not passed:
