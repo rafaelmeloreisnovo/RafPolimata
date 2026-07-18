@@ -38,12 +38,22 @@ static const char *_memmem_c(const char *hay, int hlen,
     return (const char *)0;
 }
 
+/* ARM commonly labels the ISA line "Features" while Linux x86 uses "flags".
+ * Try both names so the runtime probe cannot silently under-detect x86 ISA. */
 static void _cpuinfo_get_features(const char *cpuinfo, int cpuinfo_len,
                                    char *out, int out_cap) {
-    static const char key[] = "Features";
-    const char *p = _memmem_c(cpuinfo, cpuinfo_len, key, (int)(sizeof(key)-1));
+    static const char arm_key[] = "Features";
+    static const char x86_key[] = "flags";
+    const char *p = _memmem_c(cpuinfo, cpuinfo_len, arm_key,
+                               (int)(sizeof(arm_key) - 1));
+    int key_len = (int)(sizeof(arm_key) - 1);
+    if (!p) {
+        p = _memmem_c(cpuinfo, cpuinfo_len, x86_key,
+                      (int)(sizeof(x86_key) - 1));
+        key_len = (int)(sizeof(x86_key) - 1);
+    }
     if (!p) { out[0] = '\0'; return; }
-    p += sizeof(key) - 1;
+    p += key_len;
     while (*p && *p != ':' && *p != '\n') p++;
     if (*p != ':') { out[0] = '\0'; return; }
     p++;
