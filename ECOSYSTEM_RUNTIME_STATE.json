@@ -1,0 +1,96 @@
+{
+  "schema": "raf.ecosystem-runtime-state.v1",
+  "observed_at": "2026-07-18T18:43:58-03:00",
+  "ci_execution": {
+    "state": "OUT_OF_SCOPE_NO_CREDIT",
+    "reason": "GitHub Actions execution is excluded from this activity because the account currently has no Actions credit. Local commands are the only executable gate defined here."
+  },
+  "components": [
+    {
+      "id": "rafpolimata.compiler-core",
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "path": "raf_main.c;raf_frontend.c;raf_cpu.c;raf_compile.h",
+      "implementation_state": "EXPERIMENTAL",
+      "evidence_state": "DECLARED_BY_AUTHOR",
+      "evidence": [
+        "--native is parsed and forwarded",
+        "raw instruction bytes are written to .bin when requested",
+        "source files above the bounded capacity are rejected instead of truncated",
+        "FNV-1a 64 uses the canonical offset basis",
+        "unknown extensions map to RAF_LANG_UNKNOWN",
+        "online CPU count is probed on Linux"
+      ],
+      "gaps": [
+        "The IR remains intentionally small and is not a general 18-language compiler",
+        "Local full-repository validation must be run with scripts/validate_runtime_truth_local.sh"
+      ],
+      "next_action": "Run the local validator in Termux or a host checkout and attach stdout, compiler version and artifact hashes.",
+      "commit": "dfd554dd329530b6523b6fb160709b5443b11233"
+    },
+    {
+      "id": "rafpolimata.accelerator-detection",
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "path": "raf_cpu.c;raf_compile.h",
+      "implementation_state": "PARTIAL",
+      "evidence_state": "DECLARED_BY_AUTHOR",
+      "evidence": [
+        "GPU/DSP/NPU device-node presence has separate *_NODE bits",
+        "presence-only bits are not selected as verified compute backends"
+      ],
+      "gaps": [
+        "Vulkan/OpenCL/DSP/NPU API enumeration and minimal runtime kernels remain TOKEN_VAZIO"
+      ],
+      "next_action": "Add provider-specific probes that promote capability bits only after API enumeration and a minimal execution test.",
+      "commit": null
+    },
+    {
+      "id": "rafpolimata.segment-v1-header",
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "path": "runtime/conversation_indexer/raf_segment_v1.*",
+      "implementation_state": "IMPLEMENTED",
+      "evidence_state": "VERIFIED",
+      "evidence": [
+        "Explicit little-endian 64-byte header codec",
+        "CRC32C official 123456789 vector e3069283 passed in independent local compilation",
+        "Round-trip and corruption rejection passed with strict C warnings"
+      ],
+      "gaps": [
+        "Conversation/message record writer, reader, extraction and checkpoint/resume are not completed by this cut",
+        "BLAKE3 identity integration remains a separate cryptographic gate"
+      ],
+      "next_action": "Implement fixed-size conversation/message record codecs and golden fixtures without changing the frozen 64-byte header.",
+      "commit": null
+    },
+    {
+      "id": "rafpolimata.apkc-device-runtime",
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "path": "Apkc/;Apkc/proofs/",
+      "implementation_state": "DEVICE_REQUIRED",
+      "evidence_state": "TOKEN_VAZIO",
+      "evidence": [
+        "APK/ZIP/AXML/DEX/ELF proof artifacts exist in the repository"
+      ],
+      "gaps": [
+        "NativeActivity launch and filtered logcat without crash are absent",
+        "ARM64 library presence in the APK remains incomplete"
+      ],
+      "next_action": "Collect install, launch, pid/package and filtered logcat evidence on an authorized Android device.",
+      "commit": null
+    },
+    {
+      "id": "rafgittools-runtime-handoff",
+      "repository": "rafaelmeloreisnovo/RafGitTools",
+      "path": "contracts/job-v1.schema.json",
+      "implementation_state": "REFERENCE",
+      "evidence_state": "TOKEN_VAZIO",
+      "evidence": [
+        "Typed job contract is being introduced in the paired RafGitTools audit branch"
+      ],
+      "gaps": [
+        "Termux service transport and end-to-end job receipt are not executed here"
+      ],
+      "next_action": "Pin the paired PR commit after review and implement the consumer without generic shell execution.",
+      "commit": null
+    }
+  ]
+}
