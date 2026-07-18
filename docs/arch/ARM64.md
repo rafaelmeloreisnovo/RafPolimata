@@ -1,5 +1,7 @@
 # ARM64 (AArch64 / ARMv8-A) Architecture Reference
 
+> **Entrada canônica:** docs/AGENTES.md §8 (entradas canônicas por subsistema — Apkc/arch_arm64.h implementa ~65% dos encoders ARM64) e §4 (regras de não-colisão — adicionar instrução = 1 inline em arch_arm64.h + 1 case em asm_insn64(), freestanding, sem libc). Este documento é a referência de arquitetura ARM64/AArch64 para o projeto.
+
 This document describes the ARM64 architecture as used in the RafPolimata project.
 It covers the instruction encoders in `Apkc/arch_arm64.h`, the execve bootstrap in
 `Apkc/lang_script.h`, and the system-register access patterns in the RAF_024–RAF_028
@@ -12,7 +14,7 @@ benchmark files. Encoding constants below are taken directly from the source hea
 ### 1.1 General-Purpose Registers (GPRs)
 
 | Macro | Register | Role in AAPCS64 |
-|-------|----------|-----------------|
+|-------|----------|------------------|
 | R0    | X0       | Argument 1 / return value |
 | R1    | X1       | Argument 2 |
 | R2    | X2       | Argument 3 |
@@ -336,7 +338,7 @@ The following A64 instruction families are absent from `arch_arm64.h` and are ma
 as PENDING coverage. The header comment states approximately 65% ISA coverage.
 
 | Category | Examples of missing instructions |
-|----------|----------------------------------|
+|----------|---------------------------------|
 | SVE / SVE2 | FMLA (predicated), WHILELT, PTRUE |
 | BFloat16 | BFMMLA, BFDOT, BFMLALB |
 | SHA-3 / SHA-512 | SHA512H, RAXQX, EOR3 |
@@ -372,7 +374,7 @@ the RAF_024/RAF_025 benchmark files and are not encoded by the project's own
 `a64_mrs` function (which targets freestanding code generation, not host probing).
 
 | Register       | Source file | Purpose |
-|----------------|-------------|---------|
+|----------------|-------------|----------|
 | `cntvct_el0`   | RAF_024_leitura_de_contador_arm64_cntvct_el0.c | Read virtual counter (monotonic, no syscall) |
 | `cntfrq_el0`   | RAF_025_uso_de_cntfrq_el0_para_converter_ciclos_em_tempo.c | Counter frequency in Hz; divides delta into nanoseconds |
 | `MDSCR_EL1`    | AUDIT (referenced in CLAUDE.md) | Debug/single-step control register |
@@ -391,7 +393,7 @@ Three barrier instructions are implemented as named macros and documented in
 RAF_026, RAF_027, and RAF_028.
 
 | Macro        | Encoding   | ARM mnemonic | ISB/DSB/DMB class | Scope |
-|--------------|------------|--------------|-------------------|-------|
+|--------------|------------|--------------|-------------------|---------|
 | A64_DMB_ISH  | 0xD5033BBF | DMB ISH      | Data Memory Barrier | Inner Shareable |
 | A64_DSB_ISH  | 0xD5033B9F | DSB ISH      | Data Synchronization Barrier | Inner Shareable |
 | A64_ISB      | 0xD5033FDF | ISB          | Instruction Synchronization Barrier | — |
@@ -476,7 +478,7 @@ followed by `a64_mov_reg(R29, RSP, 1)`.
 ### 5.3 Syscall Convention (Linux/Android)
 
 | Register | Role |
-|----------|------|
+|----------|---------|
 | X8       | Syscall number |
 | X0-X5    | Arguments (up to 6) |
 | X0       | Return value |
@@ -499,7 +501,7 @@ buffer, appending a string pool after the instruction region.
 ### 6.1 Instruction Sequence
 
 | Position | Instruction | Purpose |
-|----------|-------------|---------|
+|----------|-------------|----------|
 | 0        | SUB SP, SP, #48   | Allocate argv array on stack |
 | 1        | ADR X19, pool_start-4 | X19 = pointer to interp string |
 | 2        | ADD X20, X19, interp_len+1 | X20 = pointer to arg1 (or script) |
