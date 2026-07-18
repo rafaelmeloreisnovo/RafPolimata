@@ -71,6 +71,7 @@ checks = {
     'unknown language explicit': 'RAF_LANG_UNKNOWN' in header and 'return RAF_LANG_UNKNOWN;' in cpu,
     'presence-only accelerator flags': 'RAF_FEAT_GPU_NODE' in header and '_linux_detect_hw_nodes' in cpu,
     'runtime core count': '_SC_NPROCESSORS_ONLN' in cpu,
+    'linux x86 flags parsed': 'static const char x86_key[] = "flags"' in cpu,
 }
 for name, passed in checks.items():
     if not passed:
