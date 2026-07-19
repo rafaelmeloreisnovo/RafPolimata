@@ -10,7 +10,7 @@
 ```text
 verdade do artefato
 → build fail-closed
-→ linguagem validada
+→ tabela de linguagens validada antes de cada lookup
 → toolchain resolvida no Termux
 → Java/Groovy em JAR antes do D8
 → validação binária independente ELF/DEX/APK
@@ -26,7 +26,7 @@ verdade do artefato
 
 ## Compilador multilíngua
 
-`Apkc/lang_profile.h` agora rejeita extensão desconhecida em vez de tratá-la como ASM. A tabela valida família de execução, nomes/extensões duplicados, compilador obrigatório e coerência D8/DEX.
+`Apkc/lang_profile.h` rejeita extensão desconhecida em vez de tratá-la como ASM. A tabela valida família de execução, nomes/extensões duplicados, compilador obrigatório e coerência D8/DEX. Tanto `lang_profile_find()` quanto `lang_profile_from_path()` recusam lookup quando `lang_profile_table_validate()` falha.
 
 `Apkc/sys.h` resolve ferramentas por caminhos determinísticos:
 
@@ -39,7 +39,7 @@ verdade do artefato
 
 Um caminho convencional ausente, como `/usr/bin/python3`, recai para o basename no Termux. O ambiente mínimo contém somente `PATH`, `HOME`, `TMPDIR` e `LANG=C`.
 
-Java e Groovy agora seguem:
+Java e Groovy seguem:
 
 ```text
 source → classes temporárias → JAR → D8 → classes.dex
@@ -120,7 +120,7 @@ Os arquivos em `results/` e as provas de run são produzidos durante a execuçã
 
 ## Estado de execução
 
-Os workflows GitHub associados ao HEAD terminaram como `failure`, porém o job recuperado possui lista de steps vazia. Portanto, isso não demonstra falha do código nem PASS de qualquer gate.
+Os workflows GitHub associados ao HEAD terminaram como `failure`, porém o job recuperado possui lista de steps vazia. Isso não demonstra falha do código nem PASS de qualquer gate.
 
 ```text
 código/gates desta tranche = IMPLEMENTED
