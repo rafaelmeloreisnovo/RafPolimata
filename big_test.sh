@@ -70,6 +70,7 @@ done
 FAILS=0
 HARD_FAILS=0
 REQUIRED_GAPS=0
+REVIEWS=0
 
 append_gate(){
   gate=$1
@@ -130,6 +131,13 @@ run_gate(){
     return
   fi
 
+  if grep -q '"state": "REVIEW_REQUIRED"' "$log" 2>/dev/null || \
+     grep -q 'state: REVIEW_REQUIRED' "$log" 2>/dev/null; then
+    append_gate "$gate" "$kind" REVIEW_REQUIRED "logs/$log_name"
+    REVIEWS=$((REVIEWS + 1))
+    return
+  fi
+
   append_gate "$gate" "$kind" PASS "logs/$log_name"
 }
 
@@ -149,7 +157,7 @@ run_if_exists(){
   fi
 }
 
-# ── Gates estruturais gerais ─────────────────────────────────────────────
+# ── Gates estruturais e de governança ───────────────────────────────────
 run_if_exists G00 required scripts/validate_coherence_protocol.py validate-coherence.log \
   'python3 scripts/validate_coherence_protocol.py'
 
@@ -190,13 +198,16 @@ run_if_exists G05 required scripts/audit_repository_structure.py repo-structure.
   'python3 scripts/audit_repository_structure.py --depth 5'
 
 run_if_exists G05A required tests/test_document_governance.py document-governance-tests.log \
-  'python3 -m unittest tests.test_document_governance tests.test_audit_repository_structure tests.test_validate_root_file_decisions'
+  'python3 -m unittest tests.test_document_governance tests.test_audit_repository_structure tests.test_validate_root_file_decisions tests.test_audit_zip_artifact'
 
 run_if_exists G05B required scripts/document_governance.py document-governance.log \
   'python3 scripts/document_governance.py --write --print-summary && python3 scripts/document_governance.py --check --print-summary'
 
 run_if_exists G05C required scripts/validate_root_file_decisions.py root-file-decisions.log \
   'python3 scripts/validate_root_file_decisions.py --write results/root-file-decisions-validation.json'
+
+run_if_exists G05D required RAFAELIA_COMPLETE_v4.zip zip-artifact-audit.log \
+  'python3 scripts/audit_zip_artifact.py RAFAELIA_COMPLETE_v4.zip --write results/document-governance/rafaelia-complete-v4-zip.json && cat results/document-governance/rafaelia-complete-v4-zip.json'
 
 run_if_exists G06 required scripts/android_build_matrix.sh android-plan.log \
   'sh scripts/android_build_matrix.sh --plan'
@@ -249,6 +260,7 @@ cat >> "$SUMMARY" <<EOF
 ## Política de verdade
 
 - PASS exige comando executado sem falha e sem TOKEN_VAZIO em gate required.
+- REVIEW_REQUIRED significa execução válida com decisão humana/técnica ainda aberta.
 - FAIL exige exit não-zero ou marcador explícito de falha.
 - TOKEN_VAZIO preserva ausência, mas em gate required encerra o Big Test com exit 2.
 - Gates opcionais podem permanecer TOKEN_VAZIO quando dependem de device/tool externo.
@@ -259,6 +271,7 @@ cat >> "$SUMMARY" <<EOF
 - Falhas totais: $FAILS
 - Falhas obrigatórias: $HARD_FAILS
 - Lacunas obrigatórias TOKEN_VAZIO: $REQUIRED_GAPS
+- Gates em revisão: $REVIEWS
 EOF
 
 printf '\nBig Test summary: %s\n' "$SUMMARY"
