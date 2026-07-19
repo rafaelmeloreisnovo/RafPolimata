@@ -72,6 +72,7 @@ class ApkCFirstPartGateTests(unittest.TestCase):
         self.assertEqual(manifest["schema"], "raf.apkc-first-part.v1")
         self.assertFalse(manifest["claim_allowed"])
         self.assertGreaterEqual(len(manifest["work_items"]), 7)
+        self.assertIn("scripts/validate_apkc_formats.py", manifest["work_items"][4]["paths"])
 
     def test_workflow_executes_all_first_part_gates(self) -> None:
         workflow = (ROOT / ".github/workflows/apkc-first-part.yml").read_text(encoding="utf-8")
@@ -81,6 +82,11 @@ class ApkCFirstPartGateTests(unittest.TestCase):
         self.assertIn("tools/raf_source_to_binary_proof.sh", workflow)
         self.assertNotIn("--allow-partial", workflow)
         self.assertNotIn("|| true", workflow)
+
+    def test_canonical_documentation_exists(self) -> None:
+        self.assertTrue((ROOT / "docs/APKC_FIRST_PART_EXECUTION.md").is_file())
+        self.assertTrue((ROOT / "docs/generated/REPOSITORY_LOOSE_FILES_MAP.md").is_file())
+        self.assertTrue((ROOT / "Apkc/proofs/GAPS.md").is_file())
 
 
 if __name__ == "__main__":
