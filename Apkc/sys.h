@@ -102,6 +102,13 @@ static inline int _os_has_slash(const char *p) {
     return 0;
 }
 
+static inline const char *_os_basename(const char *p) {
+    const char *name = p;
+    if (!p) return p;
+    for (sz i = 0; p[i]; i++) if (p[i] == '/' && p[i + 1]) name = p + i + 1;
+    return name;
+}
+
 static inline int _os_join_exec(char out[256], const char *prefix, const char *name) {
     sz p = 0;
     if (!out || !prefix || !name || !name[0]) return 0;
@@ -118,10 +125,9 @@ static inline int _os_join_exec(char out[256], const char *prefix, const char *n
     return 1;
 }
 
-/* execve does not search PATH. This wrapper preserves direct paths and, for a
- * bare tool name, checks deterministic Android/Termux prefixes. When the caller
- * supplies an empty environment, a minimal non-secret environment is provided
- * so clang/java/d8 can locate their own helper processes and temporary files. */
+/* execve does not search PATH. Try an explicit path first. If a conventional
+ * Linux path such as /usr/bin/python3 is absent on Android, retry its basename
+ * under deterministic Termux/Android prefixes. No shell interpolation occurs. */
 static inline i32 os_execve(const char *p, char *const argv[], char *const envp[]) {
     static char env_path[] = "PATH=/data/data/com.termux/files/usr/bin:/system/bin:/usr/bin:/bin";
     static char env_home[] = "HOME=/data/data/com.termux/files/home";
@@ -131,7 +137,13 @@ static inline i32 os_execve(const char *p, char *const argv[], char *const envp[
     char *const *effective_env = (envp && envp[0]) ? envp : fallback_env;
 
     if (!p || !p[0]) return -2;
-    if (_os_has_slash(p)) return _os_execve_raw(p, argv, effective_env);
+
+    i32 last = -2;
+    const char *name = p;
+    if (_os_has_slash(p)) {
+        last = _os_execve_raw(p, argv, effective_env);
+        name = _os_basename(p);
+    }
 
     static const char *prefixes[] = {
         "/data/data/com.termux/files/usr/bin/",
@@ -140,9 +152,8 @@ static inline i32 os_execve(const char *p, char *const argv[], char *const envp[
         "/bin/"
     };
     char candidate[256];
-    i32 last = -2;
     for (sz i = 0; i < sizeof(prefixes)/sizeof(prefixes[0]); i++) {
-        if (!_os_join_exec(candidate, prefixes[i], p)) return -36;
+        if (!_os_join_exec(candidate, prefixes[i], name)) return -36;
         last = _os_execve_raw(candidate, argv, effective_env);
     }
     return last;
