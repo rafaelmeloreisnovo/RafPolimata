@@ -23,7 +23,9 @@ class GovernanceTests(unittest.TestCase):
         report = module.validate(config)
         self.assertEqual(report["status"], "PASS")
         self.assertEqual(report["checks_passed"], 16)
-        self.assertFalse(report["claim_allowed"])
+        self.assertTrue(report["claim_allowed"])
+        self.assertEqual(report["operator_state"], "PASS")
+        self.assertEqual(report["empirical_fluid_interpretation"], "NOT_APPLICABLE")
         self.assertTrue(all(report["checks"].values()))
 
 
