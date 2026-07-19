@@ -1,6 +1,6 @@
 {
   "schema": "raf.apkc-first-part.v1",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "date": "2026-07-19",
   "authority": {
     "repository": "rafaelmeloreisnovo/RafPolimata",
@@ -22,7 +22,8 @@
     "TUI_FILE_BROWSER_NE_WEB_BROWSER",
     "TLS_MARKER_NE_VALIDATED_TLS_HANDSHAKE",
     "CERTIFICATE_STRING_NE_X509_CHAIN_VALIDATION",
-    "PARTIAL_BUILD_NE_REPRODUCIBLE_BUILD"
+    "PARTIAL_BUILD_NE_REPRODUCIBLE_BUILD",
+    "EMPTY_WORKFLOW_STEPS_NE_CODE_FAILURE"
   ],
   "work_items": [
     {
@@ -82,7 +83,7 @@
         "Apkc/proofs/out/dex-sha1.txt"
       ],
       "structural_code": "IMPLEMENTED",
-      "independent_validator_tests": "IMPLEMENTED",
+      "independent_validator_tests": "IMPLEMENTED_NOT_EXECUTED_IN_THIS_SESSION",
       "current_apk_evidence": "TOKEN_VAZIO",
       "runtime_evidence": "TOKEN_VAZIO",
       "gate": "DEX checksum and map bounds plus ELF ET_DYN ABI PT_LOAD and segment bounds"
@@ -110,6 +111,25 @@
       "gate": "tracked file -> sha256 -> category -> canonical reference -> route"
     }
   ],
+  "execution_observation": {
+    "github_runs": [
+      {
+        "run_id": 29706314720,
+        "workflow": "CI",
+        "conclusion": "failure",
+        "steps": [],
+        "evidence_state": "TOKEN_VAZIO"
+      },
+      {
+        "run_id": 29706314719,
+        "workflow": "Formal Science Orchestrator",
+        "conclusion": "failure",
+        "steps": "NOT_READ_IN_THIS_CUT",
+        "evidence_state": "TOKEN_VAZIO"
+      }
+    ],
+    "interpretation": "failure with zero recovered steps is not evidence that repository code executed"
+  },
   "canonical_commands": [
     "python3 scripts/apkc_first_part_gate.py --write results/apkc-first-part-gate.json --write-map docs/generated/REPOSITORY_LOOSE_FILES_MAP.md",
     "python3 -m unittest tests.test_apkc_first_part_gate tests.test_validate_apkc_formats",
@@ -128,6 +148,7 @@
       "loose_file_mapper"
     ],
     "gap": [
+      "test_execution_report",
       "termux_execution_report",
       "apk_with_elf32_and_elf64",
       "functional_dex_runtime",
