@@ -70,6 +70,7 @@ class ApkCFirstPartGateTests(unittest.TestCase):
     def test_manifest_is_valid_json_and_keeps_claims_blocked(self) -> None:
         manifest = json.loads((ROOT / "manifests/apkc-first-part.v1.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["schema"], "raf.apkc-first-part.v1")
+        self.assertEqual(manifest["version"], "1.4.0")
         self.assertFalse(manifest["claim_allowed"])
         self.assertGreaterEqual(len(manifest["work_items"]), 7)
         self.assertIn("scripts/validate_apkc_formats.py", manifest["work_items"][4]["paths"])
