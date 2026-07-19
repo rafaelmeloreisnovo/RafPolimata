@@ -1,0 +1,22 @@
+name: Validate Session Initial Paths
+
+on:
+  workflow_dispatch:
+
+jobs:
+  validate-session-paths:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use local checkout
+        uses: actions/checkout@v4
+
+      - name: Validate canonical order and evidence gates
+        run: |
+          python3 scripts/validate_session_initial_paths.py \
+            --write results/session-initial-paths-validation.json
+
+      - name: Preserve validation report locally
+        uses: actions/upload-artifact@v4
+        with:
+          name: session-initial-paths-validation
+          path: results/session-initial-paths-validation.json
