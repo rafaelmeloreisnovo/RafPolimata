@@ -74,6 +74,11 @@ class ApkCFirstPartGateTests(unittest.TestCase):
         self.assertGreaterEqual(len(manifest["work_items"]), 7)
         self.assertIn("scripts/validate_apkc_formats.py", manifest["work_items"][4]["paths"])
 
+    def test_language_lookup_requires_table_guard(self) -> None:
+        profiles = (ROOT / "Apkc/lang_profile.h").read_text(encoding="utf-8")
+        self.assertGreaterEqual(profiles.count("!lang_profile_table_validate()"), 2)
+        self.assertIn("families != 1", profiles)
+
     def test_workflow_executes_all_first_part_gates(self) -> None:
         workflow = (ROOT / ".github/workflows/apkc-first-part.yml").read_text(encoding="utf-8")
         self.assertIn("scripts/apkc_first_part_gate.py", workflow)
