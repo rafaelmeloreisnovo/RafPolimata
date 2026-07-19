@@ -2,8 +2,8 @@
 # raf_source_to_binary_proof.sh — reproducible, fail-closed source→binary proof.
 #
 # The canonical proof is promoted only when BOTH required targets are built,
-# identified by readelf and reproduced byte-for-byte. Failed or partial runs are
-# preserved under Apkc/proofs/runs/ and never become a false PASS.
+# identified by an ELF reader and reproduced byte-for-byte. Failed or partial
+# runs are preserved under Apkc/proofs/runs/ and never become a false PASS.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -17,12 +17,21 @@ elif [ -n "${1:-}" ]; then
     exit 2
 fi
 
-for cmd in git clang readelf sha256sum cmp date uname mkdir cp head; do
+for cmd in git clang sha256sum cmp date uname mkdir cp head grep awk; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
         printf 'source-to-binary proof: missing command: %s\n' "$cmd" >&2
         exit 127
     fi
 done
+
+if command -v readelf >/dev/null 2>&1; then
+    ELF_READER=readelf
+elif command -v llvm-readelf >/dev/null 2>&1; then
+    ELF_READER=llvm-readelf
+else
+    printf 'source-to-binary proof: missing readelf or llvm-readelf\n' >&2
+    exit 127
+fi
 
 OUT="Apkc/proofs/out"
 RUNS="Apkc/proofs/runs"
@@ -37,6 +46,7 @@ DATE_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 HOST_ARCH="$(uname -m)"
 CLANGV="$(clang --version 2>/dev/null | head -1)" || CLANGV="clang: TOKEN_VAZIO"
 LLDV="$(ld.lld --version 2>/dev/null | head -1)" || LLDV="lld: TOKEN_VAZIO"
+ELFV="$($ELF_READER --version 2>/dev/null | head -1)" || ELFV="$ELF_READER"
 
 SRC="Apkc/apkc.c"
 A64_1="$RUN_DIR/apkc-aarch64-run1.elf"
@@ -82,6 +92,7 @@ print_cmd() {
     printf 'host_arch:   %s\n' "$HOST_ARCH"
     printf 'toolchain:   %s\n' "$CLANGV"
     printf 'lld:         %s\n' "$LLDV"
+    printf 'elf_reader:  %s\n' "$ELFV"
     printf 'source:      %s\n\n' "$SRC"
     printf '[A64] command:\n'
     print_cmd "${A64_CMD[@]}"
@@ -89,7 +100,7 @@ print_cmd() {
 
 if "${A64_CMD[@]}" 2>"$A64_ERR"; then
     A64_BUILD="PASS"
-    readelf -h "$A64_1" > "$A64_HDR"
+    "$ELF_READER" -h "$A64_1" > "$A64_HDR"
     if grep -Eq 'Class:[[:space:]]+ELF64' "$A64_HDR" &&
        grep -Eq 'Machine:[[:space:]]+AArch64' "$A64_HDR"; then
         A64_IDENTITY="PASS"
@@ -124,7 +135,7 @@ fi
 
 if "${A32_CMD[@]}" 2>"$A32_ERR"; then
     A32_BUILD="PASS"
-    readelf -h "$A32_1" > "$A32_HDR"
+    "$ELF_READER" -h "$A32_1" > "$A32_HDR"
     if grep -Eq 'Class:[[:space:]]+ELF32' "$A32_HDR" &&
        grep -Eq 'Machine:[[:space:]]+ARM' "$A32_HDR"; then
         A32_IDENTITY="PASS"
@@ -174,6 +185,7 @@ cat > "$STATUS_JSON" <<JSON
   "date_utc": "$DATE_UTC",
   "commit": "$COMMIT",
   "host_arch": "$HOST_ARCH",
+  "elf_reader": "$ELF_READER",
   "aarch64": {
     "build": "$A64_BUILD",
     "identity": "$A64_IDENTITY",
