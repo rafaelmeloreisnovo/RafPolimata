@@ -21,7 +21,6 @@ typedef __SIZE_TYPE__       sz;
 
 #define NULL ((void*)0)
 
-/* open(2) flags */
 #define O_RDONLY  0x00
 #define O_WRONLY  0x01
 #define O_RDWR    0x02
@@ -29,7 +28,6 @@ typedef __SIZE_TYPE__       sz;
 #define O_TRUNC   0x200
 #define O_CLOEXEC 0x80000
 
-/* ═══════════════════════════ ARM64 ════════════════════════════════════════ */
 #ifdef __aarch64__
 
 #define _NR_read    63
@@ -75,8 +73,6 @@ static inline __attribute__((noreturn)) void os_exit(i32 c) {
     _sc1(_NR_exit,(i64)c); __builtin_unreachable();
 }
 
-/* ── Process control (ARM64 Linux) ────────────────────────────────────── */
-/* ARM64 has no fork(2); use clone(SIGCHLD=17, 0, NULL, NULL, 0) */
 #define _NR_clone   220
 #define _NR_execve  221
 #define _NR_wait4   260
@@ -91,20 +87,71 @@ _sc5(i64 n, i64 a, i64 b, i64 c, i64 d, i64 e) {
     __asm__ volatile("svc #0" : "+r"(x0) : "r"(x8),"r"(x1),"r"(x2),"r"(x3),"r"(x4) : "memory","cc");
     return x0;
 }
-/* os_fork: clone(SIGCHLD, 0, NULL, NULL, 0) — returns child PID in parent, 0 in child */
+
 static inline i32 os_fork(void) {
     return (i32)_sc5(_NR_clone, 17LL, 0LL, 0LL, 0LL, 0LL);
 }
-/* os_execve: execve(path, argv, envp) */
-static inline i32 os_execve(const char *p, char *const argv[], char *const envp[]) {
+
+static inline i32 _os_execve_raw(const char *p, char *const argv[], char *const envp[]) {
     return (i32)_sc3(_NR_execve, (i64)(uptr)p, (i64)(uptr)argv, (i64)(uptr)envp);
 }
-/* os_waitpid: wait4(pid, status, options, NULL) */
+
+static inline int _os_has_slash(const char *p) {
+    if (!p) return 0;
+    for (sz i = 0; p[i]; i++) if (p[i] == '/') return 1;
+    return 0;
+}
+
+static inline int _os_join_exec(char out[256], const char *prefix, const char *name) {
+    sz p = 0;
+    if (!out || !prefix || !name || !name[0]) return 0;
+    while (prefix[p]) {
+        if (p >= 255u) return 0;
+        out[p] = prefix[p];
+        p++;
+    }
+    for (sz i = 0; name[i]; i++) {
+        if (p >= 255u) return 0;
+        out[p++] = name[i];
+    }
+    out[p] = 0;
+    return 1;
+}
+
+/* execve does not search PATH. This wrapper preserves direct paths and, for a
+ * bare tool name, checks deterministic Android/Termux prefixes. When the caller
+ * supplies an empty environment, a minimal non-secret environment is provided
+ * so clang/java/d8 can locate their own helper processes and temporary files. */
+static inline i32 os_execve(const char *p, char *const argv[], char *const envp[]) {
+    static char env_path[] = "PATH=/data/data/com.termux/files/usr/bin:/system/bin:/usr/bin:/bin";
+    static char env_home[] = "HOME=/data/data/com.termux/files/home";
+    static char env_tmp[]  = "TMPDIR=/data/data/com.termux/files/usr/tmp";
+    static char env_lang[] = "LANG=C";
+    static char *fallback_env[] = { env_path, env_home, env_tmp, env_lang, NULL };
+    char *const *effective_env = (envp && envp[0]) ? envp : fallback_env;
+
+    if (!p || !p[0]) return -2;
+    if (_os_has_slash(p)) return _os_execve_raw(p, argv, effective_env);
+
+    static const char *prefixes[] = {
+        "/data/data/com.termux/files/usr/bin/",
+        "/system/bin/",
+        "/usr/bin/",
+        "/bin/"
+    };
+    char candidate[256];
+    i32 last = -2;
+    for (sz i = 0; i < sizeof(prefixes)/sizeof(prefixes[0]); i++) {
+        if (!_os_join_exec(candidate, prefixes[i], p)) return -36;
+        last = _os_execve_raw(candidate, argv, effective_env);
+    }
+    return last;
+}
+
 static inline i32 os_waitpid(i32 pid, i32 *st, i32 opts) {
     return (i32)_sc4(_NR_wait4, (i64)pid, (i64)(uptr)st, (i64)opts, 0LL);
 }
 
-/* ═══════════════════════════ ARM32 ════════════════════════════════════════ */
 #else
 
 #define _NR_exit   1
