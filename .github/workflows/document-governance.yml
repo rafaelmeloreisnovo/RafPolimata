@@ -1,0 +1,52 @@
+name: Document Governance
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "README.md"
+      - "docs/**"
+      - "configs/document-governance.v1.json"
+      - "schemas/document-record.v1.schema.json"
+      - "scripts/document_governance.py"
+      - "tests/test_document_governance.py"
+      - ".github/workflows/document-governance.yml"
+
+jobs:
+  document-governance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use repository checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate policy and record schema JSON
+        run: |
+          python3 -m json.tool configs/document-governance.v1.json >/dev/null
+          python3 -m json.tool schemas/document-record.v1.schema.json >/dev/null
+
+      - name: Test document governance engine
+        run: |
+          python3 -m unittest tests.test_document_governance
+
+      - name: Generate catalog graph and review queue
+        run: |
+          python3 scripts/document_governance.py --write --print-summary
+
+      - name: Verify deterministic regeneration
+        run: |
+          python3 scripts/document_governance.py --check --print-summary
+
+      - name: Preserve governance evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: document-governance-evidence
+          path: |
+            results/document-governance/summary.json
+            results/document-governance/catalog.jsonl
+            results/document-governance/relations.jsonl
+            results/document-governance/duplicates.json
+            results/document-governance/review-queue.json
+            docs/generated/DOCUMENT_GOVERNANCE_INDEX.md
+            docs/generated/DOCUMENT_REVIEW_QUEUE.md
