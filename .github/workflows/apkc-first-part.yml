@@ -1,0 +1,38 @@
+name: ApkC First Part Closure
+
+on:
+  workflow_dispatch:
+
+jobs:
+  apkc-first-part:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use local checkout
+        uses: actions/checkout@v4
+
+      - name: Reconcile proof truth and generate loose-file map
+        run: |
+          python3 scripts/apkc_first_part_gate.py \
+            --write results/apkc-first-part-gate.json \
+            --write-map docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
+
+      - name: Test truth reconciliation and browser TLS classification
+        run: |
+          python3 -m unittest tests.test_apkc_first_part_gate
+
+      - name: Build reproducible AArch64 and ARM32 compiler artifacts
+        run: |
+          bash tools/raf_source_to_binary_proof.sh
+
+      - name: Preserve first-part evidence locally
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkc-first-part-evidence
+          path: |
+            results/apkc-first-part-gate.json
+            docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
+            Apkc/proofs/out/apkc-compile.txt
+            Apkc/proofs/out/apkc-compile.status.json
+            Apkc/proofs/out/apkc-binary-arm64.txt
+            Apkc/proofs/out/apkc-binary-arm32.txt
+            Apkc/proofs/runs/
