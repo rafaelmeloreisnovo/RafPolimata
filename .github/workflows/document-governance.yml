@@ -9,7 +9,9 @@ on:
       - "configs/document-governance.v1.json"
       - "schemas/document-record.v1.schema.json"
       - "scripts/document_governance.py"
+      - "scripts/audit_repository_structure.py"
       - "tests/test_document_governance.py"
+      - "tests/test_audit_repository_structure.py"
       - ".github/workflows/document-governance.yml"
 
 jobs:
@@ -26,9 +28,11 @@ jobs:
           python3 -m json.tool configs/document-governance.v1.json >/dev/null
           python3 -m json.tool schemas/document-record.v1.schema.json >/dev/null
 
-      - name: Test document governance engine
+      - name: Test structure and document governance engines
         run: |
-          python3 -m unittest tests.test_document_governance
+          python3 -m unittest \
+            tests.test_document_governance \
+            tests.test_audit_repository_structure
 
       - name: Generate catalog graph and review queue
         run: |
