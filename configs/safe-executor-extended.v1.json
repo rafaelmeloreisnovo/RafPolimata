@@ -1,0 +1,58 @@
+{
+  "schema": "rafpolimata.safe_executor_extended.v1",
+  "executor": "scripts/safe_executor_extended.sh",
+  "launcher": "safe-extended",
+  "execution_scope": "local_termux_android",
+  "network": "DENY",
+  "github": "NOT_USED",
+  "eval": "DENY",
+  "sudo": "DENY",
+  "root_execution": "DENY",
+  "arbitrary_yaml": "DENY",
+  "root_resolution": "script_location",
+  "failure_policy": "fail_closed",
+  "lock": "build/.safe-extended.lock",
+  "reports": "build/safe-extended/<run_id>/report.json",
+  "profiles": {
+    "build": [
+      "preflight",
+      "source_audit",
+      "omega_host_gate",
+      "omega_termux_build"
+    ],
+    "run": [
+      "preflight",
+      "source_audit",
+      "omega_host_gate",
+      "omega_termux_build",
+      "omega_termux_run"
+    ],
+    "ci": [
+      "preflight",
+      "source_audit",
+      "omega_host_gate",
+      "omega_termux_build",
+      "omega_termux_run",
+      "compiler_strict_build",
+      "compiler_smoke"
+    ],
+    "ci-full": [
+      "preflight",
+      "source_audit",
+      "omega_host_gate",
+      "omega_termux_build",
+      "omega_termux_run",
+      "compiler_strict_build",
+      "compiler_smoke",
+      "runtime_truth"
+    ]
+  },
+  "states": {
+    "SOURCE_AUDITED": "scanner_and_shell_syntax_pass",
+    "HOST_OBJECT_PASS": "strict_compile_no_undefined_and_deterministic_test",
+    "TERMUX_BUILD_PASS": "native_abi_static_elf_built",
+    "TERMUX_DEVICE_PASS": "native_binary_exit_zero",
+    "LOCAL_CI_PASS": "all_selected_local_stages_pass",
+    "TOKEN_VAZIO": "stage_not_executed_or_evidence_missing"
+  }
+}
