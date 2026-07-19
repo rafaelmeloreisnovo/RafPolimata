@@ -1,6 +1,6 @@
 {
   "schema": "raf.apkc-first-part.v1",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "date": "2026-07-19",
   "authority": {
     "repository": "rafaelmeloreisnovo/RafPolimata",
@@ -9,8 +9,9 @@
     "role": "APKC_GAP_CLOSURE_ORCHESTRATOR"
   },
   "scope": {
-    "name": "primeira parte: verdade operacional, toolchains, ELF, DEX, navegador TLS e arquivos soltos",
+    "name": "primeira parte congelada: verdade operacional, toolchains, ELF, DEX, navegador TLS e arquivos soltos",
     "execution_model": "github_versioned_then_termux_local",
+    "new_features_before_runtime_evidence": "BLOCKED",
     "claim_allowed": false
   },
   "invariants": [
@@ -75,24 +76,21 @@
       "structural_code": "IMPLEMENTED",
       "independent_validator_tests": "IMPLEMENTED_NOT_EXECUTED_IN_THIS_SESSION",
       "current_apk_evidence": "TOKEN_VAZIO",
-      "runtime_evidence": "TOKEN_VAZIO",
-      "gate": "DEX checksum and map bounds plus ELF ET_DYN ABI PT_LOAD and segment bounds"
+      "runtime_evidence": "TOKEN_VAZIO"
     },
     {
       "id": "APKC-P1-006",
       "title": "Localizar navegador ASM e TLS 1.2/1.3 com X.509",
       "state": "TOKEN_VAZIO",
       "paths": ["raf_shell/raf_shell.c"],
-      "finding": "local TUI file browser found; no correlated web transport plus TLS implementation located",
-      "gate": "HTTP transport + socket layer + TLS handshake + hostname/X509 chain validation + negative certificate tests"
+      "finding": "local TUI file browser found; no correlated web transport plus TLS implementation located"
     },
     {
       "id": "APKC-P1-007",
       "title": "Mapear arquivos soltos e completar documentação por proveniência",
       "state": "IMPLEMENTED",
       "paths": ["scripts/apkc_first_part_gate.py", "docs/generated/REPOSITORY_LOOSE_FILES_MAP.md", "results/apkc-first-part-gate.json"],
-      "runtime_evidence": "generated on each run",
-      "gate": "tracked file -> sha256 -> category -> canonical reference -> route"
+      "runtime_evidence": "generated on each run"
     }
   ],
   "execution_observation": {
@@ -121,15 +119,6 @@
     "python3 scripts/validate_apkc_formats.py --apk Apkc/proofs/out/hello.apk --require-both --write results/apkc-format-validation.json",
     "sh safe-extended run .github/workflows/apkc-first-part.yml"
   ],
-  "evidence_bundle": [
-    "manifests/apkc-first-part.v1.json",
-    "docs/APKC_FIRST_PART_EXECUTION.md",
-    "docs/generated/REPOSITORY_LOOSE_FILES_MAP.md",
-    "results/apkc-first-part-gate.json",
-    "results/apkc-format-validation.json",
-    "Apkc/proofs/out/apkc-compile.status.json",
-    "Apkc/proofs/runs/"
-  ],
   "r3": {
     "ok": [
       "proof_gate_fail_closed",
@@ -152,8 +141,7 @@
       "execute apkc-first-part workflow in Termux",
       "attach report and artifact hashes to PR 147",
       "validate one real APK with both ABIs and DEX",
-      "close runtime gaps from the same run",
-      "route loose files into canonical documentation"
+      "close runtime gaps from the same run"
     ]
   },
   "claim_allowed": false
