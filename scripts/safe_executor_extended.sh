@@ -92,7 +92,7 @@ record(){
 stage(){
  n=$1; shift; l="$LOG/$n.log"; a=$(epoch)
  printf '\n=== %s ===\n' "$n"
- set +e; "$@" >"$l" 2>&1; r=$?; set -e
+ set +e; ( set -e; "$@" ) >"$l" 2>&1; r=$?; set -e
  b=$(epoch); cat "$l"
  if [ "$r" -eq 0 ]; then
    record "$n" PASS 0 "$a" "$b"; echo "SAFE_EXTENDED STAGE PASS $n"; LAST_RC=0; return 0
