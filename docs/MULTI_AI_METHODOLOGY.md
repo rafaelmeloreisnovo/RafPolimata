@@ -1,5 +1,7 @@
 # Multi-AI Methodology — RafPolimata
 
+> **Entrada canônica:** docs/AGENTES.md §2 (taxonomia de agentes — matriz Claude/Codex/ChatGPT/humano com scope de decisão) e §4 (regras de não-colisão — as 6 regras numeradas que previnem colisão entre agentes). Este documento é a metodologia detalhada de colaboração multi-AI para o projeto.
+
 ## Purpose
 
 This document defines how Claude, Codex/Copilot, ChatGPT, and other AI coding

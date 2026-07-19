@@ -1,5 +1,7 @@
 # Orquestrador do Codec Semântico-Parabólico
 
+> **Entrada canônica:** docs/AGENTES.md §5 (pipeline operacional — gate de promoção por evidência e estados BLOCKED/TOKEN_VAZIO/CLAIM_ALLOWED) e §8 (entradas canônicas por subsistema — RafPolimata como camada de governança cross-repo). Este documento define o contrato RAFAELIA-PSC-1 e as sete heurísticas do codec semântico-parabólico.
+
 Contrato: `RAFAELIA-PSC-1`
 
 ## Cadeia

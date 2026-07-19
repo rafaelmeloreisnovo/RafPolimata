@@ -1,5 +1,7 @@
 # Android NDK / ARM ABI Architecture Reference
 
+> **Entrada canônica:** docs/AGENTES.md §8 (entradas canônicas por subsistema — Apkc/lang_profile.h tabela de 12 linguagens com arm64_only/use_d8/jsx_node, Apkc/lang_script.h bootstrap execve ARM64) e §4 (regras de não-colisão — freestanding Apkc/, sem Bionic, sem heap, syscalls via sys.h). Este documento é a referência de Android NDK/ABI para o projeto.
+
 This document covers the Android NDK ABI conventions, JNI bridge patterns,
 CMake configuration, and syscall usage as implemented in the RafPolimata project.
 All code constants and patterns are taken directly from RAF_041–RAF_047 and

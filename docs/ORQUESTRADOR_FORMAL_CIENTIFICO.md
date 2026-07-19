@@ -1,5 +1,7 @@
 # Orquestrador Formal Científico RAFAELIA — Física, Matemática, Estatística e Evidência
 
+> **Entrada canônica:** docs/AGENTES.md §5 (pipeline operacional — TOKEN_VAZIO como estado válido para ausência de evidência, disciplina de claim) e §6 (escalação e conflito — quando escalar para humano, como registrar via docs/AGENTES_DECISAO_LOG.md). Este documento é o orquestrador de formalidade científica para física, matemática, estatística e estados epistêmicos.
+
 **Status:** `METHOD_DEFINED` — arquitetura formal e protocolo de validação; não constitui, por si só, confirmação experimental.  
 **Escopo:** RafPolimata como núcleo de formalidade; RLL como adaptador físico/observacional; ChipQuantum como runtime/benchmark.  
 **Regra central:** nenhuma metáfora, semelhança semântica ou coincidência numérica é promovida a alegação física sem domínio, unidade, incerteza, dado, execução e falsificador.
@@ -60,7 +62,7 @@ ARTIFACT/HASH ---------> REPRODUCIBILITY_GATE
 | `METAPHOR` | linguagem explicativa sem poder probatório |
 | `FORMALIZED` | símbolos, domínios, unidades e hipóteses definidos |
 | `METHOD_DEFINED` | método de cálculo/experimento e falsificador definidos |
-| `SIMULATED` | execução numérica reproduzível, ainda sem validação física |
+| `SIMULATED` | execução numérica reprodutível, ainda sem validação física |
 | `EVIDENCE_LINKED` | dado real, incerteza e cadeia de custódia ligados ao claim |
 | `REPLICATED` | resultado reproduzido por execução independente |
 | `CLAIM_ALLOWED` | alegação limitada ao domínio demonstrado |
@@ -195,7 +197,7 @@ n_{H_2}=\eta_F\frac{I t}{2F},
 m_{H_2}=M_{H_2}n_{H_2},
 ```
 
-onde `F=96485.33212 C·mol⁻¹`, `η_F` é a eficiência faradaica e `M_H2` é a massa molar.
+onde `F=96485.33212 C·mol⁻¹`, `η_F` é a eficiência faradáica e `M_H2` é a massa molar.
 
 A vazão energética química pelo poder calorífico inferior é:
 
@@ -361,7 +363,7 @@ Os “42 atratores” são um limite arquitetural até que uma análise de bifur
 
 ## 9. Fluidos, térmica e números adimensionais
 
-Para fluido Newtoniano incompressível:
+Para fluido Newtoniano incompatível:
 
 ```math
 \rho\left(\frac{\partial\mathbf u}{\partial t}+\mathbf u\cdot\nabla\mathbf u\right)
@@ -436,7 +438,7 @@ Em `n` operações, deve-se propagar erro por limite determinístico, análise d
 
 O sistema deve separar:
 
-- **UTC/NTP:** ordenação global, proveniência e correlação entre máquinas;
+- **UTC/NTP:** ordenação global, proveninâcia e correlação entre máquinas;
 - **relógio monotônico:** duração, benchmark e controle local;
 - **tempo do dispositivo:** contador de hardware com drift estimado.
 
@@ -533,14 +535,14 @@ claim_id -> equation_id -> implementation_ref -> dataset_ref
 1. `G-DIM`: consistência dimensional e SI.
 2. `G-DOM`: domínio, hipótese e condição de contorno.
 3. `G-NUM`: convergência, estabilidade e erro numérico.
-4. `G-TIME`: relógio monotônico + proveniência UTC/NTP.
+4. `G-TIME`: relógio monotônico + proveninâcia UTC/NTP.
 5. `G-DATA`: dataset real, schema, licença e hash.
 6. `G-UNC`: incerteza tipo A/B e propagação.
 7. `G-STAT`: baseline, hipótese nula, poder e validação.
 8. `G-PHYS`: conservação de energia, massa, carga e momento.
 9. `G-SAFE`: limites elétricos, térmicos, mecânicos e químicos.
 10. `G-SEM`: proibição de promover semântica a causalidade física.
-11. `G-REP`: execução reproduzível e independente.
+11. `G-REP`: execução reprodutível e independente.
 12. `G-CLAIM`: política final de alegação.
 
 ---

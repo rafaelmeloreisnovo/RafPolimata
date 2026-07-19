@@ -78,8 +78,60 @@ agentes** — deve ser `ESCALATED` e aguardar revisão humana:
 
 ## Decisões registradas
 
-*Nenhuma decisão registrada ainda. Esta seção será preenchida conforme conflitos
-surgem entre sessões e agentes.*
+### DECISAO-001 — Campanha de callouts `> **Entrada canônica:** docs/AGENTES.md` em todos os docs
+
+- **Data de abertura**: 2026-07-09
+- **Agente A** (sessão/tipo): Claude — branch `claude/operational-excellence-agents-mabjye`
+- **Agente B** (sessão/tipo): N/A — decisão unilateral do agente, validada pelo humano
+- **Contexto**: Após criar a trilogia AGENTES (docs/AGENTES.md, docs/AGENTES_CHECKLIST.md,
+  docs/AGENTES_DECISAO_LOG.md) nos PRs #108 e #109, identificou-se que todos os `.md`
+  anteriores em `docs/` e `docs/arch/` referenciavam documentos de profundidade mas não
+  tinham um ponteiro canônico para AGENTES.md. Sem esse ponteiro, um agente que abre um
+  documento específico não descobre o ponto de entrada unificado.
+
+#### Proposta adotada
+
+Adicionar em cada arquivo `.md` preexistente (que não seja da trilogia AGENTES) um
+blockquote de entrada imediatamente após o `# Título`:
+
+```markdown
+> **Entrada canônica:** docs/AGENTES.md §N (desc) e §N (desc). <frase contextualizando o doc>.
+```
+
+Regras de inserção:
+- 1 linha, imediatamente após `# Título`, antes do primeiro parágrafo
+- Seções referenciadas = as seções de AGENTES.md mais relevantes para o doc em questão
+- Callouts não-padrão pré-existentes (`> **Agente novo?**`, `> Para o ciclo completo...`,
+  `> **Ponto de entrada unificado:**`, `> **Resumo executivo em**`) convertidos para o
+  formato uniforme `> **Entrada canônica:**`
+- Zero alterações em código C/H
+
+**Prós:**
+- Qualquer agente que abra qualquer doc chega a AGENTES.md em ≤ 2 cliques
+- Formato uniforme é parseável por automação futura
+- Não remove nem substitui nenhum documento de profundidade
+
+**Contras:**
+- Adiciona 3–5 linhas por arquivo (visível no diff)
+- Exige manutenção caso AGENTES.md mude as numerações de seção
+
+#### Escopo executado
+
+68 arquivos `.md` em `docs/` e `docs/arch/` cobertos em batches 1–11:
+
+| Batch | PR | Arquivos |
+|---|---|---|
+| 1–9 | #110–#135 | docs/ (55 arquivos) |
+| 10 | #139 | docs/arch/ (4 arquivos) |
+| 11a–11f | #139 | docs/ remanescentes (13 arquivos — callouts não-padrão + arquivos adicionados após início da campanha) |
+
+#### Estado
+
+`RESOLVED`
+
+- **Data de resolução**: 2026-07-19
+- **Decidido por**: rafaelmeloreisnovo (aprovação tácita via merge dos PRs #110–#138)
+- **Branch / PR**: `claude/operational-excellence-agents-mabjye` → PR #139
 
 ---
 
@@ -87,6 +139,6 @@ surgem entre sessões e agentes.*
 
 | ID | Título | Data | Estado | Decidido por |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| DECISAO-001 | Campanha callouts Entrada canônica AGENTES.md | 2026-07-19 | RESOLVED | rafaelmeloreisnovo |
 
 *Atualizar esta tabela sempre que uma entrada muda de estado.*

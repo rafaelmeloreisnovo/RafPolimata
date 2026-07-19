@@ -1,5 +1,7 @@
 # Anexo matemático — ciclo de 60 minutos, bases, 12² = 144 e grade de 0,1 Hz
 
+> **Entrada canônica:** docs/AGENTES.md §3 (ciclo de sessão — estados canônicos VOID/PENDING/AUDIT/RUNTIME/REFERENCE e TOKEN_VAZIO para ausência de evidência) e §5 (pipeline operacional — TOKEN_VAZIO como saída válida quando claim físico ainda não tem ensaio). Este anexo documenta as identidades matemáticas de ciclos, bases, 144 células e grade de 0,1 Hz.
+
 > Integração complementar ao [`MAPA_MULTIPLEX_RLL_RAFAELIA_ECOSSISTEMA.md`](MAPA_MULTIPLEX_RLL_RAFAELIA_ECOSSISTEMA.md).
 >
 > Estado: `VERIFIED` para identidades aritméticas; `HYPOTHESIS / CLAIM_BLOCKED` para qualquer interpretação física ainda sem sinal, instrumento, unidade e ensaio.

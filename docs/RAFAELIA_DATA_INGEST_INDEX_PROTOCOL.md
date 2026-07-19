@@ -1,5 +1,7 @@
 # RAFAELIA Data Ingest and Index Protocol
 
+> **Entrada canônica:** docs/AGENTES.md §8 (entradas canônicas por subsistema — verbovivo.c para auditoria de conteúdo, BLAKE3 como identidade de conteúdo) e §3 (ciclo de sessão — estados canônicos TOKEN_VAZIO e AUDIT para lacunas de proveninâcia). Este documento define o protocolo freestanding de ingestão e indexação de ZIP/TGZ/JSON/Git.
+
 ## Contract
 
 Freestanding-oriented ingestion for ZIP/ZIP64, TGZ, JSON/JSONL, ChatGPT exports, Git objects and media headers. No full-file loading, no hidden mutation and no content fusion without provenance.
@@ -55,4 +57,4 @@ A temporal conflict is recorded, not overwritten.
 
 ## Initial gate
 
-Process one 150–300 MB ChatGPT export before multi-gigabyte BackReal archives. First emit central-directory inventory and manifest; only then stream `conversations.json`.
+Process one 150–300 MB ChatGPT export before multi-gigabyte BackReal archives. First emit central-directory inventory and manifest; only then stream `conversations.json`.

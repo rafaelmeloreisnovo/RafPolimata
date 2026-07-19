@@ -1,5 +1,7 @@
 # Governança federada do ZIPRAF-AO42
 
+> **Entrada canônica:** docs/AGENTES.md §6 (escalação e conflito — federação de repositórios, gate de promoção e privacidade) e §5 (pipeline operacional — append-only gate, manifest chain, rollback pointer). Este documento define a governança federada do ZIPRAF-AO42: autoridade por camada, invariante de privacidade e gates de cache e append-only.
+
 A governança não replica corpos privados. Ela compila claims, autoridades, ponteiros, gates e rollback.
 
 ## Autoridade por camada

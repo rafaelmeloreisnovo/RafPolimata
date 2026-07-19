@@ -1,7 +1,6 @@
 # Protocolos de arquivo do repositório
 
-> Para o ciclo completo de sessão de agente (startup, execução, shutdown), consulte
-> `docs/AGENTES_CHECKLIST.md`. Este documento cobre padrões de nome e checklist de evidência.
+> **Entrada canônica:** docs/AGENTES.md §3 (ciclo de sessão — o que commitar, o que deixar como PENDING, artefatos verificáveis) e §7 (CI gates — quais artefatos cada gate valida). Este documento cobre padrões de nomenclatura de arquivo e checklist de evidência mínima por artefato.
 
 | Padrão | Uso |
 |---|---|

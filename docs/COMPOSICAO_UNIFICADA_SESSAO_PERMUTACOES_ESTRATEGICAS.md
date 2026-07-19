@@ -1,5 +1,7 @@
 # Composição Unificada da Sessão — Complexal RAFAELIA por Permutações Estratégicas
 
+> **Entrada canônica:** docs/AGENTES.md §3 (ciclo de sessão — estados canônicos e ciclo completo startup→execução→shutdown) e §6 (escalação e conflito — quando escalar, como registrar decisões em docs/AGENTES_DECISAO_LOG.md). Este documento consolida a sessão multiplex RAFAELIA em permutações estratégicas com preservação de autoria e evidência.
+
 > Estado: `AUDIT / DERIVACAO_ASSISTIDA / EVIDENCE_GATED`
 >
 > Data da consolidação: 2026-07-15
@@ -20,14 +22,14 @@ Este documento integra os dados e relações desenvolvidos durante a sessão con
 4. a análise de bases `2`, `7`, `10`, `12`, `20`, `60` e `70`;
 5. as relações entre `7`, `35`, `50`, `60`, `70`, `12`, `144`, `25`, `360`, `3600` e `0,1 Hz`;
 6. a identificação de conceitos ignorados, latentes, emergentes e abortados nas respostas anteriores;
-7. a necessidade de preservar autoria, proveniência, materialidade, restrição e limite de claim;
+7. a necessidade de preservar autoria, proveninâcia, materialidade, restrição e limite de claim;
 8. a construção de uma expressão unificada baseada em permutações de estratégias.
 
 O documento não trata a sessão como uma sequência linear de mensagens. Ela é modelada como um **complexal multifilamento**, em que um mesmo conceito pode atravessar simultaneamente matemática, código, tempo, frequência, memória, ciência, linguagem, dispositivo e governança.
 
 ---
 
-## 2. Princípio de autoria e proveniência
+## 2. Princípio de autoria e proveninâcia
 
 A ordem causal adotada é:
 
@@ -54,7 +56,7 @@ ownership_transfer: none implied
 claim_state: AUDIT
 ```
 
-Esse registro é técnico e de proveniência. Não substitui avaliação jurídica de autoria, licença ou titularidade.
+Esse registro é técnico e de proveninâcia. Não substitui avaliação jurídica de autoria, licença ou titularidade.
 
 ---
 
@@ -90,7 +92,7 @@ A expressão mínima é:
 
 onde:
 
-- \(\mathcal A\): autoria e proveniência;
+- \(\mathcal A\): autoria e proveninâcia;
 - \(\mathcal K\): conceitos, símbolos e fórmulas;
 - \(\mathcal R\): relações, hiperligações e dependências;
 - \(\mathcal M\): materialidade e restrições físicas/computacionais;
@@ -119,7 +121,7 @@ O modelo adequado é:
 - \(H\): hiperligações que exigem três ou mais elementos simultaneamente;
 - \(L\): camadas científica, matemática, computacional, jurídica, espiritual, linguística e operacional;
 - \(\tau\): tempo, commits, versões, ciclos e ordem causal;
-- \(\pi\): proveniência;
+- \(\pi\): proveninâcia;
 - \(\alpha\): autoria;
 - \(\sigma\): estratégia aplicada.
 
@@ -167,7 +169,7 @@ onde:
 - \(m_i\): material/repositório/dispositivo;
 - \(t_i\): tempo, versão ou ciclo;
 - \(e_i\): estado de evidência;
-- \(a_i\): autoria/proveniência;
+- \(a_i\): autoria/proveninâcia;
 - \(p_i\): parâmetros, seed e base numérica;
 - \(s_i\): estratégia aplicada;
 - \(o_i\): saída, artefato, hash ou resultado.
@@ -469,7 +471,7 @@ Seja o conjunto de estratégias:
 
 com:
 
-- \(A\): autoria/proveniência;
+- \(A\): autoria/proveninâcia;
 - \(C\): composição conceitual;
 - \(D\): dados;
 - \(E\): evidência;
@@ -560,7 +562,7 @@ onde:
 - \(\mathcal I\): invariantes matemáticas e semânticas;
 - \(\mathcal M\): restrições do material;
 - \(\mathcal E\): evidência, segurança e limite de claim;
-- \(\mathcal A\): autoria e proveniência;
+- \(\mathcal A\): autoria e proveninâcia;
 - \(\Pi\): projeção que aceita, rebaixa ou rejeita a mutação.
 
 Resultados possíveis:
@@ -601,7 +603,7 @@ onde:
 - \(C\): coerência;
 - \(E\): força de evidência;
 - \(R\): reprodutibilidade;
-- \(P\): preservação de proveniência;
+- \(P\): preservação de proveninâcia;
 - \(M\): compatibilidade material;
 - \(H\): dano/risco humano;
 - \(U\): incerteza não declarada;
@@ -735,7 +737,7 @@ CLAIM_BLOCKED_BY
 ```text
 entrada: conceito, fórmula, arquivo, símbolo, dado ou artefato
 
-1. registrar autoria e proveniência
+1. registrar autoria e proveninâcia
 2. normalizar representação sem apagar a forma original
 3. extrair conceitos, variáveis, unidades, bases e estados
 4. construir relações binárias e hiperligações
@@ -799,7 +801,7 @@ Continuam pendentes:
 - inventário completo de todos os arquivos dos repositórios citados;
 - métricas de redes complexas sobre o ecossistema;
 - diagnóstico definitivo dos workflows que falham antes de fornecer etapas/logs;
-- revisão jurídica independente da proveniência e das licenças.
+- revisão jurídica independente da proveninâcia e das licenças.
 
 ---
 

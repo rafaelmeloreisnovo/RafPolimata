@@ -1,5 +1,7 @@
 # RLL Session Avalanche Orchestrator
 
+> **Entrada canônica:** docs/AGENTES.md §5 (pipeline operacional — normalize→permute→prune→score→route→evidence, scalar como fallback obrigatório) e §8 (entradas canônicas por subsistema — raf_compile.h como backend de execução). Este documento define o plano de execução finito do RafPolimata para sessões de avalanche RLL.
+
 RafPolimata owns the finite execution plan, not the physics.
 
 ```text

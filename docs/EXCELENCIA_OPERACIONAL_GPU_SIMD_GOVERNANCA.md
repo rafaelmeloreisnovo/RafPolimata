@@ -1,9 +1,6 @@
 # Excelência operacional GPU/SIMD, governança e execução sem gargalos
 
-> **Resumo executivo em `docs/AGENTES.md` §5** — o pipeline de promoção
-> (VOID → BASELINE → CANDIDATE → VALIDATED → ROLLBACK) e a matriz de decisão
-> por arquitetura aparecem condensados lá. Este documento contém a metodologia
-> completa com todas as tabelas, regras de governança e critério enterprise.
+> **Entrada canônica:** docs/AGENTES.md §5 (pipeline operacional — VOID → BASELINE → CANDIDATE → VALIDATED → ROLLBACK, seletor runtime e critério de parada) e §3 (ciclo de sessão — estados canônicos e disciplina de evidência). Este documento contém a metodologia completa de governança GPU/SIMD com todas as tabelas de decisão e critério enterprise.
 
 Este documento transforma as sementes conceituais do RafPolimata em uma metodologia operacional auditável para execução em CPU, GPU, NEON/SIMD, cache L1/L2, buffer/RAM/storage e pipelines paralelos. A regra principal é separar metáfora, hipótese e prova: quando não houver medição, o estado correto é `VOID`/`SKIPPED`, não uma promessa de desempenho.
 
@@ -37,7 +34,7 @@ A leitura operacional do repositório deve cobrir até cinco níveis, sem presum
 | Genérico C | baseline, portabilidade, auditoria | quando virar gargalo comprovado | correção + latência média |
 | Branchless inteiro | decisões pequenas e previsíveis | se aumentar instruções/cache miss | p95/p99 e tamanho |
 | ARM32 NEON | vetores curtos no Android legado | se custo de empacotar/desempacotar for maior | ciclos por elemento |
-| ARM64 NEON | hot path vetorial estável | se dados não forem contíguos/alinháveis | throughput e energia |
+| ARM64 NEON | hot path vetorial estável | se dados não forem contíguos/alinhaáveis | throughput e energia |
 | GPU | lote grande e paralelismo massivo | se transferência RAM/GPU dominar | tempo total fim-a-fim |
 | Syscall direta | caminho mínimo e controlado | se ABI/segurança/manutenção piorar | latência + fallback libc |
 | Storage/buffer | logs binários e batching | se comprometer integridade | perda zero + checksum |
