@@ -3,6 +3,7 @@
 > **Estado:** `BOOTSTRAP_REFERENCE`. Este arquivo é regenerado integralmente por
 > `scripts/apkc_first_part_gate.py`; a execução acrescenta SHA-256, tamanho,
 > referência em índice e rota para todos os arquivos versionados examinados.
+> A materialização completa ainda não foi executada nesta sessão.
 
 ## Núcleos já localizados
 
@@ -12,14 +13,14 @@
 | Assembler ARM | `Apkc/arch_arm32.h`, `Apkc/arch_arm64.h` | IMPLEMENTED / cobertura variável | corpus regressivo por instrução |
 | ELF | `Apkc/fmt_elf.h` | IMPLEMENTED estrutural | validar `.so` do mesmo APK/run |
 | DEX | `Apkc/fmt_dex.h` | IMPLEMENTED mínimo | separar DEX estrutural de DEX funcional |
-| Validação binária | `scripts/validate_apkc_formats.py` | IMPLEMENTED | validar bytes APK/DEX/ELF e ABI |
-| Toolchain Termux | `Apkc/sys.h` | IMPLEMENTED | executar resolução real de clang/java/d8 |
-| Java/Groovy | `scripts/apkc_java_to_jar.sh`, `scripts/apkc_groovy_to_jar.sh` | IMPLEMENTED | executar JAR→D8→DEX |
+| Validação binária | `scripts/validate_apkc_formats.py` | IMPLEMENTED / teste pendente | validar bytes APK/DEX/ELF e ABI |
+| Toolchain Termux | `Apkc/sys.h` | IMPLEMENTED / runtime pendente | executar resolução real de clang/java/d8 |
+| Java/Groovy | `scripts/apkc_java_to_jar.sh`, `scripts/apkc_groovy_to_jar.sh` | IMPLEMENTED / runtime pendente | executar JAR→D8→DEX |
 | Prova de build | `tools/raf_source_to_binary_proof.sh` | gate v2 IMPLEMENTED | executar A64+A32 e promover somente completo |
 | Provas canônicas | `Apkc/proofs/out/` | CONTRADICTION/TOKEN_VAZIO no corte | substituir por um único run coerente |
 | Navegador local | `raf_shell/raf_shell.c` | TUI file browser IMPLEMENTED | não classificar como navegador web |
 | Navegador ASM/TLS | origem não localizada | TOKEN_VAZIO | localizar em outro diretório/repositório ou implementar separadamente |
-| Gate geral | `scripts/apkc_first_part_gate.py` | IMPLEMENTED | gerar JSON e este mapa |
+| Gate geral | `scripts/apkc_first_part_gate.py` | IMPLEMENTED / execução pendente | gerar JSON e este mapa |
 
 ## Zonas que o gerador examina
 
