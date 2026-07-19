@@ -23,6 +23,7 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 | [AGENTES_CHECKLIST.md](AGENTES_CHECKLIST.md) | checklist de início, execução e encerramento | `REFERENCE` |
 | [AGENTES_DECISAO_LOG.md](AGENTES_DECISAO_LOG.md) | decisões, conflitos e escalações | `AUDIT` |
 | [DOCUMENT_GOVERNANCE.md](DOCUMENT_GOVERNANCE.md) | catálogo, indexação, ciclo de vida, risco e promoção | `CANONICAL` |
+| [ROOT_LOOSE_FILES_REVIEW.md](ROOT_LOOSE_FILES_REVIEW.md) | análise e rota de cada arquivo solto da raiz | `AUDIT/REVIEW_REQUIRED` |
 | [MAPA_ESTRUTURAL_REPOSITORIO.md](MAPA_ESTRUTURAL_REPOSITORIO.md) | disposição física e estados por diretório | `CANONICAL` |
 | [SAFE_EXTENDED_LOCAL_CI.md](SAFE_EXTENDED_LOCAL_CI.md) | execução local de workflows no Termux | `REFERENCE` |
 
@@ -112,8 +113,15 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 ## 10. Comando de atualização
 
 ```sh
+python3 -m unittest \
+  tests.test_document_governance \
+  tests.test_audit_repository_structure \
+  tests.test_validate_root_file_decisions \
+  tests.test_audit_zip_artifact
+
+python3 scripts/validate_root_file_decisions.py
 python3 scripts/document_governance.py --write --print-summary
-python3 -m unittest tests.test_document_governance
+python3 scripts/document_governance.py --check --print-summary
 ```
 
 Mudanças em documentação devem atualizar este índice quando adicionarem nova entrada canônica. O catálogo gerado cobre todos os arquivos; este arquivo permanece curado para navegação humana.
