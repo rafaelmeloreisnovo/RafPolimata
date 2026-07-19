@@ -1,0 +1,25 @@
+{
+  "protocol": "rafpolimata.formal_science_orchestrator.v1",
+  "version": 1,
+  "equation_count": 32,
+  "domain_count": 12,
+  "proof_gate_count": 12,
+  "dimensional_checks": 15,
+  "equations_by_domain": {
+    "classical_mechanics": 3,
+    "control_and_ai": 2,
+    "dimensional_analysis": 1,
+    "dynamical_systems": 2,
+    "electrical_machines": 5,
+    "electrochemistry": 2,
+    "fluid_dynamics": 3,
+    "graph_number_semantics": 2,
+    "hall_thruster": 2,
+    "quantum_mechanics": 2,
+    "statistics_and_time": 3,
+    "thermodynamics_combustion": 5
+  },
+  "semantic_physical_direct_promotion": "forbidden",
+  "time_provenance": "utc_ntp_plus_monotonic",
+  "verdict": "PASS"
+}

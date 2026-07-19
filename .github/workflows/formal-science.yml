@@ -1,0 +1,45 @@
+name: Formal Science Orchestrator
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  formal-science:
+    name: Units, evidence, statistics and time gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate formal-science registry
+        run: |
+          python3 scripts/validate_formal_science_orchestrator.py
+          test -s results/formal_science_orchestrator_report.json
+
+      - name: Verify report contract
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(
+              Path('results/formal_science_orchestrator_report.json').read_text(encoding='utf-8')
+          )
+          assert report['verdict'] == 'PASS'
+          assert report['equation_count'] == 32
+          assert report['domain_count'] == 12
+          assert report['proof_gate_count'] == 12
+          assert report['semantic_physical_direct_promotion'] == 'forbidden'
+          assert report['time_provenance'] == 'utc_ntp_plus_monotonic'
+          print(json.dumps(report, ensure_ascii=False, sort_keys=True))
+          PY
+
+      - name: Upload formal-science report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: formal-science-orchestrator-report
+          path: results/formal_science_orchestrator_report.json
+          if-no-files-found: error

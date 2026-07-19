@@ -1,0 +1,58 @@
+{
+  "schema": "rafaelia.parabolic_semantic_codec.routing.v1",
+  "protocol": "RAFAELIA-PSC-1",
+  "claim_allowed": false,
+  "states": [
+    "VERIFIED_LITERAL",
+    "PROVED",
+    "TESTED",
+    "DERIVED",
+    "HYPOTHESIS",
+    "ANALOGY_ONLY",
+    "DECLARED_BY_AUTHOR",
+    "TOKEN_VAZIO",
+    "CONTRADICTION",
+    "BLOCKED"
+  ],
+  "heuristics": [
+    "DIRECT",
+    "CAUSAL_REVERSE",
+    "TEMPORAL_ANTIDERIVATIVE",
+    "LOCAL_DERIVATIVE",
+    "COUNTERFACTUAL",
+    "ROLE_INVERSION",
+    "MULTISCALE"
+  ],
+  "owners": {
+    "protocol": "rafaelmeloreisnovo/Rafaelia_Core",
+    "codec": "rafaelmeloreisnovo/ZIPRAF_OMEGA_FULL",
+    "experiment": "rafaelmeloreisnovo/ChipQuantum",
+    "formal_math": "rafaelmeloreisnovo/Matem-tica-",
+    "paper": "rafaelmeloreisnovo/papers",
+    "governance": "rafaelmeloreisnovo/RafPolimata",
+    "knowledge_map": "rafaelmeloreisnovo/Mapa",
+    "parable_method": "rafaelmeloreisnovo/CientiEspiritual",
+    "cosmos_adapter": "rafaelmeloreisnovo/Cosmos",
+    "quantum_adapter": "instituto-Rafael/Eletron-efeitos-qu-ntico",
+    "rll_claim_boundary": "instituto-Rafael/relativity-living-light"
+  },
+  "hard_boundaries": {
+    "symbol_implies_physical_effect": false,
+    "analogy_implies_mechanism": false,
+    "finite_verification_implies_universal_proof": false,
+    "truncated_hash_implies_integrity": false,
+    "token_vazio_implies_pass": false,
+    "shared_mathematical_form_implies_shared_ontology": false
+  },
+  "required_claim_fields": [
+    "source_status",
+    "epistemic_status",
+    "claim_gate",
+    "domain",
+    "source",
+    "method",
+    "artifact",
+    "limitations",
+    "falsifier"
+  ]
+}

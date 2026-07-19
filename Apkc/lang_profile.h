@@ -27,6 +27,12 @@ typedef struct {
     int         arm64_only;  /* 1 = ARM32 not supported */
     int         use_d8;      /* 1 = run d8 after step-1 to convert to DEX */
     int         jsx_node;    /* 1 = run Babel output through node bootstrap */
+    /* ── hardware-direct dispatch flags (added in hw-abstraction pass) ── */
+    int         use_gpu_spv; /* 1 = fork shader compiler → SPIR-V APK asset */
+    int         use_gpu_cl;  /* 1 = embed OpenCL C source as APK asset */
+    int         use_gpu_wgsl;/* 1 = embed WebGPU/WGSL source as APK asset */
+    int         use_dsp;     /* 1 = fork Hexagon DSP compiler → DSP .so asset */
+    int         use_npu;     /* 1 = embed model blob as assets/model.tflite */
 } LangProfile;
 
 /* ── Language ID constants ────────────────────────────────────────────── */
@@ -46,8 +52,15 @@ typedef struct {
 #define LP_RB   13
 #define LP_SWIFT 14
 #define LP_GROOVY 15
-#define LP_CLJ  16
-#define LP_COUNT 17
+#define LP_CLJ    16
+/* hardware-direct targets */
+#define LP_GLSL   17   /* Vulkan GLSL compute → glslc → SPIR-V APK asset */
+#define LP_CL     18   /* OpenCL C source → embedded as APK asset */
+#define LP_HLSL   19   /* HLSL compute → glslc HLSL frontend → SPIR-V asset */
+#define LP_WGSL   20   /* WebGPU WGSL source → embedded as APK asset */
+#define LP_DSP    21   /* Hexagon DSP C → hexagon-clang → DSP .so asset */
+#define LP_TFLITE 22   /* TFLite model blob → assets/model.tflite NPU offload */
+#define LP_COUNT  23
 
 static const LangProfile _lang_table[LP_COUNT] = {
     /* ASM: internal 2-pass assembler, both arm64+arm32 */
@@ -134,7 +147,58 @@ static const LangProfile _lang_table[LP_COUNT] = {
 
     /* Clojure: gen_script_code64 execve bootstrap, clojure -e */
     [LP_CLJ]  = { "clj",  ".clj",  0, 1, 0, "/usr/bin/clojure",
-                  "-e", {NULL}, 0, 1, 0, 0 },
+                  "-e", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0 },
+
+    /* ── Hardware-direct compute targets ──────────────────────────────── */
+
+    /* GLSL compute: glslc -fshader-stage=compute → SPIR-V APK asset.
+     * APK contains: lib/arm64-v8a/libmain.so (NOP stub) +
+     *               assets/compute.spv (SPIR-V blob).
+     * Command: glslc -fshader-stage=compute -o /tmp/compute.spv source.comp */
+    [LP_GLSL] = { "glsl", ".comp", 0, 0, 0, "glslc",
+                  NULL, {"-fshader-stage=compute", "-o", NULL},
+                  0, 1, 0, 0,
+                  1, 0, 0, 0 },
+
+    /* OpenCL C: source embedded verbatim as assets/compute.cl (no compilation).
+     * The Android runtime loads the source via clCreateProgramWithSource. */
+    [LP_CL]   = { "cl",   ".cl",   0, 0, 0, NULL,
+                  NULL, {NULL},
+                  0, 1, 0, 0,
+                  0, 1, 0, 0 },
+
+    /* HLSL compute: glslc HLSL frontend → SPIR-V APK asset.
+     * Command: glslc -fshader-stage=compute -x hlsl -o /tmp/compute.spv source.hlsl */
+    [LP_HLSL] = { "hlsl", ".hlsl", 0, 0, 0, "glslc",
+                  NULL, {"-fshader-stage=compute", "-x", "hlsl", "-o", NULL},
+                  0, 1, 0, 0,
+                  1, 0, 0, 0 },
+
+    /* WebGPU WGSL: source embedded as assets/compute.wgsl (no compilation).
+     * The WebGPU / Dawn runtime compiles WGSL at load time. */
+    [LP_WGSL] = { "wgsl", ".wgsl", 0, 0, 0, NULL,
+                  NULL, {NULL},
+                  0, 1, 0, 0,
+                  0, 0, 1, 0 },
+
+    /* Hexagon DSP: hexagon-clang → DSP shared library for FastRPC offload.
+     * APK contains: lib/arm64-v8a/libmain.so (NOP stub) +
+     *               lib/hexagon-v65/libcompute.so (DSP compute .so).
+     * Command: hexagon-clang -mv65 -shared -o /tmp/dsp.so source.dsp */
+    [LP_DSP]  = { "dsp",  ".dsp",  0, 0, 0, "hexagon-clang",
+                  NULL, {"-mv65", "-shared", "-o", NULL},
+                  0, 1, 0, 0,
+                  0, 0, 0, 1, 0 },
+
+    /* TFLite model: binary blob embedded verbatim as assets/model.tflite.
+     * The Android TFLite runtime (or NNAPI delegate) loads and runs the model
+     * on the NPU / GPU / DSP at runtime — no on-host compilation needed.
+     * APK contains: lib/arm64-v8a/libmain.so (NOP stub) +
+     *               assets/model.tflite (TFLite flatbuffer) */
+    [LP_TFLITE] = { "tflite", ".tflite", 0, 0, 0, NULL,
+                    NULL, {NULL},
+                    0, 1, 0, 0,
+                    0, 0, 0, 0, 1 },
 };
 
 /* Find profile by CLI name — returns NULL for unknown names */

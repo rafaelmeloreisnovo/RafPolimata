@@ -9,6 +9,7 @@
 #include "arch_arm32.h"
 #include "lang_script.h"
 #include "lang_profile.h"
+#include "hw_dispatch.h"
 #include "fmt_zip.h"
 #include "fmt_dex.h"
 #include "fmt_axml.h"
@@ -1609,7 +1610,13 @@ static i32 build_apk(
     AsmResult r32_; r32_.size=0; r32_.sym1_va=0; r32_.sym2_va=0; r32_.has_sym1=0; r32_.has_sym2=0;
     sz so64sz=0, so32sz=0;
     sz dexsz=0;
-    const u8 *dex_buf_ptr = _dex_buf; /* points to whichever buffer holds the DEX */
+    const u8 *dex_buf_ptr = _dex_buf;
+
+    /* GPU / hardware-direct compute state */
+    const u8   *gpu_asset_buf  = (const u8*)0;
+    sz          gpu_asset_sz   = 0;
+    const char *gpu_asset_name = (const char*)0;
+    int         gpu_stub_so    = 0; /* set → build NOP stub .so for GPU APK */
 
     if (prof->use_asm) {
         /* internal ARM assembler */
@@ -1719,6 +1726,91 @@ static i32 build_apk(
             so64sz = outsz < sizeof(_so64_buf) ? outsz : sizeof(_so64_buf);
         }
         do32 = 0;
+
+    } else if (prof->use_gpu_spv) {
+        /* Vulkan GLSL / HLSL compute: fork+exec glslc → SPIR-V APK asset.
+         * APK layout: lib/arm64-v8a/libmain.so (NOP) + assets/compute.spv */
+        static const char _tmpout_spv[] = "/tmp/apkc_compute.spv";
+        char *args[32]; int na = 0;
+        args[na++] = (char*)prof->compiler;
+        for (int j = 0; j < 10 && prof->cc_args[j]; j++)
+            args[na++] = (char*)prof->cc_args[j];
+        args[na++] = (char*)_tmpout_spv;
+        args[na++] = (char*)inpath;
+        args[na]   = (char*)0;
+        sz spvsz = fork_exec_wait(prof->compiler, args, _tmpout_spv,
+                                  _fork_out, sizeof(_fork_out));
+        if (!spvsz) { pr_err("shader compiler produced no SPIR-V output\n"); return -1; }
+        gpu_asset_buf  = _fork_out;
+        gpu_asset_sz   = spvsz;
+        gpu_asset_name = "assets/compute.spv";
+        gpu_stub_so    = 1;
+        do32 = 0;
+
+    } else if (prof->use_gpu_cl) {
+        /* OpenCL C: embed source text as APK asset; no compilation needed.
+         * Runtime loads via clCreateProgramWithSource from assets/compute.cl */
+        gpu_asset_buf  = src;
+        gpu_asset_sz   = src_len;
+        gpu_asset_name = "assets/compute.cl";
+        gpu_stub_so    = 1;
+        do32 = 0;
+
+    } else if (prof->use_gpu_wgsl) {
+        /* WebGPU WGSL: embed source text as APK asset.
+         * Runtime compiles WGSL via WebGPU / Dawn at load time. */
+        gpu_asset_buf  = src;
+        gpu_asset_sz   = src_len;
+        gpu_asset_name = "assets/compute.wgsl";
+        gpu_stub_so    = 1;
+        do32 = 0;
+
+    } else if (prof->use_dsp) {
+        /* Hexagon DSP: fork+exec hexagon-clang → DSP .so for FastRPC offload.
+         * APK layout: lib/arm64-v8a/libmain.so (NOP) +
+         *             lib/hexagon-v65/libcompute.so (Hexagon DSP payload) */
+        static const char _tmpout_dsp[] = "/tmp/apkc_dsp.so";
+        char *args[32]; int na = 0;
+        args[na++] = (char*)prof->compiler;
+        for (int j = 0; j < 10 && prof->cc_args[j]; j++)
+            args[na++] = (char*)prof->cc_args[j];
+        args[na++] = (char*)_tmpout_dsp;
+        args[na++] = (char*)inpath;
+        args[na]   = (char*)0;
+        sz dspsz = fork_exec_wait(prof->compiler, args, _tmpout_dsp,
+                                  _fork_out, sizeof(_fork_out));
+        if (!dspsz) { pr_err("hexagon-clang produced no DSP output\n"); return -1; }
+        gpu_asset_buf  = _fork_out;
+        gpu_asset_sz   = dspsz;
+        gpu_asset_name = "lib/hexagon-v65/libcompute.so";
+        gpu_stub_so    = 1;
+        do32 = 0;
+
+    } else if (prof->use_npu) {
+        /* NPU/TFLite: embed model flatbuffer verbatim as assets/model.tflite.
+         * The Android TFLite runtime or NNAPI delegate selects NPU at runtime.
+         * APK layout: lib/arm64-v8a/libmain.so (NOP) + assets/model.tflite */
+        gpu_asset_buf  = src;
+        gpu_asset_sz   = src_len;
+        gpu_asset_name = "assets/model.tflite";
+        gpu_stub_so    = 1;
+        do32 = 0;
+    }
+
+    /* GPU/DSP/NPU bootstrap: build NOP stub .so for hardware-offload APKs.
+     * The real compute payload is packaged as an APK asset (see gpu_asset_name).
+     * ANativeActivity_onCreate is a NOP; GPU dispatch happens via Java + NDK. */
+    if (gpu_stub_so) {
+        static const u8 _gpu_stub[8] = {
+            0xC0u,0x03u,0x5Fu,0xD6u,  /* RET (x30) — ANativeActivity_onCreate NOP */
+            0x1Fu,0x20u,0x03u,0xD5u,  /* NOP — android_main placeholder */
+        };
+        ElfSym _gs[2] = {
+            {"ANativeActivity_onCreate", 0u},
+            {"android_main",             0u},
+        };
+        so64sz = elf64_build_so(_so64_buf, _gpu_stub, 8u, _gs, 2, NULL, 0u);
+        do64 = 1;
     }
 
     /* build AndroidManifest.xml */
@@ -1747,6 +1839,13 @@ static i32 build_apk(
             if (zip_add(&zw, (const char*)p32, _so32_buf, (u32)so32sz)<0) { pr_err("zip_add arm32 lib failed\n"); return -1; }
         }
         if (zip_add(&zw, "classes.dex", dex_buf_ptr, (u32)dexsz)<0) { pr_err("zip_add classes.dex failed\n"); return -1; }
+    }
+    /* GPU / DSP / NPU compute asset (SPIR-V, OpenCL, WGSL, DSP .so, TFLite) */
+    if (gpu_asset_buf && gpu_asset_sz && gpu_asset_name) {
+        if (zip_add(&zw, gpu_asset_name, gpu_asset_buf, (u32)gpu_asset_sz)<0)
+            { pr_err("zip_add gpu asset failed\n"); return -1; }
+        pr("apkc: gpu asset="); pr(gpu_asset_name);
+        pr(" sz="); pr_dec((u64)gpu_asset_sz); pr_nl();
     }
     if (zip_add(&zw, "AndroidManifest.xml", _axml_buf, (u32)axsz)<0) { pr_err("zip_add manifest failed\n"); return -1; }
 
@@ -1813,6 +1912,20 @@ static i32 apkc_main(i32 argc, char **argv) {
         if (_str_eq(a,"-lang") && i+1<argc) { lang_override=argv[++i]; continue; }
         if (_str_eq(a,"--allow-undef") || _str_eq(a,"--allow-nop-placeholder")) { _apkc_allow_undef=1; continue; }
         if (_str_eq(a,"--strict")) { _apkc_allow_undef=0; continue; }
+        if (_str_eq(a,"--hw-probe")) {
+            HWProfile hw; hw_probe(&hw);
+            pr("apkc: hw-probe: "); hw_caps_pr(&hw);
+            return 0;
+        }
+        if (_str_eq(a,"--hw-select") && i+1<argc) {
+            const char *wname = argv[++i];
+            HWProfile hw; hw_probe(&hw);
+            int wl      = hw_workload_id(wname);
+            int backend = hw_select_backend(&hw, wl);
+            pr("apkc: hw-select workload="); pr(wname);
+            pr(" backend="); pr(hw_backend_name(backend)); pr("\n");
+            return 0;
+        }
         if (a[0]!='-') { inpath=a; continue; }
         pr_err("unknown flag: "); pr_err(a); pr_err("\n");
     }
@@ -1826,10 +1939,17 @@ static i32 apkc_main(i32 argc, char **argv) {
         pr_err("  -m <sdk>    minSdkVersion\n");
         pr_err("  -t <sdk>    targetSdkVersion\n");
         pr_err("  -64/-32/-both  architecture filter\n");
-        pr_err("  -lang <name>   force language (asm/c/cpp/rs/kt/java/py/sh/pl/js/php/jsx)\n");
+        pr_err("  -lang <name>   force language\n");
+        pr_err("    CPU: asm c cpp rs kt java py sh pl js php jsx go rb swift groovy clj\n");
+        pr_err("    GPU: glsl cl hlsl wgsl\n");
+        pr_err("    DSP: dsp (hexagon-clang)\n");
+        pr_err("    NPU: tflite (TFLite model → assets/model.tflite)\n");
         pr_err("  --strict       fail build on unknown mnemonic (default)\n");
         pr_err("  --allow-undef  emit UNDEF placeholder for unknown mnemonic (experimental)\n");
-        pr_err("  (auto-detected from file extension otherwise)\n");
+        pr_err("  --hw-probe     detect and print hardware capabilities (CPU/GPU/DSP/NPU/SME)\n");
+        pr_err("  --hw-select <workload>  select optimal backend for workload and print it\n");
+        pr_err("    workloads: compute tensor signal crypto\n");
+        pr_err("  (language auto-detected from file extension otherwise)\n");
         return 1;
     }
 

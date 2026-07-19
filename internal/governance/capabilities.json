@@ -1,0 +1,13 @@
+{
+  "schema": "rafaelia.capabilities.v1",
+  "default_policy": "blocked",
+  "notes": {
+    "termux.command.safe": "Reservado para v2: comandos compilados e read-only em sandbox, sem texto livre."
+  },
+  "capabilities": {
+    "git.read": "allow",
+    "git.diff": "allow",
+    "filesystem.read": "allow",
+    "termux.command.safe": "sandbox_only"
+  }
+}

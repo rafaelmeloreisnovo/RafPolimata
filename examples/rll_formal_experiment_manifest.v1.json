@@ -1,0 +1,44 @@
+{
+  "schema": "rafaelia.formal_experiment_manifest.v1",
+  "manifest_id": "RLL-RP-FORMAL-001",
+  "owner_repository": "rafaelmeloreisnovo/RafPolimata",
+  "claim_allowed": false,
+  "claim": {
+    "claim_id": "RLL-RD-CAMB-001",
+    "text": "Recomputing r_d with CAMB/RECFAST at each MCMC point may change the quantified evidence within recorded uncertainty.",
+    "source_status": "VERIFIED_LIMITED",
+    "epistemic_status": "HYPOTHESIS",
+    "claim_gate": "BLOCKED"
+  },
+  "formalization": {
+    "definitions": ["r_d is the baryon drag sound horizon used by the likelihood."],
+    "domain": "cosmological parameter space declared by the target experiment",
+    "units": {"r_d": "Mpc"},
+    "equations": ["ln(B10)=ln(Z_RLL)-ln(Z_LCDM)"],
+    "assumptions": ["Identical datasets and priors are used for the controlled comparison."],
+    "proof_obligations": ["Record data hashes, priors, chain diagnostics and residual systematics."]
+  },
+  "experiment": {
+    "target_repository": "instituto-Rafael/relativity-living-light",
+    "source_ref": "main",
+    "source_paths": ["scripts/rll_fase22_g4_eh_bias_grid.py"],
+    "command": "TOKEN_VAZIO: target repository must define the canonical CAMB/RECFAST execution command",
+    "inputs": ["Pantheon+/DESI/CMB artifacts identified by the target repository"],
+    "expected_artifacts": ["MCMC chains", "nested-sampling evidence", "convergence report", "checksums"]
+  },
+  "evidence": {
+    "status": "TOKEN_VAZIO",
+    "artifact_sha256": "TOKEN_VAZIO",
+    "environment": "TOKEN_VAZIO",
+    "observed_at": "2026-07-17T00:00:00Z"
+  },
+  "falsifier": {
+    "condition": "The controlled recalculation fails reproducibility or contradicts the claimed numerical direction.",
+    "result_if_met": "RECALIBRATION_REQUIRED"
+  },
+  "decision": {
+    "status": "BLOCKED",
+    "next_action": "Execute the target repository command and attach dual validator reports and artifact hashes.",
+    "rollback": "Keep the previous RLL claim ledger and no-new-claim safe state."
+  }
+}

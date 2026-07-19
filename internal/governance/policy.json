@@ -1,0 +1,10 @@
+{
+  "schema": "rafaelia.policy.v1",
+  "default_gate": "blocked",
+  "allow_compiled_plan_only": true,
+  "forbid_free_text_shell": true,
+  "allowed_readonly_commands": [
+    { "command": "git", "args": ["status"] },
+    { "command": "git", "args": ["diff", "--stat"] }
+  ]
+}

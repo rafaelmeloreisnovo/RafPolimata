@@ -330,3 +330,4 @@ que o PR saia de DRAFT:
 | `docs/AGENTES_CHECKLIST.md` | Checklist executável por sessão |
 | `docs/AGENTES_DECISAO_LOG.md` | Log de conflitos e decisões entre agentes |
 | `docs/MAPA_ESTRUTURAL_REPOSITORIO.md` | Mapa em 5 níveis de profundidade |
+| `docs/INFO_DYNAMICS_INTERNAL_TRACEABILITY.md` | Dinâmica informacional e rastreabilidade interna — mapeamento filosófico→código |

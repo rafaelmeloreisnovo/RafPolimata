@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rafaelia.tool_request.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "intent_id", "tool", "capability", "args"],
+  "properties": {
+    "schema": { "const": "rafaelia.tool_request.v1" },
+    "intent_id": { "type": "string" },
+    "tool": { "type": "string" },
+    "capability": { "type": "string" },
+    "args": { "type": "array", "items": { "type": "string" } }
+  }
+}
