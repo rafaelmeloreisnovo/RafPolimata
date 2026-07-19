@@ -104,6 +104,20 @@ bash tools/raf_source_to_binary_proof.sh
 sh safe-extended run .github/workflows/apkc-first-part.yml
 ```
 
+## Evidence bundle
+
+```text
+manifests/apkc-first-part.v1.json
+docs/APKC_FIRST_PART_EXECUTION.md
+docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
+results/apkc-first-part-gate.json
+results/apkc-format-validation.json
+Apkc/proofs/out/apkc-compile.status.json
+Apkc/proofs/runs/
+```
+
+Os arquivos em `results/` e as provas de run são produzidos durante a execução. Ausência atual permanece `TOKEN_VAZIO`.
+
 ## Estado de execução
 
 Os workflows GitHub associados ao HEAD terminaram como `failure`, porém o job recuperado possui lista de steps vazia. Portanto, isso não demonstra falha do código nem PASS de qualquer gate.
