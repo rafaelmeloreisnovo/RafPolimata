@@ -5,8 +5,22 @@ ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 OUT=${OUT_DIR:-"$ROOT/build/freestanding-host"}
 REPORT=${REPORT_PATH:-"$ROOT/ci/reports/omega-freestanding.md"}
 CC=${CC:-cc}
-NM=${NM:-nm}
-SIZE=${SIZE:-size}
+
+select_tool()
+{
+    preferred=$1
+    fallback=$2
+    if command -v "$preferred" >/dev/null 2>&1; then
+        command -v "$preferred"
+    elif command -v "$fallback" >/dev/null 2>&1; then
+        command -v "$fallback"
+    else
+        return 1
+    fi
+}
+
+NM=${NM:-$(select_tool llvm-nm nm || true)}
+SIZE=${SIZE:-$(select_tool llvm-size size || true)}
 
 mkdir -p "$OUT" "$(dirname "$REPORT")"
 
@@ -17,8 +31,8 @@ fail()
 }
 
 command -v "$CC" >/dev/null 2>&1 || fail "missing C compiler: $CC"
-command -v "$NM" >/dev/null 2>&1 || fail "missing nm: $NM"
-command -v "$SIZE" >/dev/null 2>&1 || fail "missing size: $SIZE"
+[ -n "$NM" ] && command -v "$NM" >/dev/null 2>&1 || fail "missing nm/llvm-nm"
+[ -n "$SIZE" ] && command -v "$SIZE" >/dev/null 2>&1 || fail "missing size/llvm-size"
 
 SRC="$ROOT/freestanding/omega/omega_core.c"
 HDR="$ROOT/freestanding/omega/omega_core.h"
@@ -44,7 +58,7 @@ COMMON='-std=c11 -Wall -Wextra -Werror -pedantic -ffreestanding -fno-builtin -fn
 # shellcheck disable=SC2086
 "$CC" $COMMON -Os -I"$ROOT/freestanding/omega" -c "$SRC" -o "$OBJ"
 
-UNDEFINED=$($NM -u "$OBJ" 2>/dev/null || true)
+UNDEFINED=$("$NM" -u "$OBJ" 2>/dev/null || true)
 test -z "$UNDEFINED" || {
     printf '%s\n' "$UNDEFINED" > "$OUT/undefined-symbols.txt"
     fail "undefined symbols found in freestanding object"
@@ -55,7 +69,7 @@ test -z "$UNDEFINED" || {
     -I"$ROOT/freestanding/omega" "$SRC" "$TEST" -o "$BIN"
 "$BIN"
 
-SIZE_LINE=$($SIZE "$OBJ" | tail -n 1)
+SIZE_LINE=$("$SIZE" "$OBJ" | tail -n 1)
 TEXT_SIZE=$(printf '%s\n' "$SIZE_LINE" | awk '{print $1}')
 case "$TEXT_SIZE" in
     ''|*[!0-9]*) fail "could not parse object text size" ;;
@@ -66,6 +80,8 @@ esac
     echo '# Omega freestanding host gate'
     echo
     echo "- compiler: $($CC --version 2>/dev/null | head -n 1)"
+    echo "- nm: $NM"
+    echo "- size: $SIZE"
     echo "- object: $OBJ"
     echo "- text bytes: $TEXT_SIZE"
     echo '- undefined symbols: 0'
