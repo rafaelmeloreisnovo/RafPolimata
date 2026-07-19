@@ -80,6 +80,7 @@ class ApkCFirstPartGateTests(unittest.TestCase):
         self.assertIn("tests.test_validate_apkc_formats", workflow)
         self.assertIn("tools/raf_source_to_binary_proof.sh", workflow)
         self.assertNotIn("--allow-partial", workflow)
+        self.assertNotIn("|| true", workflow)
 
 
 if __name__ == "__main__":
