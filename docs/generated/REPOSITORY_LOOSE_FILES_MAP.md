@@ -12,6 +12,7 @@
 | Assembler ARM | `Apkc/arch_arm32.h`, `Apkc/arch_arm64.h` | IMPLEMENTED / cobertura variável | corpus regressivo por instrução |
 | ELF | `Apkc/fmt_elf.h` | IMPLEMENTED estrutural | validar `.so` do mesmo APK/run |
 | DEX | `Apkc/fmt_dex.h` | IMPLEMENTED mínimo | separar DEX estrutural de DEX funcional |
+| Validação binária | `scripts/validate_apkc_formats.py` | IMPLEMENTED | validar bytes APK/DEX/ELF e ABI |
 | Toolchain Termux | `Apkc/sys.h` | IMPLEMENTED | executar resolução real de clang/java/d8 |
 | Java/Groovy | `scripts/apkc_java_to_jar.sh`, `scripts/apkc_groovy_to_jar.sh` | IMPLEMENTED | executar JAR→D8→DEX |
 | Prova de build | `tools/raf_source_to_binary_proof.sh` | gate v2 IMPLEMENTED | executar A64+A32 e promover somente completo |
@@ -33,11 +34,27 @@ raiz do repositório
 
 ## Rotas produzidas
 
-| Rota | Significado |
-|---|---|
-| `INDEXED` | arquivo já citado por entrada canônica |
-| `ADD_TO_CANONICAL_INDEX` | preservar no diretório e adicionar relação documental |
-| `MOVE_OR_INDEX` | decidir destino; não apagar nem mover automaticamente |
+| Rota | Significado | Ação documental |
+|---|---|---|
+| `INDEXED` | já citado por entrada canônica | manter relação e revisar atualização |
+| `ADD_TO_CANONICAL_INDEX` | arquivo em diretório conhecido sem referência | extrair metadados e inserir no índice adequado |
+| `MOVE_OR_INDEX` | arquivo na raiz sem destino claro | classificar; mover apenas em PR separado com histórico preservado |
+
+## Protocolo de preenchimento documental
+
+```text
+arquivo detectado
+→ hash e tipo
+→ autoria/proveniência
+→ resumo extraído
+→ relações técnicas
+→ estado epistemológico
+→ documento-alvo
+→ diff revisável
+```
+
+O gerador produz a fila de incorporação. Ele não transforma o nome de um arquivo
+em conclusão técnica e não apaga conteúdo automaticamente.
 
 ## Comando de materialização completa
 
