@@ -1,0 +1,221 @@
+{
+  "schema": "raf.root-file-decisions.v1",
+  "version": "1.0.0",
+  "date": "2026-07-19",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "branch": "feat/document-governance-20260719",
+  "invariants": [
+    "NO_AUTOMATIC_DELETE",
+    "MOVE_ONLY_IN_DEDICATED_PR",
+    "PRESERVE_GIT_HISTORY_AND_PROVENANCE",
+    "BINARY_REQUIRES_INVENTORY_BEFORE_PROMOTION",
+    "CLAIMS_REQUIRE_EVIDENCE_BEFORE_CANONICALIZATION"
+  ],
+  "decisions": [
+    {
+      "path": "README_RAFAELIA_ROOT_OPTIMIZER.md",
+      "git_blob_sha": "ac4a8ab47962963271d5171a50b47b8918957c9e",
+      "kind": "component-documentation",
+      "content_state": "ACTIVE_REFERENCE",
+      "evidence_state": "IMPLEMENTATION_LINKED_RUNTIME_PENDING",
+      "route": "MOVE_PROPOSED",
+      "target": "docs/components/RAFAELIA_ROOT_OPTIMIZER.md",
+      "area": "root-runtime",
+      "owner_role": "compiler-maintainer",
+      "risk": "LOW",
+      "findings": [
+        "documento corresponde a raf_c_to_asm_root_optimizer.py",
+        "escopo declara corretamente que não é compilador C completo",
+        "exemplo raiz_example.c está versionado"
+      ],
+      "required_gates": [
+        "unit tests do parser AST IR e backends",
+        "comparação do assembly emitido",
+        "atualização de links no mesmo PR de movimentação"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    },
+    {
+      "path": "RAFAELIA_MASTER_DOC.txt",
+      "git_blob_sha": "7da9ef4de581c30b748ed75eec6490943897d242",
+      "kind": "historical-master-document",
+      "content_state": "HISTORICAL_REFERENCE",
+      "evidence_state": "MIXED_CLAIMS_REVIEW_REQUIRED",
+      "route": "ARCHIVE_PROPOSED",
+      "target": "docs/archive/RAFAELIA_MASTER_DOC_2024_2025.txt",
+      "area": "documentation",
+      "owner_role": "documentation-governance",
+      "risk": "HIGH",
+      "findings": [
+        "contém índice amplo de 18 seções e declaração SPDX GPL-3.0-only",
+        "mistura arquitetura, fórmulas, hardware e métricas declaradas",
+        "métricas e afirmações de validação precisam ser ligadas a artefatos atuais",
+        "hardware e estado material podem estar temporalmente desatualizados"
+      ],
+      "required_gates": [
+        "extrair claims para matriz claim-evidence",
+        "separar histórico de estado atual",
+        "verificar licença e autoria por seção",
+        "manter hash e origem no arquivo arquivado"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    },
+    {
+      "path": "RAFAELIA_COMPLETE_v4.zip",
+      "git_blob_sha": "a9eee433e1e85c937aad64df6d393e21e79a2e1a",
+      "kind": "binary-archive",
+      "content_state": "UNINSPECTED_BINARY_ARTIFACT",
+      "evidence_state": "TOKEN_VAZIO_INVENTORY",
+      "route": "BINARY_ARTIFACT_REVIEW",
+      "target": "release-asset-or-audited-artifact-store",
+      "area": "evidence",
+      "owner_role": "evidence-custodian",
+      "risk": "HIGH",
+      "findings": [
+        "ZIP está versionado na raiz",
+        "conteúdo interno, licenças, hashes por entrada e relação com fontes ainda não foram auditados",
+        "binário não pode ser fonte canônica enquanto o source correspondente não estiver identificado"
+      ],
+      "required_gates": [
+        "listar entradas sem extração insegura",
+        "calcular SHA-256 do ZIP e de cada entrada",
+        "detectar arquivos executáveis e segredos",
+        "comparar entradas com fontes versionadas",
+        "decidir GitHub Release, LFS ou armazenamento de evidência"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    },
+    {
+      "path": "Arduíno.txt",
+      "git_blob_sha": "35b061c51bc3c0cd9a3f307a21102b7e52e86e8c",
+      "kind": "hardware-register-dossier",
+      "content_state": "TECHNICAL_REFERENCE_DRAFT",
+      "evidence_state": "DATASHEET_AND_BENCHMARK_REVIEW_REQUIRED",
+      "route": "MOVE_AND_REFACTOR_PROPOSED",
+      "target": "docs/hardware/AVR_ATMEGA328P_REGISTER_LAB.md",
+      "area": "documentation",
+      "owner_role": "low-level-methods-maintainer",
+      "risk": "MEDIUM",
+      "findings": [
+        "contém mapa de registradores e exemplos de acesso direto ATmega328P",
+        "mistura referência técnica com linguagem promocional e alegações de novidade",
+        "custos de ciclos e frequências precisam de datasheet e medição reproduzível"
+      ],
+      "required_gates": [
+        "citar datasheet oficial por registrador",
+        "compilar exemplos com avr-gcc sem Arduino.h",
+        "validar endereços e máscaras",
+        "registrar bytes flash SRAM ciclos e medição de bancada"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    },
+    {
+      "path": "Arm64 Mixer leve criptografia.md",
+      "git_blob_sha": "f5f3c0bf1fd29fdb30594af85b5f444aba09efc5",
+      "kind": "session-transcript-with-code",
+      "content_state": "EXPERIMENTAL_REVIEW",
+      "evidence_state": "UNCOMPILED_UNBENCHMARKED_IN_CURRENT_CHAIN",
+      "route": "SPLIT_AND_REFACTOR_PROPOSED",
+      "target": "docs/experiments/ARM64_NEON_MIXER_REVIEW.md",
+      "area": "documentation",
+      "owner_role": "runtime-maintainer",
+      "risk": "HIGH",
+      "findings": [
+        "contém explicação e bloco C AArch64 NEON com pthreads e heap",
+        "registrador do contador é modificado no asm mas está declarado como input, criando risco de miscompilação",
+        "memória alocada não é inicializada nem a correção do resultado é verificada",
+        "mixer não pode ser chamado de criptográfico sem análise específica"
+      ],
+      "required_gates": [
+        "corrigir constraints e clobbers do inline ASM",
+        "validar alocação e inicialização",
+        "adicionar saída observável e teste de correção",
+        "benchmark com warmup mediana p95 e ambiente",
+        "usar nome kernel vetorial experimental até revisão criptográfica"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    },
+    {
+      "path": "L1.md",
+      "git_blob_sha": "6d365a7cb9732a83a44dcac4b5d7f5670367a23c",
+      "kind": "shell-transcript-code-and-results",
+      "content_state": "UNSTRUCTURED_EXPERIMENT",
+      "evidence_state": "RESULTS_WITHOUT_PROVENANCE",
+      "route": "SPLIT_REQUIRED",
+      "target": "tests/experiments/vectra_kernel_arm32/",
+      "area": "tests",
+      "owner_role": "quality-assurance",
+      "risk": "HIGH",
+      "findings": [
+        "mistura heredoc C, comandos shell e números de benchmark",
+        "resultados não registram commit ambiente flags repetição ou hash",
+        "o código modifica contador corretamente como operando de saída, mas não valida resultado do kernel"
+      ],
+      "required_gates": [
+        "extrair fonte C para fixture",
+        "extrair runner shell com set -eu",
+        "gerar JSON de benchmark com ambiente e hashes",
+        "adicionar teste de correção antes da medição",
+        "arquivar transcript original por proveniência"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    },
+    {
+      "path": "RASBERY.MD",
+      "git_blob_sha": "8f2597dd1d91a2569160039ce76add9ead182141",
+      "kind": "roadmap-brainstorm",
+      "content_state": "BACKLOG_SOURCE",
+      "evidence_state": "PLANNED_NOT_IMPLEMENTED",
+      "route": "CONVERT_TO_TYPED_BACKLOG",
+      "target": "docs/roadmaps/RAFAELIA_BARE_METAL_LAB.md",
+      "area": "documentation",
+      "owner_role": "documentation-governance",
+      "risk": "MEDIUM",
+      "findings": [
+        "lista 50 tópicos para MCU Raspberry QEMU Android IA e produto",
+        "o próprio documento reconhece falta de compilação medição e separação entre hipótese e prova",
+        "não deve ser usado como matriz de recursos já existentes"
+      ],
+      "required_gates": [
+        "atribuir ID responsável dependências e repositório para cada item",
+        "separar NOW NEXT LATER",
+        "definir critério de aceite e evidência",
+        "vincular itens já implementados e marcar os demais PENDING"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    },
+    {
+      "path": "big_test.sh",
+      "git_blob_sha": "e933882fcf357975523fc98902f229cc5a2e5a77",
+      "kind": "repository-test-orchestrator",
+      "content_state": "ACTIVE_AUTOMATION",
+      "evidence_state": "IMPLEMENTED_CORRECTION_REQUIRED",
+      "route": "FIX_THEN_MOVE_PROPOSED",
+      "target": "scripts/big_test.sh",
+      "area": "automation",
+      "owner_role": "quality-assurance",
+      "risk": "HIGH",
+      "findings": [
+        "orquestra gates e preserva logs ambiente comandos e artefatos",
+        "gate obrigatório de build contém || true e pode mascarar erro",
+        "auditoria estrutural está como opcional embora seja requisito de governança",
+        "não inclui o novo catálogo documental"
+      ],
+      "required_gates": [
+        "remover mascaramento de falha no build obrigatório",
+        "adicionar testes e gate de governança documental",
+        "manter TOKEN_VAZIO distinto de PASS",
+        "mover somente após atualização de chamadas e documentação"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    }
+  ]
+}
