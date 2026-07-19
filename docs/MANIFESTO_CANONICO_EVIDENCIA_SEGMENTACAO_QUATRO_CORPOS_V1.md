@@ -1,5 +1,7 @@
 # Manifesto Canônico da Segmentação, Evidência e Quatro Corpos — v1.0
 
+> **Entrada canônica:** docs/AGENTES.md §3 (estados canônicos VERIFIED/TOKEN_VAZIO) e §8 (entradas canônicas por subsistema). Snapshot histórico do ciclo de promoção do segmento v1 — estado corrente em V1_1.
+
 > **SUPERSEDED / HISTÓRICO:** este documento registra o corte em que apenas o header `segment.v1` estava verificado. O estado corrente está em [`MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md`](MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md), no qual conversation records, message records e bounded reader foram promovidos no escopo isolado comprovado.
 
 **Repositório de autoridade:** `rafaelmeloreisnovo/RafPolimata`  

@@ -1,5 +1,7 @@
 # Runtime Truth — validação local — 2026-07-18
 
+> **Entrada canônica:** docs/AGENTES.md §5 (pipeline operacional VOID→VALIDATED) e §7 (CI gates). Evidência de validação local sem GitHub Actions — corte de 2026-07-18.
+
 ## Escopo
 
 Este corte materializa correções da auditoria RafGitTools ↔ RafPolimata sem usar

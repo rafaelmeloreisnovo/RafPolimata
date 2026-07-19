@@ -1,5 +1,7 @@
 # Manifesto Canônico da Evidência e Segmentação — v1.1
 
+> **Entrada canônica:** docs/AGENTES.md §3 (estados canônicos VERIFIED/TOKEN_VAZIO) e §8 (entradas canônicas por subsistema). Estado corrente do subsistema raf_segment_v1 — estruturas binárias congeladas com prova isolada reproduzível.
+
 **Autoridade:** `rafaelmeloreisnovo/RafPolimata`  
 **Data:** `2026-07-18`  
 **PR:** `#140` — draft, aberto, sem merge e sem auto-merge  
