@@ -1,26 +1,28 @@
 {
   "checks": {
     "axial_diagonal_directions_complete": true,
-    "convention_not_promoted": true,
+    "base7_seam_preserved": true,
     "diagonal_normalization_declared": true,
     "eight_ports": true,
-    "exact_claims_present": true,
+    "empirical_fluid_not_applicable": true,
+    "exact_claim_gate_open": true,
     "exact_geometry_pass": true,
+    "exact_operator_claims_present": true,
     "four_axes": true,
-    "global_claim_gate_closed": true,
     "implementation_routed_to_chipquantum": true,
+    "operator_state_pass": true,
     "opposed_angles": true,
     "paper_routed_to_rll": true,
-    "physical_gates_complete": true,
-    "physical_state_token_vazio": true,
     "schema": true,
-    "venturi_blocked": true,
-    "vortex_blocked": true
+    "venturi_is_exact_operator": true,
+    "vortex_is_exact_operator": true
   },
   "checks_failed": 0,
   "checks_passed": 16,
   "checks_total": 16,
-  "claim_allowed": false,
-  "schema": "rafpolimata.validation.flow_ports_axial_diagonal.v1",
+  "claim_allowed": true,
+  "empirical_fluid_interpretation": "NOT_APPLICABLE",
+  "operator_state": "PASS",
+  "schema": "rafpolimata.validation.flow_ports_axial_diagonal.v2",
   "status": "PASS"
 }
