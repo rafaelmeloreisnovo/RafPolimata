@@ -16,9 +16,11 @@ jobs:
             --write results/apkc-first-part-gate.json \
             --write-map docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
 
-      - name: Test truth reconciliation and browser TLS classification
+      - name: Test truth reconciliation browser TLS DEX ELF and ABI gates
         run: |
-          python3 -m unittest tests.test_apkc_first_part_gate
+          python3 -m unittest \
+            tests.test_apkc_first_part_gate \
+            tests.test_validate_apkc_formats
 
       - name: Build reproducible AArch64 and ARM32 compiler artifacts
         run: |
