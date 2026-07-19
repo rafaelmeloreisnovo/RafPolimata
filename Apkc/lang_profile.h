@@ -205,17 +205,17 @@ static inline int lang_profile_table_validate(void) {
 }
 
 static inline const LangProfile *lang_profile_find(const char *name) {
-    if (!name || !name[0]) return (const LangProfile *)0;
+    if (!name || !name[0] || !lang_profile_table_validate())
+        return (const LangProfile *)0;
     for (int i = 0; i < LP_COUNT; i++) {
-        if (_lp_eq_ci(_lang_table[i].name, name))
-            return lang_profile_validate(&_lang_table[i]) ? &_lang_table[i]
-                                                          : (const LangProfile *)0;
+        if (_lp_eq_ci(_lang_table[i].name, name)) return &_lang_table[i];
     }
     return (const LangProfile *)0;
 }
 
 static inline const LangProfile *lang_profile_from_path(const char *path) {
-    if (!path || !path[0]) return (const LangProfile *)0;
+    if (!path || !path[0] || !lang_profile_table_validate())
+        return (const LangProfile *)0;
 
     sz last_dot = (sz)-1;
     for (sz i = 0; path[i]; i++) if (path[i] == '.') last_dot = i;
@@ -223,9 +223,7 @@ static inline const LangProfile *lang_profile_from_path(const char *path) {
 
     const char *ext = path + last_dot;
     for (int i = 0; i < LP_COUNT; i++) {
-        if (_lp_eq_ci(_lang_table[i].ext, ext))
-            return lang_profile_validate(&_lang_table[i]) ? &_lang_table[i]
-                                                          : (const LangProfile *)0;
+        if (_lp_eq_ci(_lang_table[i].ext, ext)) return &_lang_table[i];
     }
     return (const LangProfile *)0;
 }
