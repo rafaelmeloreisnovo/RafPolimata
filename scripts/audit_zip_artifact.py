@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Auditoria segura de artefato ZIP sem extração no filesystem.
 
-Inspeciona estrutura central, nomes, tamanhos, compressão, flags, CRC e hashes por
-entrada. Entradas perigosas não são abertas para hashing. Não executa conteúdo.
+Inspeciona diretório central, nomes, tamanhos, compressão, flags, CRC e hashes por
+entrada. Limites são avaliados antes da descompactação. Não executa conteúdo.
 """
 from __future__ import annotations
 
@@ -35,12 +35,13 @@ def sha256_file(path: Path) -> str:
 def unsafe_name(name: str) -> list[str]:
     flags: list[str] = []
     normalized = name.replace("\\", "/")
+    raw_parts = normalized.split("/")
     pure = PurePosixPath(normalized)
     if normalized.startswith("/"):
         flags.append("absolute_path")
     if any(part == ".." for part in pure.parts):
         flags.append("path_traversal")
-    if any(part in {"", "."} for part in pure.parts[:-1]):
+    if any(part in {"", "."} for part in raw_parts[:-1]):
         flags.append("ambiguous_path_component")
     if "\x00" in name:
         flags.append("nul_in_name")
@@ -67,6 +68,7 @@ def hash_entry(
     info: zipfile.ZipInfo,
     max_entry_bytes: int,
 ) -> tuple[str | None, str | None]:
+    """Lê no máximo max_entry_bytes; zipfile valida CRC ao atingir EOF."""
     if info.is_dir():
         return None, None
     if info.file_size > max_entry_bytes:
@@ -76,7 +78,8 @@ def hash_entry(
     try:
         with archive.open(info, "r") as fh:
             while True:
-                block = fh.read(min(131072, max_entry_bytes - total + 1))
+                remaining = max_entry_bytes - total
+                block = fh.read(min(131072, remaining + 1))
                 if not block:
                     break
                 total += len(block)
@@ -84,7 +87,7 @@ def hash_entry(
                     return None, "decompressed_stream_exceeds_limit"
                 h.update(block)
     except (RuntimeError, OSError, zipfile.BadZipFile) as exc:
-        return None, f"entry_read_error:{type(exc).__name__}"
+        return None, f"entry_read_or_crc_error:{type(exc).__name__}"
     if total != info.file_size:
         return None, "decompressed_size_mismatch"
     return h.hexdigest(), None
@@ -141,11 +144,6 @@ def audit_zip(
             if duplicate_names:
                 report["errors"].append("nomes de entrada duplicados")
 
-            bad_crc = archive.testzip()
-            report["summary"]["first_bad_crc_entry"] = bad_crc
-            if bad_crc:
-                report["errors"].append(f"CRC inválido em {bad_crc}")
-
             for info in infos:
                 flags = unsafe_name(info.filename)
                 ratio = compression_ratio(info)
@@ -164,13 +162,16 @@ def audit_zip(
                 if suffix in EXECUTABLE_OR_SENSITIVE_SUFFIXES:
                     review_flags.append("executable_or_sensitive_suffix")
 
-                can_hash = not flags and not encrypted and not symlink
+                can_read = not flags and not encrypted and not symlink
                 digest: str | None = None
                 hash_error: str | None = None
-                if can_hash:
+                crc_validated = info.is_dir()
+                if can_read:
                     digest, hash_error = hash_entry(archive, info, max_entry_bytes)
                     if hash_error:
                         flags.append(hash_error)
+                    elif not info.is_dir():
+                        crc_validated = True
 
                 entry = {
                     "name": info.filename,
@@ -178,7 +179,8 @@ def audit_zip(
                     "compressed_size": info.compress_size,
                     "uncompressed_size": info.file_size,
                     "compression_ratio": None if ratio == float("inf") else round(ratio, 6),
-                    "crc32": f"{info.CRC:08x}",
+                    "declared_crc32": f"{info.CRC:08x}",
+                    "crc_validated_by_bounded_read": crc_validated,
                     "compression_method": info.compress_type,
                     "encrypted": encrypted,
                     "symlink": symlink,
@@ -194,14 +196,22 @@ def audit_zip(
             review_entries = [
                 entry["name"] for entry in report["entries"] if entry["review_flags"]
             ]
+            crc_skipped = [
+                entry["name"] for entry in report["entries"]
+                if not entry["is_directory"] and not entry["crc_validated_by_bounded_read"]
+            ]
             report["summary"]["blocking_entry_count"] = len(blocking_entries)
             report["summary"]["review_entry_count"] = len(review_entries)
+            report["summary"]["crc_validation_skipped_count"] = len(crc_skipped)
             report["summary"]["blocking_entries"] = blocking_entries
             report["summary"]["review_entries"] = review_entries
+            report["summary"]["crc_validation_skipped_entries"] = crc_skipped
             if blocking_entries:
                 report["errors"].append("uma ou mais entradas possuem flags bloqueantes")
             if review_entries:
                 report["warnings"].append("entradas executáveis ou sensíveis exigem revisão")
+            if crc_skipped:
+                report["warnings"].append("CRC não validado para entradas bloqueadas ou não lidas")
     except (OSError, zipfile.BadZipFile, RuntimeError, NotImplementedError) as exc:
         report["errors"].append(f"ZIP inválido ou não suportado: {type(exc).__name__}: {exc}")
 
