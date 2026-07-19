@@ -1,0 +1,92 @@
+name: Freestanding Termux Android
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'freestanding/omega/**'
+      - 'tests/freestanding/**'
+      - 'scripts/validate_omega_freestanding.sh'
+      - 'scripts/android_freestanding_matrix.sh'
+      - 'scripts/termux_freestanding_build.sh'
+      - '.github/workflows/freestanding-termux-android.yml'
+  pull_request:
+    paths:
+      - 'freestanding/omega/**'
+      - 'tests/freestanding/**'
+      - 'scripts/validate_omega_freestanding.sh'
+      - 'scripts/android_freestanding_matrix.sh'
+      - 'scripts/termux_freestanding_build.sh'
+      - '.github/workflows/freestanding-termux-android.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freestanding-termux-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  host-invariants:
+    name: Host invariant and no-libc object gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate shell syntax
+        run: |
+          sh -n scripts/validate_omega_freestanding.sh
+          sh -n scripts/android_freestanding_matrix.sh
+          sh -n scripts/termux_freestanding_build.sh
+
+      - name: Compile and test freestanding object
+        run: sh scripts/validate_omega_freestanding.sh
+
+      - name: Emit Termux execution contract
+        run: sh scripts/termux_freestanding_build.sh --plan
+
+      - name: Upload host evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: omega-freestanding-host-evidence
+          path: |
+            ci/reports/omega-freestanding.md
+            build/freestanding-host/
+            build/freestanding-termux/plan.txt
+          if-no-files-found: error
+
+  android-cross:
+    name: Android NDK ARM32 and ARM64 no-libc gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve or install pinned Android NDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          if sh scripts/android_freestanding_matrix.sh --build; then
+            exit 0
+          fi
+          test -n "${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          SDK="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+          yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$SDK/cmdline-tools/latest/bin/sdkmanager" 'ndk;27.2.12479018'
+          ANDROID_NDK_HOME="$SDK/ndk/27.2.12479018" \
+            sh scripts/android_freestanding_matrix.sh --build
+
+      - name: Verify generated matrix independently
+        run: sh scripts/android_freestanding_matrix.sh --verify
+
+      - name: Upload Android ELF evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: omega-freestanding-android-arm32-arm64
+          path: build/freestanding-android/
+          if-no-files-found: error
