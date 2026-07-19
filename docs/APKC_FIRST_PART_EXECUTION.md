@@ -3,9 +3,9 @@
 **Repositório:** `rafaelmeloreisnovo/RafPolimata`  
 **Branch:** `feat/safe-extended-local-ci-20260719`  
 **PR:** `#147`  
-**Estado:** código implementado; execução Termux e runtime Android ainda precisam produzir evidência própria.
+**Escopo:** primeira parte congelada antes da execução real no Termux.
 
-## Escopo congelado desta primeira parte
+## Cadeia implementada
 
 ```text
 verdade do artefato
@@ -18,48 +18,22 @@ verdade do artefato
 → mapa dos arquivos soltos
 ```
 
-Novas funções fora deste circuito ficam para a segunda parte; esta tranche precisa primeiro gerar prova real no Termux.
+## Correções centrais
 
-## Falha concreta corrigida
-
-`Apkc/proofs/out/apkc-compile.txt` contém falhas reais de compilação, enquanto documentos posteriores promoviam build, ELF e DEX a `PASS`. Os artefatos atuais de geração, ELF32, ELF64 e DEX continuam `TOKEN_VAZIO`.
-
-`tools/raf_source_to_binary_proof.sh` agora falha fechado. Ele cria um run isolado, registra commit/toolchain, aceita `readelf` ou `llvm-readelf`, compila AArch64 e ARM32 duas vezes, valida classe/máquina, compara SHA-256 e somente promove o transcript canônico quando todos os gates passam.
-
-## Compilador multilíngua
-
-`Apkc/lang_profile.h` rejeita extensão desconhecida em vez de tratá-la como ASM. A tabela valida família de execução, nomes/extensões duplicados, compilador obrigatório e coerência D8/DEX. Tanto `lang_profile_find()` quanto `lang_profile_from_path()` recusam lookup quando `lang_profile_table_validate()` falha.
-
-`Apkc/sys.h` resolve ferramentas por caminhos determinísticos:
-
-```text
-/data/data/com.termux/files/usr/bin/
-/system/bin/
-/usr/bin/
-/bin/
-```
-
-Um caminho convencional ausente, como `/usr/bin/python3`, recai para o basename no Termux. O ambiente mínimo contém somente `PATH`, `HOME`, `TMPDIR` e `LANG=C`.
-
-Java e Groovy seguem:
-
-```text
-source → classes temporárias → JAR → D8 → classes.dex
-```
-
-## ELF/DEX/APK
-
-`scripts/validate_apkc_formats.py` verifica bytes de maneira independente dos geradores C:
-
-- DEX: magic, versão, tamanho, endian tag, SHA-1, Adler-32, seção de dados e map list;
-- ELF: classe, little-endian, `ET_DYN`, máquina ARM/AArch64, tabelas, `PT_LOAD` e limites dos segmentos;
-- APK: CRC ZIP, `classes.dex`, bibliotecas por ABI e exigência opcional das duas ABIs.
-
-Testes positivos e negativos estão em `tests/test_validate_apkc_formats.py`.
+- `apkc-compile.txt` deixou de poder sustentar falso PASS quando contém erro;
+- AArch64 e ARM32 precisam compilar duas vezes, identificar ABI e reproduzir bytes;
+- `readelf` e `llvm-readelf` são aceitos;
+- extensão desconhecida retorna erro, não ASM silencioso;
+- tabela inválida bloqueia `lang_profile_find()` e `lang_profile_from_path()`;
+- `execve` ganhou resolução determinística Android/Termux;
+- Java e Groovy geram JAR antes do D8;
+- ELF, DEX e APK ganharam parser independente dos geradores C;
+- documentação e artefatos são reconciliados por estado;
+- arquivos soltos recebem hash, categoria e rota sem exclusão automática.
 
 ## Navegador ASM/TLS
 
-`raf_shell/raf_shell.c` é navegador de arquivos TUI. Até este corte, não foi localizado no repositório um corpo que reúna HTTP, sockets, handshake TLS 1.2/1.3, hostname e cadeia X.509.
+`raf_shell/raf_shell.c` é navegador local TUI. Não foi localizado, neste repositório, um corpo que reúna HTTP, sockets, TLS 1.2/1.3, validação de hostname e cadeia X.509.
 
 ```text
 TUI file browser = IMPLEMENTED
@@ -67,11 +41,7 @@ ASM web browser = TOKEN_VAZIO
 TLS 1.2/1.3 + X.509 = TOKEN_VAZIO
 ```
 
-## Arquivos soltos
-
-`scripts/apkc_first_part_gate.py` gera mapa por caminho, SHA-256, tamanho, categoria, presença no índice e rota. Nenhum arquivo é apagado automaticamente.
-
-## Execução local obrigatória
+## Execução obrigatória
 
 ```sh
 python3 scripts/apkc_first_part_gate.py \
@@ -86,9 +56,9 @@ bash tools/raf_source_to_binary_proof.sh
 sh safe-extended run .github/workflows/apkc-first-part.yml
 ```
 
-## Estado
+## Estado honesto
 
-Os workflows GitHub recuperados terminaram como `failure`, mas o job lido não possuía steps. Isso não prova falha nem sucesso do código.
+Os workflows GitHub recuperados tiveram `failure`, porém o job inspecionado não apresentou steps. Assim, não existe prova de que estes gates foram executados pelo runner.
 
 ```text
 código/gates = IMPLEMENTED
@@ -99,3 +69,5 @@ DEX funcional Android = TOKEN_VAZIO
 navegador ASM/TLS = TOKEN_VAZIO
 claim_allowed = false
 ```
+
+A segunda parte somente deve abrir novas funções depois que esta cadeia produzir relatórios e hashes reais.
