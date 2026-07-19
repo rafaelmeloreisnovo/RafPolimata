@@ -1,0 +1,245 @@
+{
+  "schema": "raf.document-governance-policy.v1",
+  "version": "1.0.0",
+  "description": "Política determinística de catálogo, indexação, temporalidade, risco e promoção documental.",
+  "canonical_indexes": [
+    "README.md",
+    "docs/INDEX.md",
+    "docs/AGENTES.md",
+    "docs/MAPA_ESTRUTURAL_REPOSITORIO.md",
+    "docs/DOCUMENT_GOVERNANCE.md",
+    "ECOSYSTEM_RUNTIME_STATE.json"
+  ],
+  "scan": {
+    "max_text_bytes": 2000000,
+    "exclude_globs": [
+      ".git/**",
+      "build/**",
+      "dist/**",
+      "node_modules/**",
+      "__pycache__/**",
+      ".gradle/**",
+      ".idea/**",
+      "results/document-governance/**",
+      "docs/generated/DOCUMENT_GOVERNANCE_INDEX.md",
+      "docs/generated/DOCUMENT_REVIEW_QUEUE.md"
+    ],
+    "generated_prefixes": [
+      "docs/generated/",
+      "results/",
+      "Apkc/proofs/out/",
+      "Apkc/proofs/runs/"
+    ]
+  },
+  "root_policy": {
+    "allowed_files": [
+      ".gitignore",
+      "README.md",
+      "LICENSE",
+      "NOTICE",
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "SECURITY.md",
+      "CODE_OF_CONDUCT.md",
+      "GOVERNANCE.md",
+      "CITATION.cff",
+      "Makefile",
+      "CLAUDE.md",
+      "ECOSYSTEM_RUNTIME_STATE.json",
+      "RAF_INDEX.md",
+      "RELEASE_NOTES.md"
+    ],
+    "allowed_prefixes": [
+      "RAF_",
+      "raf_",
+      "raiz_",
+      "ci_out"
+    ]
+  },
+  "areas": [
+    {
+      "id": "canonical",
+      "prefixes": [
+        "README.md",
+        "ECOSYSTEM_RUNTIME_STATE.json",
+        "CLAUDE.md"
+      ],
+      "owner_role": "repository-maintainer",
+      "classification": "PUBLIC",
+      "review_interval_days": 30,
+      "lifecycle": "CANONICAL"
+    },
+    {
+      "id": "documentation",
+      "prefixes": [
+        "docs/"
+      ],
+      "owner_role": "documentation-governance",
+      "classification": "PUBLIC",
+      "review_interval_days": 180,
+      "lifecycle": "ACTIVE"
+    },
+    {
+      "id": "apkc",
+      "prefixes": [
+        "Apkc/"
+      ],
+      "owner_role": "apkc-maintainer",
+      "classification": "INTERNAL",
+      "review_interval_days": 90,
+      "lifecycle": "ACTIVE"
+    },
+    {
+      "id": "workflows",
+      "prefixes": [
+        ".github/workflows/"
+      ],
+      "owner_role": "ci-governance",
+      "classification": "INTERNAL",
+      "review_interval_days": 60,
+      "lifecycle": "ACTIVE"
+    },
+    {
+      "id": "configs",
+      "prefixes": [
+        "configs/",
+        "schemas/",
+        "contracts/",
+        "manifests/"
+      ],
+      "owner_role": "schema-governance",
+      "classification": "INTERNAL",
+      "review_interval_days": 90,
+      "lifecycle": "AUDIT"
+    },
+    {
+      "id": "automation",
+      "prefixes": [
+        "scripts/",
+        "tools/"
+      ],
+      "owner_role": "automation-maintainer",
+      "classification": "INTERNAL",
+      "review_interval_days": 90,
+      "lifecycle": "ACTIVE"
+    },
+    {
+      "id": "tests",
+      "prefixes": [
+        "tests/"
+      ],
+      "owner_role": "quality-assurance",
+      "classification": "INTERNAL",
+      "review_interval_days": 90,
+      "lifecycle": "EVIDENCE"
+    },
+    {
+      "id": "evidence",
+      "prefixes": [
+        "results/",
+        "data/"
+      ],
+      "owner_role": "evidence-custodian",
+      "classification": "INTERNAL",
+      "review_interval_days": 365,
+      "lifecycle": "EVIDENCE"
+    },
+    {
+      "id": "runtime",
+      "prefixes": [
+        "runtime/",
+        "Benchmark/",
+        "rafaelia/"
+      ],
+      "owner_role": "runtime-maintainer",
+      "classification": "INTERNAL",
+      "review_interval_days": 90,
+      "lifecycle": "ACTIVE"
+    },
+    {
+      "id": "assets",
+      "prefixes": [
+        "assets/"
+      ],
+      "owner_role": "documentation-governance",
+      "classification": "PUBLIC",
+      "review_interval_days": 365,
+      "lifecycle": "SUPPORTING"
+    },
+    {
+      "id": "root-methods",
+      "prefixes": [
+        "RAF_"
+      ],
+      "owner_role": "low-level-methods-maintainer",
+      "classification": "INTERNAL",
+      "review_interval_days": 180,
+      "lifecycle": "ACTIVE"
+    },
+    {
+      "id": "root-runtime",
+      "prefixes": [
+        "raf_",
+        "raiz_"
+      ],
+      "owner_role": "compiler-maintainer",
+      "classification": "INTERNAL",
+      "review_interval_days": 90,
+      "lifecycle": "ACTIVE"
+    },
+    {
+      "id": "root-other",
+      "prefixes": [
+        ""
+      ],
+      "owner_role": "repository-maintainer",
+      "classification": "INTERNAL",
+      "review_interval_days": 90,
+      "lifecycle": "ACTIVE"
+    }
+  ],
+  "sensitivity": {
+    "filename_globs": [
+      {
+        "id": "private_key_filename",
+        "glob": "*private*.key"
+      },
+      {
+        "id": "pem_material_filename",
+        "glob": "*.pem"
+      },
+      {
+        "id": "keystore_filename",
+        "glob": "*.keystore"
+      },
+      {
+        "id": "jks_filename",
+        "glob": "*.jks"
+      },
+      {
+        "id": "environment_file",
+        "glob": "*.env"
+      },
+      {
+        "id": "credential_filename",
+        "glob": "*credential*"
+      },
+      {
+        "id": "secret_filename",
+        "glob": "*secret*"
+      }
+    ]
+  },
+  "blocking_routes": [
+    "QUARANTINE_REVIEW"
+  ],
+  "outputs": {
+    "summary": "results/document-governance/summary.json",
+    "catalog": "results/document-governance/catalog.jsonl",
+    "relations": "results/document-governance/relations.jsonl",
+    "duplicates": "results/document-governance/duplicates.json",
+    "review_json": "results/document-governance/review-queue.json",
+    "index_markdown": "docs/generated/DOCUMENT_GOVERNANCE_INDEX.md",
+    "review_markdown": "docs/generated/DOCUMENT_REVIEW_QUEUE.md"
+  }
+}
