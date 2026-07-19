@@ -3,6 +3,9 @@
  * selects exactly one pipeline. Unknown input is rejected; it is never silently
  * reclassified as assembly.
  *
+ * Bare compiler names and conventional Unix paths are resolved by sys.h through
+ * deterministic Android/Termux prefixes; execve itself does not search PATH.
+ *
  * use_asm    : internal ARM assembler (lang=asm/.s)
  * use_script : inline execve bootstrap via gen_script_code64()
  * use_fork   : fork+exec external compiler, read output artefact
@@ -78,14 +81,11 @@ static const LangProfile _lang_table[LP_COUNT] = {
                 {"--target","aarch64-linux-android","--crate-type","cdylib","-o",NULL},
                 0, 1, 0, 0 },
 
-    /* Kotlin emits a JAR directly; ApkC then invokes d8 on that JAR. */
     [LP_KT] = { "kt", ".kt", 0, 0, 1, "kotlinc",
                 NULL,
                 {"-include-runtime","-d",NULL},
                 1, 0, 1, 0 },
 
-    /* javac -d writes a directory, not a JAR. The wrapper creates a temporary
-     * classes directory and packages it before ApkC invokes d8. */
     [LP_JAVA] = { "java", ".java", 0, 0, 1, "sh",
                   NULL,
                   {"scripts/apkc_java_to_jar.sh",NULL},
@@ -124,7 +124,6 @@ static const LangProfile _lang_table[LP_COUNT] = {
                    {"-emit-library","-o",NULL},
                    0, 1, 0, 0 },
 
-    /* groovyc also writes a directory. Package classes into a JAR first. */
     [LP_GROOVY] = { "groovy", ".groovy", 0, 0, 1, "sh",
                     NULL,
                     {"scripts/apkc_groovy_to_jar.sh",NULL},
