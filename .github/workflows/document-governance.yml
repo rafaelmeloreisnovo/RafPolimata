@@ -7,11 +7,17 @@ on:
       - "README.md"
       - "docs/**"
       - "configs/document-governance.v1.json"
+      - "configs/root-file-decisions.v1.json"
       - "schemas/document-record.v1.schema.json"
       - "scripts/document_governance.py"
       - "scripts/audit_repository_structure.py"
+      - "scripts/validate_root_file_decisions.py"
+      - "scripts/audit_zip_artifact.py"
       - "tests/test_document_governance.py"
       - "tests/test_audit_repository_structure.py"
+      - "tests/test_validate_root_file_decisions.py"
+      - "tests/test_audit_zip_artifact.py"
+      - "RAFAELIA_COMPLETE_v4.zip"
       - ".github/workflows/document-governance.yml"
 
 jobs:
@@ -23,16 +29,29 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate policy and record schema JSON
+      - name: Validate governance JSON contracts
         run: |
           python3 -m json.tool configs/document-governance.v1.json >/dev/null
+          python3 -m json.tool configs/root-file-decisions.v1.json >/dev/null
           python3 -m json.tool schemas/document-record.v1.schema.json >/dev/null
 
-      - name: Test structure and document governance engines
+      - name: Test structure document root and ZIP governance
         run: |
           python3 -m unittest \
             tests.test_document_governance \
-            tests.test_audit_repository_structure
+            tests.test_audit_repository_structure \
+            tests.test_validate_root_file_decisions \
+            tests.test_audit_zip_artifact
+
+      - name: Validate every loose root-file decision
+        run: |
+          python3 scripts/validate_root_file_decisions.py \
+            --write results/root-file-decisions-validation.json
+
+      - name: Audit versioned ZIP without filesystem extraction
+        run: |
+          python3 scripts/audit_zip_artifact.py RAFAELIA_COMPLETE_v4.zip \
+            --write results/document-governance/rafaelia-complete-v4-zip.json
 
       - name: Generate catalog graph and review queue
         run: |
@@ -47,10 +66,12 @@ jobs:
         with:
           name: document-governance-evidence
           path: |
+            results/root-file-decisions-validation.json
             results/document-governance/summary.json
             results/document-governance/catalog.jsonl
             results/document-governance/relations.jsonl
             results/document-governance/duplicates.json
             results/document-governance/review-queue.json
+            results/document-governance/rafaelia-complete-v4-zip.json
             docs/generated/DOCUMENT_GOVERNANCE_INDEX.md
             docs/generated/DOCUMENT_REVIEW_QUEUE.md
