@@ -1,0 +1,108 @@
+{
+  "schema": "raf.document-governance-manifest.v1",
+  "version": "1.0.0",
+  "date": "2026-07-19",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "branch": "feat/document-governance-20260719",
+  "base_branch": "feat/safe-extended-local-ci-20260719",
+  "state": "IMPLEMENTED_RUNTIME_PENDING",
+  "claim_allowed": false,
+  "objectives": [
+    "catalogar todos os arquivos versionados",
+    "construir grafo de referências locais",
+    "detectar duplicidade exata e normalizada",
+    "atribuir área e responsável lógico",
+    "medir temporalidade de revisão",
+    "classificar risco de dados sem expor valores",
+    "gerar índice e fila de revisão determinísticos"
+  ],
+  "invariants": [
+    "FILE_EXISTS_NE_PASS",
+    "INDEXED_NE_RUNTIME_PROVEN",
+    "NO_AUTOMATIC_DELETE",
+    "NO_SECRET_VALUE_IN_REPORT",
+    "SAME_COMMIT_SAME_OUTPUT",
+    "HUMAN_APPROVAL_FOR_MOVE_MERGE_ARCHIVE",
+    "TOKEN_VAZIO_WHEN_EVIDENCE_IS_MISSING"
+  ],
+  "components": [
+    {
+      "id": "DG-POLICY",
+      "path": "configs/document-governance.v1.json",
+      "state": "IMPLEMENTED"
+    },
+    {
+      "id": "DG-ENGINE",
+      "path": "scripts/document_governance.py",
+      "state": "IMPLEMENTED"
+    },
+    {
+      "id": "DG-SCHEMA",
+      "path": "schemas/document-record.v1.schema.json",
+      "state": "IMPLEMENTED"
+    },
+    {
+      "id": "DG-TESTS",
+      "path": "tests/test_document_governance.py",
+      "state": "IMPLEMENTED_DEVELOPMENT_TEST_PASS"
+    },
+    {
+      "id": "DG-METHOD",
+      "path": "docs/DOCUMENT_GOVERNANCE.md",
+      "state": "IMPLEMENTED"
+    },
+    {
+      "id": "DG-INDEX",
+      "path": "docs/INDEX.md",
+      "state": "IMPLEMENTED"
+    },
+    {
+      "id": "DG-WORKFLOW",
+      "path": ".github/workflows/document-governance.yml",
+      "state": "IMPLEMENTED_RUNTIME_PENDING"
+    },
+    {
+      "id": "DG-MATERIAL-CATALOG",
+      "path": "results/document-governance/",
+      "state": "TOKEN_VAZIO_UNTIL_CHECKOUT_RUN"
+    }
+  ],
+  "canonical_commands": [
+    "python3 -m json.tool configs/document-governance.v1.json >/dev/null",
+    "python3 -m json.tool schemas/document-record.v1.schema.json >/dev/null",
+    "python3 -m unittest tests.test_document_governance",
+    "python3 scripts/document_governance.py --write --print-summary",
+    "python3 scripts/document_governance.py --check --print-summary",
+    "sh safe-extended run .github/workflows/document-governance.yml"
+  ],
+  "outputs": [
+    "results/document-governance/summary.json",
+    "results/document-governance/catalog.jsonl",
+    "results/document-governance/relations.jsonl",
+    "results/document-governance/duplicates.json",
+    "results/document-governance/review-queue.json",
+    "docs/generated/DOCUMENT_GOVERNANCE_INDEX.md",
+    "docs/generated/DOCUMENT_REVIEW_QUEUE.md"
+  ],
+  "r3": {
+    "ok": [
+      "policy",
+      "engine",
+      "schema",
+      "tests",
+      "canonical_index",
+      "workflow"
+    ],
+    "gap": [
+      "full_checkout_materialization",
+      "review_queue_decisions",
+      "runtime_artifact_hashes"
+    ],
+    "next": [
+      "execute on Termux checkout",
+      "attach generated artifacts to pull request",
+      "treat critical and high-risk routes first",
+      "move or consolidate files only in dedicated reviewed pull requests"
+    ]
+  }
+}
