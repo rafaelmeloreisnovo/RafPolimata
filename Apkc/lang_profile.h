@@ -78,14 +78,17 @@ static const LangProfile _lang_table[LP_COUNT] = {
                 {"--target","aarch64-linux-android","--crate-type","cdylib","-o",NULL},
                 0, 1, 0, 0 },
 
+    /* Kotlin emits a JAR directly; ApkC then invokes d8 on that JAR. */
     [LP_KT] = { "kt", ".kt", 0, 0, 1, "kotlinc",
                 NULL,
                 {"-include-runtime","-d",NULL},
                 1, 0, 1, 0 },
 
-    [LP_JAVA] = { "java", ".java", 0, 0, 1, "javac",
+    /* javac -d writes a directory, not a JAR. The wrapper creates a temporary
+     * classes directory and packages it before ApkC invokes d8. */
+    [LP_JAVA] = { "java", ".java", 0, 0, 1, "sh",
                   NULL,
-                  {"-source","8","-target","8","-d",NULL},
+                  {"scripts/apkc_java_to_jar.sh",NULL},
                   1, 0, 1, 0 },
 
     [LP_PY] = { "py", ".py", 0, 1, 0, "/usr/bin/python3",
@@ -121,9 +124,10 @@ static const LangProfile _lang_table[LP_COUNT] = {
                    {"-emit-library","-o",NULL},
                    0, 1, 0, 0 },
 
-    [LP_GROOVY] = { "groovy", ".groovy", 0, 0, 1, "groovyc",
+    /* groovyc also writes a directory. Package classes into a JAR first. */
+    [LP_GROOVY] = { "groovy", ".groovy", 0, 0, 1, "sh",
                     NULL,
-                    {"-d",NULL},
+                    {"scripts/apkc_groovy_to_jar.sh",NULL},
                     1, 0, 1, 0 },
 
     [LP_CLJ] = { "clj", ".clj", 0, 1, 0, "/usr/bin/clojure",
@@ -174,7 +178,6 @@ static inline int _lp_eq_ci(const char *a, const char *b) {
     return !a[i] && !b[i];
 }
 
-/* Exactly one execution family must own each profile. */
 static inline int lang_profile_validate(const LangProfile *p) {
     if (!p || !p->name || !p->name[0] || !p->ext || p->ext[0] != '.') return 0;
 
@@ -212,7 +215,6 @@ static inline const LangProfile *lang_profile_find(const char *name) {
     return (const LangProfile *)0;
 }
 
-/* Detect from extension. Missing or unknown extensions are hard errors. */
 static inline const LangProfile *lang_profile_from_path(const char *path) {
     if (!path || !path[0]) return (const LangProfile *)0;
 
