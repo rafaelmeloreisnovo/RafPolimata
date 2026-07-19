@@ -1,6 +1,6 @@
 {
   "schema": "raf.apkc-first-part.v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "date": "2026-07-19",
   "authority": {
     "repository": "rafaelmeloreisnovo/RafPolimata",
@@ -54,7 +54,7 @@
         "Apkc/sys.h"
       ],
       "runtime_evidence": "TOKEN_VAZIO",
-      "gate": "bare command resolves through deterministic Termux and Android prefixes"
+      "gate": "explicit or bare command resolves through deterministic Termux and Android prefixes"
     },
     {
       "id": "APKC-P1-004",
@@ -70,18 +70,22 @@
     },
     {
       "id": "APKC-P1-005",
-      "title": "Reconciliar ELF e DEX",
+      "title": "Reconciliar ELF e DEX com parser independente",
       "state": "PARTIAL",
       "paths": [
         "Apkc/fmt_elf.h",
         "Apkc/fmt_dex.h",
+        "scripts/validate_apkc_formats.py",
+        "tests/test_validate_apkc_formats.py",
         "Apkc/proofs/out/readelf-arm32.txt",
         "Apkc/proofs/out/readelf-arm64.txt",
         "Apkc/proofs/out/dex-sha1.txt"
       ],
       "structural_code": "IMPLEMENTED",
+      "independent_validator_tests": "IMPLEMENTED",
       "current_apk_evidence": "TOKEN_VAZIO",
-      "runtime_evidence": "TOKEN_VAZIO"
+      "runtime_evidence": "TOKEN_VAZIO",
+      "gate": "DEX checksum and map bounds plus ELF ET_DYN ABI PT_LOAD and segment bounds"
     },
     {
       "id": "APKC-P1-006",
@@ -108,8 +112,9 @@
   ],
   "canonical_commands": [
     "python3 scripts/apkc_first_part_gate.py --write results/apkc-first-part-gate.json --write-map docs/generated/REPOSITORY_LOOSE_FILES_MAP.md",
-    "python3 -m unittest tests.test_apkc_first_part_gate",
+    "python3 -m unittest tests.test_apkc_first_part_gate tests.test_validate_apkc_formats",
     "bash tools/raf_source_to_binary_proof.sh",
+    "python3 scripts/validate_apkc_formats.py --apk Apkc/proofs/out/hello.apk --require-both --write results/apkc-format-validation.json",
     "sh safe-extended run .github/workflows/apkc-first-part.yml"
   ],
   "r3": {
@@ -118,6 +123,7 @@
       "unknown_language_rejected",
       "termux_exec_resolution",
       "java_groovy_jar_stage",
+      "independent_dex_elf_validator",
       "truth_reconciler",
       "loose_file_mapper"
     ],
@@ -131,7 +137,8 @@
     "next": [
       "execute apkc-first-part workflow in Termux",
       "attach report and artifact hashes to PR 147",
-      "close ELF DEX and runtime gaps from one run",
+      "validate one real APK with both ABIs and DEX",
+      "close runtime gaps from the same run",
       "route loose files into canonical documentation"
     ]
   },
