@@ -1,0 +1,47 @@
+{
+  "schema": "rafpolimata.safe_extended.policy.v2",
+  "execution_model": "hosted_termux_bionic",
+  "arm_role": "native_host_architecture_not_ci_executor",
+  "workflow_source": ".github/workflows/*.yml",
+  "supported_actions": {
+    "actions/checkout@v4": "local_checkout_noop",
+    "actions/upload-artifact@v4": "copy_to_local_artifact_directory"
+  },
+  "compiler_adapters": {
+    "gcc": "clang",
+    "g++": "clang++",
+    "python": "python3"
+  },
+  "deny": [
+    "network_commands",
+    "git_network_operations",
+    "package_installation",
+    "privilege_escalation",
+    "device_mutation",
+    "destructive_root_paths",
+    "dynamic_eval",
+    "github_expressions",
+    "working_directory_escape"
+  ],
+  "warn_and_block_by_default": [
+    "masked_failure_with_or_true",
+    "background_process"
+  ],
+  "runtime": {
+    "shell": "bash --noprofile --norc -euo pipefail",
+    "default_timeout_seconds": 900,
+    "root_execution": "DENY",
+    "network": "DENY_BY_POLICY",
+    "lock": "build/.safe-extended.lock",
+    "logs": "build/safe-extended/<run_id>/logs",
+    "artifacts": "build/safe-extended/<run_id>/artifacts",
+    "report": "build/safe-extended/<run_id>/report.json"
+  },
+  "epistemic_states": {
+    "COMPILED_PLAN": "workflow parsed and hashed",
+    "POLICY_DENY": "step blocked before execution",
+    "LOCAL_STEP_PASS": "command executed locally with rc=0",
+    "LOCAL_CI_PASS": "all supported selected steps executed with rc=0",
+    "TOKEN_VAZIO": "unsupported or not executed"
+  }
+}
