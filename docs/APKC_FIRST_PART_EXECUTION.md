@@ -104,10 +104,13 @@ bash tools/raf_source_to_binary_proof.sh
 sh safe-extended run .github/workflows/apkc-first-part.yml
 ```
 
-## Estado honesto
+## Estado de execução
+
+Os workflows GitHub associados ao HEAD terminaram como `failure`, porém o job recuperado possui lista de steps vazia. Portanto, isso não demonstra falha do código nem PASS de qualquer gate.
 
 ```text
 código/gates desta tranche = IMPLEMENTED
+execução dos testes nesta sessão = TOKEN_VAZIO
 execução Termux = TOKEN_VAZIO
 APK atual com ELF32+ELF64 = TOKEN_VAZIO
 DEX funcional em Android = TOKEN_VAZIO
