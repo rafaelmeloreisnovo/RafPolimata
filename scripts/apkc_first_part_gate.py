@@ -137,20 +137,20 @@ def check_code_markers(root: Path) -> list[Check]:
         ),
         Check(
             "LANG-UNKNOWN-REJECTED",
-            "PASS" if "Missing or unknown extensions are hard errors" in profiles or "return (const LangProfile *)0" in profiles else "FAIL",
+            "PASS" if "return (const LangProfile *)0" in profiles else "FAIL",
             "extensão ausente/desconhecida não é convertida silenciosamente em ASM",
             ("Apkc/lang_profile.h",),
         ),
         Check(
             "LANG-TABLE-VALIDATED",
-            "PASS" if "lang_profile_table_validate" in profiles and "families != 1" in profiles else "FAIL",
-            "cada perfil possui uma única família de execução e tabela sem duplicatas",
+            "PASS" if all(x in profiles for x in ("lang_profile_table_validate", "families != 1", "!lang_profile_table_validate()")) else "FAIL",
+            "cada lookup exige tabela íntegra, uma família por perfil e ausência de duplicatas",
             ("Apkc/lang_profile.h",),
         ),
         Check(
             "TERMUX-EXEC-RESOLUTION",
-            "PASS" if all(x in sys_h for x in ("execve does not search PATH", "/data/data/com.termux/files/usr/bin/", "fallback_env")) else "FAIL",
-            "execve resolve ferramentas por prefixos determinísticos e ambiente mínimo",
+            "PASS" if all(x in sys_h for x in ("execve does not search PATH", "/data/data/com.termux/files/usr/bin/", "fallback_env", "_os_basename")) else "FAIL",
+            "execve resolve caminhos explícitos e ferramentas por prefixos determinísticos",
             ("Apkc/sys.h",),
         ),
         Check(
