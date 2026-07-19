@@ -31,8 +31,11 @@ jobs:
         with:
           name: apkc-first-part-evidence
           path: |
-            results/apkc-first-part-gate.json
+            manifests/apkc-first-part.v1.json
+            docs/APKC_FIRST_PART_EXECUTION.md
             docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
+            results/apkc-first-part-gate.json
+            results/apkc-format-validation.json
             Apkc/proofs/out/apkc-compile.txt
             Apkc/proofs/out/apkc-compile.status.json
             Apkc/proofs/out/apkc-binary-arm64.txt
