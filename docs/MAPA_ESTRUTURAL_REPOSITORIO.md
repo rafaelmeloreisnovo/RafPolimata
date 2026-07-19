@@ -1,81 +1,167 @@
-# Mapa estrutural do repositório RafPolimata
+# Mapa Estrutural e Governança do Repositório RafPolimata
 
-Este documento organiza a leitura técnica do repositório em até **5 níveis de profundidade**, seguindo o princípio de que um `token vazio` é melhor do que uma alegação falsa: quando uma pasta ou arquivo não tem função operacional comprovada, ele deve aparecer como `VOID`, `PENDING` ou `AUDIT` até receber teste, documentação e dono.
+Este documento organiza a leitura técnica do repositório e separa estrutura física de governança documental.
 
-## Estados canônicos de uso
+```text
+estrutura observada ≠ uso conhecido ≠ evidência ≠ validação runtime
+```
+
+Quando a função de um caminho não está comprovada, o estado correto permanece `VOID`, `PENDING`, `REFERENCE`, `AUDIT`, `RUNTIME` ou `TOKEN_VAZIO`.
+
+## 1. Modelo em seis níveis
+
+| Nível | Corpo | Executor | Resultado |
+|---|---|---|---|
+| `L0` | estrutura física | `scripts/audit_repository_structure.py` | diretórios, raiz, links e RAF index |
+| `L1` | identidade | `scripts/document_governance.py` | SHA-256, tamanho, tipo e hash normalizado |
+| `L2` | relações | mesmo executor | grafo dirigido e referências quebradas |
+| `L3` | governança | política documental | área, dono lógico, classificação e temporalidade |
+| `L4` | qualidade e risco | motor documental | evidência, duplicidade, sensibilidade e notas |
+| `L5` | operação | catálogo e fila | indexar, reparar, revisar, quarentenar ou promover |
+
+A política é `configs/document-governance.v1.json`; o contrato de registro é `schemas/document-record.v1.schema.json`.
+
+## 2. Estados canônicos de uso
 
 | Estado | Uso | Critério de saída |
 |---|---|---|
-| `VOID` | Conteúdo ausente, diretório vazio ou referência sem artefato. | Criar artefato mínimo ou remover em mudança dedicada. |
-| `PENDING` | Conteúdo existe, mas ainda sem gate automatizado suficiente. | Adicionar teste, manifesto ou validação documental. |
-| `AUDIT` | Conteúdo é evidência, relatório ou matriz de rastreio. | Manter reprodutibilidade e data/hash quando aplicável. |
-| `RUNTIME` | Código executável, cabeçalho, script ou rota operacional. | Compilar/executar em CI ou teste local. |
-| `REFERENCE` | Documentação, especificação, roteiro ou explicação conceitual. | Linkar a uma rotina, gate ou arquivo de implementação. |
+| `VOID` | conteúdo ausente ou referência sem artefato | criar artefato mínimo ou remover em mudança dedicada |
+| `PENDING` | conteúdo existe sem gate suficiente | adicionar teste, manifesto ou validação |
+| `REFERENCE` | documentação, especificação ou roteiro | ligar à implementação, evidência ou limite |
+| `AUDIT` | contrato, matriz ou relatório | manter origem, data e hash |
+| `RUNTIME` | código ou rota executável | compilar/executar no ambiente declarado |
+| `IMPLEMENTED` | corpo técnico presente | produzir teste e evidência runtime |
+| `PASS` | gate definido executado com sucesso | preservar comando e artefato |
+| `FAIL` | gate definido falhou | corrigir ou registrar rollback |
+| `TOKEN_VAZIO` | evidência ausente ou insuficiente | executar ou manter a lacuna explícita |
 
-## Disposição por tags/diretórios de raiz
+## 3. Ciclo de vida documental
 
-| Tag estrutural | Caminho | Conteúdo | Uso recomendado | Estado |
+| Estado | Significado |
+|---|---|
+| `CANONICAL` | entrada oficial, política ou índice |
+| `ACTIVE` | em uso e sob manutenção |
+| `SUPPORTING` | ativo auxiliar |
+| `AUDIT` | trilha ou contrato |
+| `EVIDENCE` | prova, teste ou resultado |
+| `GENERATED` | derivado de ferramenta; não editar manualmente |
+| `ARCHIVE_CANDIDATE` | sem uso atual demonstrado |
+| `QUARANTINE` | risco de exposição ou integridade |
+
+## 4. Disposição por diretórios
+
+| Tag | Caminho | Conteúdo | Responsável lógico | Estado-base |
 |---|---|---|---|---|
-| `ci` | `.github/workflows/` | Pipeline GitHub Actions. | Reproduzir gates de coerência, C host, manifesto operacional e relatório P(k). | `RUNTIME` |
-| `apk-android` | `Apkc/` | Protótipos C/ASM e formatos APK/DEX/ELF/ZIP. | Base de baixo nível para Android; manter sem heap quando possível e com fallback por ABI. | `PENDING` |
-| `benchmark` | `Benchmark/` | Router de runtime, benchmark, tipos, arena e primitivas. | Medir latência, fallback, failover e seleção de backend. | `RUNTIME` |
-| `configs` | `configs/` | Manifestos YAML de coerência e excelência operacional. | Fonte de verdade para gates, estados, arquiteturas e limites. | `AUDIT` |
-| `data` | `data/` | Dados observados para falsificabilidade. | Entrada controlada para P(k), anomalias e relatórios. | `AUDIT` |
-| `docs` | `docs/` | Documentação técnica, jurídica, operacional e semântica. | Explicar conceitos e vincular cada metáfora a prova operacional. | `REFERENCE` |
-| `results` | `results/` | Saídas reprodutíveis de testes. | Evidência gerada por scripts; não usar como fonte única sem comando. | `AUDIT` |
-| `scripts` | `scripts/` | Validações sem dependências externas e planos de build. | Automatizar fail-safe/failover/rollback e auditoria de estrutura. | `RUNTIME` |
-| `tools` | `tools/` | Utilitários C de validação. | Compilar com `-Wall -Wextra -Werror` e usar em gates. | `RUNTIME` |
-| `root-methods` | `RAF_001_*.c` … `RAF_056_*.c` | 56 métodos C de baixo nível. | Catálogo operacional de técnicas bare-metal/registrador/syscall/Android. | `PENDING` |
-| `root-compiler` | `raf_*.c`, `raf_*.h`, `raiz_*` | Compilador/otimizador raiz e exemplos/auditorias geradas. | Núcleo compilável do projeto; preservar smoke test antes de refatorar. | `RUNTIME` |
+| `ci` | `.github/workflows/` | workflows e gates | `ci-governance` | `RUNTIME` |
+| `apk-android` | `Apkc/` | C/ASM, APK, DEX, ELF, ZIP e provas | `apkc-maintainer` | `ACTIVE` |
+| `benchmark` | `Benchmark/` | router, benchmark e primitivas | `runtime-maintainer` | `RUNTIME` |
+| `configs` | `configs/` | políticas e manifestos operacionais | `schema-governance` | `AUDIT` |
+| `schemas` | `schemas/`, `contracts/` | contratos de dados | `schema-governance` | `AUDIT` |
+| `manifests` | `manifests/` | escopo e cadeia de implementação | `schema-governance` | `AUDIT` |
+| `data` | `data/` | entradas observadas | `evidence-custodian` | `EVIDENCE` |
+| `docs` | `docs/` | documentação curada e gerada | `documentation-governance` | `REFERENCE` |
+| `results` | `results/` | saídas de teste e catálogos | `evidence-custodian` | `EVIDENCE` |
+| `scripts` | `scripts/` | validação e automação | `automation-maintainer` | `RUNTIME` |
+| `tests` | `tests/` | regressão positiva e negativa | `quality-assurance` | `EVIDENCE` |
+| `tools` | `tools/` | utilitários de validação | `automation-maintainer` | `RUNTIME` |
+| `runtime` | `runtime/` | codecs e componentes runtime | `runtime-maintainer` | `ACTIVE` |
+| `rafaelia` | `rafaelia/` | verbovivo e Fiber-H | `runtime-maintainer` | `ACTIVE` |
+| `assets` | `assets/` | ativos auxiliares | `documentation-governance` | `SUPPORTING` |
+| `root-methods` | `RAF_001_*.c` … `RAF_056_*.c` | métodos C de baixo nível | `low-level-methods-maintainer` | `ACTIVE/PENDING` |
+| `root-compiler` | `raf_*.c`, `raf_*.h`, `raiz_*` | compilador e otimizadores | `compiler-maintainer` | `RUNTIME` |
 
-### Documentos de colaboração de agentes (destaque dentro de `docs/`)
-
-Os três arquivos abaixo formam a trilha de entrada obrigatória para qualquer
-agente (AI ou humano) que abra uma sessão neste repositório:
-
-| Arquivo | Papel | Estado |
-|---|---|---|
-| `docs/AGENTES.md` | Guia unificado — leitura antes de codificar (taxonomia, ciclo, regras, CI gates, escalação) | `REFERENCE` |
-| `docs/AGENTES_CHECKLIST.md` | Checklist executável por sessão (startup, execução, shutdown) | `REFERENCE` |
-| `docs/AGENTES_DECISAO_LOG.md` | Log de conflitos e decisões entre agentes — template + histórico | `AUDIT` |
-
-Cadeia de entrada: `CLAUDE.md` → `docs/AGENTES.md` → documentos de profundidade.
-
-### Documento de rastreabilidade informacional (destaque dentro de `docs/`)
+## 5. Entradas obrigatórias
 
 | Arquivo | Papel | Estado |
 |---|---|---|
-| `docs/INFO_DYNAMICS_INTERNAL_TRACEABILITY.md` | Framework filosófico-técnico que mapeia dinâmica evolutiva da informação para implementações concretas no código (arquivo:linha); substitui cadeia bibliográfica por rastreabilidade interna procedimental | `REFERENCE` |
+| `README.md` | entrada pública e verdade resumida | `CANONICAL` |
+| `docs/INDEX.md` | navegação humana curada | `CANONICAL` |
+| `docs/AGENTES.md` | regras de sessão e não-colisão | `CANONICAL` |
+| `docs/DOCUMENT_GOVERNANCE.md` | política operacional de documentos | `CANONICAL` |
+| `docs/MAPA_ESTRUTURAL_REPOSITORIO.md` | mapa físico e lógico | `CANONICAL` |
+| `ECOSYSTEM_RUNTIME_STATE.json` | estado material por componente | `CANONICAL/AUDIT` |
 
-## Diferenças entre tags de conteúdo
+Cadeia de entrada:
 
-- **`REFERENCE` não prova execução**: documentação deve apontar para `scripts/`, `configs/`, `Benchmark/` ou arquivos C quando declarar comportamento verificável.
-- **`AUDIT` não substitui teste**: JSON/CSV em `results/` e `data/` registra evidência, mas o comando reprodutível precisa continuar documentado.
-- **`RUNTIME` precisa fallback**: rotas SIMD, ARM, syscall direta, GPU ou Android devem manter caminho `generic_c`/baseline para fail-safe.
-- **`PENDING` é honesto**: arquivos conceituais ou métodos ainda não conectados à CI ficam marcados sem prometer performance, segurança ou completude.
-- **`VOID` deve ser rastreado**: diretório vazio, link quebrado ou arquivo solto deve ser detectado por auditoria antes de virar dívida invisível.
+```text
+README.md → docs/INDEX.md → docs/AGENTES.md → documento de área → implementação/evidência
+```
 
-## Varredura de estrutura e dados
+## 6. Rotas para arquivos soltos
 
-A auditoria canônica é:
+| Rota | Condição | Ação |
+|---|---|---|
+| `QUARANTINE_REVIEW` | chave privada/keystore potencial | bloquear e investigar |
+| `SENSITIVITY_REVIEW` | sinal de dado sensível | revisão humana |
+| `DUPLICATE_REVIEW` | SHA-256 repetido | comparar origem, licença e dependências |
+| `ROOT_REVIEW` | arquivo de raiz fora da política | indexar ou mover em PR dedicado |
+| `OWNER_REQUIRED` | área desconhecida | atribuir responsável lógico |
+| `REFERENCE_REPAIR` | link local quebrado | corrigir referência |
+| `LINK_REQUIRED` | sem entrada no grafo | vincular a índice ou justificativa |
+| `REVIEW_STALE` | prazo de revisão ultrapassado | revisar estado e validade |
+| `INDEXED` | classificado e referenciado | manter sob drift |
+
+`MOVE_OR_INDEX` do mapa legado passa a ser decomposto em rotas específicas. Nenhuma rota autoriza exclusão automática.
+
+## 7. Comandos canônicos
+
+### Estrutura L0
 
 ```sh
 python3 scripts/audit_repository_structure.py --depth 5
 ```
 
-Ela verifica, de forma determinística e sem dependências externas:
+### Governança L1–L5
 
-1. quantidade de diretórios e arquivos visíveis até o nível configurado;
-2. diretórios vazios (`VOID` estrutural);
-3. arquivos de raiz fora dos padrões conhecidos;
-4. diretórios esperados ausentes;
-5. links Markdown quebrados em `README.md` e `docs/*.md`;
-6. divergência informativa entre `RAF_INDEX.md` e a disposição atual dos 56 métodos `RAF_###_*.c` na raiz.
+```sh
+python3 -m unittest tests.test_document_governance
+python3 scripts/document_governance.py --write --print-summary
+python3 scripts/document_governance.py --check --print-summary
+```
 
-## Política de refatoração profissional
+### Gate local por workflow
 
-1. **Mapear antes de mover**: qualquer reorganização de arquivos deve atualizar README, índices, CI e referências internas no mesmo commit.
-2. **Sem ocultar falhas**: testes com falha devem aparecer como `FAIL` ou `SKIPPED` com motivo explícito.
-3. **Fallback primeiro**: otimizações branchless/SIMD/syscall/bare-metal só podem substituir baseline depois de comparação e rollback.
-4. **Reduzir fricção sem remover semântica**: eliminar loops, símbolos ou condicionais apenas quando a equivalência estiver testada.
-5. **Conteúdo multidisciplinar com prova**: metáforas, fórmulas e camadas semânticas devem ser ligadas a invariantes, dados ou limites de escopo.
+```sh
+sh safe-extended run .github/workflows/document-governance.yml
+```
+
+## 8. Saídas de governança
+
+```text
+results/document-governance/summary.json
+results/document-governance/catalog.jsonl
+results/document-governance/relations.jsonl
+results/document-governance/duplicates.json
+results/document-governance/review-queue.json
+docs/generated/DOCUMENT_GOVERNANCE_INDEX.md
+docs/generated/DOCUMENT_REVIEW_QUEUE.md
+```
+
+O catálogo completo é máquina-legível. `docs/INDEX.md` permanece curado para humanos.
+
+## 9. Política de refatoração
+
+1. **Mapear antes de mover:** registrar origem, hash, relações, área e rota.
+2. **Mover em PR dedicado:** atualização de links, índices, workflow e rollback no mesmo conjunto.
+3. **Não apagar duplicidade automaticamente:** conteúdos iguais podem ter proveniência ou licença distintas.
+4. **Não promover pelo nome:** “proof”, “runtime” ou “certified” no nome não cria evidência.
+5. **Preservar falhas:** `FAIL`, `TOKEN_VAZIO` e referências históricas devem permanecer distinguíveis.
+6. **Fallback primeiro:** otimizações só substituem baseline após comparação e rollback.
+7. **Dados mínimos:** relatórios de sensibilidade nunca reproduzem o valor detectado.
+8. **Documentação e código juntos:** mudança técnica atualiza a entrada correspondente no mesmo PR.
+
+## 10. Critério de excelência
+
+Uma reorganização só pode ser promovida quando:
+
+```text
+estrutura íntegra
+∧ catálogo regenerável
+∧ referências reparadas
+∧ responsável lógico definido
+∧ risco crítico zerado
+∧ testes passam
+∧ rollback possível
+```
+
+A condição melhora governança e confiança, mas não substitui prova funcional ou científica do conteúdo.
