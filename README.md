@@ -9,6 +9,15 @@ RafPolimata é uma proposta de **arquitetura semântica-tecnológica-jurídica**
 
 Este repositório passa a incluir uma documentação de referência de nível avançado (estilo pós-doc) para orientar implementação, validação e auditoria.
 
+## Fonte de verdade executável desta revisão
+
+- [`ECOSYSTEM_RUNTIME_STATE.json`](ECOSYSTEM_RUNTIME_STATE.json): estado material por componente, evidência, lacuna e próxima ação.
+- [`contracts/ecosystem-runtime-state.schema.json`](contracts/ecosystem-runtime-state.schema.json): contrato da matriz.
+- [`scripts/validate_runtime_truth_local.sh`](scripts/validate_runtime_truth_local.sh): build/teste local sem depender de GitHub Actions.
+- [`scripts/validate_ecosystem_runtime_state.py`](scripts/validate_ecosystem_runtime_state.py): valida estados de evidência com Python stdlib.
+
+> **GitHub Actions:** nesta revisão, a execução de Actions está `OUT_OF_SCOPE_NO_CREDIT`. A ausência de run não vira PASS. O gate executável momentâneo é local e deve registrar comando, ambiente, stdout/stderr e hashes.
+
 ## Documentação principal
 
 ### Colaboração entre agentes (AI e humanos)
@@ -42,7 +51,6 @@ Este repositório passa a incluir uma documentação de referência de nível av
 > Este material é técnico-acadêmico e **não substitui parecer jurídico profissional**.
 > A aplicação em produção deve passar por validação de advogados habilitados em cada jurisdição relevante.
 
-
 ## Qualidade e automação
 
 - Pipeline GitHub Actions em `.github/workflows/ci.yml` com validação do protocolo canônico, checagem C host, build estrito (`-Wall -Wextra -Werror`), smoke test do binário e relatório P(k).
@@ -60,9 +68,37 @@ Este repositório passa a incluir uma documentação de referência de nível av
 - [`docs/LOGOTIPO_RAFAELIA_60COL.md`](docs/LOGOTIPO_RAFAELIA_60COL.md): logotipo ASCII de 60 colunas com variante colorida ANSI.
 - [`assets/raf_operational_seal.svg`](assets/raf_operational_seal.svg): selo visual local dos gates operacionais, sem alegação de certificação.
 
+### Gate local momentâneo
+
+Enquanto GitHub Actions estiver fora do escopo por falta de crédito, o caminho executável é:
+
+```sh
+bash scripts/validate_runtime_truth_local.sh
+```
+
+Esse comando compila o núcleo C, executa o codec `segment.v1`, verifica `.s/.hex/.bin/.ops`, rejeita extensão desconhecida e fonte oversized, e valida a matriz de estados. Seu resultado só pode ser promovido com stdout/stderr, versão da ferramenta, commit e hashes.
+
 ## Evidence Discipline
 
 RafPolimata separa hipótese, analogia, prova parcial e prova runtime. `TOKEN_VAZIO` é um estado válido quando falta ferramenta, device, dataset, log ou execução. O CI atua como compilador de evidências estruturais, enquanto a matriz do universo registra estado, lacunas, próximos passos e rollback sem transformar ausência em PASS.
+
+## Conversation Indexer — `segment.v1`
+
+`runtime/conversation_indexer/` mantém o scanner streaming existente e inclui agora:
+
+- header explícito de 64 bytes;
+- conversation record explícito de 96 bytes;
+- message record explícito de 128 bytes;
+- leitor limitado com iteração tipada;
+- CRC32C de header, records, título, autor e conteúdo;
+- rejeição de corrupção, truncamento, roles inválidos e ranges fora do buffer.
+
+O ensaio isolado host, a auditoria freestanding e a compilação cruzada ARM32/ARM64 foram executados e estão documentados em:
+
+- [`docs/RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md`](docs/RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md);
+- [`docs/MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md`](docs/MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md).
+
+Streaming extractor, writer atômico, checkpoint/resume, BLAKE3 e execução em device continuam pendentes e não são declarados concluídos.
 
 ## ApkC — micro-toolchain Android freestanding
 
