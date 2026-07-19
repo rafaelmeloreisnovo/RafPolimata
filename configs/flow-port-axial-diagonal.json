@@ -1,0 +1,143 @@
+{
+  "schema": "rafpolimata.geometry.flow_ports_axial_diagonal.v1",
+  "status": "AUDIT",
+  "claim_allowed": false,
+  "exact_geometry_state": "PASS",
+  "physical_state": "TOKEN_VAZIO",
+  "author": "Rafael Melo Reis (∆RafaelVerboΩ)",
+  "implementation": {
+    "repository": "rafaelmeloreisnovo/ChipQuantum",
+    "branch": "feature/hex-matrix-projection-20260719",
+    "module": "src/geometry/sqrt3_geometry_matrix/flow_port_axial_diagonal.py",
+    "tests": "tests/test_flow_port_axial_diagonal.py",
+    "runtime_schema": "raf.geometry.flow_ports_axial_diagonal.v1"
+  },
+  "paper": {
+    "repository": "instituto-Rafael/relativity-living-light",
+    "branch": "paper/hex-matrix-projection-addendum-20260719",
+    "path": "PapersPub/08_multiscale_validation_methods/appendix_c_four_axis_flow_ports.md"
+  },
+  "construction": {
+    "center": "C=(R,0)",
+    "radius": "r",
+    "axes": [
+      {
+        "id": "vertical",
+        "ports": ["upper", "lower"],
+        "angles_degrees": [90, 270]
+      },
+      {
+        "id": "horizontal",
+        "ports": ["right", "left"],
+        "angles_degrees": [0, 180]
+      },
+      {
+        "id": "diagonal_rising",
+        "ports": ["upper_right", "lower_left"],
+        "angles_degrees": [45, 225]
+      },
+      {
+        "id": "diagonal_falling",
+        "ports": ["upper_left", "lower_right"],
+        "angles_degrees": [135, 315]
+      }
+    ],
+    "axis_count": 4,
+    "port_count": 8,
+    "matrix_directions": [
+      [0, 1],
+      [0, -1],
+      [1, 0],
+      [-1, 0],
+      [1, 1],
+      [-1, -1],
+      [-1, 1],
+      [1, -1]
+    ],
+    "diagonal_normalization": "1/sqrt(2)",
+    "port_formula": "P(theta)=C+r(cos(theta),sin(theta))",
+    "tangent_formula": "n(theta) dot X = n(theta) dot P(theta)",
+    "torus_sweep": "X_P(u)=(rho_P cos u,rho_P sin u,z_P)"
+  },
+  "claims": [
+    {
+      "id": "FLOW-E-001",
+      "class": "E",
+      "state": "PASS",
+      "claim": "Four opposed axes define eight distinct mouths around one center."
+    },
+    {
+      "id": "FLOW-E-002",
+      "class": "E",
+      "state": "PASS",
+      "claim": "Each opposed pair has midpoint C and diameter 2r."
+    },
+    {
+      "id": "FLOW-E-003",
+      "class": "E",
+      "state": "PASS",
+      "claim": "Each aperture tangent is perpendicular to its radial direction."
+    },
+    {
+      "id": "FLOW-E-004",
+      "class": "E",
+      "state": "PASS",
+      "claim": "Axial and diagonal matrix directions cover the eight-neighbor projection."
+    },
+    {
+      "id": "FLOW-E-005",
+      "class": "E",
+      "state": "PASS",
+      "claim": "Diagonal unit directions have components ±1/sqrt(2)."
+    },
+    {
+      "id": "FLOW-C-006",
+      "class": "C",
+      "state": "REFERENCE",
+      "claim": "The eight mouths are interpreted as matrix flow gates and swept toroidal rings."
+    },
+    {
+      "id": "FLOW-H-007",
+      "class": "H",
+      "state": "TOKEN_VAZIO",
+      "claim": "The gates produce a physical Venturi effect."
+    },
+    {
+      "id": "FLOW-H-008",
+      "class": "H",
+      "state": "TOKEN_VAZIO",
+      "claim": "The gates produce a physical vortex."
+    }
+  ],
+  "promotion_gates": {
+    "exact_geometry": [
+      "4 axes",
+      "8 ports",
+      "opposed midpoint",
+      "diameter 2r",
+      "tangent perpendicularity",
+      "eight matrix directions",
+      "diagonal normalization",
+      "toroidal sweep"
+    ],
+    "physical_model": [
+      "aperture area",
+      "pressure",
+      "density",
+      "viscosity",
+      "flow rate",
+      "circulation",
+      "governing equations",
+      "boundary conditions",
+      "dataset",
+      "uncertainty",
+      "falsifier"
+    ]
+  },
+  "guards": [
+    "Four axes are four diameters, not four isolated points.",
+    "Eight geometric ports do not prove eight physical jets.",
+    "Torus sweep is a geometric embedding, not a measured flow.",
+    "Venturi and physical-vortex claims remain TOKEN_VAZIO."
+  ]
+}
