@@ -1,6 +1,6 @@
 {
   "schema": "raf.apkc-first-part.v1",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "date": "2026-07-19",
   "authority": {
     "repository": "rafaelmeloreisnovo/RafPolimata",
@@ -30,10 +30,7 @@
       "id": "APKC-P1-001",
       "title": "Corrigir falso verde da prova source-to-binary",
       "state": "IMPLEMENTED",
-      "paths": [
-        "tools/raf_source_to_binary_proof.sh",
-        "Apkc/proofs/GAPS.md"
-      ],
+      "paths": ["tools/raf_source_to_binary_proof.sh", "Apkc/proofs/GAPS.md"],
       "runtime_evidence": "TOKEN_VAZIO",
       "gate": "AArch64 and ARM32 build, identity and reproducibility must all PASS"
     },
@@ -41,9 +38,7 @@
       "id": "APKC-P1-002",
       "title": "Rejeitar extensão desconhecida e validar perfis de linguagem",
       "state": "IMPLEMENTED",
-      "paths": [
-        "Apkc/lang_profile.h"
-      ],
+      "paths": ["Apkc/lang_profile.h"],
       "runtime_evidence": "TOKEN_VAZIO",
       "gate": "one execution family per profile; unknown maps to NULL"
     },
@@ -51,9 +46,7 @@
       "id": "APKC-P1-003",
       "title": "Resolver executáveis de toolchain no Termux sem libc PATH lookup",
       "state": "IMPLEMENTED",
-      "paths": [
-        "Apkc/sys.h"
-      ],
+      "paths": ["Apkc/sys.h"],
       "runtime_evidence": "TOKEN_VAZIO",
       "gate": "explicit or bare command resolves through deterministic Termux and Android prefixes"
     },
@@ -61,11 +54,7 @@
       "id": "APKC-P1-004",
       "title": "Corrigir Java e Groovy antes do D8",
       "state": "IMPLEMENTED",
-      "paths": [
-        "scripts/apkc_java_to_jar.sh",
-        "scripts/apkc_groovy_to_jar.sh",
-        "Apkc/lang_profile.h"
-      ],
+      "paths": ["scripts/apkc_java_to_jar.sh", "scripts/apkc_groovy_to_jar.sh", "Apkc/lang_profile.h"],
       "runtime_evidence": "TOKEN_VAZIO",
       "gate": "source -> classes -> jar -> d8 -> classes.dex"
     },
@@ -92,9 +81,7 @@
       "id": "APKC-P1-006",
       "title": "Localizar navegador ASM e TLS 1.2/1.3 com X.509",
       "state": "TOKEN_VAZIO",
-      "paths": [
-        "raf_shell/raf_shell.c"
-      ],
+      "paths": ["raf_shell/raf_shell.c"],
       "finding": "local TUI file browser found; no correlated web transport plus TLS implementation located",
       "gate": "HTTP transport + socket layer + TLS handshake + hostname/X509 chain validation + negative certificate tests"
     },
@@ -102,11 +89,7 @@
       "id": "APKC-P1-007",
       "title": "Mapear arquivos soltos e completar documentação por proveniência",
       "state": "IMPLEMENTED",
-      "paths": [
-        "scripts/apkc_first_part_gate.py",
-        "docs/generated/REPOSITORY_LOOSE_FILES_MAP.md",
-        "results/apkc-first-part-gate.json"
-      ],
+      "paths": ["scripts/apkc_first_part_gate.py", "docs/generated/REPOSITORY_LOOSE_FILES_MAP.md", "results/apkc-first-part-gate.json"],
       "runtime_evidence": "generated on each run",
       "gate": "tracked file -> sha256 -> category -> canonical reference -> route"
     }
@@ -136,6 +119,15 @@
     "bash tools/raf_source_to_binary_proof.sh",
     "python3 scripts/validate_apkc_formats.py --apk Apkc/proofs/out/hello.apk --require-both --write results/apkc-format-validation.json",
     "sh safe-extended run .github/workflows/apkc-first-part.yml"
+  ],
+  "evidence_bundle": [
+    "manifests/apkc-first-part.v1.json",
+    "docs/APKC_FIRST_PART_EXECUTION.md",
+    "docs/generated/REPOSITORY_LOOSE_FILES_MAP.md",
+    "results/apkc-first-part-gate.json",
+    "results/apkc-format-validation.json",
+    "Apkc/proofs/out/apkc-compile.status.json",
+    "Apkc/proofs/runs/"
   ],
   "r3": {
     "ok": [
