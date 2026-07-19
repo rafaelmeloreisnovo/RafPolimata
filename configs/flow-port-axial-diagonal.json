@@ -1,16 +1,20 @@
 {
-  "schema": "rafpolimata.geometry.flow_ports_axial_diagonal.v1",
+  "schema": "rafpolimata.geometry.flow_ports_axial_diagonal.v2",
   "status": "AUDIT",
-  "claim_allowed": false,
+  "claim_allowed": true,
   "exact_geometry_state": "PASS",
-  "physical_state": "TOKEN_VAZIO",
+  "operator_state": "PASS",
+  "empirical_fluid_interpretation": "NOT_APPLICABLE",
   "author": "Rafael Melo Reis (∆RafaelVerboΩ)",
   "implementation": {
     "repository": "rafaelmeloreisnovo/ChipQuantum",
     "branch": "feature/hex-matrix-projection-20260719",
-    "module": "src/geometry/sqrt3_geometry_matrix/flow_port_axial_diagonal.py",
-    "tests": "tests/test_flow_port_axial_diagonal.py",
-    "runtime_schema": "raf.geometry.flow_ports_axial_diagonal.v1"
+    "geometry_module": "src/geometry/sqrt3_geometry_matrix/flow_port_axial_diagonal.py",
+    "cyclic_base_module": "src/geometry/sqrt3_geometry_matrix/cyclic_base_curvature.py",
+    "geometry_tests": "tests/test_flow_port_axial_diagonal.py",
+    "cyclic_base_tests": "tests/test_cyclic_base_curvature.py",
+    "runtime_schema": "raf.geometry.flow_ports_axial_diagonal.v2",
+    "cyclic_schema": "raf.math.cyclic_base_curvature.v1"
   },
   "paper": {
     "repository": "instituto-Rafael/relativity-living-light",
@@ -21,96 +25,57 @@
     "center": "C=(R,0)",
     "radius": "r",
     "axes": [
-      {
-        "id": "vertical",
-        "ports": ["upper", "lower"],
-        "angles_degrees": [90, 270]
-      },
-      {
-        "id": "horizontal",
-        "ports": ["right", "left"],
-        "angles_degrees": [0, 180]
-      },
-      {
-        "id": "diagonal_rising",
-        "ports": ["upper_right", "lower_left"],
-        "angles_degrees": [45, 225]
-      },
-      {
-        "id": "diagonal_falling",
-        "ports": ["upper_left", "lower_right"],
-        "angles_degrees": [135, 315]
-      }
+      {"id": "vertical", "ports": ["upper", "lower"], "angles_degrees": [90, 270]},
+      {"id": "horizontal", "ports": ["right", "left"], "angles_degrees": [0, 180]},
+      {"id": "diagonal_rising", "ports": ["upper_right", "lower_left"], "angles_degrees": [45, 225]},
+      {"id": "diagonal_falling", "ports": ["upper_left", "lower_right"], "angles_degrees": [135, 315]}
     ],
     "axis_count": 4,
     "port_count": 8,
-    "matrix_directions": [
-      [0, 1],
-      [0, -1],
-      [1, 0],
-      [-1, 0],
-      [1, 1],
-      [-1, -1],
-      [-1, 1],
-      [1, -1]
-    ],
+    "matrix_directions": [[0,1],[0,-1],[1,0],[-1,0],[1,1],[-1,-1],[-1,1],[1,-1]],
     "diagonal_normalization": "1/sqrt(2)",
     "port_formula": "P(theta)=C+r(cos(theta),sin(theta))",
     "tangent_formula": "n(theta) dot X = n(theta) dot P(theta)",
     "torus_sweep": "X_P(u)=(rho_P cos u,rho_P sin u,z_P)"
   },
+  "cyclic_base": {
+    "domain": "N_0",
+    "base": 7,
+    "division": "n=bq+r, 0<=r<b",
+    "complete_state": "E_b(n)=(q,r)",
+    "one_based_phase": "p_b(n)=1+((n-1) mod b), n>0",
+    "venturi_operator": "V_b(n)=(q,r)",
+    "vortex_operator": "W_b(n,delta)=E_b(n+delta), delta>=0",
+    "curvature_angle": "Theta_b(n)=2*pi*n/b",
+    "lifted_curve": "Gamma_b(n)=(R cos Theta,R sin Theta,lambda Theta/(2*pi))",
+    "base7_example": {
+      "decimal_value": 7,
+      "positional_base7": "10",
+      "quotient": 1,
+      "remainder": 0,
+      "cycle_index": 0,
+      "phase": 7,
+      "lifted_angle": "2*pi",
+      "wrapped_angle": 0
+    },
+    "zero_semantics": "valid value, positional seam and remainder; not missing information",
+    "transition_rule": "non-negative addition only",
+    "unsigned_subtraction_encoding": "a-b == a+(~b+1) mod 2^w"
+  },
   "claims": [
-    {
-      "id": "FLOW-E-001",
-      "class": "E",
-      "state": "PASS",
-      "claim": "Four opposed axes define eight distinct mouths around one center."
-    },
-    {
-      "id": "FLOW-E-002",
-      "class": "E",
-      "state": "PASS",
-      "claim": "Each opposed pair has midpoint C and diameter 2r."
-    },
-    {
-      "id": "FLOW-E-003",
-      "class": "E",
-      "state": "PASS",
-      "claim": "Each aperture tangent is perpendicular to its radial direction."
-    },
-    {
-      "id": "FLOW-E-004",
-      "class": "E",
-      "state": "PASS",
-      "claim": "Axial and diagonal matrix directions cover the eight-neighbor projection."
-    },
-    {
-      "id": "FLOW-E-005",
-      "class": "E",
-      "state": "PASS",
-      "claim": "Diagonal unit directions have components ±1/sqrt(2)."
-    },
-    {
-      "id": "FLOW-C-006",
-      "class": "C",
-      "state": "REFERENCE",
-      "claim": "The eight mouths are interpreted as matrix flow gates and swept toroidal rings."
-    },
-    {
-      "id": "FLOW-H-007",
-      "class": "H",
-      "state": "TOKEN_VAZIO",
-      "claim": "The gates produce a physical Venturi effect."
-    },
-    {
-      "id": "FLOW-H-008",
-      "class": "H",
-      "state": "TOKEN_VAZIO",
-      "claim": "The gates produce a physical vortex."
-    }
+    {"id":"FLOW-E-001","class":"E","state":"PASS","claim":"Four opposed axes define eight distinct mouths around one center."},
+    {"id":"FLOW-E-002","class":"E","state":"PASS","claim":"Each opposed pair has midpoint C and diameter 2r."},
+    {"id":"FLOW-E-003","class":"E","state":"PASS","claim":"Each aperture tangent is perpendicular to its radial direction."},
+    {"id":"FLOW-E-004","class":"E","state":"PASS","claim":"Axial and diagonal matrix directions cover the eight-neighbor projection."},
+    {"id":"FLOW-E-005","class":"E","state":"PASS","claim":"Diagonal unit directions have components ±1/sqrt(2)."},
+    {"id":"FLOW-C-006","class":"C","state":"REFERENCE","claim":"The eight mouths are matrix gates and swept toroidal rings."},
+    {"id":"FLOW-E-007","class":"E","state":"PASS","claim":"Venturi is the reversible finite-base fold V_b(n)=(q,r), retaining carry."},
+    {"id":"FLOW-E-008","class":"E","state":"PASS","claim":"Vortex is additive cyclic return W_b(n,delta)=E_b(n+delta), retaining phase and winding."},
+    {"id":"FLOW-E-009","class":"E","state":"PASS","claim":"7 decimal is 10 base 7; 7 mod 7=0 is only the remainder while the complete state is (1,0) and phase is 7."},
+    {"id":"FLOW-E-010","class":"E","state":"PASS","claim":"Zero is a valid state/seam and does not denote absent information."}
   ],
   "promotion_gates": {
-    "exact_geometry": [
+    "exact_math": [
       "4 axes",
       "8 ports",
       "opposed midpoint",
@@ -118,26 +83,18 @@
       "tangent perpendicularity",
       "eight matrix directions",
       "diagonal normalization",
-      "toroidal sweep"
-    ],
-    "physical_model": [
-      "aperture area",
-      "pressure",
-      "density",
-      "viscosity",
-      "flow rate",
-      "circulation",
-      "governing equations",
-      "boundary conditions",
-      "dataset",
-      "uncertainty",
-      "falsifier"
+      "toroidal sweep",
+      "carry retained",
+      "phase retained",
+      "winding retained",
+      "base conversion reconstructs value"
     ]
   },
   "guards": [
     "Four axes are four diameters, not four isolated points.",
-    "Eight geometric ports do not prove eight physical jets.",
-    "Torus sweep is a geometric embedding, not a measured flow.",
-    "Venturi and physical-vortex claims remain TOKEN_VAZIO."
+    "Venturi and vortex are operator names in this model, not fluid/material hypotheses.",
+    "7 mod 7 = 0 is a remainder projection, not the complete state.",
+    "Ordinary base-7 notation uses 10 for decimal 7; phase label 7 belongs to one-based cyclic notation.",
+    "All transitions use non-negative addition; wrap preserves carry/cycle history."
   ]
 }
