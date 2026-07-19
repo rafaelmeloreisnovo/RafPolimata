@@ -3,92 +3,32 @@
 **Repositório:** `rafaelmeloreisnovo/RafPolimata`  
 **Branch:** `feat/safe-extended-local-ci-20260719`  
 **PR:** `#147`  
-**Estado:** código implementado; execução Termux e runtime Android ainda devem produzir evidência própria.
+**Estado:** código implementado; execução Termux e runtime Android ainda precisam produzir evidência própria.
 
-## 1. Objetivo desta tranche
-
-Esta etapa não tenta declarar o repositório inteiro concluído por documentação. Ela fecha primeiro as fronteiras que permitem confiar nas próximas execuções:
+## Cadeia desta tranche
 
 ```text
 verdade do artefato
 → build fail-closed
-→ seleção correta da linguagem
-→ resolução real da toolchain
-→ JAR/DEX coerente
-→ distinção ELF estrutural/runtime
-→ localização objetiva do navegador/TLS
+→ linguagem validada
+→ toolchain resolvida no Termux
+→ Java/Groovy em JAR antes do D8
+→ validação binária independente ELF/DEX/APK
+→ busca objetiva do navegador ASM/TLS
 → mapa dos arquivos soltos
 ```
 
-## 2. Falha concreta encontrada
+## Falha concreta corrigida
 
-O transcript canônico `Apkc/proofs/out/apkc-compile.txt` contém falhas de compilação, incluindo opção `-target` enviada ao GCC e registradores ARM usados em host incompatível. Ao mesmo tempo, documentos posteriores promoviam L1/ELF/DEX a `PASS`.
+`Apkc/proofs/out/apkc-compile.txt` contém falhas reais de compilação, enquanto documentos posteriores promoviam build, ELF e DEX a `PASS`. Os artefatos atuais de geração, ELF32, ELF64 e DEX continuam `TOKEN_VAZIO`.
 
-Também permanecem canonicamente vazios:
+`tools/raf_source_to_binary_proof.sh` agora falha fechado. Ele cria um run isolado, registra commit/toolchain, aceita `readelf` ou `llvm-readelf`, compila AArch64 e ARM32 duas vezes, valida classe/máquina, compara SHA-256 e somente promove o transcript canônico quando todos os gates passam.
 
-```text
-Apkc/proofs/out/apkc-generate.txt
-Apkc/proofs/out/readelf-arm32.txt
-Apkc/proofs/out/readelf-arm64.txt
-Apkc/proofs/out/dex-sha1.txt
-```
+## Compilador multilíngua
 
-A correção foi registrar a contradição e impedir nova promoção parcial.
+`Apkc/lang_profile.h` agora rejeita extensão desconhecida em vez de tratá-la como ASM. A tabela valida família de execução, nomes/extensões duplicados, compilador obrigatório e coerência D8/DEX.
 
-## 3. Prova source→binary v2
-
-`tools/raf_source_to_binary_proof.sh` agora:
-
-- cria um diretório isolado por execução;
-- registra commit, data, host e toolchain;
-- compila AArch64 duas vezes;
-- compila ARM32 duas vezes;
-- valida `Class` e `Machine` com `readelf`;
-- compara SHA-256 e bytes das duas compilações;
-- escreve `status.json` tipado;
-- somente promove o transcript canônico quando todos os gates passam;
-- sai com código diferente de zero em resultado incompleto;
-- preserva o transcript anterior em `Apkc/proofs/archive/`.
-
-```text
-A64 build
-∧ A64 identity
-∧ A64 reproducibility
-∧ A32 build
-∧ A32 identity
-∧ A32 reproducibility
-= PASS necessário
-```
-
-## 4. Compilador multilíngua
-
-### 4.1 Extensão desconhecida
-
-Antes, arquivo sem extensão ou extensão desconhecida era enviado silenciosamente ao assembler.
-
-Agora:
-
-```text
-unknown extension → NULL → erro de CLI → nenhum APK
-```
-
-A tabela de 23 perfis também possui verificador de:
-
-- uma única família de execução por perfil;
-- nomes e extensões sem duplicidade;
-- compilador obrigatório quando aplicável;
-- coerência `use_d8 + dex_output`;
-- coerência JSX.
-
-### 4.2 `execve` e Termux
-
-`execve("clang", ...)` não pesquisa `PATH`. Caminhos como `/usr/bin/python3` normalmente também não existem no Termux.
-
-`Apkc/sys.h` agora:
-
-1. tenta o caminho explícito;
-2. extrai o basename quando o caminho convencional não existe;
-3. tenta prefixos determinísticos:
+`Apkc/sys.h` resolve ferramentas por caminhos determinísticos:
 
 ```text
 /data/data/com.termux/files/usr/bin/
@@ -97,29 +37,12 @@ A tabela de 23 perfis também possui verificador de:
 /bin/
 ```
 
-4. fornece ambiente mínimo sem segredo:
+Um caminho convencional ausente, como `/usr/bin/python3`, recai para o basename no Termux. O ambiente mínimo contém somente `PATH`, `HOME`, `TMPDIR` e `LANG=C`.
+
+Java e Groovy agora seguem:
 
 ```text
-PATH
-HOME
-TMPDIR
-LANG=C
-```
-
-Não existe interpolação por shell nessa resolução.
-
-### 4.3 Java e Groovy
-
-`javac -d` e `groovyc -d` produzem diretórios de classes, não um arquivo JAR. O pipeline anterior tentava ler o diretório como se fosse `/tmp/apkc_out.so`.
-
-Agora:
-
-```text
-Java/Groovy source
-→ classes em diretório temporário
-→ jar --create
-→ D8
-→ classes.dex
+source → classes temporárias → JAR → D8 → classes.dex
 ```
 
 Arquivos:
@@ -129,53 +52,26 @@ scripts/apkc_java_to_jar.sh
 scripts/apkc_groovy_to_jar.sh
 ```
 
-Kotlin continua emitindo JAR diretamente com `kotlinc -include-runtime -d`.
+## ELF/DEX/APK
 
-## 5. ELF e DEX
+`scripts/validate_apkc_formats.py` verifica bytes de maneira independente dos geradores C:
 
-### ELF
+- DEX: magic, versão, tamanho, endian tag, SHA-1, Adler-32, seção de dados e map list;
+- ELF: classe, little-endian, `ET_DYN`, máquina ARM/AArch64, tabelas, `PT_LOAD` e limites dos segmentos;
+- APK: CRC ZIP, `classes.dex`, bibliotecas por ABI e exigência opcional das duas ABIs.
 
-`Apkc/fmt_elf.h` possui geradores estruturais ELF32 e ELF64 com seções dinâmicas e símbolos. Isso é implementação de formato.
+Testes positivos e negativos estão em `tests/test_validate_apkc_formats.py`.
 
-Não prova ainda:
-
-- `.so` presente no APK atual;
-- `readelf` sobre o mesmo run;
-- `dlopen` Android;
-- `ANativeActivity_onCreate` executado;
-- ausência de crash.
-
-### DEX
-
-`Apkc/fmt_dex.h` gera DEX 035 mínimo de 140 bytes com:
-
-- limite de buffer;
-- SHA-1 do DEX;
-- Adler-32;
-- header e map list.
-
-Esse DEX mínimo é estrutural. Java/Kotlin/Groovy funcional exige:
-
-```text
-JAR real → D8 → dexdump → instalação → execução Android
+```sh
+python3 scripts/validate_apkc_formats.py \
+  --apk Apkc/proofs/out/hello.apk \
+  --require-both \
+  --write results/apkc-format-validation.json
 ```
 
-## 6. Navegador ASM e TLS
+## Navegador ASM/TLS
 
-A árvore contém `raf_shell/raf_shell.c`, que é um navegador de arquivos TUI e orquestrador. Isso não é automaticamente um navegador web.
-
-Até este corte, a busca correlacionada não localizou no repositório:
-
-```text
-transporte HTTP
-+ sockets/connect
-+ handshake TLS 1.2/1.3
-+ validação de hostname
-+ cadeia X.509
-+ testes negativos de certificado
-```
-
-Por isso:
+`raf_shell/raf_shell.c` é navegador de arquivos TUI. Até este corte, não foi localizado no repositório um corpo que reúna HTTP, sockets, handshake TLS 1.2/1.3, hostname e cadeia X.509. Portanto:
 
 ```text
 TUI file browser = IMPLEMENTED
@@ -183,63 +79,38 @@ ASM web browser = TOKEN_VAZIO
 TLS 1.2/1.3 + X.509 = TOKEN_VAZIO
 ```
 
-Caso o navegador esteja em outro repositório ou diretório ainda não indexado, o mapa gerado deve revelar o caminho. Quando localizado, ele entra como componente separado e recebe testes de handshake e certificado; não será promovido apenas pelo nome do arquivo.
+## Arquivos soltos
 
-## 7. Arquivos soltos e documentação completável
+`scripts/apkc_first_part_gate.py` gera mapa versionado por caminho, SHA-256, tamanho, categoria, presença no índice e rota:
 
-`scripts/apkc_first_part_gate.py` percorre arquivos versionados e produz:
+- `INDEXED`;
+- `ADD_TO_CANONICAL_INDEX`;
+- `MOVE_OR_INDEX`.
 
-```text
-path
-sha256
-size
-category
-canonical-index reference
-route
-```
+Nenhum arquivo é apagado automaticamente.
 
-Rotas:
-
-- `INDEXED` — já aparece em índice canônico;
-- `ADD_TO_CANONICAL_INDEX` — arquivo em diretório conhecido, mas sem referência;
-- `MOVE_OR_INDEX` — arquivo na raiz sem rota documental clara.
-
-Nenhum arquivo é apagado automaticamente. O mapa preserva proveniência e permite completar documentos a partir dos artefatos realmente existentes.
-
-## 8. Execução pelo Safe Extended no Termux
+## Execução local
 
 ```sh
-cd ~/RafPolimata
-
-git checkout feat/safe-extended-local-ci-20260719
-
 python3 scripts/apkc_first_part_gate.py \
   --write results/apkc-first-part-gate.json \
   --write-map docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
 
-python3 -m unittest tests.test_apkc_first_part_gate
+python3 -m unittest \
+  tests.test_apkc_first_part_gate \
+  tests.test_validate_apkc_formats
 
 bash tools/raf_source_to_binary_proof.sh
-
 sh safe-extended run .github/workflows/apkc-first-part.yml
 ```
 
-O workflow não contém rede, instalação de pacote ou root. Ele usa somente checkout local, comandos locais e preservação local de artefatos.
-
-## 9. Critério de fechamento desta primeira parte
+## Estado honesto
 
 ```text
-code gates = PASS
-proof contradiction = 0
-source-to-binary = PASS
-report hash = registrado
-loose-file map = gerado
+código/gates desta tranche = IMPLEMENTED
+execução Termux = TOKEN_VAZIO
+APK atual com ELF32+ELF64 = TOKEN_VAZIO
+DEX funcional em Android = TOKEN_VAZIO
+navegador ASM/TLS localizado = TOKEN_VAZIO
+claim_allowed = false
 ```
-
-ELF dentro do APK, DEX funcional, assinatura, instalação e runtime continuam na próxima cadeia até que um único run os comprove.
-
-## R₃
-
-- **F_ok:** falso verde bloqueado; linguagem e toolchain corrigidas; mapa e gate implementados.
-- **F_gap:** execução Termux, APK atual com ELF32/64, DEX funcional e fonte real do navegador ASM/TLS.
-- **F_next:** executar `.github/workflows/apkc-first-part.yml` localmente e anexar os hashes ao PR #147.
