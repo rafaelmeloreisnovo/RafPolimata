@@ -5,7 +5,7 @@
 **PR:** `#147`  
 **Estado:** código implementado; execução Termux e runtime Android ainda precisam produzir evidência própria.
 
-## Cadeia desta tranche
+## Escopo congelado desta primeira parte
 
 ```text
 verdade do artefato
@@ -17,6 +17,8 @@ verdade do artefato
 → busca objetiva do navegador ASM/TLS
 → mapa dos arquivos soltos
 ```
+
+Novas funções fora deste circuito ficam para a segunda parte; esta tranche precisa primeiro gerar prova real no Termux.
 
 ## Falha concreta corrigida
 
@@ -45,13 +47,6 @@ Java e Groovy seguem:
 source → classes temporárias → JAR → D8 → classes.dex
 ```
 
-Arquivos:
-
-```text
-scripts/apkc_java_to_jar.sh
-scripts/apkc_groovy_to_jar.sh
-```
-
 ## ELF/DEX/APK
 
 `scripts/validate_apkc_formats.py` verifica bytes de maneira independente dos geradores C:
@@ -62,16 +57,9 @@ scripts/apkc_groovy_to_jar.sh
 
 Testes positivos e negativos estão em `tests/test_validate_apkc_formats.py`.
 
-```sh
-python3 scripts/validate_apkc_formats.py \
-  --apk Apkc/proofs/out/hello.apk \
-  --require-both \
-  --write results/apkc-format-validation.json
-```
-
 ## Navegador ASM/TLS
 
-`raf_shell/raf_shell.c` é navegador de arquivos TUI. Até este corte, não foi localizado no repositório um corpo que reúna HTTP, sockets, handshake TLS 1.2/1.3, hostname e cadeia X.509. Portanto:
+`raf_shell/raf_shell.c` é navegador de arquivos TUI. Até este corte, não foi localizado no repositório um corpo que reúna HTTP, sockets, handshake TLS 1.2/1.3, hostname e cadeia X.509.
 
 ```text
 TUI file browser = IMPLEMENTED
@@ -81,15 +69,9 @@ TLS 1.2/1.3 + X.509 = TOKEN_VAZIO
 
 ## Arquivos soltos
 
-`scripts/apkc_first_part_gate.py` gera mapa versionado por caminho, SHA-256, tamanho, categoria, presença no índice e rota:
+`scripts/apkc_first_part_gate.py` gera mapa por caminho, SHA-256, tamanho, categoria, presença no índice e rota. Nenhum arquivo é apagado automaticamente.
 
-- `INDEXED`;
-- `ADD_TO_CANONICAL_INDEX`;
-- `MOVE_OR_INDEX`.
-
-Nenhum arquivo é apagado automaticamente.
-
-## Execução local
+## Execução local obrigatória
 
 ```sh
 python3 scripts/apkc_first_part_gate.py \
@@ -104,30 +86,16 @@ bash tools/raf_source_to_binary_proof.sh
 sh safe-extended run .github/workflows/apkc-first-part.yml
 ```
 
-## Evidence bundle
+## Estado
+
+Os workflows GitHub recuperados terminaram como `failure`, mas o job lido não possuía steps. Isso não prova falha nem sucesso do código.
 
 ```text
-manifests/apkc-first-part.v1.json
-docs/APKC_FIRST_PART_EXECUTION.md
-docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
-results/apkc-first-part-gate.json
-results/apkc-format-validation.json
-Apkc/proofs/out/apkc-compile.status.json
-Apkc/proofs/runs/
-```
-
-Os arquivos em `results/` e as provas de run são produzidos durante a execução. Ausência atual permanece `TOKEN_VAZIO`.
-
-## Estado de execução
-
-Os workflows GitHub associados ao HEAD terminaram como `failure`, porém o job recuperado possui lista de steps vazia. Isso não demonstra falha do código nem PASS de qualquer gate.
-
-```text
-código/gates desta tranche = IMPLEMENTED
-execução dos testes nesta sessão = TOKEN_VAZIO
+código/gates = IMPLEMENTED
+execução de testes nesta sessão = TOKEN_VAZIO
 execução Termux = TOKEN_VAZIO
-APK atual com ELF32+ELF64 = TOKEN_VAZIO
-DEX funcional em Android = TOKEN_VAZIO
-navegador ASM/TLS localizado = TOKEN_VAZIO
+APK com ELF32+ELF64 = TOKEN_VAZIO
+DEX funcional Android = TOKEN_VAZIO
+navegador ASM/TLS = TOKEN_VAZIO
 claim_allowed = false
 ```
