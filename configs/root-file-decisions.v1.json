@@ -73,7 +73,7 @@
       "risk": "HIGH",
       "findings": [
         "contém índice amplo de 18 seções e declaração SPDX GPL-3.0-only",
-        "mistura arquitetura, fórmulas, hardware e métricas declaradas",
+        "mistura arquitetura fórmulas hardware e métricas declaradas",
         "métricas e afirmações de validação precisam ser ligadas a artefatos atuais",
         "hardware e estado material podem estar temporalmente desatualizados"
       ],
@@ -104,8 +104,8 @@
       ],
       "required_gates": [
         "listar entradas sem extração insegura",
-        "calcular SHA-256 do ZIP e de cada entrada",
-        "detectar arquivos executáveis e segredos",
+        "calcular SHA-256 do ZIP e de cada entrada segura",
+        "detectar executáveis segredos traversal symlink criptografia e zip bomb",
         "comparar entradas com fontes versionadas",
         "decidir GitHub Release LFS ou armazenamento de evidência"
       ],
@@ -217,7 +217,7 @@
     },
     {
       "path": "big_test.sh",
-      "git_blob_sha": "f2bb5813375b669cb919a34fbe2ea22f69cc3bbd",
+      "git_blob_sha": "4bd89367616895107f7e71911ab52ea569d49b6b",
       "kind": "repository-test-orchestrator",
       "content_state": "ACTIVE_AUTOMATION",
       "evidence_state": "IMPLEMENTED_RUNTIME_PENDING",
@@ -228,14 +228,16 @@
       "risk": "MEDIUM",
       "findings": [
         "orquestra gates e preserva logs ambiente comandos e artefatos",
-        "gate de build obrigatório foi corrigido para não mascarar falha",
-        "TOKEN_VAZIO em requisito agora encerra com exit 2",
-        "auditoria estrutural catálogo documental e decisões de raiz foram integrados"
+        "gate de build obrigatório não mascara falha",
+        "TOKEN_VAZIO required encerra com exit 2 e FAIL required com exit 1",
+        "REVIEW_REQUIRED é preservado sem virar PASS",
+        "auditoria estrutural catálogo decisões de raiz e ZIP limitado estão integrados"
       ],
       "required_gates": [
         "executar Big Test no Termux",
         "confirmar exit 1 para falha real",
         "confirmar exit 2 para pré-condição required ausente",
+        "confirmar REVIEW_REQUIRED sem promoção a PASS",
         "mover somente após atualização de chamadas e documentação"
       ],
       "delete_allowed": false,
