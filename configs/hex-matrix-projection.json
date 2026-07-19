@@ -1,0 +1,117 @@
+{
+  "schema": "rafpolimata.geometry.hex_projection.v1",
+  "status": "AUDIT",
+  "claim_allowed": false,
+  "author": "Rafael Melo Reis (∆RafaelVerboΩ)",
+  "canonical_paper": {
+    "repository": "instituto-Rafael/relativity-living-light",
+    "path": "PapersPub/08_multiscale_validation_methods/appendix_b_hex_matrix_projection.md"
+  },
+  "implementation": {
+    "repository": "rafaelmeloreisnovo/ChipQuantum",
+    "path": "src/geometry/sqrt3_geometry_matrix/hex_matrix_projection.py",
+    "tests": "tests/test_hex_matrix_projection.py",
+    "runtime_schema": "raf.geometry.hex_projection.v1"
+  },
+  "projection": {
+    "index_order": ["column", "row"],
+    "basis": [[1.0, 0.5], [0.0, 0.8660254037844386]],
+    "determinant": 0.8660254037844386,
+    "metric": [[1.0, 0.5], [0.5, 1.0]],
+    "distance_formula": "d^2 = dc^2 + dc*dr + dr^2",
+    "neighbor_directions": [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]]
+  },
+  "matrices": {
+    "A": {"shape": [8, 5], "states": 40},
+    "B": {"shape": [7, 3], "states": 21},
+    "relation_tensor": {"shape": [8, 5, 7, 3, 2], "records": 840}
+  },
+  "relation_types": [
+    "PROJECTS_TO",
+    "HAS_METRIC",
+    "HAS_NEIGHBOR",
+    "FORMS_EQUILATERAL_CELL",
+    "RELATES_TO_MATRIX_STATE",
+    "LIFTS_TO_CONE",
+    "EMBEDS_ON_TORUS",
+    "MODELS_TANGENTIAL_FIELD",
+    "REQUIRES_PHYSICAL_EVIDENCE"
+  ],
+  "claims": [
+    {
+      "id": "HEX-E-001",
+      "class": "E",
+      "state": "PASS",
+      "claim": "The determinant of the unit projection basis is sqrt(3)/2.",
+      "falsifier": "Direct determinant differs beyond floating tolerance."
+    },
+    {
+      "id": "HEX-E-002",
+      "class": "E",
+      "state": "PASS",
+      "claim": "The induced metric is [[1,1/2],[1/2,1]].",
+      "falsifier": "H^T H differs from the declared metric."
+    },
+    {
+      "id": "HEX-E-003",
+      "class": "E",
+      "state": "PASS",
+      "claim": "The six axial neighbor directions project to unit distance.",
+      "falsifier": "Any declared neighbor has projected distance different from one."
+    },
+    {
+      "id": "HEX-C-004",
+      "class": "C",
+      "state": "REFERENCE",
+      "claim": "Matrices A and B use the hexagonal basis as a common projection page.",
+      "falsifier": "The implementation uses a different index order or basis without versioning."
+    },
+    {
+      "id": "HEX-E-005",
+      "class": "E",
+      "state": "PASS",
+      "claim": "The A×B geometric relation tensor has 840 records and two spatial components.",
+      "falsifier": "Enumeration count differs from 8*5*7*3."
+    },
+    {
+      "id": "HEX-H-006",
+      "class": "H",
+      "state": "TOKEN_VAZIO",
+      "claim": "A projected cone necessarily produces a physical Venturi mechanism.",
+      "falsifier": "No fluid variables, governing equations, boundary conditions or measurements are supplied."
+    },
+    {
+      "id": "HEX-H-007",
+      "class": "H",
+      "state": "TOKEN_VAZIO",
+      "claim": "A toroidal embedding necessarily represents a physical vortex or cosmological structure.",
+      "falsifier": "No physical field, units, data or causal model are supplied."
+    }
+  ],
+  "promotion_gates": {
+    "exact_geometry": [
+      "determinant check",
+      "metric check",
+      "inverse projection round trip",
+      "neighbor unit distances",
+      "equilateral cell side equality",
+      "tensor cardinality"
+    ],
+    "physical_model": [
+      "units",
+      "equations of motion",
+      "initial and boundary conditions",
+      "dataset",
+      "uncertainty",
+      "falsifier",
+      "independent reproduction"
+    ]
+  },
+  "guards": [
+    "Exact geometry may be PASS while physical claims remain TOKEN_VAZIO.",
+    "Similarity of sqrt(3) factors does not establish causal identity.",
+    "Toro geometry is not equivalent to vortex dynamics.",
+    "Cone geometry is not equivalent to the Venturi effect.",
+    "RafPolimata records semantics and evidence; ChipQuantum owns runtime implementation."
+  ]
+}
