@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 import tempfile
 import unittest
@@ -65,6 +66,19 @@ class ApkCFirstPartGateTests(unittest.TestCase):
     def test_current_gap_document_does_not_promote_token_artifacts(self) -> None:
         _, contradictions = GATE.reconcile_proofs(ROOT)
         self.assertEqual(contradictions, [])
+
+    def test_manifest_is_valid_json_and_keeps_claims_blocked(self) -> None:
+        manifest = json.loads((ROOT / "manifests/apkc-first-part.v1.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["schema"], "raf.apkc-first-part.v1")
+        self.assertFalse(manifest["claim_allowed"])
+        self.assertGreaterEqual(len(manifest["work_items"]), 7)
+
+    def test_workflow_executes_gate_tests_and_fail_closed_build(self) -> None:
+        workflow = (ROOT / ".github/workflows/apkc-first-part.yml").read_text(encoding="utf-8")
+        self.assertIn("scripts/apkc_first_part_gate.py", workflow)
+        self.assertIn("tests.test_apkc_first_part_gate", workflow)
+        self.assertIn("tools/raf_source_to_binary_proof.sh", workflow)
+        self.assertNotIn("--allow-partial", workflow)
 
 
 if __name__ == "__main__":
