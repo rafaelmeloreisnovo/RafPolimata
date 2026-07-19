@@ -1,0 +1,207 @@
+{
+  "schema": "raf.session-initial-paths.v1",
+  "version": "1.0.0",
+  "date": "2026-07-19",
+  "authority": {
+    "repository": "rafaelmeloreisnovo/RafPolimata",
+    "branch": "feat/safe-extended-local-ci-20260719",
+    "pull_request": 147,
+    "role": "SESSION_PATH_ORCHESTRATOR"
+  },
+  "session_scope": {
+    "name": "caminhos iniciais da sessao completa",
+    "objective": "converter a sessao em uma cadeia executavel, auditavel e sem promocao artificial de evidencias",
+    "mode": "local_termux_first",
+    "claim_allowed": false
+  },
+  "invariants": [
+    "FILE_EXISTS_NE_INTEGRATED",
+    "INTEGRATED_NE_EXECUTED",
+    "EXECUTED_NE_RUNTIME_PROVEN",
+    "PARABLE_NE_HYPOTHESIS_NE_VERIFICATION",
+    "THIRD_PARTY_LICENSE_NE_RAFAEL_AUTHORSHIP",
+    "TOKEN_VAZIO_NE_ZERO",
+    "WORKFLOW_NOT_EXECUTED_NE_PASS"
+  ],
+  "allowed_states": [
+    "READY",
+    "IMPLEMENTED",
+    "PARTIAL",
+    "REFERENCE",
+    "BLOCKED",
+    "TOKEN_VAZIO"
+  ],
+  "allowed_evidence_states": [
+    "VERIFIED",
+    "DEVELOPMENT_TEST_PASS",
+    "DECLARED_BY_AUTHOR",
+    "REFERENCE",
+    "TOKEN_VAZIO",
+    "CONTRADICTION"
+  ],
+  "paths": [
+    {
+      "id": "PATH-00-TRUTH-SNAPSHOT",
+      "order": 0,
+      "title": "Fixar o estado verdadeiro antes de executar",
+      "state": "READY",
+      "executor": "RafPolimata",
+      "inputs": [
+        "manifests/session-initial-paths.v1.json",
+        "manifests/evidence-compiler-projection.v1.json"
+      ],
+      "outputs": [
+        "results/session-initial-paths-validation.json"
+      ],
+      "gates": [
+        "no_fake_pass",
+        "typed_empty_states",
+        "claim_allowed_false_until_runtime_evidence"
+      ],
+      "evidence": {
+        "implementation": "VERIFIED",
+        "runtime": "TOKEN_VAZIO"
+      },
+      "next": "PATH-01-LOCAL-CI",
+      "implementation_paths": [
+        ".github/workflows/session-initial-paths.yml",
+        "scripts/validate_session_initial_paths.py"
+      ]
+    },
+    {
+      "id": "PATH-01-LOCAL-CI",
+      "order": 1,
+      "title": "Compilar e executar workflows localmente no Termux",
+      "state": "IMPLEMENTED",
+      "executor": "Safe Extended v2",
+      "inputs": [
+        ".github/workflows/*.yml",
+        "configs/safe-extended-policy.v2.json"
+      ],
+      "implementation_paths": [
+        "safe-extended",
+        "scripts/safe_extended.py",
+        "configs/safe-extended-policy.v2.json"
+      ],
+      "outputs": [
+        "build/safe-extended/<run_id>/report.json",
+        "build/safe-extended/<run_id>/logs",
+        "build/safe-extended/<run_id>/artifacts"
+      ],
+      "gates": [
+        "network_denied",
+        "root_denied",
+        "unsupported_action_is_not_pass",
+        "real_return_code"
+      ],
+      "evidence": {
+        "implementation": "DEVELOPMENT_TEST_PASS",
+        "termux_runtime": "TOKEN_VAZIO"
+      },
+      "next": "PATH-02-TAIL-TOKEN"
+    },
+    {
+      "id": "PATH-02-TAIL-TOKEN",
+      "order": 2,
+      "title": "Anexar TAIL e TOKEN_VAZIO tipado a cada artefato",
+      "state": "READY",
+      "executor": "RafPolimata evidence compiler",
+      "inputs": [
+        "origin",
+        "authorship",
+        "intent",
+        "license",
+        "evidence"
+      ],
+      "outputs": [
+        "typed evidence state",
+        "provenance relation",
+        "next permitted operation"
+      ],
+      "gates": [
+        "unknown_is_not_zero",
+        "missing_license_blocks_release",
+        "metaphor_is_not_evidence"
+      ],
+      "evidence": {
+        "model": "VERIFIED",
+        "repository_wide_application": "TOKEN_VAZIO"
+      },
+      "next": "PATH-03-SESSION-SEGMENTATION"
+    },
+    {
+      "id": "PATH-03-SESSION-SEGMENTATION",
+      "order": 3,
+      "title": "Segmentar a sessao sem perder genealogia",
+      "state": "PARTIAL",
+      "executor": "RafPolimata bounded evidence compiler",
+      "inputs": [
+        "conversation export",
+        "session manifest",
+        "fragment ancestry"
+      ],
+      "outputs": [
+        "conversation records",
+        "message records",
+        "atomic segments",
+        "checkpoint"
+      ],
+      "gates": [
+        "bounded_memory",
+        "no_silent_truncation",
+        "atomic_publication",
+        "resume_without_duplicate_records"
+      ],
+      "evidence": {
+        "frozen_record_codecs": "VERIFIED",
+        "bounded_reader": "VERIFIED",
+        "streaming_extractor": "TOKEN_VAZIO",
+        "atomic_segment_writer": "TOKEN_VAZIO",
+        "checkpoint_resume": "TOKEN_VAZIO"
+      },
+      "next": "DEFERRED-REPOSITORY-ROUTING"
+    }
+  ],
+  "deferred_paths": [
+    {
+      "id": "DEFERRED-REPOSITORY-ROUTING",
+      "reason": "executar depois que os quatro caminhos iniciais produzirem evidencias locais",
+      "targets": [
+        "RafGitTools as controller",
+        "Termux as authorized executor",
+        "RafPolimata as evidence compiler",
+        "LlamaRafaelia as provenance-bounded interpreter"
+      ]
+    },
+    {
+      "id": "DEFERRED-LEGAL-LICENSE-ZONES",
+      "reason": "depende do inventario TAIL por caminho e componente"
+    },
+    {
+      "id": "DEFERRED-PUBLICATION",
+      "reason": "paper e claims somente depois de evidencia reproduzivel"
+    }
+  ],
+  "r3": {
+    "ok": [
+      "safe_extended_implemented",
+      "evidence_compiler_manifest_exists",
+      "typed_epistemic_states_defined",
+      "initial_execution_order_fixed"
+    ],
+    "gap": [
+      "termux_runtime_report",
+      "repository_wide_tail_application",
+      "streaming_extractor",
+      "atomic_segment_writer",
+      "checkpoint_resume"
+    ],
+    "next": [
+      "run_python_validator",
+      "run_safe_extended_plan",
+      "run_safe_extended_on_termux",
+      "attach_report_hash_to_pull_request"
+    ]
+  },
+  "claim_allowed": false
+}
