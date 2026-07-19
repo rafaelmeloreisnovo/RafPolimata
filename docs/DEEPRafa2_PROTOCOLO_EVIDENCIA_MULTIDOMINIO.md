@@ -1,4 +1,4 @@
-# DeepRafa2 — protocolo de evidência multidомínio
+# DeepRafa2 — protocolo de evidência multidomínio
 
 > **Entrada canônica:** docs/AGENTES.md §3 (estados canônicos e epistêmicos) e §5 (pipeline operacional VOID→VALIDATED). Protocolo multidomínio de validação de claims — gates G0-G9 e ciclo R3⟨F_ok, F_gap, F_next⟩.
 
@@ -169,7 +169,7 @@ Para componentes de IA, DeepRafa2 mapeia suas funções ao NIST AI RMF:
 | `GOVERN` | responsabilidades, estados e política de claims | owner + regras + auditoria |
 | `MAP` | contexto, atores, danos e limites | mapa de risco |
 | `MEASURE` | métricas, testes e incerteza | relatório reproduzível |
-| `MANAGE` | decisão, mitigação, rollback e monitoramento | ação rastereável |
+| `MANAGE` | decisão, mitigação, rollback e monitoramento | ação rastreavel |
 
 A explicabilidade não substitui acurácia, segurança ou justiça; é uma dimensão adicional de controle.
 
