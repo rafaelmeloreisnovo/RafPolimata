@@ -73,10 +73,11 @@ class ApkCFirstPartGateTests(unittest.TestCase):
         self.assertFalse(manifest["claim_allowed"])
         self.assertGreaterEqual(len(manifest["work_items"]), 7)
 
-    def test_workflow_executes_gate_tests_and_fail_closed_build(self) -> None:
+    def test_workflow_executes_all_first_part_gates(self) -> None:
         workflow = (ROOT / ".github/workflows/apkc-first-part.yml").read_text(encoding="utf-8")
         self.assertIn("scripts/apkc_first_part_gate.py", workflow)
         self.assertIn("tests.test_apkc_first_part_gate", workflow)
+        self.assertIn("tests.test_validate_apkc_formats", workflow)
         self.assertIn("tools/raf_source_to_binary_proof.sh", workflow)
         self.assertNotIn("--allow-partial", workflow)
 
