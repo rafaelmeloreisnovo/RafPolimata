@@ -23,13 +23,14 @@
 #define RAF_LANG_PHP 10
 #define RAF_LANG_JSX 11
 /* hardware-direct compute languages (mirror APKc LP_GLSL…LP_TFLITE) */
-#define RAF_LANG_GLSL   12  /* Vulkan GLSL compute → SPIR-V APK asset */
-#define RAF_LANG_CL     13  /* OpenCL C source → APK asset */
-#define RAF_LANG_HLSL   14  /* HLSL compute → SPIR-V APK asset */
-#define RAF_LANG_WGSL   15  /* WebGPU WGSL source → APK asset */
-#define RAF_LANG_DSP    16  /* Hexagon DSP C → DSP .so APK asset */
-#define RAF_LANG_TFLITE 17  /* TFLite model flatbuffer → NPU APK asset */
-#define RAF_LANG_COUNT 18
+#define RAF_LANG_GLSL   12
+#define RAF_LANG_CL     13
+#define RAF_LANG_HLSL   14
+#define RAF_LANG_WGSL   15
+#define RAF_LANG_DSP    16
+#define RAF_LANG_TFLITE 17
+#define RAF_LANG_UNKNOWN 18
+#define RAF_LANG_COUNT 19
 
 #define RAF_OPT_0 0
 #define RAF_OPT_1 1
@@ -37,22 +38,27 @@
 #define RAF_OPT_3 3
 #define RAF_OPT_S 4
 
-#define RAF_FEAT_SSE4    0x001u  /* x86 SSE4.2 */
-#define RAF_FEAT_AVX2    0x002u  /* x86 AVX2 */
-#define RAF_FEAT_AVX512  0x004u  /* x86 AVX-512 */
-#define RAF_FEAT_NEON    0x008u  /* ARM64 ASIMD/NEON (mandatory on arm64) */
-#define RAF_FEAT_SVE     0x010u  /* ARM64 Scalable Vector Extension */
-#define RAF_FEAT_I8MM    0x020u  /* ARM64 Int8 matrix multiply (SMMLA) */
-#define RAF_FEAT_SME     0x040u  /* ARM64 Scalable Matrix Extension */
-#define RAF_FEAT_GPU_VK  0x080u  /* Vulkan-capable GPU detected at runtime */
-#define RAF_FEAT_GPU_CL  0x100u  /* OpenCL-capable GPU detected at runtime */
-#define RAF_FEAT_DSP_HXN 0x200u  /* Qualcomm Hexagon DSP detected at runtime */
-#define RAF_FEAT_NPU     0x400u  /* Neural accelerator detected at runtime */
+#define RAF_FEAT_SSE4    0x001u
+#define RAF_FEAT_AVX2    0x002u
+#define RAF_FEAT_AVX512  0x004u
+#define RAF_FEAT_NEON    0x008u
+#define RAF_FEAT_SVE     0x010u
+#define RAF_FEAT_I8MM    0x020u
+#define RAF_FEAT_SME     0x040u
+#define RAF_FEAT_GPU_VK  0x080u
+#define RAF_FEAT_GPU_CL  0x100u
+#define RAF_FEAT_DSP_HXN 0x200u
+#define RAF_FEAT_NPU     0x400u
+/* Presence-only probes. These bits do not authorize compute dispatch. */
+#define RAF_FEAT_GPU_NODE 0x0800u
+#define RAF_FEAT_DSP_NODE 0x1000u
+#define RAF_FEAT_NPU_NODE 0x2000u
 
 #define RAF_IR_CAP (1u << 16)
 #define RAF_ASM_CAP (1u << 15)
 #define RAF_ASM_LINE 128
 #define RAF_HEX_CAP (1u << 20)
+#define RAF_SOURCE_CAP (1u << 20)
 
 typedef enum { IR_NOP = 0, IR_MOVIMM, IR_RET } RafIROp;
 typedef uint64_t RafIR;
@@ -84,6 +90,7 @@ typedef struct {
   uint8_t lang;
   uint8_t opt;
   uint32_t feat;
+  char src_storage[RAF_SOURCE_CAP];
   const char *src;
   size_t src_len;
   RafIRBuf ir;
@@ -107,6 +114,8 @@ typedef struct {
   uint64_t ops_signature;
   int rollback_code;
   uint64_t elapsed_ns;
+  uint8_t native_requested;
+  uint8_t native_written;
 } RafCtx;
 
 void raf_cpu_detect(RafCPU *cpu);
@@ -122,70 +131,51 @@ int raf_compile_file(RafCtx *ctx, const char *src_path, const char *out_base,
                      int do_native);
 void raf_ctx_report(const RafCtx *ctx);
 
-/* ── Language × Architecture capability matrix ───────────────────────────
- * RAF_CAP_MATRIX[lang][arch]: 1 = can produce valid APK on this host arch.
- * use_script langs (py/sh/pl/js/php): any host with apkc binary → 1 on x86+arm
- * use_asm (asm/S): internal 2-pass assembler, no external toolchain needed
- * use_fork langs (c/cpp/rs/kt/java/jsx): fork_exec_wait is arm64-only → 0 on x86
- *
- * Columns: [0]=x86_64 [1]=arm64 [2]=arm32 [3]=rv64 [4]=unknown
- * Rows:    C CPP ASM PY RS KT JAVA SH PL JS PHP JSX
- *          GLSL CL HLSL WGSL DSP TFLITE  (RAF_LANG_* order) */
+/* Language × architecture routing matrix.
+ * A value of 1 means that a route exists; it does not by itself prove the
+ * external toolchain, driver, Android runtime or generated artifact. */
 static const uint8_t RAF_CAP_MATRIX[RAF_LANG_COUNT][5] = {
- /* lang          x86_64 arm64 arm32 rv64  unk  */
- /* C      fork */  { 0,   1,   0,   0,   0 },
- /* CPP    fork */  { 0,   1,   0,   0,   0 },
- /* ASM    asm  */  { 1,   1,   1,   0,   0 },
- /* PY     scr  */  { 1,   1,   1,   0,   1 },
- /* RS     fork */  { 0,   1,   0,   0,   0 },
- /* KT     fork */  { 0,   1,   0,   0,   0 },
- /* JAVA   fork */  { 0,   1,   0,   0,   0 },
- /* SH     scr  */  { 1,   1,   1,   0,   1 },
- /* PL     scr  */  { 1,   1,   1,   0,   1 },
- /* JS     scr  */  { 1,   1,   1,   0,   1 },
- /* PHP    scr  */  { 1,   1,   1,   0,   1 },
- /* JSX    fork */  { 0,   1,   0,   0,   0 },
- /* GLSL   gpu  */  { 0,   1,   0,   0,   0 },
- /* CL     gpu  */  { 0,   1,   0,   0,   0 },
- /* HLSL   gpu  */  { 0,   1,   0,   0,   0 },
- /* WGSL   gpu  */  { 0,   1,   0,   0,   0 },
- /* DSP    dsp  */  { 0,   1,   0,   0,   0 },
- /* TFLITE npu  */  { 0,   1,   0,   0,   0 },
+ /* lang             x86_64 arm64 arm32 rv64 unk */
+ /* C       fork */   { 0, 1, 0, 0, 0 },
+ /* CPP     fork */   { 0, 1, 0, 0, 0 },
+ /* ASM     asm  */   { 1, 1, 1, 0, 0 },
+ /* PY      scr  */   { 1, 1, 1, 0, 1 },
+ /* RS      fork */   { 0, 1, 0, 0, 0 },
+ /* KT      fork */   { 0, 1, 0, 0, 0 },
+ /* JAVA    fork */   { 0, 1, 0, 0, 0 },
+ /* SH      scr  */   { 1, 1, 1, 0, 1 },
+ /* PL      scr  */   { 1, 1, 1, 0, 1 },
+ /* JS      scr  */   { 1, 1, 1, 0, 1 },
+ /* PHP     scr  */   { 1, 1, 1, 0, 1 },
+ /* JSX     fork */   { 0, 1, 0, 0, 0 },
+ /* GLSL    gpu  */   { 0, 1, 0, 0, 0 },
+ /* CL      gpu  */   { 0, 1, 0, 0, 0 },
+ /* HLSL    gpu  */   { 0, 1, 0, 0, 0 },
+ /* WGSL    gpu  */   { 0, 1, 0, 0, 0 },
+ /* DSP     dsp  */   { 0, 1, 0, 0, 0 },
+ /* TFLITE  npu  */   { 0, 1, 0, 0, 0 },
+ /* UNKNOWN      */   { 0, 0, 0, 0, 0 },
 };
 
-/* Query helper: returns 1 if host_arch can compile lang to valid APK, 0 otherwise. */
 static inline int raf_cap_query(uint8_t lang, uint8_t arch) {
     if (lang >= RAF_LANG_COUNT || arch > RAF_ARCH_UNKNOWN) return 0;
     return (int)RAF_CAP_MATRIX[lang][arch];
 }
 
-/* ── APKc bridge ──────────────────────────────────────────────────────────
- * These two inline helpers let any caller bridge RafCtx → APKc dispatch
- * without including any Apkc/ headers directly.
- * Usage:
- *   #include "raf_compile.h"
- *   #include "Apkc/lang_profile.h"
- *   const LangProfile *prof =
- *       lang_profile_find(raf_lang_to_apkc_name(ctx.lang));
- *   int do64, do32;
- *   raf_cpu_to_apkc_modes(&ctx.cpu, &do64, &do32);
- * ─────────────────────────────────────────────────────────────────────── */
-
-/* Maps RAF_LANG_* to the APKc lang_profile name string.
- * Returns NULL for values without an APKc mapping. */
+/* Maps RAF_LANG_* to the APKc lang_profile name string. */
 static inline const char *raf_lang_to_apkc_name(uint8_t lang) {
     switch (lang) {
-    case RAF_LANG_C:    return "c";
-    case RAF_LANG_CPP:  return "cpp";
-    case RAF_LANG_S:    return "asm";
-    case RAF_LANG_PY:   return "py";
-    case RAF_LANG_RS:   return "rs";
-    case RAF_LANG_KT:   return "kt";
-    case RAF_LANG_JAVA: return "java";
-    case RAF_LANG_SH:   return "sh";
-    case RAF_LANG_PL:   return "pl";
-    case RAF_LANG_JS:   return "js";
-    case RAF_LANG_PHP:  return "php";
+    case RAF_LANG_C:      return "c";
+    case RAF_LANG_CPP:    return "cpp";
+    case RAF_LANG_S:      return "asm";
+    case RAF_LANG_PY:     return "py";
+    case RAF_LANG_RS:     return "rs";
+    case RAF_LANG_KT:     return "kt";
+    case RAF_LANG_JAVA:   return "java";
+    case RAF_LANG_SH:     return "sh";
+    case RAF_LANG_PL:     return "pl";
+    case RAF_LANG_JS:     return "js";
+    case RAF_LANG_PHP:    return "php";
     case RAF_LANG_JSX:    return "jsx";
     case RAF_LANG_GLSL:   return "glsl";
     case RAF_LANG_CL:     return "cl";
@@ -197,18 +187,16 @@ static inline const char *raf_lang_to_apkc_name(uint8_t lang) {
     }
 }
 
-/* Select best APKc compute language for detected hardware features.
- * Priority: Vulkan GPU > OpenCL GPU > Hexagon DSP > NPU/TFLite > C scalar.
- * Pass RafCPU.feat populated from raf_cpu_detect() + runtime hw probing. */
+/* Selects only verified compute-capability bits. Presence-only *_NODE flags
+ * never promote a backend automatically. */
 static inline const char *raf_hw_select_compute_lang(uint32_t feat) {
     if (feat & RAF_FEAT_GPU_VK)   return "glsl";
     if (feat & RAF_FEAT_GPU_CL)   return "cl";
     if (feat & RAF_FEAT_DSP_HXN)  return "dsp";
     if (feat & RAF_FEAT_NPU)      return "tflite";
-    return "c";  /* scalar CPU fallback */
+    return "c";
 }
 
-/* Maps RafCPU arch + feat flags to APKc do64/do32 output mode. */
 static inline void raf_cpu_to_apkc_modes(const RafCPU *cpu,
                                           int *do64, int *do32) {
     *do64 = (cpu->arch == RAF_ARCH_ARM64)

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafcode.local/contracts/ecosystem-runtime-state.schema.json",
+  "title": "RAFAELIA Ecosystem Runtime State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "observed_at", "ci_execution", "components"],
+  "properties": {
+    "schema": { "const": "raf.ecosystem-runtime-state.v1" },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "ci_execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "reason"],
+      "properties": {
+        "state": { "enum": ["OUT_OF_SCOPE_NO_CREDIT", "AVAILABLE", "TOKEN_VAZIO"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "repository", "path", "implementation_state", "evidence_state", "evidence", "gaps", "next_action"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9._-]+$" },
+          "repository": { "type": "string", "pattern": "^[^/]+/[^/]+$" },
+          "path": { "type": "string", "minLength": 1 },
+          "implementation_state": {
+            "enum": ["IMPLEMENTED", "PARTIAL", "ADAPTER_IMPLEMENTED", "STUB", "EXPERIMENTAL", "DEVICE_REQUIRED", "REFERENCE"]
+          },
+          "evidence_state": {
+            "enum": ["VERIFIED", "DECLARED_BY_AUTHOR", "TOKEN_VAZIO", "CONTRADICTION"]
+          },
+          "evidence": { "type": "array", "items": { "type": "string" } },
+          "gaps": { "type": "array", "items": { "type": "string" } },
+          "next_action": { "type": "string", "minLength": 1 },
+          "commit": { "type": ["string", "null"], "pattern": "^[a-f0-9]{40}$" }
+        }
+      }
+    }
+  }
+}
