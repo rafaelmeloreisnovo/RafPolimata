@@ -11,7 +11,10 @@
     "repository": "rafaelmeloreisnovo/ChipQuantum",
     "path": "src/geometry/sqrt3_geometry_matrix/hex_matrix_projection.py",
     "tests": "tests/test_hex_matrix_projection.py",
-    "runtime_schema": "raf.geometry.hex_projection.v1"
+    "runtime_schema": "raf.geometry.hex_projection.v1",
+    "torus_path": "src/geometry/sqrt3_geometry_matrix/torus_sphere_poincare.py",
+    "torus_tests": "tests/test_torus_sphere_poincare.py",
+    "torus_runtime_schema": "raf.geometry.torus_sphere_poincare.v1"
   },
   "projection": {
     "index_order": ["column", "row"],
@@ -26,6 +29,27 @@
     "B": {"shape": [7, 3], "states": 21},
     "relation_tensor": {"shape": [8, 5, 7, 3, 2], "records": 840}
   },
+  "torus_sphere_poincare": {
+    "torus_equation": "X(u,v)=((R+r*cos(v))*cos(u),(R+r*cos(v))*sin(u),r*sin(v))",
+    "domain": "R>r>0",
+    "radial_bounds": ["R-r", "R+r"],
+    "median_radius": "R",
+    "meridian_equation": "(rho-R)^2+z^2=r^2",
+    "upper_branch": "z_plus=+sqrt(r^2-(rho-R)^2)",
+    "lower_branch": "z_minus=-sqrt(r^2-(rho-R)^2)",
+    "max_equilateral_side": "sqrt(3)*r",
+    "rotating_square_common_radius": "s/2",
+    "rotating_square_swept_radius": "s/sqrt(2)",
+    "line_circle_discriminant": "Delta=B^2-4*A*C",
+    "tangent_30_slope": "abs(m)=1/sqrt(3)",
+    "poincare_section": "u=0 mod 2*pi",
+    "poincare_return": "P(v)=v+2*pi*(omega_v/omega_u) mod 2*pi",
+    "geodesic_icosphere_counts": {
+      "vertices": "10*f^2+2",
+      "edges": "30*f^2",
+      "faces": "20*f^2"
+    }
+  },
   "relation_types": [
     "PROJECTS_TO",
     "HAS_METRIC",
@@ -34,6 +58,12 @@
     "RELATES_TO_MATRIX_STATE",
     "LIFTS_TO_CONE",
     "EMBEDS_ON_TORUS",
+    "BOUNDED_BY_SPHERICAL_SHELL",
+    "HAS_MERIDIAN_SECTION",
+    "HAS_UPPER_LOWER_BRANCHES",
+    "HAS_TANGENT",
+    "INTERSECTS_BY_QUADRATIC",
+    "RETURNS_BY_POINCARE_MAP",
     "MODELS_TANGENTIAL_FIELD",
     "REQUIRES_PHYSICAL_EVIDENCE"
   ],
@@ -86,6 +116,69 @@
       "state": "TOKEN_VAZIO",
       "claim": "A toroidal embedding necessarily represents a physical vortex or cosmological structure.",
       "falsifier": "No physical field, units, data or causal model are supplied."
+    },
+    {
+      "id": "TOR-E-008",
+      "class": "E",
+      "state": "PASS",
+      "claim": "A ring torus is radially bounded from the origin by R-r and R+r.",
+      "falsifier": "The norm of the standard torus embedding falls outside the declared interval."
+    },
+    {
+      "id": "TOR-E-009",
+      "class": "E",
+      "state": "PASS",
+      "claim": "The meridian section is the circle (rho-R)^2+z^2=r^2 with upper and lower semicircular branches.",
+      "falsifier": "Substitution of the standard embedding does not satisfy the circle equation."
+    },
+    {
+      "id": "TOR-E-010",
+      "class": "E",
+      "state": "PASS",
+      "claim": "The largest equilateral triangle inscribed in the meridian circle has side sqrt(3)*r.",
+      "falsifier": "Three points separated by 120 degrees do not have equal chord length sqrt(3)*r."
+    },
+    {
+      "id": "TOR-E-011",
+      "class": "E",
+      "state": "PASS",
+      "claim": "All rotations of a centered square share an inner disk of radius s/2 and sweep an outer disk of radius s/sqrt(2).",
+      "falsifier": "The square inradius or circumradius differs from the declared values."
+    },
+    {
+      "id": "TOR-E-012",
+      "class": "E",
+      "state": "PASS",
+      "claim": "Line-meridian intersections reduce to a quadratic equation classified by the discriminant.",
+      "falsifier": "Substitution of z=m*rho+b does not produce the declared coefficients."
+    },
+    {
+      "id": "TOR-C-013",
+      "class": "C",
+      "state": "PASS",
+      "claim": "Tangents constrained to 30 degrees use slopes plus or minus 1/sqrt(3) and satisfy Delta=0.",
+      "falsifier": "The generated lines are not tangent or do not have the declared slopes."
+    },
+    {
+      "id": "GEO-E-014",
+      "class": "E",
+      "state": "PASS",
+      "claim": "A frequency-f subdivided icosahedral sphere has V=10f^2+2, E=30f^2 and F=20f^2.",
+      "falsifier": "The counts fail V-E+F=2 or disagree with subdivision combinatorics."
+    },
+    {
+      "id": "POIN-C-015",
+      "class": "C",
+      "state": "PASS",
+      "claim": "For linear flow on T^2, the u-section return map is P(v)=v+2*pi*(omega_v/omega_u) mod 2*pi.",
+      "falsifier": "Direct integration of constant angular velocities yields a different return."
+    },
+    {
+      "id": "POIN-H-016",
+      "class": "H",
+      "state": "TOKEN_VAZIO",
+      "claim": "The linear return map proves recurrence or stability for a measured physical vortex.",
+      "falsifier": "No physical equations, parameters, observations or nonlinear stability analysis are supplied."
     }
   ],
   "promotion_gates": {
@@ -95,7 +188,15 @@
       "inverse projection round trip",
       "neighbor unit distances",
       "equilateral cell side equality",
-      "tensor cardinality"
+      "tensor cardinality",
+      "torus radial bounds",
+      "meridian branch equation",
+      "equilateral meridian chord",
+      "square rotation envelope",
+      "quadratic intersection",
+      "30 degree tangency discriminant",
+      "icosphere Euler characteristic",
+      "linear Poincare return"
     ],
     "physical_model": [
       "units",
@@ -112,6 +213,12 @@
     "Similarity of sqrt(3) factors does not establish causal identity.",
     "Toro geometry is not equivalent to vortex dynamics.",
     "Cone geometry is not equivalent to the Venturi effect.",
+    "R-r and R+r are Euclidean radial bounds, not torus geodesic distances.",
+    "The upper and lower meridian branches are semicircles, not parabolas.",
+    "Bhaskara solves the line-circle intersection; it does not define the geometry alone.",
+    "Thirty degrees is an imposed and tested tangent condition.",
+    "The implemented Poincare map is for linear T^2 flow, not the Poincare conjecture.",
+    "An icosphere is a triangular approximation of a sphere after radial projection.",
     "RafPolimata records semantics and evidence; ChipQuantum owns runtime implementation."
   ]
 }
