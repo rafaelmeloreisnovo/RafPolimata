@@ -1,54 +1,23 @@
 #!/usr/bin/env python3
-"""Audita a estrutura do repositório RafPolimata até uma profundidade definida.
+"""Auditoria estrutural L0 do RafPolimata.
 
-A saída é determinística e sem dependências externas para servir como gate de
-mapeamento: classifica arquivos/diretórios, detecta diretórios vazios, arquivos
-soltos de raiz, referências documentais quebradas e divergências entre o índice
-RAF_INDEX.md e os arquivos RAF_*.c realmente existentes.
+Valida a árvore física, política da raiz, diretórios esperados, links Markdown e
+coerência do índice RAF. A governança semântica L1–L5 permanece em
+scripts/document_governance.py.
 """
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DEPTH = 5
-IGNORED_DIRS = {".git", "__pycache__", "build_host_check"}
-ROOT_ALLOWED_FILES = {
-    ".gitignore",
-    "README.md",
-    "README_RAFAELIA_ROOT_OPTIMIZER.md",
-    "RAFAELIA_MASTER_DOC.txt",
-    "RAFAELIA_COMPLETE_v4.zip",
-    "Arduíno.txt",
-    "Arm64 Mixer leve criptografia.md",
-    "L1.md",
-    "RASBERY.MD",
-    "CHANGELOG.md",
-    "Makefile",
-    "RELEASE_NOTES.md",
-    "CLAUDE.md",
-    "big_test.sh",
-}
-ROOT_PREFIXES = (
-    "RAF_",
-    "raf_",
-    "raiz_",
-    "ci_out",
-)
-EXPECTED_TOP_DIRS = {
-    ".github",
-    "Apkc",
-    "Benchmark",
-    "configs",
-    "data",
-    "docs",
-    "results",
-    "scripts",
-    "tools",
-}
+DEFAULT_POLICY = "configs/document-governance.v1.json"
+IGNORED_DIRS = {".git", "__pycache__", "build_host_check", "node_modules", ".gradle", ".idea"}
+MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)\s]+)(?:\s+['\"][^'\"]*['\"])?\)")
 
 
 @dataclass(frozen=True)
@@ -58,25 +27,39 @@ class Entry:
     kind: str
 
 
-def rel(path: Path) -> str:
-    return path.relative_to(ROOT).as_posix()
+def load_policy(root: Path, policy_path: str) -> dict[str, Any]:
+    path = Path(policy_path)
+    if not path.is_absolute():
+        path = root / path
+    try:
+        policy = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"repository-structure: política inválida: {exc}") from exc
+    if policy.get("schema") != "raf.document-governance-policy.v1":
+        raise SystemExit("repository-structure: schema de política incompatível")
+    return policy
+
+
+def rel(root: Path, path: Path) -> str:
+    return path.relative_to(root).as_posix()
 
 
 def visible_children(path: Path) -> list[Path]:
-    return sorted(
-        (child for child in path.iterdir() if child.name not in IGNORED_DIRS),
-        key=lambda item: item.as_posix(),
-    )
+    try:
+        children = [child for child in path.iterdir() if child.name not in IGNORED_DIRS]
+    except OSError:
+        return []
+    return sorted(children, key=lambda item: item.as_posix().casefold())
 
 
-def walk_depth(max_depth: int) -> list[Entry]:
+def walk_depth(root: Path, max_depth: int) -> list[Entry]:
     entries: list[Entry] = []
-    stack: list[tuple[Path, int]] = [(ROOT, 0)]
+    stack: list[tuple[Path, int]] = [(root, 0)]
     while stack:
         path, depth = stack.pop()
         if depth > max_depth:
             continue
-        if path != ROOT:
+        if path != root:
             entries.append(Entry(path, depth, "dir" if path.is_dir() else "file"))
         if path.is_dir() and depth < max_depth:
             for child in reversed(visible_children(path)):
@@ -84,105 +67,194 @@ def walk_depth(max_depth: int) -> list[Entry]:
     return entries
 
 
-def empty_dirs(max_depth: int) -> list[str]:
-    return [rel(entry.path) for entry in walk_depth(max_depth) if entry.kind == "dir" and not visible_children(entry.path)]
+def empty_dirs(root: Path, max_depth: int) -> list[str]:
+    return [
+        rel(root, entry.path)
+        for entry in walk_depth(root, max_depth)
+        if entry.kind == "dir" and not visible_children(entry.path)
+    ]
 
 
-def root_loose_files() -> list[str]:
+def root_loose_files(root: Path, policy: dict[str, Any]) -> list[str]:
+    root_policy = policy.get("root_policy", {})
+    allowed = set(root_policy.get("allowed_files", []))
+    prefixes = tuple(root_policy.get("allowed_prefixes", []))
     loose: list[str] = []
-    for child in visible_children(ROOT):
+    for child in visible_children(root):
         if not child.is_file():
             continue
-        name = child.name
-        if name in ROOT_ALLOWED_FILES or name.startswith(ROOT_PREFIXES):
+        if child.name in allowed or child.name.startswith(prefixes):
             continue
-        loose.append(name)
+        loose.append(child.name)
     return loose
 
 
-def missing_expected_dirs() -> list[str]:
-    return sorted(name for name in EXPECTED_TOP_DIRS if not (ROOT / name).is_dir())
+def expected_top_dirs(policy: dict[str, Any]) -> set[str]:
+    expected = {".github", "docs", "scripts", "configs", "tests"}
+    for area in policy.get("areas", []):
+        for prefix in area.get("prefixes", []):
+            if not prefix or "/" not in prefix:
+                continue
+            top = prefix.split("/", 1)[0]
+            if top and not top.startswith("*"):
+                expected.add(top)
+    return expected
 
 
-def raf_c_files() -> list[str]:
-    return sorted(path.name for path in ROOT.glob("RAF_[0-9][0-9][0-9]_*.c"))
+def missing_expected_dirs(root: Path, policy: dict[str, Any]) -> list[str]:
+    return sorted(name for name in expected_top_dirs(policy) if not (root / name).is_dir())
 
 
-def index_method_refs() -> list[str]:
-    index = ROOT / "RAF_INDEX.md"
+def raf_c_files(root: Path) -> set[str]:
+    return {path.name for path in root.glob("RAF_[0-9][0-9][0-9]_*.c")}
+
+
+def index_method_refs(root: Path) -> set[str]:
+    index = root / "RAF_INDEX.md"
     if not index.exists():
-        return []
-    return re.findall(r"`([^`]+\.c)`", index.read_text(encoding="utf-8"))
+        return set()
+    try:
+        text = index.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return set()
+    return set(re.findall(r"`([^`]+\.c)`", text))
 
 
-def broken_markdown_links() -> list[str]:
+def local_target_status(root: Path, source: Path, target: str) -> str:
+    target = target.strip().strip("<>").split("#", 1)[0].split("?", 1)[0]
+    if not target or "://" in target or target.startswith(("mailto:", "#")):
+        return "external-or-anchor"
+    candidates = [source.parent / target, root / target]
+    for candidate in candidates:
+        try:
+            resolved = candidate.resolve()
+            resolved.relative_to(root.resolve())
+        except (OSError, ValueError):
+            continue
+        if resolved.exists():
+            return "exists"
+    return "missing"
+
+
+def markdown_files(root: Path) -> list[Path]:
+    files = [root / "README.md"] if (root / "README.md").is_file() else []
+    docs = root / "docs"
+    if docs.is_dir():
+        files.extend(path for path in docs.rglob("*.md") if path.is_file())
+    return sorted(set(files), key=lambda path: rel(root, path).casefold())
+
+
+def broken_markdown_links(root: Path) -> list[str]:
     broken: list[str] = []
-    pattern = re.compile(r"\[[^\]]+\]\(([^)#:]+)(?:#[^)]+)?\)")
-    for path in sorted(list((ROOT / "docs").glob("*.md")) + [ROOT / "README.md"]):
-        text = path.read_text(encoding="utf-8")
-        for target in pattern.findall(text):
-            if "://" in target or target.startswith("mailto:"):
-                continue
-            candidate = (path.parent / target).resolve()
-            try:
-                candidate.relative_to(ROOT)
-            except ValueError:
-                broken.append(f"{rel(path)} -> {target} (fora_da_raiz)")
-                continue
-            if not candidate.exists():
-                broken.append(f"{rel(path)} -> {target}")
-    return broken
+    for path in markdown_files(root):
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for target in MARKDOWN_LINK.findall(text):
+            if local_target_status(root, path, target) == "missing":
+                broken.append(f"{rel(root, path)} -> {target}")
+    return sorted(set(broken))
 
 
-def build_report(max_depth: int) -> tuple[str, int]:
-    entries = walk_depth(max_depth)
-    dirs = [entry for entry in entries if entry.kind == "dir"]
+def raf_index_diff(root: Path) -> dict[str, list[str]]:
+    existing = raf_c_files(root)
+    refs = index_method_refs(root)
+    referenced_names = {Path(item).name for item in refs}
+    return {
+        "existing_not_indexed": sorted(existing - referenced_names),
+        "indexed_not_existing": sorted(referenced_names - existing),
+    }
+
+
+def build_report(root: Path, policy: dict[str, Any], max_depth: int) -> tuple[dict[str, Any], int]:
+    entries = walk_depth(root, max_depth)
+    directories = [entry for entry in entries if entry.kind == "dir"]
     files = [entry for entry in entries if entry.kind == "file"]
-    empties = empty_dirs(max_depth)
-    loose = root_loose_files()
-    missing_dirs = missing_expected_dirs()
-    broken_links = broken_markdown_links()
-    refs = index_method_refs()
-    existing_raf = raf_c_files()
-    index_mismatch = bool(refs) and not any((ROOT / ref).exists() for ref in refs) and bool(existing_raf)
+    empties = empty_dirs(root, max_depth)
+    loose = root_loose_files(root, policy)
+    missing = missing_expected_dirs(root, policy)
+    broken = broken_markdown_links(root)
+    raf_diff = raf_index_diff(root)
 
+    blockers = {
+        "missing_expected_top_dirs": missing,
+        "broken_markdown_links": broken,
+    }
+    reviews = {
+        "empty_directories": empties,
+        "root_loose_files": loose,
+        "raf_existing_not_indexed": raf_diff["existing_not_indexed"],
+        "raf_indexed_not_existing": raf_diff["indexed_not_existing"],
+    }
+    state = "FAIL" if any(blockers.values()) else (
+        "REVIEW_REQUIRED" if any(reviews.values()) else "PASS"
+    )
+    report = {
+        "schema": "raf.repository-structure-audit.v2",
+        "depth": max_depth,
+        "state": state,
+        "claim_allowed": state == "PASS",
+        "summary": {
+            "directories": len(directories),
+            "files": len(files),
+            "root_raf_method_files": len(raf_c_files(root)),
+            "empty_directories": len(empties),
+            "root_loose_files": len(loose),
+            "missing_expected_top_dirs": len(missing),
+            "broken_markdown_links": len(broken),
+            "raf_existing_not_indexed": len(raf_diff["existing_not_indexed"]),
+            "raf_indexed_not_existing": len(raf_diff["indexed_not_existing"]),
+        },
+        "blockers": blockers,
+        "reviews": reviews,
+    }
+    return report, 1 if state == "FAIL" else 0
+
+
+def text_report(report: dict[str, Any]) -> str:
     lines = [
         "repository_structure_audit:",
-        f"  depth: {max_depth}",
-        f"  directories: {len(dirs)}",
-        f"  files: {len(files)}",
-        f"  root_raf_method_files: {len(existing_raf)}",
-        f"  empty_directories: {len(empties)}",
-        f"  root_loose_files: {len(loose)}",
-        f"  missing_expected_top_dirs: {len(missing_dirs)}",
-        f"  broken_markdown_links: {len(broken_links)}",
-        f"  raf_index_points_to_missing_methods_dir: {str(index_mismatch).lower()}",
-        "details:",
-        "  empty_directories:",
-        *(f"    - {item}" for item in empties),
-        "  root_loose_files:",
-        *(f"    - {item}" for item in loose),
-        "  missing_expected_top_dirs:",
-        *(f"    - {item}" for item in missing_dirs),
-        "  broken_markdown_links:",
-        *(f"    - {item}" for item in broken_links),
+        f"  schema: {report['schema']}",
+        f"  depth: {report['depth']}",
+        f"  state: {report['state']}",
+        f"  claim_allowed: {str(report['claim_allowed']).lower()}",
+        "  summary:",
     ]
-    # O mismatch do índice é informativo enquanto o repositório mantiver os 56
-    # métodos no padrão RAF_###_* na raiz; falha apenas em links quebrados,
-    # diretórios esperados ausentes ou arquivos raiz inesperados.
-    exit_code = 1 if missing_dirs or broken_links or loose else 0
-    return "\n".join(lines), exit_code
+    for key, value in report["summary"].items():
+        lines.append(f"    {key}: {value}")
+    lines.append("  blockers:")
+    for key, values in report["blockers"].items():
+        lines.append(f"    {key}:")
+        lines.extend(f"      - {item}" for item in values)
+    lines.append("  reviews:")
+    for key, values in report["reviews"].items():
+        lines.append(f"    {key}:")
+        lines.extend(f"      - {item}" for item in values)
+    return "\n".join(lines)
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Audit repository layout up to a bounded depth")
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Auditoria estrutural L0")
+    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--depth", type=int, default=DEFAULT_DEPTH)
-    args = parser.parse_args()
+    parser.add_argument("--policy", default=DEFAULT_POLICY)
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--strict-review", action="store_true")
+    args = parser.parse_args(argv)
+
+    root = args.root.resolve()
     if args.depth < 1:
         raise SystemExit("depth must be >= 1")
-    report, exit_code = build_report(args.depth)
-    print(report)
-    return exit_code
+    policy = load_policy(root, args.policy)
+    report, code = build_report(root, policy, args.depth)
+    if args.json:
+        print(json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2))
+    else:
+        print(text_report(report))
+    if args.strict_review and report["state"] != "PASS":
+        return 1
+    return code
 
 
 if __name__ == "__main__":
