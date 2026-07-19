@@ -1,4 +1,6 @@
-# DeepRafa2 — protocolo de evidência multidomínio
+# DeepRafa2 — protocolo de evidência multidомínio
+
+> **Entrada canônica:** docs/AGENTES.md §3 (estados canônicos e epistêmicos) e §5 (pipeline operacional VOID→VALIDATED). Protocolo multidomínio de validação de claims — gates G0-G9 e ciclo R3⟨F_ok, F_gap, F_next⟩.
 
 **Função:** orquestrar projetos científicos, técnicos, estatísticos, econômicos e de propriedade intelectual sem transformar hipótese em prova.
 
@@ -35,7 +37,7 @@ INTENT -> CLAIM -> SOURCE -> MODEL -> TEST -> EVIDENCE
 | `REFERENCE` | conteúdo sustentado por fonte identificada | com atribuição |
 | `HYPOTHESIS` | proposição falsificável sem validação | apenas como hipótese |
 | `DERIVED` | consequência matemática de premissas declaradas | apenas no domínio das premissas |
-| `SIMULATED` | resultado reproduzível de simulação | como resultado simulado |
+| `SIMULATED` | resultado reprodutível de simulação | como resultado simulado |
 | `MEASURED` | medição com instrumento e incerteza | sim, com protocolo |
 | `REPLICATED` | resultado repetido de forma independente | sim |
 | `IP_CANDIDATE` | possível solução técnica; anterioridade pendente | não como patente |
@@ -43,7 +45,7 @@ INTENT -> CLAIM -> SOURCE -> MODEL -> TEST -> EVIDENCE
 | `PATENT_GRANTED` | concessão comprovada | sim, nos limites das reivindicações |
 | `VALUED` | valor derivado por método documentado | sim, com premissas |
 
-Promoções exigem evidência. O sistema não aceita promoção por repetição textual.
+Promóções exigem evidência. O sistema não aceita promoção por repetição textual.
 
 ---
 
@@ -167,7 +169,7 @@ Para componentes de IA, DeepRafa2 mapeia suas funções ao NIST AI RMF:
 | `GOVERN` | responsabilidades, estados e política de claims | owner + regras + auditoria |
 | `MAP` | contexto, atores, danos e limites | mapa de risco |
 | `MEASURE` | métricas, testes e incerteza | relatório reproduzível |
-| `MANAGE` | decisão, mitigação, rollback e monitoramento | ação rastreável |
+| `MANAGE` | decisão, mitigação, rollback e monitoramento | ação rastereável |
 
 A explicabilidade não substitui acurácia, segurança ou justiça; é uma dimensão adicional de controle.
 
@@ -210,7 +212,7 @@ O ciclo é invariante; a evidência não é intercambiável.
 ### Anti-padrões
 
 - copiar o mesmo texto para muitos repositórios;
-- declarar “concluído” sem artefato;
+- declarar "concluído" sem artefato;
 - usar IA como justificativa genérica;
 - misturar valor de mercado com custo de desenvolvimento;
 - publicar reivindicação de patente antes de análise de anterioridade;
@@ -264,7 +266,7 @@ Diagnóstico:
 - arquitetura DeepRafa2: defensável como método organizacional;
 - invariantes físicos básicos: defensáveis com referência;
 - percentuais de eficiência e vida útil: não demonstrados;
-- “Patent A–E”: identificadores exemplificativos;
+- "Patent A–E": identificadores exemplificativos;
 - valor financeiro consolidado: cenário narrativo, não valuation;
 - aplicação inicial: bancada em vácuo, não mobilidade terrestre;
 - IA: futura camada residual/preditiva, condicionada a dataset.
