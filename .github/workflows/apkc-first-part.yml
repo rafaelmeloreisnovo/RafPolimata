@@ -8,13 +8,16 @@ on:
       - 'configs/browser-tls-capability.v1.json'
       - 'manifests/apkc-first-part.v1.json'
       - 'scripts/apkc_*'
+      - 'scripts/patch_apkc_runtime_source.py'
       - 'scripts/audit_browser_tls_capability.py'
       - 'scripts/raf_https_fetch.sh'
       - 'scripts/validate_apkc_formats.py'
       - 'tests/test_apkc_*'
+      - 'tests/test_patch_apkc_runtime_source.py'
       - 'tests/test_browser_tls_capability.py'
       - 'tests/test_validate_apkc_formats.py'
       - 'tools/raf_source_to_binary_proof.sh'
+      - 'tools/raf_apkc_runtime_hardening_proof.sh'
       - '.github/workflows/apkc-first-part.yml'
 
 jobs:
@@ -24,15 +27,18 @@ jobs:
       - name: Use local checkout
         uses: actions/checkout@v4
 
-      - name: Validate source syntax and JSON contracts
+      - name: Validate source syntax shell and JSON contracts
         run: |
           python3 -m py_compile \
             scripts/apkc_first_part_gate.py \
             scripts/validate_apkc_formats.py \
             scripts/audit_browser_tls_capability.py \
             scripts/apkc_runtime_preflight.py \
-            scripts/apkc_verified_build.py
+            scripts/apkc_verified_build.py \
+            scripts/patch_apkc_runtime_source.py
           sh -n scripts/raf_https_fetch.sh
+          sh -n tools/raf_source_to_binary_proof.sh
+          sh -n tools/raf_apkc_runtime_hardening_proof.sh
           python3 -m json.tool configs/browser-tls-capability.v1.json >/dev/null
 
       - name: Reconcile proof truth and generate loose-file map
@@ -48,18 +54,23 @@ jobs:
           python3 scripts/apkc_runtime_preflight.py \
             --write results/apkc-runtime-preflight.json
 
-      - name: Test truth browser TLS verified APK DEX ELF and ABI gates
+      - name: Test truth browser TLS verified APK DEX ELF ABI and source hardening
         run: |
           python3 -m unittest \
             tests.test_apkc_first_part_gate \
             tests.test_validate_apkc_formats \
             tests.test_browser_tls_capability \
             tests.test_apkc_runtime_preflight \
-            tests.test_apkc_verified_build
+            tests.test_apkc_verified_build \
+            tests.test_patch_apkc_runtime_source
 
-      - name: Build reproducible AArch64 and ARM32 compiler artifacts
+      - name: Build baseline reproducible AArch64 and ARM32 compiler artifacts
         run: |
           bash tools/raf_source_to_binary_proof.sh
+
+      - name: Build runtime-hardened source reproducibly on AArch64 and ARM32
+        run: |
+          bash tools/raf_apkc_runtime_hardening_proof.sh
 
       - name: Preserve first-part evidence locally
         if: always()
@@ -76,6 +87,9 @@ jobs:
             results/apkc-format-validation.json
             results/browser-tls-capability.json
             results/apkc-runtime-preflight.json
+            results/apkc-runtime-source-hardening.json
+            results/apkc-runtime-hardening-proof.json
+            build/generated/Apkc/apkc.runtime-hardened.c
             Apkc/proofs/out/apkc-compile.txt
             Apkc/proofs/out/apkc-compile.status.json
             Apkc/proofs/out/apkc-binary-arm64.txt
