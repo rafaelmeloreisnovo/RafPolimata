@@ -1,0 +1,65 @@
+{
+  "schema": "rafpolimata.toroidal-research-router.v1",
+  "version": "1.0.0",
+  "authority": "rafaelmeloreisnovo/RafPolimata",
+  "claim_allowed": false,
+  "canonical_governance": {
+    "repository": "rafaelmeloreisnovo/RafGitTools",
+    "commit": "bed562a2a38218bc001d44484effcbdee7eafdbc",
+    "path": "configs/toroidal_research_cycle_contract.json",
+    "schema": "rafaelia.toroidal-research-cycle-contract.v1"
+  },
+  "principles": [
+    "routing does not transfer source authority",
+    "orchestration may validate or execute a formula but may not own or promote the scientific claim",
+    "TOKEN_VAZIO is routed as a blocking state, never coerced to PASS or zero",
+    "device execution claims require a runtime receipt",
+    "identical input produces identical route decisions"
+  ],
+  "authorities": [
+    {"id": "GOVERNANCE", "repository": "rafaelmeloreisnovo/RafGitTools"},
+    {"id": "MAP", "repository": "rafaelmeloreisnovo/Mapa"},
+    {"id": "SCIENCE", "repository": "instituto-Rafael/relativity-living-light"},
+    {"id": "ORCHESTRATION", "repository": "rafaelmeloreisnovo/RafPolimata"},
+    {"id": "RUNTIME", "repository": "rafaelmeloreisnovo/termux-app-rafacodephi"},
+    {"id": "MEMORY", "repository": "rafaelmeloreisnovo/llamaRafaelia"}
+  ],
+  "object_kinds": [
+    "QUERY",
+    "SOURCE",
+    "CLAIM",
+    "FORMULA",
+    "TEST",
+    "EXECUTION_EVIDENCE",
+    "RESIDUAL",
+    "TOKEN_VAZIO",
+    "REPOSITORY_METADATA"
+  ],
+  "actions": [
+    "REGISTER",
+    "VALIDATE",
+    "EXECUTE",
+    "CONSUME",
+    "CLASSIFY",
+    "MAP",
+    "PROMOTE"
+  ],
+  "route_rules": [
+    {"kind": "QUERY", "source_roles": ["SCIENCE", "ORCHESTRATION"], "allowed_targets": ["SCIENCE", "ORCHESTRATION"], "allowed_actions": ["REGISTER", "VALIDATE"]},
+    {"kind": "SOURCE", "source_roles": ["SCIENCE", "GOVERNANCE"], "allowed_targets": ["SCIENCE", "GOVERNANCE"], "allowed_actions": ["REGISTER", "VALIDATE"]},
+    {"kind": "CLAIM", "source_roles": ["SCIENCE"], "allowed_targets": ["GOVERNANCE", "MEMORY"], "allowed_actions": ["CLASSIFY", "CONSUME"]},
+    {"kind": "FORMULA", "source_roles": ["SCIENCE", "ORCHESTRATION"], "allowed_targets": ["ORCHESTRATION", "GOVERNANCE"], "allowed_actions": ["VALIDATE", "EXECUTE", "CLASSIFY"]},
+    {"kind": "TEST", "source_roles": ["SCIENCE", "ORCHESTRATION", "RUNTIME"], "allowed_targets": ["ORCHESTRATION", "RUNTIME", "GOVERNANCE"], "allowed_actions": ["VALIDATE", "EXECUTE", "CLASSIFY"]},
+    {"kind": "EXECUTION_EVIDENCE", "source_roles": ["ORCHESTRATION", "RUNTIME"], "allowed_targets": ["GOVERNANCE", "SCIENCE"], "allowed_actions": ["REGISTER", "CLASSIFY"]},
+    {"kind": "RESIDUAL", "source_roles": ["SCIENCE", "ORCHESTRATION", "RUNTIME", "GOVERNANCE"], "allowed_targets": ["GOVERNANCE", "MAP", "SCIENCE"], "allowed_actions": ["REGISTER", "CLASSIFY", "MAP"]},
+    {"kind": "TOKEN_VAZIO", "source_roles": ["GOVERNANCE", "MAP", "SCIENCE", "ORCHESTRATION", "RUNTIME", "MEMORY"], "allowed_targets": ["GOVERNANCE", "MAP"], "allowed_actions": ["REGISTER", "MAP"]},
+    {"kind": "REPOSITORY_METADATA", "source_roles": ["MAP"], "allowed_targets": ["GOVERNANCE", "ORCHESTRATION", "MEMORY"], "allowed_actions": ["MAP", "REGISTER"]}
+  ],
+  "promotion_policy": {
+    "router_may_promote": false,
+    "promotion_action_allowed": false,
+    "scientific_claim_authority": "SCIENCE",
+    "runtime_receipt_required_for_device_claim": true,
+    "unresolved_token_vazio_blocks": true
+  }
+}
