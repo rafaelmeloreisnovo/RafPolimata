@@ -10,17 +10,38 @@ jobs:
       - name: Use local checkout
         uses: actions/checkout@v4
 
+      - name: Validate source syntax and JSON contracts
+        run: |
+          python3 -m py_compile \
+            scripts/apkc_first_part_gate.py \
+            scripts/validate_apkc_formats.py \
+            scripts/audit_browser_tls_capability.py \
+            scripts/apkc_runtime_preflight.py \
+            scripts/apkc_verified_build.py
+          sh -n scripts/raf_https_fetch.sh
+          python3 -m json.tool configs/browser-tls-capability.v1.json >/dev/null
+
       - name: Reconcile proof truth and generate loose-file map
         run: |
           python3 scripts/apkc_first_part_gate.py \
             --write results/apkc-first-part-gate.json \
             --write-map docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
 
-      - name: Test truth reconciliation browser TLS DEX ELF and ABI gates
+      - name: Audit browser TLS and ApkC runtime contracts
+        run: |
+          python3 scripts/audit_browser_tls_capability.py \
+            --write results/browser-tls-capability.json
+          python3 scripts/apkc_runtime_preflight.py \
+            --write results/apkc-runtime-preflight.json
+
+      - name: Test truth browser TLS verified APK DEX ELF and ABI gates
         run: |
           python3 -m unittest \
             tests.test_apkc_first_part_gate \
-            tests.test_validate_apkc_formats
+            tests.test_validate_apkc_formats \
+            tests.test_browser_tls_capability \
+            tests.test_apkc_runtime_preflight \
+            tests.test_apkc_verified_build
 
       - name: Build reproducible AArch64 and ARM32 compiler artifacts
         run: |
@@ -32,10 +53,13 @@ jobs:
           name: apkc-first-part-evidence
           path: |
             manifests/apkc-first-part.v1.json
+            configs/browser-tls-capability.v1.json
             docs/APKC_FIRST_PART_EXECUTION.md
             docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
             results/apkc-first-part-gate.json
             results/apkc-format-validation.json
+            results/browser-tls-capability.json
+            results/apkc-runtime-preflight.json
             Apkc/proofs/out/apkc-compile.txt
             Apkc/proofs/out/apkc-compile.status.json
             Apkc/proofs/out/apkc-binary-arm64.txt

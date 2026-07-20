@@ -1,6 +1,6 @@
 {
   "schema": "raf.apkc-first-part.v1",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "date": "2026-07-19",
   "authority": {
     "repository": "rafaelmeloreisnovo/RafPolimata",
@@ -22,9 +22,12 @@
     "INVALID_LANGUAGE_TABLE_BLOCKS_LOOKUP",
     "DEX_STRUCTURAL_NE_JAVA_RUNTIME",
     "TUI_FILE_BROWSER_NE_WEB_BROWSER",
+    "HTTPS_TRANSPORT_NE_HTML_BROWSER",
     "TLS_MARKER_NE_VALIDATED_TLS_HANDSHAKE",
     "CERTIFICATE_STRING_NE_X509_CHAIN_VALIDATION",
+    "ASM_PRESENT_NE_ASM_TLS_BROWSER",
     "PARTIAL_BUILD_NE_REPRODUCIBLE_BUILD",
+    "INVALID_APK_NE_PROMOTABLE_ARTIFACT",
     "EMPTY_WORKFLOW_STEPS_NE_CODE_FAILURE"
   ],
   "work_items": [
@@ -81,9 +84,16 @@
     {
       "id": "APKC-P1-006",
       "title": "Localizar navegador ASM e TLS 1.2/1.3 com X.509",
-      "state": "TOKEN_VAZIO",
-      "paths": ["raf_shell/raf_shell.c"],
-      "finding": "local TUI file browser found; no correlated web transport plus TLS implementation located"
+      "state": "PARTIAL",
+      "paths": [
+        "raf_shell/raf_shell.c",
+        "configs/browser-tls-capability.v1.json",
+        "scripts/audit_browser_tls_capability.py",
+        "scripts/raf_https_fetch.sh",
+        "tests/test_browser_tls_capability.py"
+      ],
+      "finding": "raf_shell is a TUI file browser; a verified HTTPS adapter now exists; web browser, ASM TLS core, X.509 implementation and certification remain TOKEN_VAZIO",
+      "runtime_evidence": "TOKEN_VAZIO"
     },
     {
       "id": "APKC-P1-007",
@@ -91,6 +101,38 @@
       "state": "IMPLEMENTED",
       "paths": ["scripts/apkc_first_part_gate.py", "docs/generated/REPOSITORY_LOOSE_FILES_MAP.md", "results/apkc-first-part-gate.json"],
       "runtime_evidence": "generated on each run"
+    },
+    {
+      "id": "APKC-P1-008",
+      "title": "Detectar blockers operacionais do subprocesso ApkC",
+      "state": "IMPLEMENTED",
+      "paths": ["scripts/apkc_runtime_preflight.py", "tests/test_apkc_runtime_preflight.py"],
+      "runtime_evidence": "TOKEN_VAZIO",
+      "known_blockers": [
+        "hardcoded /tmp",
+        "ARM32 external fork unsupported",
+        "bounded read without EOF overflow probe",
+        "native and direct DEX copy truncation",
+        "stale compiler output not removed",
+        "Android C target lacks API/sysroot contract",
+        "Go Android environment absent"
+      ]
+    },
+    {
+      "id": "APKC-P1-009",
+      "title": "Bloquear promoção de APK inválido, truncado ou ABI-incompleto",
+      "state": "IMPLEMENTED",
+      "paths": ["scripts/apkc_verified_build.py", "tests/test_apkc_verified_build.py", "scripts/validate_apkc_formats.py"],
+      "runtime_evidence": "TOKEN_VAZIO",
+      "gate": "private candidate -> build log and hashes -> DEX ELF ABI validation -> atomic promotion"
+    },
+    {
+      "id": "APKC-P1-010",
+      "title": "Fornecer transporte HTTPS com TLS fixado e validação ativa",
+      "state": "IMPLEMENTED_RUNTIME_PENDING",
+      "paths": ["scripts/raf_https_fetch.sh", "configs/browser-tls-capability.v1.json"],
+      "runtime_evidence": "TOKEN_VAZIO",
+      "claim_limit": "HTTPS transport adapter only; not HTML browser, not ASM TLS stack, not certification"
     }
   ],
   "execution_observation": {
@@ -114,9 +156,14 @@
   },
   "canonical_commands": [
     "python3 scripts/apkc_first_part_gate.py --write results/apkc-first-part-gate.json --write-map docs/generated/REPOSITORY_LOOSE_FILES_MAP.md",
-    "python3 -m unittest tests.test_apkc_first_part_gate tests.test_validate_apkc_formats",
+    "python3 scripts/audit_browser_tls_capability.py --write results/browser-tls-capability.json",
+    "python3 scripts/apkc_runtime_preflight.py --write results/apkc-runtime-preflight.json",
+    "python3 -m unittest tests.test_apkc_first_part_gate tests.test_validate_apkc_formats tests.test_browser_tls_capability tests.test_apkc_runtime_preflight tests.test_apkc_verified_build",
     "bash tools/raf_source_to_binary_proof.sh",
     "python3 scripts/validate_apkc_formats.py --apk Apkc/proofs/out/hello.apk --require-both --write results/apkc-format-validation.json",
+    "python3 scripts/apkc_verified_build.py --apkc ./Apkc/apkc --input sample.s --output results/sample.apk --require-both -- -lang asm",
+    "sh scripts/raf_https_fetch.sh --tls 1.2 --url https://example.com/ --output results/https-fetch/tls12.bin",
+    "sh scripts/raf_https_fetch.sh --tls 1.3 --url https://example.com/ --output results/https-fetch/tls13.bin",
     "sh safe-extended run .github/workflows/apkc-first-part.yml"
   ],
   "r3": {
@@ -127,7 +174,11 @@
       "java_groovy_jar_stage",
       "independent_dex_elf_validator",
       "truth_reconciler",
-      "loose_file_mapper"
+      "loose_file_mapper",
+      "browser_tls_capability_contract",
+      "verified_https_transport_adapter",
+      "apkc_runtime_preflight",
+      "atomic_verified_apk_promotion"
     ],
     "gap": [
       "test_execution_report",
@@ -135,13 +186,16 @@
       "apk_with_elf32_and_elf64",
       "functional_dex_runtime",
       "nativeactivity_logcat",
-      "asm_web_browser_tls_x509_source"
+      "internal_apkc_subprocess_hardening",
+      "asm_web_browser_tls_x509_source",
+      "named_certificate_or_security_review"
     ],
     "next": [
       "execute apkc-first-part workflow in Termux",
       "attach report and artifact hashes to PR 147",
+      "patch ApkC internal fork output and TMPDIR contract using full-source checkout",
       "validate one real APK with both ABIs and DEX",
-      "close runtime gaps from the same run"
+      "execute controlled TLS 1.2 and TLS 1.3 transfers and preserve evidence"
     ]
   },
   "claim_allowed": false

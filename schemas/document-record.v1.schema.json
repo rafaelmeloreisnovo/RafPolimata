@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafaelmeloreisnovo.github.io/RafPolimata/schemas/document-record.v1.schema.json",
+  "title": "RafPolimata Document Governance Record v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "path",
+    "sha256",
+    "size_bytes",
+    "media_class",
+    "area",
+    "owner_role",
+    "classification",
+    "lifecycle",
+    "evidence_grade",
+    "indexed",
+    "inbound_references",
+    "outbound_references",
+    "last_commit",
+    "last_modified_at",
+    "review_interval_days",
+    "risk_score",
+    "quality_score",
+    "route",
+    "route_reason"
+  ],
+  "properties": {
+    "schema": {
+      "const": "raf.document-record.v1"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*\\.\\./).+$"
+    },
+    "sha256": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "const": "TOKEN_VAZIO"
+        }
+      ]
+    },
+    "normalized_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "size_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "line_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "media_class": {
+      "enum": [
+        "documentation",
+        "structured-data",
+        "source",
+        "automation",
+        "artifact",
+        "text",
+        "binary-or-other"
+      ]
+    },
+    "area": {
+      "type": "string",
+      "minLength": 1
+    },
+    "owner_role": {
+      "type": "string",
+      "minLength": 1
+    },
+    "classification": {
+      "enum": [
+        "PUBLIC",
+        "INTERNAL",
+        "RESTRICTED"
+      ]
+    },
+    "lifecycle": {
+      "enum": [
+        "CANONICAL",
+        "ACTIVE",
+        "SUPPORTING",
+        "AUDIT",
+        "EVIDENCE",
+        "GENERATED",
+        "ARCHIVE_CANDIDATE",
+        "QUARANTINE"
+      ]
+    },
+    "evidence_grade": {
+      "enum": [
+        "E0",
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ]
+    },
+    "indexed": {
+      "type": "boolean"
+    },
+    "inbound_references": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "outbound_references": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "last_commit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "last_modified_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "age_days": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "review_interval_days": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "review_due": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "sensitivity_flags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "policy_flags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "duplicate_group": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "normalized_duplicate_group": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "broken_references": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "risk_score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "quality_score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "route": {
+      "enum": [
+        "CANONICAL",
+        "INDEXED",
+        "LINK_REQUIRED",
+        "REFERENCE_REPAIR",
+        "ROOT_REVIEW",
+        "OWNER_REQUIRED",
+        "DUPLICATE_REVIEW",
+        "SENSITIVITY_REVIEW",
+        "QUARANTINE_REVIEW",
+        "REVIEW_STALE"
+      ]
+    },
+    "route_reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state_markers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "VOID",
+          "PENDING",
+          "AUDIT",
+          "RUNTIME",
+          "REFERENCE",
+          "TOKEN_VAZIO",
+          "PASS",
+          "FAIL",
+          "IMPLEMENTED"
+        ]
+      }
+    }
+  }
+}
