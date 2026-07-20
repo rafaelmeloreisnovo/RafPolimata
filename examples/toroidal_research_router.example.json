@@ -1,0 +1,46 @@
+{
+  "schema": "rafpolimata.toroidal-research-routing-manifest.v1",
+  "manifest_id": "RTR-EXAMPLE-20260720",
+  "observed_at": "2026-07-20T13:00:00Z",
+  "declared_scope": "Demonstrate deterministic routing without authority transfer or claim promotion.",
+  "claim_allowed": false,
+  "objects": [
+    {
+      "id": "O-CLAIM",
+      "kind": "CLAIM",
+      "source_repository": "instituto-Rafael/relativity-living-light",
+      "target_repository": "rafaelmeloreisnovo/llamaRafaelia",
+      "requested_action": "CONSUME",
+      "state": "RESTRICTED",
+      "device_claim": false
+    },
+    {
+      "id": "O-FORMULA",
+      "kind": "FORMULA",
+      "source_repository": "instituto-Rafael/relativity-living-light",
+      "target_repository": "rafaelmeloreisnovo/RafPolimata",
+      "requested_action": "VALIDATE",
+      "state": "EXTRACTED",
+      "device_claim": false
+    },
+    {
+      "id": "O-MAP",
+      "kind": "REPOSITORY_METADATA",
+      "source_repository": "rafaelmeloreisnovo/Mapa",
+      "target_repository": "rafaelmeloreisnovo/RafGitTools",
+      "requested_action": "REGISTER",
+      "state": "PARTIAL",
+      "device_claim": false
+    },
+    {
+      "id": "O-DEVICE",
+      "kind": "EXECUTION_EVIDENCE",
+      "source_repository": "rafaelmeloreisnovo/termux-app-rafacodephi",
+      "target_repository": "rafaelmeloreisnovo/RafGitTools",
+      "requested_action": "REGISTER",
+      "state": "TOKEN_VAZIO",
+      "device_claim": true,
+      "runtime_receipt": "TOKEN_VAZIO"
+    }
+  ]
+}
