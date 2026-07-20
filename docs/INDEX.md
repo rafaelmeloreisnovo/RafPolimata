@@ -1,0 +1,129 @@
+# Índice Canônico de Documentação — RafPolimata
+
+> **Entrada canônica:** docs/AGENTES.md §1 (leitura rápida) e §8 (entradas canônicas por subsistema). Índice curado de toda a documentação — regra de leitura README→INDEX→área→código e 10 seções temáticas com estados CANONICAL/REFERENCE/AUDIT.
+
+**Papel:** entrada curada para documentação técnica, operacional, científica, jurídica e de governança.  
+**Estado:** `CANONICAL`  
+**Catálogo completo:** `generated/DOCUMENT_GOVERNANCE_INDEX.md`
+
+## Regra de leitura
+
+```text
+README.md
+→ docs/INDEX.md
+→ documento de área
+→ código/configuração/teste/evidência relacionado
+```
+
+A presença neste índice significa que o documento possui rota conhecida. Não significa que todas as afirmações estejam validadas em runtime.
+
+## 1. Entrada e governança de trabalho
+
+| Documento | Função | Estado de uso |
+|---|---|---|
+| [AGENTES.md](AGENTES.md) | guia operacional para agentes humanos e IA | `CANONICAL` |
+| [AGENTES_CHECKLIST.md](AGENTES_CHECKLIST.md) | checklist de início, execução e encerramento | `REFERENCE` |
+| [AGENTES_DECISAO_LOG.md](AGENTES_DECISAO_LOG.md) | decisões, conflitos e escalações | `AUDIT` |
+| [DOCUMENT_GOVERNANCE.md](DOCUMENT_GOVERNANCE.md) | catálogo, indexação, ciclo de vida, risco e promoção | `CANONICAL` |
+| [ROOT_LOOSE_FILES_REVIEW.md](ROOT_LOOSE_FILES_REVIEW.md) | análise e rota de cada arquivo solto da raiz | `AUDIT/REVIEW_REQUIRED` |
+| [MAPA_ESTRUTURAL_REPOSITORIO.md](MAPA_ESTRUTURAL_REPOSITORIO.md) | disposição física e estados por diretório | `CANONICAL` |
+| [SAFE_EXTENDED_LOCAL_CI.md](SAFE_EXTENDED_LOCAL_CI.md) | execução local de workflows no Termux | `REFERENCE` |
+
+## 2. Arquitetura e metodologia
+
+| Documento | Função |
+|---|---|
+| [ARQUITETURA_21_NIVEIS.md](ARQUITETURA_21_NIVEIS.md) | arquitetura semântica em 21 níveis |
+| [DEZ_DIMENSOES_SEMANTICAS.md](DEZ_DIMENSOES_SEMANTICAS.md) | dimensões e dinâmicas do sentido |
+| [CONVERGENCIA_UNICA_METODOLOGICA.md](CONVERGENCIA_UNICA_METODOLOGICA.md) | convergência metodológica auditável |
+| [CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md](CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md) | relações com repositórios irmãos |
+| [INFO_DYNAMICS_INTERNAL_TRACEABILITY.md](INFO_DYNAMICS_INTERNAL_TRACEABILITY.md) | rastreabilidade interna de dinâmica informacional |
+| [ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md](ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md) | evolução conjunta de código e documentação |
+
+## 3. Excelência operacional e evidência
+
+| Documento | Função |
+|---|---|
+| [EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md](EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md) | governança de otimização, fallback e rollback |
+| [ROTINA_OPERACIONAL_BENCHMARKS.md](ROTINA_OPERACIONAL_BENCHMARKS.md) | rotina de benchmark e estatística operacional |
+| [PROTOCOLO_FALSIFICABILIDADE_PK.md](PROTOCOLO_FALSIFICABILIDADE_PK.md) | falsificabilidade mínima em P(k) |
+| [PROTOCOLO_CANONICO_COHERENCIA.md](PROTOCOLO_CANONICO_COHERENCIA.md) | coerência, invariantes e gates |
+| [PROTOCOLO_DOIS_CICLOS_OMEGA.md](PROTOCOLO_DOIS_CICLOS_OMEGA.md) | dois ciclos, fail-safe, failover e rollback |
+| [DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md](DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md) | claim, fonte, ensaio, incerteza e IP |
+| [CONCEPT_STRUCTURAL_AUDIT.md](CONCEPT_STRUCTURAL_AUDIT.md) | conceitos ligados a arquivos e lacunas |
+| [ORQUESTRADOR_FORMAL_CIENTIFICO.md](ORQUESTRADOR_FORMAL_CIENTIFICO.md) | orquestração científica e gates dimensionais |
+
+## 4. ApkC e baixo nível Android
+
+| Documento | Função | Limite atual |
+|---|---|---|
+| [APKC_STRUCTURE.md](APKC_STRUCTURE.md) | estrutura do micro-toolchain | implementação estrutural |
+| [APKC_PROTOCOL.md](APKC_PROTOCOL.md) | contrato de APK/AXML/DEX/ELF | runtime parcial |
+| [APKC_VALUE_AND_GAPS.md](APKC_VALUE_AND_GAPS.md) | valor e lacunas | não é valuation certificado |
+| [APKC_FLAGS_LIMITS_AND_COMMANDS.md](APKC_FLAGS_LIMITS_AND_COMMANDS.md) | flags, limites e comandos | validar por versão |
+| [APKC_FIRST_PART_EXECUTION.md](APKC_FIRST_PART_EXECUTION.md) | fechamento inicial de toolchain/ELF/DEX | execução Termux pendente |
+| [LACUNAS_PROFUNDAS_MVP_PRODUTO.md](LACUNAS_PROFUNDAS_MVP_PRODUTO.md) | mapa de lacunas técnicas | estados precisam reconciliar artefatos |
+| [CI_COMPILER_EXCELLENCE/README.md](CI_COMPILER_EXCELLENCE/README.md) | gates de compilador | evidência por run |
+
+## 5. Runtime e segmentação
+
+| Documento | Função |
+|---|---|
+| [RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md](RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md) | validação local registrada |
+| [MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md](MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md) | contrato de segmentação e evidência |
+
+## 6. Jurídico, licenças e padrões
+
+| Documento | Função |
+|---|---|
+| [MATRIZ_JURIDICO_TECNOLOGICA.md](MATRIZ_JURIDICO_TECNOLOGICA.md) | matriz jurídico-tecnológica |
+| [LICENCAS_COMPARADAS.md](LICENCAS_COMPARADAS.md) | comparação de licenças e termos |
+| [ATRATORES_42_JURIDICOS.md](ATRATORES_42_JURIDICOS.md) | framework de atratores jurídicos |
+| [BASES_SUPRALEGAIS_E_PADROES.md](BASES_SUPRALEGAIS_E_PADROES.md) | bases supralegais e padrões técnicos |
+| [IA_AGENTE_HUMANOS_TECNICO_FORMALIDADE.md](IA_AGENTE_HUMANOS_TECNICO_FORMALIDADE.md) | protocolo IA↔humanos |
+
+> Estes documentos não substituem parecer jurídico profissional.
+
+## 7. Comunicação, mercado e publicação
+
+| Documento | Função |
+|---|---|
+| [RAFAELIA_PAPER_MARKET_7_VECTORS.md](RAFAELIA_PAPER_MARKET_7_VECTORS.md) | tradução técnica e mercadológica |
+| [RELEASE_NOTES_PENDING.md](RELEASE_NOTES_PENDING.md) | pendências de release |
+| [LOGOTIPO_RAFAELIA_60COL.md](LOGOTIPO_RAFAELIA_60COL.md) | representação ASCII |
+
+## 8. Índices e filas geradas
+
+| Saída | Função | Edição manual |
+|---|---|---|
+| [generated/DOCUMENT_GOVERNANCE_INDEX.md](generated/DOCUMENT_GOVERNANCE_INDEX.md) | resumo material do catálogo | proibida; regenerar |
+| [generated/DOCUMENT_REVIEW_QUEUE.md](generated/DOCUMENT_REVIEW_QUEUE.md) | fila ordenada por risco | proibida; regenerar |
+| [generated/REPOSITORY_LOOSE_FILES_MAP.md](generated/REPOSITORY_LOOSE_FILES_MAP.md) | compatibilidade com mapa da primeira parte | regenerar pelo gate original |
+
+## 9. Estados de leitura
+
+| Estado | Interpretação |
+|---|---|
+| `CANONICAL` | entrada oficial de governança |
+| `REFERENCE` | explicação ou especificação |
+| `AUDIT` | trilha e evidência documental |
+| `EVIDENCE` | resultado ligado a teste/comando |
+| `RUNTIME` | código ou rota executável |
+| `PENDING` | conteúdo existente sem gate suficiente |
+| `TOKEN_VAZIO` | evidência ausente ou insuficiente |
+
+## 10. Comando de atualização
+
+```sh
+python3 -m unittest \
+  tests.test_document_governance \
+  tests.test_audit_repository_structure \
+  tests.test_validate_root_file_decisions \
+  tests.test_audit_zip_artifact
+
+python3 scripts/validate_root_file_decisions.py
+python3 scripts/document_governance.py --write --print-summary
+python3 scripts/document_governance.py --check --print-summary
+```
+
+Mudanças em documentação devem atualizar este índice quando adicionarem nova entrada canônica. O catálogo gerado cobre todos os arquivos; este arquivo permanece curado para navegação humana.
