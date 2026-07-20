@@ -2,6 +2,20 @@ name: ApkC First Part Closure
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'Apkc/**'
+      - 'configs/browser-tls-capability.v1.json'
+      - 'manifests/apkc-first-part.v1.json'
+      - 'scripts/apkc_*'
+      - 'scripts/audit_browser_tls_capability.py'
+      - 'scripts/raf_https_fetch.sh'
+      - 'scripts/validate_apkc_formats.py'
+      - 'tests/test_apkc_*'
+      - 'tests/test_browser_tls_capability.py'
+      - 'tests/test_validate_apkc_formats.py'
+      - 'tools/raf_source_to_binary_proof.sh'
+      - '.github/workflows/apkc-first-part.yml'
 
 jobs:
   apkc-first-part:
@@ -48,9 +62,11 @@ jobs:
           bash tools/raf_source_to_binary_proof.sh
 
       - name: Preserve first-part evidence locally
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: apkc-first-part-evidence
+          if-no-files-found: warn
           path: |
             manifests/apkc-first-part.v1.json
             configs/browser-tls-capability.v1.json
