@@ -1,0 +1,152 @@
+name: Repository commit and fork tracker
+
+on:
+  schedule:
+    # Every 15 minutes, offset from the busiest minute of the hour.
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+    inputs:
+      validate_only:
+        description: "Validate contracts and tests without calling the GitHub API"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  TRACKER_CONFIG: configs/repository-tracker.v1.json
+  TRACKER_STATE_DIR: .tracker-state
+  TRACKER_OUTPUT_DIR: build/repository-tracker
+
+concurrency:
+  group: repository-tracker-${{ github.repository }}
+  cancel-in-progress: true
+
+jobs:
+  track:
+    name: Bounded read-only lineage scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Checkout control repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate tracker configuration
+        run: |
+          python3 scripts/repo_commit_tracker.py \
+            --config "$TRACKER_CONFIG" \
+            --validate-only
+
+      - name: Run deterministic tracker tests
+        run: python3 -m unittest tests.test_repo_commit_tracker
+
+      - name: Restore persistent tracker state
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.validate_only != true }}
+        id: restore-state
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.TRACKER_STATE_DIR }}
+          key: repository-tracker-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            repository-tracker-${{ github.ref_name }}-
+
+      - name: Poll repositories, forks and commit heads
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.validate_only != true }}
+        id: tracker
+        env:
+          # A fine-grained read-only token covering the selected private repositories
+          # may be stored as RAFAELIA_GITHUB_READ_TOKEN. Without it, github.token is
+          # used and inaccessible repositories remain TOKEN_VAZIO_AUTH_SCOPE_OR_NOT_FOUND.
+          GITHUB_API_TOKEN: ${{ secrets.RAFAELIA_GITHUB_READ_TOKEN || github.token }}
+        run: |
+          rm -rf "$TRACKER_OUTPUT_DIR"
+          python3 scripts/repo_commit_tracker.py \
+            --config "$TRACKER_CONFIG" \
+            --state-dir "$TRACKER_STATE_DIR" \
+            --output-dir "$TRACKER_OUTPUT_DIR"
+
+      - name: Validate generated manifest invariants
+        if: ${{ steps.tracker.outcome == 'success' }}
+        id: summary
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          manifest = json.loads(
+              Path("build/repository-tracker/manifest.json").read_text(encoding="utf-8")
+          )
+          assert manifest["schema"] == "raf.repository-tracker-manifest.v1"
+          assert manifest["claim_allowed"] is False
+          assert manifest["mode"] == "READ_ONLY_METADATA_AND_COMMIT_LINEAGE"
+          assert manifest["requests_used"] <= manifest["request_budget"]
+          assert manifest["safety"] == {
+              "read_only": True,
+              "auto_fork": False,
+              "auto_merge": False,
+              "auto_push": False,
+              "execute_external_code": False,
+              "clone_external_repositories": False,
+          }
+
+          summary = manifest["summary"]
+          output = Path(os.environ["GITHUB_OUTPUT"])
+          with output.open("a", encoding="utf-8") as stream:
+              stream.write(f"snapshot_ready={str(summary['snapshot_ready']).lower()}\n")
+              stream.write(f"new_events={summary['new_events']}\n")
+              stream.write(f"next_shard_id={summary['next_shard_id']}\n")
+
+          step_summary = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          step_summary.write_text(
+              "# Repository tracker\n\n"
+              f"- repositories: {summary['repositories_selected']}\n"
+              f"- accessible: {summary['repositories_ok']}\n"
+              f"- TOKEN_VAZIO: {summary['repositories_token_vazio']}\n"
+              f"- new events: {summary['new_events']}\n"
+              f"- shards: {summary['shards_created']}\n"
+              f"- next shard: `{summary['next_shard_id']}`\n"
+              f"- snapshot ready: `{summary['snapshot_ready']}`\n"
+              f"- API requests: {manifest['requests_used']}/{manifest['request_budget']}\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Save tracker state for the next cycle
+        if: ${{ steps.tracker.outcome == 'success' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.TRACKER_STATE_DIR }}
+          key: repository-tracker-${{ github.ref_name }}-${{ github.run_id }}
+
+      - name: Upload run snapshot
+        if: ${{ steps.tracker.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-tracker-${{ github.run_id }}
+          path: ${{ env.TRACKER_OUTPUT_DIR }}/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 9
+
+      - name: Upload stable snapshot
+        if: ${{ steps.summary.outputs.snapshot_ready == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-tracker-stable-${{ steps.summary.outputs.next_shard_id }}
+          path: ${{ env.TRACKER_OUTPUT_DIR }}/repository-tracker-snapshot.zip
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
