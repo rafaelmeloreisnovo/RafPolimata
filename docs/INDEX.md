@@ -48,6 +48,7 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 | Documento | Função |
 |---|---|
 | [REPOSITORY_COMMIT_TRACKER_OMEGA.md](REPOSITORY_COMMIT_TRACKER_OMEGA.md) | rastreamento bounded de repositórios, forks, commits, shards e snapshots |
+| [REPOSITORY_PR_CONTEXT_SIDECAR.md](REPOSITORY_PR_CONTEXT_SIDECAR.md) | sidecar de contexto temporal e semântico dos pull requests |
 | [EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md](EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md) | governança de otimização, fallback e rollback |
 | [ROTINA_OPERACIONAL_BENCHMARKS.md](ROTINA_OPERACIONAL_BENCHMARKS.md) | rotina de benchmark e estatística operacional |
 | [PROTOCOLO_FALSIFICABILIDADE_PK.md](PROTOCOLO_FALSIFICABILIDADE_PK.md) | falsificabilidade mínima em P(k) |
@@ -126,7 +127,8 @@ python3 -m unittest \
   tests.test_audit_zip_artifact \
   tests.test_language_matrix \
   tests.test_language_commit_evidence \
-  tests.test_repo_commit_tracker
+  tests.test_repo_commit_tracker \
+  tests.test_repo_pr_context_tracker
 
 python3 scripts/validate_root_file_decisions.py
 python3 scripts/language_matrix.py --state data/language/language-matrix-state.v1.json
