@@ -1,0 +1,41 @@
+{
+  "schema": "raf.language-matrix-config.v1",
+  "version": "1.0.0",
+  "score_ladder": [
+    {"score": 0.1, "gate": "definition"},
+    {"score": 0.2, "gate": "contract"},
+    {"score": 0.3, "gate": "implementation"},
+    {"score": 0.4, "gate": "local_test"},
+    {"score": 0.5, "gate": "hashed_fixture"},
+    {"score": 0.6, "gate": "validated_tokenizer"},
+    {"score": 0.7, "gate": "out_of_sample"},
+    {"score": 0.8, "gate": "independent_replication"},
+    {"score": 0.9, "gate": "multi_repository"},
+    {"score": 1.0, "gate": "domain_audit"}
+  ],
+  "operators": [
+    {"id": "direct", "definition": "A", "domain": "square numeric matrix"},
+    {"id": "inverse_relational", "definition": "transpose(A)", "domain": "square numeric matrix"},
+    {"id": "indirect_two_step", "definition": "A @ A", "domain": "square numeric matrix"},
+    {"id": "reciprocal", "definition": "min(A, transpose(A))", "domain": "nonnegative square matrix"},
+    {"id": "logarithmic", "definition": "log1p(A)", "domain": "nonnegative square matrix"},
+    {"id": "inverse_logarithmic", "definition": "expm1(A)", "domain": "numeric square matrix"},
+    {"id": "fibonacci_windows", "definition": "positive Fibonacci sizes <= length", "domain": "length >= 0"},
+    {"id": "dyadic_partition", "definition": "recursive half-open intervals", "domain": "length >= 0"}
+  ],
+  "tokenizers": [
+    {"id": "unicode_codepoint_nonspace", "status": "IMPLEMENTED_BASELINE"},
+    {"id": "unicode_whitespace", "status": "IMPLEMENTED_BASELINE"},
+    {"id": "linguistic_greek", "status": "TOKEN_VAZIO_CORPUS_VALIDATION"},
+    {"id": "linguistic_hebrew", "status": "TOKEN_VAZIO_CORPUS_VALIDATION"},
+    {"id": "linguistic_aramaic", "status": "TOKEN_VAZIO_CORPUS_VALIDATION"}
+  ],
+  "script_inventory": [
+    {"id": "greek", "direction": "LTR", "sample": "ἀρχή λόγος φῶς ζωή", "status": "REFERENCE_SAMPLE"},
+    {"id": "hebrew", "direction": "RTL", "sample": "בראשית אור חיים דבר", "status": "REFERENCE_SAMPLE"},
+    {"id": "syriac", "direction": "RTL", "sample": "ܒܪܫܝܬ ܢܘܗܪܐ ܚܝܐ ܡܠܬܐ", "status": "REFERENCE_SAMPLE"},
+    {"id": "portuguese", "direction": "LTR", "sample": "princípio verbo luz vida", "status": "REFERENCE_SAMPLE"},
+    {"id": "ipa", "direction": "LTR", "sample": "a e i o u p b t d k ɡ m n ŋ r l s z ʃ ʒ θ ð x ə ɛ ɔ", "status": "REFERENCE_SAMPLE"},
+    {"id": "computing", "direction": "LTR", "sample": "∅ 0 1 NULL NaN TOKEN_VAZIO -> <- @ # ::", "status": "REFERENCE_SAMPLE"}
+  ]
+}
