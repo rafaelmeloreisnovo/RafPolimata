@@ -1,5 +1,7 @@
 # ApkC — primeira parte executável do fechamento de lacunas
 
+> **Entrada canônica:** docs/AGENTES.md §8 (entradas canônicas por subsistema — apkc_main) e §5 (pipeline operacional VOID→VALIDATED). Primeira parte congelada do fechamento de lacunas ApkC — toolchain Termux, validação binária ELF/DEX/APK e claim_allowed=false até execução real.
+
 **Repositório:** `rafaelmeloreisnovo/RafPolimata`  
 **Branch:** `feat/safe-extended-local-ci-20260719`  
 **PR:** `#147`  

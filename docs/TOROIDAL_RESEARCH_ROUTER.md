@@ -1,5 +1,7 @@
 # Toroidal Research Router
 
+> **Entrada canônica:** docs/AGENTES.md §2 (taxonomia de agentes e autoridades por repositório) e §6 (escalação e conflito). Router de objetos de pesquisa entre autoridades canônicas — blocos duros, invariante de roteamento e integração com gates de ciência formal.
+
 `RafPolimata` routes research objects between canonical repository authorities.
 It does not transfer ownership and does not promote scientific claims.
 

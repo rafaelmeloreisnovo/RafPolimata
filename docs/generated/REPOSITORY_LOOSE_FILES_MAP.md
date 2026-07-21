@@ -1,5 +1,7 @@
 # Mapa inicial — componentes, provas e arquivos sem rota confirmada
 
+> **Entrada canônica:** docs/AGENTES.md §8 (entradas canônicas por subsistema) e §5 (pipeline operacional VOID→VALIDATED). Mapa de arquivos soltos gerado por apkc_first_part_gate.py — inventário com hash, tamanho e rota; bootstrap até materialização completa.
+
 > **Estado:** `BOOTSTRAP_REFERENCE`. Este arquivo é regenerado integralmente por
 > `scripts/apkc_first_part_gate.py`; a execução acrescenta SHA-256, tamanho,
 > referência em índice e rota para todos os arquivos versionados examinados.

@@ -1,5 +1,7 @@
 # Mapa Estrutural e Governança do Repositório RafPolimata
 
+> **Entrada canônica:** docs/AGENTES.md §1 (leitura rápida — o que este repo faz) e §8 (entradas canônicas por subsistema). Mapa físico e lógico do repositório — modelo em seis níveis, estados canônicos, ciclo de vida documental e rotas para arquivos soltos.
+
 Este documento organiza a leitura técnica do repositório e separa estrutura física de governança documental.
 
 ```text

@@ -1,5 +1,7 @@
 # Ponte de Evidência — Matriz, Projeção Hexagonal, Toro, Esfera e Poincaré
 
+> **Entrada canônica:** docs/AGENTES.md §5 (pipeline operacional VOID→VALIDATED) e §8 (entradas canônicas por subsistema). Ponte de evidência geométrica — matriz hexagonal, projeção toroidal e seção de Poincaré com claims tipados E/C e estados PASS/TOKEN_VAZIO.
+
 **Estado:** `AUDIT | exact_geometry=PASS | physical_state=TOKEN_VAZIO`  
 **Autor conceitual:** Rafael Melo Reis (∆RafaelVerboΩ)  
 **Data:** 2026-07-19

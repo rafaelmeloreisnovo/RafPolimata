@@ -1,5 +1,7 @@
 # Caminhos iniciais executáveis da sessão completa
 
+> **Entrada canônica:** docs/AGENTES.md §3 (ciclo de sessão — startup e shutdown) e §5 (pipeline operacional VOID→VALIDATED). Cadeia sequencial obrigatória: PATH-00 verdade canônica → PATH-01 CI local → PATH-02 TAIL+TOKEN_VAZIO → PATH-03 segmentação.
+
 Este documento fixa a primeira cadeia operacional da sessão sem misturar planejamento, implementação e prova.
 
 ```text

@@ -1,5 +1,7 @@
 # Índice Canônico de Documentação — RafPolimata
 
+> **Entrada canônica:** docs/AGENTES.md §1 (leitura rápida) e §8 (entradas canônicas por subsistema). Índice curado de toda a documentação — regra de leitura README→INDEX→área→código e 10 seções temáticas com estados CANONICAL/REFERENCE/AUDIT.
+
 **Papel:** entrada curada para documentação técnica, operacional, científica, jurídica e de governança.  
 **Estado:** `CANONICAL`  
 **Catálogo completo:** `generated/DOCUMENT_GOVERNANCE_INDEX.md`

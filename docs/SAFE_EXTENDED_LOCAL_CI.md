@@ -1,5 +1,7 @@
 # Safe Extended v2 — executar GitHub Actions localmente no Termux
 
+> **Entrada canônica:** docs/AGENTES.md §7 (CI gates) e §3 (ciclo de sessão — startup/shutdown). Executor local de GitHub Actions no Termux — política de segurança, estados LOCAL_CI_PASS/TOKEN_VAZIO e distinção entre execução real e action não suportada.
+
 ## Correção arquitetural
 
 O Safe Extended não transforma a ARM em executor de CI e não cria um runtime freestanding para substituir o Termux.

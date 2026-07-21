@@ -1,5 +1,7 @@
 # Governança Documental e Indexação Operacional — RafPolimata
 
+> **Entrada canônica:** docs/AGENTES.md §3 (estados canônicos) e §7 (CI gates — document governance). Motor de governança documental — arquitetura em 6 níveis L0–L5, estados de ciclo de vida, graus de evidência E0–E4 e rotas operacionais por prioridade.
+
 **Estado:** `IMPLEMENTED` no código; catálogo material depende da execução no checkout.  
 **Política:** `configs/document-governance.v1.json`  
 **Executor:** `scripts/document_governance.py`  
@@ -273,7 +275,7 @@ Complexidade dominante:
 hash dos arquivos: O(total de bytes)
 relações textuais: O(total de texto lido)
 histórico Git: O(commits + nomes observados)
-ordenação: O(n log n)
+ordenatção: O(n log n)
 ```
 
 O limite padrão de leitura textual é 2 MB por arquivo; arquivos maiores continuam recebendo SHA-256 e metadados, mas não são analisados semanticamente.

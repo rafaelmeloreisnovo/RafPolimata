@@ -1,5 +1,7 @@
 # Índice de governança documental — bootstrap
 
+> **Entrada canônica:** docs/AGENTES.md §8 (entradas canônicas por subsistema) e §3 (estados canônicos — TOKEN_VAZIO). Índice material gerado por document_governance.py — substituído integralmente na execução; bootstrap enquanto não houver checkout completo.
+
 > **Estado:** `TOKEN_VAZIO`. Este arquivo é substituído integralmente por
 > `python3 scripts/document_governance.py --write`.
 

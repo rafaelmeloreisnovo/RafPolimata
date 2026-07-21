@@ -1,5 +1,7 @@
 # Quatro eixos, Venturi de base e retorno vortex — ponte de evidência
 
+> **Entrada canônica:** docs/AGENTES.md §5 (pipeline operacional VOID→VALIDATED) e §8 (entradas canônicas por subsistema). Ponte de evidência geométrica — quatro eixos, operador Venturi e retorno vortex com 16/16 gates PASS.
+
 **Estado:** `AUDIT | exact_geometry=PASS | operator_state=PASS`  
 **Interpretação fluida/material:** `NOT_APPLICABLE`  
 **Autor:** Rafael Melo Reis (∆RafaelVerboΩ)

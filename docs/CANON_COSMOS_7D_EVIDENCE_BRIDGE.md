@@ -1,9 +1,11 @@
 # CÂNONE DO COSMOS 7D — Ponte de Evidência, Semântica e Governança
 
+> **Entrada canônica:** docs/AGENTES.md §2 (taxonomia de agentes e responsabilidades inter-repositório) e §6 (escalação e conflito). Ponte semântica entre RafPolimata e o paper 7D — contrato TAIL, matriz de roteamento e gates de promoção claim_allowed=false.
+
 **Estado:** `AUDIT | REFERENCE | claim_allowed=false`  
 **Data:** 2026-07-19  
 **Autor:** Rafael Melo Reis (∆RafaelVerboΩ)  
-**Assinatura:** `RAFCODE-Φ-∆RafaelVerboΩ-𓂀ΔΦΩ`
+**Assinatura:** `RAFCODE-Φ-∆RafaelVerboΩ-𓀀ΔΦΩ`
 
 ## 1. Fonte canônica
 

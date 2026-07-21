@@ -1,5 +1,7 @@
 # Revisão Técnica dos Arquivos Soltos da Raiz
 
+> **Entrada canônica:** docs/AGENTES.md §5 (pipeline operacional VOID→VALIDATED) e §6 (escalação e conflito). Revisão técnica e rota de cada arquivo solto da raiz — matriz de decisão, diagnóstico por arquivo e ordem operacional P0–P3.
+
 **Estado:** `REVIEW_REQUIRED`  
 **Decisões máquina-legíveis:** `configs/root-file-decisions.v1.json`  
 **Validador:** `scripts/validate_root_file_decisions.py`  
@@ -31,7 +33,7 @@ O problema não é apenas estético. Arquivos heterogêneos na raiz aumentam:
 | `README_RAFAELIA_ROOT_OPTIMIZER.md` | documentação de componente | implementação e exemplo localizados | baixo | `MOVE_PROPOSED` | `docs/components/RAFAELIA_ROOT_OPTIMIZER.md` |
 | `RAFAELIA_MASTER_DOC.txt` | documento master histórico | claims mistos sem reconciliação integral | alto | `ARCHIVE_PROPOSED` | `docs/archive/RAFAELIA_MASTER_DOC_2024_2025.txt` |
 | `RAFAELIA_COMPLETE_v4.zip` | arquivo binário | inventário interno ainda pendente | alto | `BINARY_ARTIFACT_REVIEW` | release/LFS/evidence store após auditoria |
-| `Arduíno.txt` | dossiê AVR/registradores | referência técnica sem datasheet+bench completo | médio | `MOVE_AND_REFACTOR_PROPOSED` | `docs/hardware/AVR_ATMEGA328P_REGISTER_LAB.md` |
+| `Arduíno.txt` | dosiê AVR/registradores | referência técnica sem datasheet+bench completo | médio | `MOVE_AND_REFACTOR_PROPOSED` | `docs/hardware/AVR_ATMEGA328P_REGISTER_LAB.md` |
 | `Arm64 Mixer leve criptografia.md` | transcrição com código SIMD | não compilado/validado nesta cadeia | alto | `SPLIT_AND_REFACTOR_PROPOSED` | `docs/experiments/ARM64_NEON_MIXER_REVIEW.md` |
 | `L1.md` | heredoc C + comandos + resultados | benchmark sem proveniência suficiente | alto | `SPLIT_REQUIRED` | `tests/experiments/vectra_kernel_arm32/` |
 | `RASBERY.MD` | brainstorm/roadmap de 50 itens | planejado, não matriz de implementação | médio | `CONVERT_TO_TYPED_BACKLOG` | `docs/roadmaps/RAFAELIA_BARE_METAL_LAB.md` |
