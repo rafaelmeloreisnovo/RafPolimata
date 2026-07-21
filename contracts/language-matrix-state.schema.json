@@ -24,7 +24,10 @@
             ]
           },
           "status": {
-            "enum": ["DEFINED", "CONTRACT", "IMPLEMENTED", "TESTED_LOCAL", "MEASURED_ZERO", "TOKEN_VAZIO"]
+            "enum": [
+              "DEFINED", "CONTRACT", "IMPLEMENTED", "TESTED_LOCAL",
+              "FIXTURE_HASHED", "MEASURED_ZERO", "TOKEN_VAZIO"
+            ]
           },
           "evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
           "token_vazio": {"type": ["string", "null"]},
