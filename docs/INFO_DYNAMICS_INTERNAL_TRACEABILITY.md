@@ -1,5 +1,7 @@
 # Dinâmica Informacional e Rastreabilidade Interna
 
+> **Entrada canônica:** docs/AGENTES.md §5 (pipeline operacional — 5 fases de transformação) e §8 (entradas canônicas — phi_fst, T^7, FiberHash). Framework epistemológico de rastreabilidade interna — cadeia de custódia L0/L1/L2 e mapeamento de princípios para código.
+
 **Estado**: `REFERENCE`
 **Autoria**: Rafael Melo Reis
 **Origem documental**: Sessão Claude `claude/info-dynamics-internal-traceability-nxbznc`
@@ -56,7 +58,7 @@ computacional: manutenção e regeneração de estado segundo regras internas ex
 ### Axiomas de Validade Epistêmica Interna
 
 | Axioma | Descrição |
-|--------|-----------|
+|--------|----------|
 | **Consistência interna** | A transformação deve respeitar invariantes, tipos, limites e contratos do sistema |
 | **Poder preditivo interno** | O sistema deve produzir padrões ou resultados testáveis contra entradas e estados posteriores |
 | **Rastreabilidade procedimental** | Cada transformação deve registrar entrada, saída, agente, versão, parâmetros e vínculo com o evento anterior |
@@ -70,7 +72,7 @@ A cadeia interna prova **o que o sistema fez**, **com quais dados**, **em qual v
 externo.
 
 | Nível | O que pode ser demonstrado | Evidência mínima |
-|------:|-----------------------------|-----------------|
+|------:|-----------------------------|----------------|
 | `L0` | Integridade e linhagem do artefato | hashes, commit, parent hash, manifesto |
 | `L1` | Reprodutibilidade e coerência operacional | testes, seeds, parâmetros, ambiente, gates |
 | `L2` | Validade empírica externa | observações, datasets independentes, bibliografia e comparação externa |
