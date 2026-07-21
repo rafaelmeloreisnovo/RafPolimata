@@ -1,18 +1,24 @@
 {
   "schema": "raf.language-matrix-config.v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "score_ladder": [
     {"score": 0.1, "gate": "definition"},
     {"score": 0.2, "gate": "contract"},
     {"score": 0.3, "gate": "implementation"},
     {"score": 0.4, "gate": "local_test"},
-    {"score": 0.5, "gate": "hashed_fixture"},
-    {"score": 0.6, "gate": "validated_tokenizer"},
-    {"score": 0.7, "gate": "out_of_sample"},
-    {"score": 0.8, "gate": "independent_replication"},
-    {"score": 0.9, "gate": "multi_repository"},
-    {"score": 1.0, "gate": "domain_audit"}
+    {"score": 0.5, "gate": "hashed_fixture"}
   ],
+  "post_0_5_policy": {
+    "state": "TOKEN_VAZIO_AXIS_SPECIFIC_GATE_PROFILE",
+    "rule": "scores above 0.5 require a separately contracted and tested gate profile",
+    "forbidden": "using validated_tokenizer as a universal gate for mathematical or provenance axes",
+    "candidate_profiles": {
+      "linguistic": ["validated_tokenizer", "out_of_sample", "independent_replication", "multi_repository", "domain_audit"],
+      "deterministic": ["randomized_fixture", "out_of_sample", "independent_replication", "multi_repository", "domain_audit"],
+      "provenance": ["clean_checkout", "parent_chain_verified", "independent_replication", "multi_repository", "domain_audit"]
+    },
+    "candidate_profiles_status": "REFERENCE_NOT_EXECUTABLE"
+  },
   "operators": [
     {"id": "direct", "definition": "A", "domain": "square numeric matrix"},
     {"id": "inverse_relational", "definition": "transpose(A)", "domain": "square numeric matrix"},
