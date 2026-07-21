@@ -1,0 +1,45 @@
+{
+  "schema": "raf.repository-tracker-config.v1",
+  "version": "1.0.0",
+  "owner": "rafaelmeloreisnovo",
+  "poll_interval_minutes": 15,
+  "api": {
+    "max_requests": 180,
+    "timeout_seconds": 20,
+    "max_repositories": 16,
+    "max_commits_per_repository": 12,
+    "max_forks_per_repository": 4
+  },
+  "shard": {
+    "alphabet": "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-._~",
+    "width": 8,
+    "snapshot_after_stable_runs": 4,
+    "max_history_events": 8192
+  },
+  "repositories": [
+    {"full_name":"rafaelmeloreisnovo/RafPolimata","priority":0,"family":"orchestrator","follow_forks":false,"aliases":["polimata"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/Mapa","priority":1,"family":"orchestrator","follow_forks":false,"aliases":["mapa"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/RafGitTools","priority":2,"family":"git_tooling","follow_forks":false,"aliases":["gittools"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/termux-app-rafacodephi","priority":3,"family":"termux_android","follow_forks":true,"aliases":["termux-app"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/termux-api_rafcodephi","priority":4,"family":"termux_android","follow_forks":true,"aliases":["termux-api"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/PCR_Rafaelia_Code_seed","priority":5,"family":"root_system","follow_forks":true,"aliases":["PCE_","PCR","magisk-derived"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/UserLAnd","priority":6,"family":"linux_distribution","follow_forks":true,"aliases":["ubuntu","debian","distribution"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/UserLAnd2","priority":7,"family":"linux_distribution","follow_forks":true,"aliases":["userland-public"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/Vectras-VM-Android","priority":8,"family":"virtualization","follow_forks":true,"aliases":["vectras","vm-android"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/qemu_rafaelia","priority":9,"family":"virtualization","follow_forks":true,"aliases":["qemu"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/BLAKE3","priority":10,"family":"cryptography","follow_forks":true,"aliases":["blake3"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/relativity-living-light","priority":11,"family":"science","follow_forks":false,"aliases":["RLL"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/CONVERSATIONS_CHUNKS_PRIVATE","priority":12,"family":"corpus_memory","follow_forks":false,"aliases":["chunks","DeepRafa2"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/linuxkernel","priority":13,"family":"kernel","follow_forks":true,"aliases":["linux"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/androidRom","priority":14,"family":"android_system","follow_forks":true,"aliases":["lineage"],"enabled":true},
+    {"full_name":"rafaelmeloreisnovo/android_frameworks_base_rafaelia","priority":15,"family":"android_system","follow_forks":true,"aliases":["frameworks-base"],"enabled":true}
+  ],
+  "safety": {
+    "read_only": true,
+    "auto_fork": false,
+    "auto_merge": false,
+    "auto_push": false,
+    "execute_external_code": false,
+    "clone_external_repositories": false
+  }
+}
