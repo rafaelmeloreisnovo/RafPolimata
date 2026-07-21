@@ -1,5 +1,7 @@
 # Checklist operacional por sessão de agente
 
+> **Entrada canônica:** docs/AGENTES.md §3 (ciclo de sessão — startup e shutdown) e §4 (regras de não-colisão). Checklist executável por sessão de agente — 5 passos de startup, verificações pré-código por tipo de mudança e critérios de shutdown.
+
 Este checklist é executável — marque cada item antes de prosseguir.
 Para contexto completo de cada item, consulte `docs/AGENTES.md`.
 
