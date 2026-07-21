@@ -34,6 +34,7 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 | Documento | Função |
 |---|---|
 | [ARQUITETURA_21_NIVEIS.md](ARQUITETURA_21_NIVEIS.md) | arquitetura semântica em 21 níveis |
+| [LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md](LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md) | matriz multilíngue, operadores e promoção 0,1 por evidência |
 | [DEZ_DIMENSOES_SEMANTICAS.md](DEZ_DIMENSOES_SEMANTICAS.md) | dimensões e dinâmicas do sentido |
 | [CONVERGENCIA_UNICA_METODOLOGICA.md](CONVERGENCIA_UNICA_METODOLOGICA.md) | convergência metodológica auditável |
 | [CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md](CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md) | relações com repositórios irmãos |
@@ -119,9 +120,11 @@ python3 -m unittest \
   tests.test_document_governance \
   tests.test_audit_repository_structure \
   tests.test_validate_root_file_decisions \
-  tests.test_audit_zip_artifact
+  tests.test_audit_zip_artifact \
+  tests.test_language_matrix
 
 python3 scripts/validate_root_file_decisions.py
+python3 scripts/language_matrix.py --state data/language/language-matrix-state.v1.json
 python3 scripts/document_governance.py --write --print-summary
 python3 scripts/document_governance.py --check --print-summary
 ```
