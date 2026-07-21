@@ -18,12 +18,8 @@ GATES = (
     "implementation",
     "local_test",
     "hashed_fixture",
-    "validated_tokenizer",
-    "out_of_sample",
-    "independent_replication",
-    "multi_repository",
-    "domain_audit",
 )
+UNIVERSAL_MAX_SCORE = 0.5
 
 
 def require(condition: bool, message: str) -> None:
@@ -39,6 +35,10 @@ def is_tenth(value: float) -> bool:
 
 def required_gates(score: float) -> list[str]:
     require(is_tenth(score), f"score must be in 0.1 steps: {score}")
+    require(
+        score <= UNIVERSAL_MAX_SCORE,
+        "scores above 0.5 require an axis-specific gate profile",
+    )
     count = int(round(score * 10.0))
     return list(GATES[:count])
 
@@ -64,6 +64,10 @@ def validate_axis(axis: dict) -> None:
     require(isinstance(score, (int, float)), f"{identifier}: score must be numeric or null")
     score = float(score)
     require(is_tenth(score), f"{identifier}: score must be a tenth between 0 and 1")
+    require(
+        score <= UNIVERSAL_MAX_SCORE,
+        f"{identifier}: axis-specific profile required above 0.5",
+    )
     require(token_vazio is None, f"{identifier}: scored axis cannot carry TOKEN_VAZIO")
 
     if math.isclose(score, 0.0):
@@ -100,7 +104,10 @@ def promote(score: float | None, evidence: Iterable[str]) -> float:
         return 0.1
 
     require(is_tenth(float(score)), "current score is invalid")
-    require(score < 1.0, "score is already at maximum")
+    require(
+        float(score) < UNIVERSAL_MAX_SCORE,
+        "promotion above 0.5 requires an axis-specific gate profile",
+    )
     next_score = round(float(score) + 0.1, 1)
     next_gate = GATES[int(round(float(score) * 10.0))]
     require(next_gate in evidence_set, f"promotion requires gate: {next_gate}")
@@ -248,6 +255,8 @@ def main(argv: list[str] | None = None) -> int:
                 "schema": SCHEMA,
                 "state": "PASS",
                 "max_sustained_score": max(scored) if scored else None,
+                "universal_max_score": UNIVERSAL_MAX_SCORE,
+                "post_0_5_policy": "TOKEN_VAZIO_AXIS_SPECIFIC_GATE_PROFILE",
                 "token_vazio_axes": empty,
                 "claim_allowed": False,
             },
