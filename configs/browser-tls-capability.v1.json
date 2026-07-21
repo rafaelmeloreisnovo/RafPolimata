@@ -1,0 +1,79 @@
+{
+  "schema": "raf.browser-tls-capability.v1",
+  "version": "1.0.0",
+  "description": "Contrato de evidência estática e runtime para distinguir navegador local, transporte HTTPS e navegador web completo.",
+  "states": [
+    "ABSENT",
+    "SOURCE_PRESENT",
+    "STATIC_EVIDENCE",
+    "RUNTIME_PENDING",
+    "PASS",
+    "FAIL",
+    "TOKEN_VAZIO"
+  ],
+  "capability_levels": {
+    "TUI_FILE_BROWSER": [
+      "local_directory_listing",
+      "keyboard_navigation",
+      "terminal_rendering"
+    ],
+    "HTTPS_TRANSPORT_ADAPTER": [
+      "dns_resolution",
+      "tcp_transport",
+      "https_only_policy",
+      "tls_1_2_request",
+      "tls_1_3_request",
+      "system_ca_validation",
+      "hostname_verification",
+      "redirect_limit",
+      "timeout",
+      "atomic_output",
+      "evidence_report"
+    ],
+    "WEB_BROWSER_TLS": [
+      "url_parser",
+      "dns_resolution",
+      "tcp_transport",
+      "http_response_parser",
+      "https_transport",
+      "tls_1_2_handshake",
+      "tls_1_3_handshake",
+      "x509_chain_validation",
+      "hostname_verification",
+      "certificate_time_validation",
+      "trusted_root_store",
+      "redirect_policy",
+      "content_renderer",
+      "navigation_history",
+      "runtime_integration_test"
+    ],
+    "ASM_WEB_BROWSER_TLS": [
+      "web_browser_tls",
+      "assembly_source_core",
+      "abi_contract",
+      "memory_bounds_evidence",
+      "crypto_known_answer_tests",
+      "tls_transcript_tests",
+      "certificate_chain_fixtures",
+      "independent_security_review"
+    ]
+  },
+  "forbidden_shortcuts": [
+    "treat_file_browser_as_web_browser",
+    "treat_https_fetch_as_html_browser",
+    "disable_certificate_validation",
+    "use_insecure_tls_flag",
+    "claim_tls_version_without_handshake_evidence",
+    "claim_asm_core_from_inline_asm_unrelated_to_networking",
+    "claim_certified_without_named_certificate_scope_and evidence"
+  ],
+  "known_candidates": [
+    "raf_shell/raf_shell.c",
+    "scripts/raf_https_fetch.sh"
+  ],
+  "outputs": {
+    "audit": "results/browser-tls-capability.json",
+    "https_evidence": "results/https-fetch/"
+  },
+  "claim_allowed": false
+}

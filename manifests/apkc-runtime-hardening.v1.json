@@ -1,0 +1,43 @@
+{
+  "schema": "raf.apkc-runtime-hardening.v1",
+  "version": "1.0.0",
+  "date": "2026-07-20",
+  "source": "Apkc/apkc.c",
+  "generated_source": "build/generated/Apkc/apkc.runtime-hardened.c",
+  "transformer": "scripts/patch_apkc_runtime_source.py",
+  "proof": "tools/raf_apkc_runtime_hardening_proof.sh",
+  "tests": [
+    "tests/test_patch_apkc_runtime_source.py"
+  ],
+  "closed_structural_gaps": [
+    "ARM32 clone/execve/wait4 path generated for external toolchains",
+    "stale compiler output removed before child execution",
+    "wait result, exit status and signal state checked",
+    "bounded compiler output proves EOF with one-byte overflow probe",
+    "direct DEX path without D8 rejected",
+    "D8 output checked for DEX magic",
+    "external native output checked for AArch64 ET_DYN ELF",
+    "external native output packaged without 32KiB second-copy truncation",
+    "global /tmp output paths removed from generated source",
+    "source input proves EOF beyond the 1MiB boundary",
+    "exact source anchors and deterministic generated SHA required",
+    "AArch64 and ARM32 compile identity and byte reproducibility required"
+  ],
+  "open_gaps": [
+    "runtime execution on Android/Termux",
+    "real external compiler execution on ARM32 device",
+    "Android NDK API and sysroot contract for C/C++",
+    "Go Android environment contract",
+    "concurrent D8 workspace isolation",
+    "real APK with dual ABI and functional DEX",
+    "NativeActivity install and logcat smoke test"
+  ],
+  "truth": {
+    "source_transform": "IMPLEMENTED",
+    "unit_tests": "WRITTEN_RUNTIME_PENDING",
+    "aarch64_compile_proof": "WRITTEN_RUNTIME_PENDING",
+    "arm32_compile_proof": "WRITTEN_RUNTIME_PENDING",
+    "device_runtime": "TOKEN_VAZIO",
+    "claim_allowed": false
+  }
+}

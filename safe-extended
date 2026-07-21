@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+command -v python3 >/dev/null 2>&1 || {
+  echo 'SAFE_EXTENDED: python3 ausente; instale com: pkg install python' >&2
+  exit 127
+}
+exec python3 "$ROOT/scripts/safe_extended.py" "$@"

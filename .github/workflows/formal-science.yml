@@ -36,10 +36,42 @@ jobs:
           print(json.dumps(report, ensure_ascii=False, sort_keys=True))
           PY
 
-      - name: Upload formal-science report
+      - name: Validate toroidal research router
+        run: |
+          python3 -m unittest tests/test_toroidal_research_router.py -v
+          python3 scripts/toroidal_research_router.py validate-contract \
+            contracts/toroidal_research_router.v1.json
+          python3 scripts/toroidal_research_router.py validate-manifest \
+            contracts/toroidal_research_router.v1.json \
+            examples/toroidal_research_router.example.json
+          python3 scripts/toroidal_research_router.py summarize \
+            contracts/toroidal_research_router.v1.json \
+            examples/toroidal_research_router.example.json \
+            > results/toroidal_research_router_report.json
+
+      - name: Verify router report contract
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(
+              Path('results/toroidal_research_router_report.json').read_text(encoding='utf-8')
+          )
+          assert report['status'] == 'PASS'
+          assert report['object_count'] == 4
+          assert report['routed_limited_count'] == 3
+          assert report['blocked_token_vazio_count'] == 1
+          assert report['claim_allowed'] is False
+          print(json.dumps(report, ensure_ascii=False, sort_keys=True))
+          PY
+
+      - name: Upload formal-science reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: formal-science-orchestrator-report
-          path: results/formal_science_orchestrator_report.json
+          path: |
+            results/formal_science_orchestrator_report.json
+            results/toroidal_research_router_report.json
           if-no-files-found: error

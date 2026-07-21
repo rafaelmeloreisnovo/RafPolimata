@@ -1,151 +1,227 @@
 #!/usr/bin/env bash
-# raf_source_to_binary_proof.sh — reproducible source→binary transcript (L1).
+# raf_source_to_binary_proof.sh — reproducible, fail-closed source→binary proof.
 #
-# Closes audit lacuna L1 ("Prova source→binary do executável apkc"): builds the
-# apkc compiler from the *versioned* source at the current commit, on the current
-# host, with a recorded toolchain, and emits a transcript that a third party can
-# reproduce bit-for-bit (same commit + same clang → same sha256).
-#
-# What this proves (PASS) and what it does NOT (TOKEN_VAZIO):
-#   PASS  — Apkc/apkc.c compiles+links to a valid AArch64 ELF and to an ARM32
-#           relocatable object, from committed source, with logged provenance.
-#   REPRO — Two independent builds of the same source/commit produce identical
-#           SHA-256 hashes (determinism gate; CI exits nonzero on mismatch).
-#   TZ    — running apkc to *generate an APK* (and the arm64-v8a .so inside it,
-#           L4 on-device) requires an ARM runtime/Termux/qemu; not done here.
-#
-# Usage: bash tools/raf_source_to_binary_proof.sh
-set -u
+# The canonical proof is promoted only when BOTH required targets are built,
+# identified by an ELF reader and reproduced byte-for-byte. Failed or partial
+# runs are preserved under Apkc/proofs/runs/ and never become a false PASS.
+set -uo pipefail
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+ALLOW_PARTIAL=0
+if [ "${1:-}" = "--allow-partial" ]; then
+    ALLOW_PARTIAL=1
+elif [ -n "${1:-}" ]; then
+    printf 'usage: %s [--allow-partial]\n' "$0" >&2
+    exit 2
+fi
+
+for cmd in git clang sha256sum cmp date uname mkdir cp head grep awk; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        printf 'source-to-binary proof: missing command: %s\n' "$cmd" >&2
+        exit 127
+    fi
+done
+
+if command -v readelf >/dev/null 2>&1; then
+    ELF_READER=readelf
+elif command -v llvm-readelf >/dev/null 2>&1; then
+    ELF_READER=llvm-readelf
+else
+    printf 'source-to-binary proof: missing readelf or llvm-readelf\n' >&2
+    exit 127
+fi
+
 OUT="Apkc/proofs/out"
-mkdir -p "$OUT"
-COMMIT="$(git rev-parse HEAD 2>/dev/null || echo TOKEN_VAZIO)"
-SHORT="$(git rev-parse --short HEAD 2>/dev/null || echo TOKEN_VAZIO)"
+RUNS="Apkc/proofs/runs"
+ARCHIVE="Apkc/proofs/archive"
+RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
+RUN_DIR="$RUNS/$RUN_ID/source-to-binary"
+mkdir -p "$OUT" "$RUN_DIR" "$ARCHIVE"
+
+COMMIT="$(git rev-parse HEAD 2>/dev/null)" || COMMIT="TOKEN_VAZIO"
+SHORT="$(git rev-parse --short HEAD 2>/dev/null)" || SHORT="TOKEN_VAZIO"
 DATE_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 HOST_ARCH="$(uname -m)"
-CLANGV="$(clang --version 2>/dev/null | head -1 || echo 'clang: TOKEN_VAZIO')"
-LLDV="$(ld.lld --version 2>/dev/null | head -1 || lld --version 2>/dev/null | head -1 || echo 'lld: TOKEN_VAZIO')"
+CLANGV="$(clang --version 2>/dev/null | head -1)" || CLANGV="clang: TOKEN_VAZIO"
+LLDV="$(ld.lld --version 2>/dev/null | head -1)" || LLDV="lld: TOKEN_VAZIO"
+ELFV="$($ELF_READER --version 2>/dev/null | head -1)" || ELFV="$ELF_READER"
 
-A64_ELF="/tmp/apkc_a64.elf"
-A64_ELF2="/tmp/apkc_a64_run2.elf"
-A64_OBJ="/tmp/apkc_a64.o"
-A32_OBJ="/tmp/apkc_a32.o"
-A32_OBJ2="/tmp/apkc_a32_run2.o"
 SRC="Apkc/apkc.c"
-CC_BASE="clang -ffreestanding -nostdlib -nostdinc -I Apkc"
+A64_1="$RUN_DIR/apkc-aarch64-run1.elf"
+A64_2="$RUN_DIR/apkc-aarch64-run2.elf"
+A32_1="$RUN_DIR/apkc-arm32-run1.o"
+A32_2="$RUN_DIR/apkc-arm32-run2.o"
+A64_ERR="$RUN_DIR/aarch64.stderr.txt"
+A32_ERR="$RUN_DIR/arm32.stderr.txt"
+A64_HDR="$RUN_DIR/readelf-aarch64.txt"
+A32_HDR="$RUN_DIR/readelf-arm32.txt"
+TRANSCRIPT="$RUN_DIR/apkc-compile.txt"
+STATUS_JSON="$RUN_DIR/status.json"
 
-PASS=0; TZ=0
-log() { printf '%s\n' "$*"; }
+COMMON=(clang -ffreestanding -fno-builtin -nostdlib -nostdinc -I Apkc)
+A64_CMD=("${COMMON[@]}" --target=aarch64-linux-gnu -fuse-ld=lld \
+         -Wl,-e,_start -Wl,--build-id=none "$SRC" -o "$A64_1")
+A64_CMD_2=("${COMMON[@]}" --target=aarch64-linux-gnu -fuse-ld=lld \
+           -Wl,-e,_start -Wl,--build-id=none "$SRC" -o "$A64_2")
+A32_CMD=("${COMMON[@]}" --target=arm-linux-gnueabihf -c "$SRC" -o "$A32_1")
+A32_CMD_2=("${COMMON[@]}" --target=arm-linux-gnueabihf -c "$SRC" -o "$A32_2")
 
-TRANSCRIPT="$OUT/apkc-compile.txt"
-# Preserve prior evidence: append a new dated section, never overwrite history.
+A64_BUILD="TOKEN_VAZIO"
+A64_IDENTITY="TOKEN_VAZIO"
+A64_REPRO="TOKEN_VAZIO"
+A32_BUILD="TOKEN_VAZIO"
+A32_IDENTITY="TOKEN_VAZIO"
+A32_REPRO="TOKEN_VAZIO"
+A64_SHA="TOKEN_VAZIO"
+A32_SHA="TOKEN_VAZIO"
+
+print_cmd() {
+    printf '  '
+    printf '%q ' "$@"
+    printf '\n'
+}
+
 {
-  echo ""
-  echo "=================================================================="
-  echo "REPRODUCIBLE SOURCE->BINARY TRANSCRIPT  (L1)  ${DATE_UTC}"
-  echo "=================================================================="
-  echo "commit:      ${COMMIT}"
-  echo "host_arch:   ${HOST_ARCH}"
-  echo "toolchain:   ${CLANGV}"
-  echo "lld:         ${LLDV}"
-  echo "source:      ${SRC}"
-} >> "$TRANSCRIPT"
+    printf '==================================================================\n'
+    printf 'REPRODUCIBLE SOURCE->BINARY TRANSCRIPT  %s\n' "$DATE_UTC"
+    printf '==================================================================\n'
+    printf 'run_id:      %s\n' "$RUN_ID"
+    printf 'commit:      %s\n' "$COMMIT"
+    printf 'host_arch:   %s\n' "$HOST_ARCH"
+    printf 'toolchain:   %s\n' "$CLANGV"
+    printf 'lld:         %s\n' "$LLDV"
+    printf 'elf_reader:  %s\n' "$ELFV"
+    printf 'source:      %s\n\n' "$SRC"
+    printf '[A64] command:\n'
+    print_cmd "${A64_CMD[@]}"
+} > "$TRANSCRIPT"
 
-# 1) AArch64 freestanding ELF (prefer a fully-linked executable via lld)
-if $CC_BASE -target aarch64-linux-gnu -Wl,-e,_start -fuse-ld=lld "$SRC" -o "$A64_ELF" 2>/tmp/_l64.err; then
-    SHA1="$(sha256sum "$A64_ELF" | awk '{print $1}')"
-    HDR="$(readelf -h "$A64_ELF" | grep -E 'Class|Data|Machine|Type|Entry' | sed 's/^/    /')"
-    {
-      echo ""
-      echo "[A64-ELF] command: ${CC_BASE} -target aarch64-linux-gnu -Wl,-e,_start -fuse-ld=lld ${SRC} -o apkc_a64.elf"
-      echo "[A64-ELF] sha256:  ${SHA1}"
-      echo "[A64-ELF] readelf:"
-      echo "$HDR"
-      echo "[A64-ELF] STATUS:  PASS (AArch64 ELF built from committed source)"
-    } >> "$TRANSCRIPT"
-    { echo "# apkc compiler binary — AArch64 ELF (source->binary L1), ${DATE_UTC}, commit ${SHORT}";
-      readelf -h "$A64_ELF"; } > "$OUT/apkc-binary-arm64.txt"
-    PASS=$((PASS+1))
-    # Determinism gate: rebuild and compare SHA-256; CI exits nonzero on mismatch.
-    if $CC_BASE -target aarch64-linux-gnu -Wl,-e,_start -fuse-ld=lld "$SRC" -o "$A64_ELF2" 2>/dev/null; then
-        SHA2="$(sha256sum "$A64_ELF2" | awk '{print $1}')"
-        if [ "$SHA1" = "$SHA2" ]; then
-            echo "[REPRO-A64] STATUS: PASS (run1 sha256 == run2 sha256; build is deterministic)" >> "$TRANSCRIPT"
-            PASS=$((PASS+1))
+if "${A64_CMD[@]}" 2>"$A64_ERR"; then
+    A64_BUILD="PASS"
+    "$ELF_READER" -h "$A64_1" > "$A64_HDR"
+    if grep -Eq 'Class:[[:space:]]+ELF64' "$A64_HDR" &&
+       grep -Eq 'Machine:[[:space:]]+AArch64' "$A64_HDR"; then
+        A64_IDENTITY="PASS"
+    else
+        A64_IDENTITY="FAIL"
+    fi
+    if "${A64_CMD_2[@]}" 2>>"$A64_ERR"; then
+        A64_SHA="$(sha256sum "$A64_1" | awk '{print $1}')"
+        A64_SHA_2="$(sha256sum "$A64_2" | awk '{print $1}')"
+        if [ "$A64_SHA" = "$A64_SHA_2" ] && cmp -s "$A64_1" "$A64_2"; then
+            A64_REPRO="PASS"
         else
-            {
-              echo "[REPRO-A64] STATUS: FAIL (non-deterministic build)"
-              echo "[REPRO-A64] run1: ${SHA1}"
-              echo "[REPRO-A64] run2: ${SHA2}"
-            } >> "$TRANSCRIPT"
-            log "FAIL: A64 ELF build is non-deterministic (SHA-256 differs between run1 and run2)"; exit 1
+            A64_REPRO="FAIL"
         fi
     else
-        echo "[REPRO-A64] STATUS: TOKEN_VAZIO (second compile failed)" >> "$TRANSCRIPT"
-        TZ=$((TZ+1))
+        A64_REPRO="FAIL"
     fi
 else
-    echo "[A64-ELF] STATUS:  TOKEN_VAZIO (link failed; see below)" >> "$TRANSCRIPT"
-    head -3 /tmp/_l64.err >> "$TRANSCRIPT"
-    # Fall back to a relocatable object so we still have a real artifact.
-    if $CC_BASE -target aarch64-linux-gnu -c "$SRC" -o "$A64_OBJ" 2>/dev/null; then
-        echo "[A64-OBJ] sha256:  $(sha256sum "$A64_OBJ" | awk '{print $1}') (REL object, PASS)" >> "$TRANSCRIPT"
-        PASS=$((PASS+1))
-    fi
-    TZ=$((TZ+1))
+    A64_BUILD="FAIL"
 fi
 
-# 2) ARM32 relocatable object (ELF32 ARM) — structural proof of A32 codegen path
-if $CC_BASE -target arm-linux-gnueabihf -c "$SRC" -o "$A32_OBJ" 2>/tmp/_a32.err; then
-    SHA1="$(sha256sum "$A32_OBJ" | awk '{print $1}')"
-    HDR="$(readelf -h "$A32_OBJ" | grep -E 'Class|Data|Machine|Type' | sed 's/^/    /')"
-    {
-      echo ""
-      echo "[A32-OBJ] command: ${CC_BASE} -target arm-linux-gnueabihf -c ${SRC} -o apkc_a32.o"
-      echo "[A32-OBJ] sha256:  ${SHA1}"
-      echo "[A32-OBJ] readelf:"
-      echo "$HDR"
-      echo "[A32-OBJ] STATUS:  PASS (ELF32 ARM object built from committed source)"
-    } >> "$TRANSCRIPT"
-    { echo "# apkc compiler binary — ELF32 ARM object (L1), ${DATE_UTC}, commit ${SHORT}";
-      readelf -h "$A32_OBJ"; } > "$OUT/apkc-binary-arm32.txt"
-    PASS=$((PASS+1))
-    # Determinism gate: rebuild and compare SHA-256; CI exits nonzero on mismatch.
-    if $CC_BASE -target arm-linux-gnueabihf -c "$SRC" -o "$A32_OBJ2" 2>/dev/null; then
-        SHA2="$(sha256sum "$A32_OBJ2" | awk '{print $1}')"
-        if [ "$SHA1" = "$SHA2" ]; then
-            echo "[REPRO-A32] STATUS: PASS (run1 sha256 == run2 sha256; build is deterministic)" >> "$TRANSCRIPT"
-            PASS=$((PASS+1))
+{
+    printf '[A64] build=%s identity=%s reproducibility=%s sha256=%s\n' \
+        "$A64_BUILD" "$A64_IDENTITY" "$A64_REPRO" "$A64_SHA"
+    if [ -s "$A64_ERR" ]; then
+        printf '[A64] stderr (first 20 lines):\n'
+        head -20 "$A64_ERR"
+    fi
+    printf '\n[A32] command:\n'
+    print_cmd "${A32_CMD[@]}"
+} >> "$TRANSCRIPT"
+
+if "${A32_CMD[@]}" 2>"$A32_ERR"; then
+    A32_BUILD="PASS"
+    "$ELF_READER" -h "$A32_1" > "$A32_HDR"
+    if grep -Eq 'Class:[[:space:]]+ELF32' "$A32_HDR" &&
+       grep -Eq 'Machine:[[:space:]]+ARM' "$A32_HDR"; then
+        A32_IDENTITY="PASS"
+    else
+        A32_IDENTITY="FAIL"
+    fi
+    if "${A32_CMD_2[@]}" 2>>"$A32_ERR"; then
+        A32_SHA="$(sha256sum "$A32_1" | awk '{print $1}')"
+        A32_SHA_2="$(sha256sum "$A32_2" | awk '{print $1}')"
+        if [ "$A32_SHA" = "$A32_SHA_2" ] && cmp -s "$A32_1" "$A32_2"; then
+            A32_REPRO="PASS"
         else
-            {
-              echo "[REPRO-A32] STATUS: FAIL (non-deterministic build)"
-              echo "[REPRO-A32] run1: ${SHA1}"
-              echo "[REPRO-A32] run2: ${SHA2}"
-            } >> "$TRANSCRIPT"
-            log "FAIL: A32 object build is non-deterministic (SHA-256 differs between run1 and run2)"; exit 1
+            A32_REPRO="FAIL"
         fi
     else
-        echo "[REPRO-A32] STATUS: TOKEN_VAZIO (second compile failed)" >> "$TRANSCRIPT"
-        TZ=$((TZ+1))
+        A32_REPRO="FAIL"
     fi
 else
-    echo "[A32-OBJ] STATUS:  TOKEN_VAZIO (compile failed)" >> "$TRANSCRIPT"
-    TZ=$((TZ+1))
+    A32_BUILD="FAIL"
 fi
 
-# 3) The arm64-v8a .so INSIDE a generated APK (L4 on-device) is NOT produced here.
 {
-  echo ""
-  echo "[APK-SO] STATUS:  TOKEN_VAZIO — generating the APK payload (lib/arm64-v8a/*.so)"
-  echo "[APK-SO]          requires running apkc, which is freestanding ARM64 and"
-  echo "[APK-SO]          cannot execute on a ${HOST_ARCH} host. Run on ARM/Termux:"
-  echo "[APK-SO]            ./apkc Apkc/hello.s.txt -o hello.apk -both"
-  echo "[APK-SO]            unzip -p hello.apk 'lib/arm64-v8a/*.so' | readelf -h -"
+    printf '[A32] build=%s identity=%s reproducibility=%s sha256=%s\n' \
+        "$A32_BUILD" "$A32_IDENTITY" "$A32_REPRO" "$A32_SHA"
+    if [ -s "$A32_ERR" ]; then
+        printf '[A32] stderr (first 20 lines):\n'
+        head -20 "$A32_ERR"
+    fi
 } >> "$TRANSCRIPT"
-TZ=$((TZ+1))
 
-log "source->binary proof: ${PASS} PASS, ${TZ} TOKEN_VAZIO"
-log "transcript: ${TRANSCRIPT}"
-exit 0
+COMPLETE=0
+if [ "$A64_BUILD" = PASS ] && [ "$A64_IDENTITY" = PASS ] && [ "$A64_REPRO" = PASS ] &&
+   [ "$A32_BUILD" = PASS ] && [ "$A32_IDENTITY" = PASS ] && [ "$A32_REPRO" = PASS ]; then
+    COMPLETE=1
+fi
+
+if [ "$COMPLETE" -eq 1 ]; then
+    FINAL_STATE="PASS"
+else
+    FINAL_STATE="FAIL"
+fi
+
+cat > "$STATUS_JSON" <<JSON
+{
+  "schema": "raf.apkc.source-to-binary-proof.v2",
+  "run_id": "$RUN_ID",
+  "date_utc": "$DATE_UTC",
+  "commit": "$COMMIT",
+  "host_arch": "$HOST_ARCH",
+  "elf_reader": "$ELF_READER",
+  "aarch64": {
+    "build": "$A64_BUILD",
+    "identity": "$A64_IDENTITY",
+    "reproducibility": "$A64_REPRO",
+    "sha256": "$A64_SHA"
+  },
+  "arm32": {
+    "build": "$A32_BUILD",
+    "identity": "$A32_IDENTITY",
+    "reproducibility": "$A32_REPRO",
+    "sha256": "$A32_SHA"
+  },
+  "apk_payload_runtime": "TOKEN_VAZIO",
+  "state": "$FINAL_STATE",
+  "claim_allowed": false
+}
+JSON
+
+printf '\n[FINAL] state=%s claim_allowed=false\n' "$FINAL_STATE" >> "$TRANSCRIPT"
+cp "$STATUS_JSON" "$OUT/apkc-compile.status.json"
+
+if [ "$COMPLETE" -eq 1 ]; then
+    if [ -s "$OUT/apkc-compile.txt" ]; then
+        OLD_SHA="$(sha256sum "$OUT/apkc-compile.txt" | awk '{print $1}')"
+        cp "$OUT/apkc-compile.txt" "$ARCHIVE/apkc-compile.pre-${RUN_ID}.${OLD_SHA}.txt"
+    fi
+    cp "$TRANSCRIPT" "$OUT/apkc-compile.txt"
+    cp "$A64_HDR" "$OUT/apkc-binary-arm64.txt"
+    cp "$A32_HDR" "$OUT/apkc-binary-arm32.txt"
+    printf 'source->binary proof: PASS (%s)\n' "$RUN_DIR"
+    exit 0
+fi
+
+cp "$TRANSCRIPT" "$OUT/apkc-compile.pending.txt"
+printf 'source->binary proof: FAIL; canonical PASS was not promoted (%s)\n' "$RUN_DIR" >&2
+if [ "$ALLOW_PARTIAL" -eq 1 ]; then
+    exit 0
+fi
+exit 1

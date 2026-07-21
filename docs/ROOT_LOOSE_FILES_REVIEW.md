@@ -51,7 +51,7 @@ O problema não é apenas estético. Arquivos heterogêneos na raiz aumentam:
 - delega diretamente para `scripts/safe_extended.py`;
 - não usa `eval` nem carrega código dinâmico.
 
-**Decisão:** permanecer na raiz para ergonomia CLI. Recebe decisão explícita porque excessão documentada é melhor que allow-list invisível.
+**Decisão:** permanecer na raiz para ergonomia CLI. Recebe decisão explícita porque exceção documentada é melhor que allow-list invisível.
 
 ### 3.2 `README_RAFAELIA_ROOT_OPTIMIZER.md`
 
