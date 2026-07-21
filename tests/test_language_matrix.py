@@ -38,6 +38,23 @@ class LanguageMatrixTests(unittest.TestCase):
         self.assertEqual(LM.promote(0.1, ["contract"]), 0.2)
         with self.assertRaises(AssertionError):
             LM.promote(0.2, ["local_test"])
+        with self.assertRaises(AssertionError):
+            LM.promote(0.5, ["validated_tokenizer"])
+
+    def test_score_above_half_requires_axis_profile(self) -> None:
+        axis = {
+            "id": "matrix_operators",
+            "score": 0.6,
+            "status": "FIXTURE_HASHED",
+            "evidence": [
+                "definition", "contract", "implementation",
+                "local_test", "hashed_fixture", "validated_tokenizer",
+            ],
+            "token_vazio": None,
+            "next_gate": "axis-specific profile",
+        }
+        with self.assertRaises(AssertionError):
+            LM.validate_axis(axis)
 
     def test_direct_inverse_indirect_and_reciprocal(self) -> None:
         matrix = [[0, 1], [2, 0]]
@@ -85,6 +102,7 @@ class LanguageMatrixTests(unittest.TestCase):
         )
         LM.validate_state(state)
         self.assertFalse(state["claim_allowed"])
+        self.assertEqual(max(axis["score"] for axis in state["axes"] if axis["score"] is not None), 0.5)
         empty = {axis["id"] for axis in state["axes"] if axis["score"] is None}
         self.assertIn("weights", empty)
         self.assertIn("time", empty)
