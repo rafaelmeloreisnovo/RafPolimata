@@ -50,7 +50,10 @@ jobs:
             --validate-only
 
       - name: Run deterministic tracker tests
-        run: python3 -m unittest tests.test_repo_commit_tracker
+        run: |
+          python3 -m unittest \
+            tests.test_repo_commit_tracker \
+            tests.test_repo_pr_context_tracker
 
       - name: Restore persistent tracker state
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.validate_only != true }}
@@ -77,8 +80,34 @@ jobs:
             --state-dir "$TRACKER_STATE_DIR" \
             --output-dir "$TRACKER_OUTPUT_DIR"
 
-      - name: Validate generated manifest invariants
+      - name: Poll pull request context
         if: ${{ steps.tracker.outcome == 'success' }}
+        id: pr-context
+        env:
+          GITHUB_API_TOKEN: ${{ secrets.RAFAELIA_GITHUB_READ_TOKEN || github.token }}
+        run: |
+          python3 scripts/repo_pr_context_tracker.py \
+            --config "$TRACKER_CONFIG" \
+            --state-dir "$TRACKER_STATE_DIR" \
+            --output-dir "$TRACKER_OUTPUT_DIR" \
+            --max-per-repository 6
+
+      - name: Rebuild deterministic snapshot with PR context
+        if: ${{ steps.pr-context.outcome == 'success' }}
+        run: |
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+
+          sys.path.insert(0, "scripts")
+          from repo_commit_tracker import deterministic_zip
+
+          output = Path("build/repository-tracker")
+          deterministic_zip(output, output / "repository-tracker-snapshot.zip")
+          PY
+
+      - name: Validate generated manifest invariants
+        if: ${{ steps.pr-context.outcome == 'success' }}
         id: summary
         run: |
           python3 - <<'PY'
@@ -86,13 +115,20 @@ jobs:
           import os
           from pathlib import Path
 
+          output_dir = Path("build/repository-tracker")
           manifest = json.loads(
-              Path("build/repository-tracker/manifest.json").read_text(encoding="utf-8")
+              (output_dir / "manifest.json").read_text(encoding="utf-8")
+          )
+          pr_context = json.loads(
+              (output_dir / "learning/pr-context.json").read_text(encoding="utf-8")
           )
           assert manifest["schema"] == "raf.repository-tracker-manifest.v1"
           assert manifest["claim_allowed"] is False
           assert manifest["mode"] == "READ_ONLY_METADATA_AND_COMMIT_LINEAGE"
           assert manifest["requests_used"] <= manifest["request_budget"]
+          assert pr_context["schema"] == "raf.repository-pr-context-report.v1"
+          assert pr_context["claim_allowed"] is False
+          assert pr_context["requests_used"] <= pr_context["request_budget"]
           assert manifest["safety"] == {
               "read_only": True,
               "auto_fork": False,
@@ -103,10 +139,12 @@ jobs:
           }
 
           summary = manifest["summary"]
+          pr_summary = pr_context["summary"]
           output = Path(os.environ["GITHUB_OUTPUT"])
           with output.open("a", encoding="utf-8") as stream:
               stream.write(f"snapshot_ready={str(summary['snapshot_ready']).lower()}\n")
               stream.write(f"new_events={summary['new_events']}\n")
+              stream.write(f"changed_prs={pr_summary['changed_pull_requests']}\n")
               stream.write(f"next_shard_id={summary['next_shard_id']}\n")
 
           step_summary = Path(os.environ["GITHUB_STEP_SUMMARY"])
@@ -115,24 +153,28 @@ jobs:
               f"- repositories: {summary['repositories_selected']}\n"
               f"- accessible: {summary['repositories_ok']}\n"
               f"- TOKEN_VAZIO: {summary['repositories_token_vazio']}\n"
-              f"- new events: {summary['new_events']}\n"
-              f"- shards: {summary['shards_created']}\n"
+              f"- new commit/fork events: {summary['new_events']}\n"
+              f"- changed PRs: {pr_summary['changed_pull_requests']}\n"
+              f"- commit/fork shards: {summary['shards_created']}\n"
+              f"- PR shards: {pr_summary['shards_created']}\n"
               f"- next shard: `{summary['next_shard_id']}`\n"
               f"- snapshot ready: `{summary['snapshot_ready']}`\n"
-              f"- API requests: {manifest['requests_used']}/{manifest['request_budget']}\n",
+              f"- API requests: "
+              f"{manifest['requests_used'] + pr_context['requests_used']}/"
+              f"{manifest['request_budget'] + pr_context['request_budget']}\n",
               encoding="utf-8",
           )
           PY
 
       - name: Save tracker state for the next cycle
-        if: ${{ steps.tracker.outcome == 'success' }}
+        if: ${{ steps.pr-context.outcome == 'success' }}
         uses: actions/cache/save@v4
         with:
           path: ${{ env.TRACKER_STATE_DIR }}
           key: repository-tracker-${{ github.ref_name }}-${{ github.run_id }}
 
       - name: Upload run snapshot
-        if: ${{ steps.tracker.outcome == 'success' }}
+        if: ${{ steps.pr-context.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: repository-tracker-${{ github.run_id }}
