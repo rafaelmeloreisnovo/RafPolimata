@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafpolimata.local/contracts/language-matrix-state.schema.json",
+  "title": "RafPolimata language matrix support state",
+  "type": "object",
+  "required": ["schema", "version", "claim_allowed", "score_semantics", "axes"],
+  "properties": {
+    "schema": {"const": "raf.language-matrix-state.v1"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "claim_allowed": {"const": false},
+    "score_semantics": {"const": "engineering_support_not_accuracy"},
+    "axes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "score", "status", "evidence", "token_vazio", "next_gate"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9_\\-]+$"},
+          "score": {
+            "oneOf": [
+              {"type": "null"},
+              {"type": "number", "minimum": 0, "maximum": 1, "multipleOf": 0.1}
+            ]
+          },
+          "status": {
+            "enum": ["DEFINED", "CONTRACT", "IMPLEMENTED", "TESTED_LOCAL", "MEASURED_ZERO", "TOKEN_VAZIO"]
+          },
+          "evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "token_vazio": {"type": ["string", "null"]},
+          "next_gate": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
