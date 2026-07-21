@@ -20,7 +20,7 @@
           "score": {
             "oneOf": [
               {"type": "null"},
-              {"type": "number", "minimum": 0, "maximum": 1, "multipleOf": 0.1}
+              {"type": "number", "minimum": 0, "maximum": 0.5, "multipleOf": 0.1}
             ]
           },
           "status": {
