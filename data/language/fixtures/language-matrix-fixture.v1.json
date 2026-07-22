@@ -1,0 +1,29 @@
+{
+  "schema": "raf.language-matrix-fixture.v1",
+  "version": "1.0.0",
+  "scope": "deterministic_engineering_fixture_not_linguistic_corpus",
+  "claim_allowed": false,
+  "normalization": "NFC",
+  "matrix": [[0, 1], [2, 0]],
+  "expected": {
+    "direct": [[0.0, 1.0], [2.0, 0.0]],
+    "inverse_relational": [[0.0, 2.0], [1.0, 0.0]],
+    "indirect_two_step": [[2.0, 0.0], [0.0, 2.0]],
+    "reciprocal": [[0.0, 1.0], [1.0, 0.0]]
+  },
+  "logarithmic_source": [[0.0, 1.0], [3.0, 10.0]],
+  "fibonacci": {
+    "limit": 13,
+    "windows": [1, 2, 3, 5, 8, 13],
+    "inverse": {"13": 7, "4": null}
+  },
+  "dyadic": {"length": 7, "expected_leaf_count": 7},
+  "multiscript_text": "λόγος בראשית ܒܪܫܝܬ TOKEN_VAZIO",
+  "expected_whitespace_tokens": ["λόγος", "בראשית", "ܒܪܫܝܬ", "TOKEN_VAZIO"],
+  "limits": [
+    "not_a_linguistic_corpus",
+    "not_a_human_comprehension_measure",
+    "not_accuracy",
+    "not_cross_repository_validation"
+  ]
+}

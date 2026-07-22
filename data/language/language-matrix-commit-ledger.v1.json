@@ -1,0 +1,93 @@
+{
+  "schema": "raf.language-matrix-commit-ledger.v1",
+  "version": "1.0.0",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "branch": "research/language-matrix-token-vazio-01-20260721",
+  "scope": "foundational_commits_before_hashed_fixture_extension",
+  "base_sha": "7924259d02c99720b073da28f705c7346faf529b",
+  "observed_head_sha": "bef9ba548ebc89d4d0e0c31f5be685061ddeb37a",
+  "branch_relation": {
+    "ahead_by": 7,
+    "behind_by": 0,
+    "observed_via": "GitHub compare API"
+  },
+  "claim_allowed": false,
+  "evidence_scope": {
+    "commit_existence": "VERIFIED_GITHUB_API",
+    "commit_content": "VERIFIED_GITHUB_API",
+    "branch_ahead_count": "VERIFIED_GITHUB_API",
+    "parent_chain_linearity": "TOKEN_VAZIO_PARENT_CHAIN_NOT_EXPORTED",
+    "runtime_reexecution": "TOKEN_VAZIO_CURRENT_CHECKOUT"
+  },
+  "fixture": {
+    "path": "data/language/fixtures/language-matrix-fixture.v1.json",
+    "sha256": "206bddd5bec7fd9f97d09793ad83adc4900a3ec98e24a38d1d6a4eef356fad83",
+    "classification": "HASHED_ENGINEERING_FIXTURE_NOT_CORPUS"
+  },
+  "commits": [
+    {
+      "sequence": 1,
+      "sha": "d210459b0a9c7641e791d37515551d4214be8178",
+      "message": "feat(language): add 0.1 support ladder and multilingual operator config",
+      "artifacts": ["configs/language-matrix.v1.json"],
+      "gate_contribution": ["definition", "contract"],
+      "existence": "VERIFIED_GITHUB_API"
+    },
+    {
+      "sequence": 2,
+      "sha": "c267cb43cb98c0845f56814d2a33a82f47a2b35d",
+      "message": "feat(language): add auditable state contract",
+      "artifacts": ["contracts/language-matrix-state.schema.json"],
+      "gate_contribution": ["contract"],
+      "existence": "VERIFIED_GITHUB_API"
+    },
+    {
+      "sequence": 3,
+      "sha": "5873af3ba235424f7925b98d86d0c37d33ca0795",
+      "message": "feat(language): seed support state without invented weights or accuracy",
+      "artifacts": ["data/language/language-matrix-state.v1.json"],
+      "gate_contribution": ["contract"],
+      "existence": "VERIFIED_GITHUB_API"
+    },
+    {
+      "sequence": 4,
+      "sha": "db6e4ae15763bf30b7122329a5fc2d95bd6c9051",
+      "message": "feat(language): implement matrix operators and TOKEN_VAZIO promotion gates",
+      "artifacts": ["scripts/language_matrix.py"],
+      "gate_contribution": ["implementation"],
+      "existence": "VERIFIED_GITHUB_API"
+    },
+    {
+      "sequence": 5,
+      "sha": "33775a6480182df7535592a29fc0da43a5ba2692",
+      "message": "test(language): cover 0.1 ladder, matrices, Unicode and fractal partitions",
+      "artifacts": ["tests/test_language_matrix.py"],
+      "gate_contribution": ["local_test"],
+      "existence": "VERIFIED_GITHUB_API"
+    },
+    {
+      "sequence": 6,
+      "sha": "38fc09e2182cfecb5eaf1d33c79fe3b4cf846211",
+      "message": "docs(language): formalize multilingual matrix and 0.1 evidence ladder",
+      "artifacts": ["docs/LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md"],
+      "gate_contribution": ["definition"],
+      "existence": "VERIFIED_GITHUB_API"
+    },
+    {
+      "sequence": 7,
+      "sha": "bef9ba548ebc89d4d0e0c31f5be685061ddeb37a",
+      "message": "docs(index): register language matrix subsystem and validation gate",
+      "artifacts": ["docs/INDEX.md"],
+      "gate_contribution": ["contract"],
+      "existence": "VERIFIED_GITHUB_API"
+    }
+  ],
+  "limits": [
+    "commit_proves_recorded_repository_state_not_scientific_truth",
+    "commit_does_not_prove_runtime_success_without_execution_log",
+    "fixture_does_not_validate_linguistic_tokenization",
+    "fixture_does_not_define_weights_blending_accuracy_or_time",
+    "no_child_data"
+  ],
+  "next_gate": "run validators on a clean checkout and attach environment stdout stderr and artifact hashes"
+}

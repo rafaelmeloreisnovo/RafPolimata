@@ -1,0 +1,25 @@
+{
+  "schema": "raf.language-matrix-state.v1",
+  "version": "1.1.0",
+  "claim_allowed": false,
+  "score_semantics": "engineering_support_not_accuracy",
+  "axes": [
+    {"id":"support_contract","score":0.5,"status":"FIXTURE_HASHED","evidence":["definition","contract","implementation","local_test","hashed_fixture"],"token_vazio":null,"next_gate":"out-of-sample contract mutation tests"},
+    {"id":"matrix_operators","score":0.5,"status":"FIXTURE_HASHED","evidence":["definition","contract","implementation","local_test","hashed_fixture"],"token_vazio":null,"next_gate":"operator fixtures outside authored sample"},
+    {"id":"fibonacci_windows","score":0.5,"status":"FIXTURE_HASHED","evidence":["definition","contract","implementation","local_test","hashed_fixture"],"token_vazio":null,"next_gate":"independently generated sequence fixtures"},
+    {"id":"hierarchical_partition","score":0.5,"status":"FIXTURE_HASHED","evidence":["definition","contract","implementation","local_test","hashed_fixture"],"token_vazio":null,"next_gate":"randomized bounded lengths outside fixture"},
+    {"id":"script_inventory","score":0.5,"status":"FIXTURE_HASHED","evidence":["definition","contract","implementation","local_test","hashed_fixture"],"token_vazio":null,"next_gate":"linguistic review of script metadata"},
+    {"id":"baseline_tokenization","score":0.5,"status":"FIXTURE_HASHED","evidence":["definition","contract","implementation","local_test","hashed_fixture"],"token_vazio":null,"next_gate":"language-specific tokenizer validation"},
+    {"id":"commit_provenance","score":0.5,"status":"FIXTURE_HASHED","evidence":["definition","contract","implementation","local_test","hashed_fixture"],"token_vazio":null,"next_gate":"clean-checkout run and parent-chain verification"},
+    {"id":"linguistic_tokenization","score":null,"status":"TOKEN_VAZIO","evidence":[],"token_vazio":"TOKEN_VAZIO_CORPUS_VALIDATION","next_gate":"select licensed corpora and validate tokenizers"},
+    {"id":"canonical_tokens","score":null,"status":"TOKEN_VAZIO","evidence":[],"token_vazio":"TOKEN_VAZIO_CORPUS","next_gate":"freeze licensed corpus and inventory"},
+    {"id":"weights","score":null,"status":"TOKEN_VAZIO","evidence":[],"token_vazio":"TOKEN_VAZIO_CALIBRATION","next_gate":"define target and fit outside sample"},
+    {"id":"language_layers","score":null,"status":"TOKEN_VAZIO","evidence":[],"token_vazio":"TOKEN_VAZIO_LAYER_MAPPING","next_gate":"map 21 levels without duplicating semantics"},
+    {"id":"blending","score":null,"status":"TOKEN_VAZIO","evidence":[],"token_vazio":"TOKEN_VAZIO_MODEL","next_gate":"define candidate blend and baseline"},
+    {"id":"time","score":null,"status":"TOKEN_VAZIO","evidence":[],"token_vazio":"TOKEN_VAZIO_TIME_SERIES","next_gate":"obtain ordered observations"},
+    {"id":"accuracy","score":null,"status":"TOKEN_VAZIO","evidence":[],"token_vazio":"TOKEN_VAZIO_GROUND_TRUTH","next_gate":"pre-register labels and metric"},
+    {"id":"multi_repository_geometry","score":null,"status":"TOKEN_VAZIO","evidence":[],"token_vazio":"TOKEN_VAZIO_REPOSITORY_INVENTORY","next_gate":"inventory authenticated matrix artifacts"},
+    {"id":"fractal_dimension","score":null,"status":"TOKEN_VAZIO","evidence":[],"token_vazio":"TOKEN_VAZIO_ESTIMATOR","next_gate":"define estimator domain and falsifier"},
+    {"id":"human_comprehension","score":null,"status":"TOKEN_VAZIO","evidence":[],"token_vazio":"TOKEN_VAZIO_ETHICS_STUDY","next_gate":"adult study with ethics and preregistration"}
+  ]
+}
