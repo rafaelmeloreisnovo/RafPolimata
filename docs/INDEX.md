@@ -37,6 +37,7 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 | [LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md](LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md) | matriz multilíngue, operadores e promoção 0,1 por evidência |
 | [LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01_ERRATA_V1_1.md](LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01_ERRATA_V1_1.md) | corrige a escada universal: teto 0,5 e perfis próprios acima dele |
 | [LINGUAGEM/COERENCIA_COMMIT_FRACTAL_OMEGA.md](LINGUAGEM/COERENCIA_COMMIT_FRACTAL_OMEGA.md) | commits, fixture SHA-256, sete direções e fechamento Ω |
+| [LINGUAGEM/ATLAS_ARCOS_FLUXOS_LIVROS_ATOS_CRENCAS_MATEMATICA.md](LINGUAGEM/ATLAS_ARCOS_FLUXOS_LIVROS_ATOS_CRENCAS_MATEMATICA.md) | posições metodológicas, árvore canônica aberta, arcos textuais e semântica dos números |
 | [DEZ_DIMENSOES_SEMANTICAS.md](DEZ_DIMENSOES_SEMANTICAS.md) | dimensões e dinâmicas do sentido |
 | [CONVERGENCIA_UNICA_METODOLOGICA.md](CONVERGENCIA_UNICA_METODOLOGICA.md) | convergência metodológica auditável |
 | [CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md](CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md) | relações com repositórios irmãos |
