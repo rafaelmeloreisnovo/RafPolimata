@@ -1,5 +1,7 @@
 # Repository PR Context Sidecar
 
+> **Entrada canônica:** docs/AGENTES.md §8 (entradas canônicas por subsistema) e §6 (escalação e conflito — visibilidade inter-repositório). Sidecar de contexto de PRs em somente leitura — cadeia própria de shards, etiquetas semânticas determinísticas e TOKEN_VAZIO onde não existe prova.
+
 > **Entrada:** `scripts/repo_pr_context_tracker.py`  
 > **Estado:** `AUDIT / CANDIDATE`  
 > **Modo:** somente leitura  

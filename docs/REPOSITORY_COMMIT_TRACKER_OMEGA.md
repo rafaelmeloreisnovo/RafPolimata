@@ -1,5 +1,7 @@
 # Repository Commit Tracker Ω
 
+Ju> **Entrada canônica:** docs/AGENTES.md §8 (entradas canônicas por subsistema) e §3 (estados canônicos — ciclo de sessão e rastreabilidade). Rastreador Ω de commits e forks em somente leitura — anel inicial de 16 repositórios, cadeia SHA-256 de shards e cadência de 15 minutos.
+
 > **Estado:** `AUDIT / CANDIDATE`  
 > **Modo:** metadados, commits e linhagem de forks em somente leitura  
 > **Cadência configurada:** 15 minutos  
