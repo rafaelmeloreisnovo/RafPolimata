@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafpolimata.local/schemas/repository-tracker-manifest.schema.json",
+  "title": "RafPolimata repository tracker manifest",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "generated_at",
+    "owner",
+    "mode",
+    "claim_allowed",
+    "requests_used",
+    "request_budget",
+    "poll_interval_minutes",
+    "summary",
+    "repositories",
+    "safety",
+    "limitations"
+  ],
+  "properties": {
+    "schema": {"const": "raf.repository-tracker-manifest.v1"},
+    "version": {"const": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "owner": {"type": "string", "minLength": 1},
+    "mode": {"const": "READ_ONLY_METADATA_AND_COMMIT_LINEAGE"},
+    "claim_allowed": {"const": false},
+    "requests_used": {"type": "integer", "minimum": 0},
+    "request_budget": {"type": "integer", "minimum": 1, "maximum": 500},
+    "poll_interval_minutes": {"type": "integer", "minimum": 15},
+    "summary": {
+      "type": "object",
+      "required": [
+        "repositories_selected",
+        "repositories_ok",
+        "repositories_token_vazio",
+        "new_events",
+        "shards_created",
+        "global_stable_runs",
+        "snapshot_ready",
+        "next_shard_id",
+        "chain_head"
+      ],
+      "properties": {
+        "repositories_selected": {"type": "integer", "minimum": 1},
+        "repositories_ok": {"type": "integer", "minimum": 0},
+        "repositories_token_vazio": {"type": "integer", "minimum": 0},
+        "new_events": {"type": "integer", "minimum": 0},
+        "shards_created": {"type": "integer", "minimum": 0},
+        "global_stable_runs": {"type": "integer", "minimum": 0},
+        "snapshot_ready": {"type": "boolean"},
+        "next_shard_id": {"type": "string", "pattern": "^[0-9A-Za-z._~-]{2,32}$"},
+        "chain_head": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "full_name",
+          "family",
+          "priority",
+          "aliases",
+          "status",
+          "token_vazio",
+          "metadata",
+          "head_sha",
+          "new_commit_count",
+          "forks"
+        ],
+        "properties": {
+          "full_name": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+          "family": {"type": "string", "minLength": 1},
+          "priority": {"type": "integer"},
+          "aliases": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "status": {"enum": ["OK", "TOKEN_VAZIO"]},
+          "token_vazio": {"type": ["string", "null"]},
+          "metadata": {"type": ["object", "null"]},
+          "head_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+          "new_commit_count": {"type": "integer", "minimum": 0},
+          "forks": {"type": "array", "items": {"type": "object"}}
+        },
+        "additionalProperties": false
+      }
+    },
+    "safety": {
+      "const": {
+        "read_only": true,
+        "auto_fork": false,
+        "auto_merge": false,
+        "auto_push": false,
+        "execute_external_code": false,
+        "clone_external_repositories": false
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    }
+  },
+  "additionalProperties": false
+}

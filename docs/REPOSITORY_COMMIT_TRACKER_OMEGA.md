@@ -1,6 +1,6 @@
 # Repository Commit Tracker Ω
 
-> **Entrada canônica:** docs/AGENTES.md §8 (entradas canônicas por subsistema) e §3 (estados canônicos — ciclo de sessão e rastreabilidade). Rastreador Ω de commits e forks em somente leitura — anel inicial de 16 repositórios, cadeia SHA-256 de shards e cadência de 15 minutos.
+Ju> **Entrada canônica:** docs/AGENTES.md §8 (entradas canônicas por subsistema) e §3 (estados canônicos — ciclo de sessão e rastreabilidade). Rastreador Ω de commits e forks em somente leitura — anel inicial de 16 repositórios, cadeia SHA-256 de shards e cadência de 15 minutos.
 
 > **Estado:** `AUDIT / CANDIDATE`  
 > **Modo:** metadados, commits e linhagem de forks em somente leitura  
@@ -315,7 +315,7 @@ python3 scripts/repo_commit_tracker.py \
 
 ```text
 execução no default branch       = TOKEN_VAZIO_UNTIL_MERGE
-secret multirepositório         = TOKEN_VAZIO_SECRET_SCOPE
+secret multirrepositório         = TOKEN_VAZIO_SECRET_SCOPE
 primeiro artifact remoto         = TOKEN_VAZIO_CI_RUN
 FreeBSD no conjunto observado    = TOKEN_VAZIO_REPOSITORY_MAPPING
 PCE_ como nome exato             = TOKEN_VAZIO_ALIAS_RESOLUTION
