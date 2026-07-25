@@ -33,6 +33,8 @@ A ordem de leitura é:
 | Contrato do estado | [`contracts/ecosystem-runtime-state.schema.json`](contracts/ecosystem-runtime-state.schema.json) | schema da matriz material |
 | Validação local | [`scripts/validate_runtime_truth_local.sh`](scripts/validate_runtime_truth_local.sh) | build e testes locais sem crédito de Actions |
 | Validador do estado | [`scripts/validate_ecosystem_runtime_state.py`](scripts/validate_ecosystem_runtime_state.py) | coerência de estados com Python stdlib |
+| Build Doctor | [`scripts/ecosystem_build_doctor.py`](scripts/ecosystem_build_doctor.py) | CMake, flags, linker, fontes zumbis e binários sem proveniência |
+| Contrato do Build Doctor | [`contracts/ecosystem-build-doctor-report.schema.json`](contracts/ecosystem-build-doctor-report.schema.json) | envelope de achados, severidade e fronteira de claims |
 | Política documental | [`configs/document-governance.v1.json`](configs/document-governance.v1.json) | áreas, responsáveis, revisão e sensibilidade |
 | Catálogo documental | [`scripts/document_governance.py`](scripts/document_governance.py) | identidade, relações, duplicidade e fila |
 
@@ -170,8 +172,10 @@ Principais corpos:
 - `.github/workflows/formal-science.yml` — orquestração científica;
 - `.github/workflows/document-governance.yml` — catálogo e fila documental;
 - `.github/workflows/apkc-first-part.yml` — verdade, toolchain e prova inicial ApkC;
+- `.github/workflows/ecosystem-build-doctor.yml` — warnings, CMake, linker, zumbis e proveniência;
 - `scripts/audit_repository_structure.py` — estrutura física `L0`;
 - `scripts/document_governance.py` — governança documental `L1–L5`;
+- `scripts/ecosystem_build_doctor.py` — auditoria read-only de fricção de build;
 - `scripts/validate_apkc_formats.py` — validação independente de APK/DEX/ELF.
 
 ## Documentação de profundidade
