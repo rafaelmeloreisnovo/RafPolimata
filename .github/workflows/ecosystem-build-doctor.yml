@@ -1,0 +1,68 @@
+name: Ecosystem Build Doctor
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/ecosystem_build_doctor.py'
+      - 'tests/test_ecosystem_build_doctor.py'
+      - 'contracts/ecosystem-build-doctor-report.schema.json'
+      - 'docs/ECOSYSTEM_BUILD_DOCTOR.md'
+      - '.github/workflows/ecosystem-build-doctor.yml'
+      - 'scripts/validate_runtime_truth_local.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ecosystem-build-doctor-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  doctor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python identity
+        run: python3 --version
+
+      - name: Validate JSON contract syntax
+        run: python3 -m json.tool contracts/ecosystem-build-doctor-report.schema.json >/dev/null
+
+      - name: Unit tests
+        run: python3 -m unittest tests/test_ecosystem_build_doctor.py -v
+
+      - name: Self-audit RafPolimata
+        run: |
+          mkdir -p artifacts/ecosystem-build-doctor
+          python3 scripts/ecosystem_build_doctor.py \
+            --repo rafpolimata=. \
+            --json-out artifacts/ecosystem-build-doctor/report.json \
+            --markdown-out artifacts/ecosystem-build-doctor/report.md \
+            --fail-on critical
+
+      - name: Validate report envelope
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path('artifacts/ecosystem-build-doctor/report.json').read_text())
+          assert report['schema'] == 'raf.ecosystem-build-doctor-report.v1'
+          assert report['claim_boundary']['static_analysis'] == 'VERIFIED_BY_EXECUTION'
+          assert report['claim_boundary']['build_execution'] == 'TOKEN_VAZIO'
+          assert report['claim_boundary']['runtime_correctness'] == 'TOKEN_VAZIO'
+          assert report['claim_boundary']['automatic_deletion'] is False
+          assert report['summary']['state'] in {'PASS', 'PASS_LIMITED', 'REVIEW_REQUIRED'}
+          print('PASS ecosystem-build-doctor-report-envelope')
+          PY
+
+      - name: Upload audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecosystem-build-doctor-report
+          path: artifacts/ecosystem-build-doctor/
+          if-no-files-found: error
