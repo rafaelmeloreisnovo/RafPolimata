@@ -15,5 +15,18 @@
   ],
   "safe_state": "vm-stopped-no-image-mutation",
   "rollback_anchor": "TOKEN_VAZIO",
-  "claim_allowed": false
+  "claim_allowed": false,
+  "input_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "output_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "status": "DISPATCH_ACCEPTED_EXECUTION_PENDING",
+  "F_ok": [
+    "dispatch_accepted"
+  ],
+  "F_gap": [
+    "execution_exit_code:TOKEN_VAZIO",
+    "guest_boot:TOKEN_VAZIO"
+  ],
+  "F_next": [
+    "capture_termux_execution_receipt"
+  ]
 }
