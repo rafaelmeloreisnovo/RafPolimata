@@ -7,15 +7,15 @@ trap 'rm -rf "$BUILD"' EXIT
 mkdir -p "$BUILD"
 cd "$ROOT"
 
-printf '%s\n' '[1/8] strict host compiler build'
+printf '%s\n' '[1/9] strict host compiler build'
 cc -std=c11 -Wall -Wextra -Werror \
   raf_main.c raf_frontend.c raf_cpu.c raf_asm_emit.c raf_precomp.c \
   -o "$BUILD/raf_compile"
 
-printf '%s\n' '[2/8] segment v1 header, fixed records and bounded-reader tests'
+printf '%s\n' '[2/9] segment v1 header, fixed records and bounded-reader tests'
 make -C runtime/conversation_indexer test-segment audit
 
-printf '%s\n' '[3/8] raw native output contract'
+printf '%s\n' '[3/9] raw native output contract'
 printf 'int main(void){return 0;}\n' > "$BUILD/input.c"
 "$BUILD/raf_compile" "$BUILD/input.c" "$BUILD/out" O2 --native
 for suffix in s hex bin ops; do
@@ -25,7 +25,7 @@ grep -qx 'ops_schema=3' "$BUILD/out.ops"
 grep -qx 'native_requested=1' "$BUILD/out.ops"
 grep -qx 'native_written=1' "$BUILD/out.ops"
 
-printf '%s\n' '[4/8] optional output-base parsing'
+printf '%s\n' '[4/9] optional output-base parsing'
 (
   cd "$BUILD"
   "$BUILD/raf_compile" input.c --native
@@ -33,7 +33,7 @@ printf '%s\n' '[4/8] optional output-base parsing'
   grep -qx 'native_written=1' raf_out.ops
 )
 
-printf '%s\n' '[5/8] unknown extension and oversized source rejection'
+printf '%s\n' '[5/9] unknown extension and oversized source rejection'
 printf 'not a C source\n' > "$BUILD/input.unknown"
 if "$BUILD/raf_compile" "$BUILD/input.unknown" "$BUILD/unknown"; then
   echo 'FAIL unknown extension was accepted as C' >&2
@@ -52,7 +52,7 @@ if "$BUILD/raf_compile" "$BUILD/oversized.c" "$BUILD/oversized"; then
 fi
 grep -qx 'rollback_code=-5' "$BUILD/oversized.ops"
 
-printf '%s\n' '[6/8] source-level honesty invariants'
+printf '%s\n' '[6/9] source-level honesty invariants'
 python3 - <<'PY'
 from pathlib import Path
 
@@ -85,10 +85,10 @@ for name, passed in checks.items():
     print(f'PASS {name}')
 PY
 
-printf '%s\n' '[7/8] ecosystem evidence-state validation'
+printf '%s\n' '[7/9] ecosystem evidence-state validation'
 python3 scripts/validate_ecosystem_runtime_state.py
 
-printf '%s\n' '[8/8] toroidal research router validation'
+printf '%s\n' '[8/9] toroidal research router validation'
 python3 -m unittest tests/test_toroidal_research_router.py -v
 python3 scripts/toroidal_research_router.py validate-contract \
   contracts/toroidal_research_router.v1.json
@@ -98,5 +98,26 @@ python3 scripts/toroidal_research_router.py validate-manifest \
 python3 scripts/toroidal_research_router.py summarize \
   contracts/toroidal_research_router.v1.json \
   examples/toroidal_research_router.example.json
+
+printf '%s\n' '[9/9] ecosystem build doctor unit tests and self-audit'
+python3 -m unittest tests/test_ecosystem_build_doctor.py -v
+python3 scripts/ecosystem_build_doctor.py \
+  --repo rafpolimata=. \
+  --json-out "$BUILD/ecosystem-build-doctor.json" \
+  --markdown-out "$BUILD/ecosystem-build-doctor.md" \
+  --fail-on critical
+python3 - "$BUILD/ecosystem-build-doctor.json" <<'PY'
+import json
+from pathlib import Path
+import sys
+
+report = json.loads(Path(sys.argv[1]).read_text())
+assert report['schema'] == 'raf.ecosystem-build-doctor-report.v1'
+assert report['claim_boundary']['static_analysis'] == 'VERIFIED_BY_EXECUTION'
+assert report['claim_boundary']['build_execution'] == 'TOKEN_VAZIO'
+assert report['claim_boundary']['runtime_correctness'] == 'TOKEN_VAZIO'
+assert report['claim_boundary']['automatic_deletion'] is False
+print('PASS ecosystem-build-doctor-report-envelope')
+PY
 
 printf '%s\n' 'PASS rafpolimata-runtime-truth-local'
