@@ -23,6 +23,16 @@ class EvidenceError(ValueError):
     pass
 
 
+def is_sha256(value: Any) -> bool:
+    if not isinstance(value, str) or len(value) != 64:
+        return False
+    try:
+        int(value, 16)
+    except ValueError:
+        return False
+    return True
+
+
 def compile_evidence(receipt: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
     if receipt.get("schema") != "raf.android-runtime-receipt.v1":
@@ -37,6 +47,17 @@ def compile_evidence(receipt: dict[str, Any]) -> dict[str, Any]:
         errors.append("claim_allowed")
     if receipt.get("safe_state") != "vm-stopped-no-image-mutation":
         errors.append("safe_state")
+    if not is_sha256(receipt.get("input_sha256")):
+        errors.append("input_sha256")
+    if not is_sha256(receipt.get("output_sha256")):
+        errors.append("output_sha256")
+    if not isinstance(receipt.get("status"), str) or not receipt.get("status"):
+        errors.append("status")
+    if not isinstance(receipt.get("effects_observed"), list):
+        errors.append("effects_observed")
+    for field in ("F_ok", "F_gap", "F_next"):
+        if not isinstance(receipt.get(field), list):
+            errors.append(field)
     if errors:
         raise EvidenceError(",".join(errors))
 
