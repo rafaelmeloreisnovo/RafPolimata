@@ -1,0 +1,19 @@
+{
+  "schema": "raf.android-runtime-receipt.v1",
+  "transaction_id": "tx-vectras-termux-0001",
+  "producer": "rafaelmeloreisnovo/Vectras-VM-Android",
+  "producer_commit": "TOKEN_VAZIO",
+  "termux_commit": "TOKEN_VAZIO",
+  "protocol_version": 2,
+  "binary_name": "qemu-system-aarch64",
+  "dispatch_state": "DISPATCHED",
+  "execution_exit_code": null,
+  "guest_boot_artifact_sha256": null,
+  "private_paths_exposed": false,
+  "effects_observed": [
+    "DISPATCH"
+  ],
+  "safe_state": "vm-stopped-no-image-mutation",
+  "rollback_anchor": "TOKEN_VAZIO",
+  "claim_allowed": false
+}
