@@ -41,6 +41,12 @@ class AndroidRuntimeEvidenceTest(unittest.TestCase):
         with self.assertRaises(MODULE.EvidenceError):
             MODULE.compile_evidence(receipt)
 
+    def test_missing_output_hash_is_blocked(self):
+        receipt = self.fixture()
+        receipt.pop("output_sha256")
+        with self.assertRaises(MODULE.EvidenceError):
+            MODULE.compile_evidence(receipt)
+
 
 if __name__ == "__main__":
     unittest.main()
