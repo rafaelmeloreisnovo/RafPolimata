@@ -8,18 +8,23 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import sys
 from typing import Any
 
 SCHEMA = "raf.apkc-structural-closure.v1"
 SOURCE_PROOF_SCHEMA = "raf.apkc.source-to-binary-proof.v2"
+FIRST_PART_SCHEMA = "raf.apkc-first-part-gate.v1"
+PREFLIGHT_SCHEMA = "raf.apkc-runtime-preflight.v1"
 FORMAT_MODULE_PATH = Path(__file__).with_name("validate_apkc_formats.py")
 
 
 def load_format_module():
-    spec = importlib.util.spec_from_file_location("validate_apkc_formats_c04", FORMAT_MODULE_PATH)
+    name = "validate_apkc_formats_c04"
+    spec = importlib.util.spec_from_file_location(name, FORMAT_MODULE_PATH)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot import {FORMAT_MODULE_PATH}")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
 
@@ -107,14 +112,40 @@ def source_proof_state(proof: dict[str, Any] | None, source_commit: str) -> tupl
     return ("PASS" if not errors else "FAIL"), errors
 
 
-def auxiliary_state(document: dict[str, Any] | None, label: str) -> dict[str, Any]:
+def first_part_state(document: dict[str, Any] | None) -> tuple[str, list[str]]:
     if document is None:
-        return {"label": label, "present": False, "state": "TOKEN_VAZIO"}
+        return "TOKEN_VAZIO", []
+    errors: list[str] = []
+    if document.get("schema") != FIRST_PART_SCHEMA:
+        errors.append(f"unexpected first-part schema: {document.get('schema')}")
+    if document.get("state") != "PASS":
+        errors.append(f"first-part gate is not PASS: {document.get('state')}")
+    if document.get("claim_allowed") is not False:
+        errors.append("first-part claim_allowed must remain false")
+    contradictions = document.get("contradictions")
+    if contradictions not in ([], None):
+        errors.append("first-part gate contains contradictions")
+    return ("PASS" if not errors else "FAIL"), errors
+
+
+def preflight_state(document: dict[str, Any] | None) -> dict[str, Any]:
+    if document is None:
+        return {
+            "state": "TOKEN_VAZIO",
+            "schema_valid": False,
+            "runtime_blocked": "TOKEN_VAZIO",
+            "blocker_count": "TOKEN_VAZIO",
+            "critical_blockers": "TOKEN_VAZIO",
+        }
+    schema_valid = document.get("schema") == PREFLIGHT_SCHEMA
+    summary = document.get("summary") if isinstance(document.get("summary"), dict) else {}
+    state = document.get("state", "TOKEN_VAZIO")
     return {
-        "label": label,
-        "present": True,
-        "schema": document.get("schema", "TOKEN_VAZIO"),
-        "state": document.get("state", document.get("overall_state", "TOKEN_VAZIO")),
+        "state": state,
+        "schema_valid": schema_valid,
+        "runtime_blocked": state == "BLOCKED",
+        "blocker_count": summary.get("source_blocker_count", "TOKEN_VAZIO"),
+        "critical_blockers": summary.get("critical_blockers", "TOKEN_VAZIO"),
         "claim_allowed": document.get("claim_allowed", "TOKEN_VAZIO"),
     }
 
@@ -138,7 +169,10 @@ def main() -> int:
             missing.append(str(path))
 
     source_state, source_errors = source_proof_state(source_proof, args.source_commit)
+    first_state, first_errors = first_part_state(first_part)
+    preflight_summary = preflight_state(preflight)
     errors.extend(source_errors)
+    errors.extend(first_errors)
 
     apk_report = format_module.validate_apk(args.apk, require_both=True)
     apk_state = apk_report.get("state", "TOKEN_VAZIO")
@@ -155,10 +189,15 @@ def main() -> int:
     )
     both_abis = set(apk_report.get("abis", [])) >= {"arm64-v8a", "armeabi-v7a"}
 
-    hard_failure = bool(errors) or apk_state == "FAIL" or source_state == "FAIL"
+    hard_failure = (
+        bool(errors)
+        or apk_state == "FAIL"
+        or source_state == "FAIL"
+        or first_state == "FAIL"
+    )
     if hard_failure:
         state = "FAIL"
-    elif missing or source_state != "PASS" or apk_state != "PASS":
+    elif missing or source_state != "PASS" or first_state != "PASS" or apk_state != "PASS":
         state = "INCOMPLETE"
     elif not (dex_pass and elf_pass and both_abis):
         state = "FAIL"
@@ -178,18 +217,22 @@ def main() -> int:
             "state": source_state,
             "document": source_proof if source_proof is not None else "TOKEN_VAZIO",
         },
-        "apk_validation": apk_report,
-        "auxiliary": {
-            "first_part_gate": auxiliary_state(first_part, "first_part_gate"),
-            "runtime_preflight": auxiliary_state(preflight, "runtime_preflight"),
+        "first_part_gate": {
+            "state": first_state,
+            "document": first_part if first_part is not None else "TOKEN_VAZIO",
         },
+        "runtime_preflight": preflight_summary,
+        "apk_validation": apk_report,
         "checks": {
             "source_proof_pass": source_state == "PASS",
+            "first_part_gate_pass": first_state == "PASS",
             "apk_zip_pass": apk_state == "PASS",
             "dex_pass": dex_pass,
             "elf_pass": elf_pass,
             "both_abis": both_abis,
             "source_commit_matches": bool(source_proof) and source_proof.get("commit") == args.source_commit,
+            "runtime_preflight_schema_valid": preflight_summary["schema_valid"],
+            "runtime_blockers_do_not_expand_structural_claim": True,
         },
         "artifacts": [
             artifact(args.apk),
@@ -200,6 +243,9 @@ def main() -> int:
         "missing_required_artifacts": sorted(set(missing)),
         "errors": sorted(set(errors)),
         "runtime_boundary": {
+            "source_contract_safe": (
+                False if preflight_summary["runtime_blocked"] is True else "TOKEN_VAZIO"
+            ),
             "apk_signed": "TOKEN_VAZIO",
             "apk_installed": "TOKEN_VAZIO",
             "package_launched": "TOKEN_VAZIO",
@@ -211,6 +257,7 @@ def main() -> int:
         "falsifiers": [
             "source_proof_commit_mismatch",
             "source_build_or_reproducibility_not_pass",
+            "first_part_gate_not_pass_or_contains_contradiction",
             "apk_missing_or_invalid_zip",
             "dex_internal_sha1_or_adler32_invalid",
             "elf_wrong_machine_or_invalid_layout",
