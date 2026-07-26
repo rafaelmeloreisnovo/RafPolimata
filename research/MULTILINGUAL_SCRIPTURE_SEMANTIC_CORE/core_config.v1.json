@@ -1,0 +1,123 @@
+{
+  "schema": "rafpolimata.multilingual-scripture-core.config.v1",
+  "version": "1.0.0",
+  "enabled": false,
+  "activation_policy": "MANUAL_EXPLICIT_ONLY",
+  "execution_mode": "EMULATION_ONLY",
+  "claim_allowed": false,
+  "corpus_import_allowed": false,
+  "network_access_allowed": false,
+  "deterministic_receipt": true,
+  "normalization": {
+    "storage": "NFC",
+    "comparison": "NFD_DIACRITIC_PRESERVING",
+    "compatibility_folding": false,
+    "segmentation_profile": "STDLIB_APPROXIMATION_UAX29_NOT_CLAIMED"
+  },
+  "languages": [
+    {
+      "tag": "pt-BR",
+      "name": "Português brasileiro",
+      "script": "Latn",
+      "role": "translation_and_analysis",
+      "pronunciation_profile": "REGIONAL_PROFILE_REQUIRED",
+      "historical_pronunciation": false
+    },
+    {
+      "tag": "hbo",
+      "name": "Hebraico bíblico",
+      "script": "Hebr",
+      "role": "source_language",
+      "pronunciation_profile": "SCHOLARLY_RECONSTRUCTION_REQUIRED",
+      "historical_pronunciation": true
+    },
+    {
+      "tag": "arc",
+      "name": "Aramaico bíblico",
+      "script": "Hebr",
+      "role": "source_language",
+      "pronunciation_profile": "DIALECT_AND_RECONSTRUCTION_REQUIRED",
+      "historical_pronunciation": true
+    },
+    {
+      "tag": "grc",
+      "name": "Grego antigo/coiné",
+      "script": "Grek",
+      "role": "source_language",
+      "pronunciation_profile": "EDITION_AND_RECONSTRUCTION_REQUIRED",
+      "historical_pronunciation": true
+    }
+  ],
+  "relation_types": [
+    "translation_alignment",
+    "quotation",
+    "allusion",
+    "lexical",
+    "thematic",
+    "contrast",
+    "grammatical_parallel",
+    "hypothesis"
+  ],
+  "epistemic_states": [
+    "VERIFIED_LITERAL",
+    "TESTED_SYNTHETIC_LOCAL",
+    "DERIVED",
+    "HYPOTHESIS",
+    "ANALOGY_ONLY",
+    "TOKEN_VAZIO",
+    "CONTRADICTION",
+    "BLOCKED"
+  ],
+  "hard_boundaries": {
+    "translation_equivalence_implies_identical_meaning": false,
+    "phonetic_approximation_implies_historical_certainty": false,
+    "shared_lexeme_implies_authorial_intent": false,
+    "thematic_similarity_implies_quotation": false,
+    "text_metric_implies_brain_state": false,
+    "neurocognitive_proxy_implies_clinical_or_neural_measurement": false,
+    "mathematical_pattern_implies_doctrinal_or_physical_causality": false
+  },
+  "neurocognitive_layer": {
+    "mode": "OBSERVABLE_PROXIES_ONLY",
+    "allowed": [
+      "token_count",
+      "mean_grapheme_length",
+      "clause_count",
+      "dependency_distance",
+      "morphological_density",
+      "phonetic_annotation_coverage",
+      "character_entropy",
+      "token_entropy"
+    ],
+    "forbidden_without_human_study": [
+      "brain_activation",
+      "emotion_detection",
+      "cognitive_diagnosis",
+      "spiritual_state",
+      "authorial_intention",
+      "reader_comprehension"
+    ]
+  },
+  "corpus_adapters": {
+    "hebrew": {
+      "candidate": "Open Scriptures Hebrew Bible",
+      "status": "ADAPTER_NOT_IMPLEMENTED",
+      "license_gate": "TEXT_AND_MORPHOLOGY_LICENSES_MUST_BE_RECORDED_SEPARATELY"
+    },
+    "greek": {
+      "candidate": "MorphGNT or another edition-specific corpus",
+      "status": "ADAPTER_NOT_IMPLEMENTED",
+      "license_gate": "TEXT_EULA_AND_MORPHOLOGY_LICENSE_MUST_BE_RECORDED_SEPARATELY"
+    },
+    "aramaic": {
+      "candidate": "TOKEN_VAZIO_CORPUS_SELECTION",
+      "status": "TOKEN_VAZIO",
+      "license_gate": "DIALECT_EDITION_LICENSE_AND_VERSE_MAPPING_REQUIRED"
+    },
+    "portuguese": {
+      "candidate": "TOKEN_VAZIO_PORTUGUESE_EDITION_SELECTION",
+      "status": "TOKEN_VAZIO",
+      "license_gate": "EDITION_COPYRIGHT_AND_ORTHOGRAPHY_PROFILE_REQUIRED"
+    }
+  }
+}
