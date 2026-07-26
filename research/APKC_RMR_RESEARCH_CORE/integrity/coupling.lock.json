@@ -1,0 +1,81 @@
+{
+  "artifacts": [
+    {
+      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "path": "README.md",
+      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "sha256": "fceeca17ce4e85a4816a2b548e00a2b102311effd006b9156e71750e641cdc6b"
+    },
+    {
+      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "path": "core/apkc_rmr_research_core.c",
+      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "sha256": "2700155ee3916bf585f12b062ceb40259bf282c00f1bd23f9d32d95c95ed10f2"
+    },
+    {
+      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "path": "docs/APKC_RMR_COUPLED_ARTIFACT_SPEC.md",
+      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "sha256": "9314cb2d6440ce8664398f853f3b86dda3176cd9765a27cfa9bb01d0ed768d43"
+    },
+    {
+      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "path": "licenses/SOFTWARE_LICENSE.md",
+      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "sha256": "36a2718342d1f266e907b635583523a4ef87f03c685852d71f82b0c7140b1e03"
+    },
+    {
+      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "path": "licenses/DOCUMENTATION_LICENSE.md",
+      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "sha256": "d75adbc56165f63718df3396d0c23b3c77457b8fda9f860be9b627711ddca9a1"
+    },
+    {
+      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "path": "licenses/COMMERCIAL_LICENSING_POLICY.md",
+      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "sha256": "af9e91db4b32f9fd9f3ec90ad99e5292b479f79961e04f0367418ea36e2d80a9"
+    },
+    {
+      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "path": "licenses/HIGH_RISK_SYSTEMS_ADDENDUM.md",
+      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "sha256": "b0ea7e1634381de040da60a10563a0ae5c4247053e0c158ae032f78367a6b1c0"
+    },
+    {
+      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "path": "governance/AUDIT_AND_CHAIN_OF_CUSTODY.md",
+      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "sha256": "6ac1270bd0c1fe78cec0772c122f4713513d6597f58644858bcb2582049cac8e"
+    },
+    {
+      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "path": "governance/THIRD_PARTY_AND_RELICENSING_BOUNDARY.md",
+      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "sha256": "891d9a8c434adffa87077b54cbd14e4b27fb00c272f2b57c16d438602d08aa8f"
+    },
+    {
+      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "path": "NOTICE.md",
+      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "sha256": "099e81ebc0e9772e9e92b35c3326d4235b9414702d11c017ea96a1bf2dac6fa6"
+    },
+    {
+      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "path": "tools/verify_coupled_artifacts.py",
+      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "sha256": "9e326542d2ff38189b494a8df0a74d16b010e714dc39bcc4c38800fbe4515d24"
+    }
+  ],
+  "blake3_gate": {
+    "next_step": "Seal release artifacts with the canonical BLAKE3 tool and record its commit/hash.",
+    "reason": "No verified BLAKE3 implementation was bundled into this isolated nucleus.",
+    "state": "TOKEN_VAZIO"
+  },
+  "claim_allowed": false,
+  "commercial_authorized": false,
+  "coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+  "license_class": "SOURCE_AVAILABLE_NONCOMMERCIAL",
+  "schema": "raf.apkc-rmr-coupling-lock.v1",
+  "state": "SEALED_SHA256_BLAKE3_PENDING"
+}
