@@ -118,11 +118,18 @@ def audit(source: Path, language: str) -> dict[str, object]:
         for record in files
         if Path(str(record["path"])).name.lower() in LICENSE_NAMES
     )
+    source_files = sorted(
+        str(record["path"])
+        for record in files
+        if Path(str(record["path"])).name.lower() not in LICENSE_NAMES
+    )
     tree_digest = sha256_bytes(
         "\n".join(f"{record['path']}\t{record['sha256']}" for record in files).encode("utf-8")
     )
 
-    if severities.get("BLOCK", 0) > 0:
+    if not source_files:
+        status = "TOKEN_VAZIO_NO_SCANNABLE_SOURCE"
+    elif severities.get("BLOCK", 0) > 0:
         status = "REJECTED_RUNTIME_UNTIL_REWRITE"
     elif language not in DIRECT_CANDIDATE_LANGS:
         status = "LOWERING_REQUIRED"
@@ -138,6 +145,7 @@ def audit(source: Path, language: str) -> dict[str, object]:
             "language": language,
             "tree_sha256": tree_digest,
             "file_count": len(files),
+            "source_file_count": len(source_files),
             "license_files": license_files,
         },
         "inventory": {
@@ -159,6 +167,12 @@ def audit(source: Path, language: str) -> dict[str, object]:
 def selftest() -> int:
     with tempfile.TemporaryDirectory(prefix="rafaelia-m063-") as tmp:
         root = Path(tmp)
+
+        empty = root / "empty"
+        empty.mkdir()
+        empty_report = audit(empty, "c")
+        assert empty_report["decision"]["status"] == "TOKEN_VAZIO_NO_SCANNABLE_SOURCE"  # type: ignore[index]
+
         pure = root / "pure.c"
         pure.write_text(
             "unsigned long long patch(unsigned long long a, unsigned long long v, "
