@@ -60,6 +60,7 @@ fi
   -c "$ROOT/raf_cpu.c" -o "$CPU_OBJ"
 python3 "$ROOT/tests/test_capability_matrix.py"
 python3 "$ROOT/scripts/raf_library_assimilation_audit.py" --selftest
+python3 "$ROOT/scripts/raf_strict_compile_plan.py" --selftest
 
 TSV="$ROOT/ci/contracts/rafaelia_language_completion_v1.tsv"
 [[ -s "$TSV" ]] || fail 'matriz TSV ausente'
@@ -102,9 +103,10 @@ done
   echo '- Strict compile warnings: PASS'
   echo '- Undefined symbols in strict object: PASS'
   echo '- Selective bit patch selftest: PASS'
-  echo '- Static lane-16 dependency selftest: PASS'
+  echo '- Static lane-16 dependency/resource selftest: PASS'
   echo '- Compiler matrix and frontend detection: PASS'
   echo '- Foreign-library inventory selftest: PASS'
+  echo '- Strict compile-plan selftest: PASS'
   echo '- Policy/TSV coverage: PASS'
   echo
   echo 'Resultado: PASS_LOCAL. Final ELF/DEX/device binaries still require their own symbol, relocation and runtime gates.'
