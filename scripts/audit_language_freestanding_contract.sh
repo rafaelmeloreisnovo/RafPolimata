@@ -59,6 +59,7 @@ fi
 "$CC_BIN" -std=c11 -Wall -Wextra -Werror \
   -c "$ROOT/raf_cpu.c" -o "$CPU_OBJ"
 python3 "$ROOT/tests/test_capability_matrix.py"
+python3 "$ROOT/scripts/raf_library_assimilation_audit.py" --selftest
 
 TSV="$ROOT/ci/contracts/rafaelia_language_completion_v1.tsv"
 [[ -s "$TSV" ]] || fail 'matriz TSV ausente'
@@ -103,6 +104,7 @@ done
   echo '- Selective bit patch selftest: PASS'
   echo '- Static lane-16 dependency selftest: PASS'
   echo '- Compiler matrix and frontend detection: PASS'
+  echo '- Foreign-library inventory selftest: PASS'
   echo '- Policy/TSV coverage: PASS'
   echo
   echo 'Resultado: PASS_LOCAL. Final ELF/DEX/device binaries still require their own symbol, relocation and runtime gates.'
