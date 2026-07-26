@@ -45,7 +45,7 @@ python3 tools/forensic_deception_lab.py --output build/forensic-deception/report
 
 ## Observação local anterior ao commit
 
-O mesmo conteúdo foi executado em sandbox isolado:
+O conteúdo atual, após correção exclusivamente terminológica de `signed` para `authenticated`, foi executado em sandbox isolado:
 
 ```text
 Python: 3.13.5
@@ -55,11 +55,11 @@ Resultado: OK
 Tempo reportado pelo unittest: 0.003 s
 ```
 
-SHA-256 do conteúdo executado antes da gravação:
+SHA-256 do conteúdo executado:
 
 ```text
 tools/forensic_deception_lab.py
-ac2b5811afffe98bc264da8875bca9a4934a4d608349671f04ffc13799af07e0
+96b1da19adcbc952e7cdb187bd2da7710cdc6ac9d8e991d4bb99b0c515f28a60
 
 tests/test_forensic_deception_lab.py
 e9b61ecbd2388e31558f7d01b79b7e5d06d37a811db47cb3c060898d2c905410
