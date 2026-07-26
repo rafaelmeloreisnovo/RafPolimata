@@ -12,24 +12,9 @@
   },
   "compiler_gate": {
     "commands": [
-      [
-        "make",
-        "-C",
-        "{self}/research/APKC_RMR_RESEARCH_CORE",
-        "verify"
-      ],
-      [
-        "make",
-        "-C",
-        "{self}/research/APKC_RMR_RESEARCH_CORE",
-        "test"
-      ],
-      [
-        "make",
-        "-C",
-        "{self}/research/APKC_RMR_RESEARCH_CORE",
-        "coupled-build"
-      ]
+      ["make", "-C", "{self}/research/APKC_RMR_RESEARCH_CORE", "verify"],
+      ["make", "-C", "{self}/research/APKC_RMR_RESEARCH_CORE", "test"],
+      ["make", "-C", "{self}/research/APKC_RMR_RESEARCH_CORE", "coupled-build"]
     ]
   },
   "targets": {
@@ -40,218 +25,149 @@
         "research/APKC_RMR_RESEARCH_CORE/Makefile",
         "research/APKC_RMR_RESEARCH_CORE/integrity/coupling.lock.json"
       ],
-      "required_commands": [
-        "git",
-        "make",
-        "python3"
-      ],
+      "required_commands": ["git", "make", "python3"],
       "required_env_any": [],
-      "build_command": [
-        "make",
-        "-C",
-        "{self}/research/APKC_RMR_RESEARCH_CORE",
-        "coupled-build"
+      "build_command": ["make", "-C", "{self}/research/APKC_RMR_RESEARCH_CORE", "coupled-build"],
+      "workdir": "{self}",
+      "artifact_globs": ["{self}/research/APKC_RMR_RESEARCH_CORE/build/coupled/**/*"],
+      "scope": "Sealed freestanding compiler core; no APK install or runtime.",
+      "required_command_any": [["cc", "clang", "gcc"]]
+    },
+    "rafpolimata-semantic-language-core": {
+      "repo": "self",
+      "level": "SEMANTIC_LANGUAGE_COMPILER_CORE",
+      "required_files": [
+        "scripts/raf_semantic_ir.py",
+        "scripts/raf_architecture_registry.py",
+        "scripts/raf_lexical_semantics.py",
+        "scripts/run_semantic_core_gate.sh",
+        "compiler/architectures.v2.json",
+        "schemas/semantic-lexeme.schema.json",
+        "data/semantics/lexemes.seed.v1.jsonl",
+        "tests/test_raf_semantic_ir.py",
+        "tests/test_raf_architecture_registry.py",
+        "tests/test_raf_lexical_semantics.py",
+        "tests/fixtures/semantic_equivalence_mix32.v1.json"
       ],
+      "required_commands": ["git", "python3", "sh"],
+      "required_env_any": [],
+      "build_command": ["sh", "{self}/scripts/run_semantic_core_gate.sh", "{out}"],
       "workdir": "{self}",
       "artifact_globs": [
-        "{self}/research/APKC_RMR_RESEARCH_CORE/build/coupled/**/*"
+        "{out}/semantic-receipt.json",
+        "{out}/architecture-receipt.json",
+        "{out}/lexical-semantics-receipt.json",
+        "{out}/raf_mix32.c",
+        "{out}/raf_mix32.o",
+        "{out}/semantic-core-gate.env"
       ],
-      "scope": "Sealed freestanding compiler core; no APK install or runtime.",
-      "required_command_any": [
-        [
-          "cc",
-          "clang",
-          "gcc"
-        ]
-      ]
+      "scope": "Multi-language source semantics, seven active ISA policy and explicit lexical/IPA registry; i386 retired.",
+      "required_command_any": [["cc", "clang", "gcc"]]
+    },
+    "rafpolimata-seven-architecture-policy": {
+      "repo": "self",
+      "level": "SEVEN_ARCHITECTURE_POLICY",
+      "required_files": [
+        "compiler/architectures.v2.json",
+        "scripts/raf_architecture_registry.py",
+        "tests/test_raf_architecture_registry.py"
+      ],
+      "required_commands": ["git", "python3"],
+      "required_env_any": [],
+      "build_command": [
+        "python3", "{self}/scripts/raf_architecture_registry.py",
+        "{self}/compiler/architectures.v2.json", "--receipt", "{out}/architecture-receipt.json"
+      ],
+      "workdir": "{self}",
+      "artifact_globs": ["{out}/architecture-receipt.json"],
+      "scope": "Exactly seven active architectures: AArch64, ARMv7-A, x86-64, RV64GC, MIPS64r6el, s390x and LoongArch64.",
+      "required_command_any": []
+    },
+    "rafpolimata-lexical-semantics": {
+      "repo": "self",
+      "level": "LEXICAL_SEMANTICS_AND_PHONOLOGY",
+      "required_files": [
+        "schemas/semantic-lexeme.schema.json",
+        "data/semantics/lexemes.seed.v1.jsonl",
+        "scripts/raf_lexical_semantics.py",
+        "tests/test_raf_lexical_semantics.py"
+      ],
+      "required_commands": ["git", "python3"],
+      "required_env_any": [],
+      "build_command": [
+        "python3", "{self}/scripts/raf_lexical_semantics.py",
+        "{self}/data/semantics/lexemes.seed.v1.jsonl", "--receipt", "{out}/lexical-semantics-receipt.json"
+      ],
+      "workdir": "{self}",
+      "artifact_globs": ["{out}/lexical-semantics-receipt.json"],
+      "scope": "Explicit word meaning, lemmas, morphemes, senses, IPA phonemes, syllables and stress; no automatic G2P.",
+      "required_command_any": []
     },
     "rafpolimata-apkc-native": {
       "repo": "self",
       "level": "NATIVE_BOOTSTRAP_APK",
-      "required_files": [
-        "scripts/apkc_termux_hermetic_build.sh",
-        "Apkc/apkc.c",
-        "Apkc/hello.s.txt"
-      ],
-      "required_commands": [
-        "git",
-        "sh"
-      ],
+      "required_files": ["scripts/apkc_termux_hermetic_build.sh", "Apkc/apkc.c", "Apkc/hello.s.txt"],
+      "required_commands": ["git", "sh"],
       "required_env_any": [],
       "build_command": [
-        "sh",
-        "{self}/scripts/apkc_termux_hermetic_build.sh",
-        "--out",
-        "{out}",
-        "--abi",
-        "{abi}",
-        "--unsigned"
+        "sh", "{self}/scripts/apkc_termux_hermetic_build.sh", "--out", "{out}", "--abi", "{abi}", "--unsigned"
       ],
       "workdir": "{self}",
-      "artifact_globs": [
-        "{out}/*.apk",
-        "{out}/receipt.env",
-        "{out}/build.log",
-        "{out}/apkc-host"
-      ],
+      "artifact_globs": ["{out}/*.apk", "{out}/receipt.env", "{out}/build.log", "{out}/apkc-host"],
       "scope": "Minimal dual-ABI NativeActivity APK generated by ApkC.",
-      "required_command_any": [
-        [
-          "cc",
-          "clang",
-          "gcc"
-        ]
-      ]
+      "required_command_any": [["cc", "clang", "gcc"]]
     },
     "rafgittools-apkc-native": {
-      "repo": {
-        "env": "RAFGITTOOLS_ROOT",
-        "default_relative": "../RafGitTools"
-      },
+      "repo": {"env": "RAFGITTOOLS_ROOT", "default_relative": "../RafGitTools"},
       "level": "NATIVE_BOOTSTRAP_APK",
-      "required_files": [
-        "scripts/termux/build_apkc_hermetic.sh",
-        "tools/termuxforge/rafgittools_bootstrap.s"
-      ],
-      "required_commands": [
-        "git",
-        "sh"
-      ],
+      "required_files": ["scripts/termux/build_apkc_hermetic.sh", "tools/termuxforge/rafgittools_bootstrap.s"],
+      "required_commands": ["git", "sh"],
       "required_env_any": [],
       "build_command": [
-        "sh",
-        "{repo}/scripts/termux/build_apkc_hermetic.sh",
-        "--rafpolimata-root",
-        "{self}",
-        "--out",
-        "{out}",
-        "--abi",
-        "{abi}",
-        "--unsigned"
+        "sh", "{repo}/scripts/termux/build_apkc_hermetic.sh", "--rafpolimata-root", "{self}", "--out", "{out}", "--abi", "{abi}", "--unsigned"
       ],
       "workdir": "{repo}",
       "artifact_globs": [
-        "{out}/*.apk",
-        "{out}/receipt.env",
-        "{out}/build.log",
-        "{out}/rafgittools-orchestrator.env",
-        "{out}/apkc-host"
+        "{out}/*.apk", "{out}/receipt.env", "{out}/build.log", "{out}/rafgittools-orchestrator.env", "{out}/apkc-host"
       ],
       "scope": "NativeActivity bootstrap only; not the full Kotlin/Compose/JGit application.",
-      "required_command_any": [
-        [
-          "cc",
-          "clang",
-          "gcc"
-        ]
-      ]
+      "required_command_any": [["cc", "clang", "gcc"]]
     },
     "rafgittools-full-dev-debug": {
-      "repo": {
-        "env": "RAFGITTOOLS_ROOT",
-        "default_relative": "../RafGitTools"
-      },
+      "repo": {"env": "RAFGITTOOLS_ROOT", "default_relative": "../RafGitTools"},
       "level": "FULL_ANDROID_APPLICATION",
-      "required_files": [
-        "scripts/gradlew_with_java17.sh",
-        "gradlew",
-        "app/build.gradle"
-      ],
-      "required_commands": [
-        "git",
-        "bash"
-      ],
-      "required_env_any": [
-        [
-          "ANDROID_SDK_ROOT",
-          "ANDROID_HOME"
-        ]
-      ],
-      "build_command": [
-        "bash",
-        "scripts/gradlew_with_java17.sh",
-        "--offline",
-        "assembleDevDebug"
-      ],
+      "required_files": ["scripts/gradlew_with_java17.sh", "gradlew", "app/build.gradle"],
+      "required_commands": ["git", "bash"],
+      "required_env_any": [["ANDROID_SDK_ROOT", "ANDROID_HOME"]],
+      "build_command": ["bash", "scripts/gradlew_with_java17.sh", "--offline", "assembleDevDebug"],
       "workdir": "{repo}",
-      "artifact_globs": [
-        "{repo}/app/build/outputs/apk/**/*.apk",
-        "{repo}/app/build/outputs/bundle/**/*.aab"
-      ],
+      "artifact_globs": ["{repo}/app/build/outputs/apk/**/*.apk", "{repo}/app/build/outputs/bundle/**/*.aab"],
       "scope": "Full RafGitTools application; requires resolved offline Gradle dependencies and Android SDK.",
       "required_command_any": []
     },
     "vectras-full-debug": {
-      "repo": {
-        "env": "VECTRAS_ROOT",
-        "default_relative": "../Vectras-VM-Android"
-      },
+      "repo": {"env": "VECTRAS_ROOT", "default_relative": "../Vectras-VM-Android"},
       "level": "FULL_ANDROID_APPLICATION",
-      "required_files": [
-        "tools/gradle_with_jdk21.sh",
-        "gradlew",
-        "app/build.gradle",
-        "BUILDING.md"
-      ],
-      "required_commands": [
-        "git",
-        "bash"
-      ],
-      "required_env_any": [
-        [
-          "ANDROID_SDK_ROOT",
-          "ANDROID_HOME"
-        ]
-      ],
-      "build_command": [
-        "bash",
-        "tools/gradle_with_jdk21.sh",
-        "--offline",
-        ":app:assembleDebug",
-        "--stacktrace"
-      ],
+      "required_files": ["tools/gradle_with_jdk21.sh", "gradlew", "app/build.gradle", "BUILDING.md"],
+      "required_commands": ["git", "bash"],
+      "required_env_any": [["ANDROID_SDK_ROOT", "ANDROID_HOME"]],
+      "build_command": ["bash", "tools/gradle_with_jdk21.sh", "--offline", ":app:assembleDebug", "--stacktrace"],
       "workdir": "{repo}",
-      "artifact_globs": [
-        "{repo}/app/build/outputs/apk/**/*.apk"
-      ],
+      "artifact_globs": ["{repo}/app/build/outputs/apk/**/*.apk"],
       "scope": "Full Vectras debug APK using the canonical root Gradle project.",
       "required_command_any": []
     },
     "vectras-release-unsigned": {
-      "repo": {
-        "env": "VECTRAS_ROOT",
-        "default_relative": "../Vectras-VM-Android"
-      },
+      "repo": {"env": "VECTRAS_ROOT", "default_relative": "../Vectras-VM-Android"},
       "level": "FULL_ANDROID_APPLICATION",
-      "required_files": [
-        "tools/gradle_with_jdk21.sh",
-        "gradlew",
-        "app/build.gradle",
-        "BUILDING.md"
-      ],
-      "required_commands": [
-        "git",
-        "bash"
-      ],
-      "required_env_any": [
-        [
-          "ANDROID_SDK_ROOT",
-          "ANDROID_HOME"
-        ]
-      ],
+      "required_files": ["tools/gradle_with_jdk21.sh", "gradlew", "app/build.gradle", "BUILDING.md"],
+      "required_commands": ["git", "bash"],
+      "required_env_any": [["ANDROID_SDK_ROOT", "ANDROID_HOME"]],
       "build_command": [
-        "bash",
-        "tools/gradle_with_jdk21.sh",
-        "--offline",
-        ":app:assembleRelease",
-        "-Psigning_mode=unsigned",
-        "--stacktrace"
+        "bash", "tools/gradle_with_jdk21.sh", "--offline", ":app:assembleRelease", "-Psigning_mode=unsigned", "--stacktrace"
       ],
       "workdir": "{repo}",
-      "artifact_globs": [
-        "{repo}/app/build/outputs/apk/**/*.apk",
-        "{repo}/app/build/outputs/bundle/**/*.aab"
-      ],
+      "artifact_globs": ["{repo}/app/build/outputs/apk/**/*.apk", "{repo}/app/build/outputs/bundle/**/*.aab"],
       "scope": "Full Vectras internal unsigned release; not official distribution.",
       "required_command_any": []
     }
