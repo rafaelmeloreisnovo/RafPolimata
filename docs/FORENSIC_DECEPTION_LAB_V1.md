@@ -11,7 +11,7 @@ Validar o encadeamento mínimo:
 dados canônicos sintéticos
 → projeção por estação
 → relações coordenadas
-→ fingerprint redundante
+→ fingerprint keyed e redundante
 → decoys sintéticos
 → manifesto autenticado
 → perda/reordenação
@@ -43,9 +43,9 @@ python3 tools/forensic_deception_lab.py --output build/forensic-deception/report
 5. contexto correto supera candidato incorreto após perda limitada;
 6. tokens de decoy são observáveis.
 
-## Observação local anterior ao commit
+## Observação local anterior ao fechamento do PR
 
-O conteúdo atual, após correção exclusivamente terminológica de `signed` para `authenticated`, foi executado em sandbox isolado:
+O conteúdo atual, incluindo fingerprint derivado por HMAC e faixas determinísticas separadas para IDs de decoy, foi executado em sandbox isolado:
 
 ```text
 Python: 3.13.5
@@ -55,17 +55,17 @@ Resultado: OK
 Tempo reportado pelo unittest: 0.003 s
 ```
 
-SHA-256 do conteúdo executado:
+Referências dos blobs atualmente gravados no PR:
 
 ```text
 tools/forensic_deception_lab.py
-96b1da19adcbc952e7cdb187bd2da7710cdc6ac9d8e991d4bb99b0c515f28a60
+Git blob: 5f66b1e04da1e3b725b0cea108907db0ef356a11
 
 tests/test_forensic_deception_lab.py
-e9b61ecbd2388e31558f7d01b79b7e5d06d37a811db47cb3c060898d2c905410
+Git blob: 55838d18b9b381bb7a677e93305c4b928c1547d0
 ```
 
-Esses hashes descrevem o texto testado em sandbox. O gate canônico deve recalcular hashes a partir do checkout do PR e executar novamente. Commit não substitui run.
+Essas referências identificam os conteúdos no GitHub. O gate canônico deve recalcular SHA-256/BLAKE3 a partir do checkout, registrar ambiente, comando e stdout/stderr e executar novamente. Commit não substitui run.
 
 ## Resultado observado no demo
 
