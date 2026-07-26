@@ -18,16 +18,43 @@ on:
       - 'tests/test_validate_apkc_formats.py'
       - 'tools/raf_source_to_binary_proof.sh'
       - 'tools/raf_apkc_runtime_hardening_proof.sh'
+      - 'docs/C04_APKC_STRUCTURAL_CLOSURE.md'
       - '.github/workflows/apkc-first-part.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apkc-first-part-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
   apkc-first-part:
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - name: Use local checkout
         uses: actions/checkout@v4
 
+      - name: Install proof-only AArch64 user-mode runner
+        id: tooling
+        continue-on-error: true
+        run: |
+          set -eu
+          if ! command -v qemu-aarch64 >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes qemu-user
+          fi
+          qemu-aarch64 --version
+          clang --version | head -1
+          ld.lld --version | head -1
+
       - name: Validate source syntax shell and JSON contracts
+        id: syntax
+        continue-on-error: true
         run: |
           python3 -m py_compile \
             scripts/apkc_first_part_gate.py \
@@ -35,26 +62,16 @@ jobs:
             scripts/audit_browser_tls_capability.py \
             scripts/apkc_runtime_preflight.py \
             scripts/apkc_verified_build.py \
+            scripts/apkc_structural_closure_receipt.py \
             scripts/patch_apkc_runtime_source.py
           sh -n scripts/raf_https_fetch.sh
           sh -n tools/raf_source_to_binary_proof.sh
           sh -n tools/raf_apkc_runtime_hardening_proof.sh
           python3 -m json.tool configs/browser-tls-capability.v1.json >/dev/null
 
-      - name: Reconcile proof truth and generate loose-file map
-        run: |
-          python3 scripts/apkc_first_part_gate.py \
-            --write results/apkc-first-part-gate.json \
-            --write-map docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
-
-      - name: Audit browser TLS and ApkC runtime contracts
-        run: |
-          python3 scripts/audit_browser_tls_capability.py \
-            --write results/browser-tls-capability.json
-          python3 scripts/apkc_runtime_preflight.py \
-            --write results/apkc-runtime-preflight.json
-
-      - name: Test truth browser TLS verified APK DEX ELF ABI and source hardening
+      - name: Test truth browser TLS verified APK DEX ELF ABI source hardening and C04 receipt
+        id: tests
+        continue-on-error: true
         run: |
           python3 -m unittest \
             tests.test_apkc_first_part_gate \
@@ -62,36 +79,163 @@ jobs:
             tests.test_browser_tls_capability \
             tests.test_apkc_runtime_preflight \
             tests.test_apkc_verified_build \
+            tests.test_apkc_structural_closure_receipt \
             tests.test_patch_apkc_runtime_source
 
       - name: Build baseline reproducible AArch64 and ARM32 compiler artifacts
+        id: source_proof
+        continue-on-error: true
+        run: bash tools/raf_source_to_binary_proof.sh
+
+      - name: Generate and validate dual-ABI APK through AArch64 compiler artifact
+        id: generate_apk
+        continue-on-error: true
         run: |
-          bash tools/raf_source_to_binary_proof.sh
+          set -euo pipefail
+          run_id="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          status = json.loads(Path('Apkc/proofs/out/apkc-compile.status.json').read_text())
+          if status.get('state') != 'PASS':
+              raise SystemExit('source-to-binary proof is not PASS')
+          print(status['run_id'])
+          PY
+          )"
+          a64="Apkc/proofs/runs/${run_id}/source-to-binary/apkc-aarch64-run1.elf"
+          test -x "$a64"
+          mkdir -p Apkc/proofs/out results
+          runner="Apkc/proofs/out/apkc-qemu-aarch64.sh"
+          qemu_bin="$(command -v qemu-aarch64)"
+          a64_abs="$(readlink -f "$a64")"
+          cat > "$runner" <<EOF
+          #!/bin/sh
+          exec "$qemu_bin" "$a64_abs" "\$@"
+          EOF
+          chmod 0755 "$runner"
+
+          python3 scripts/apkc_verified_build.py \
+            --apkc "$runner" \
+            --input Apkc/hello.s.txt \
+            --output Apkc/proofs/out/hello.apk \
+            --report results/apkc-verified-build.json \
+            --log results/apkc-verified-build.log \
+            --require-both \
+            -- \
+            -lang asm \
+            -both \
+            -p com.rafaelia.polimata.c04 \
+            -l 'RafPolimata C04' \
+            -n rafpolimata_c04 \
+            -m 24 \
+            -t 35 \
+            --strict
 
       - name: Build runtime-hardened source reproducibly on AArch64 and ARM32
-        run: |
-          bash tools/raf_apkc_runtime_hardening_proof.sh
+        id: hardening
+        continue-on-error: true
+        run: bash tools/raf_apkc_runtime_hardening_proof.sh
 
-      - name: Preserve first-part evidence locally
+      - name: Reconcile proof truth after candidate generation
+        id: first_part
+        continue-on-error: true
+        run: |
+          python3 scripts/apkc_first_part_gate.py \
+            --write results/apkc-first-part-gate.json \
+            --write-map docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
+
+      - name: Audit browser TLS and ApkC runtime contracts
+        id: contracts
+        continue-on-error: true
+        run: |
+          python3 scripts/audit_browser_tls_capability.py \
+            --write results/browser-tls-capability.json
+          python3 scripts/apkc_runtime_preflight.py \
+            --write results/apkc-runtime-preflight.json
+
+      - name: Create scoped C04 structural closure receipt
+        id: structural_receipt
+        if: always()
+        continue-on-error: true
+        run: |
+          python3 scripts/apkc_structural_closure_receipt.py \
+            --apk Apkc/proofs/out/hello.apk \
+            --source-proof Apkc/proofs/out/apkc-compile.status.json \
+            --first-part-gate results/apkc-first-part-gate.json \
+            --runtime-preflight results/apkc-runtime-preflight.json \
+            --source-commit "${SOURCE_COMMIT}" \
+            --output results/apkc-structural-closure.json
+
+      - name: Preserve first-part and C04 evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: apkc-first-part-evidence
+          name: apkc-first-part-evidence-${{ github.sha }}
           if-no-files-found: warn
+          retention-days: 30
           path: |
             manifests/apkc-first-part.v1.json
             configs/browser-tls-capability.v1.json
             docs/APKC_FIRST_PART_EXECUTION.md
+            docs/C04_APKC_STRUCTURAL_CLOSURE.md
             docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
             results/apkc-first-part-gate.json
             results/apkc-format-validation.json
+            results/apkc-verified-build.json
+            results/apkc-verified-build.log
+            results/apkc-structural-closure.json
             results/browser-tls-capability.json
             results/apkc-runtime-preflight.json
             results/apkc-runtime-source-hardening.json
             results/apkc-runtime-hardening-proof.json
             build/generated/Apkc/apkc.runtime-hardened.c
+            Apkc/proofs/out/hello.apk
+            Apkc/proofs/out/apkc-qemu-aarch64.sh
             Apkc/proofs/out/apkc-compile.txt
+            Apkc/proofs/out/apkc-compile.pending.txt
             Apkc/proofs/out/apkc-compile.status.json
             Apkc/proofs/out/apkc-binary-arm64.txt
             Apkc/proofs/out/apkc-binary-arm32.txt
             Apkc/proofs/runs/
+
+      - name: Enforce complete first-part and C04 result
+        if: always()
+        env:
+          TOOLING_OUTCOME: ${{ steps.tooling.outcome }}
+          SYNTAX_OUTCOME: ${{ steps.syntax.outcome }}
+          TESTS_OUTCOME: ${{ steps.tests.outcome }}
+          SOURCE_PROOF_OUTCOME: ${{ steps.source_proof.outcome }}
+          GENERATE_APK_OUTCOME: ${{ steps.generate_apk.outcome }}
+          HARDENING_OUTCOME: ${{ steps.hardening.outcome }}
+          FIRST_PART_OUTCOME: ${{ steps.first_part.outcome }}
+          CONTRACTS_OUTCOME: ${{ steps.contracts.outcome }}
+          STRUCTURAL_RECEIPT_OUTCOME: ${{ steps.structural_receipt.outcome }}
+        run: |
+          set -eu
+          for item in \
+            "$TOOLING_OUTCOME" \
+            "$SYNTAX_OUTCOME" \
+            "$TESTS_OUTCOME" \
+            "$SOURCE_PROOF_OUTCOME" \
+            "$GENERATE_APK_OUTCOME" \
+            "$HARDENING_OUTCOME" \
+            "$FIRST_PART_OUTCOME" \
+            "$CONTRACTS_OUTCOME" \
+            "$STRUCTURAL_RECEIPT_OUTCOME"; do
+            test "$item" = success
+          done
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('results/apkc-structural-closure.json')
+          if not path.is_file():
+              raise SystemExit('missing C04 structural receipt')
+          receipt = json.loads(path.read_text())
+          assert receipt['schema'] == 'raf.apkc-structural-closure.v1'
+          assert receipt['state'] == 'PASS_STRUCTURAL'
+          assert receipt['structural_claim_allowed'] is True
+          assert receipt['claim_allowed'] is False
+          assert receipt['runtime_boundary']['apk_installed'] == 'TOKEN_VAZIO'
+          assert receipt['runtime_boundary']['package_launched'] == 'TOKEN_VAZIO'
+          print('PASS C04 scoped structural closure')
+          PY
