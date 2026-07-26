@@ -10,14 +10,45 @@
 This isolated nucleus connects the deterministic ApkC structural receipt to the RMR/BLAKE3 custody model without relicensing or copying third-party code.
 
 ```text
-source + comments + specification + license + policy
-→ exact hashes
-→ coupling lock
-→ verifier
+compiler source + public interface
++ normative comments
++ compiled policy stubs
++ technical documentation
++ software/documentation licenses
++ commercial and high-risk policy
+→ exact Git blob identities
+→ SHA-256 artifact root
+→ generated coupling header
+→ freestanding compilation
 → audit receipt
 ```
 
-A one-bit change in any sealed artifact invalidates the coupling lock. An intentional change must be reviewed, versioned and resealed as a new coupling generation.
+A one-bit change in any sealed artifact invalidates the authorized build generation. An intentional change must be reviewed, versioned and resealed.
+
+## What “comment-bound” means
+
+C comments normally do not alter machine semantics. In this nucleus they become normative inputs because the build contract requires markers such as:
+
+```text
+Coupling-ID
+Contract-Role
+License-Role
+Normative comment
+```
+
+The verifier checks those markers and the exact file identity before generating the header consumed by the compiler. Removing or altering a required comment therefore blocks compilation.
+
+## Compiled stubs
+
+Unavailable capabilities are represented inside the C unit as explicit states:
+
+```text
+FORBIDDEN
+TOKEN_VAZIO
+NOT_AUTHORIZED
+```
+
+The compiled table covers commercial licensing, high-risk production, APK signing, installation, package launch and regulatory approval. No stub may silently return success.
 
 ## Repository boundaries
 
@@ -45,13 +76,27 @@ academic_noncommercial_use: permitted_subject_to_license
 claim_allowed: false
 ```
 
-## Verification
+## Coupled build
 
 ```sh
-python3 tools/verify_coupled_artifacts.py
+make verify
+make test
+make coupled-build
 ```
 
-The verifier checks exact SHA-256 digests and the shared coupling identifier. BLAKE3 is an additional seal only when a verified `b3sum` or equivalent tool is present; absence remains explicit and cannot be promoted to PASS.
+The order is mandatory:
+
+```text
+verify → generate header → compile
+```
+
+The current sealed artifact root is:
+
+```text
+d86e8457cab1e863634af68e8532c9ed3b89674b1aa9de14f39d71ae32b477fa
+```
+
+BLAKE3 remains an additional release seal only when a verified canonical implementation and source commit are recorded; absence remains `TOKEN_VAZIO`.
 
 ## No production claim
 
