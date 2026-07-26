@@ -2,10 +2,15 @@
 set -uo pipefail
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-OUT="${1:-$ROOT/artifacts/runtime-truth}"
+OUT_ARG="${1:-artifacts/runtime-truth}"
+case "$OUT_ARG" in
+  /*) OUT="$OUT_ARG" ;;
+  *) OUT="$ROOT/$OUT_ARG" ;;
+esac
 IMPLEMENTATION_BASE_COMMIT="${RAFPOLIMATA_IMPLEMENTATION_BASE_COMMIT:-b230f79b4519f398d6a0f32c2235527966f14a36}"
 
 mkdir -p "$OUT"
+OUT="$(CDPATH= cd -- "$OUT" && pwd)"
 
 RUNTIME_STDOUT="$OUT/runtime-truth.stdout.log"
 RUNTIME_STDERR="$OUT/runtime-truth.stderr.log"
