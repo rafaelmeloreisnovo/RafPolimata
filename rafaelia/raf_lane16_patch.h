@@ -115,6 +115,31 @@ rafaelia_lane16_ready_mask(const rafaelia_lane16_plan_t *plan) {
     return ready;
 }
 
+/* Selects a deterministic subset of ready lanes whose declared resource masks
+ * do not collide. Lower lane id wins a conflict. Resource mask zero means the
+ * backend declared no exclusive resource for that lane. */
+static inline unsigned short
+rafaelia_lane16_dispatch_mask(const rafaelia_lane16_plan_t *plan) {
+    unsigned int lane;
+    unsigned short ready;
+    unsigned short selected = 0u;
+    unsigned short used_resources = 0u;
+    if (plan == (const rafaelia_lane16_plan_t *)0) {
+        return 0u;
+    }
+    ready = rafaelia_lane16_ready_mask(plan);
+    for (lane = 0u; lane < RAF_LANE16_COUNT; ++lane) {
+        unsigned short bit = (unsigned short)(1u << lane);
+        unsigned short resources = plan->resource_mask[lane];
+        if ((ready & bit) != 0u &&
+            (resources == 0u || (resources & used_resources) == 0u)) {
+            selected = (unsigned short)(selected | bit);
+            used_resources = (unsigned short)(used_resources | resources);
+        }
+    }
+    return selected;
+}
+
 static inline int
 rafaelia_lane16_complete(rafaelia_lane16_plan_t *plan, unsigned int lane) {
     unsigned short bit;
