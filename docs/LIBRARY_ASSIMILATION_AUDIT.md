@@ -17,6 +17,7 @@ O recibo registra:
 
 - SHA-256 de cada fonte e da árvore ordenada;
 - arquivos de licença encontrados;
+- quantidade efetiva de fontes escaneáveis;
 - sinais de heap e runtime gerenciado;
 - exceções, unwind e reflexão;
 - threads e scheduler;
@@ -29,11 +30,14 @@ O recibo registra:
 ## Estados
 
 ```text
+TOKEN_VAZIO_NO_SCANNABLE_SOURCE
 CANDIDATE_FOR_KERNEL_EXTRACTION
 CANDIDATE_REQUIRES_REWRITE
 LOWERING_REQUIRED
 REJECTED_RUNTIME_UNTIL_REWRITE
 ```
+
+`TOKEN_VAZIO_NO_SCANNABLE_SOURCE` impede que diretório vazio, licença isolada ou formato não reconhecido seja promovido como biblioteca limpa.
 
 Nenhum desses estados permite claim final. Mesmo uma biblioteca sem padrões proibidos precisa de:
 
@@ -55,6 +59,7 @@ python3 scripts/raf_library_assimilation_audit.py --selftest
 
 O teste cobre:
 
+- diretório vazio ou sem fonte escaneável como `TOKEN_VAZIO`;
 - kernel C puro como candidato;
 - Python hospedado como lowering obrigatório;
 - uso de `malloc` como bloqueio até reescrita.
