@@ -1,0 +1,100 @@
+{
+  "schema": "rafaelia.architecture-registry.v2",
+  "claim_allowed": false,
+  "active_count": 7,
+  "policy": {
+    "source_semantics_independent_from_isa": true,
+    "generated_is_not_executed": true,
+    "native_is_not_virtualized": true,
+    "cross_compiled_is_not_device_validated": true,
+    "install": "FORBIDDEN_BEFORE_COMPILER_RECEIPT",
+    "launch": "FORBIDDEN_BEFORE_COMPILER_RECEIPT"
+  },
+  "retired": [
+    {
+      "id": "i386",
+      "aliases": ["ia32", "x86-32", "80386"],
+      "state": "RETIRED_NOT_AN_ACTIVE_TARGET",
+      "reason": "Removed from the active RAFAELIA compiler matrix by author decision on 2026-07-26."
+    }
+  ],
+  "architectures": [
+    {
+      "id": "aarch64",
+      "display_name": "AArch64 / ARM64",
+      "bits": 64,
+      "endianness": "little",
+      "compiler_triple": "aarch64-linux-gnu",
+      "qemu_user": "qemu-aarch64",
+      "android_abi": "arm64-v8a",
+      "state": "ACTIVE_PRIMARY",
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING"
+    },
+    {
+      "id": "armv7a",
+      "display_name": "ARMv7-A / AArch32",
+      "bits": 32,
+      "endianness": "little",
+      "compiler_triple": "arm-linux-gnueabihf",
+      "qemu_user": "qemu-arm",
+      "android_abi": "armeabi-v7a",
+      "state": "ACTIVE_PHYSICAL_COMPATIBILITY",
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING"
+    },
+    {
+      "id": "x86_64",
+      "display_name": "x86-64 / AMD64",
+      "bits": 64,
+      "endianness": "little",
+      "compiler_triple": "x86_64-linux-gnu",
+      "qemu_user": "qemu-x86_64",
+      "android_abi": "x86_64",
+      "state": "ACTIVE_HOST_AND_VIRTUALIZATION",
+      "execution": "TOKEN_VAZIO_SEVEN_ARCH_RECEIPT_PENDING"
+    },
+    {
+      "id": "riscv64",
+      "display_name": "RISC-V RV64GC",
+      "bits": 64,
+      "endianness": "little",
+      "compiler_triple": "riscv64-linux-gnu",
+      "qemu_user": "qemu-riscv64",
+      "android_abi": "TOKEN_VAZIO_NOT_CANONICAL_ANDROID_ABI",
+      "state": "ACTIVE_RESEARCH",
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING"
+    },
+    {
+      "id": "mips64r6el",
+      "display_name": "MIPS64 Release 6 little-endian",
+      "bits": 64,
+      "endianness": "little",
+      "compiler_triple": "mips64el-linux-gnuabi64",
+      "qemu_user": "qemu-mips64el",
+      "android_abi": "TOKEN_VAZIO_NOT_CANONICAL_ANDROID_ABI",
+      "state": "ACTIVE_RESEARCH_COMPATIBILITY",
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING"
+    },
+    {
+      "id": "s390x",
+      "display_name": "IBM Z / s390x",
+      "bits": 64,
+      "endianness": "big",
+      "compiler_triple": "s390x-linux-gnu",
+      "qemu_user": "qemu-s390x",
+      "android_abi": "TOKEN_VAZIO_NOT_CANONICAL_ANDROID_ABI",
+      "state": "ACTIVE_RESEARCH",
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING"
+    },
+    {
+      "id": "loongarch64",
+      "display_name": "LoongArch64",
+      "bits": 64,
+      "endianness": "little",
+      "compiler_triple": "loongarch64-linux-gnu",
+      "qemu_user": "qemu-loongarch64",
+      "android_abi": "TOKEN_VAZIO_NOT_CANONICAL_ANDROID_ABI",
+      "state": "ACTIVE_RESEARCH",
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING"
+    }
+  ]
+}

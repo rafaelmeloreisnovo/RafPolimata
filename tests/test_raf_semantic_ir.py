@@ -24,7 +24,7 @@ class SemanticIrTests(unittest.TestCase):
         ir = module.compile_source_set(self.contract())
         self.assertEqual(ir["semantic_equivalence"], "PASS")
         self.assertEqual(len(ir["languages"]), 10)
-        self.assertTrue(ir["kernel_id"].startswith("rafk1-"))
+        self.assertTrue(ir["kernel_id"].startswith("rafk2-"))
         self.assertEqual({v["state"] for v in ir["vectors"]}, {"PASS"})
 
     def test_formatting_and_commutative_order_normalize(self):
@@ -68,14 +68,11 @@ class SemanticIrTests(unittest.TestCase):
         self.assertNotIn("malloc", first)
         self.assertIn("_Static_assert", first)
 
-    def test_x86_assembly_emitters_are_arch_specific(self):
+    def test_architecture_emission_is_separated_from_semantics(self):
         ir = module.compile_source_set(self.contract())
-        vector = ir["vectors"][1]
-        a32 = module.assembly_for_bound_vector(ir, vector["inputs"], "i386")
-        a64 = module.assembly_for_bound_vector(ir, vector["inputs"], "x86_64")
-        self.assertIn("int $0x80", a32)
-        self.assertIn("syscall", a64)
-        self.assertNotEqual(a32, a64)
+        self.assertEqual(ir["architecture_policy"], "compiler/architectures.v2.json")
+        self.assertEqual(ir["retired_architectures"], ["i386", "ia32", "x86-32"])
+        self.assertFalse(hasattr(module, "x3264_harness"))
 
     def test_contract_requires_claim_false(self):
         contract = self.contract()

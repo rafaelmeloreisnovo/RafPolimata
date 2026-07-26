@@ -1,28 +1,25 @@
 #!/usr/bin/env python3
 """Lower a strict multi-language scalar subset to deterministic RAF Semantic IR.
 
-V1 is intentionally small: one unsigned u32/u64 return expression, no heap,
-I/O, calls, loops, exceptions or hidden runtime. Unsupported syntax fails closed.
-The x32/x64 command emits freestanding ELF specimens; it never installs or
-launches Android applications.
+V2 keeps source-language equivalence independent from processor emission. It
+accepts one unsigned u32/u64 return expression, with no heap, I/O, calls,
+loops, exceptions or hidden runtime. Unsupported syntax fails closed.
+
+Processor selection is governed separately by compiler/architectures.v2.json.
+i386/IA-32 is retired and is not an active target.
 """
 from __future__ import annotations
 
 import argparse
 import datetime as dt
-import errno
 import hashlib
 import json
 from pathlib import Path
-import platform
 import re
-import shlex
-import shutil
-import subprocess
 from typing import Any
 
 CONTRACT_SCHEMA = "rafaelia.semantic-source-set.v1"
-IR_SCHEMA = "rafaelia.semantic-ir.v1"
+IR_SCHEMA = "rafaelia.semantic-ir.v2"
 LANGUAGES = {
     "asm", "c", "cpp", "rs", "kt", "java", "py", "sh", "pl", "js",
     "php", "jsx", "go", "rb", "swift", "groovy", "clj", "glsl", "cl",
@@ -133,7 +130,7 @@ class Parser:
 
 def extract_expression(language: str, source: str) -> str:
     if language not in FRONTENDS:
-        raise SemanticError(f"frontend {language!r} is registered but not executable in v1")
+        raise SemanticError(f"frontend {language!r} is registered but not executable in v2")
     text = re.sub(r"/\*.*?\*/", " ", source, flags=re.S)
     text = re.sub(r"#.*$" if language in {"py", "rb"} else r"//.*$", "", text, flags=re.M)
     found = re.search(r"\breturn\s+(.+?)(?:;|\n|\}|$)", text, flags=re.S)
@@ -167,7 +164,7 @@ def validate_contract(contract: dict[str, Any]) -> tuple[int, list[str]]:
     integer = contract.get("integer", {})
     bits = integer.get("bits")
     if bits not in {32, 64} or integer.get("signed") is not False or integer.get("overflow") != "wrap":
-        raise SemanticError("v1 requires unsigned u32/u64 wrap semantics")
+        raise SemanticError("v2 requires unsigned u32/u64 wrap semantics")
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", str(contract.get("kernel", ""))):
         raise SemanticError("invalid kernel name")
     params = contract.get("params")
@@ -199,8 +196,10 @@ def validate_contract(contract: dict[str, Any]) -> tuple[int, list[str]]:
 
 def evaluate(node: tuple, inputs: dict[str, int], bits: int) -> int:
     mask = (1 << bits) - 1
-    if node[0] == "var": return int(inputs[node[1]]) & mask
-    if node[0] == "const": return int(node[1]) & mask
+    if node[0] == "var":
+        return int(inputs[node[1]]) & mask
+    if node[0] == "const":
+        return int(node[1]) & mask
     values = [evaluate(child, inputs, bits) for child in node[1:]]
     op = node[0]
     if op == "add": value = values[0] + values[1]
@@ -221,16 +220,21 @@ def evaluate(node: tuple, inputs: dict[str, int], bits: int) -> int:
 def lower_ssa(root: tuple, params: list[str]) -> dict[str, Any]:
     nodes: list[dict[str, Any]] = []
     memo: dict[bytes, str] = {}
+
     def visit(node: tuple) -> str:
         key = canonical_bytes(node)
-        if key in memo: return memo[key]
-        if node[0] == "var": ref = "@" + node[1]
-        elif node[0] == "const": ref = "#" + str(node[1])
+        if key in memo:
+            return memo[key]
+        if node[0] == "var":
+            ref = "@" + node[1]
+        elif node[0] == "const":
+            ref = "#" + str(node[1])
         else:
             ref = f"%{len(nodes)}"
             nodes.append({"id": ref, "op": node[0], "args": [visit(child) for child in node[1:]]})
         memo[key] = ref
         return ref
+
     return {"params": params, "nodes": nodes, "result": visit(root)}
 
 
@@ -242,12 +246,16 @@ def compile_source_set(contract: dict[str, Any]) -> dict[str, Any]:
         expression = extract_expression(language, source)
         root = Parser(expression, set(params)).parse()
         roots[language] = root
-        languages[language] = {"expression": expression, "source_sha256": sha256_bytes(source.encode()), "tree_sha256": sha256_bytes(canonical_bytes(root))}
+        languages[language] = {
+            "expression": expression,
+            "source_sha256": sha256_bytes(source.encode()),
+            "tree_sha256": sha256_bytes(canonical_bytes(root)),
+        }
     if len({canonical_bytes(root) for root in roots.values()}) != 1:
         raise SemanticError("semantic mismatch across frontends")
     root = next(iter(roots.values()))
     identity = {"integer": contract["integer"], "params": contract["params"], "tree": root}
-    kernel_id = "rafk1-" + sha256_bytes(canonical_bytes(identity))
+    kernel_id = "rafk2-" + sha256_bytes(canonical_bytes(identity))
     mask = (1 << bits) - 1
     vectors = []
     for index, vector in enumerate(contract["vectors"]):
@@ -257,10 +265,19 @@ def compile_source_set(contract: dict[str, Any]) -> dict[str, Any]:
             raise SemanticError(f"vector {index} expected mismatch")
         vectors.append({"id": vector.get("id", f"v{index:03d}"), "inputs": vector["inputs"], "observed": observed, "state": "PASS"})
     return {
-        "schema": IR_SCHEMA, "kernel": contract["kernel"], "kernel_id": kernel_id,
-        "integer": contract["integer"], "params": contract["params"], "canonical_tree": root,
-        "ssa": lower_ssa(root, params), "languages": languages, "vectors": vectors,
-        "semantic_equivalence": "PASS", "frontend_scope": "STRICT_SINGLE_EXPRESSION_UNSIGNED_WRAP_SUBSET",
+        "schema": IR_SCHEMA,
+        "kernel": contract["kernel"],
+        "kernel_id": kernel_id,
+        "integer": contract["integer"],
+        "params": contract["params"],
+        "canonical_tree": root,
+        "ssa": lower_ssa(root, params),
+        "languages": languages,
+        "vectors": vectors,
+        "semantic_equivalence": "PASS",
+        "frontend_scope": "STRICT_SINGLE_EXPRESSION_UNSIGNED_WRAP_SUBSET",
+        "architecture_policy": "compiler/architectures.v2.json",
+        "retired_architectures": ["i386", "ia32", "x86-32"],
         "claim_allowed": False,
     }
 
@@ -280,7 +297,7 @@ def emit_c(ir: dict[str, Any]) -> str:
     ctype, base = ("raf_u32", "unsigned int") if bits == 32 else ("raf_u64", "unsigned long long")
     params = ", ".join(f"{ctype} {item['name']}" for item in ir["params"])
     return (
-        "/* Generated from RAF Semantic IR. */\n"
+        "/* Generated from RAF Semantic IR V2. */\n"
         f"/* Kernel-ID: {ir['kernel_id']} */\n"
         f"typedef {base} {ctype};\n"
         f"_Static_assert(sizeof({ctype}) * 8u == {bits}u, \"unexpected width\");\n"
@@ -288,122 +305,59 @@ def emit_c(ir: dict[str, Any]) -> str:
     )
 
 
-def assembly_for_bound_vector(ir: dict[str, Any], inputs: dict[str, int], arch: str) -> str:
-    if ir["integer"]["bits"] != 32 or arch not in {"i386", "x86_64"}:
-        raise SemanticError("x32/x64 harness v1 requires u32 and i386/x86_64")
-    push, pop_a, pop_c = (("pushl %eax", "popl %eax", "popl %ecx") if arch == "i386" else ("pushq %rax", "popq %rax", "popq %rcx"))
-    lines = [".global _start", ".section .text", "_start:"]
-    def emit(node: tuple) -> None:
-        if node[0] in {"var", "const"}:
-            value = (inputs[node[1]] if node[0] == "var" else node[1]) & 0xFFFFFFFF
-            lines.extend([f"    movl $0x{value:08x}, %eax", f"    {push}"])
-            return
-        if node[0] in {"not", "neg", "pos"}:
-            emit(node[1]); lines.append(f"    {pop_a}")
-            if node[0] == "not": lines.append("    notl %eax")
-            elif node[0] == "neg": lines.append("    negl %eax")
-            lines.append(f"    {push}"); return
-        emit(node[1]); emit(node[2]); lines.extend([f"    {pop_c}", f"    {pop_a}"])
-        instruction = {"add":"addl %ecx, %eax","sub":"subl %ecx, %eax","mul":"imull %ecx, %eax","and":"andl %ecx, %eax","or":"orl %ecx, %eax","xor":"xorl %ecx, %eax","shl":"shll %cl, %eax","shr":"shrl %cl, %eax"}.get(node[0])
-        if not instruction: raise SemanticError(f"no x86 lowering for {node[0]}")
-        lines.extend([f"    {instruction}", f"    {push}"])
-    emit(ir["canonical_tree"]); lines.append(f"    {pop_a}")
-    lines.extend(["    movzbl %al, %ebx", "    movl $1, %eax", "    int $0x80"] if arch == "i386" else ["    movzbl %al, %edi", "    movl $60, %eax", "    syscall"])
-    return "\n".join(lines) + "\n"
-
-
-def command_version(name: str) -> str:
-    path = shutil.which(name)
-    if not path: return "TOKEN_VAZIO_COMMAND_ABSENT"
-    result = subprocess.run([path, "--version"], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    return f"{path}: {(result.stdout.strip().splitlines() or ['unknown'])[0][:200]}"
-
-
-def run(command: list[str], cwd: Path) -> dict[str, Any]:
-    result = subprocess.run(command, cwd=cwd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return {"command": shlex.join(command), "exit_code": result.returncode, "stdout": result.stdout[-2000:], "stderr": result.stderr[-2000:]}
-
-
-def execute_elf(path: Path, arch: str) -> dict[str, Any]:
-    emulator = shutil.which("qemu-i386" if arch == "i386" else "qemu-x86_64")
-    if emulator: command, executor = [emulator, str(path)], Path(emulator).name
-    elif arch == "x86_64" and platform.machine().lower() in {"x86_64", "amd64"}: command, executor = [str(path)], "NATIVE_X86_64_FALLBACK"
-    else: command, executor = [str(path)], "NATIVE_COMPATIBILITY_PROBE"
-    try:
-        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    except OSError as exc:
-        return {"state": "TOKEN_VAZIO_EMULATOR_ABSENT" if exc.errno == errno.ENOEXEC else "FAIL_EXECUTOR", "executor": executor, "error": str(exc)}
-    return {"state": "EXECUTED", "executor": executor, "exit_code": result.returncode}
-
-
-def x3264_harness(ir: dict[str, Any], out_dir: Path) -> dict[str, Any]:
-    out_dir = out_dir.resolve(); out_dir.mkdir(parents=True, exist_ok=True)
-    cc = shutil.which("cc") or shutil.which("clang") or shutil.which("gcc")
-    if not cc: raise SemanticError("local compiler driver absent")
-    vectors, states = [], {"i386": [], "x86_64": []}
-    for index, vector in enumerate(ir["vectors"]):
-        item = {"id": vector["id"], "expected_exit": vector["observed"] & 0xFF, "architectures": {}}
-        for arch, flag in (("i386", "-m32"), ("x86_64", "-m64")):
-            asm, elf = out_dir / f"{index:02d}-{arch}.S", out_dir / f"{index:02d}-{arch}.elf"
-            asm.write_text(assembly_for_bound_vector(ir, vector["inputs"], arch))
-            compile_result = run([cc, flag, "-nostdlib", "-nostartfiles", "-nodefaultlibs", "-no-pie", "-Wl,--build-id=none", str(asm), "-o", str(elf)], out_dir)
-            record: dict[str, Any] = {"assembly_sha256": sha256_file(asm), "compile": compile_result}
-            if compile_result["exit_code"] or not elf.is_file(): record["state"] = "FAIL_COMPILE"
-            else:
-                record["elf_sha256"] = sha256_file(elf)
-                record["readelf"] = run(["readelf", "-h", str(elf)], out_dir)
-                execution = execute_elf(elf, arch); record["execution"] = execution
-                if execution["state"] != "EXECUTED": record["state"] = execution["state"]
-                elif execution["exit_code"] != item["expected_exit"]: record["state"] = "FAIL_SEMANTIC_MISMATCH"
-                else: record["state"] = "PASS_VIRTUALIZED" if str(execution["executor"]).startswith("qemu-") else "PASS_NATIVE"
-            item["architectures"][arch] = record; states[arch].append(record["state"])
-        vectors.append(item)
-    i386 = all(state in {"PASS_VIRTUALIZED", "PASS_NATIVE"} for state in states["i386"])
-    x64 = all(state in {"PASS_VIRTUALIZED", "PASS_NATIVE"} for state in states["x86_64"])
-    virtual = all(state == "PASS_VIRTUALIZED" for state in states["i386"] + states["x86_64"])
-    if i386 and x64 and virtual: state = "PASS_X32_X64_VIRTUALIZED"
-    elif i386 and x64: state = "PASS_X32_X64_MIXED_EXECUTION"
-    elif x64 and all(value == "TOKEN_VAZIO_EMULATOR_ABSENT" for value in states["i386"]): state = "PARTIAL_X64_PASS_X32_TOKEN_VAZIO_EMULATOR_ABSENT"
-    else: state = "FAIL_OR_INCOMPLETE"
-    return {
-        "schema":"rafaelia.semantic-x3264-receipt.v1", "created_at":now_utc(), "state":state,
-        "kernel":ir["kernel"], "kernel_id":ir["kernel_id"], "semantic_ir_state":ir["semantic_equivalence"],
-        "host":{"platform":platform.platform(),"machine":platform.machine()},
-        "toolchain":{"cc":command_version(Path(cc).name),"readelf":command_version("readelf"),"qemu_i386":command_version("qemu-i386"),"qemu_x86_64":command_version("qemu-x86_64")},
-        "vectors":vectors, "install_executed":False, "android_launch_executed":False, "claim_allowed":False,
-    }
-
-
 def load(path: Path) -> dict[str, Any]:
-    try: value = json.loads(path.read_text())
-    except (OSError, json.JSONDecodeError) as exc: raise SemanticError(f"cannot read contract: {exc}") from exc
-    if not isinstance(value, dict): raise SemanticError("contract root must be object")
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SemanticError(f"cannot read contract: {exc}") from exc
+    if not isinstance(value, dict):
+        raise SemanticError("contract root must be object")
     return value
 
 
 def write_json(path: Path | None, value: Any) -> None:
-    text = json.dumps(value, indent=2, sort_keys=True) + "\n"
-    if path: path.parent.mkdir(parents=True, exist_ok=True); path.write_text(text)
+    text = json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    if path:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
     print(text, end="")
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(); sub = parser.add_subparsers(dest="command", required=True)
-    validate = sub.add_parser("validate"); validate.add_argument("contract", type=Path); validate.add_argument("--out", type=Path)
-    emit = sub.add_parser("emit-c"); emit.add_argument("contract", type=Path); emit.add_argument("--out", type=Path, required=True)
-    cross = sub.add_parser("x3264"); cross.add_argument("contract", type=Path); cross.add_argument("--out-dir", type=Path, required=True); cross.add_argument("--receipt", type=Path, required=True); cross.add_argument("--require-virtualized-both", action="store_true")
+    parser = argparse.ArgumentParser()
+    sub = parser.add_subparsers(dest="command", required=True)
+    validate = sub.add_parser("validate")
+    validate.add_argument("contract", type=Path)
+    validate.add_argument("--out", type=Path)
+    emit = sub.add_parser("emit-c")
+    emit.add_argument("contract", type=Path)
+    emit.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     try:
-        contract = load(args.contract); ir = compile_source_set(contract)
+        contract = load(args.contract)
+        ir = compile_source_set(contract)
         if args.command == "validate":
-            receipt = {"schema":"rafaelia.semantic-lowering-receipt.v1","created_at":now_utc(),"state":"PASS_SEMANTIC_EQUIVALENCE","contract_sha256":sha256_file(args.contract),"kernel_id":ir["kernel_id"],"language_count":len(ir["languages"]),"vector_count":len(ir["vectors"]),"semantic_ir":ir,"claim_allowed":False}
-            write_json(args.out, receipt); return 0
-        if args.command == "emit-c":
-            args.out.parent.mkdir(parents=True, exist_ok=True); args.out.write_text(emit_c(ir)); write_json(None,{"state":"PASS","path":str(args.out),"sha256":sha256_file(args.out),"kernel_id":ir["kernel_id"],"claim_allowed":False}); return 0
-        receipt = x3264_harness(ir, args.out_dir); write_json(args.receipt, receipt)
-        return 0 if (receipt["state"] == "PASS_X32_X64_VIRTUALIZED" if args.require_virtualized_both else receipt["state"] != "FAIL_OR_INCOMPLETE") else 1
+            receipt = {
+                "schema": "rafaelia.semantic-lowering-receipt.v2",
+                "created_at": now_utc(),
+                "state": "PASS_SEMANTIC_EQUIVALENCE",
+                "contract_sha256": sha256_file(args.contract),
+                "kernel_id": ir["kernel_id"],
+                "language_count": len(ir["languages"]),
+                "vector_count": len(ir["vectors"]),
+                "semantic_ir": ir,
+                "claim_allowed": False,
+            }
+            write_json(args.out, receipt)
+            return 0
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(emit_c(ir), encoding="utf-8")
+        write_json(None, {"state": "PASS", "path": str(args.out), "sha256": sha256_file(args.out), "kernel_id": ir["kernel_id"], "claim_allowed": False})
+        return 0
     except SemanticError as exc:
-        output = getattr(args, "out", None) or getattr(args, "receipt", None); write_json(output,{"state":"FAIL","error":str(exc),"claim_allowed":False}); return 1
+        output = getattr(args, "out", None)
+        write_json(output, {"state": "FAIL", "error": str(exc), "claim_allowed": False})
+        return 1
 
 
 if __name__ == "__main__":
