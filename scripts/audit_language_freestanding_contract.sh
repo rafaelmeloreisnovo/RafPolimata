@@ -6,8 +6,9 @@ CC_BIN="${CC:-cc}"
 NM_BIN="${NM:-nm}"
 REPORT="$ROOT/ci/reports/language-freestanding-contract.md"
 OBJ="$(mktemp)"
+CPU_OBJ="$(mktemp)"
 BIN="$(mktemp)"
-trap 'rm -f "$OBJ" "$BIN"' EXIT
+trap 'rm -f "$OBJ" "$CPU_OBJ" "$BIN"' EXIT
 
 STRICT_FILES=(
   "$ROOT/Apkc/lang_freestanding_policy.h"
@@ -55,6 +56,10 @@ fi
   "$ROOT/RAF_063_language_completion_freestanding.c" -o "$BIN"
 "$BIN"
 
+"$CC_BIN" -std=c11 -Wall -Wextra -Werror \
+  -c "$ROOT/raf_cpu.c" -o "$CPU_OBJ"
+python3 "$ROOT/tests/test_capability_matrix.py"
+
 TSV="$ROOT/ci/contracts/rafaelia_language_completion_v1.tsv"
 [[ -s "$TSV" ]] || fail 'matriz TSV ausente'
 
@@ -74,6 +79,9 @@ awk -F '\t' '
 grep -Eq '^#define[[:space:]]+LP_COUNT[[:space:]]+23([[:space:]]|$)' \
   "$ROOT/Apkc/lang_profile.h" || fail 'LP_COUNT de lang_profile.h não é 23'
 
+grep -Eq '^#define[[:space:]]+RAF_RECOGNIZED_LANG_COUNT[[:space:]]+23([[:space:]]|$)' \
+  "$ROOT/raf_compile.h" || fail 'raf_compile.h não declara 23 perfis reconhecidos'
+
 for name in asm c cpp rs kt java py sh pl js php jsx go rb swift groovy clj glsl cl hlsl wgsl dsp tflite; do
   grep -Fq "\"$name\"" "$ROOT/Apkc/lang_freestanding_policy.h" \
     || fail "linguagem sem política M063: $name"
@@ -85,6 +93,8 @@ done
   echo "- Compiler: $CC_BIN"
   echo '- Strict source files: 3'
   echo '- Language policies: 23'
+  echo '- Compiler language ids: 23 + UNKNOWN'
+  echo '- Extension routes: 23'
   echo '- Heap calls: PASS'
   echo '- Hosted headers: PASS'
   echo '- C++ runtime tokens: PASS'
@@ -92,6 +102,7 @@ done
   echo '- Undefined symbols in strict object: PASS'
   echo '- Selective bit patch selftest: PASS'
   echo '- Static lane-16 dependency selftest: PASS'
+  echo '- Compiler matrix and frontend detection: PASS'
   echo '- Policy/TSV coverage: PASS'
   echo
   echo 'Resultado: PASS_LOCAL. Final ELF/DEX/device binaries still require their own symbol, relocation and runtime gates.'
