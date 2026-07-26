@@ -1,0 +1,68 @@
+{
+  "schema": "raf.compiler-target-registry.v1",
+  "claim_allowed": false,
+  "policy": {
+    "network": "OFFLINE_ONLY",
+    "install": "FORBIDDEN",
+    "launch": "FORBIDDEN",
+    "device_runtime": "TOKEN_VAZIO",
+    "sha256": "REQUIRED",
+    "blake3": "OPTIONAL_LOCAL_TOOL_WITH_PROVENANCE",
+    "dirty_worktree_default": "FORBIDDEN"
+  },
+  "compiler_gate": {
+    "commands": [
+      ["make", "-C", "{self}/research/APKC_RMR_RESEARCH_CORE", "verify"],
+      ["make", "-C", "{self}/research/APKC_RMR_RESEARCH_CORE", "test"],
+      ["make", "-C", "{self}/research/APKC_RMR_RESEARCH_CORE", "coupled-build"]
+    ]
+  },
+  "targets": {
+    "rafpolimata-semantic-ir": {
+      "repo": "self",
+      "level": "SEMANTIC_COMPILER_CORE",
+      "required_files": [
+        "scripts/raf_semantic_ir.py",
+        "scripts/run_semantic_core_gate.sh",
+        "tests/test_raf_semantic_ir.py",
+        "tests/fixtures/semantic_equivalence_mix32.v1.json"
+      ],
+      "required_commands": ["git", "python3", "sh"],
+      "required_env_any": [],
+      "required_command_any": [["cc", "clang", "gcc"]],
+      "build_command": ["sh", "{self}/scripts/run_semantic_core_gate.sh", "{out}"],
+      "workdir": "{self}",
+      "artifact_globs": [
+        "{out}/semantic-receipt.json",
+        "{out}/raf_mix32.c",
+        "{out}/raf_mix32.o",
+        "{out}/semantic-core-gate.env"
+      ],
+      "scope": "Ten source frontends lower to one typed RAF Semantic IR and one freestanding C object."
+    },
+    "rafpolimata-semantic-x3264": {
+      "repo": "self",
+      "level": "SEMANTIC_X32_X64_VIRTUALIZATION",
+      "required_files": [
+        "scripts/raf_semantic_ir.py",
+        "tests/fixtures/semantic_equivalence_mix32.v1.json"
+      ],
+      "required_commands": ["git", "python3", "readelf", "qemu-i386", "qemu-x86_64"],
+      "required_env_any": [],
+      "required_command_any": [["cc", "clang", "gcc"]],
+      "build_command": [
+        "python3", "{self}/scripts/raf_semantic_ir.py", "x3264",
+        "{self}/tests/fixtures/semantic_equivalence_mix32.v1.json",
+        "--out-dir", "{out}/x3264",
+        "--receipt", "{out}/semantic-x3264-receipt.json",
+        "--require-virtualized-both"
+      ],
+      "workdir": "{self}",
+      "artifact_globs": [
+        "{out}/semantic-x3264-receipt.json",
+        "{out}/x3264/**/*"
+      ],
+      "scope": "Strict QEMU user-mode equivalence across generated i386 ELF32 and x86-64 ELF64 specimens."
+    }
+  }
+}
