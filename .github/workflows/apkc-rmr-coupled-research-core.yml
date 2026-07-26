@@ -1,0 +1,31 @@
+name: APKC RMR coupled research core
+
+on:
+  pull_request:
+    paths:
+      - 'research/APKC_RMR_RESEARCH_CORE/**'
+      - '.github/workflows/apkc-rmr-coupled-research-core.yml'
+  push:
+    paths:
+      - 'research/APKC_RMR_RESEARCH_CORE/**'
+      - '.github/workflows/apkc-rmr-coupled-research-core.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apkc-rmr-coupled-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coupled-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify sealed source comments documentation licenses and stubs
+        run: make -C research/APKC_RMR_RESEARCH_CORE verify
+      - name: Execute adversarial mutation tests
+        run: make -C research/APKC_RMR_RESEARCH_CORE test
+      - name: Compile sealed freestanding unit
+        run: make -C research/APKC_RMR_RESEARCH_CORE coupled-build
