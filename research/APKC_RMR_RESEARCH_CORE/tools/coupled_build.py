@@ -29,6 +29,14 @@ class CouplingError(RuntimeError):
     pass
 
 
+def file_sha256(path: Path) -> str:
+    value = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            value.update(chunk)
+    return value.hexdigest()
+
+
 def git_blob_sha1(path: Path) -> str:
     data = path.read_bytes()
     header = f"blob {len(data)}\0".encode("ascii")
@@ -40,7 +48,7 @@ def artifact_root(records: list[dict[str, str]]) -> str:
     for record in sorted(records, key=lambda item: item["path"]):
         value.update(record["path"].encode("utf-8"))
         value.update(b"\0")
-        value.update(record["git_blob_sha1"].encode("ascii"))
+        value.update(record["sha256"].encode("ascii"))
         value.update(b"\n")
     return value.hexdigest()
 
@@ -73,10 +81,14 @@ def verify(root: Path = ROOT) -> dict[str, object]:
         if not path.is_file():
             errors.append(f"missing artifact: {rel}")
             continue
-        actual = git_blob_sha1(path)
-        expected = str(item["git_blob_sha1"])
-        if actual != expected:
-            errors.append(f"identity mismatch: {rel}")
+        actual_blob = git_blob_sha1(path)
+        actual_sha256 = file_sha256(path)
+        expected_blob = str(item["git_blob_sha1"])
+        expected_sha256 = str(item["sha256"])
+        if actual_blob != expected_blob:
+            errors.append(f"git blob identity mismatch: {rel}")
+        if actual_sha256 != expected_sha256:
+            errors.append(f"sha256 mismatch: {rel}")
         text = path.read_text(encoding="utf-8", errors="replace")
         for marker in item.get("required_markers", []):
             if str(marker) not in text:
@@ -85,7 +97,11 @@ def verify(root: Path = ROOT) -> dict[str, object]:
             for marker in source_markers:
                 if marker not in text:
                     errors.append(f"source marker absent in {rel}: {marker}")
-        observed.append({"path": rel, "git_blob_sha1": actual})
+        observed.append({
+            "path": rel,
+            "git_blob_sha1": actual_blob,
+            "sha256": actual_sha256,
+        })
 
     computed_root = artifact_root(observed)
     if computed_root != lock.get("artifact_root_sha256"):
