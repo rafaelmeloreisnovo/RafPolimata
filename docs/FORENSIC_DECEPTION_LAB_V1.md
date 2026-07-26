@@ -30,6 +30,10 @@ tests/test_forensic_deception_lab.py
 ## Execução
 
 ```bash
+python3 -m py_compile \
+  tools/forensic_deception_lab.py \
+  tests/test_forensic_deception_lab.py
+
 python3 -m unittest -v tests/test_forensic_deception_lab.py
 python3 tools/forensic_deception_lab.py --output build/forensic-deception/report.json
 ```
@@ -43,31 +47,34 @@ python3 tools/forensic_deception_lab.py --output build/forensic-deception/report
 5. contexto correto supera candidato incorreto após perda limitada;
 6. tokens de decoy são observáveis.
 
-## Observação local anterior ao fechamento do PR
+## Recibo local do conteúdo final
 
-O conteúdo atual, incluindo fingerprint derivado por HMAC e faixas determinísticas separadas para IDs de decoy, foi executado em sandbox isolado:
+O conteúdo final, incluindo fingerprint derivado por HMAC e faixas determinísticas separadas para IDs de decoy, foi executado novamente em sandbox isolado:
 
 ```text
 Python: 3.13.5
 Plataforma: Linux 6.12.13 x86_64, glibc 2.41
+py_compile exit code: 0
+unittest exit code: 0
 Testes: 5
-Resultado: OK
+Resultado: 5 PASS / 0 FAIL
 Tempo reportado pelo unittest: 0.003 s
+demo exit code: 0
 ```
 
-Referências dos blobs atualmente gravados no PR:
+SHA-256 do conteúdo executado:
 
 ```text
 tools/forensic_deception_lab.py
-Git blob: 5f66b1e04da1e3b725b0cea108907db0ef356a11
+7dc03d68f052f29eecdc655c8fd3e6dfdb7d462c53b1ae00c14a4531703a6d88
 
 tests/test_forensic_deception_lab.py
-Git blob: 55838d18b9b381bb7a677e93305c4b928c1547d0
+13108b5357ed9824a2bffeba0b16d77dd032a092700d6658d1b87d82c66b6bd1
 ```
 
-Essas referências identificam os conteúdos no GitHub. O gate canônico deve recalcular SHA-256/BLAKE3 a partir do checkout, registrar ambiente, comando e stdout/stderr e executar novamente. Commit não substitui run.
+O ambiente Python emitiu no `stderr` um aviso externo de warmup do `artifact_tool` sem relação com o laboratório; o processo de testes retornou código 0 e todos os cinco casos passaram. O gate remoto deve recalcular os hashes a partir do checkout e preservar stdout/stderr integralmente. Commit não substitui run.
 
-## Resultado observado no demo
+## Resultado observado no demo final
 
 ```text
 manifest_valid = true
