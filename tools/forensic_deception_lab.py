@@ -7,7 +7,7 @@ It models:
 - station-specific projected identifiers;
 - synthetic decoy records;
 - a repeated fingerprint codeword distributed across records;
-- signed epoch manifests;
+- authenticated epoch manifests;
 - bounded attack simulations (drop/reorder/strip);
 - source-candidate scoring.
 
