@@ -59,9 +59,11 @@ class ForensicDeceptionLabTests(unittest.TestCase):
     def test_fingerprint_survives_bounded_record_loss(self):
         leak = simulate_leak(self.projected, seed=9, drop_fraction=0.10)
         recovered, confidence = recover_fingerprint(leak)
-        correct = score_candidate(recovered, self.context)
+        correct = score_candidate(recovered, self.context, self.key)
         wrong = score_candidate(
-            recovered, dataclasses.replace(self.context, station_id="S-02")
+            recovered,
+            dataclasses.replace(self.context, station_id="S-02"),
+            self.key,
         )
         self.assertGreaterEqual(confidence, 0.90)
         self.assertGreater(correct, wrong)
