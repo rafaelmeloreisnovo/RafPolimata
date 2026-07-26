@@ -16,7 +16,7 @@ compiler source + public interface
 + technical documentation
 + software/documentation licenses
 + commercial and high-risk policy
-→ exact Git blob identities
+→ per-file SHA-256 + Git blob provenance
 → SHA-256 artifact root
 → generated coupling header
 → freestanding compilation
@@ -36,7 +36,7 @@ License-Role
 Normative comment
 ```
 
-The verifier checks those markers and the exact file identity before generating the header consumed by the compiler. Removing or altering a required comment therefore blocks compilation.
+The verifier checks those markers, each exact SHA-256 and the Git blob identity before generating the header consumed by the compiler. Removing or altering a required comment therefore blocks compilation.
 
 ## Compiled stubs
 
@@ -93,7 +93,7 @@ verify → generate header → compile
 The current sealed artifact root is:
 
 ```text
-d86e8457cab1e863634af68e8532c9ed3b89674b1aa9de14f39d71ae32b477fa
+150105a1294fbbfa2430afd18e681da4599989eaf9b41611b521778238485046
 ```
 
 BLAKE3 remains an additional release seal only when a verified canonical implementation and source commit are recorded; absence remains `TOKEN_VAZIO`.
