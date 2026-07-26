@@ -1,0 +1,28 @@
+{
+  "coord": {
+    "t": 3,
+    "x": 4,
+    "y": 0,
+    "z": 0
+  },
+  "expected": null,
+  "known_erasure": true,
+  "latency_ns": 215.0,
+  "linear_index": 4,
+  "matrix_id": "m1",
+  "observation_id": "query-001",
+  "observed": null,
+  "parity_memberships": [0, 4],
+  "run_id": "rq",
+  "schema_version": "rafaelia.bitraf-loss-observation/v1",
+  "shard": 1,
+  "source": {
+    "commit": "q",
+    "path": "q",
+    "repo": "fixture"
+  },
+  "stripe": 0,
+  "syndrome": [1, 1, 1],
+  "temperature_c": 59.5,
+  "voltage_v": 0.8
+}
