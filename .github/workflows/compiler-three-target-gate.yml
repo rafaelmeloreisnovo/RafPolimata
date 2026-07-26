@@ -1,0 +1,52 @@
+name: Compiler Three Target Gate
+
+on:
+  pull_request:
+    paths:
+      - "compiler/**"
+      - "scripts/compiler_orchestrator.py"
+      - "tests/test_compiler_orchestrator.py"
+      - "docs/COMPILER_THREE_TARGET_GATE_V1.md"
+      - ".github/workflows/compiler-three-target-gate.yml"
+  push:
+    paths:
+      - "compiler/**"
+      - "scripts/compiler_orchestrator.py"
+      - "tests/test_compiler_orchestrator.py"
+      - "docs/COMPILER_THREE_TARGET_GATE_V1.md"
+      - ".github/workflows/compiler-three-target-gate.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compiler-three-target-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compiler-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate registry and orchestrator
+        run: python3 -m unittest discover -s tests -p 'test_compiler_orchestrator.py'
+
+      - name: Compile sealed RafPolimata compiler core
+        run: |
+          python3 scripts/compiler_orchestrator.py \
+            --target rafpolimata-coupled-core \
+            --mode build \
+            --receipt build/compiler-gate/ci/compiler-receipt.json
+
+      - name: Upload compiler receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rafpolimata-compiler-gate-receipt
+          path: |
+            build/compiler-gate/ci/compiler-receipt.json
+            build/compiler-gate/rafpolimata-coupled-core/logs/
+            research/APKC_RMR_RESEARCH_CORE/build/coupled/
+          if-no-files-found: warn
