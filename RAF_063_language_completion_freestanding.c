@@ -6,8 +6,8 @@
  *
  * This method does not execute foreign runtimes. It validates the canonical
  * language policy, selective masked replacement and a static 16-lane
- * dependency plan. Language-specific frontends must lower into RAF IR/C/ASM
- * before they can claim the strict final-binary profile.
+ * dependency/resource plan. Language-specific frontends must lower into RAF
+ * IR/C/ASM before they can claim the strict final-binary profile.
  */
 
 int rafaelia_m063_selftest(void) {
@@ -18,6 +18,7 @@ int rafaelia_m063_selftest(void) {
     rafaelia_overlay64_t overlay;
     rafaelia_lane16_plan_t plan;
     unsigned short ready;
+    unsigned short dispatch;
 
     if (!rafaelia_m063_policy_validate()) return -1;
     if (!rafaelia_m063_policy_is_standalone(RAF_M063_LP_ASM)) return -1;
@@ -43,6 +44,10 @@ int rafaelia_m063_selftest(void) {
     if (!rafaelia_lane16_configure(
             &plan, RAF_LANE_CPU0, 0u,
             (unsigned short)(1u << RAF_LANE_CPU0))) return -1;
+    /* CPU1 deliberately shares CPU0's exclusive resource for arbitration. */
+    if (!rafaelia_lane16_configure(
+            &plan, RAF_LANE_CPU1, 0u,
+            (unsigned short)(1u << RAF_LANE_CPU0))) return -1;
     if (!rafaelia_lane16_configure(
             &plan, RAF_LANE_NEON, 0u,
             (unsigned short)(1u << RAF_LANE_NEON))) return -1;
@@ -54,8 +59,14 @@ int rafaelia_m063_selftest(void) {
 
     ready = rafaelia_lane16_ready_mask(&plan);
     if ((ready & (unsigned short)(1u << RAF_LANE_CPU0)) == 0u) return -1;
+    if ((ready & (unsigned short)(1u << RAF_LANE_CPU1)) == 0u) return -1;
     if ((ready & (unsigned short)(1u << RAF_LANE_NEON)) == 0u) return -1;
     if ((ready & (unsigned short)(1u << RAF_LANE_CRC32_SW)) != 0u) return -1;
+
+    dispatch = rafaelia_lane16_dispatch_mask(&plan);
+    if ((dispatch & (unsigned short)(1u << RAF_LANE_CPU0)) == 0u) return -1;
+    if ((dispatch & (unsigned short)(1u << RAF_LANE_CPU1)) != 0u) return -1;
+    if ((dispatch & (unsigned short)(1u << RAF_LANE_NEON)) == 0u) return -1;
 
     if (!rafaelia_lane16_complete(&plan, RAF_LANE_CPU0)) return -1;
     if (!rafaelia_lane16_complete(&plan, RAF_LANE_NEON)) return -1;
