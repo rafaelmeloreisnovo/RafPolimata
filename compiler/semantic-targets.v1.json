@@ -1,0 +1,92 @@
+{
+  "schema": "raf.compiler-target-registry.v1",
+  "claim_allowed": false,
+  "policy": {
+    "network": "OFFLINE_ONLY",
+    "install": "FORBIDDEN",
+    "launch": "FORBIDDEN",
+    "device_runtime": "TOKEN_VAZIO",
+    "sha256": "REQUIRED",
+    "blake3": "OPTIONAL_LOCAL_TOOL_WITH_PROVENANCE",
+    "dirty_worktree_default": "FORBIDDEN"
+  },
+  "compiler_gate": {
+    "commands": [
+      ["make", "-C", "{self}/research/APKC_RMR_RESEARCH_CORE", "verify"],
+      ["make", "-C", "{self}/research/APKC_RMR_RESEARCH_CORE", "test"],
+      ["make", "-C", "{self}/research/APKC_RMR_RESEARCH_CORE", "coupled-build"]
+    ]
+  },
+  "targets": {
+    "rafpolimata-semantic-language-core": {
+      "repo": "self",
+      "level": "SEMANTIC_LANGUAGE_COMPILER_CORE",
+      "required_files": [
+        "scripts/raf_semantic_ir.py",
+        "scripts/raf_architecture_registry.py",
+        "scripts/raf_lexical_semantics.py",
+        "scripts/run_semantic_core_gate.sh",
+        "compiler/architectures.v2.json",
+        "schemas/semantic-lexeme.schema.json",
+        "data/semantics/lexemes.seed.v1.jsonl",
+        "tests/test_raf_semantic_ir.py",
+        "tests/test_raf_architecture_registry.py",
+        "tests/test_raf_lexical_semantics.py",
+        "tests/fixtures/semantic_equivalence_mix32.v1.json"
+      ],
+      "required_commands": ["git", "python3", "sh"],
+      "required_env_any": [],
+      "build_command": ["sh", "{self}/scripts/run_semantic_core_gate.sh", "{out}"],
+      "workdir": "{self}",
+      "artifact_globs": [
+        "{out}/semantic-receipt.json",
+        "{out}/architecture-receipt.json",
+        "{out}/lexical-semantics-receipt.json",
+        "{out}/raf_mix32.c",
+        "{out}/raf_mix32.o",
+        "{out}/semantic-core-gate.env"
+      ],
+      "scope": "Multi-language source semantics, seven active ISA policy and explicit lexical/IPA registry; i386 retired.",
+      "required_command_any": [["cc", "clang", "gcc"]]
+    },
+    "rafpolimata-seven-architecture-policy": {
+      "repo": "self",
+      "level": "SEVEN_ARCHITECTURE_POLICY",
+      "required_files": [
+        "compiler/architectures.v2.json",
+        "scripts/raf_architecture_registry.py",
+        "tests/test_raf_architecture_registry.py"
+      ],
+      "required_commands": ["git", "python3"],
+      "required_env_any": [],
+      "build_command": [
+        "python3", "{self}/scripts/raf_architecture_registry.py",
+        "{self}/compiler/architectures.v2.json", "--receipt", "{out}/architecture-receipt.json"
+      ],
+      "workdir": "{self}",
+      "artifact_globs": ["{out}/architecture-receipt.json"],
+      "scope": "Exactly seven active architectures: AArch64, ARMv7-A, x86-64, RV64GC, MIPS64r6el, s390x and LoongArch64.",
+      "required_command_any": []
+    },
+    "rafpolimata-lexical-semantics": {
+      "repo": "self",
+      "level": "LEXICAL_SEMANTICS_AND_PHONOLOGY",
+      "required_files": [
+        "schemas/semantic-lexeme.schema.json",
+        "data/semantics/lexemes.seed.v1.jsonl",
+        "scripts/raf_lexical_semantics.py",
+        "tests/test_raf_lexical_semantics.py"
+      ],
+      "required_commands": ["git", "python3"],
+      "required_env_any": [],
+      "build_command": [
+        "python3", "{self}/scripts/raf_lexical_semantics.py",
+        "{self}/data/semantics/lexemes.seed.v1.jsonl", "--receipt", "{out}/lexical-semantics-receipt.json"
+      ],
+      "workdir": "{self}",
+      "artifact_globs": ["{out}/lexical-semantics-receipt.json"],
+      "scope": "Explicit word meaning, lemmas, morphemes, senses, IPA phonemes, syllables and stress; no automatic G2P.",
+      "required_command_any": []
+    }
+  }
+}

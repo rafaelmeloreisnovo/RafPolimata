@@ -1,0 +1,33 @@
+{
+  "schema": "rafaelia.semantic-source-set.v1",
+  "kernel": "raf_mix32",
+  "integer": {
+    "bits": 32,
+    "signed": false,
+    "overflow": "wrap"
+  },
+  "params": [
+    {"name": "a", "type": "u32"},
+    {"name": "b", "type": "u32"},
+    {"name": "mask", "type": "u32"}
+  ],
+  "sources": {
+    "c": "unsigned raf_mix32(unsigned a, unsigned b, unsigned mask) { return ((a ^ b) + (a & mask)) * 3; }",
+    "cpp": "unsigned raf_mix32(unsigned a, unsigned b, unsigned mask) { return ((a ^ b) + (a & mask)) * 3; }",
+    "java": "static int raf_mix32(int a, int b, int mask) { return ((a ^ b) + (a & mask)) * 3; }",
+    "js": "function raf_mix32(a, b, mask) { return ((a ^ b) + (a & mask)) * 3; }",
+    "kt": "fun raf_mix32(a: UInt, b: UInt, mask: UInt): UInt = ((a xor b) + (a and mask)) * 3",
+    "py": "def raf_mix32(a, b, mask):\n    return ((a ^ b) + (a & mask)) * 3",
+    "go": "func raf_mix32(a uint32, b uint32, mask uint32) uint32 { return ((a ^ b) + (a & mask)) * 3; }",
+    "rb": "def raf_mix32(a, b, mask)\n  ((a ^ b) + (a & mask)) * 3\nend",
+    "swift": "func raf_mix32(_ a: UInt32, _ b: UInt32, _ mask: UInt32) -> UInt32 { return ((a ^ b) + (a & mask)) * 3; }",
+    "php": "function raf_mix32($a, $b, $mask) { return (($a ^ $b) + ($a & $mask)) * 3; }"
+  },
+  "vectors": [
+    {"id": "zero", "inputs": {"a": 0, "b": 0, "mask": 0}, "expected": 0},
+    {"id": "small", "inputs": {"a": 5, "b": 9, "mask": 7}, "expected": 51},
+    {"id": "wrap", "inputs": {"a": 4294967295, "b": 1, "mask": 4294967295}, "expected": 4294967287},
+    {"id": "pattern", "inputs": {"a": 305419896, "b": 2271560481, "mask": 16711935}, "expected": 3230613875}
+  ],
+  "claim_allowed": false
+}
