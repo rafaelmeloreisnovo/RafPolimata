@@ -1,0 +1,28 @@
+{
+  "auth": {
+    "kind": "NONE",
+    "tag": null
+  },
+  "body": {
+    "auth_state": "UNSIGNED_DIGEST_CHECKPOINT",
+    "baseline_heads": {
+      "Mapa#65": "dd853548d58b68177b25dd85be7028343b3475da",
+      "RafGitTools#309": "dfed9ed546c4e86f8bf499d63b548e2e96b7a835",
+      "RafPolimata#166": "1fb036a3d124a111abfd08356f6b4d6ce49329c5",
+      "papers#24": "0c82658fb5069c71a79fb057e7e8c6cd163b9c27"
+    },
+    "claim_allowed": false,
+    "epoch_id": "E1",
+    "gates": {
+      "local": "VERIFIED_LIMITED_LOCAL",
+      "production": "BLOCKED",
+      "remote": "TOKEN_VAZIO_RUNNER"
+    },
+    "privacy": "NO_PII_NO_SECRET_NO_RAW_DATA",
+    "schema": "RAFCUSTODY-QR/1",
+    "scope": "FORENSIC-DECEPTION-CUSTODY",
+    "snapshot_id": "FDV1-20260726-QR01"
+  },
+  "crc32": "690a3641",
+  "sha256": "2d6f4b2ce47939b0ffb78904c6acd1fcd190c1c2b0eab7bb6943e5852db44f1d"
+}
