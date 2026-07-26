@@ -1,0 +1,69 @@
+name: Segment V1 ABI Contract
+
+on:
+  pull_request:
+    paths:
+      - 'runtime/conversation_indexer/SEGMENT_V1_ABI_CONTRACT.json'
+      - 'runtime/conversation_indexer/raf_segment_v1.h'
+      - 'runtime/conversation_indexer/raf_segment_v1.c'
+      - 'docs/copilot/TASK_02_CONVERSATION_SEGMENTS_V1.md'
+      - 'docs/C03_SEGMENT_V1_ABI_RECONCILIATION.md'
+      - 'scripts/validate_segment_v1_abi_contract.py'
+      - 'tests/test_segment_v1_abi_contract.py'
+      - '.github/workflows/segment-v1-abi-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: segment-v1-abi-contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  abi-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+
+      - name: Python syntax
+        run: |
+          python3 -m py_compile \
+            scripts/validate_segment_v1_abi_contract.py \
+            tests/test_segment_v1_abi_contract.py
+
+      - name: ABI contract tests
+        run: python3 -m unittest tests/test_segment_v1_abi_contract.py -v
+
+      - name: Emit reconciliation report
+        run: |
+          python3 scripts/validate_segment_v1_abi_contract.py \
+            --repo . \
+            --output artifacts/segment-v1-abi/report.json
+
+      - name: Verify claim boundary
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path('artifacts/segment-v1-abi/report.json').read_text())
+          assert report['state'] == 'PASS_WITH_RECONCILED_SPEC_CONFLICTS'
+          assert report['claim_allowed'] is False
+          assert report['extractor_gate']['segment_v1_wire_layout'] == 'FROZEN'
+          assert report['extractor_gate']['streaming_extractor'].startswith('TOKEN_VAZIO')
+          assert report['extractor_gate']['atomic_writer'].startswith('TOKEN_VAZIO')
+          assert report['extractor_gate']['checkpoint_resume'].startswith('TOKEN_VAZIO')
+          print('PASS segment.v1 reconciliation boundary')
+          PY
+
+      - name: Upload ABI receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: segment-v1-abi-contract-${{ github.sha }}
+          path: artifacts/segment-v1-abi/
+          if-no-files-found: error
+          retention-days: 30
