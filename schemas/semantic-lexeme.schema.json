@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafaelia.local/schemas/semantic-lexeme.schema.json",
+  "title": "RAFAELIA Semantic Lexeme V1",
+  "type": "object",
+  "required": [
+    "schema", "id", "language", "script", "surface", "normalized", "lemma",
+    "part_of_speech", "morphemes", "senses", "phonology", "provenance",
+    "limitations", "claim_allowed"
+  ],
+  "properties": {
+    "schema": {"const": "rafaelia.semantic-lexeme.v1"},
+    "id": {"type": "string", "pattern": "^lex-[a-z0-9-]+$"},
+    "language": {"type": "string", "minLength": 2},
+    "script": {"type": "string", "minLength": 4, "maxLength": 4},
+    "surface": {"type": "string", "minLength": 1},
+    "normalized": {"type": "string", "minLength": 1},
+    "lemma": {"type": "string", "minLength": 1},
+    "part_of_speech": {"type": "string", "minLength": 1},
+    "morphemes": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "senses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["sense_id", "gloss", "semantic_tags", "domain", "state"],
+        "properties": {
+          "sense_id": {"type": "string", "minLength": 1},
+          "gloss": {"type": "string", "minLength": 1},
+          "semantic_tags": {"type": "array", "items": {"type": "string"}},
+          "domain": {"type": "string", "minLength": 1},
+          "state": {"enum": ["CONTROLLED_CONVENTION", "HYPOTHESIS", "TOKEN_VAZIO"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "phonology": {
+      "type": "object",
+      "required": ["state", "system", "representation", "dialect", "ipa", "phonemes", "syllables", "stress_index"],
+      "properties": {
+        "state": {"enum": ["DECLARED_BROAD_PHONEMIC", "TOKEN_VAZIO_PHONEME_NOT_DECLARED"]},
+        "system": {"const": "IPA"},
+        "representation": {"enum": ["PHONEMIC_BROAD", "TOKEN_VAZIO"]},
+        "dialect": {"type": "string", "minLength": 1},
+        "ipa": {"type": "string"},
+        "phonemes": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "syllables": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "stress_index": {"type": "integer", "minimum": -1}
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source_class", "linguistic_review"],
+      "properties": {
+        "source_class": {"type": "string", "minLength": 1},
+        "linguistic_review": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "claim_allowed": {"const": false}
+  },
+  "additionalProperties": false
+}
