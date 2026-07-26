@@ -1,0 +1,62 @@
+name: Semantic IR Core
+
+on:
+  pull_request:
+    paths:
+      - "compiler/semantic-targets.v1.json"
+      - "scripts/raf_semantic_ir.py"
+      - "scripts/run_semantic_core_gate.sh"
+      - "tests/test_raf_semantic_ir.py"
+      - "tests/fixtures/semantic_equivalence_mix32.v1.json"
+      - "docs/RAF_SEMANTIC_IR_X3264_V1.md"
+      - ".github/workflows/semantic-ir-core.yml"
+  push:
+    paths:
+      - "compiler/semantic-targets.v1.json"
+      - "scripts/raf_semantic_ir.py"
+      - "scripts/run_semantic_core_gate.sh"
+      - "tests/test_raf_semantic_ir.py"
+      - "tests/fixtures/semantic_equivalence_mix32.v1.json"
+      - "docs/RAF_SEMANTIC_IR_X3264_V1.md"
+      - ".github/workflows/semantic-ir-core.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  semantic-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run offline semantic core gate
+        run: sh scripts/run_semantic_core_gate.sh build/semantic-ci
+      - name: Upload semantic core receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semantic-ir-core-receipt
+          path: build/semantic-ci/
+          if-no-files-found: warn
+
+  x3264-virtualized:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, rafaelia-x3264]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require virtualized i386 and x86-64 equivalence
+        run: |
+          python3 scripts/raf_semantic_ir.py x3264 \
+            tests/fixtures/semantic_equivalence_mix32.v1.json \
+            --out-dir build/semantic-x3264/x3264 \
+            --receipt build/semantic-x3264/semantic-x3264-receipt.json \
+            --require-virtualized-both
+      - name: Upload x32 x64 receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semantic-x3264-receipt
+          path: build/semantic-x3264/
+          if-no-files-found: warn
