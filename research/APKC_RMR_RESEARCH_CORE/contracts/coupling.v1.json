@@ -1,5 +1,5 @@
 {
-  "artifact_root_algorithm": "SHA-256(path NUL git_blob_sha1 LF, sorted by path)",
+  "artifact_root_algorithm": "SHA-256(path NUL file_sha256 LF, sorted by path)",
   "claim_allowed": false,
   "commercial_policy": {
     "communication_is_authorization": false,
