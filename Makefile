@@ -6,19 +6,21 @@ SHELL    := /bin/sh
 VERBOVIVO := verbovivo_ci
 SYNTAX_CC := clang -target aarch64-linux-gnu -fsyntax-only -nostdlib -nostdinc -ffreestanding -I Apkc Apkc/apkc.c
 
-.PHONY: help syntax verbovivo verbovivo-demo encoders proof audit report clean
+.PHONY: help syntax verbovivo verbovivo-demo encoders proof audit language-contract strict-elf report clean
 
 help:
 	@echo 'RafPolimata — make targets:'
-	@echo '  help            this list (default)'
-	@echo '  syntax          freestanding aarch64 syntax check (Apkc/apkc.c)'
-	@echo '  verbovivo       build $(VERBOVIVO) (T^7 toroid pipeline)'
-	@echo '  verbovivo-demo  build + smoke run, asserts verbovivo: ... phi='
-	@echo '  encoders        ARM32 + ARM64 encoder golden tests'
-	@echo '  proof           one clean reproducible proof run (tools/raf_clean_proof_run.sh)'
-	@echo '  audit           freestanding invariant audit (scripts/ci_freestanding_audit.sh)'
-	@echo '  report          point at Apkc/proofs/out + latest run dir (PASS/TOKEN_VAZIO)'
-	@echo '  clean           remove $(VERBOVIVO), /tmp/engram.svg, *.o'
+	@echo '  help              this list (default)'
+	@echo '  syntax            freestanding aarch64 syntax check (Apkc/apkc.c)'
+	@echo '  verbovivo         build $(VERBOVIVO) (T^7 toroid pipeline)'
+	@echo '  verbovivo-demo    build + smoke run, asserts verbovivo: ... phi='
+	@echo '  encoders          ARM32 + ARM64 encoder golden tests'
+	@echo '  proof             one clean reproducible proof run (tools/raf_clean_proof_run.sh)'
+	@echo '  audit             freestanding invariant audit (scripts/ci_freestanding_audit.sh)'
+	@echo '  language-contract M063: 23-language lowering/freestanding/bit-patch gate'
+	@echo '  strict-elf        audit ELF=$(ELF) for zero interpreter/dynamic/runtime residue'
+	@echo '  report            point at Apkc/proofs/out + latest run dir (PASS/TOKEN_VAZIO)'
+	@echo '  clean             remove $(VERBOVIVO), /tmp/engram.svg, *.o'
 
 syntax:
 	$(SYNTAX_CC)
@@ -44,6 +46,13 @@ audit:
 	else \
 		echo 'audit: TOKEN_VAZIO — scripts/ci_freestanding_audit.sh ausente'; \
 	fi
+
+language-contract:
+	bash scripts/audit_language_freestanding_contract.sh
+
+strict-elf:
+	@test -n "$(ELF)" || { echo 'Uso: make strict-elf ELF=out/programa.elf' >&2; exit 64; }
+	bash scripts/audit_strict_elf.sh "$(ELF)"
 
 report:
 	@echo '== RafPolimata proof report =='
