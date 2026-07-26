@@ -84,10 +84,12 @@ def derive_seed(master_key: bytes, context: StationContext, purpose: str) -> byt
     ).digest()
 
 
-def station_fingerprint(context: StationContext, bits: int = 16) -> list[int]:
+def station_fingerprint(
+    context: StationContext, master_key: bytes, bits: int = 16
+) -> list[int]:
     if bits <= 0 or bits % 8:
         raise ValueError("bits must be a positive multiple of 8")
-    digest = hashlib.sha256(context.canonical_bytes()).digest()
+    digest = derive_seed(master_key, context, "station-fingerprint")
     raw = int.from_bytes(digest[: bits // 8], "big")
     return [(raw >> shift) & 1 for shift in range(bits - 1, -1, -1)]
 
@@ -172,7 +174,9 @@ def project_records(
 
     seed = derive_seed(master_key, context, "id-projection")
     mapping = _ranked_projection(records, seed)
-    codeword = repetition_encode(station_fingerprint(context), repetitions=3)
+    codeword = repetition_encode(
+        station_fingerprint(context, master_key), repetitions=3
+    )
 
     projected: list[ProjectedRecord] = []
     for index, record in enumerate(records):
@@ -207,7 +211,11 @@ def project_records(
         projected.append(
             ProjectedRecord(
                 canonical_id=next_canonical + offset,
-                projected_id=next_projected + rng.randrange(1_000, 9_999),
+                projected_id=(
+                    next_projected
+                    + (offset + 1) * 10_000
+                    + rng.randrange(1_000, 9_999)
+                ),
                 projected_parent_id=None,
                 name=f"PROJETO-RESERVADO-{token[:6].upper()}",
                 cep=f"98{rng.randrange(0, 999):03d}-{rng.randrange(0, 999):03d}",
@@ -247,7 +255,7 @@ def make_manifest(
         "canonical_record_count": len(canonical),
         "projected_record_count": len(projected),
         "decoy_record_count": sum(record.is_decoy for record in projected),
-        "fingerprint_bits": station_fingerprint(context),
+        "fingerprint_bits": station_fingerprint(context, master_key),
         "encoding": {"kind": "repetition", "repetitions": 3},
         "limitations": [
             "synthetic data only",
@@ -321,8 +329,10 @@ def recover_fingerprint(
     return repetition_decode(symbols, repetitions=repetitions)
 
 
-def score_candidate(recovered: Sequence[int | None], context: StationContext) -> float:
-    expected = station_fingerprint(context, bits=len(recovered))
+def score_candidate(
+    recovered: Sequence[int | None], context: StationContext, master_key: bytes
+) -> float:
+    expected = station_fingerprint(context, master_key, bits=len(recovered))
     observed = [(a, b) for a, b in zip(recovered, expected) if a is not None]
     if not observed:
         return 0.0
@@ -362,7 +372,7 @@ def run_demo() -> dict[str, object]:
         (
             {
                 "context": dataclasses.asdict(candidate),
-                "score": score_candidate(recovered, candidate),
+                "score": score_candidate(recovered, candidate, master_key),
             }
             for candidate in candidates
         ),
