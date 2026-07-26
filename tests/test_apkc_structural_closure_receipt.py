@@ -38,8 +38,36 @@ def source_proof(commit: str = COMMIT) -> dict:
     }
 
 
+def first_part_gate(state: str = "PASS") -> dict:
+    return {
+        "schema": "raf.apkc-first-part-gate.v1",
+        "state": state,
+        "claim_allowed": False,
+        "contradictions": [] if state == "PASS" else [{"id": "fixture"}],
+    }
+
+
+def runtime_preflight() -> dict:
+    return {
+        "schema": "raf.apkc-runtime-preflight.v1",
+        "state": "BLOCKED",
+        "claim_allowed": False,
+        "summary": {
+            "source_blocker_count": 3,
+            "critical_blockers": 1,
+        },
+    }
+
+
 class ApkCStructuralClosureReceiptTest(unittest.TestCase):
-    def make_inputs(self, root: Path, *, both_abis: bool = True, commit: str = COMMIT):
+    def make_inputs(
+        self,
+        root: Path,
+        *,
+        both_abis: bool = True,
+        commit: str = COMMIT,
+        first_part_state: str = "PASS",
+    ):
         apk = root / "candidate.apk"
         with zipfile.ZipFile(apk, "w", compression=zipfile.ZIP_STORED) as archive:
             archive.writestr("classes.dex", make_dex())
@@ -50,15 +78,9 @@ class ApkCStructuralClosureReceiptTest(unittest.TestCase):
         proof = root / "source-proof.json"
         proof.write_text(json.dumps(source_proof(commit)), encoding="utf-8")
         gate = root / "first-part.json"
-        gate.write_text(
-            json.dumps({"schema": "fixture.first-part", "state": "PASS", "claim_allowed": False}),
-            encoding="utf-8",
-        )
+        gate.write_text(json.dumps(first_part_gate(first_part_state)), encoding="utf-8")
         preflight = root / "preflight.json"
-        preflight.write_text(
-            json.dumps({"schema": "fixture.preflight", "state": "PASS", "claim_allowed": False}),
-            encoding="utf-8",
-        )
+        preflight.write_text(json.dumps(runtime_preflight()), encoding="utf-8")
         return apk, proof, gate, preflight
 
     def run_receipt(self, root: Path, apk: Path, proof: Path, gate: Path, preflight: Path):
@@ -96,6 +118,8 @@ class ApkCStructuralClosureReceiptTest(unittest.TestCase):
         self.assertEqual(report["state"], "PASS_STRUCTURAL")
         self.assertTrue(report["structural_claim_allowed"])
         self.assertFalse(report["claim_allowed"])
+        self.assertTrue(report["runtime_preflight"]["runtime_blocked"])
+        self.assertFalse(report["runtime_boundary"]["source_contract_safe"])
         self.assertEqual(report["runtime_boundary"]["apk_installed"], "TOKEN_VAZIO")
 
     def test_missing_apk_is_incomplete(self):
@@ -125,6 +149,15 @@ class ApkCStructuralClosureReceiptTest(unittest.TestCase):
         self.assertEqual(completed.returncode, 1)
         self.assertEqual(report["state"], "FAIL")
         self.assertFalse(report["checks"]["both_abis"])
+
+    def test_first_part_contradiction_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inputs = self.make_inputs(root, first_part_state="FAIL")
+            completed, report = self.run_receipt(root, *inputs)
+        self.assertEqual(completed.returncode, 1)
+        self.assertEqual(report["state"], "FAIL")
+        self.assertFalse(report["checks"]["first_part_gate_pass"])
 
 
 if __name__ == "__main__":
