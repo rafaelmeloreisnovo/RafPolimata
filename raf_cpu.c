@@ -210,26 +210,33 @@ void raf_cpu_detect(RafCPU *cpu) {
 }
 
 uint8_t raf_lang_from_ext(const char *path) {
-    const char *dot = strrchr(path, '.');
+    const char *dot;
+    if (path == (const char *)0) return RAF_LANG_UNKNOWN;
+    dot = strrchr(path, '.');
     if (!dot) return RAF_LANG_UNKNOWN;
-    if (!strcmp(dot, ".c"))                         return RAF_LANG_C;
+    if (!strcmp(dot, ".c"))                           return RAF_LANG_C;
     if (!strcmp(dot, ".cpp") || !strcmp(dot, ".cc")) return RAF_LANG_CPP;
-    if (!strcmp(dot, ".s") || !strcmp(dot, ".S")) return RAF_LANG_S;
-    if (!strcmp(dot, ".py"))                        return RAF_LANG_PY;
-    if (!strcmp(dot, ".rs"))                        return RAF_LANG_RS;
-    if (!strcmp(dot, ".kt"))                        return RAF_LANG_KT;
-    if (!strcmp(dot, ".java"))                      return RAF_LANG_JAVA;
-    if (!strcmp(dot, ".sh"))                        return RAF_LANG_SH;
-    if (!strcmp(dot, ".pl"))                        return RAF_LANG_PL;
-    if (!strcmp(dot, ".js"))                        return RAF_LANG_JS;
-    if (!strcmp(dot, ".php"))                       return RAF_LANG_PHP;
-    if (!strcmp(dot, ".jsx"))                       return RAF_LANG_JSX;
-    if (!strcmp(dot, ".comp"))                      return RAF_LANG_GLSL;
-    if (!strcmp(dot, ".cl"))                        return RAF_LANG_CL;
-    if (!strcmp(dot, ".hlsl"))                      return RAF_LANG_HLSL;
-    if (!strcmp(dot, ".wgsl"))                      return RAF_LANG_WGSL;
-    if (!strcmp(dot, ".dsp"))                       return RAF_LANG_DSP;
-    if (!strcmp(dot, ".tflite"))                    return RAF_LANG_TFLITE;
+    if (!strcmp(dot, ".s") || !strcmp(dot, ".S"))   return RAF_LANG_S;
+    if (!strcmp(dot, ".py"))                          return RAF_LANG_PY;
+    if (!strcmp(dot, ".rs"))                          return RAF_LANG_RS;
+    if (!strcmp(dot, ".kt"))                          return RAF_LANG_KT;
+    if (!strcmp(dot, ".java"))                        return RAF_LANG_JAVA;
+    if (!strcmp(dot, ".sh"))                          return RAF_LANG_SH;
+    if (!strcmp(dot, ".pl"))                          return RAF_LANG_PL;
+    if (!strcmp(dot, ".js"))                          return RAF_LANG_JS;
+    if (!strcmp(dot, ".php"))                         return RAF_LANG_PHP;
+    if (!strcmp(dot, ".jsx"))                         return RAF_LANG_JSX;
+    if (!strcmp(dot, ".go"))                          return RAF_LANG_GO;
+    if (!strcmp(dot, ".rb"))                          return RAF_LANG_RB;
+    if (!strcmp(dot, ".swift"))                       return RAF_LANG_SWIFT;
+    if (!strcmp(dot, ".groovy"))                      return RAF_LANG_GROOVY;
+    if (!strcmp(dot, ".clj"))                         return RAF_LANG_CLJ;
+    if (!strcmp(dot, ".comp"))                        return RAF_LANG_GLSL;
+    if (!strcmp(dot, ".cl"))                          return RAF_LANG_CL;
+    if (!strcmp(dot, ".hlsl"))                        return RAF_LANG_HLSL;
+    if (!strcmp(dot, ".wgsl"))                        return RAF_LANG_WGSL;
+    if (!strcmp(dot, ".dsp"))                         return RAF_LANG_DSP;
+    if (!strcmp(dot, ".tflite"))                      return RAF_LANG_TFLITE;
     return RAF_LANG_UNKNOWN;
 }
 
@@ -289,10 +296,15 @@ void raf_flag_matrix_get(uint8_t arch, uint8_t lang, uint8_t opt, uint32_t feat,
         lang_flags = " -ffreestanding -fno-builtin";
     }
 
+    /* Hosted and managed routes are recorded, not promoted to strict native
+     * flags. M063 requires lowering before a freestanding final claim. */
     if (lang == RAF_LANG_PY || lang == RAF_LANG_JAVA ||
         lang == RAF_LANG_KT || lang == RAF_LANG_SH ||
         lang == RAF_LANG_PL || lang == RAF_LANG_JS ||
-        lang == RAF_LANG_PHP || lang == RAF_LANG_JSX) {
+        lang == RAF_LANG_PHP || lang == RAF_LANG_JSX ||
+        lang == RAF_LANG_GO || lang == RAF_LANG_RB ||
+        lang == RAF_LANG_SWIFT || lang == RAF_LANG_GROOVY ||
+        lang == RAF_LANG_CLJ) {
         lang_flags = "";
     }
 

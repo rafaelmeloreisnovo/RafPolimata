@@ -1,0 +1,77 @@
+name: M063 language completion freestanding contract
+
+on:
+  pull_request:
+    paths:
+      - 'Apkc/lang_freestanding_policy.h'
+      - 'rafaelia/raf_lane16_patch.h'
+      - 'RAF_063_language_completion_freestanding.c'
+      - 'raf_compile.h'
+      - 'raf_cpu.c'
+      - 'tests/test_capability_matrix.py'
+      - 'ci/contracts/rafaelia_language_completion_v1.tsv'
+      - 'scripts/audit_language_freestanding_contract.sh'
+      - 'scripts/audit_strict_elf.sh'
+      - 'scripts/raf_library_assimilation_audit.py'
+      - 'scripts/raf_strict_compile_plan.py'
+      - 'docs/LANGUAGE_COMPLETION_FREESTANDING_METHODOLOGY.md'
+      - 'docs/LIBRARY_ASSIMILATION_AUDIT.md'
+      - 'docs/templates/RAFAELIA_LIBRARY_ASSIMILATION_MANIFEST.yaml'
+      - 'Makefile'
+      - '.github/workflows/m063-language-freestanding.yml'
+  push:
+    paths:
+      - 'Apkc/lang_freestanding_policy.h'
+      - 'rafaelia/raf_lane16_patch.h'
+      - 'RAF_063_language_completion_freestanding.c'
+      - 'raf_compile.h'
+      - 'raf_cpu.c'
+      - 'tests/test_capability_matrix.py'
+      - 'ci/contracts/rafaelia_language_completion_v1.tsv'
+      - 'scripts/audit_language_freestanding_contract.sh'
+      - 'scripts/audit_strict_elf.sh'
+      - 'scripts/raf_library_assimilation_audit.py'
+      - 'scripts/raf_strict_compile_plan.py'
+      - 'docs/LANGUAGE_COMPLETION_FREESTANDING_METHODOLOGY.md'
+      - 'docs/LIBRARY_ASSIMILATION_AUDIT.md'
+      - 'docs/templates/RAFAELIA_LIBRARY_ASSIMILATION_MANIFEST.yaml'
+      - 'Makefile'
+      - '.github/workflows/m063-language-freestanding.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate M063 static core and 23-language policy
+        run: bash scripts/audit_language_freestanding_contract.sh
+
+      - name: Validate strict ELF gate with syscall-only specimen
+        shell: bash
+        run: |
+          cat > /tmp/rafaelia-m063-minimal.S <<'ASM'
+          .global _start
+          .section .text
+          _start:
+            mov $60, %rax
+            xor %rdi, %rdi
+            syscall
+          ASM
+          cc -nostdlib -nostartfiles -nodefaultlibs -no-pie \
+            -Wl,--build-id=none -Wl,-e,_start -Wl,--strip-all \
+            /tmp/rafaelia-m063-minimal.S -o /tmp/rafaelia-m063-minimal.elf
+          bash scripts/audit_strict_elf.sh /tmp/rafaelia-m063-minimal.elf
+
+      - name: Upload M063 audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m063-language-freestanding-${{ github.run_id }}
+          path: ci/reports/language-freestanding-contract.md
+          if-no-files-found: warn
+          retention-days: 7
