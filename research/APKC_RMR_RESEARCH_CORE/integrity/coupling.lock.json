@@ -1,81 +1,133 @@
 {
+  "artifact_root_algorithm": "SHA-256(path NUL file_sha256 LF, sorted by path)",
+  "artifact_root_sha256": "150105a1294fbbfa2430afd18e681da4599989eaf9b41611b521778238485046",
   "artifacts": [
     {
-      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
-      "path": "README.md",
-      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
-      "sha256": "fceeca17ce4e85a4816a2b548e00a2b102311effd006b9156e71750e641cdc6b"
+      "git_blob_sha1": "acf5fa65b986fac7763b40480e0c023811633bfd",
+      "path": "Makefile",
+      "sha256": "8e4ac1634a2740cec608bb790eed92bec739491c86da312579750bb977e05ba5",
+      "source_contract": true
     },
     {
-      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
-      "path": "core/apkc_rmr_research_core.c",
-      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
-      "sha256": "2700155ee3916bf585f12b062ceb40259bf282c00f1bd23f9d32d95c95ed10f2"
-    },
-    {
-      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
-      "path": "docs/APKC_RMR_COUPLED_ARTIFACT_SPEC.md",
-      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
-      "sha256": "9314cb2d6440ce8664398f853f3b86dda3176cd9765a27cfa9bb01d0ed768d43"
-    },
-    {
-      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
-      "path": "licenses/SOFTWARE_LICENSE.md",
-      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
-      "sha256": "36a2718342d1f266e907b635583523a4ef87f03c685852d71f82b0c7140b1e03"
-    },
-    {
-      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
-      "path": "licenses/DOCUMENTATION_LICENSE.md",
-      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
-      "sha256": "d75adbc56165f63718df3396d0c23b3c77457b8fda9f860be9b627711ddca9a1"
-    },
-    {
-      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
-      "path": "licenses/COMMERCIAL_LICENSING_POLICY.md",
-      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
-      "sha256": "af9e91db4b32f9fd9f3ec90ad99e5292b479f79961e04f0367418ea36e2d80a9"
-    },
-    {
-      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
-      "path": "licenses/HIGH_RISK_SYSTEMS_ADDENDUM.md",
-      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
-      "sha256": "b0ea7e1634381de040da60a10563a0ae5c4247053e0c158ae032f78367a6b1c0"
-    },
-    {
-      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
-      "path": "governance/AUDIT_AND_CHAIN_OF_CUSTODY.md",
-      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
-      "sha256": "6ac1270bd0c1fe78cec0772c122f4713513d6597f58644858bcb2582049cac8e"
-    },
-    {
-      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
-      "path": "governance/THIRD_PARTY_AND_RELICENSING_BOUNDARY.md",
-      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
-      "sha256": "891d9a8c434adffa87077b54cbd14e4b27fb00c272f2b57c16d438602d08aa8f"
-    },
-    {
-      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
+      "git_blob_sha1": "ded5d45e68f5f67da7d8b19cffee7377d0a1181f",
       "path": "NOTICE.md",
-      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+      "required_markers": [
+        "APKC-RMR-RESEARCH-CORE-V1-20260726",
+        "Communication alone does not grant permission"
+      ],
       "sha256": "099e81ebc0e9772e9e92b35c3326d4235b9414702d11c017ea96a1bf2dac6fa6"
     },
     {
-      "blake3": "TOKEN_VAZIO_B3SUM_NOT_AVAILABLE_AT_SEAL_TIME",
-      "path": "tools/verify_coupled_artifacts.py",
-      "required_coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
-      "sha256": "9e326542d2ff38189b494a8df0a74d16b010e714dc39bcc4c38800fbe4515d24"
+      "git_blob_sha1": "508fefc5ea7e0faedf58daa02dc68b1e85ec6cff",
+      "path": "contracts/coupling.v1.json",
+      "required_markers": [
+        "raf.apkc-rmr-coupling-contract.v1",
+        "VERIFY_BEFORE_COMPILE"
+      ],
+      "sha256": "ce183d843cba3a1c957e916c51a2b76bf5e5eb312d51cdb9f344f0f562b90d4a"
+    },
+    {
+      "git_blob_sha1": "4f05c8d23b0f7edc843290e278eed0d700dc1f22",
+      "path": "core/apkc_rmr_research_core.c",
+      "sha256": "8525fe7fecc5215917b62a011105eb278a4256a93e43eff161dcc49648d263f9",
+      "source_contract": true
+    },
+    {
+      "git_blob_sha1": "597c4f703a047b57c414c9ab3e1e3a445ed5d1c4",
+      "path": "core/apkc_rmr_research_core.h",
+      "sha256": "bc3e122695e85ddd4a45edfd3f90643b40733b0584eacf429fa1fe8b10f31806",
+      "source_contract": true
+    },
+    {
+      "git_blob_sha1": "f2a89c80670cf9baa31be86d18c3949f0dd7cc91",
+      "path": "docs/APKC_RMR_COUPLED_ARTIFACT_SPEC.md",
+      "required_markers": [
+        "APKC-RMR-RESEARCH-CORE-V1-20260726",
+        "A bit change in any sealed member"
+      ],
+      "sha256": "9314cb2d6440ce8664398f853f3b86dda3176cd9765a27cfa9bb01d0ed768d43"
+    },
+    {
+      "git_blob_sha1": "e66fce87589f37233eee72ea09ca3323a9c6a336",
+      "path": "docs/COUPLED_BUILD_CONTRACT.md",
+      "required_markers": [
+        "NORMATIVE_BUILD_DOCUMENT",
+        "Compilation must never run after failed verification"
+      ],
+      "sha256": "e65f3b02a4613e07caf6d4276b14c2e01a77fa806ae097643549e83bbb5c17d5"
+    },
+    {
+      "git_blob_sha1": "15962d8a207a2b3ee60004670a725bf590beb2b3",
+      "path": "governance/AUDIT_AND_CHAIN_OF_CUSTODY.md",
+      "required_markers": [
+        "raf.apkc-rmr-custody.v1",
+        "Bit-coupling rule"
+      ],
+      "sha256": "6ac1270bd0c1fe78cec0772c122f4713513d6597f58644858bcb2582049cac8e"
+    },
+    {
+      "git_blob_sha1": "75c190c4a35623a8a9f7ce947800af49d96c4320",
+      "path": "licenses/COMMERCIAL_LICENSING_POLICY.md",
+      "required_markers": [
+        "NO COMMERCIAL LICENSE GRANTED",
+        "Commercial rights exist only after a separate written agreement"
+      ],
+      "sha256": "af9e91db4b32f9fd9f3ec90ad99e5292b479f79961e04f0367418ea36e2d80a9"
+    },
+    {
+      "git_blob_sha1": "6adc501bfe809db0a8c1649244c868067371fcec",
+      "path": "licenses/DOCUMENTATION_LICENSE.md",
+      "required_markers": [
+        "CC-BY-NC-SA-4.0",
+        "APKC-RMR-RESEARCH-CORE-V1-20260726"
+      ],
+      "sha256": "d75adbc56165f63718df3396d0c23b3c77457b8fda9f860be9b627711ddca9a1"
+    },
+    {
+      "git_blob_sha1": "a1983673348f8f9be3c73813977b8b73085bc4e4",
+      "path": "licenses/HIGH_RISK_SYSTEMS_ADDENDUM.md",
+      "required_markers": [
+        "Research grant production authorization",
+        "NONE"
+      ],
+      "sha256": "b0ea7e1634381de040da60a10563a0ae5c4247053e0c158ae032f78367a6b1c0"
+    },
+    {
+      "git_blob_sha1": "03c97f0567857e4d8f3e57ff5cc9b25962d67818",
+      "path": "licenses/SOFTWARE_LICENSE.md",
+      "required_markers": [
+        "PolyForm-Noncommercial-1.0.0",
+        "Commercial use requires prior written authorization"
+      ],
+      "sha256": "36a2718342d1f266e907b635583523a4ef87f03c685852d71f82b0c7140b1e03"
+    },
+    {
+      "git_blob_sha1": "9ab41c278743dd0881ec1d4515b431de9cdde804",
+      "path": "stubs/apkc_rmr_research_stubs.c",
+      "sha256": "6c4e1cedf3051db9c7f1681a7b7a2c0214d7c58c1467345e8174777dfba73cf4",
+      "source_contract": true
+    },
+    {
+      "git_blob_sha1": "c44f90d2df438aa997d543f504b529503ddb29ac",
+      "path": "stubs/apkc_rmr_research_stubs.h",
+      "sha256": "90caf0e1f1ed54df5df344e2e526f33cba947726f5118a013f2d6d11845241d4",
+      "source_contract": true
+    },
+    {
+      "git_blob_sha1": "c247ec5452e4959963ca96bc4afcd1448218c5c0",
+      "path": "tools/coupled_build.py",
+      "sha256": "c382db5c8f7969fb221858351f8a008c19fe0282f75533d4de43198e0a7fd7e8",
+      "source_contract": true
     }
   ],
   "blake3_gate": {
-    "next_step": "Seal release artifacts with the canonical BLAKE3 tool and record its commit/hash.",
-    "reason": "No verified BLAKE3 implementation was bundled into this isolated nucleus.",
+    "next_step": "Seal a verified release receipt with the canonical BLAKE3 implementation and record its source commit.",
     "state": "TOKEN_VAZIO"
   },
   "claim_allowed": false,
   "commercial_authorized": false,
   "coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
   "license_class": "SOURCE_AVAILABLE_NONCOMMERCIAL",
-  "schema": "raf.apkc-rmr-coupling-lock.v1",
-  "state": "SEALED_SHA256_BLAKE3_PENDING"
+  "schema": "raf.apkc-rmr-coupling-lock.v2",
+  "state": "SEALED_COMPILER_DOC_LICENSE_STUB_UNIT"
 }
