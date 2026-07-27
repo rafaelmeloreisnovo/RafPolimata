@@ -115,6 +115,21 @@ jobs:
           grep -q '<svg' ci/reports/engram.svg && echo 'SVG gate: PASS' \
             || echo 'SVG gate: TOKEN_VAZIO (verbovivo -s did not produce SVG — check verbovivo.c)'
 
+      - name: Coherence phi_fst golden tests (C1-C6, Item C)
+        run: |
+          gcc -std=c11 -I. tests/test_coherence_phi.c -o build_coherence_phi
+          ./build_coherence_phi
+
+      - name: verbovivo golden unit tests (V1-V7, Item D)
+        run: |
+          gcc -std=c11 -O2 -I. -IBenchmark \
+            tests/test_verbovivo.c rafaelia/verbovivo.c rafaelia/fiber_relmat.c \
+            -lm -o build_verbovivo_test
+          ./build_verbovivo_test
+
+      - name: Runtime router CI gate (7 cases, Item E)
+        run: python3 tests/test_runtime_router.py
+
       - name: Codegen equivalence-family test (deterministic multi-encoding MOV family)
         run: |
           gcc -std=c11 -Wall -Wextra -Werror \
