@@ -6,9 +6,8 @@
  * Runtime contract:
  * - no heap and no hosted libc dependency;
  * - storage is static or caller-owned;
- * - functions below are bounded by their explicit arguments;
- * - strtoul overflow saturates at ULONG_MAX because errno is intentionally
- *   absent from the strict runtime.
+ * - destination capacity must be explicit for copying strings;
+ * - atoi and strtoul use deterministic saturation because errno is absent.
  */
 
 typedef __SIZE_TYPE__ size_t;
@@ -27,6 +26,12 @@ typedef __PTRDIFF_TYPE__ ssize_t;
 
 #ifndef ULONG_MAX
 #define ULONG_MAX __ULONG_MAX__
+#endif
+#ifndef INT_MAX
+#define INT_MAX __INT_MAX__
+#endif
+#ifndef INT_MIN
+#define INT_MIN (-INT_MAX - 1)
 #endif
 
 #ifndef NULL
@@ -87,8 +92,8 @@ RAF_INLINE void *memmove(void *dst, const void *src, size_t n) {
     const uint8_t *s = (const uint8_t *)src;
     if (d == s || n == 0u) return dst;
 
-    /* Relational comparison of pointers to unrelated objects is undefined in C.
-     * Integer addresses provide the ordering needed by this low-level routine. */
+    /* Relational comparison of unrelated pointers is undefined in C. The
+     * supported flat-address targets provide the required uintptr_t ordering. */
     if ((uintptr_t)d < (uintptr_t)s) {
         for (size_t i = 0u; i < n; ++i) d[i] = s[i];
     } else {
@@ -151,14 +156,6 @@ RAF_INLINE int strncmp(const char *a, const char *b, size_t n) {
     return 0;
 }
 
-RAF_INLINE char *strcpy(char *dst, const char *src) {
-    size_t i = 0u;
-    do {
-        dst[i] = src[i];
-    } while (src[i++] != '\0');
-    return dst;
-}
-
 RAF_INLINE char *strncpy(char *dst, const char *src, size_t n) {
     size_t i = 0u;
     while (i < n && src[i] != '\0') {
@@ -189,16 +186,27 @@ RAF_INLINE char *strrchr(const char *s, int c) {
 }
 
 RAF_INLINE int atoi(const char *s) {
-    int sign = 1;
-    int value = 0;
+    unsigned value = 0u;
+    int negative = 0;
     while (*s == ' ' || *s == '\t' || *s == '\n' || *s == '\r') ++s;
-    if (*s == '-') { sign = -1; ++s; }
-    else if (*s == '+') { ++s; }
-    while (*s >= '0' && *s <= '9') {
-        value = value * 10 + (*s - '0');
+    if (*s == '+' || *s == '-') {
+        negative = (*s == '-');
         ++s;
     }
-    return sign * value;
+
+    const unsigned limit = negative ? (unsigned)INT_MAX + 1u : (unsigned)INT_MAX;
+    while (*s >= '0' && *s <= '9') {
+        const unsigned digit = (unsigned)(*s - '0');
+        if (value > (limit - digit) / 10u) {
+            value = limit;
+            while (s[1] >= '0' && s[1] <= '9') ++s;
+            break;
+        }
+        value = value * 10u + digit;
+        ++s;
+    }
+    if (negative) return value == (unsigned)INT_MAX + 1u ? INT_MIN : -(int)value;
+    return (int)value;
 }
 
 RAF_INLINE int raf_digit_value(char c) {
@@ -308,5 +316,6 @@ RAF_INLINE int puts(const char *s) {
 #define calloc(...) RAF_HEAP_FORBIDDEN__use_static_or_caller_owned_buffer
 #define realloc(...) RAF_HEAP_FORBIDDEN__use_static_or_caller_owned_buffer
 #define free(...) RAF_HEAP_FORBIDDEN__no_heap_object_exists
+#define strcpy(...) RAF_UNBOUNDED_STRING_COPY_FORBIDDEN__use_strncpy_with_capacity
 
 #endif
