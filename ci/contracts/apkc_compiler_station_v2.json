@@ -12,6 +12,15 @@
     "full_selftest": "make compiler-selftest",
     "language_contract": "make language-contract"
   },
+  "limits": {
+    "source_bytes": 1048576,
+    "root_expression_tokens": 1024,
+    "root_expression_depth": 64,
+    "hosted_kernel_expression_chars": 4096,
+    "hosted_kernel_ast_nodes": 256,
+    "hosted_kernel_ast_depth": 64,
+    "hosted_kernel_arguments": 4
+  },
   "planes": {
     "build": {
       "allowed_tools": ["python3", "clang", "lld", "readelf_or_llvm-readelf", "nm_or_llvm-nm", "sha256sum_or_shasum"],
@@ -66,20 +75,14 @@
     }
   ],
   "verified_targets_in_selftest": [
-    "c_arm64_android_so",
-    "c_arm32_android_so",
-    "cpp_arm64_android_so",
-    "python_raf_kernel_arm64_android_so",
-    "root_u32_ir_host_architecture",
+    "c_arm64_android_so", "c_arm32_android_so", "cpp_arm64_android_so",
+    "python_raf_kernel_arm64_android_so", "root_u32_ir_host_architecture",
     "libc_emulation_host_semantics"
   ],
   "implemented_but_target_proof_conditional": [
-    "strict_x86_64_android_so",
-    "strict_rv64_android_so",
-    "hosted_raf_kernel_arm32",
-    "hosted_raf_kernel_x86_64",
-    "hosted_raf_kernel_rv64",
-    "direct_assembly_all_targets"
+    "strict_x86_64_android_so", "strict_rv64_android_so",
+    "hosted_raf_kernel_arm32", "hosted_raf_kernel_x86_64",
+    "hosted_raf_kernel_rv64", "direct_assembly_all_targets"
   ],
   "emulated_headers": ["stddef.h", "stdint.h", "stdbool.h", "stdio.h", "stdlib.h", "string.h"],
   "emulated_functions": [
@@ -103,6 +106,8 @@
   ],
   "blocking_gates": [
     "source_exists_and_is_bounded",
+    "root_expression_budget_enforced",
+    "hosted_kernel_ast_budget_enforced",
     "unique_and_valid_lowering_contract",
     "unsupported_headers_fail_closed",
     "forbidden_runtime_surfaces_fail_closed",
@@ -144,21 +149,12 @@
     "scientific_or_semantic_truth_from_Omega_metrics"
   ],
   "canonical_files": [
-    "raf_compile.h",
-    "raf_frontend.c",
-    "raf_precomp.c",
-    "raf_asm_emit.c",
-    "Apkc/raf_libc_emu.h",
-    "scripts/raf_c_rewrite.py",
-    "scripts/raf_kernel_lower.py",
-    "scripts/apkc_strict_native_build.sh",
-    "scripts/audit_strict_elf.sh",
-    "scripts/validate_ops_manifest.py",
-    "scripts/compare_ops_manifest.py",
-    "scripts/test_compiler_station.sh",
-    "scripts/validate_compiler_station_contract.py",
-    "tests/raf_libc_emu_selftest.c",
-    "docs/APKC_COMPILER_STATION_COMPLETE.md",
-    "docs/APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md"
+    "raf_compile.h", "raf_frontend.c", "raf_precomp.c", "raf_asm_emit.c",
+    "Apkc/raf_libc_emu.h", "scripts/raf_c_rewrite.py",
+    "scripts/raf_kernel_lower.py", "scripts/apkc_strict_native_build.sh",
+    "scripts/audit_strict_elf.sh", "scripts/validate_ops_manifest.py",
+    "scripts/compare_ops_manifest.py", "scripts/test_compiler_station.sh",
+    "scripts/validate_compiler_station_contract.py", "tests/raf_libc_emu_selftest.c",
+    "docs/APKC_COMPILER_STATION_COMPLETE.md", "docs/APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md"
   ]
 }
