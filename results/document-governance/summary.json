@@ -1,7 +1,7 @@
 {
   "claim_allowed": false,
-  "commit": "1b070d0171574cda942d2c3c0f5a9c66ffd2a2fc",
-  "generated_at": "2026-07-27T18:32:37Z",
+  "commit": "0b896e1507ae1651c656e934c762300eeb407bce",
+  "generated_at": "2026-07-27T18:35:21Z",
   "policy_version": "1.0.0",
   "schema": "raf.document-governance.v1",
   "state": "REVIEW_REQUIRED",
@@ -22,7 +22,7 @@
       "workflows": 7
     },
     "blockers": 0,
-    "broken_reference_sources": 3,
+    "broken_reference_sources": 2,
     "classifications": {
       "INTERNAL": 496,
       "PUBLIC": 111
@@ -32,12 +32,12 @@
     "missing_canonical_indexes": [],
     "normalized_duplicate_groups": 0,
     "relations": 794,
-    "review_queue": 305,
+    "review_queue": 304,
     "routes": {
       "CANONICAL": 6,
-      "INDEXED": 296,
+      "INDEXED": 297,
       "LINK_REQUIRED": 290,
-      "REFERENCE_REPAIR": 3,
+      "REFERENCE_REPAIR": 2,
       "ROOT_REVIEW": 10,
       "SENSITIVITY_REVIEW": 2
     }

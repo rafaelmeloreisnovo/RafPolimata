@@ -308,7 +308,6 @@
 | 20 | `ROOT_REVIEW` | `RASBERY.MD` | root-other | arquivo de raiz fora da política declarada |
 | 20 | `ROOT_REVIEW` | `README_RAFAELIA_ROOT_OPTIMIZER.md` | root-other | arquivo de raiz fora da política declarada |
 | 5 | `REFERENCE_REPAIR` | `scripts/ci_freestanding_audit.sh` | automation | referência local quebrada |
-| 5 | `REFERENCE_REPAIR` | `scripts/science_learning_engine.py` | automation | referência local quebrada |
 
 ## Ordem de tratamento
 

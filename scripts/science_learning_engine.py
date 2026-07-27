@@ -198,8 +198,8 @@ def _md_entry(rec: dict, idx: int) -> str:
     doi    = rec.get("doi") or "N/A"
     title  = rec.get("title") or "Untitled"
     stage  = rec.get("_stage", "?")
-    doi_url = f"https://doi.org/{doi}" if doi != "N/A" else ""
-    link_md = f"[DOI: {doi}]({doi_url})" if doi_url else f"DOI: {doi}"
+    doi_url = ("https://doi.org/" + doi) if doi != "N/A" else ""
+    link_md = ("[DOI: " + doi + "](" + doi_url + ")") if doi_url else ("DOI: " + doi)
     kw = ", ".join(rec.get("keywords", [])[:5]) or "—"
     return (
         f"### {idx}. {title}\n\n"

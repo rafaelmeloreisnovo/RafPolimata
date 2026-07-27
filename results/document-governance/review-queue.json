@@ -4,15 +4,12 @@
     "scripts/ci_freestanding_audit.sh": [
       "stdlib|stdio|string|stdint|unistd|fcntl"
     ],
-    "scripts/science_learning_engine.py": [
-      "{doi_url}"
-    ],
     "tests/test_audit_repository_structure.py": [
       "docs/guide.md",
       "missing.md"
     ]
   },
-  "commit": "1b070d0171574cda942d2c3c0f5a9c66ffd2a2fc",
+  "commit": "0b896e1507ae1651c656e934c762300eeb407bce",
   "review_queue": [
     {
       "age_days": 7,
@@ -10234,41 +10231,6 @@
       "state_markers": [
         "FAIL",
         "PASS",
-        "TOKEN_VAZIO"
-      ]
-    },
-    {
-      "age_days": 0,
-      "area": "automation",
-      "broken_references": 1,
-      "classification": "INTERNAL",
-      "duplicate_group": null,
-      "evidence_grade": "E2",
-      "inbound_references": 4,
-      "indexed": true,
-      "last_commit": "e0f5c5f086c36b5d7d437227e87fc38ff2623fce",
-      "last_modified_at": "2026-07-27T18:19:10+00:00",
-      "lifecycle": "ACTIVE",
-      "line_count": 544,
-      "media_class": "automation",
-      "normalized_duplicate_group": null,
-      "normalized_sha256": "683a80600e4730a29beea839e033d5d88efdfee6f9366a8628a2c90324f4907a",
-      "outbound_references": 2,
-      "owner_role": "automation-maintainer",
-      "path": "scripts/science_learning_engine.py",
-      "policy_flags": [],
-      "quality_score": 85,
-      "review_due": false,
-      "review_interval_days": 90,
-      "risk_score": 5,
-      "route": "REFERENCE_REPAIR",
-      "route_reason": "referência local quebrada",
-      "schema": "raf.document-record.v1",
-      "sensitivity_flags": [],
-      "sha256": "c52a82703cc21bbad2ac2bd2b0b4a400f8dfa2e521928420e99969a875d086bc",
-      "size_bytes": 18688,
-      "state_markers": [
-        "PENDING",
         "TOKEN_VAZIO"
       ]
     }
