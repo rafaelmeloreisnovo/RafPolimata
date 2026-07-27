@@ -1,0 +1,210 @@
+{
+  "alignment": {
+    "DAN.2.4": {
+      "coverage_of_four_languages": 0.5,
+      "full_four_language_alignment": false,
+      "languages_present": [
+        "arc",
+        "pt-BR"
+      ]
+    },
+    "GEN.1.1": {
+      "coverage_of_four_languages": 0.5,
+      "full_four_language_alignment": false,
+      "languages_present": [
+        "hbo",
+        "pt-BR"
+      ]
+    },
+    "JHN.1.1": {
+      "coverage_of_four_languages": 0.5,
+      "full_four_language_alignment": false,
+      "languages_present": [
+        "grc",
+        "pt-BR"
+      ]
+    }
+  },
+  "claim_allowed": false,
+  "config_sha256": "d9f0c75d0f70a23a0013ad165cedc41eb4d07ffc1f22fa0622c2dc2c84becdfd",
+  "connected_components": 2,
+  "enabled": false,
+  "execution_mode": "EMULATION_ONLY",
+  "fixture_sha256": "06915d9a4b9d3981588c34e3c35621d3238959563c9be0807a0c229467e07950",
+  "language_registry": [
+    "arc",
+    "grc",
+    "hbo",
+    "pt-BR"
+  ],
+  "proof_boundary": {
+    "not_validated": [
+      "corpus_authenticity",
+      "edition_license_completeness",
+      "historical_pronunciation_accuracy",
+      "translation_equivalence",
+      "authorial_intent",
+      "human_comprehension",
+      "brain_state_or_neural_activation",
+      "doctrinal_truth"
+    ],
+    "validated": [
+      "configuration_invariants",
+      "NFC_storage",
+      "annotated_token_structure",
+      "script_profile",
+      "relation_graph_integrity",
+      "explicit_pronunciation_approximation",
+      "deterministic_hash_receipt"
+    ]
+  },
+  "receipt_sha256": "04f36abba5d6d5d4a2794cfaa8b4a2964b8a4819e8700de579374dc7fb65fc67",
+  "relation_count": 4,
+  "relation_counts": {
+    "thematic": 1,
+    "translation_alignment": 3
+  },
+  "schema": "rafpolimata.multilingual-scripture-receipt.v1",
+  "state": "PASS_WITH_TOKEN_VAZIO",
+  "unit_count": 6,
+  "unit_metrics": [
+    {
+      "canonical_passage": "DAN.2.4",
+      "character_entropy": 3.180833,
+      "clause_count": 1,
+      "grapheme_count_approx": 13,
+      "language_tag": "arc",
+      "max_dependency_distance": 2,
+      "mean_dependency_distance": 1.666667,
+      "mean_grapheme_length_per_token": 4.333333,
+      "morphological_density": 2.666667,
+      "neurocognitive_interpretation": "OBSERVABLE_PROXY_ONLY_NO_BRAIN_STATE_INFERENCE",
+      "phonetic_annotation_coverage": 0.0,
+      "pos_signature": {
+        "NOUN": 1,
+        "NOUN_ADVERBIAL": 1,
+        "VERB": 1
+      },
+      "text_sha256": "b20cabd0c17ee454d966f6ce6dcfceb4eeb67928225ede00b5a4bc80ca1138a0",
+      "token_count": 3,
+      "token_entropy": 1.584963,
+      "unit_id": "DAN.2.4.arc.excerpt"
+    },
+    {
+      "canonical_passage": "DAN.2.4",
+      "character_entropy": 3.155565,
+      "clause_count": 1,
+      "grapheme_count_approx": 19,
+      "language_tag": "pt-BR",
+      "max_dependency_distance": 2,
+      "mean_dependency_distance": 1.4,
+      "mean_grapheme_length_per_token": 3.8,
+      "morphological_density": 1.0,
+      "neurocognitive_interpretation": "OBSERVABLE_PROXY_ONLY_NO_BRAIN_STATE_INFERENCE",
+      "phonetic_annotation_coverage": 0.0,
+      "pos_signature": {
+        "ADVERB": 1,
+        "NOUN": 1,
+        "PREPOSITION": 1,
+        "VERB": 1,
+        "VOCATIVE_PARTICLE": 1
+      },
+      "text_sha256": "2adbd5782d6bec9d22165da1abd0a8254fccf94a2de98ebcf62d263fe60d9a86",
+      "token_count": 5,
+      "token_entropy": 2.321928,
+      "unit_id": "DAN.2.4.pt-BR.excerpt"
+    },
+    {
+      "canonical_passage": "GEN.1.1",
+      "character_entropy": 2.584963,
+      "clause_count": 1,
+      "grapheme_count_approx": 6,
+      "language_tag": "hbo",
+      "max_dependency_distance": 0,
+      "mean_dependency_distance": 0.0,
+      "mean_grapheme_length_per_token": 6.0,
+      "morphological_density": 4.0,
+      "neurocognitive_interpretation": "OBSERVABLE_PROXY_ONLY_NO_BRAIN_STATE_INFERENCE",
+      "phonetic_annotation_coverage": 0.0,
+      "pos_signature": {
+        "NOUN": 1
+      },
+      "text_sha256": "424a9bc4a0510031d21d3a00f96137d7588e36016a1ed1fc097d3e5dc9b36e6e",
+      "token_count": 1,
+      "token_entropy": -0.0,
+      "unit_id": "GEN.1.1.hbo.excerpt"
+    },
+    {
+      "canonical_passage": "GEN.1.1",
+      "character_entropy": 2.913977,
+      "clause_count": 1,
+      "grapheme_count_approx": 11,
+      "language_tag": "pt-BR",
+      "max_dependency_distance": 1,
+      "mean_dependency_distance": 1.0,
+      "mean_grapheme_length_per_token": 5.5,
+      "morphological_density": 2.0,
+      "neurocognitive_interpretation": "OBSERVABLE_PROXY_ONLY_NO_BRAIN_STATE_INFERENCE",
+      "phonetic_annotation_coverage": 1.0,
+      "pos_signature": {
+        "ADPOSITION_ARTICLE_CONTRACTION": 1,
+        "NOUN": 1
+      },
+      "text_sha256": "65e15b85f68742804c2c2b91489e46310ae61bbfbb01a8a3f03168d2371d92b7",
+      "token_count": 2,
+      "token_entropy": 1.0,
+      "unit_id": "GEN.1.1.pt-BR.excerpt"
+    },
+    {
+      "canonical_passage": "JHN.1.1",
+      "character_entropy": 2.584963,
+      "clause_count": 1,
+      "grapheme_count_approx": 6,
+      "language_tag": "grc",
+      "max_dependency_distance": 1,
+      "mean_dependency_distance": 1.0,
+      "mean_grapheme_length_per_token": 3.0,
+      "morphological_density": 2.0,
+      "neurocognitive_interpretation": "OBSERVABLE_PROXY_ONLY_NO_BRAIN_STATE_INFERENCE",
+      "phonetic_annotation_coverage": 0.0,
+      "pos_signature": {
+        "NOUN": 1,
+        "PREPOSITION": 1
+      },
+      "text_sha256": "80ccea841876eb36c0ba2c54f6d7e57fc5e4dcc8f9bbab5d1a5157002aa45a91",
+      "token_count": 2,
+      "token_entropy": 1.0,
+      "unit_id": "JHN.1.1.grc.excerpt"
+    },
+    {
+      "canonical_passage": "JHN.1.1",
+      "character_entropy": 2.913977,
+      "clause_count": 1,
+      "grapheme_count_approx": 11,
+      "language_tag": "pt-BR",
+      "max_dependency_distance": 1,
+      "mean_dependency_distance": 1.0,
+      "mean_grapheme_length_per_token": 5.5,
+      "morphological_density": 2.0,
+      "neurocognitive_interpretation": "OBSERVABLE_PROXY_ONLY_NO_BRAIN_STATE_INFERENCE",
+      "phonetic_annotation_coverage": 1.0,
+      "pos_signature": {
+        "ADPOSITION_ARTICLE_CONTRACTION": 1,
+        "NOUN": 1
+      },
+      "text_sha256": "65e15b85f68742804c2c2b91489e46310ae61bbfbb01a8a3f03168d2371d92b7",
+      "token_count": 2,
+      "token_entropy": 1.0,
+      "unit_id": "JHN.1.1.pt-BR.excerpt"
+    }
+  ],
+  "warnings": [
+    "DAN.2.4.arc.excerpt: source corpus remains TOKEN_VAZIO",
+    "DAN.2.4: TOKEN_VAZIO_FULL_FOUR_LANGUAGE_ALIGNMENT",
+    "GEN.1.1.hbo.excerpt: source corpus remains TOKEN_VAZIO",
+    "GEN.1.1: TOKEN_VAZIO_FULL_FOUR_LANGUAGE_ALIGNMENT",
+    "JHN.1.1.grc.excerpt: source corpus remains TOKEN_VAZIO",
+    "JHN.1.1: TOKEN_VAZIO_FULL_FOUR_LANGUAGE_ALIGNMENT",
+    "REL-GEN-JHN-BEGINNING: relation remains HYPOTHESIS"
+  ]
+}
