@@ -1,20 +1,22 @@
 #include "raf_compile.h"
 
 /* Source-dependent bounded lowering for the canonical u32 kernel contract.
- *
- * Accepted forms outside comments and literals:
+ * Accepted outside comments/literals:
  *   RAF_RETURN(<constant expression>)
- *   exactly one: return <constant expression>;
- *   exactly one: exit <constant expression>
- *
+ *   exactly one return <constant expression>;
+ *   exactly one exit <constant expression>
  * Operators: + - * / % << >> & ^ | ~ and parentheses.
- * Arithmetic is evaluated in uint64 modulo arithmetic and the result is
- * explicitly narrowed to uint32. There is no symbol table, heap or fallback.
+ * Arithmetic is uint64 modulo arithmetic, narrowed explicitly to uint32.
  */
+
+#define RAF_EXPR_MAX_DEPTH 64u
+#define RAF_EXPR_MAX_TOKENS 1024u
 
 typedef struct {
     const char *p;
     const char *end;
+    unsigned depth;
+    unsigned tokens;
     int err;
 } RafExpr;
 
@@ -32,11 +34,34 @@ static void raf_skip_ws(RafExpr *e) {
     while (e->p < e->end && (*e->p == ' ' || *e->p == '\t' || *e->p == '\r')) ++e->p;
 }
 
+static int raf_take_token(RafExpr *e) {
+    if (e->tokens >= RAF_EXPR_MAX_TOKENS) {
+        e->err = 1;
+        return 0;
+    }
+    ++e->tokens;
+    return 1;
+}
+
+static int raf_enter(RafExpr *e) {
+    if (e->depth >= RAF_EXPR_MAX_DEPTH) {
+        e->err = 1;
+        return 0;
+    }
+    ++e->depth;
+    return 1;
+}
+
+static void raf_leave(RafExpr *e) {
+    if (e->depth != 0u) --e->depth;
+}
+
 static int raf_single_operator_is_doubled(const char *p, const char *end, char op) {
     return p + 1 < end && p[0] == op && p[1] == op;
 }
 
 static int raf_match(RafExpr *e, const char *token) {
+    if (e->err) return 0;
     raf_skip_ws(e);
     const char *p = e->p;
     const char *t = token;
@@ -50,6 +75,7 @@ static int raf_match(RafExpr *e, const char *token) {
 
     while (*t && p < e->end && *p == *t) { ++p; ++t; }
     if (*t) return 0;
+    if (!raf_take_token(e)) return 0;
     e->p = p;
     return 1;
 }
@@ -81,7 +107,7 @@ static uint64_t raf_parse_number(RafExpr *e) {
         ++digits;
         ++e->p;
     }
-    if (digits == 0u) {
+    if (digits == 0u || !raf_take_token(e)) {
         e->err = 1;
         return 0u;
     }
@@ -92,7 +118,9 @@ static uint64_t raf_parse_number(RafExpr *e) {
 static uint64_t raf_parse_primary(RafExpr *e) {
     raf_skip_ws(e);
     if (raf_match(e, "(")) {
+        if (!raf_enter(e)) return 0u;
         const uint64_t value = raf_parse_or(e);
+        raf_leave(e);
         if (!raf_match(e, ")")) e->err = 1;
         return value;
     }
@@ -100,9 +128,24 @@ static uint64_t raf_parse_primary(RafExpr *e) {
 }
 
 static uint64_t raf_parse_unary(RafExpr *e) {
-    if (raf_match(e, "+")) return raf_parse_unary(e);
-    if (raf_match(e, "-")) return (uint64_t)(0u - raf_parse_unary(e));
-    if (raf_match(e, "~")) return ~raf_parse_unary(e);
+    if (raf_match(e, "+")) {
+        if (!raf_enter(e)) return 0u;
+        const uint64_t value = raf_parse_unary(e);
+        raf_leave(e);
+        return value;
+    }
+    if (raf_match(e, "-")) {
+        if (!raf_enter(e)) return 0u;
+        const uint64_t value = raf_parse_unary(e);
+        raf_leave(e);
+        return (uint64_t)(0u - value);
+    }
+    if (raf_match(e, "~")) {
+        if (!raf_enter(e)) return 0u;
+        const uint64_t value = raf_parse_unary(e);
+        raf_leave(e);
+        return ~value;
+    }
     return raf_parse_primary(e);
 }
 
@@ -270,6 +313,8 @@ int raf_precompile(RafCtx *ctx) {
     RafExpr expr;
     expr.p = start;
     expr.end = ctx->src + ctx->src_len;
+    expr.depth = 0u;
+    expr.tokens = 0u;
     expr.err = 0;
     const uint64_t value = raf_parse_or(&expr);
     if (expr.err || !raf_expression_tail_ok(&expr, marker_parenthesized)) return -3;
