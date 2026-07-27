@@ -4,38 +4,72 @@ on:
   pull_request:
     paths:
       - 'Apkc/lang_freestanding_policy.h'
+      - 'Apkc/raf_libc_emu.h'
       - 'rafaelia/raf_lane16_patch.h'
       - 'RAF_063_language_completion_freestanding.c'
       - 'raf_compile.h'
       - 'raf_cpu.c'
+      - 'raf_precomp.c'
+      - 'raf_asm_emit.c'
       - 'tests/test_capability_matrix.py'
+      - 'tests/fixtures/strict_kernel.c'
+      - 'tests/fixtures/kernel.py'
+      - 'tests/fixtures/raf_return_42.c'
+      - 'tests/fixtures/raf_return_1337.py'
+      - 'tests/fixtures/raf_return_invalid.c'
       - 'ci/contracts/rafaelia_language_completion_v1.tsv'
       - 'scripts/audit_language_freestanding_contract.sh'
       - 'scripts/audit_strict_elf.sh'
       - 'scripts/raf_library_assimilation_audit.py'
       - 'scripts/raf_strict_compile_plan.py'
+      - 'scripts/raf_c_rewrite.py'
+      - 'scripts/raf_kernel_lower.py'
+      - 'scripts/apkc_strict_native_build.sh'
+      - 'scripts/test_compiler_station.sh'
+      - 'scripts/test_ops_manifest.sh'
       - 'docs/LANGUAGE_COMPLETION_FREESTANDING_METHODOLOGY.md'
       - 'docs/LIBRARY_ASSIMILATION_AUDIT.md'
+      - 'docs/APKC_COMPILER_STATION_COMPLETE.md'
+      - 'docs/OPERACAO_COMPILAR_PRECOMPILAR.md'
       - 'docs/templates/RAFAELIA_LIBRARY_ASSIMILATION_MANIFEST.yaml'
+      - 'Apkc/proofs/GAPS.md'
       - 'Makefile'
+      - '.github/workflows/ci.yml'
       - '.github/workflows/m063-language-freestanding.yml'
   push:
     paths:
       - 'Apkc/lang_freestanding_policy.h'
+      - 'Apkc/raf_libc_emu.h'
       - 'rafaelia/raf_lane16_patch.h'
       - 'RAF_063_language_completion_freestanding.c'
       - 'raf_compile.h'
       - 'raf_cpu.c'
+      - 'raf_precomp.c'
+      - 'raf_asm_emit.c'
       - 'tests/test_capability_matrix.py'
+      - 'tests/fixtures/strict_kernel.c'
+      - 'tests/fixtures/kernel.py'
+      - 'tests/fixtures/raf_return_42.c'
+      - 'tests/fixtures/raf_return_1337.py'
+      - 'tests/fixtures/raf_return_invalid.c'
       - 'ci/contracts/rafaelia_language_completion_v1.tsv'
       - 'scripts/audit_language_freestanding_contract.sh'
       - 'scripts/audit_strict_elf.sh'
       - 'scripts/raf_library_assimilation_audit.py'
       - 'scripts/raf_strict_compile_plan.py'
+      - 'scripts/raf_c_rewrite.py'
+      - 'scripts/raf_kernel_lower.py'
+      - 'scripts/apkc_strict_native_build.sh'
+      - 'scripts/test_compiler_station.sh'
+      - 'scripts/test_ops_manifest.sh'
       - 'docs/LANGUAGE_COMPLETION_FREESTANDING_METHODOLOGY.md'
       - 'docs/LIBRARY_ASSIMILATION_AUDIT.md'
+      - 'docs/APKC_COMPILER_STATION_COMPLETE.md'
+      - 'docs/OPERACAO_COMPILAR_PRECOMPILAR.md'
       - 'docs/templates/RAFAELIA_LIBRARY_ASSIMILATION_MANIFEST.yaml'
+      - 'Apkc/proofs/GAPS.md'
       - 'Makefile'
+      - '.github/workflows/ci.yml'
       - '.github/workflows/m063-language-freestanding.yml'
 
 permissions:
@@ -44,11 +78,11 @@ permissions:
 jobs:
   contract:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate M063 static core and 23-language policy
+      - name: Validate M063 static core and completed compiler station
         run: bash scripts/audit_language_freestanding_contract.sh
 
       - name: Validate strict ELF gate with syscall-only specimen
