@@ -7,6 +7,7 @@ export TZ=UTC
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-0}"
 umask 077
 
+MAX_SOURCE_BYTES=$((1 << 20))
 usage() {
   echo 'usage: apkc_strict_native_build.sh <language> <arm64|arm32|x86_64|rv64> <output.so> <source>' >&2
   exit 64
@@ -24,6 +25,11 @@ PYTHON_BIN="${PYTHON:-python3}"
 command -v "$CLANG_BIN" >/dev/null 2>&1 || { echo "missing compiler: $CLANG_BIN" >&2; exit 69; }
 command -v "$PYTHON_BIN" >/dev/null 2>&1 || { echo "missing python: $PYTHON_BIN" >&2; exit 69; }
 [[ -s "$SOURCE" ]] || { echo "source missing or empty: $SOURCE" >&2; exit 66; }
+SOURCE_BYTES="$(wc -c < "$SOURCE")"
+[[ "$SOURCE_BYTES" -le "$MAX_SOURCE_BYTES" ]] || {
+  echo "source exceeds $MAX_SOURCE_BYTES bytes: $SOURCE_BYTES" >&2
+  exit 65
+}
 
 case "$ARCH" in
   arm64)
@@ -65,8 +71,8 @@ cleanup() {
 }
 trap cleanup EXIT HUP INT TERM
 
-# The invocation owns this output base. Remove prior pairs immediately so a
-# failed new attempt cannot be mistaken for a successful current build.
+# This invocation owns its output base. A failed current attempt must not leave
+# a previous pair that a file-existence check could mistake for the new result.
 rm -f "$OUTPUT" "$RECEIPT"
 
 LOWERED="$TMP_ROOT/lowered.c"
@@ -140,15 +146,17 @@ cp "$SEALED" "$COMMIT_TMP"
 chmod 0644 "$COMMIT_TMP"
 
 "$PYTHON_BIN" - "$RECEIPT_TMP" "$LANGUAGE" "$ARCH" "$TARGET" "$SOURCE" \
-  "$SOURCE_SHA" "$OUTPUT" "$OUTPUT_SHA" "$COMPILER_VERSION" \
+  "$SOURCE_BYTES" "$SOURCE_SHA" "$OUTPUT" "$OUTPUT_SHA" "$COMPILER_VERSION" \
   "$LOWER_MANIFEST" "$REWRITE_MANIFEST" <<'PY'
 import json
+import os
 from pathlib import Path
 import sys
 
 (
-    receipt_path, language, arch, target, source, source_sha, output, output_sha,
-    compiler_version, lower_manifest_path, rewrite_manifest_path,
+    receipt_path, language, arch, target, source, source_bytes, source_sha,
+    output, output_sha, compiler_version, lower_manifest_path,
+    rewrite_manifest_path,
 ) = sys.argv[1:]
 
 def load_optional(path: str):
@@ -164,6 +172,8 @@ receipt = {
     "architecture": arch,
     "target": target,
     "source": source,
+    "source_bytes": int(source_bytes),
+    "source_limit_bytes": 1 << 20,
     "source_sha256": source_sha,
     "output": output,
     "output_sha256": output_sha,
@@ -174,6 +184,7 @@ receipt = {
     "rewrite_manifest": load_optional(rewrite_manifest_path),
     "gates": {
         "source_nonempty": "PASS",
+        "source_bounded": "PASS",
         "lowering_or_rewrite": "PASS",
         "no_undefined_symbols": "PASS",
         "no_pt_interp": "PASS",
@@ -191,16 +202,18 @@ receipt = {
         "full_source_language_semantics"
     ]
 }
-Path(receipt_path).write_text(
-    json.dumps(receipt, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-    encoding="utf-8"
-)
+payload = json.dumps(receipt, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+with open(receipt_path, "w", encoding="utf-8", newline="") as handle:
+    handle.write(payload)
+    handle.flush()
+    os.fsync(handle.fileno())
 PY
 chmod 0644 "$RECEIPT_TMP"
 
-# Promote the pair. If the second rename fails, the EXIT trap removes the first.
-mv -f "$COMMIT_TMP" "$OUTPUT"
+# Receipt-first promotion is crash-safer: a power loss can leave metadata
+# without executable output, but never an executable output without custody.
 mv -f "$RECEIPT_TMP" "$RECEIPT"
+mv -f "$COMMIT_TMP" "$OUTPUT"
 COMMITTED=1
 
 printf 'apkc_strict_native_build: PASS lang=%s arch=%s output=%s sha256=%s\n' \
