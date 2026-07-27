@@ -13,8 +13,6 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 python3 "$ROOT/scripts/raf_c_rewrite.py" --selftest
 python3 "$ROOT/scripts/raf_kernel_lower.py" --selftest
 
-# Host-executable regression for the freestanding compatibility layer. This
-# catches memmove overlap, conversion and string-surface defects before cross-link.
 "$CC_BIN" -std=c11 -Wall -Wextra -Werror -Wshadow -Wconversion -Wpedantic \
   -fno-builtin -I"$ROOT" "$ROOT/tests/raf_libc_emu_selftest.c" \
   -o "$TMP_ROOT/libc-emu-selftest"
@@ -43,6 +41,8 @@ receipt = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 assert receipt["schema"] == "rafaelia.apkc.strict-native-receipt.v2"
 assert receipt["status"] == "STRICT_ELF_PASS"
 assert receipt["claim_allowed"] is True
+assert receipt["source_bytes"] > 0
+assert receipt["source_bytes"] <= receipt["source_limit_bytes"] == 1 << 20
 assert receipt["runtime_external_dependencies"] == []
 assert all(value == "PASS" for value in receipt["gates"].values())
 PY
@@ -64,7 +64,7 @@ done
 "$TMP_ROOT/raf_compile" "$ROOT/tests/fixtures/raf_return_1337.py" "$TMP_ROOT/c" --native >/dev/null
 cmp "$TMP_ROOT/a.bin" "$TMP_ROOT/b.bin"
 if cmp -s "$TMP_ROOT/a.bin" "$TMP_ROOT/c.bin"; then
-  echo 'source-dependent gate: FAIL — distinct source values emitted identical bytes' >&2
+  echo 'source-dependent gate: FAIL — distinct values emitted identical bytes' >&2
   exit 1
 fi
 python3 "$ROOT/scripts/validate_ops_manifest.py" "$TMP_ROOT/a.ops" --expect-rollback 0
@@ -75,8 +75,7 @@ grep -qx 'ops_schema=4' "$TMP_ROOT/a.ops"
 grep -qx 'transaction_state=COMMITTED' "$TMP_ROOT/a.ops"
 grep -qx 'ir_value=42' "$TMP_ROOT/a.ops"
 
-# Transaction rollback: a failed compile over the same output base must remove
-# every prior executable artifact and replace only the failure receipt.
+# Root compiler rollback over a previous successful output.
 "$TMP_ROOT/raf_compile" "$ROOT/tests/fixtures/raf_return_42.c" "$TMP_ROOT/stale" --native >/dev/null
 test -s "$TMP_ROOT/stale.bin"
 set +e
@@ -85,7 +84,7 @@ stale_rc=$?
 set -e
 [[ $stale_rc -ne 0 ]] || { echo 'invalid source unexpectedly committed' >&2; exit 1; }
 for suffix in s hex bin; do
-  [[ ! -e "$TMP_ROOT/stale.$suffix" ]] || { echo "stale artifact survived rollback: stale.$suffix" >&2; exit 1; }
+  [[ ! -e "$TMP_ROOT/stale.$suffix" ]] || { echo "stale artifact survived: stale.$suffix" >&2; exit 1; }
 done
 python3 "$ROOT/scripts/validate_ops_manifest.py" "$TMP_ROOT/stale.ops" --expect-rollback -2
 grep -qx 'transaction_state=ROLLED_BACK' "$TMP_ROOT/stale.ops"
@@ -105,16 +104,50 @@ for invalid_fixture in \
   [[ ! -e "$base.bin" ]] || { echo "$invalid_fixture left native bytes" >&2; exit 1; }
 done
 
-# Unsupported hosted surface must fail during rewrite, before object creation.
+# Root expression depth and token budgets.
+python3 - "$TMP_ROOT/deep.c" "$TMP_ROOT/wide.c" <<'PY'
+from pathlib import Path
+import sys
+Path(sys.argv[1]).write_text("int f(void){return " + "(" * 70 + "1" + ")" * 70 + ";}\n")
+Path(sys.argv[2]).write_text("int f(void){return " + "+".join("1" for _ in range(1100)) + ";}\n")
+PY
+for bounded in deep wide; do
+  set +e
+  "$TMP_ROOT/raf_compile" "$TMP_ROOT/$bounded.c" "$TMP_ROOT/$bounded" --native >/dev/null 2>&1
+  bounded_rc=$?
+  set -e
+  [[ $bounded_rc -ne 0 ]] || { echo "$bounded expression escaped limits" >&2; exit 1; }
+  python3 "$ROOT/scripts/validate_ops_manifest.py" "$TMP_ROOT/$bounded.ops" --expect-rollback -2
+done
+
+# Strict builder rollback and source-size limit must invalidate an old pair.
+bash "$ROOT/scripts/apkc_strict_native_build.sh" c arm64 \
+  "$TMP_ROOT/strict-stale.so" "$ROOT/tests/fixtures/strict_kernel.c"
+test -s "$TMP_ROOT/strict-stale.so" && test -s "$TMP_ROOT/strict-stale.so.receipt.json"
 set +e
 bash "$ROOT/scripts/apkc_strict_native_build.sh" c arm64 \
-  "$TMP_ROOT/unsupported.so" "$ROOT/tests/fixtures/unsupported_header.c" >/dev/null 2>&1
+  "$TMP_ROOT/strict-stale.so" "$ROOT/tests/fixtures/unsupported_header.c" >/dev/null 2>&1
 unsupported_rc=$?
 set -e
 [[ $unsupported_rc -ne 0 ]] || { echo 'unsupported header must fail closed' >&2; exit 1; }
-[[ ! -e "$TMP_ROOT/unsupported.so" && ! -e "$TMP_ROOT/unsupported.so.receipt.json" ]]
+[[ ! -e "$TMP_ROOT/strict-stale.so" && ! -e "$TMP_ROOT/strict-stale.so.receipt.json" ]]
 
-# Tampering with any signed field must invalidate the receipt.
+python3 - "$TMP_ROOT/oversized.s" <<'PY'
+from pathlib import Path
+import sys
+Path(sys.argv[1]).write_bytes(b'x' * ((1 << 20) + 1))
+PY
+bash "$ROOT/scripts/apkc_strict_native_build.sh" c arm64 \
+  "$TMP_ROOT/oversized-target.so" "$ROOT/tests/fixtures/strict_kernel.c"
+set +e
+bash "$ROOT/scripts/apkc_strict_native_build.sh" asm arm64 \
+  "$TMP_ROOT/oversized-target.so" "$TMP_ROOT/oversized.s" >/dev/null 2>&1
+oversized_rc=$?
+set -e
+[[ $oversized_rc -ne 0 ]] || { echo 'oversized ASM source must fail' >&2; exit 1; }
+[[ ! -e "$TMP_ROOT/oversized-target.so" && ! -e "$TMP_ROOT/oversized-target.so.receipt.json" ]]
+
+# Tampering with any signed field must invalidate the .ops receipt.
 cp "$TMP_ROOT/a.ops" "$TMP_ROOT/tampered.ops"
 sed -i 's/^ir_value=42$/ir_value=43/' "$TMP_ROOT/tampered.ops"
 if python3 "$ROOT/scripts/validate_ops_manifest.py" "$TMP_ROOT/tampered.ops" >/dev/null 2>&1; then
