@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+
+#define RAF_OPS_SCHEMA 4u
+#define RAF_EMITTER_SCHEMA 2u
 
 /* Returns 0 on success, -1 on I/O failure and -2 when the source exceeds the
  * bounded no-heap storage. Oversized input is rejected instead of truncated. */
@@ -15,17 +19,17 @@ static int read_src(RafCtx *ctx, const char *path) {
 
   size_t n = fread(ctx->src_storage, 1, RAF_SOURCE_CAP - 1u, f);
   if (ferror(f)) {
-    fclose(f);
+    (void)fclose(f);
     return -1;
   }
 
   int extra = fgetc(f);
   if (extra != EOF) {
-    fclose(f);
+    (void)fclose(f);
     return -2;
   }
 
-  fclose(f);
+  if (fclose(f) != 0) return -1;
   ctx->src_storage[n] = '\0';
   ctx->src = ctx->src_storage;
   ctx->src_len = n;
@@ -57,6 +61,15 @@ static uint64_t raf_hash_u64(uint64_t h, uint64_t v) {
   return raf_hash_update(h, b, sizeof(b));
 }
 
+static uint32_t raf_ir_value(const RafCtx *ctx) {
+  if (!ctx || ctx->ir.n == 0u) return 0u;
+  return (uint32_t)ctx->ir.buf[0];
+}
+
+static const char *raf_transaction_state(const RafCtx *ctx) {
+  return ctx->rollback_code == 0 ? "COMMITTED" : "ROLLED_BACK";
+}
+
 static uint64_t raf_ops_signature(const RafCtx *ctx) {
   uint64_t h = UINT64_C(14695981039346656037);
   h = raf_hash_u64(h, ctx->cpu.arch);
@@ -76,9 +89,13 @@ static uint64_t raf_ops_signature(const RafCtx *ctx) {
   h = raf_hash_u64(h, ctx->ir.n);
   h = raf_hash_u64(h, ctx->asm_out.n);
   h = raf_hash_u64(h, ctx->bin.n);
+  h = raf_hash_u64(h, raf_ir_value(ctx));
+  h = raf_hash_u64(h, RAF_EMITTER_SCHEMA);
   h = raf_hash_u64(h, ctx->native_requested);
   h = raf_hash_u64(h, ctx->native_written);
   h = raf_hash_u64(h, (uint64_t)(int64_t)ctx->rollback_code);
+  h = raf_hash_update(h, (const uint8_t *)raf_transaction_state(ctx),
+                      strlen(raf_transaction_state(ctx)));
   return h;
 }
 
@@ -95,28 +112,72 @@ void raf_ctx_init(RafCtx *ctx) {
 
 void raf_ctx_report(const RafCtx *ctx) {
   printf("[raf] arch=%u brand=%s cores=%u ir=%u asm=%u bin=%u native=%u/%u "
-         "src_hash=%016llx omega=%s/%u phi=%u entropy=%u flags=%s\n",
+         "src_hash=%016llx omega=%s/%u phi=%u entropy=%u flags=%s state=%s\n",
          ctx->cpu.arch, ctx->cpu.brand, ctx->cpu.cores, ctx->ir.n,
          ctx->asm_out.n, ctx->bin.n, ctx->native_requested,
          ctx->native_written, (unsigned long long)ctx->src_hash,
          raf_omega_path_name((RafOmegaPath)ctx->omega_path),
          ctx->omega_attractor, ctx->omega_phi_q16,
-         ctx->omega_entropy_milli, ctx->flags);
+         ctx->omega_entropy_milli, ctx->flags, raf_transaction_state(ctx));
 }
 
-static void prepare_manifest(RafCtx *ctx, const char *out_base) {
-  snprintf(ctx->out_asm, sizeof(ctx->out_asm), "%s.s", out_base);
-  snprintf(ctx->out_hex, sizeof(ctx->out_hex), "%s.hex", out_base);
-  snprintf(ctx->out_bin, sizeof(ctx->out_bin), "%s.bin", out_base);
-  snprintf(ctx->out_ops, sizeof(ctx->out_ops), "%s.ops", out_base);
+static void reset_transaction(RafCtx *ctx) {
+  ctx->lang = RAF_LANG_UNKNOWN;
+  ctx->feat = ctx->cpu.feat;
+  ctx->src_storage[0] = '\0';
+  ctx->src = (const char *)0;
+  ctx->src_len = 0u;
+  ctx->ir.n = 0u;
+  ctx->asm_out.n = 0u;
+  ctx->bin.n = 0u;
+  ctx->flags[0] = '\0';
+  ctx->src_hash = 0u;
+  ctx->omega_entropy_milli = 0u;
+  ctx->omega_phi_q16 = 0u;
+  ctx->omega_attractor = 0u;
+  ctx->omega_flags = 0u;
+  ctx->omega_path = (uint8_t)RAF_OMEGA_VOID;
+  ctx->ops_signature = 0u;
+  ctx->rollback_code = -99;
+  ctx->elapsed_ns = 0u;
+  ctx->native_requested = 0u;
+  ctx->native_written = 0u;
+}
+
+static int format_path(char *dst, size_t cap, const char *base, const char *suffix) {
+  int n = snprintf(dst, cap, "%s%s", base, suffix);
+  return n >= 0 && (size_t)n < cap ? 0 : -1;
+}
+
+static int prepare_manifest(RafCtx *ctx, const char *out_base) {
+  if (!out_base || !out_base[0]) return -1;
+  if (format_path(ctx->out_asm, sizeof(ctx->out_asm), out_base, ".s") != 0) return -1;
+  if (format_path(ctx->out_hex, sizeof(ctx->out_hex), out_base, ".hex") != 0) return -1;
+  if (format_path(ctx->out_bin, sizeof(ctx->out_bin), out_base, ".bin") != 0) return -1;
+  if (format_path(ctx->out_ops, sizeof(ctx->out_ops), out_base, ".ops") != 0) return -1;
+  return 0;
+}
+
+static int temp_path(char *dst, size_t cap, const char *final_path) {
+  int n = snprintf(dst, cap, "%s.tmp.%ld", final_path, (long)getpid());
+  return n >= 0 && (size_t)n < cap ? 0 : -1;
+}
+
+static void clear_data_artifacts(const RafCtx *ctx) {
+  (void)remove(ctx->out_asm);
+  (void)remove(ctx->out_hex);
+  (void)remove(ctx->out_bin);
 }
 
 static int write_ops_manifest(RafCtx *ctx) {
+  char tmp[320];
+  if (temp_path(tmp, sizeof(tmp), ctx->out_ops) != 0) return -12;
+
   ctx->ops_signature = raf_ops_signature(ctx);
-  FILE *fo = fopen(ctx->out_ops, "w");
+  FILE *fo = fopen(tmp, "w");
   if (!fo) return -12;
-  fprintf(fo,
-          "ops_schema=3\n"
+  int ok = fprintf(fo,
+          "ops_schema=%u\n"
           "arch=%u\n"
           "brand=%s\n"
           "cores=%u\n"
@@ -135,81 +196,125 @@ static int write_ops_manifest(RafCtx *ctx) {
           "ir=%u\n"
           "asm=%u\n"
           "bin=%u\n"
+          "ir_value=%u\n"
+          "emitter_schema=%u\n"
           "native_requested=%u\n"
           "native_written=%u\n"
           "elapsed_ns=%llu\n"
           "rollback_code=%d\n"
+          "transaction_state=%s\n"
           "ops_signature=%016llx\n",
-          ctx->cpu.arch, ctx->cpu.brand, ctx->cpu.cores, ctx->lang, ctx->opt,
-          ctx->feat, ctx->flags, ctx->src_len,
+          RAF_OPS_SCHEMA, ctx->cpu.arch, ctx->cpu.brand, ctx->cpu.cores,
+          ctx->lang, ctx->opt, ctx->feat, ctx->flags, ctx->src_len,
           (unsigned long long)ctx->src_hash,
           ctx->omega_entropy_milli, ctx->omega_phi_q16,
           ctx->omega_attractor, ctx->omega_flags, ctx->omega_path,
           raf_omega_path_name((RafOmegaPath)ctx->omega_path),
-          ctx->ir.n, ctx->asm_out.n, ctx->bin.n,
-          ctx->native_requested, ctx->native_written,
+          ctx->ir.n, ctx->asm_out.n, ctx->bin.n, raf_ir_value(ctx),
+          RAF_EMITTER_SCHEMA, ctx->native_requested, ctx->native_written,
           (unsigned long long)ctx->elapsed_ns, ctx->rollback_code,
-          (unsigned long long)ctx->ops_signature);
-  fclose(fo);
+          raf_transaction_state(ctx), (unsigned long long)ctx->ops_signature) >= 0;
+  if (fflush(fo) != 0) ok = 0;
+  if (fclose(fo) != 0) ok = 0;
+  if (!ok || rename(tmp, ctx->out_ops) != 0) {
+    (void)remove(tmp);
+    return -12;
+  }
   return 0;
 }
 
-static int write_artifacts(RafCtx *ctx) {
-  FILE *fa = fopen(ctx->out_asm, "w");
-  if (!fa) {
-    ctx->rollback_code = -10;
-    (void)write_ops_manifest(ctx);
-    return -10;
-  }
+static int write_asm_temp(const RafCtx *ctx, const char *path) {
+  FILE *f = fopen(path, "w");
+  if (!f) return -10;
+  int ok = 1;
   for (uint32_t i = 0; i < ctx->asm_out.n; ++i) {
-    fprintf(fa, "%s\n", ctx->asm_out.lines[i]);
+    if (fprintf(f, "%s\n", ctx->asm_out.lines[i]) < 0) { ok = 0; break; }
   }
-  fclose(fa);
+  if (fflush(f) != 0) ok = 0;
+  if (fclose(f) != 0) ok = 0;
+  return ok ? 0 : -10;
+}
 
-  FILE *fh = fopen(ctx->out_hex, "w");
-  if (!fh) {
-    ctx->rollback_code = -11;
-    (void)write_ops_manifest(ctx);
-    return -11;
-  }
+static int write_hex_temp(const RafCtx *ctx, const char *path) {
+  FILE *f = fopen(path, "w");
+  if (!f) return -11;
+  int ok = 1;
   for (uint32_t i = 0; i < ctx->bin.n; ++i) {
-    fprintf(fh, "%02X%s", ctx->bin.bytes[i], ((i + 1u) % 16u) ? " " : "\n");
-  }
-  fclose(fh);
-
-  if (ctx->native_requested) {
-    FILE *fb = fopen(ctx->out_bin, "wb");
-    if (!fb) {
-      ctx->rollback_code = -13;
-      (void)write_ops_manifest(ctx);
-      return -13;
+    if (fprintf(f, "%02X%s", ctx->bin.bytes[i], ((i + 1u) % 16u) ? " " : "\n") < 0) {
+      ok = 0;
+      break;
     }
-    size_t written = fwrite(ctx->bin.bytes, 1, ctx->bin.n, fb);
-    if (fclose(fb) != 0 || written != ctx->bin.n) {
-      ctx->rollback_code = -13;
-      (void)write_ops_manifest(ctx);
-      return -13;
-    }
-    ctx->native_written = 1u;
+  }
+  if (ctx->bin.n % 16u != 0u && fputc('\n', f) == EOF) ok = 0;
+  if (fflush(f) != 0) ok = 0;
+  if (fclose(f) != 0) ok = 0;
+  return ok ? 0 : -11;
+}
+
+static int write_bin_temp(const RafCtx *ctx, const char *path) {
+  FILE *f = fopen(path, "wb");
+  if (!f) return -13;
+  size_t written = fwrite(ctx->bin.bytes, 1, ctx->bin.n, f);
+  int ok = written == ctx->bin.n && fflush(f) == 0 && fclose(f) == 0;
+  return ok ? 0 : -13;
+}
+
+static int write_artifacts(RafCtx *ctx) {
+  char asm_tmp[320];
+  char hex_tmp[320];
+  char bin_tmp[320];
+  if (temp_path(asm_tmp, sizeof(asm_tmp), ctx->out_asm) != 0 ||
+      temp_path(hex_tmp, sizeof(hex_tmp), ctx->out_hex) != 0 ||
+      temp_path(bin_tmp, sizeof(bin_tmp), ctx->out_bin) != 0) return -14;
+
+  int rc = write_asm_temp(ctx, asm_tmp);
+  if (rc == 0) rc = write_hex_temp(ctx, hex_tmp);
+  if (rc == 0 && ctx->native_requested) rc = write_bin_temp(ctx, bin_tmp);
+  if (rc != 0) {
+    (void)remove(asm_tmp); (void)remove(hex_tmp); (void)remove(bin_tmp);
+    clear_data_artifacts(ctx);
+    ctx->rollback_code = rc;
+    (void)write_ops_manifest(ctx);
+    return rc;
   }
 
-  return write_ops_manifest(ctx);
+  clear_data_artifacts(ctx);
+  if (rename(asm_tmp, ctx->out_asm) != 0 || rename(hex_tmp, ctx->out_hex) != 0 ||
+      (ctx->native_requested && rename(bin_tmp, ctx->out_bin) != 0)) {
+    (void)remove(asm_tmp); (void)remove(hex_tmp); (void)remove(bin_tmp);
+    clear_data_artifacts(ctx);
+    ctx->rollback_code = -13;
+    (void)write_ops_manifest(ctx);
+    return -13;
+  }
+
+  ctx->native_written = ctx->native_requested ? 1u : 0u;
+  ctx->rollback_code = 0;
+  if (write_ops_manifest(ctx) != 0) {
+    clear_data_artifacts(ctx);
+    return -12;
+  }
+  return 0;
 }
 
 static int fail_with_manifest(RafCtx *ctx, int code, uint64_t t0) {
   uint64_t t1 = raf_now_ns();
+  clear_data_artifacts(ctx);
+  ctx->native_written = 0u;
   ctx->rollback_code = code;
   ctx->elapsed_ns = t1 >= t0 ? t1 - t0 : 0;
-  (void)write_ops_manifest(ctx);
-  return code;
+  return write_ops_manifest(ctx) == 0 ? code : -12;
 }
 
 int raf_compile_file(RafCtx *ctx, const char *src_path, const char *out_base,
                      int do_native) {
-  prepare_manifest(ctx, out_base);
+  if (!ctx || !src_path || !out_base) return -15;
+  reset_transaction(ctx);
+  if (prepare_manifest(ctx, out_base) != 0) return -14;
+  clear_data_artifacts(ctx);
+
   uint64_t t0 = raf_now_ns();
   ctx->native_requested = do_native ? 1u : 0u;
-  ctx->native_written = 0u;
   ctx->lang = raf_lang_from_ext(src_path);
   if (ctx->lang == RAF_LANG_UNKNOWN) return fail_with_manifest(ctx, -6, t0);
 
@@ -238,6 +343,5 @@ int raf_compile_file(RafCtx *ctx, const char *src_path, const char *out_base,
 
   uint64_t t1 = raf_now_ns();
   ctx->elapsed_ns = t1 >= t0 ? t1 - t0 : 0;
-  ctx->rollback_code = 0;
   return write_artifacts(ctx);
 }
