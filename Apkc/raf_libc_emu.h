@@ -45,11 +45,19 @@ typedef _Bool bool;
 
 #if defined(__GNUC__) || defined(__clang__)
 #define RAF_INLINE static __inline__ __attribute__((always_inline))
-#define RAF_EXPORT __attribute__((visibility("default"), used))
+# ifdef __cplusplus
+#  define RAF_EXPORT extern "C" __attribute__((visibility("default"), used))
+# else
+#  define RAF_EXPORT __attribute__((visibility("default"), used))
+# endif
 #define RAF_NORETURN __attribute__((noreturn))
 #else
 #define RAF_INLINE static inline
-#define RAF_EXPORT
+# ifdef __cplusplus
+#  define RAF_EXPORT extern "C"
+# else
+#  define RAF_EXPORT
+# endif
 #define RAF_NORETURN
 #endif
 
