@@ -5,7 +5,7 @@
 RAF_EXPORT uint32_t raf_cpp_patch(uint32_t current, uint32_t value, uint32_t mask) {
     char probe[8];
     memset(probe, 0, sizeof(probe));
-    strcpy(probe, "ok");
+    strncpy(probe, "ok", sizeof(probe));
     return strlen(probe) == 2u ? current ^ ((current ^ value) & mask) : 0u;
 }
 
