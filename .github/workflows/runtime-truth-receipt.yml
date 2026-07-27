@@ -5,14 +5,29 @@ on:
     paths:
       - 'raf_*.c'
       - 'raf_*.h'
+      - 'Apkc/raf_libc_emu.h'
       - 'runtime/conversation_indexer/**'
       - 'scripts/validate_runtime_truth_local.sh'
+      - 'scripts/validate_ops_manifest.py'
+      - 'scripts/compare_ops_manifest.py'
+      - 'scripts/validate_compiler_station_contract.py'
+      - 'scripts/test_compiler_station.sh'
+      - 'scripts/raf_c_rewrite.py'
+      - 'scripts/raf_kernel_lower.py'
+      - 'scripts/apkc_strict_native_build.sh'
+      - 'scripts/audit_strict_elf.sh'
       - 'scripts/validate_ecosystem_runtime_state.py'
       - 'scripts/ecosystem_build_doctor.py'
       - 'scripts/toroidal_research_router.py'
       - 'scripts/run_runtime_truth_receipt.sh'
+      - 'tests/raf_libc_emu_selftest.c'
+      - 'tests/fixtures/raf_return_*.c'
+      - 'tests/fixtures/strict_kernel.*'
+      - 'tests/fixtures/kernel.py'
+      - 'tests/fixtures/unsupported_header.c'
       - 'tests/test_ecosystem_build_doctor.py'
       - 'tests/test_toroidal_research_router.py'
+      - 'ci/contracts/apkc_compiler_station_v2.json'
       - 'contracts/**'
       - 'examples/toroidal_research_router.example.json'
       - 'ECOSYSTEM_RUNTIME_STATE.json'
@@ -29,7 +44,7 @@ concurrency:
 jobs:
   local-truth:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout exact revision
