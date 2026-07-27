@@ -1,0 +1,234 @@
+{
+  "schema": "rafaelia.apkc.compiler-station.v2",
+  "generated_for": "hotfix/apkc-operational-excellence-20260727",
+  "state": "IMPLEMENTED_HOTFIX_PENDING_CI",
+  "claim_allowed": false,
+  "claim_promotion_gate": "ALL_BLOCKING_TESTS_PASS",
+  "purpose": "Deterministic bounded compilation and strict Android shared-object sealing without hidden runtime dependencies.",
+  "entrypoints": {
+    "root_compiler": "raf_compile_file",
+    "strict_native_builder": "scripts/apkc_strict_native_build.sh",
+    "canonical_make_target": "make compile",
+    "full_selftest": "make compiler-selftest",
+    "language_contract": "make language-contract"
+  },
+  "planes": {
+    "build": {
+      "allowed_tools": [
+        "python3",
+        "clang",
+        "lld",
+        "readelf_or_llvm-readelf",
+        "nm_or_llvm-nm",
+        "sha256sum_or_shasum"
+      ],
+      "hidden_dependency_allowed": false
+    },
+    "final_runtime": {
+      "heap": false,
+      "garbage_collector": false,
+      "hosted_libc": false,
+      "pt_interp": false,
+      "dt_needed": false,
+      "undefined_symbols": false,
+      "executable_stack": false,
+      "rwx_load_segment": false,
+      "android_loader_metadata": "PT_DYNAMIC_AND_DT_SONAME_ALLOWED",
+      "memory_ownership": "STATIC_OR_CALLER_OWNED"
+    }
+  },
+  "routes": [
+    {
+      "id": "ROOT_U32_IR",
+      "input_languages": ["c", "cpp", "asm", "py", "rs", "kt", "java", "sh", "pl", "js", "php", "jsx", "go", "rb", "swift", "groovy", "clj"],
+      "accepted_contract": "Exactly one RAF_RETURN(constant-expression), return constant-expression, or exit constant-expression",
+      "output": ["textual_assembly", "raw_machine_bytes", "ops_manifest"],
+      "architectures": ["x86_64", "arm64", "arm32_thumb2", "rv64"],
+      "semantic_scope": "uint32_constant_return_only"
+    },
+    {
+      "id": "STRICT_C_REWRITE",
+      "input_languages": ["c", "cpp"],
+      "accepted_contract": "Single translation unit using only emulated headers and runtime surfaces",
+      "output": ["android_shared_object", "strict_native_receipt"],
+      "architectures": ["arm64", "arm32", "x86_64", "rv64"],
+      "semantic_scope": "bounded_freestanding_subset"
+    },
+    {
+      "id": "HOSTED_RAF_KERNEL",
+      "input_languages": ["rs", "kt", "java", "py", "sh", "pl", "js", "php", "jsx", "go", "rb", "swift", "groovy", "clj"],
+      "accepted_contract": "Exactly one standalone RAF_KERNEL name(args)=u32-expression annotation",
+      "output": ["lowered_strict_c", "android_shared_object", "strict_native_receipt"],
+      "architectures": ["arm64", "arm32", "x86_64", "rv64"],
+      "semantic_scope": "pure_uint32_expression_kernel_not_full_language"
+    },
+    {
+      "id": "DIRECT_ASSEMBLY",
+      "input_languages": ["asm"],
+      "accepted_contract": "Target assembler accepted by clang integrated assembler",
+      "output": ["android_shared_object", "strict_native_receipt"],
+      "architectures": ["arm64", "arm32", "x86_64", "rv64"],
+      "semantic_scope": "direct_target_isa"
+    }
+  ],
+  "verified_targets_in_selftest": [
+    "c_arm64_android_so",
+    "c_arm32_android_so",
+    "cpp_arm64_android_so",
+    "python_raf_kernel_arm64_android_so",
+    "root_u32_ir_host_architecture",
+    "libc_emulation_host_semantics"
+  ],
+  "implemented_but_target_proof_conditional": [
+    "strict_x86_64_android_so",
+    "strict_rv64_android_so",
+    "hosted_raf_kernel_arm32",
+    "hosted_raf_kernel_x86_64",
+    "hosted_raf_kernel_rv64",
+    "direct_assembly_all_targets"
+  ],
+  "emulated_headers": [
+    "stddef.h",
+    "stdint.h",
+    "stdbool.h",
+    "stdio.h",
+    "stdlib.h",
+    "string.h"
+  ],
+  "emulated_functions": [
+    "memcpy",
+    "memmove",
+    "memset",
+    "memcmp",
+    "memchr",
+    "strlen",
+    "strnlen",
+    "strcmp",
+    "strncmp",
+    "strcpy",
+    "strncpy",
+    "strchr",
+    "strrchr",
+    "atoi",
+    "strtoul",
+    "raf_write",
+    "putchar",
+    "puts"
+  ],
+  "forbidden_runtime_surfaces": [
+    "malloc",
+    "calloc",
+    "realloc",
+    "free",
+    "aligned_alloc",
+    "printf_family",
+    "FILE_streams",
+    "system",
+    "popen",
+    "dlopen",
+    "dlsym",
+    "pthread_create",
+    "fork",
+    "execve",
+    "setjmp",
+    "longjmp",
+    "atexit",
+    "exit",
+    "abort"
+  ],
+  "artifacts": [
+    {
+      "suffix": ".s",
+      "producer": "raf_compile",
+      "meaning": "Textual architecture emission",
+      "transactional": true
+    },
+    {
+      "suffix": ".hex",
+      "producer": "raf_compile",
+      "meaning": "Canonical hexadecimal machine-byte stream",
+      "transactional": true
+    },
+    {
+      "suffix": ".bin",
+      "producer": "raf_compile --native",
+      "meaning": "Raw target instruction stream, not an ELF",
+      "transactional": true
+    },
+    {
+      "suffix": ".ops",
+      "producer": "raf_compile",
+      "meaning": "Signed operational receipt schema 4",
+      "transactional": true
+    },
+    {
+      "suffix": ".so",
+      "producer": "apkc_strict_native_build.sh",
+      "meaning": "Sealed self-contained Android shared object",
+      "transactional": true
+    },
+    {
+      "suffix": ".so.receipt.json",
+      "producer": "apkc_strict_native_build.sh",
+      "meaning": "Hash, toolchain, gates and claim-boundary receipt",
+      "transactional": true
+    }
+  ],
+  "blocking_gates": [
+    "source_exists_and_is_bounded",
+    "unique_and_valid_lowering_contract",
+    "unsupported_headers_fail_closed",
+    "forbidden_runtime_surfaces_fail_closed",
+    "strict_object_compilation",
+    "link_no_undefined_symbols",
+    "no_pt_interp",
+    "no_dt_needed",
+    "no_rwx_load_segment",
+    "no_executable_stack",
+    "no_build_id",
+    "machine_identity",
+    "same_source_same_output",
+    "different_constant_different_machine_bytes",
+    "manifest_signature_recomputation",
+    "manifest_tamper_rejection",
+    "rollback_removes_stale_artifacts",
+    "c_and_cpp_export_names_unmangled",
+    "libc_overlap_and_conversion_selftests"
+  ],
+  "custody": {
+    "ops_schema": 4,
+    "ops_hash": "FNV1A64_CANONICAL",
+    "strict_native_hash": "SHA256",
+    "transaction_states": ["COMMITTED", "ROLLED_BACK"],
+    "source_rewrite_claim_allowed": false,
+    "kernel_lowering_claim_allowed": false,
+    "strict_elf_receipt_claim_allowed_after_all_gates": true
+  },
+  "not_claimed": [
+    "general_purpose_C_or_CPP_compiler",
+    "full_semantics_of_any_hosted_language",
+    "APK_packaging_signature_installation_or_launch",
+    "ANativeActivity_runtime_observed_on_device",
+    "GPU_DSP_NPU_driver_execution",
+    "constant_time_or_side_channel_equivalence",
+    "x86_64_or_rv64_target_execution_without_target_evidence",
+    "scientific_or_semantic_truth_from_Omega_metrics"
+  ],
+  "canonical_files": [
+    "raf_compile.h",
+    "raf_frontend.c",
+    "raf_precomp.c",
+    "raf_asm_emit.c",
+    "Apkc/raf_libc_emu.h",
+    "scripts/raf_c_rewrite.py",
+    "scripts/raf_kernel_lower.py",
+    "scripts/apkc_strict_native_build.sh",
+    "scripts/audit_strict_elf.sh",
+    "scripts/validate_ops_manifest.py",
+    "scripts/compare_ops_manifest.py",
+    "scripts/test_compiler_station.sh",
+    "tests/raf_libc_emu_selftest.c",
+    "docs/APKC_COMPILER_STATION_COMPLETE.md",
+    "docs/APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md"
+  ]
+}
