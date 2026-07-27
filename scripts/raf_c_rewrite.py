@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Rewrite a bounded C/C++ subset onto RAFAELIA's freestanding layer.
 
-A header is removed only when its required surface is provided by
-``Apkc/raf_libc_emu.h``. Unknown includes and unsafe hosted operations fail
-closed instead of being silently discarded.
+A header is removed only when its surface is explicitly provided by
+``Apkc/raf_libc_emu.h``. Input is UTF-8 and bounded to the same 1 MiB envelope
+used by the compiler core.
 """
 from __future__ import annotations
 
@@ -16,13 +16,9 @@ import tempfile
 from pathlib import Path
 
 SCHEMA = "rafaelia.c.rewrite.v2"
+MAX_SOURCE_BYTES = 1 << 20
 EMULATED_HEADERS = {
-    "stddef.h",
-    "stdint.h",
-    "stdbool.h",
-    "stdio.h",
-    "stdlib.h",
-    "string.h",
+    "stddef.h", "stdint.h", "stdbool.h", "stdio.h", "stdlib.h", "string.h",
 }
 UNSUPPORTED_HOSTED_HEADERS = {
     "assert.h", "ctype.h", "errno.h", "inttypes.h", "limits.h",
@@ -47,6 +43,18 @@ INJECT = '#include "raf_libc_emu.h"\n'
 
 def sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def read_bounded_text(path: Path) -> str:
+    raw = path.read_bytes()
+    if not raw:
+        raise ValueError("source is empty")
+    if len(raw) > MAX_SOURCE_BYTES:
+        raise ValueError(f"source exceeds {MAX_SOURCE_BYTES} bytes")
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError("source is not valid UTF-8") from exc
 
 
 def atomic_write_text(path: Path, text: str) -> None:
@@ -119,6 +127,12 @@ def mask_comments_and_literals(src: str) -> str:
 
 
 def rewrite(src: str) -> tuple[str, dict[str, object]]:
+    source_size = len(src.encode("utf-8"))
+    if source_size == 0:
+        raise ValueError("source is empty")
+    if source_size > MAX_SOURCE_BYTES:
+        raise ValueError(f"source exceeds {MAX_SOURCE_BYTES} bytes")
+
     stripped_headers: list[str] = []
     unresolved_headers: list[str] = []
     lines: list[str] = []
@@ -160,7 +174,6 @@ def rewrite(src: str) -> tuple[str, dict[str, object]]:
     for name in sorted(EMULATED_CALLS):
         if re.search(rf"\b{re.escape(name)}\s*\(", masked):
             emulated.append(name)
-
     if forbidden:
         raise ValueError("forbidden hosted/runtime token(s): " + ", ".join(forbidden))
 
@@ -168,6 +181,8 @@ def rewrite(src: str) -> tuple[str, dict[str, object]]:
     manifest = {
         "schema": SCHEMA,
         "stage": "SOURCE_REWRITE_ONLY",
+        "source_limit_bytes": MAX_SOURCE_BYTES,
+        "source_bytes": source_size,
         "input_sha256": sha256_text(src),
         "output_sha256": sha256_text(rewritten),
         "stripped_headers": sorted(set(stripped_headers)),
@@ -190,9 +205,11 @@ def selftest() -> int:
     assert out.startswith(INJECT)
     assert "RAF_REWRITE emulated" in out
     assert manifest["emulated_calls"] == ["memset", "strlen", "strncpy"]
+    assert manifest["source_bytes"] == len(src.encode("utf-8"))
     assert manifest["claim_allowed"] is False
 
     for bad, expected in [
+        ("", "empty"),
         ("void *f(void){ return malloc(4); }\n", "malloc"),
         ('char *f(char *d){ return strcpy(d,"x"); }\n', "strcpy"),
         ("#include <ctype.h>\nint f(int x){return isalpha(x);}\n", "ctype.h"),
@@ -221,10 +238,10 @@ def main() -> int:
         return selftest()
     if not args.source or not args.output:
         parser.error("source and output are required")
-    src = Path(args.source).read_text(encoding="utf-8")
     try:
+        src = read_bounded_text(Path(args.source))
         rewritten, manifest = rewrite(src)
-    except ValueError as exc:
+    except (ValueError, OSError) as exc:
         print(f"raf_c_rewrite: FAIL — {exc}")
         return 65
     atomic_write_text(Path(args.output), rewritten)
