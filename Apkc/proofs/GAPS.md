@@ -1,36 +1,31 @@
-# Gaps ApkC — estado canônico reconciliado
+# Gaps ApkC — estado canônico após fechamento da estação do compilador
 
-> Corte: 2026-07-19. Regra: documento não promove estado acima do artefato
-> existente. Provas antigas continuam preservadas em `Apkc/proofs/runs/`, mas os
-> arquivos canônicos de `Apkc/proofs/out/` governam o estado atual.
+> Corte: 2026-07-26. Regra: documento não promove estado acima do artefato existente.
 
-| Gap | Estado atual | Evidência / próxima ação |
+| Frente | Estado atual | Evidência / limite |
 |---|---|---|
-| Build reproduzível de `apkc.c` | **CONTRADICTION → GATE CORRIGIDO** | O transcript canônico anterior contém erros. O gate v2 agora falha fechado, aceita `readelf`/`llvm-readelf`, isola runs e só promove quando AArch64+ARM32 constroem, identificam e reproduzem. |
-| Geração de `hello.apk` | **TOKEN_VAZIO** | `apkc-generate.txt` declara ausência de binário executável. Rodar em ARM64/Termux após source→binary PASS. |
-| Mnemônicos ARM32 desconhecidos | **PARTIAL / STRICT GATE** | O compilador bloqueia APK por padrão quando encontra instrução desconhecida; ampliar cobertura conforme corpus real. |
-| Parser ZIP | **TOKEN_VAZIO neste corte** | Regerar `unzip.txt` no mesmo run e commit do APK. |
-| Parser AXML | **TOKEN_VAZIO neste corte** | Regerar `aapt-xmltree.txt` no mesmo run e commit do APK. |
-| ELF ARM32 dentro do APK | **TOKEN_VAZIO** | `readelf-arm32.txt` diz que `hello.apk` está ausente. |
-| ELF ARM64 dentro do APK | **TOKEN_VAZIO** | `readelf-arm64.txt` diz que `hello.apk` está ausente. |
-| Gerador ELF estrutural | **IMPLEMENTED / RUNTIME PENDING** | `fmt_elf.h` contém geradores ELF32/ELF64; falta validar o `.so` empacotado e carregado pelo Android. |
-| Validador ELF independente | **IMPLEMENTED / TEST EXECUTION TOKEN_VAZIO** | `validate_apkc_formats.py` verifica classe, endian, `ET_DYN`, ABI, tabelas, `PT_LOAD` e limites de segmentos; testes foram escritos, mas não executados nesta sessão. |
-| DEX mínimo estrutural | **IMPLEMENTED** | `fmt_dex.h` gera DEX035 mínimo de 140 bytes com SHA-1 e Adler-32. Isso não prova classe Java/Kotlin funcional. |
-| DEX SHA-1 do APK atual | **TOKEN_VAZIO** | `dex-sha1.txt` declara `hello.apk` ausente. |
-| Validador DEX independente | **IMPLEMENTED / TEST EXECUTION TOKEN_VAZIO** | Verifica magic, versão, tamanhos, SHA-1, Adler-32, data e map list sem reutilizar o gerador C. |
-| Java/Kotlin/Groovy → JAR → D8 | **IMPLEMENTED / RUNTIME PENDING** | Java/Groovy agora geram JAR; `execve` resolve ferramentas Termux/Android. Falta executar e validar `dexdump`/runtime. |
-| Assinatura APK | **REFERENCE HISTÓRICA** | Há transcript anterior, mas deve ser regenerado sobre o APK do mesmo run atual. Release key permanece fora do repositório. |
-| Package instalado/visível | **REFERENCE HISTÓRICA** | Não equivale a runtime. Capturar `adb install -r` integral no mesmo run. |
-| Runtime NativeActivity | **TOKEN_VAZIO** | Capturar lançamento, `dlopen`, `ANativeActivity_onCreate` e logcat sem fatal. |
-| Navegador web ASM + TLS 1.2/1.3 + X.509 | **TOKEN_VAZIO / NÃO LOCALIZADO** | `raf_shell` é navegador de arquivos TUI, não prova cliente HTTP/TLS. Identificar origem ou implementar camada separada com validação de certificado. |
-| Mapa de arquivos soltos | **IMPLEMENTED NESTA FRENTE** | O gate gera inventário por hash, categoria, referência e rota documental. |
-| Reprodutibilidade completa | **TOKEN_VAZIO** | Um único run deve registrar commit, ambiente, comandos, binário, APK, ELF32/64, DEX, assinatura, instalação e runtime. |
+| Lowering do núcleo `raf_compile` | **IMPLEMENTED / TESTED** | A fonte controla o valor IR; removido o emissor fixo `42`. Expressões constantes inválidas falham fechadas. |
+| Emissão x86-64/ARM64/ARM32/RV64 | **IMPLEMENTED / TESTED** | Imediato real é codificado por arquitetura; mesma fonte deve repetir bytes e fontes diferentes devem divergir. |
+| Compatibilidade C sem libc final | **IMPLEMENTED / TESTED** | `raf_libc_emu.h` + rewriter; memória/string/conversão/saída mínima internas; heap e runtime hospedado bloqueados. |
+| C estrito ARM64 | **IMPLEMENTED / TESTED_LOCAL / CI_GATED** | ELF64 AArch64, `-nostdlib`, `--no-undefined`, sem `PT_INTERP`. |
+| C estrito ARM32 | **IMPLEMENTED / TESTED_LOCAL / CI_GATED** | ELF32 ARM, mesmo contrato, fallback não permitido. |
+| Linguagens hospedadas → kernel puro | **IMPLEMENTED / TESTED** | `RAF_KERNEL` é baixado para C estrito. Não equivale a compilar a linguagem inteira. |
+| Build reproduzível de `apkc.c` | **GATE CORRIGIDO** | CI usa `clang -target aarch64-linux-gnu -fsyntax-only` e falha bloqueante. |
+| Geração de `hello.apk` no run atual | **TOKEN_VAZIO** | Requer binário APKc executável no ambiente Android/Termux e empacotamento no mesmo run. |
+| Parser ZIP do APK atual | **TOKEN_VAZIO** | Regenerar `unzip.txt` a partir do APK produzido no mesmo run. |
+| Parser AXML do APK atual | **TOKEN_VAZIO** | Regenerar `aapt-xmltree.txt` no mesmo run. |
+| ELF ARM32/ARM64 dentro do APK | **TOKEN_VAZIO** | Os `.so` estritos existem como rota; ainda precisam ser inseridos e extraídos do APK canônico. |
+| DEX mínimo estrutural | **IMPLEMENTED** | Continua distinto de classe Java/Kotlin funcional. |
+| Assinatura APK | **REFERENCE HISTÓRICA** | Regenerar sobre o APK do run atual; chave release fora do repositório. |
+| Instalação e runtime NativeActivity | **TOKEN_VAZIO** | Capturar `adb install`, launch, `dlopen`, `ANativeActivity_onCreate` e `logcat` sem fatal. |
+| GPU/DSP/NPU | **DEVICE_KERNEL / RUNTIME TOKEN_VAZIO** | Kernel/asset não prova driver, loader nem execução física. |
+| Reprodutibilidade completa APK→runtime | **TOKEN_VAZIO** | Um run deve registrar commit, ambiente, comandos, ELF, APK, assinatura, instalação e runtime. |
 
 ## Invariante
 
 ```text
-IMPLEMENTED ≠ EXECUTED ≠ RUNTIME_PROVEN
+COMPILER_STATION_PASS ≠ APK_RUNTIME_PROVEN
+KERNEL_LOWERED ≠ FULL_LANGUAGE_IMPLEMENTED
 FILE_EXISTS ≠ PASS
-HISTORICAL_REFERENCE ≠ CURRENT_CANONICAL_EVIDENCE
-EMPTY_WORKFLOW_STEPS ≠ CODE_FAILURE
+TOKEN_VAZIO ≠ ZERO
 ```

@@ -1,13 +1,14 @@
-# RafPolimata — navegable release entrypoint (L19) + clean proof run (L6)
-# All targets REUSE existing scripts/commands. No logic is duplicated here.
-# Recipes use real tabs. See CLAUDE.md for the canonical commands.
-
+# RafPolimata — canonical release/compiler entrypoints
 SHELL    := /bin/sh
 VERBOVIVO := verbovivo_ci
 SYNTAX_CC := clang -target aarch64-linux-gnu -fsyntax-only -nostdlib -nostdinc -ffreestanding -I Apkc Apkc/apkc.c
 AUDIT_OUT ?= ci/reports/library-assimilation.json
+RAF_LANG ?= c
+RAF_ARCH ?= arm64
+SRC ?= tests/fixtures/strict_kernel.c
+OUT ?= build/strict/libmain.so
 
-.PHONY: help syntax verbovivo verbovivo-demo encoders proof audit language-contract compile-plan library-audit strict-elf report clean
+.PHONY: help syntax verbovivo verbovivo-demo encoders proof audit language-contract compile compile-plan compiler-selftest library-audit strict-elf report clean
 
 help:
 	@echo 'RafPolimata — make targets:'
@@ -19,11 +20,13 @@ help:
 	@echo '  proof             one clean reproducible proof run (tools/raf_clean_proof_run.sh)'
 	@echo '  audit             freestanding invariant audit (scripts/ci_freestanding_audit.sh)'
 	@echo '  language-contract M063: 23-language lowering/freestanding/bit-patch gate'
-	@echo '  compile-plan      use RAF_LANG/RAF_ARCH/SRC/OUT to emit a strict JSON plan'
+	@echo '  compile           execute strict compiler: RAF_LANG/RAF_ARCH/SRC/OUT'
+	@echo '  compile-plan      emit the deterministic JSON plan without executing'
+	@echo '  compiler-selftest close the compiler station end to end'
 	@echo '  library-audit     use LIB/RAF_LANG; writes AUDIT_OUT=$(AUDIT_OUT)'
 	@echo '  strict-elf        audit ELF=$(ELF) for zero interpreter/dynamic/runtime residue'
 	@echo '  report            point at Apkc/proofs/out + latest run dir (PASS/TOKEN_VAZIO)'
-	@echo '  clean             remove $(VERBOVIVO), /tmp/engram.svg, *.o'
+	@echo '  clean             remove generated compiler/demo artifacts'
 
 syntax:
 	$(SYNTAX_CC)
@@ -53,10 +56,18 @@ audit:
 language-contract:
 	bash scripts/audit_language_freestanding_contract.sh
 
+compile:
+	@test -n "$(RAF_LANG)" && test -n "$(RAF_ARCH)" && test -n "$(SRC)" && test -n "$(OUT)" || { echo 'RAF_LANG, RAF_ARCH, SRC e OUT são obrigatórios' >&2; exit 64; }
+	@mkdir -p "$(dir $(OUT))"
+	bash scripts/apkc_strict_native_build.sh "$(RAF_LANG)" "$(RAF_ARCH)" "$(OUT)" "$(SRC)"
+
 compile-plan:
 	@test -n "$(RAF_LANG)" || { echo 'Uso: make compile-plan RAF_LANG=c RAF_ARCH=arm32 SRC=kernel.c OUT=kernel.o' >&2; exit 64; }
 	@test -n "$(RAF_ARCH)" && test -n "$(SRC)" && test -n "$(OUT)" || { echo 'RAF_ARCH, SRC e OUT são obrigatórios' >&2; exit 64; }
 	python3 scripts/raf_strict_compile_plan.py --language "$(RAF_LANG)" --arch "$(RAF_ARCH)" --source "$(SRC)" --output "$(OUT)"
+
+compiler-selftest:
+	bash scripts/test_compiler_station.sh
 
 library-audit:
 	@test -n "$(LIB)" && test -n "$(RAF_LANG)" || { echo 'Uso: make library-audit LIB=vendor/lib RAF_LANG=c [AUDIT_OUT=...]' >&2; exit 64; }
@@ -83,5 +94,6 @@ report:
 	fi
 
 clean:
-	rm -f $(VERBOVIVO) /tmp/engram.svg *.o
+	rm -f $(VERBOVIVO) /tmp/engram.svg *.o raf_compile apkc_host
+	rm -rf build/strict build_host_check/ops_manifest
 	@echo 'clean: done'

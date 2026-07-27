@@ -15,6 +15,15 @@ STRICT_FILES=(
   "$ROOT/rafaelia/raf_lane16_patch.h"
   "$ROOT/RAF_063_language_completion_freestanding.c"
 )
+COMPILER_STATION_FILES=(
+  "$ROOT/Apkc/raf_libc_emu.h"
+  "$ROOT/scripts/raf_c_rewrite.py"
+  "$ROOT/scripts/raf_kernel_lower.py"
+  "$ROOT/scripts/apkc_strict_native_build.sh"
+  "$ROOT/scripts/test_compiler_station.sh"
+  "$ROOT/raf_precomp.c"
+  "$ROOT/raf_asm_emit.c"
+)
 
 mkdir -p "$ROOT/ci/reports"
 
@@ -23,7 +32,7 @@ fail() {
   exit 1
 }
 
-for file in "${STRICT_FILES[@]}"; do
+for file in "${STRICT_FILES[@]}" "${COMPILER_STATION_FILES[@]}"; do
   [[ -s "$file" ]] || fail "arquivo ausente ou vazio: $file"
 done
 
@@ -61,6 +70,9 @@ fi
 python3 "$ROOT/tests/test_capability_matrix.py"
 python3 "$ROOT/scripts/raf_library_assimilation_audit.py" --selftest
 python3 "$ROOT/scripts/raf_strict_compile_plan.py" --selftest
+python3 "$ROOT/scripts/raf_c_rewrite.py" --selftest
+python3 "$ROOT/scripts/raf_kernel_lower.py" --selftest
+bash "$ROOT/scripts/test_compiler_station.sh"
 
 TSV="$ROOT/ci/contracts/rafaelia_language_completion_v1.tsv"
 [[ -s "$TSV" ]] || fail 'matriz TSV ausente'
@@ -93,12 +105,11 @@ done
   echo '# M063 — Language completion freestanding audit'
   echo
   echo "- Compiler: $CC_BIN"
-  echo '- Strict source files: 3'
   echo '- Language policies: 23'
   echo '- Compiler language ids: 23 + UNKNOWN'
   echo '- Extension routes: 23'
-  echo '- Heap calls: PASS'
-  echo '- Hosted headers: PASS'
+  echo '- Heap calls in strict core: PASS'
+  echo '- Hosted headers in strict core: PASS'
   echo '- C++ runtime tokens: PASS'
   echo '- Strict compile warnings: PASS'
   echo '- Undefined symbols in strict object: PASS'
@@ -106,10 +117,14 @@ done
   echo '- Static lane-16 dependency/resource selftest: PASS'
   echo '- Compiler matrix and frontend detection: PASS'
   echo '- Foreign-library inventory selftest: PASS'
-  echo '- Strict compile-plan selftest: PASS'
+  echo '- C compatibility rewrite/emulation: PASS'
+  echo '- Cross-language RAF_KERNEL lowering: PASS'
+  echo '- Source-dependent IR and architecture emission: PASS'
+  echo '- ARM64 + ARM32 strict shared objects: PASS'
+  echo '- Compiler station end-to-end: PASS'
   echo '- Policy/TSV coverage: PASS'
   echo
-  echo 'Resultado: PASS_LOCAL. Final ELF/DEX/device binaries still require their own symbol, relocation and runtime gates.'
+  echo 'Resultado: COMPILER_STATION_PASS_LOCAL. Android install/launch and device-specific GPU/DSP/NPU runtime remain separate evidence gates.'
 } > "$REPORT"
 
 cat "$REPORT"

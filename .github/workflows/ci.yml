@@ -28,13 +28,18 @@ jobs:
             raf_main.c raf_frontend.c raf_cpu.c raf_asm_emit.c raf_precomp.c \
             -o raf_compile
 
-      - name: Smoke test compiler
+      - name: Smoke test source-dependent compiler
         run: |
           ./raf_compile --help
-          ./raf_compile raf_main.c ci_out
+          ./raf_compile tests/fixtures/raf_return_42.c ci_out --native
+          test -s ci_out.bin
+          test -s ci_out.ops
 
       - name: Validate operational manifest
         run: bash scripts/test_ops_manifest.sh
+
+      - name: Close compiler station end to end
+        run: bash scripts/test_compiler_station.sh
 
       - name: Audit repository structure
         run: python3 scripts/audit_repository_structure.py --depth 5
@@ -59,7 +64,9 @@ jobs:
         run: bash scripts/android_build_matrix.sh --plan
 
       - name: Audit ApkC freestanding invariants
-        run: bash scripts/ci_freestanding_audit.sh
+        run: |
+          bash scripts/ci_freestanding_audit.sh
+          bash scripts/audit_language_freestanding_contract.sh
 
       - name: RAF TraceBuf freestanding smoke gate
         run: |
@@ -82,12 +89,9 @@ jobs:
       - name: ApkC compile transcript (F1 chain-of-custody)
         run: |
           mkdir -p Apkc/proofs/out
-          gcc -std=c11 -O2 -Wall -Wextra \
-            -target aarch64-linux-gnu -nostdlib -ffreestanding -I Apkc \
-            -fsyntax-only Apkc/apkc.c 2>&1 | tee Apkc/proofs/out/apkc-compile.txt || true
-          # Also record host-native compile (for CI runners without cross-compiler)
-          gcc -std=c11 -O2 -Wall -I Apkc Apkc/apkc.c -o apkc_host 2>&1 \
-            | tee -a Apkc/proofs/out/apkc-compile.txt || true
+          clang -std=c11 -O2 -Wall -Wextra -Werror \
+            -target aarch64-linux-gnu -nostdlib -nostdinc -ffreestanding -I Apkc \
+            -fsyntax-only Apkc/apkc.c 2>&1 | tee Apkc/proofs/out/apkc-compile.txt
           echo "F1: apkc-compile.txt generated ($(wc -l < Apkc/proofs/out/apkc-compile.txt) lines)"
 
       - name: Validate ApkC proof protocol
@@ -109,7 +113,6 @@ jobs:
             ./verbovivo_ci Apkc/hello.apk /dev/null 2>&1 | \
             grep -E 'verbovivo:.*phi=' || echo 'TOKEN_VAZIO: hello.apk ausente'
           echo 'RAFAELIA relmat smoke test' | ./verbovivo_ci -s -m < /dev/stdin > /dev/null 2>&1 || true
-          # A4/B4: SVG engram gate — validate verbovivo produces SVG output
           mkdir -p ci/reports
           echo 'SVG gate test vector for engram' | ./verbovivo_ci -s > ci/reports/engram.svg 2>&1 || true
           grep -q '<svg' ci/reports/engram.svg && echo 'SVG gate: PASS' \
@@ -171,7 +174,7 @@ jobs:
         run: |
           python3 scripts/first_test_pk.py --output results/first_test_report.json
           python3 - <<'PY'
-          import json, sys
+          import json
           from pathlib import Path
           report = json.loads(Path('results/first_test_report.json').read_text(encoding='utf-8'))
           verdict = report['verdict']
