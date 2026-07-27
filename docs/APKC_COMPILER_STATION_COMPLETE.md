@@ -2,27 +2,26 @@
 
 **Estado no código:** `IMPLEMENTED_HOTFIX`  
 **Estado da evidência neste branch:** `CI_PENDING / claim_allowed=false`  
-**Escopo:** compilação determinística de núcleo `u32`, C/C++ estrito, lowering portátil `RAF_KERNEL`, emissão nativa e selagem de `.so` Android.  
-**Documento detalhado do HOTFIX:** [`APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md`](APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md).
+**Escopo:** núcleo `u32`, C/C++ estrito, lowering `RAF_KERNEL`, emissão nativa, transação e selagem de `.so` Android.  
+**HOTFIX detalhado:** [`APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md`](APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md).
 
-## 1. Pipeline canônico
+## Pipeline canônico
 
 ```text
 fonte
 → detectar rota
 → validar contrato delimitado
-→ rewrite ou lowering dependente da fonte
+→ rewrite/lowering dependente da fonte
 → objeto freestanding
 → link estrito
 → auditoria ELF por perfil
-→ promoção atômica do artefato
-→ recibo com hashes e fronteira de claim
+→ promoção atômica do artefato e recibo
 ```
 
-O compilador raiz também mantém a rota compacta:
+O compilador raiz mantém a rota compacta:
 
 ```text
-RAF_RETURN / return / exit com expressão constante única
+exatamente um RAF_RETURN / return / exit constante
 → IR_MOVIMM(u32)
 → emissão por arquitetura
 → .s + .hex + .bin + .ops schema 4
@@ -30,49 +29,50 @@ RAF_RETURN / return / exit com expressão constante única
 
 Não existe retorno fixo, NOP de sucesso ou reclassificação silenciosa.
 
-## 2. Rotas existentes
+## Rotas existentes
 
-| Rota | Contrato | Saída | O que não significa |
+| Rota | Contrato | Saída | Limite |
 |---|---|---|---|
-| `ROOT_U32_IR` | exatamente uma expressão constante | `.s/.hex/.bin/.ops` | compilador geral da linguagem |
-| `STRICT_C_REWRITE` | C/C++ em superfície explicitamente emulada | `.so + receipt` | libc completa ou múltiplas translation units |
-| `HOSTED_RAF_KERNEL` | uma anotação de kernel puro em 14 perfis | C estrito → `.so + receipt` | Python/JVM/Node/Go/Swift completos |
-| `DIRECT_ASSEMBLY` | assembler aceito pelo target | `.so + receipt` | portabilidade automática entre ISAs |
+| `ROOT_U32_IR` | uma expressão constante | `.s/.hex/.bin/.ops` | não é parser geral |
+| `STRICT_C_REWRITE` | C/C++ na superfície explícita | `.so + receipt` | uma translation unit, sem includes externos |
+| `HOSTED_RAF_KERNEL` | uma anotação pura em 14 perfis | C estrito → `.so + receipt` | não compila a linguagem completa |
+| `DIRECT_ASSEMBLY` | assembler do target | `.so + receipt` | depende da ISA/toolchain alvo |
 
-Inventário legível por máquina:
+Inventário de máquina:
 
 ```text
 ci/contracts/apkc_compiler_station_v2.json
 ```
 
-## 3. Emissão por arquitetura
+## Emissão
 
-O backend raiz codifica o valor real do IR:
+O backend raiz codifica o valor real:
 
 - x86-64: `mov eax, imm32; ret`;
-- ARM64: `movz` + `movk` quando necessário + `ret`;
-- ARM32/Thumb-2: `movw` + `movt` quando necessário + `bx lr`;
-- RV64: `lui/addi` ou `addi` + `jalr`.
+- ARM64: `movz/movk/ret`;
+- ARM32 Thumb-2: `movw/movt/bx lr`;
+- RV64: `lui/addi/jalr`.
 
-A selagem Android tem targets explícitos para ARM64, ARM32, x86-64 e RV64. Os testes bloqueantes desta estação exercitam diretamente C ARM64, C ARM32, C++ ARM64 e `RAF_KERNEL` Python ARM64. Demais combinações permanecem implementadas, mas condicionais à evidência de target.
+Os gates exercitam C ARM64, C ARM32, C++ ARM64, `RAF_KERNEL` Python ARM64, arquitetura host e semântica local da emulação. Outras combinações permanecem implementadas, mas condicionais à prova no target.
 
-## 4. Superfície C assimilada
+## Superfície C assimilada
 
 ```text
 memcpy memmove memset memcmp memchr
-strlen strnlen strcmp strncmp strcpy strncpy strchr strrchr
+strlen strnlen strcmp strncmp strncpy strchr strrchr
 atoi strtoul raf_write putchar puts
 ```
 
 Propriedades:
 
-- zero heap;
-- zero GC;
+- zero heap e GC;
 - storage estático ou do chamador;
 - `memmove` sem comparação relacional indefinida de ponteiros;
-- `strtoul` com base, prefixo, `endptr`, sinal e overflow delimitados;
-- exports C++ com `extern "C"`;
-- assertions de largura inteira.
+- `atoi/strtoul` com overflow determinístico;
+- `strncpy` exige capacidade explícita;
+- `strcpy`, `strcat` e `gets` são proibidos;
+- exports C++ usam `extern "C"`;
+- larguras inteiras são verificadas na compilação.
 
 Headers assimiláveis:
 
@@ -80,11 +80,11 @@ Headers assimiláveis:
 stddef.h stdint.h stdbool.h stdio.h stdlib.h string.h
 ```
 
-Isso não libera todas as APIs desses headers. Chamadas não emuladas falham fechadas. Includes externos ou headers hospedados sem implementação não são apagados silenciosamente.
+A presença do header não libera toda a API. Função não emulada, header hospedado ou include local sem resolução falha fechado.
 
-## 5. Contrato `RAF_KERNEL`
+## `RAF_KERNEL`
 
-Perfis aceitos:
+Perfis:
 
 ```text
 rs kt java py sh pl js php jsx go rb swift groovy clj
@@ -98,35 +98,33 @@ RAF_KERNEL mix(a,b) = ((a ^ b) + 7) & 0xffffffff
 
 Regras:
 
-- exatamente uma anotação independente;
-- até quatro argumentos `uint32_t`;
-- nenhuma chamada ou acesso a estado;
-- divisão/módulo somente por constante não nula;
-- shift somente por constante `0..31`;
-- resultado em semântica `uint32_modulo`.
+- uma anotação independente;
+- até quatro `uint32_t`;
+- nenhuma chamada ou estado;
+- divisão/módulo por constante não nula;
+- shift constante `0..31`;
+- semântica `uint32_modulo`.
 
-O manifesto intermediário permanece `claim_allowed=false`. Apenas o `.so` que atravessou os gates recebe recibo `STRICT_ELF_PASS`.
+Rewrite e lowering continuam `claim_allowed=false`; somente o ELF selado que atravessou todos os gates recebe recibo `STRICT_ELF_PASS`.
 
-## 6. Cadeia de custódia
+## Cadeia de custódia
 
 ### `.ops` schema 4
 
-Campos assinados incluem arquitetura, marca, cores, linguagem, flags, hash da fonte, métricas Ω, contagens de artefatos, `ir_value`, versão do emissor, estado nativo, rollback e transação.
+Assina arquitetura, marca, cores, linguagem, flags, hash da fonte, métricas Ω, IR/ASM/BIN, `ir_value`, emissor, estado nativo, rollback e transação com FNV-1a 64 canônico.
 
 ```text
-COMMITTED   → saída coerente
-ROLLED_BACK → sem .s/.hex/.bin antigo
+COMMITTED   → artefatos atuais e coerentes
+ROLLED_BACK → nenhum .s/.hex/.bin anterior
 ```
-
-O validador recomputa FNV-1a 64 com o offset canônico e rejeita alteração em qualquer campo assinado.
 
 ### `.so.receipt.json`
 
-Registra SHA-256 da fonte/saída, target, compilador, gates, dependências do plano de construção e ausência de dependências externas no runtime final.
+Registra SHA-256 da fonte/saída, target, compilador, gates, dependências de build e zero dependência externa no runtime final. `.so` e recibo são tratados como uma única transação: se o recibo não fechar, a saída não permanece promovida.
 
-## 7. Perfis ELF
+## Perfis ELF
 
-### Executável estrito
+### `exec`
 
 ```text
 ELF EXEC
@@ -135,30 +133,33 @@ sem PT_DYNAMIC
 sem relocação residual
 ```
 
-### Android shared object
+### `android-so`
 
 ```text
 ELF DYN
-PT_DYNAMIC e DT_SONAME permitidos para o loader
+PT_DYNAMIC + DT_SONAME permitidos
 sem PT_INTERP
 sem DT_NEEDED
 sem símbolo indefinido
 somente relocação relativa autorizada
 ```
 
-Ambos bloqueiam build-id, pilha executável, segmento LOAD RWX, `RPATH`, `RUNPATH`, `TEXTREL` e seções de exceção/runtime.
+Ambos bloqueiam build-id, pilha executável, LOAD RWX, `RPATH`, `RUNPATH`, `TEXTREL` e seções de exceção/runtime.
 
-## 8. Escrita e rollback
+## Transação
 
-Artefatos são produzidos em temporários e promovidos por `rename`. Falha sobre o mesmo `out_base` elimina resultados anteriores e deixa somente o recibo de rollback.
+```text
+.tmp → flush/close → auditoria → rename → COMMITTED
+erro → remover temporários e saídas antigas → ROLLED_BACK
+```
 
 ```text
 FILE_EXISTS ≠ PASS
 OLD_FILE ≠ NEW_RESULT
-ROLLBACK = remoção efetiva + recibo verificável
+OUTPUT_WITHOUT_RECEIPT ≠ COMMITTED
 ```
 
-## 9. Comandos únicos
+## Comandos
 
 ```bash
 make compiler-contract
@@ -173,55 +174,47 @@ make compile \
   OUT=build/strict/libmain.so
 ```
 
-## 10. Gates bloqueantes
+## Gates bloqueantes
 
 ```text
-G00 contrato/inventário canônico
+G00 inventário canônico
 G01 source bounded
-G02 rewrite/lowering único
-G03 hosted surface fail-closed
-G04 libc selftest adversarial
+G02 contrato único
+G03 superfície hosted fail-closed
+G04 libc adversarial
 G05 objeto estrito
-G06 link sem símbolo indefinido
+G06 link sem undefined
 G07 perfil ELF e máquina
 G08 sem PT_INTERP/DT_NEEDED/RWX/exec-stack/build-id
 G09 mesma fonte → mesma saída
-G10 valores distintos → bytes distintos
-G11 assinatura .ops recomputada
-G12 adulteração de manifesto rejeitada
-G13 rollback remove artefatos antigos
-G14 C++ exports sem mangling
-G15 recibo SHA-256 e claim boundary
+G10 valores diferentes → bytes diferentes
+G11 assinatura .ops recomposta
+G12 adulteração rejeitada
+G13 rollback remove stale
+G14 C++ sem mangling
+G15 .so + receipt transacionais
 ```
 
-## 11. Limite preservado
+## Não reivindicado
 
-A estação não reivindica:
+- compilador geral de C/C++ ou linguagens hospedadas;
+- assinatura, instalação e launch de APK;
+- NativeActivity observada em dispositivo;
+- runtime GPU/DSP/NPU;
+- equivalência de timing, energia ou side channel;
+- execução x86-64/RV64 sem target;
+- verdade científica ou semântica derivada de Ω.
 
-- compilação geral de C/C++ ou de linguagens hospedadas;
-- assinatura, instalação ou lançamento de APK;
-- runtime Android observado em dispositivo;
-- execução real de drivers GPU/DSP/NPU;
-- equivalência de tempo, consumo ou side channel;
-- execução x86-64/RV64 sem prova no target;
-- verdade científica ou semântica derivada das métricas Ω.
-
-Após CI verde, o estado promovível é:
+Após CI verde:
 
 ```text
-HOTFIX_VERIFIED_BY_CI
-```
-
-Isso continua diferente de:
-
-```text
-APK_RUNTIME_PROVEN
+HOTFIX_VERIFIED_BY_CI ≠ APK_RUNTIME_PROVEN
 ```
 
 ## R3
 
 ```text
 F_ok   = compilador delimitado + transação + recibos + gates adversariais
-F_gap  = dispositivo Android e combinações condicionais de target
-F_next = empacotar a saída selada e produzir uma cadeia única assinatura→instalação→launch→logcat
+F_gap  = dispositivo Android e targets condicionais
+F_next = empacotar a saída selada numa prova única assinatura→instalação→launch→logcat
 ```
