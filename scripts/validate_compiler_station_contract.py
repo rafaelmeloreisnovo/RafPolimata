@@ -7,6 +7,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CONTRACT = ROOT / "ci" / "contracts" / "apkc_compiler_station_v2.json"
+EXPECTED_LIMITS = {
+    "source_bytes": 1 << 20,
+    "root_expression_tokens": 1024,
+    "root_expression_depth": 64,
+    "hosted_kernel_expression_chars": 4096,
+    "hosted_kernel_ast_nodes": 256,
+    "hosted_kernel_ast_depth": 64,
+    "hosted_kernel_arguments": 4,
+}
 
 
 def require(condition: bool, message: str) -> None:
@@ -32,6 +41,10 @@ def unique_nonempty(items: object, name: str) -> list[str]:
 
 def main() -> int:
     data = load_contract()
+
+    limits = data.get("limits")
+    require(isinstance(limits, dict), "limits object missing")
+    require(limits == EXPECTED_LIMITS, f"limits mismatch: {limits!r}")
 
     routes = data.get("routes")
     require(isinstance(routes, list) and len(routes) == 4, "exactly four canonical routes required")
@@ -62,6 +75,8 @@ def main() -> int:
 
     gates = unique_nonempty(data.get("blocking_gates"), "blocking_gates")
     for gate in (
+        "root_expression_budget_enforced",
+        "hosted_kernel_ast_budget_enforced",
         "manifest_signature_recomputation",
         "manifest_tamper_rejection",
         "rollback_removes_stale_artifacts",
@@ -83,6 +98,7 @@ def main() -> int:
     rewriter = (ROOT / "scripts" / "raf_c_rewrite.py").read_text(encoding="utf-8")
     lowerer = (ROOT / "scripts" / "raf_kernel_lower.py").read_text(encoding="utf-8")
     frontend = (ROOT / "raf_frontend.c").read_text(encoding="utf-8")
+    precompiler = (ROOT / "raf_precomp.c").read_text(encoding="utf-8")
     libc_emu = (ROOT / "Apkc" / "raf_libc_emu.h").read_text(encoding="utf-8")
     elf_audit = (ROOT / "scripts" / "audit_strict_elf.sh").read_text(encoding="utf-8")
     builder = (ROOT / "scripts" / "apkc_strict_native_build.sh").read_text(encoding="utf-8")
@@ -99,6 +115,17 @@ def main() -> int:
     require('"claim_allowed": False' in lowerer, "lowerer claim gate must be false")
     require('"strcpy"' in rewriter and "RAF_UNBOUNDED_STRING_COPY_FORBIDDEN" in libc_emu,
             "strcpy fail-closed enforcement absent")
+
+    require("MAX_SOURCE_BYTES = 1 << 20" in rewriter, "rewriter source bound mismatch")
+    require("MAX_SOURCE_BYTES = 1 << 20" in lowerer, "lowerer source bound mismatch")
+    require("MAX_EXPRESSION_CHARS = 4096" in lowerer, "lowerer expression bound mismatch")
+    require("MAX_AST_NODES = 256" in lowerer, "lowerer AST-node bound mismatch")
+    require("MAX_AST_DEPTH = 64" in lowerer, "lowerer AST-depth bound mismatch")
+    require("len(args) > 4" in lowerer, "lowerer argument bound mismatch")
+    require("#define RAF_EXPR_MAX_DEPTH 64u" in precompiler, "root depth bound mismatch")
+    require("#define RAF_EXPR_MAX_TOKENS 1024u" in precompiler, "root token bound mismatch")
+    require("MAX_SOURCE_BYTES=$((1 << 20))" in builder, "strict builder source bound mismatch")
+
     require("#define RAF_OPS_SCHEMA 4u" in frontend, "ops schema 4 not active")
     require("transaction_state" in frontend and "ir_value" in frontend, "transaction receipt fields absent")
     require("extern \"C\"" in libc_emu, "C++ export de-mangling absent")
@@ -107,6 +134,9 @@ def main() -> int:
             "strict native receipt boundary absent")
     require("COMMITTED=1" in builder and 'rm -f "$OUTPUT" "$RECEIPT"' in builder,
             "strict output/receipt transaction absent")
+    require('mv -f "$RECEIPT_TMP" "$RECEIPT"' in builder and
+            'mv -f "$COMMIT_TMP" "$OUTPUT"' in builder,
+            "receipt-first pair promotion absent")
 
     artifacts = data.get("artifacts")
     require(isinstance(artifacts, list) and len(artifacts) == 6, "artifact registry must contain six types")
@@ -119,7 +149,8 @@ def main() -> int:
     print(
         "compiler-station contract: PASS — "
         f"routes={len(routes)} hosted={len(hosted_languages)} "
-        f"functions={len(emulated_functions)} gates={len(gates)} files={len(canonical_files)}"
+        f"functions={len(emulated_functions)} gates={len(gates)} "
+        f"limits={len(limits)} files={len(canonical_files)}"
     )
     return 0
 
