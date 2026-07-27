@@ -50,7 +50,6 @@ static uint64_t raf_hash_update(uint64_t h, const uint8_t *buf, size_t len) {
   return h;
 }
 
-/* Canonical FNV-1a 64-bit offset basis. */
 static uint64_t raf_fnv1a64(const uint8_t *buf, size_t len) {
   return raf_hash_update(UINT64_C(14695981039346656037), buf, len);
 }
@@ -255,7 +254,9 @@ static int write_bin_temp(const RafCtx *ctx, const char *path) {
   FILE *f = fopen(path, "wb");
   if (!f) return -13;
   size_t written = fwrite(ctx->bin.bytes, 1, ctx->bin.n, f);
-  int ok = written == ctx->bin.n && fflush(f) == 0 && fclose(f) == 0;
+  int ok = written == ctx->bin.n;
+  if (fflush(f) != 0) ok = 0;
+  if (fclose(f) != 0) ok = 0;
   return ok ? 0 : -13;
 }
 
@@ -312,6 +313,7 @@ int raf_compile_file(RafCtx *ctx, const char *src_path, const char *out_base,
   reset_transaction(ctx);
   if (prepare_manifest(ctx, out_base) != 0) return -14;
   clear_data_artifacts(ctx);
+  (void)remove(ctx->out_ops);
 
   uint64_t t0 = raf_now_ns();
   ctx->native_requested = do_native ? 1u : 0u;
