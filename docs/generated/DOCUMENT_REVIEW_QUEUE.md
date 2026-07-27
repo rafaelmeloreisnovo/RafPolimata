@@ -22,6 +22,10 @@
 | 40 | `LINK_REQUIRED` | `Apkc/proofs/out/api-abi-matrix.md` | apkc | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `Apkc/proofs/out/apkc-binary-arm32.txt` | apkc | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `Apkc/proofs/out/apkc-binary-arm64.txt` | apkc | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `Apkc/proofs/out/engram_biology.svg` | apkc | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `Apkc/proofs/out/engram_chemistry.svg` | apkc | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `Apkc/proofs/out/engram_mathematics.svg` | apkc | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `Apkc/proofs/out/engram_physics.svg` | apkc | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `Apkc/proofs/out/java-hello-class.txt` | apkc | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `Apkc/proofs/out/lang-coverage.md` | apkc | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `Apkc/proofs/README.md` | apkc | sem relação de entrada em índice ou documento |
@@ -110,6 +114,55 @@
 | 40 | `LINK_REQUIRED` | `internal/governance/capabilities.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `internal/governance/policy.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `internal/orchestrator/vertical_slice.md` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/AQUISICAO_RESUMO.md` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_1_discovery/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_1_discovery/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_2_candidate/bibliography.bib` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_2_candidate/bibliography.md` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_2_candidate/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_2_candidate/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_3_validated/bibliography.bib` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_3_validated/bibliography.md` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_3_validated/metadata.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_3_validated/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_3_validated/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/biology/stage_4_canonical/synthesis.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_1_discovery/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_1_discovery/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_2_candidate/bibliography.bib` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_2_candidate/bibliography.md` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_2_candidate/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_2_candidate/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_3_validated/bibliography.bib` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_3_validated/bibliography.md` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_3_validated/metadata.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_3_validated/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_3_validated/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/chemistry/stage_4_canonical/synthesis.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_1_discovery/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_1_discovery/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_2_candidate/bibliography.bib` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_2_candidate/bibliography.md` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_2_candidate/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_2_candidate/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_3_validated/bibliography.bib` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_3_validated/bibliography.md` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_3_validated/metadata.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_3_validated/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_3_validated/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/mathematics/stage_4_canonical/synthesis.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_1_discovery/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_1_discovery/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_2_candidate/bibliography.bib` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_2_candidate/bibliography.md` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_2_candidate/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_2_candidate/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_3_validated/bibliography.bib` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_3_validated/bibliography.md` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_3_validated/metadata.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_3_validated/records.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_3_validated/urls.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `knowledge_base/physics/stage_4_canonical/synthesis.txt` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `Makefile` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `manifests/apkc-first-part.v1.json` | configs | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `manifests/apkc-runtime-hardening.v1.json` | configs | sem relação de entrada em índice ou documento |
@@ -256,6 +309,7 @@
 | 20 | `ROOT_REVIEW` | `RASBERY.MD` | root-other | arquivo de raiz fora da política declarada |
 | 20 | `ROOT_REVIEW` | `README_RAFAELIA_ROOT_OPTIMIZER.md` | root-other | arquivo de raiz fora da política declarada |
 | 5 | `REFERENCE_REPAIR` | `scripts/ci_freestanding_audit.sh` | automation | referência local quebrada |
+| 5 | `REFERENCE_REPAIR` | `scripts/science_learning_engine.py` | automation | referência local quebrada |
 
 ## Ordem de tratamento
 

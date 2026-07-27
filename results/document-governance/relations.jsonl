@@ -199,6 +199,7 @@
 {"evidence": "inline-path", "relation": "references", "source": "README.md", "target": "rafaelia/verbovivo.c"}
 {"evidence": "inline-path", "relation": "references", "source": "README.md", "target": "scripts/audit_repository_structure.py"}
 {"evidence": "inline-path", "relation": "references", "source": "README.md", "target": "scripts/document_governance.py"}
+{"evidence": "inline-path", "relation": "references", "source": "README.md", "target": "scripts/science_learning_engine.py"}
 {"evidence": "inline-path", "relation": "references", "source": "README.md", "target": "scripts/validate_apkc_formats.py"}
 {"evidence": "inline-path", "relation": "references", "source": "README.md", "target": "scripts/validate_ecosystem_runtime_state.py"}
 {"evidence": "inline-path", "relation": "references", "source": "README.md", "target": "scripts/validate_runtime_truth_local.sh"}
@@ -660,6 +661,7 @@
 {"evidence": "inline-path", "relation": "references", "source": "docs/ROOT_LOOSE_FILES_REVIEW.md", "target": "scripts/validate_root_file_decisions.py"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/ROTINA_OPERACIONAL_BENCHMARKS.md", "target": "docs/AGENTES.md"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/SAFE_EXTENDED_LOCAL_CI.md", "target": ".github/workflows/ci.yml"}
+{"evidence": "inline-path", "relation": "references", "source": "docs/SCIENCE_LEARNING_ENGINE.md", "target": "scripts/science_learning_engine.py"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/SEMENTES_PRIORITARIAS.md", "target": "docs/AGENTES.md"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/SESSAO_SITUACAO_MECANISMOS.md", "target": "docs/AGENTES.md"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/SESSAO_SITUACAO_MECANISMOS.md", "target": "docs/COERENCIA_FECHAMENTO_SESSAO_APKC.md"}
@@ -712,6 +714,8 @@
 {"evidence": "inline-path", "relation": "references", "source": "experimental/EXPERIMENTAL_POLICY.md", "target": "docs/CICLOS_ESTIMADOS_VS_MEDIDOS.md"}
 {"evidence": "inline-path", "relation": "references", "source": "internal/orchestrator/vertical_slice.md", "target": "docs/contracts/execution_result.schema.json"}
 {"evidence": "inline-path", "relation": "references", "source": "internal/orchestrator/vertical_slice.md", "target": "docs/contracts/intent_ir.schema.json"}
+{"evidence": "inline-path", "relation": "references", "source": "knowledge_base/AQUISICAO_RESUMO.md", "target": "docs/SCIENCE_LEARNING_ENGINE.md"}
+{"evidence": "inline-path", "relation": "references", "source": "knowledge_base/AQUISICAO_RESUMO.md", "target": "scripts/science_learning_engine.py"}
 {"evidence": "inline-path", "relation": "references", "source": "packages/educational/arduino/GETTING_STARTED.md", "target": "RAF_003_timer_ctc_para_evento_periodico.c"}
 {"evidence": "inline-path", "relation": "references", "source": "packages/educational/arduino/GETTING_STARTED.md", "target": "RAF_009_adc_com_oversampling.c"}
 {"evidence": "inline-path", "relation": "references", "source": "packages/educational/arduino/GETTING_STARTED.md", "target": "RAF_013_uart_interrupt_driven_com_ring_buffer.c"}
@@ -764,6 +768,8 @@
 {"evidence": "inline-path", "relation": "references", "source": "releases/v0.1.0-apkc-termux-arm32-proof.md", "target": "docs/APKC_VALUE_AND_GAPS.md"}
 {"evidence": "inline-path", "relation": "references", "source": "scripts/apkc_first_part_gate.py", "target": "scripts/apkc_first_part_gate.py"}
 {"evidence": "inline-path", "relation": "references", "source": "scripts/document_governance.py", "target": "scripts/document_governance.py"}
+{"evidence": "inline-path", "relation": "references", "source": "scripts/science_learning_engine.py", "target": "docs/SCIENCE_LEARNING_ENGINE.md"}
+{"evidence": "inline-path", "relation": "references", "source": "scripts/science_learning_engine.py", "target": "scripts/science_learning_engine.py"}
 {"evidence": "inline-path", "relation": "references", "source": "tests/fixtures/README.md", "target": "Apkc/proofs/out/aapt-xmltree.txt"}
 {"evidence": "inline-path", "relation": "references", "source": "tests/fixtures/README.md", "target": "Apkc/proofs/out/artifact-sha256.txt"}
 {"evidence": "inline-path", "relation": "references", "source": "tests/fixtures/README.md", "target": "Apkc/proofs/out/dex-sha1.txt"}
