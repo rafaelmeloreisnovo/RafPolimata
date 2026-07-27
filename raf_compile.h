@@ -65,7 +65,9 @@
 #define RAF_ASM_CAP (1u << 15)
 #define RAF_ASM_LINE 128
 #define RAF_HEX_CAP (1u << 20)
-#define RAF_SOURCE_CAP (1u << 20)
+/* RAF_SOURCE_MAX is the exact accepted payload. CAP includes one NUL byte. */
+#define RAF_SOURCE_MAX (1u << 20)
+#define RAF_SOURCE_CAP (RAF_SOURCE_MAX + 1u)
 
 typedef enum { IR_NOP = 0, IR_MOVIMM, IR_RET } RafIROp;
 typedef uint64_t RafIR;
