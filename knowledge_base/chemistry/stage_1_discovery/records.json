@@ -1,0 +1,1052 @@
+[
+  {
+    "source": "zenodo",
+    "title": "Molecular Dynamics Data: Xenon Explores Apparent and Cryptic Binding Sites",
+    "doi": "10.5281/zenodo.17299983",
+    "abstract": "File specification xe_protein*.zip : MD data for checking if the xenon model can be located in known xenon-binding sites. xe_CB*.zip : MD data with xenon&nbsp; ben_CB*.zip : MD data with benzene How to use a trajectory I assume that you have installed PyMOL. To view a trajectory, after launching PyMOL, execute the following lines: load ref_nowat.pdb load_trj npt_prod_[ID]_nowat.xtc Whenever you want to analyse a trajectory by yourself, you can use xtc files with their corresponding reference pdbs. Get in touch If you have any questions, please contact me by writing to the corresponding author on my work: Iida, S. Xenon Explores Apparent and Cryptic Binding Sites.&nbsp; bioRxiv &nbsp; 2025 , 2025.04.30.651394. https://doi.org/10.1101/2025.04.30.651394. Citation If you are using my data, please consider citing my work: Iida, S. Xenon Explores Apparent and Cryptic Binding Sites.&nbsp; bioRxiv 2025 , 2025.04.30.651394. https://doi.org/10.1101/2025.04.30.651394. Funding This work was supported by Kitasato University Academic Research Encouragement Fund. The computation was performed using the Research Center for Computational Science, Okazaki, Japan (Project: 24-IMS-C128).",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17299983/files/xe_CB_1maz_mdata.zip/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Molecular Dynamics Simulations of Coronavirus Papain-Like Proteases: Insights into Conformational Equilibrium and Inter-Domain Allosterism",
+    "doi": "10.5281/zenodo.10992424",
+    "abstract": "All data is in a zipped folder named \"all_data.zip\". In this zipped folder, there are three main folders: Crystallographic Structures and Parametrization, DM, and PCA. The molecular dynamics simulation calculations performed using the NAMD program for the SARS-CoV-2 PLpro protein with and without zinc and for SARS-CoV-1 with and without zinc are found in the DM folder. Within these three main folders, there are subfolders where the data is located. &nbsp; Descriptions of files in the DM folder &nbsp; + subfolder PLpro SARS-CoV-1 without zinc (PLpro1_not_zinc) &nbsp; - &nbsp;&nbsp; PLpro1-restricao-1.pdb: PDB file with harmonic restrictions used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1-ref.pdb: PDB file used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1-backbone: PDB file with restrictions on the protein backbone used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1.prmtop: topology file. - &nbsp;&nbsp; 1_PLpro_MIN.conf: Configuration file used in the minimization protocol with harmonic restrictions. - &nbsp;&nbsp; 1_PLpro_MIN.log: Output for minimization with harmonic restrictions. - &nbsp;&nbsp; 2_PLpro_MIN.conf: Configuration file used in the minimization protocol without harmonic restrictions. - &nbsp;&nbsp; 2_PLpro_MIN.log: Output for minimization without harmonic restrictions. - &nbsp;&nbsp; 3_PLpro_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol with harmonic restrictions. - &nbsp;&nbsp; 3_PLpro_DM.log: Output for molecular dynamics simulation equilibration protocol with harmonic restrictions. - &nbsp;&nbsp; 4_PLpro_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol with harmonic restrictions on the protein backbone atoms. - &nbsp;&nbsp; 4_PLpro_DM.log: Output for molecular dynamics simulation equilibration protocol with harmonic restrictions on the protein backbone atoms. - &nbsp;&nbsp; 5_PLpro_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol without harmonic restrictions. - &nbsp;&nbsp; 5_PLpro_DM.log: Output molecular dynamics simulation equilibration protocol without harmonic restrictions. - &nbsp;&nbsp; 6_PLpro_DM.conf: Configuration file used in the pre-production molecular dynamics simulation equilibration protocol. - &nbsp;&nbsp; 6_PLpro_DM.log: Output for pre-production molecular dynamics simulation equilibration protocol. &nbsp; + subfolder PLpro SARS-CoV-1 with zinc (PLpro1_zinc) &nbsp; - &nbsp;&nbsp; PLpro1-retrizn.pdb: PDB file with harmonic restrictions on the zinc finger of the protein used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1-retrizn-1.pdb: PDB file with harmonic restrictions on the protein's zinc finger used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1_ZAFF_solv.pdb: PDB file with the parameters for the simulation. - &nbsp;&nbsp; PLpro1_ZAFF_solv.prmtop: topology file. - &nbsp;&nbsp; PLpro1zn-backbone.pdb: PDB file with harmonic restrictions on the protein backbone used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1zn-backbone-1.pdb: PDB file with harmonic restrictions on the protein backbone used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1zn-ref.pdb: PDB file with harmonic restrictions used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1zn-restricao-1.pdb: PDB file with harmonic restrictions used in molecular dynamics simulation. - &nbsp;&nbsp; 1_PLpro_MIN.conf: Configuration file used in minimization protocol with harmonic restrictions. - &nbsp;&nbsp; 1_PLpro_MIN.log: Output for minimization with harmonic restrictions. - &nbsp;&nbsp; 2_PLpro_MIN.conf: Configuration file used in the molecular dynamics simulation minimization protocol without harmonic restrictions. - &nbsp;&nbsp; 2_PLpro_MIN.log: Output for minimization file without harmonic restrictions. - &nbsp;&nbsp; 3_PLpro_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol with harmonic restrictions. - &nbsp;&nbsp; 3_PLpro_DM.log: Output for molecular dynamics simulation equilibration protocol with harmonic restrictions. - &nbsp;&nbsp; 4_PLpro_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol with harmonic restrictions on the zinc finger. - &nbsp;&nbsp; 4_PLpro_DM.log: Output for molecular dynamics simulation equilibration protocol with harmonic restrictions on the zinc finger. - &nbsp;&nbsp; 5_PLpro_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol with harmonic restrictions on the protein backbone atoms. - &nbsp;&nbsp; 5_PLpro_DM.log: Output of the molecular dynamics simulation equilibration protocol with harmonic restrictions on the protein backbone. - &nbsp;&nbsp; 6_PLpro_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol without harmonic restrictions. - &nbsp;&nbsp; 6_PLpro_DM.log: Output for molecular dynamics simulation equilibration protocol without harmonic restrictions. - &nbsp;&nbsp; 7_PLpro_DM.conf: Configuration file used in the pre-production molecular dynamics simulation equilibration protocol. - &nbsp;&nbsp; 7_PLpro_DM.log: Output for pre-production molecular dynamics simulation equilibration protocol. &nbsp; + subfolder PLpro SARS-CoV-1 without zinc (PLpro2_notzn) &nbsp; - &nbsp;&nbsp; PLpro2-backbone.pdb: PDB file with restriction on the protein backbone used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro2-backbone-1.pdb: PDB file with restriction on the protein backbone used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro2-ref.pdb: PDB file with harmonic restrictions used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro2-restricao-1.pdb: PDB file with harmonic restrictions used in molecular dynamics simulation. - &nbsp;&nbsp; 1_PLpro2_MIN.conf: Configuration file used in minimization protocol with harmonic restrictions. - &nbsp;&nbsp; 1_PLpro2_MIN.log: Output fo minimization protocol with harmonic restrictions. - &nbsp;&nbsp; 2_PLpro2_MIN.conf: Configuration file used in minimization protocol without harmonic restrictions. - &nbsp;&nbsp; 2_PLpro2_MIN.log: Output for minimization without harmonic restrictions - &nbsp;&nbsp; 3_PLpro2_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol with harmonic restrictions. - &nbsp;&nbsp; 3_PLpro2_DM.log: Output for molecular dynamics simulation equilibration protocol with harmonic restrictions. - &nbsp;&nbsp; 4_PLpro2_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol with harmonic restrictions on the protein backbone atoms. - &nbsp;&nbsp; 4_PLpro2_DM.log: Output for molecular dynamics simulation equilibration protocol with harmonic restrictions on the protein backbone atoms. - &nbsp;&nbsp; 5_PLpro2_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol without harmonic restrictions. - &nbsp;&nbsp; 5_PLpro2_DM.log: Output for molecular dynamics simulation equilibration protocol without harmonic restrictions. - &nbsp;&nbsp; 6_PLpro2_DM.conf: Configuration file used in the pre-production molecular dynamics simulation equilibration protocol. - &nbsp;&nbsp; 6_PLpro2_DM.log: Output for pre-production molecular dynamics simulation equilibration protocol. &nbsp; + SARS-CoV-2 subfolder with zinc (PLpro2_zinc) &nbsp; - &nbsp;&nbsp; PLpro2zn-restricao-1.pdb: PDB file with harmonic restrictions used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro2zn-ref.pdb: PDB file with harmonic restrictions used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro2zn-backbone-1.pdb: PDB file with restriction on the protein backbone used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro2zn-backbone.pdb: PDB file with restriction on the protein backbone used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro2-retrizn-1.pdb: PDB file with harmonic restrictions on the zinc finger of the protein used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro2-retrizn.pdb: PDB file with harmonic restrictions on the zinc finger of the protein used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1-retrizn.pdb: PDB file with harmonic restrictions on the zinc finger of the protein used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1-retrizn-1.pdb: PDB file with harmonic restrictions on the protein's zinc finger used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1_ZAFF_solv.pdb: PDB file with the parameters for the simulation. - &nbsp;&nbsp; PLpro1_ZAFF_solv.prmtop: topology file. - &nbsp;&nbsp; PLpro1zn-backbone.pdb: PDB file with harmonic restrictions on the protein backbone used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1zn-backbone-1.pdb: PDB file with harmonic restrictions on the protein backbone used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1zn-ref.pdb: PDB file with harmonic restrictions used in molecular dynamics simulation. - &nbsp;&nbsp; PLpro1zn-restricao-1.pdb: PDB file with harmonic restrictions used in molecular dynamics simulation. - &nbsp;&nbsp; 1_PLpro_MIN.conf: Configuration file used in the minimization protocol with harmonic restrictions. - &nbsp;&nbsp; 1_PLpro_MIN.log: Output for minimization with harmonic restrictions. - &nbsp;&nbsp; 2_PLpro_MIN.conf: Configuration file used in the minimization protocol without harmonic restrictions. - &nbsp;&nbsp; 2_PLpro_MIN.log: Output for minimization without harmonic restrictions. - &nbsp;&nbsp; 3_PLpro_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol with harmonic restrictions. - &nbsp;&nbsp; 3_PLpro_DM.log: Output for molecular dynamics simulation equilibration protocol with harmonic restrictions. - &nbsp;&nbsp; 4_PLpro_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol with harmonic restrictions on the zinc finger. - &nbsp;&nbsp; 4_PLpro_DM.log: Output for molecular dynamics simulation equilibration protocol with harmonic restrictions on the zinc finger. - &nbsp;&nbsp; 5_PLpro_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol with harmonic restrictions on the protein backbone atoms. - &nbsp;&nbsp; 5_PLpro_DM.log: Output for molecular dynamics simulation equilibration protocol with harmonic restrictions on the protein backbone. - &nbsp;&nbsp; 6_PLpro_DM.conf: Configuration file used in the molecular dynamics simulation equilibration protocol without harmonic restrictions. - &nbsp;&nbsp; 6_PLpro_DM.log: Output for molecular dynamics simulation equilibration protocol without harmonic restrictions. - &nbsp;&nbsp; 7_PLpro_DM.conf: Configuration file used in the pre-production molecular dynamics simulation equilibration protocol. - &nbsp;&nbsp; 7_PLpro_DM.log: Output for pre-production molecular dynamics simulation equilibration protocol. &nbsp; &nbsp; Descriptions of files in the folder named Crystallographic_Structures_and_Parametrization &nbsp; - &nbsp;&nbsp; leap.log: Output generated by TLEAP. - &nbsp;&nbsp; PLpro1.pdb: Zinc-free PLpro SARS-CoV-1 PDB file. - &nbsp;&nbsp; PLpro1.prmtop: Topology file used for molecular dynamics simulations. - &nbsp;&nbsp; PLpro1.rst7: Zinc-free PLpro SARS-CoV-1 atomic coordinate file - &nbsp;&nbsp; PLpro1_1.pdb: PLpro SARS-CoV-1 PDB file without solvated zinc. - &nbsp;&nbsp; PLpro_tleap.in: TLEAP input file used to build the system. - &nbsp;&nbsp; PLpro_tleap.out: Output with program execution information. - &nbsp;&nbsp; PLpro1_zn.pdb: PDB file of PLpro SARS-CoV-1 with zinc. - &nbsp;&nbsp; PLpro1_ZAFF_dry.inpcrd: File with the initial coordinates of all atoms in the system. - &nbsp;&nbsp; PLpro1_ZAFF_dry.pdb: PDB file of PLpro SARS-CoV-1 with zinc. - &nbsp;&nbsp; PLpro1_ZAFF_dry.prmtop: Topology file used for molecular dynamics simulations. - &nbsp;&nbsp; PLpro1_ZAFF_solv.inpcrd: File with the initial coordinates of all atoms in the system for the solvated system. - &nbsp;&nbsp; PLpro1_ZAFF_solv.pdb: PDB file of PLpro SARS-CoV-1 with solvated zinc. - &nbsp;&nbsp; PLpro1_ZAFF_solv.prmtop: Topology file used for molecular dynamics simulations. - &nbsp;&nbsp; PLpro1_ZAFF_tleap.in: TLEAP input file used to build the system. - &nbsp;&nbsp; PLpro1_ZAFF_tleap.out: Output with program execution information. - &nbsp;&nbsp; PLpro2.pdb: Zinc-free PLpro SARS-CoV-2 PDB file. - &nbsp;&nbsp; PLpro2.prmtop: Topology file used for molecular dynamics simulations. - &nbsp;&nbsp; PLpro2.rst7: Zinc-free PLpro SARS-CoV-2 atomic coordinate file - &nbsp;&nbsp; PLpro2_1.pdb: PDB file of PLpro SARS-CoV-2 without solvated zinc. - &nbsp;&nbsp; PLpro_tleap.in: TLEAP input file used to build the system. - &nbsp;&nbsp; PLpro_tleap.out: Output with program execution information. - &nbsp;&nbsp; PLpro2_zn.pdb: PDB file of PLpro SARS-CoV-2 with zinc. - &nbsp;&nbsp; PLpro2_ZAFF_dry.inpcrd: File with the initial coordinates of all atoms in the system. - &nbsp;&nbsp; PLpro2_ZAFF_dry.pdb: PDB file with the initial coordinates of all atoms in the system. - &nbsp;&nbsp; PLpro2_ZAFF_dry.prmtop: Topology file for the starting coordinates of all atoms in the system. - &nbsp;&nbsp; PLpro2_ZAFF_solv.inpcrd: File with the initial coordinates of all atoms in the system for the solvated system. - &nbsp;&nbsp; PLpro2_ZAFF_solv.pdb: PDB file of PLpro SARS-CoV-2 with solvated zinc. - &nbsp;&nbsp; PLpro2_ZAFF_solv.prmtop: Topology file used for molecular dynamics simulations. - &nbsp;&nbsp; PLpro2_ZAFF_tleap.in: TLEAP input file used to build the system. - &nbsp;&nbsp; PLpro2_ZAFF_tleap.out: Output with program execution information. &nbsp; + File descriptions in PCA folder &nbsp; - &nbsp;&nbsp; evecs.dat: File with the atomic coordinates used to reconstruct the free energy profiles for each system, the projections on the first three eigenvectors, PC1, PC2, PC3. - &nbsp;&nbsp; project.dat: Files with the vectors that were projected into the free energy profiles, the average projection of each system was projected for a better visualization of the displacement of the structural differences in each system. - &nbsp;&nbsp; \"Figure\"12.png: figures related to the projections of PC1x PC2, which are the highest amplitude and intrinsic movements of the protein. - &nbsp;&nbsp; \"Figure\"13.png: figures related to the projections of PC1x PC3, which are the most internal movements of the protein. - &nbsp;&nbsp; \"Figure\"23.png: figures related to the projections of PC2x PC3, which are the most internal movements of the protein. - &nbsp;&nbsp; \"clusters\".pdb: Clusters most representative of the molecular dynamics simulation for each system. - &nbsp;&nbsp; \"cluster\".dat: Files with clustering information. - &nbsp;&nbsp; \"cluster\".sum: Files with clustering information.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/10992424/files/all_data.zip/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Data for: \"Isotope effects in Eley-Rideal abstraction of Hydrogen from Tungsten surfaces: the role of dissipation\" manuscript.",
+    "doi": "10.5281/zenodo.13970565",
+    "abstract": "This dataset contains the molecular dynamics simulation data used in the manuscript \"Isotope effects in Eley-Rideal abstraction of Hydrogen from Tungsten surfaces: the role of dissipation.\" The simulations investigate the influence of isotope substitutions (H, D, T) on the recombination dynamics of hydrogen isotopes on tungsten surfaces (W(100) and W(110)). The dataset includes the input files and results for quasi-classical trajectory simulations, detailing the energy dissipation to both electrons and phonons through the Local Density Friction Approximation (LDFA) and Generalized Langevin Oscillator (GLO) models. These data support the conclusions regarding the role of projectile mass in determining the dissipation pathways and reaction outcomes. This dataset is relevant for researchers interested in surface science, fusion plasma interactions, and theoretical modeling of energy dissipation mechanisms.",
+    "keywords": [
+      "Molecular dynamics simulations",
+      "Eley-Rideal recombination",
+      "Electron-hole pair excitations",
+      "Quasi-classical trajectory simulations"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/13970565/files/FIG-data.tar/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Casmaria boblehmani Fedosov & Olivera & Watkins & Barkalova 2014, sp. nov.",
+    "doi": "10.5281/zenodo.3851687",
+    "abstract": "Casmaria boblehmani sp. nov. urn:lsid:zoobank.org:act: FA0142B4-BEF4-4F08-8BFD-C0870F39DC88 Fig. 2 Casmaria ponderosa &ndash; Robin 2008: 145, fig. 5 &mdash; Buijse et al. 2013: 13, fig. 25-2 [middle specimen], pl. 6, figs 6, 8, 13, pl. 7, figs 1, 5, 8-10, 12-15, 17, pl. 8, fig. 1,?pl. 10, fig. 11. Etymology This species is named to honor I. Robert (Bob) Lehman, a great scientist, mentor and teacher. One of the authors (BMO) has been the grateful direct beneficiary of his remarkable generosity. Type material Holotype Molecular voucher Casm.5, 36.3 mm, Danajon Banks, off Olango Island, Cebu, Philippines, 10&deg;17.8&rsquo; N, 124&deg;05.3&rsquo; E, 10-25 m, coll. local diver, Jun. 2012, ANSP-453749 (Fig. 2A-C). Paratypes 1 (35.1 mm) and 2 (34.8 mm, molecular voucher Casm. 7), same locality as holotype, ANSP-453750 (Fig. 2D-E). The holotype and paratype 2 provided the two DNA sequences labeled Casm. 7 and Casm. 5, respectively, in Fig. 1. Other material examined PHILIPPINES: 34.6 mm, off Masbate Island, Central Philippines, coll. local diver, BO collection; 34.9 mm, off Calituban Island, Bohol, 9 m, on mud, BO collection; 44.9 mm, off Cuyo Island, Palawan, 10-25 m, BO collection; 32.2 mm, Palawan Island, unknown locality, 10-15 m, BO collection. AUSTRALIA: 27.7 x 18.8 mm, tip of Cape Yorke, Queensland, BO collection (Fig. 2F). INDONESIA: 38.6 x 25.4 mm, off Woka Island, Molucca Sea, BO collection (Fig. 2G). VANUATU: juv., Expedition &ldquo; SANTO 2006&rdquo;, Stn. FR10, Belmoul Lagoon, 15&deg;36.7&rsquo; S, 167&deg;05.8&rsquo; E, 5-25 m, MNHN IM- 2007-33625; juv., Expedition &ldquo; SANTO 2006&rdquo;, Stn. FR03, Belmoul Lagoon entrance, 15&deg;36.2&rsquo; S, 167&deg;06.3&rsquo; E, 3-32 m, MNHN IM- 2007-33628 (Fig. 1A). FIJI: 41.5 x 24.2 mm, off Akuilan Island, ANSP 276463 (Fig. 2H-I). SOCIETY ISLANDS: 36.5 x 24.6 mm, Atiue, Tahiti, ANSP 266122 (Fig. 2K-L). Description Adult shell small to medium-sized, solid, glossy, ovate-elongate with very prominent terminal varix, studied specimens 34.8-36.3 mm high. Proportions of shell vary considerably, ratio of shell breadth to height 0.58-0.7. Protoconch of about 4 smooth, evenly convex whorls. Teleoconch of 4-5 whorls; early spire whorls evenly convex, with no sculpture. Last adult whorl and in most specimens penultimate whorl with row of glossy nodules (6 to 12 on last whorl), weakly developed in some specimens (Fig. 2D-E), prominent in others (Fig. 2 G). Due to nodules, late whorls distinctly shouldered; shoulder situated at mid-height of penultimate whorl and adapical quarter of last adult whorl. Aperture ovate, outer lip strongly thickened, drawn upwards, with wide, shallow sinus in upper side. Interior of outer lip with distinct dentition. Apertural varix very prominent, thick, with ten brownish-black blotches on abapertural face; adapertural face with seven or eight well-developed spines directed transversally to apertural plane. Their positions correspond approximately with black blotches on abapertural face. Columellar shield solid, white, heavily callused, with numerous spiral wrinkles in some specimens. Last adult whorl of pinkish, tan, or pale brown background color, with indistinct brown spiral stripes and a row of brown to blackish-brown spots below suture. Siphonal canal with black blotch. Interior of aperture pale brown. Tip of protoconch brown. . Remarks Specimens that are most appropriately assigned to Casmaria boblehmani sp. nov. are found at sites in eastern Indonesia, northern Australia (Northern Territory and Queensland), Vanuatu and the South Pacific. The largest specimen (51.8 mm) that we can confidently assign to C. boblehmani sp. nov. is known from the Philippines (Buijse et al. 2013: pl. 6, fig. 13). In the Philippines C. boblehmani sp. nov. occurs syntopically with C. ponderosa , C. erinaceus and C. turgida . All four species co-occur in sandy patches at depths of 1 to 30-40 meters. Characters allowing the unequivocal recognition of Casmaria boblehmani sp. nov. and the delimitation of the Casmaria species described to date are summarized in Table 2. Casmaria ponderosa and C. boblehmani sp. nov. can be distinguished from each other by the number and arrangement of brown blotches on the dorsal side (abapertural face) of the terminal varix: C. ponderosa has five major blotches and two to three intermediate strokes, while C. boblehmani sp. nov. has nine to ten blotches of equal or subequal size, evenly distributed along the varix of most specimens. Another character, although less stable, is a row of spots on the shell base, posterior to the siphonal canal. These are always distinct in C. ponderosa , but are missing in most specimens, or in rare cases present but indistinct, in C. boblehmani sp. nov. Specimens of Casmaria erinaceus can easily be distinguished from both C. ponderosa and C. boblehmani sp. nov. by the absence of dentition on the inner surface of the outer lip and by the presence of only three or four (very rarely five) spines restricted to the anterior edge of the outer lip, directed forward. The anterior edge of the outer lip is drawn slightly forward and abaxially. Both C. ponderosa and C. boblehmani sp. nov. have distinct dentition on the inner surface of the outer lip and have six or more spines directed transversely to the apertural plane, located along the anterior and medial edges of the outer lip. Most of these characters were mentioned by Abbott (1968) and Buijse et al. (2013) as allowing discrimination between C. erinaceus and C. ponderosa . Casmaria boblehmani sp. nov. can be readily distinguished from Casmaria turgida (Reeve, 1848). The latter species is rather conservative in morphology throughout its range (Buijse et al. 2013) and has a shell with evenly convex whorls, notable because of the characteristic zigzag color pattern. Besides that, C. turgida exceeds all co-occurring Casmaria forms in size. Unfortunately, C. turgida is missing in our molecular dataset. However, the conservative morphology of this species and its sympatry on a small scale with C. erinaceus , C. ponderosa and C. boblehmani sp. nov. at a number of Indo-Pacific localities prove that it is a distinct species. Despite the fact that C. ponderosa , C. boblehmani and C. turgida in most cases can be distinguished from each other confidently by the combination of characters discussed above, these characters may intergrade to a certain extent, creating somewhat intermediate forms that may be difficult to interpret. Buijse et al. (2013: pl. 6, figs 6, 8, pl. 9, fig. 15) depicted a few specimens of intermediate appearance that we are not certain where to assign. All these specimens have smooth shells intermediate between C. ponderosa and C. turgida in size (48-51 mm). Among the other Casmaria species not occurring sympatrically with C. boblehmani sp. nov., C. unicolor (Pallary, 1926) is probably the most similar. As in other Casmaria species, C . unicolor varies significantly in sculpture and encompasses both smooth and nodulose forms, and the nodulose form closely resembles C. boblehmani sp. nov. (see Buijse et al. 2013: pl. 22). These two forms seem to differ in the number of spines on the outer lip. C. boblehmani sp. nov. possesses seven to eight spines, while C . unicolor has 10-12, and they are located along the entire length of the lip in many specimens, reaching the adapical angle of the aperture. Apart from that, C. unicolor can be distinguished by its more inflated upper (adapical) whorl profile and more clearly distinguished, weakly flattened sutural ramp, giving it a wider, more stepped spire outline. Casmaria unicolor is restricted to the Red Sea (Fig. 3), and the widely distant distributions of this species and C. boblehmani sp. nov. suggest that these two forms are sufficiently divergent to be considered as separate species. The three species Casmaria cernica (G. B. Sowerby III, 1888), C. perryi (Iredale, 1912) and C. atlantica Clench, 1944 are extremely similar to each other. They are characterized by being narrower in outline and with a narrower terminal varix than C. boblehmani sp. nov. Besides that, all three mentioned species share the same arrangement of dark blotches on the dorsal side of the apertural varix as in C. ponderosa : five major blotches with one or two intermediate strokes between each major pair. In comparison with Casmaria boblehmani sp. nov., C. kalosmodix (Melvill, 1883) has a much larger, far more elongate and more narrowly varicate shell with narrow axial color lines that are not present in other Casmaria species, and with no spines on the outer lip. As in C. boblehmani sp. nov., the blotches on the abapertural face of the varix in C. kalosmodix are narrow, but in the latter species they are grouped in 3-4 clusters, separated by wide interspaces. Another species, Casmaria kayae Buijse, Dekker &amp; Verbinnen, 2013, in general resembles C. erinaceus . C. boblehmani sp. nov. can easily be distinguished from C. kayae by the number and position of spines on the outer lip and by the color pattern. C. kayae has three or four (five in a few specimens) spines on the anterior portion of the lip, and these are directed forward. Many specimens have a distinctive zigzag color pattern, quite different from the usual coloration of C. boblehmani sp. nov. Finally, C. beui Buijse, Dekker &amp; Verbinnen, 2013, from Western Indian Ocean, can easily be distinguished from C. boblehmani sp. nov. by its small size, its smooth, thin, relatively very wide shell with distinctively inflated whorls, and by its characteristic color pattern, resembling that of C. turgida . Distribution Casmaria boblehmani sp. nov. is widely distributed across the Pacific Ocean: from the Philippines, eastern Indonesia, northern Australia, to Fiji and the Society Islands, and (based on specimens illustrated by Buijse et al. 2013) to Hawaii (Fig. 3). Possibly reaches India (based on the specimen illustrated by Robin 2008).",
+    "keywords": [
+      "Biodiversity",
+      "Taxonomy",
+      "Animalia",
+      "Mollusca",
+      "Gastropoda",
+      "Littorinimorpha",
+      "Cassidae",
+      "Casmaria",
+      "Casmaria boblehmani"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/3851687/files/treatment.html/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Molecular Dynamics",
+    "doi": "10.1038/031461a0",
+    "abstract": "n/a",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/1937239/files/article.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Molecular Dynamics",
+    "doi": "10.1038/031503a0",
+    "abstract": "n/a",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/1845791/files/article.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "A molecular perspective on Tully models for nonadiabatic dynamics",
+    "doi": "10.1039/d0cp01353f",
+    "abstract": "Over the past decades, an important number of methods have been developed to simulate the nonadiabatic dynamics of molecules, that is, the dynamics of molecules beyond the Born&ndash;Oppenheimer approximation. These nonadiabatic methods differ in the way they approximate the dynamics emanating from the time-dependent molecular Schr&ouml;dinger equation. In 1990, Tully devised a series of three one-dimensional model systems to test the approximations of the method called trajectory surface hopping. The Tully models were designed to probe different scenarios of nonadiabatic processes, such as single and multiple nonadiabatic (re)crossings. These one-dimensional models rapidly became the testbed for any new nonadiabatic dynamics strategy. In this work, we present a molecular perspective to the Tully models by highlighting a correspondence between these simple one-dimensional models and processes happening during the excited-state dynamics of molecules. More importantly, each of these nonadiabatic processes can be connected to a given exemplary molecular system, and we propose here three molecules that could serve as molecular Tully models, reproducing some of the key features of the original models but this time in a high-dimensional space. We compare trajectory surface hopping with the ab initio multiple spawning for the three molecular Tully models and highlight particular features and differences between these methods resulting from their distinct approximations. We also provide all the necessary information &ndash; initial conditions and all required parameters for the dynamics as well as the electronic structure &ndash; employed in our simulations such that the molecular Tully models can become in the future a unified and standardized test for ab initio nonadiabatic molecular dynamics methods. The molecular Tully models also offer an exciting link between the world of low-dimensional model systems for nonadiabatic dynamics and the excited-state dynamics of molecular systems in their full dimensionality.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4737788/files/PCCPGOLD%20d0cp01353f.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Computational Dissection of Mutation-Driven Allosteric Modulations and Remodelling of the Conformational and Energetic Landscapes in EGFR Exon 19 Deletion and L747P Variants: A Multiscale Approach to Decipher Dual-Mode Afatinib Binding Mechanisms",
+    "doi": "10.5281/zenodo.17589021",
+    "abstract": "The entire dataset of molecular dynamics ,movie of molecular dynamics simulation, Well tempered metadynamics ,BFEE2 (alchemical) free energy calculation.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17589021/files/supporting_data_exon19_l747p.zip/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Loop Evolutionary Patterns Shape Catalytic Efficiency of TRI101/201 for Trichothecenes: Insights into Protein-Substrate Interactions",
+    "doi": "10.5281/zenodo.8198147",
+    "abstract": "Topology, parameter and structure files of the i) Conventional Molecular Dynamics (CMD) simulation of FgTRI101 with DON and FoTRI201 with DON, ii)&nbsp;Steered Molecular dynamics (SMD) simulations of FgTRI101 with DON and FoTRI201 with DON and&nbsp;iii) Conventional Molecular Dynamics (CMD) simulation of FgTRI101 with DON and FoTRI201 with DON and&nbsp;acetyl CoA.&nbsp;An explanatory document (workflow.txt)&nbsp;for guiding the reproduction of this experiment is also attached to this folder.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/8198147/files/MD%20files.zip/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "DockSurf: A molecular modeling software for the prediction of protein/surface adhesion. Molecular dynamics dataset",
+    "doi": "10.5281/zenodo.7817095",
+    "abstract": "Dataset for molecular dynamics simulations of the article: DockSurf: A molecular modeling software for the prediction of protein/surface adhesion. &nbsp;",
+    "keywords": [
+      "Molecular Dynamics"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7817095/files/Apolipoprotein.tar.gz/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Targeting glial cells by Organic anion transporting polypeptide 1C1 (OATP1C1) -utilizing L-Thyroxine-derived prodrugs",
+    "doi": "10.5281/zenodo.7861415",
+    "abstract": "These files contain the molecular docking results and molecular dynamics related stuff. Molecular Dynamics simulation data and simulation interaction data&nbsp;of compounds 1-8, apo, T4.&nbsp; Docking pose results for OATP1C1, OATP1A2, mouse oatp1a4, oatp1c1, oatp1a5, oatp1a6. &nbsp;",
+    "keywords": [
+      "molecular dynamics, docking, OATP1C1, transporter"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7861415/files/Compound8_OATP1C1_MD_5runs.zip/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Fighting antimicrobial resistance: insights on how the S. aureus NorA Efflux Pump Recognizes 2-phenylquinoline Inhibitors by Supervised Molecular Dynamics (SuMD) and Molecular Docking Simulations",
+    "doi": "10.5281/zenodo.7798718",
+    "abstract": "Topology, parameter and coordinates files of the i) plain molecular dynamics (MD) performed on the NorA apo structure (PDB ID: 7LO8; NorA-MD directory) and ii)&nbsp;supervised Molecular dynamics (suMD) simulations of NorA with in-house EPI (NorA-PQQ16P-suMD directory) &nbsp;",
+    "keywords": [
+      "antimicrobial resistance, efflux pump, NorA efflux pump, NorA EPI, molecular dynamics, Supervised Molecular Dynamics"
+    ],
+    "open_license": false,
+    "download_url": null,
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Investigation of unprecedented sites and proposition of new ligands for programmed cell death protein I through molecular dynamics with co-solvents and virtual screening",
+    "doi": "10.5281/zenodo.5999136",
+    "abstract": "This public repository contains files of molecular dynamics simulation performed on the following paper:&nbsp; Investigation of unprecedented sites and proposition of new ligands for programmed cell death protein I through molecular dynamics with co-solvents and virtual screening.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5999136/files/long_MD.rar/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Attosecond core-level absorption spectroscopy reveals the electronic and nuclear dynamics of molecular ring opening",
+    "doi": "10.1038/s41566-024-01436-9",
+    "abstract": "We show that attosecond core-level spectroscopy is a powerful tool for investigating molecular dynamics due to its combined attosecond temporal resolution and the broad coherent spectrum that allows deciphering the signatures of nuclear and electronic motion through their different energetic signatures. The method reveals that the correlated real-time electronic and nuclear wavepacket dynamics and non-adiabatic transitions across conical intersections identify electronic and nuclear coherences and directly register symmetry changes in the X-ray absorption spectrum. We demonstrate the method's efficacy to unveil the entire time history of the ring-opening dynamics of furan. The investigation establishes attosecond core-level spectroscopy as a potent method to investigate the real-time dynamics of photochemical reaction pathways in molecular systems. Attosecond core-level spectroscopy is used to probe the ultrafast molecular dynamics of furan at the carbon K-edge, demonstrating its ability to simultaneously probe electronic and vibrational dynamics.",
+    "keywords": [
+      "Astronomia / física",
+      "Atomic and molecular physics, and optics",
+      "Electronic, optical and magnetic materials",
+      "Optics",
+      "Physics, applied",
+      "Química"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/13685242/files/Furan-deposit.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Ionic Shielding of Electrostatic Interactions of Fibrinogen during Aggregate Formation: a Molecular Dynamics Study",
+    "doi": "10.5281/zenodo.17780806",
+    "abstract": "Directory for files from molecular dynamics simulation and analysis scripts of our publication \"Ionic Shielding of Electrostatic Interactions of Fibrinogen during Aggregate Formation: a Molecular Dynamics Study\". This archive contains four zip files: Simulationfiles_ECC_compress.zip and Simulationfiles_noECC_compress.zip, which contain the structures (.pdb) , force field parameters (toppar), and trajectory files (.xtc) for molecular dynamics simulations of scaled (ECC) and unscaled (noECC) systems in GROMACS format. MDP files are also given Analysis scripts used for the calculation of density distribution, residence time, diffusion coefficient, and electrostatic potential in the publication are also provided here.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17780806/files/mdpfiles.zip/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Allosteric rescue of catalytically impaired ATP phosphoribosyltransferase variants links protein dynamics to active-site electrostatic preorganisation",
+    "doi": "10.5281/zenodo.7077771",
+    "abstract": "Topologies and molecular dynamics files to run simulations of the nonactivated and activated ATP phosphoribosyltransferases.",
+    "keywords": [
+      "ATP phosphoribosyltransferases",
+      "allostery",
+      "molecular dynamics inputs",
+      "molecular dynamics parameters"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7077771/files/eq_nvt_1.in/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "THE MOLECULAR INTERACTION PATTERN OF LENVATINIB ENABLES INHIBITION OF WILD-TYPE OR KINASE-MUTATED FGFR2-DRIVEN CHOLANGIOCARCINOMA",
+    "doi": "10.5281/zenodo.7456830",
+    "abstract": "Enclosed are the molecular dynamics simulations of drug&ndash;FGFR2 systems and the MM-GBSA raw data. The zip archives include the molecular dynamics trajectory files in Desmond Maestro format (*_trj;&nbsp;*-out.cms), the naming of zip archives is as following: Drug_Studied FGFR2 mutant. MM-GBSA raw data is attached in the csv format. &nbsp;",
+    "keywords": [],
+    "open_license": false,
+    "download_url": "https://zenodo.org/api/records/7456830/files/Pemigatinib_N549K_mmgbsa-prime-out.csv/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Molecular dynamics trajectory files",
+    "doi": "10.5281/zenodo.7680485",
+    "abstract": "分子动力学轨迹文件",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7680485/files/Molecular%20dynamics%20trajectory%20files.zip/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "MD input files and post-processing files for graphene/h-BN superlattice monolayers",
+    "doi": "10.5281/zenodo.7029105",
+    "abstract": "This file contains related molecular dynamics input files and post-processing files for the manuscript &quot;Phonon thermal transport in graphene/h-BN superlattice monolayers&quot; (to be published). All the simulations are conducted in the open source molecular dynamics software called GPUMD with a version of 3.2, one could download the software freely and conveniently from https://github.com/brucefan1983/GPUMD .",
+    "keywords": [
+      "molecular dynamics",
+      "graphene",
+      "boron nitride"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7029105/files/data.zip/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Structural and Dynamic Insights into Agonist Recognition by and Function of the Thromboxane A2 Receptor: Implications for Disease-Causing Mutations",
+    "doi": "10.5281/zenodo.17848900",
+    "abstract": "The thromboxane A 2 receptor (TP), expressed in platelets and smooth muscle, plays an important role in blood clotting and muscle contraction. T he endogenous ligand of this G protein-coupled receptor (GPCR), thromboxane A 2 (TXA 2 ), is a short-lived arachidonic acid metabolite with a half-life of &sim; 30 seconds, which makes investigating the TP structure and activation mechanism highly challenging. Here, we determined the structures of the TP in complex with the synthetic agonists, U46619 and I-BOP, stable analogues of the natural ligand, in the presence of the signalling protein partner, G q . The structures reveal a unique activation switch for the receptor that differs from typical class A GPCR family members. Complemented by functional studies, mutational analysis, docking, and molecular dynamics (MD) simulations, our investigation highlights the differences between agonist and antagonist binding and explores the ligand entry mechanism to the binding pocket from within the membrane via a molecular gate composed of two transmembrane helices. In addition, our study provides crucial information to aid in the rational design of compounds targeting the TP, and offers mechanistic insights into inherited disorders associated with mutations in the TP. You will find the input files for MD simulations and an example of an MD trajectory for ligand binding. &nbsp; The paper will be published in Nature Communications.&nbsp;",
+    "keywords": [
+      "Molecular dynamics simulations"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17848900/files/classical_MD.zip/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Experimental determination of macro-kinetic calcination/carbonation data for the investigated Chinese and reference raw meal qualities",
+    "doi": "10.5281/zenodo.5556101",
+    "abstract": "A micro-fluidized bed thermogravimetric analysis (MFB-TGA) method based on real-time mass measurement of solid sample inside&nbsp; a fluidized bed was developed. This technique was used to measure the fast reaction kinetics of CaO carbonation in calcium looping with similar characteristics of a strong mass and heat transfer in the fluidized bed reactor. The effects of particle size, temperature, and CO2 concentration on the fast reaction kinetics of CaO carbonation were investigated. The experimental data measured upon MFB-TGA were interpreted with a K-L two-phase fluidized bed model to evaluate the effect of gas exchange between the bubble phase and the emulsion phase on the carbonation kinetics. We concluded that the kinetics of CaO carbonation measured by MFB-TGA were faster than those measured via regular TGA. The reaction rate constant (ks) was 8.0&times;10&minus;10 m4/(mol&middot;s), the activation energy of the carbonation reaction was near zero, and the reaction was first order when the CO2 concentration was within 50 vol% (1 bar). This MFB-TGA method provides a new experimental idea and method for measuring gas&ndash;solid reaction kinetics occurring inside fluidized bed reactors.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5556101/files/CLEANKER%20Deliverable%204.7_V1_Tsinghua.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "CaO carbonation kinetics determined using micro-fluidized bed thermogravimetric analysis",
+    "doi": "10.1016/j.fuel.2019.116823",
+    "abstract": "A micro-fluidized bed thermogravimetric analysis (MFB-TGA) method based on real-time mass measurement of solid sample inside a fluidized bed was developed. This technique was used to measure the fast reaction kinetics of CaO carbonation in calcium looping with similar characteristics of a strong mass and heat transfer in the fluidized bed reactor. The effects of particle size, temperature, and CO2 concentration on the fast reaction kinetics of CaO carbonation were investigated. The experimental data measured upon MFB-TGA were interpreted with a K-L two-phase fluidized bed model to evaluate the effect of gas exchange between the bubble phase and the emulsion phase on the carbonation kinetics. We concluded that the kinetics of CaO carbonation measured by MFB-TGA were faster than those measured via regular TGA. The reaction rate constant (ks) was 8.0&times;10&minus;10 m4/ (mol&middot;s), the activation energy of the carbonation reaction was near zero, and the reaction was first order when the CO2 concentration was within 50 vol% (1 bar). This MFB-TGA method provides a new experimental idea and method for measuring gas&ndash;solid reaction kinetics occurring inside fluidized bed reactors.",
+    "keywords": [
+      "Micro-fluidized bed thermogravimetric analysis (MFB-TGA) CaO carbonation reaction Kinetics"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5556085/files/1-s2.0-S0016236119321775-main.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Kinetics of Oxidation of Iodide Ion by lron(III) in the Presence of 2,2′-Bipyridyl",
+    "doi": "10.5281/zenodo.6197572",
+    "abstract": "School of Chemistry, Andhra University, Waltair-530 003 Manuscript received 7 October 1986, revised 20 April 1987, accepted 6 April 1987 2,2 &#39; -Bipyridyi accelerates the reaction between iron(III) and iodide Ion and the kinetics of this reaction has a different pattern from that of the uncatalysed reaction. The reaction obeys first order kinetics with respect to Fe III &nbsp;and a plot of&nbsp; \\(k'\\) l [I - ]vs [I - ] is linear with positive intercept, showing that the reaction has two rate-determining paths, one involving one iodide ion and the other too iodide ions. The hydrogen ion inhibits the reaction. A mechanism involving 1: 2 iron III -bipyridyl complex as the active species has been proposed.",
+    "keywords": [
+      "Oxidation",
+      "lron"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/6197572/files/463-466.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "EVIDENCE OF CARBOXY ESTER MECHANISMS IN NITRIFICATION FROM THE DYNAMIC REACTION KINETICS AT NATURAL CONCENTRATIONS. Part III. The Oxidation of Ammonia in Nitrification Follows Pseudo Half Order Kinetics Compatible with a Carboxy Ester Mechanism where Hydroxamic Acid is an Intermediate not Hydroxylamine.",
+    "doi": "10.5281/zenodo.17340863",
+    "abstract": "Ammonia pulse test experiments at different pHs were conducted on a submerged biofilter with fast recirculation acting as a batch reactor. The steady-state ammonia concentrations in an organic carbon substrate-free environment were similar to natural water courses and the introduced pulses were less than 1 mg / l of total ammonia nitrogen. At pH levels of 7.2 to 9.0 ammonia concentrations returned to the steady state values within 30 minutes, while a significant lag with a slower reaction was noted at a pH of 6.2. Integrated half-order plots have better correlations than the integrated Michaelis-Menten plots. Half-order reaction kinetics differs from Michaelis-Menten type kinetics in a subtle way, with a second molecule leaving in the equilibrium-binding step. At very low ammonia concentrations, as found in natural water courses, half-order kinetics results in faster reaction rates. Half-order kinetics is compatible with the theory that the reactions proceed via a carboxylic ester route, using ATP in a cyclic fashion, with iron-stabilized hydroxamic acid as the true intermediate in ammonia oxidation. The intermediate undergoes a hydrolysis reaction to nitrite and the ester is recycled. The mechanisms include features which allow efficient dynamic control and optimisation as demanded by evolution without extremely toxic hydroxylamine as an intermediate. Design equations are provided for the optimisation of nitrification filters at low and medium TAN concentrations, based upon half-order kinetics and liquid film diffusion. Similar experiments at very high ammonia concentrations, such as those in wastewater treatment, described in the literature indicate that the reaction kinetics, with pre-oxygenated water and favourable temperature conditions, then follows second-order kinetics compatible with a dimer reaction as given in the carboxy ester mechanisms. Data from the literature that examined nitrification in soils using high concentrations of urea indicate that under these conditions, the toxicity of nitrite and ammonia forces the production of nitrous oxides or given time to optimise the diffusion resistance is increased in the form of an intercellular gel.",
+    "keywords": [
+      "Nitrification, Pulse Testing, Reaction kinetics, Carboxy ester,Theorised mechanisms"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17340863/files/CarboxyEsterTheory3_9.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Kinetics and mechanism of chloramine-T oxidation of glycolic acid catalysed by PdII complex in alkaline medium",
+    "doi": "10.5281/zenodo.5772132",
+    "abstract": "Department of Chemistry, Chemical Kinetics Research Laboratory, T.D.P.G. College, Jaunpur-222 002, Uttar Pradesh, India E-mail : rasinghtdc@rediffmail.com Manuscript received 17 June 2011, revised 05 March 2012, accepted 14 March 2012 The kinetics of chloramine-T (CAT) oxidation of glycolic acid (GA) using alkaline solution of palladous chloride complex as homogeneous catalyst has been investigated at 308 K. A 1 : 1 stoichiometry has been observed. The reaction shows first-order kinetics at lower [CAT] but at its higher concentration first-order tends to zero order. A first-order dependence of the reaction on both [GA] and [Pd II ] was observed. An increase in the concentration of OH - ions increased the reaction rate, while addition of chloride ions decreased the rate of reaction. Added p -toluene sulphonamide (reduction product of chloramine-T) did not influence the reaction rate while zero effect of variation of ionic strength of the medium was observed. The overall activation parameters have been calculated from the Arrhenius plot. Mechanistic steps are suggested and the rate law derived was found in agreement with the observed kinetic results, stoichiometry and the reaction products.",
+    "keywords": [
+      "Kinetics",
+      "oxidation",
+      "chloramine-T",
+      "glycolic acid",
+      "PdII chloride",
+      "mechanism"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5772132/files/1671-1676.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Kinetic Study of Ag(l) Catalysed Oxidation of Glycine  by Ce(IV) in Perchloric Acid Medium",
+    "doi": "10.5281/zenodo.6348715",
+    "abstract": "Department of Chemistry, University of Allahabad, Allahabad-211 002 Manuscript received 25 January 1980, revised 9 July 1981, accepted 30 October 1981 The kinetics of Ag(l) catalysed oxidation of glycine by ceric perchlorate in perchloric acid solution are reported. The reaction follows first-order kinetics with respect to each Ce(IV), glycine and perchloric acid. The reaction rate is found to be accelerated by Ag(I). Formic acid and ammonia are found to be reaction products. A suitable mechanism involving formation of a transient complex [glycine-Ce(IV)] has been proposed.",
+    "keywords": [
+      "Perchloric Acid",
+      "Glycine",
+      "kinetic"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/6348715/files/59-62.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Studies on the Suppression of Polarographic Maxima of o-, m- and p-Chloronitrobenzenes by Some uni- and poly-Valent Cations and Anions vis-a-vis the Kinetics of the Electrode Reaction",
+    "doi": "10.5281/zenodo.6330476",
+    "abstract": "Department of Chemistry, Agra College, Agra-282 002 Manuscript received 26 March 1982, revised 21 January 1983, accepted 23 April 1983 The suppression of the polarographic negative maxima of o-,m- and p -chloronitrobenzenes in borax-boric acid buffer of p H 7.09 has been attempted at 25&plusmn;0.1⁰&nbsp;using some uni- and poly-valent cations and anions, viz., Na + , Ca 2+ , Al 3+ , and I - , CNS - , oxalate 2- , citrate 2- , as suppressors. The electrode reactions of the depolarizers have been found to be diffusion-controlled and irreversible in the presence of different amounts of these suppressors. The values of kinetic parameters (&alpha;n a &nbsp;and k o f , h ) have been calcu&shy;lated by Koutecky&#39;s method. Efficacies of uni- and poly-valent cations and anions in the suppression of the negative maxima of o -, m - and p -chloronitrobenzenes have been determined on the basis of &alpha;n a &nbsp;values. A tentative mechanism for the polarographic reduction of o-, m- and p -chloronitrobenzenes at p H 7.09 has also been postulated. The ease of reduction of three isomers at dme follows the order meta&gt; ortho&gt; para.",
+    "keywords": [
+      "Reaction",
+      "Electrode",
+      "Kinetics"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/6330476/files/647-651.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Cetyl pyridinium chloride catalysed reaction of acridine yellow with acidic chloramine-T",
+    "doi": "10.5281/zenodo.5811735",
+    "abstract": "Post Graduate Department of Chemistry, Madhav Science College (Vikram University), Ujjain-456 010, Madhya Pradesh, India E-mail : brijesh_pare@hotmail.com University of KwaZula-Natal, Durban. South Africa Manuscript received 11 October 2007, revised 17 October 2008, accepted 19 December 2008 The kinetics and mechanism of the uncatalyzed and cetyl pyridinium chloride (CPC) catalyzed oxidation of acridine yellow (3,6-diamino-2,7-dimethyl acridine hydrochloride) dye by chloramine-T in acidic media has been studied spectrophotometrically. With excess concentrations of other reactants, the reaction rate follows pseudo-first order kinetics with respect to acridine yellow. The uncatalyzed reaction has fractional order dependence on chloramine-T as well as on H + &nbsp;concentration. The catalyzed reaction follows fractional order kinetics in [CPC]. The cetyl pyridinium chloride, a cationic surfactant, catalysed the reaction even before its critical micelle concentration. This premicellar kinetics has been rationalized in the light of Piszkiewicz positive co-operativity model. The positive co-operativity index n = 1.95 has also been computed. The spectral shifts are the evidences of dye-surfactant and dye-surfartant-oxidant interactions. Variations of ionic strength has no influence on the reaction rate suggesting that neutral charged species are Involved in the rate-determining step. Increase in the addition of p - toluenesulfonamide resulted In decrease In rate constant values. The basic stoichiometric cquatioo is as follows : AV+ + ArSO 2 NHCI + H 2 O&nbsp;= P + + ArSO 2 NH 2&nbsp; + CH 3 CH 2 OH + CH 3 CN + 2HCI, whene P + = 7-aminoquinoline-2,3-dicarboxylic acid. On the basis of the product analysis pertinent mechanisms arc proposed. &nbsp;",
+    "keywords": [
+      "Chloramine-T",
+      "acridine yellow",
+      "cetyl pyridinium chloride"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5811735/files/582-587.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "A kinetic and mechanistic study of oxidation of N-Acetyl-DL-Methionine by pyridinium chlorochromate in aqueous DMF medium",
+    "doi": "10.5281/zenodo.13685185",
+    "abstract": "The Kinetics of Oxidative transformation of N-Acetyl-DL-Methionine by pyridinium chlorochromate in aqueous DMF medium, containing perchloric acid has been studied at 40 ℃. The rate of reaction was found to be of first order dependence on PCC, N-Acetyl-DL-Methionine, and H + ion Concentration. Michaelis&ndash;Menten type kinetics is observed respect to substrate. The increase in the rate of reaction with increase in acidity indicates the involvement of a protonated chromium(VI) species in the rate-determining step. The product of oxidation has been identified as N-Acetyl-DL-Methionine sulfoxide. The rate of reaction increased with increase in dielectric constant of the reaction medium. The activation parameters have been evaluated. On the basis of the experimental findings, a suitable mechanism and rate law has been proposed.",
+    "keywords": [
+      "Kinetics",
+      "Oxidation",
+      "DMF (N",
+      "N-dimethylformamide)",
+      "N-Acetyl-DL-Methionine",
+      "PCC (pyridinium chlorochromate)"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/13685185/files/GSCARR-2024-0311.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Interaction of catechol with FeIII tripodal ligand complex in aqueous surfactant medium : A kinetic approach",
+    "doi": "10.5281/zenodo.5595878",
+    "abstract": "Department of Chemistry, Arya Vidyapeeth College, Guwahati-781 016, Assam, India E-mail : gu_123456@yahoo.com Department of Chemistry, Gauhati University, Guwahati-781 014, Assam, India Manuscript received online 10 August 2016, accepted 19 August 2016 The oxygenation reaction of catechol (cat 2&ndash; ) with ferric complex [Fe(NTA)] (NTA = nitrilotriacetate) has been studied in aqueous surfactant medium. The oxygenation reaction is observed to follow pseudo-first order pathway in cationic, anionic and non-ionic surfactant medium. These rate constant values are validated and enzyme kinetics of the oxygenation reaction has also been thoroughly examined. The results of the kinetics experiment may be considered as dioxygenase enzyme mimics.",
+    "keywords": [
+      "Catechol",
+      "tripodal ligand",
+      "surfactant",
+      "oxygenation reaction",
+      "enzyme kinetics"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5595878/files/1351-1356.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "PROCESSING AND CHARACTERIZATION OF SIC FIBER REINFORCED TI-15V-3CR MATRIX COMPOSITES",
+    "doi": "10.5281/zenodo.15419834",
+    "abstract": "SiC/Ti-15V-3Cr metal matrix composites have been developed using the hot uniaxial pressing of an assembly of Ti-15V-3Cr foils stacked between uniaxial fiber mats. The interfacial microstructures and interfacial reaction kinetics were analyzed with respect to the reactivates of the interface and the relevant elements involved. The recrystallization of matrix materials played a great role in refining the matrix grain size, improving the diffusion bonding of matrix/matrix interface as well as fiber/matrix interface. A layer of chemical reaction products mainly consisting of titanium carbides was observed at the fiber/matrix interfaces. Limited reactions were observed compared with those that occurred in the SiC/Ti-6Al-4V system due to a lower processing temperature. This advantage was attributed to the temperature dependence of reaction driving-force. Three types of reaction mechanisms were suggested based on the controlling kinetics of reaction rate.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/15419834/files/pap768.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Kinetics and Mechanism of uncatalysed and Chloridecatalysed Oxidative Decarboxylation of Glycine and Aspartic Acid by Chloramine- T in Perchloric Acid Medium",
+    "doi": "10.5281/zenodo.7078834",
+    "abstract": "Department of Post-Graduate Studies and Research in Chemistry, Mangalore University, Mangalagangothri-574 199 Manuscript received 17 June 1986, raised 18 March 1987, accepted 23 July 1987 The kinetics of oxidative decarboxylation of glycine and L-aspartic acid by chloramine-T&nbsp;has been investigated both in the absence and presence of chloride ion in perchloric acid medium. In the absence of chloride ion, the rate followed second order kinetics in [CAT] o , first order in [substrate], inverse first order in [H + ] with both the amino acids. Chloride was found to enhance the rate of oxidation and affect the kinetics. In the presence of chloride, the rate followed first order kinetics in [CAT] o in both cases . But the rate was fractional and zero order in [substrate] with glycine and aspartic acid, respectively. The kinetic order in was also different, 8 \\(\\epsilon\\) . inverse fractional order and fractional order respectively with glycine and aspartic acid. The effect of chloride was more pronounced with aspartic acid. Effects of added reaction product and the variation of ionic strength and dielectric constant of the reaction medium have also been investigated. Reaction schemes in conformity with the observed kinetics have been proposed and the related rate laws derived. The constants of the rate limiting and other steps have been calculated in some cases.",
+    "keywords": [
+      "Kinetics",
+      "Aspartic Acid"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7078834/files/467-473.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "A kinetic study of photochemical oxidation of sucrose by chloramine-T in acidic medium",
+    "doi": "10.5281/zenodo.5785085",
+    "abstract": "School of Studies in Chemistry and Biochemistry, Vikram University, Ujjain-456 010, Madhya Pradesh, India E-mail : drshubhajain@yahoo.com, meenak.dr@gmail.com Govt. College, Barnagar (Vikram University), Ujjain, Madhya Pradesh, India E-mail : rekha.nagwanshi@gmail.com Manuscript received 18 March 2010, revised 29 December 2010, accepted 29 December 2010 The kinetics investigation of oxidation of sucrose by chloramine-T in acidic medium has been carried out in presence of visible light. The reaction has a first order dependence on chloramine-T. With excess concentration of other reactants the reaction rate follows a fractional order kinetics with respect to substrate. The reaction is catalysed by H +&nbsp; ions as well. A small salt effect and increase in reaction rate with increasing the intensity of light source is also observed. Addition of p-toluene sulphonamide retards the reaction rate. The various thermodynamic parameters have been calculated from the rate measurements at different temperatures.",
+    "keywords": [
+      "Kinetics",
+      "photochemical oxidation",
+      "sucrose",
+      "chloramine-T"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5785085/files/963-968.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "2D axisymmetric simulation of photocyclization reactions (probe reaction) in a capillary microreactor_support information_COMSOL Demo",
+    "doi": "10.5281/zenodo.11107170",
+    "abstract": "This is a COMSOL Demo for reaction simulation. The output results were used to verify the correctness of the established reaction kinetics from a plug flow assumption. Instructions are available on request.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/11107170/files/2st%20order_asymmertic_2D_PFA_20240503_200%20K%20mesh_40%25-100%25_Kapp%200.1519-0.3799_.mph/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Decomposition of Aqueous Hydrogen Peroxide by Colloidal Manganese Dioxide",
+    "doi": "10.5281/zenodo.5113212",
+    "abstract": "The kinetics of the decomposition of aqueous hydrogen peroxide by water-soluble colloidal manganese dioxide (obtained by reduction of potassium permanganate with sodium thiosulphate) has been studied in the absence and presence of aqueous perchloric acid solution. The reaction followed pseudo first order kinetics with respect to [MnO 2 ], fractional order with respect to [HClO 4 ] and first order kinetics with respect to [H 2 O 2 ].",
+    "keywords": [
+      "Hydrogen peroxide",
+      "perchloric acid",
+      "colloidal manganese dioxide"
+    ],
+    "open_license": false,
+    "download_url": null,
+    "curated": true,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Toward Quantitative Measurements of Enzyme Kinetics by Dissolution Dynamic Nuclear Polarization",
+    "doi": "10.1021/jz501411d",
+    "abstract": "Dissolution dynamic nuclear polarization (D-DNP) experiments enabled us to study the kinetics of the enzymatic phosphorylation reaction of glucose to form glucose-6-phosphate (G6P) by hexokinase (HK), with or without the presence of an excess of G6P, which is known to be an inhibitor of the enzyme. Against all expectations, our observations demonstrate that the phosphorylation of both alpha and beta glucose anomers occurs with comparable kinetics. The catalytic constant of the reaction was estimated based on a simple kinetic model tailored for hyperpolarized systems.",
+    "keywords": [],
+    "open_license": false,
+    "download_url": "https://zenodo.org/api/records/45370/files/article.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Extended Kinetic Studies on the Decarboxylation of α-Picolinic Acid in Organic Solvents",
+    "doi": "10.5281/zenodo.6381841",
+    "abstract": "Department of Petroleum Engineering, Indian School of Mines, Dhanbad-826 004 Manuscript received 30 August 1980, revised 11 June 1981, accepted 14 September 1981 The kinetics of decarboxylation of \\(\\propto\\) -picolinic acid in eight additional organic solvents has been studied under inert. atmosphere of nitrogen. The activation parameters of the reaction are calculated. The solvent effect on the kinetics of the reaction is discussed. The possibility of chelated picolinic acid molecule rather than zwitterion to act as an initial reactant Is favoured. An isokinetic temperature of 149 o &nbsp;is obtained.",
+    "keywords": [
+      "Nitrogen",
+      "Picolinic acid",
+      "Molecule"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/6381841/files/1063-1065.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Solvent effects in acid‐catalyzed biomass conversion reactions",
+    "doi": "10.1002/anie.201408359",
+    "abstract": "Reaction kinetics were studied to quantify the effects of polar aprotic organic solvents on the acid-catalyzed conversion of xylose into furfural. A solvent of particular importance is &gamma;-valerolactone (GVL), which leads to significant increases in reaction rates compared to water in addition to increased product selectivity. GVL has similar effects on the kinetics for the dehydration of 1,2-propanediol to propanal and for the hydrolysis of cellobiose to glucose. Based on results obtained for homogeneous Br&oslash;nsted acid catalysts that span a range of p K a values, we suggest that an aprotic organic solvent affects the reaction kinetics by changing the stabilization of the acidic proton relative to the protonated transition state. This same behavior is displayed by strong solid Br&oslash;nsted acid catalysts, such as H-mordenite and H-beta.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": null,
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Solvent Effect on the Kinetics of Reaction between Methyl Orange and Peroxydisulphate Ion in Presence of Bromide Ion - Separation into Transition State and Reactant Components",
+    "doi": "10.5281/zenodo.6299012",
+    "abstract": "School of Chemistry, Andhra University, Visakhapatnam-530 003 Manuscript received 14 February 1987, revised 26 February 1988, accepted 11 March 1988 Nuclear bromination&nbsp;was observed when methyl orange interacts with&nbsp; \\(S_2O_8^{2-}\\) &nbsp;in presence of bromide ion. The reaction obeys zero order kinetics in the dye whereas first order kinetics in H + , \\(S_2O_8^{2-}\\) &nbsp;and Br - . Thus, the kinetics pertain to the rate&middot; determining stage or peroxydisulphate- bromide reaction. The study in different acetic acid -water mixtures has shown that the rate increases with the Increase In acetic acid content. The separation of the solvent effect Into transition state and reactant components was accomplished from rate data and transfer free energies or&nbsp; \\(S_2O_8^{2-}\\) ,Br - and H + . The results indicate greater destabilisation of the reactants than transition state as acetic acid content is increased.",
+    "keywords": [
+      "Solvent Effect",
+      "Methyl Orange",
+      "Nuclear bromination",
+      "azo compound"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/6299012/files/329-332.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Studies of the Kinetics Between Chromium Peroxydichromate and Various Acids. Part I. Sulphuric Acid",
+    "doi": "10.5281/zenodo.6500467",
+    "abstract": "&nbsp;The kinetics of the reaction between chromium peroxydichromate and sulphuric acid has been studied by Ostwald&#39;s isolation method. The total order of the reaction has been found to be 2 and its&nbsp; mechanism has also been suggested.&nbsp;",
+    "keywords": [
+      "Sulphuric Acid",
+      "kinetics",
+      "isolation"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/6500467/files/133-136.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Development and evaluation of a re-sequenced intervention module in learning chemical bonding",
+    "doi": "10.11591/ijere.v14i6.31851",
+    "abstract": "In the typical high school chemistry curriculum, chemical bonding precedes the chemical reactions. In this study, the re-sequenced effect of learning chemical bonding when chemical reactions are introduced first among grade 9 learners was investigated. A learning module with re-sequenced intervention in chemical bonding was developed using analysis, design, development, implementation, evaluation (ADDIE) model and validated by eight science education professionals rated as very satisfactory. A quasi-experimental research design was utilized in the implementation phase with 129 respondents selected through cluster random sampling. Pre- and post-tests, formative and summative assessments, and evaluation surveys were administered. Evaluation results revealed that the scores from the re-sequenced intervention group displayed a slightly higher overall satisfaction percentage (99.06%) compared to the control group (94.74%). In addition, the experimental group achieved significantly higher competency levels (M=49.3, SD=19.4) compared to the control group (M=41.4, SD=15.3), with p=0.016 and d=0.37. Furthermore, students reported positive perceptions despite initial misconceptions. These findings highlight that re-sequencing topic order enhances chemistry learning outcomes and student engagement. Hence, the re-sequenced learning module became a valuable tool for enhancing understanding of chemical bonding, independent of baseline competency or attitudes toward the material.",
+    "keywords": [
+      "ADDIE model",
+      "Chemical bonding",
+      "Chemical reactions",
+      "Module development",
+      "Module evaluation",
+      "Proficiency level",
+      "Topic re-sequencing"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/18105067/files/54-31851%20IJERE%20DEC%202025.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Molecular Geometry as Relative Offset Systems: A Gap-Based Interpretation of Chemical Bonding",
+    "doi": "10.5281/zenodo.19245294",
+    "abstract": "This paper extends a geometric interpretation of elemental behavior into molecular systems by reframing chemical bonding as stable relative offset relationships (&ldquo;gaps&rdquo;) between atomic nodes. Rather than redefining chemical bonding, this framework interprets bond length, bond angle, and coordination geometry as manifestations of radial and angular spacing constraints. By analyzing molecules as organized gap systems, this approach provides a consistent structural lens that may support improved modeling of molecular stability, deformation behavior, and material design, particularly in polymer and biomaterial contexts.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": null,
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "POLAR COVALENT BONDING",
+    "doi": "10.5281/zenodo.20726070",
+    "abstract": "Polar covalent bonding is a chemical bond formed by the unequal sharing of electrons between atoms with different electronegativities. The concept of bond polarity is essential for understanding molecular geometry, intermolecular forces, solubility, and biochemical processes. Compounds such as water, ammonia, and hydrogen chloride possess polar covalent bonds and play important roles in living organisms and industrial applications. The study of polar covalent bonding helps explain the behavior of molecules in chemical reactions and the physical properties of matter.",
+    "keywords": [
+      "Polar Covalent Bonding, chemistry, inorganic compounds, chemical properties, industrial applications"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20726070/files/Qobilov%2029-30%20CHEMISTRY.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Influence use Media Learning Videoscribe to Results Study Students of SMPN 2 Rappang",
+    "doi": "10.59890/ijsas.v1i4.651",
+    "abstract": "The purposes of this research are to investigate:1) The differences in students learning outcomes between taught Videoscribe media and learning without Videoscribe media in class IX SMPN 2 Rappang. On chemical bonding materials 2) The influence of learning with Videoscribe media the learning outcomes in class IX SMPN 2 Rappang on chemical bonding material. The form of the research was quasy experiment with nonequivalent control group design. Sample selection technique was random sampling. The instrument of the research was of test. To find out the differences in student learning outcomes used the U-Mann Whitney test, based on the results of the hypothesis test obtained the value of Asymp. Sig. (2-tailed) of 0.033, the test results showed that there was a differences between students learning outcomes taught Videoscribe media and students learning outcomes taught without Videoscribe. Learning using Videoscribe learning media in class IX SMPN 2 Rappang on chemical bonding material giving the influence of 19.85% toward student learning outcomes.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/10776373/files/Influence+use+Media+Learning+Videoscribe+to+Results+Study+Students+of+SMPN+2+Rappang.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "«ХИМИЯЛЫҚ БАЙЛАНЫС» ТАҚЫРЫБЫН ПӘНАРАЛЫҚ ИНТЕГРАЦИЯ НЕГІЗІНДЕ ОҚЫТУДЫҢ МӘНІ",
+    "doi": "10.5281/zenodo.10113366",
+    "abstract": "Annotation: The importance of teaching the topic \"chemical bond\" with the method of interdisciplinary integration based on the integration of chemistry with physical science is emphasized. The relationship between physical concepts is carefully considered: chemical bond energy, bond length, angle between bonds, and the nature of chemical bonding and the reactivity of substances. Key words: chemical knowledge, chemical bond, interdisciplinary integration, formation of chemical bond, nature of chemical bond.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/10113366/files/112%20%D0%90%D0%BB%D1%88%D0%BE%D1%80%D0%B0%20%D0%90%D0%B9%D2%93%D0%B0%D0%BD%D1%8B%D0%BC%20%D0%BC%D0%B5%D0%B6%D0%B4%D1%83%D0%BD%D0%B0%D1%80%D0%BE%D0%B4%D0%BD%D1%8B%D0%B9%20%D0%BD%D0%B0%D1%83%D1%87%D0%BD%D1%8B%D0%B9%20%D0%B6%D1%83%D1%80%D0%BD%D0%B0%D0%BB.docx/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Chemical Applications of X-ray Spectroscopy",
+    "doi": "10.5281/zenodo.6330761",
+    "abstract": "Department of Chemistry, Regional Engineering College, Kurukshetra-132 119 The study or the X -ray absorption or X -ray emission spectrum or an atom in a molecule leads to important informations on the nature of chemical bonding (bonding sites, bond distance, bonding character, degree or covalency), valence state, coordination symmetry, and electronic structure of an atom In a molecule. The relation between the X -ray spectra and various solid state phenomena, such as valence state, bond distance, bonding character, and coordination symmetry are discussed. A number or examples have been presented to illustrate the various possibilities of the X -ray spectroscopy of the bonded atoms.",
+    "keywords": [
+      "Phenomena",
+      "Spectroscopy",
+      "Coordination"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/6330761/files/737-743.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Rectifying misconceptions on covalent bonding using cooperative learning, concrete models, and computer simulation: A case study",
+    "doi": "10.5281/zenodo.6975643",
+    "abstract": "The covalent bonding concept is perceived by students as abstract to comprehend and thus leads to the development of misconceptions. The inappropriate preconception on the subject is one of the contributing factors that lead to the development of misconceptions among the students. To this end, identifying and remediating learners&rsquo; misconceptions is vital for every individual teacher in order to cultivate sound scientific knowledge in their learners. This study aimed to explore two aspects: first, the misconceptions of the grade-ninth students on the covalent bonding concept. Second, the effectiveness of cooperative learning based on conceptual change instruction, the use of concrete models, and computer simulation in remediating those misconceptions. The study adopted a quantitative method. The sample comprised 20 students (n=20) studying in the ninth grade of Drukjegang Higher Secondary School in Bhutan. The misconceptions of the students were identified using two-tier diagnostic tests. The study revealed that students&rsquo; common misconceptions related to covalent bonding are concentrated under five themes: the kinds of atoms that form covalent bonding, how covalent bonding is formed, the kinds of covalent bonding, the characteristics of covalent compounds, and the Lewis dot structure and the octet rule. The data collected from the pre-test and post-test were analysed and compared to determine the effectiveness of the intervention strategies. The misconceptions of students in post-test have significantly reduced after the intervention was implemented. The study suggests the use of cooperative learning, concrete models, and computer simulation as an effective remediating means of delivering the concept of covalent bonding among the students. Implications of the findings are also discussed.The covalent bonding concept is perceived by students as abstract to comprehend and thus leads to the development of misconceptions. The inappropriate preconception on the subject is one of the contributing factors that lead to the development of misconceptions among the students. To this end, identifying and remediating learners&rsquo; misconceptions is vital for every individual teacher in order to cultivate sound scientific knowledge in their learners. This study aimed to explore two aspects: first, the misconceptions of the grade-ninth students on the covalent bonding concept. Second, the effectiveness of cooperative learning based on conceptual change instruction, the use of concrete models, and computer simulation in remediating those misconceptions. The study adopted a quantitative method. The sample comprised 20 students (n=20) studying in the ninth grade of Drukjegang Higher Secondary School in Bhutan. The misconceptions of the students were identified using two-tier diagnostic tests. The study revealed that students&rsquo; common misconceptions related to covalent bonding are concentrated under five themes: the kinds of atoms that form covalent bonding, how covalent bonding is formed, the kinds of covalent bonding, the characteristics of covalent compounds, and the Lewis dot structure and the octet rule. The data collected from the pre-test and post-test were analysed and compared to determine the effectiveness of the intervention strategies. The misconceptions of students in post-test have significantly reduced after the intervention was implemented. The study suggests the use of cooperative learning, concrete models, and computer simulation as an effective remediating means of delivering the concept of covalent bonding among the students. Implications of the findings are also discussed.",
+    "keywords": [
+      "Computer simulation",
+      "Concrete models",
+      "Cooperative learning",
+      "Covalent bonding",
+      "Two-tier diagnostic tests"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/6975643/files/P1.docx/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Misconceptions in chemical bonding and its remedial measure through constructivist strategies",
+    "doi": "10.5281/zenodo.5788402",
+    "abstract": "Union Christian Training College, Berhampore, Murshidabad, West Bengal, India Education College, Basantapur, Dumkal, Murshidabad, West Bengal, India Sponsored Teachers&#39; Training College, Purulia-723 101, West Bengal, India E-mail : bhimsttc@gmail.com Manuscript received online 05 June 2012, accepted 09 September 2012 Science educators have agreed that understanding of chemical bonding is the basis of chemistry education. In this field, many articles dealing with the problem of learning difficulties of students in the concept of mole, chemical equilibrium, solutions, electrochemistry and atomic structure can be found in the science education literature. Learning science is a cumulative process where new information is added to students&#39; existing knowledge, constructing the knowledge based on what they already have. What students do with information which is presented to them depends largely on what they already think and believe. Constructivist approach seems to be effective in providing meaningful learning. According to this approach, this kind of learning can take place only when the learner relates the new information to his already existing knowledge. Knowledge cannot be transmitted to the learner&#39;s mind from a textbook or by the teacher. Instead, students construct their knowledge by making links between their ideas and new concepts through experience they acquire in school or society. Teacher, thus, must help students&#39; correct alternative conceptions and. assist meaningful learning. In this article we have concentrated the basic misconceptions of students to explain different types of chemical bonds and advocate some measures to eradicate the misconceptions related to chemical bonding.",
+    "keywords": [
+      "Misconceptions",
+      "chemical bonding",
+      "constructive approach"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5788402/files/1269-1272.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Transfer of Heteroepitaxial Grown 3C-SiC Layers for Application in Optical Frequency Combs",
+    "doi": "10.4028/p-58x5tx",
+    "abstract": "We developed a process for the fabrication of SiCOI stacks which are a suitable platform for optical devices. Starting from 3C‑on‑Si samples the silicon substrate was removed by wet chemical etching and the remaining 3C‑SiC layers were bonded to two different low refractive substrates (Al 2 O 3 &nbsp;and polycrystalline SiC with a 3 &micro;m thick SiO 2 &nbsp;layer on top deposited by PECVD). We found that also bonding onto Al 2 O 3 &nbsp;was possible, the stability of the resulting stack wasn&acute;t strong enough for further processing. In contrast mechanical stable SiCOI stacks could be realized using the oxide coated polycrystalline SiC as substrate. Besides the substrate materials three different bonding approaches (hydrophilic, hydrophobic and adhesive bonding using an HSQ resist) as well as multiple process parameters were analyzed with regard to the bonding performance. The best results could be achieved using the adhesive bonding approach with a bonding temperature &ge; 400&deg;C, a process time &ge; 4 h and a bonding pressure of 96 N/cm 2 .",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/8341442/files/Transfer_of_Heteroepitaxial_Grown_3C-SiC_Layers_fo.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Development of Microsoft Powerpoint Learning Media on Chemical Bonding Material",
+    "doi": "10.5281/zenodo.10969761",
+    "abstract": "This Research has been conducted to development of Microsoft Powerpoint media on chemical bonding material. Based on observations and interviews with high school IT students Alfityan Aceh Besar shows the use of instructional media on chemical bonding material is still not applied in learning students that cause difficulty understanding about abstract material. The purpose of this study was to determine the feasibility of learning media developed and determine students' responses to the development of Microsoft Powerpoint media on chemical bonding material. The design of this study is the design of Research and Development (R&amp;D). The subjects of this study were 13 high school IT students Alfityan Aceh Besar. Data collection techniques using validation and questionnaires. Validation and response data were analyzed using quantitative descriptive techniques. The percentage of validation results obtained by the media expert validator was 77.9% and the percentage of material expert validators was 92.2%. So, the Microsoft Powerpoint learning media is categorized as suitable for use in chemical bonding material. The results of student responses to the Microsoft Powerpoint learning media that is 94.9% of students responded with very good criteria for the development of Microsoft Powerpoint media on chemical bonding material.",
+    "keywords": [
+      "Microsoft Powerpoint; Learning; Media; Student Responses; Eligibility; Chemical"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/10969761/files/Development%20of%20Microsoft%20Powerpoint%20Learning%20Media%20on%20Chemical%20Bonding%20Material%20(1).pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Enseñanza del enlace químico a través de un Módulo Instruccional  apoyado de Realidad Aumentada [Teaching chemical bonding through an Augmented Reality-supported instructional module]",
+    "doi": "10.13140/RG.2.2.19748.64647",
+    "abstract": "&nbsp; [Teaching chemical bonding through an Augmented Reality-supported instructional module] This thesis describes a proposal for teaching chemical bonding at the secondary level through an instructional module supported by Augmented Reality. This proposal stems from the observed difficulty students have in understanding this principle, coupled with a lack of resources that adequately illustrate and connect chemistry to the environment. To address this, an Instructional Module was designed, comprising four products that utilize Augmented Reality at different levels, following the PRADDIE Instructional Design methodology. It was subsequently implemented using the 5E instructional strategy with a secondary school group in the Guadalajara Metropolitan Area. The results of this initial implementation indicate a higher degree of learning retention for students using these techniques compared to those using conventional strategies for learning chemical bonding. The module also fosters the development of digital and collaborative skills suggested in the SEP (2011) curriculum, and participants reported positive user experiences during the training process, facilitating a dynamic learning experience of chemistry topics. It is hoped that this work will serve as an example for the development of other proposals that incorporate technologies with a pedagogical use for the teaching and learning of science at the basic education levels in Mexico. Recuperado de: https://hdl.handle.net/20.500.12104/80837",
+    "keywords": [
+      "Science Education",
+      "Technologies for learning",
+      "#5C21"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/19477214/files/Tesis%20Guillermo%20Pech.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "FIBER-MATRIX INTERFACE REINFORCEMENT USING ATOMIC LAYER DEPOSITION",
+    "doi": "10.5281/zenodo.15440655",
+    "abstract": "Atomic layer deposition (ALD) was investigated as a possible way to enhance the chemical bonding between the UHMWPE fibers and epoxy matrix without undermining the fiber tensile strength.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/15440655/files/GOU80316.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "EFFECT OF SIZING ON THE INTERFACIAL PROPERTIES OF CARBON FIBER/BMI UNDER DIFFERENT PROCESSING TEMPERATURE",
+    "doi": "10.5281/zenodo.15438760",
+    "abstract": "Diffusion temperatures have no obvious effect on the interfacial shear strength of composite, but interfacial chemical bonding plays a key role. Besides, sizing and its impact on fiber were analyzed.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/15438760/files/WUQ80165.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Integrating Computer Animation in Teaching of Chemical Bonding: Effect on  Students' Achievement",
+    "doi": "10.5281/zenodo.14885923",
+    "abstract": "Abstract &nbsp; This study investigated the effect of computer animation in teaching of chemical bonding on senior&nbsp; secondary school students&rsquo; academic achievement in Ogbia Local Government of Bayelsa State.&nbsp; Two research questions guided the study while three null hypotheses were formulated and tested&nbsp; at 0.05 level of significance. Quasi experimental research design was adopted for the study. The&nbsp; population for the study was 865 chemistry students from 30 public secondary schools. Taro&nbsp; Yamane formula was used to draw a sample size of 243 SS 1 chemistry students from four&nbsp; secondary schools. The instrument used for data collection was Chemical Bonding Achievement&nbsp; Test (CBAT) which was developed by the researchers and validated by three research experts.&nbsp; Kuder-Richardson 20 (K-20) formula was used to estimate the reliability of the instrument and a&nbsp; reliability index of 0.80 was obtained. The researchers facilitated a comprehensive two-week&nbsp; training programme within the schools, specifically tailored for the regular chemistry teachers.&nbsp; This program was designed to enhance their instructional skills, familiarize them with innovative&nbsp; teaching strategies, and improve their overall effectiveness in delivering chemistry lessons. The&nbsp; chemistry teachers for the experimental group used computer animation while the teachers for the&nbsp; control group used the conventional teaching method. Mean and standard deviation were used for&nbsp; answering the research questions while Analysis of Covariance was used to test the null&nbsp; hypotheses. The findings of the study revealed that students who were taught chemical bonding&nbsp; by integrating computer animation in the teaching process recorded increased achievement than&nbsp; their counterparts who were taught with the lecture method. The test of hypotheses also showed&nbsp; that the mean difference in achievement was significant, in favour of the students in the&nbsp; experimental group. Based on the findings, the study recommended among others that the&nbsp; government should provide chemistry teachers with computer facilities such as computers, storage&nbsp; devices and projectors which they need for preparing and teaching their lessons using computer&nbsp; animation.&nbsp;",
+    "keywords": [
+      "Computer Animation, Chemical Bonding, Academic Achievement"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/14885923/files/No.%2025%20(Pages%20107-117).pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "The Chemical Bond as Harmonic Synchronization",
+    "doi": "10.5281/zenodo.15396762",
+    "abstract": "This article introduces a new interpretation of chemical bonding under the Alkimi frame- work. Rather than viewing bonds as interactions between electrons or orbitals, Alkimi defines chemical bonds as synchronizations between elemental field nodes. This shift to a field-based ontology reveals resonance compatibility as the key to understanding bond formation, strength, polarity, and reversibility. It opens new avenues for modeling exotic bonds, reversible reactions, and quantum-coupled molecules.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": null,
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Effect of Computer Simulation Method on Gender Perspectives in Learning Chemical Bonding Concepts.",
+    "doi": "10.5281/zenodo.21338350",
+    "abstract": "Abstract: The persistent difficulty students face in understanding chemical bonding in High School chemistry, particularly in the contexts of limited laboratory resources, has prompted the exploration of innovative pedagogy such as Computer Simulation Instructional Method (CSIM). Grounded in Kolb&rsquo;s Experiential Learning Theory, this study examined the effectiveness of the CSIM in teaching chemical bonding and gender-related differences in learning at Senior High Technical School (SHTS). The research adopted quasi- experimental one-group pretest-posttest design with a quantitative approach. A purposive sample of 65 elective chemistry students from the Senior High Technical School participated in a five-week intervention period using an integrated PhET simulations in CSIM. Data were collected through pre- and post-intervention achievement tests and structured questionnaire. Data was analysed using descriptive statistics and paired t-tests. Results showed that CSIM significantly improved students&rsquo; performance. The findings revealed that both male and female learners benefited equally from the intervention, thus no statistically significant gender differences observed. Students also reported that CSIM enhanced their understanding, motivation, and engagement irrespective of infrastructural challenges such as limited devices and poor internet connectivity. The study concludes that CSIM is an effective and equitable instructional strategy for teaching chemical bonding in resource-constrained contexts. Therefore, it was recommended school management and policymakers within the study area invest in ICT infrastructure and teacher training to support Simulation-based instruction. Future research should investigate the combined impact of CSIM and hands- on laboratory activities on students&rsquo; conceptual and practical skills.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/21338350/files/Effect%20of%20Computer%20Simulation%20Method%20on%20Gender%20Perspectives%20in%20Learning%20Chemical%20Bonding%20Concepts.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Engineering Direction-Dependent Properties in 2D Hetero-Anionic Monochalcogenide Alloys",
+    "doi": "10.5281/zenodo.4395673",
+    "abstract": "Exploring beyond mono-elemental and binary two-dimensional (2D) nanomaterials is an important step to further engineer and functionalize well-known 2D nanomaterials for the next-generation technologies. In this work, using state-of-the-art first-principles electronic structure calculations and statistical sampling of structural configurations, we examine the influence of anionic exchange in two monolayer Group IV (namely, Ge- and Sn-based) monochalcogenides. Using chemical bonding analysis, we demonstrate that the link between anisotropic lattice properties and band structure-derived characteristics. We also show how this anisotropic in geometrical structure and chemical bonding may either strongly influence the direction-dependent optical responses or have a milder effect on direction-dependent thermoelectric power factor in these monolayer Group IV alloys. This allows one to consider the linear Vegard&#39;s relation for anionic engineering of monolayer Group IV alloys and further explore strong (and weak) anisotropy in their direction-dependent material properties.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4395673/files/structures.zip/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "ADHESIVE TECHNOLOGIES USED IN DENTISTRY.",
+    "doi": "10.5281/zenodo.13754175",
+    "abstract": "&nbsp; &nbsp; Due to the rapidly changing situation in the dental materials market, as a result of the constant emergence of new adhesive systems, it is important for the practitioner to choose an adhesive that gives reliable and durable results. Bonding systems differ from each other in many respects: chemical composition, physical properties, mechanism of action, etc. Despite this, the doctor at a clinical appointment is faced with a choice of which adhesive system to choose in a particular clinical case. Until recently, the development of dental adhesives was represented by five generations of bonding systems, the difference of which is the method of processing the smear layer. With first generation adhesives, conventional bonding methods were used with less hydrophilic enamel to provide a bond on highly hydrophilic dentin tissue: after etching, a universal adhesive was applied",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/13754175/files/Colloquium_I_%D1%81%D0%B5%D0%BD%D1%82%D1%8F%D0%B1%D1%80%D1%8F_%D0%B6%D1%83%D1%80%D0%BD%D0%B0%D0%BB_1_%D1%87%D0%B0%D1%81%D1%82%D1%8C%20_p33-34.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Chemical reactivity profile and bonding nature of cadmium chalcogenides fullerene",
+    "doi": "10.5281/zenodo.5644612",
+    "abstract": "Department of Physics, Assam University, Silchar-788 011, Assam, India E-mail: utpalchemiitkgp@yahoo.com Manuscript received online 23 April 2019, revised and accepted 15 May 2019 We present a detailed density functional theory study on the structural properties, chemical reactivity parameters and bonding analysis of cadmium chalcogenide fullerenes (Cd 12 X 12 , X = S, Se, Te) and compared them to their pristine counterpart, C 24 . The energetic stability via cohesive energy per atom indicates that the fullerenes are stable. Bond length elongation occurs on Cd 12 X 12 with increasing atomic size from S to Te. Cd 12 Te 12 shows high redox characteristic with the lowest ionization potential and highest electron affinity values. All these fullerenes can be used as UV light protectors. Lastly, to get insight into the nature of bonding character, here we performed bonding analysis based on Wiberg bond index and electron density analysis of these fullerenes.",
+    "keywords": [
+      "Density functional theory",
+      "pristine and cadmium chalcogenide fullerenes",
+      "chemical reactivity parameters",
+      "bonding analysis"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5644612/files/11%20-%20July%2019.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Analytical Approach on the Influence of Some Chemical Constituents of Palm Nut Shells on Nut Cracking",
+    "doi": "10.5281/zenodo.10715222",
+    "abstract": "ABSTRACT Some chemical constituents such as Carbon, Sulphur, Calcium, Nitrogen, Hydrogen and Sodium in palm nut shells of the Dura and Tenera nut varieties were investigated to establish its existence; then analyze its potential to encourage nut cracking. In this study, dried palm nuts were obtained from a local palm oil processing mill; and each variety graded into three size ranges based on their minor axis &nbsp; as follows: small size: &nbsp; &nbsp; 10 mm, medium size: 10 mm &lt; &nbsp; &nbsp; 20 mm, and large size: &nbsp; &gt; 20 mm. Well dried and crushed shell samples following nut cracking to remove kernels were prepared from each of the size ranges per nut variety. The selected chemical constituents were then determined and analyzed. Result showed that there is a significant difference among the constituents in the two varieties. More so, there is no statistically significant difference in the constituents between the two varieties. Also, the difference in interaction between constituent and variety was not significant. Technical analysis revealed that it is possible to weaken the shell bonding through reactions by appropriate chemical application to form high covalent bonding in order to enhance &nbsp;&nbsp; easy release of whole kernels when appropriate impact energy is applied.",
+    "keywords": [
+      "Chemical constituent, Nut shell, Cracking, Covalent bond, Nut varieties"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/10715222/files/EJAET-5-7-470-473.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Linking High-Harmonic Generation and Strong-Field Ionization in Bulk Crystals",
+    "doi": "10.1021/acsphotonics.3c01436",
+    "abstract": "The generation of high-order harmonics in bulk solids subjected to intense ultrashort laser pulses has opened up new avenues for research in extreme nonlinear optics and light&ndash;matter interaction on subcycle time scales. Despite significant advancement over the past decade, a complete understanding of the involved phenomena is still lacking. High-harmonic generation in solids is currently understood as arising from nonlinear intraband currents, interband recollision, and ionization-related phenomena. As all of these mechanisms involve or rely upon laser-driven excitation, we combine measurements of the angular dependence of nonlinear absorption and high-order harmonic generation in bulk crystals to demonstrate the relation between high-harmonic emission and nonlinear, laser-induced ionization in solids. An unambiguous correlation between the emission of harmonics and laser-induced ionization is found experimentally, which is supported by numerical solutions of the semiconductor Bloch equations and an analytical model of orientation-dependent ionization rates using maximally localized Wannier functions.",
+    "keywords": [
+      "Absorption",
+      "Crystal",
+      "Group Theory",
+      "Ionization",
+      "Magnesium oxide",
+      "high-harmonic generation",
+      "strong-field ionization",
+      "plasma formation",
+      "attosecond physics",
+      "strong-field physics",
+      "ultrafast optics",
+      "nonlinear optics"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/14603774/files/juergens_2024_10.1021-acsphotonics.3c01436.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Magnetic Field Mapping using Off-Axis Electron Holography in the Transmission Electron Microscope",
+    "doi": "10.3791/61907",
+    "abstract": "Off-axis electron holography is a powerful technique that involves the formation of an interference pattern in a transmission electron microscope (TEM) by overlapping two parts of an electron wave, one of which has passed through a region of interest on a specimen and the other is a reference wave. The resulting off-axis electron hologram can be analyzed digitally to recover the phase difference between the two parts of the electron wave, which can then be interpreted to provide quantitative information about local variations in electrostatic potential and magnetic induction within and around the specimen. Off-axis electron holograms can be recorded while a specimen is subjected to external stimuli such as elevated or reduced temperature, voltage, or light. The protocol that is presented here describes the practical steps that are required to record, analyze, and interpret off-axis electron holograms, with a primary focus on the measurement of magnetic fields within and around nanoscale materials and devices. Presented here are the steps involved in the recording, analysis, and processing of off-axis electron holograms, as well as the reconstruction and interpretation of phase images and visualization of the results. Also discussed are the need for optimization of the specimen geometry, the electron optical configuration of the microscope, and the electron hologram acquisition parameters, as well as the need for the use of information from multiple holograms to extract the desired magnetic contributions from the recorded signal. The steps are illustrated through a study of specimens of B20-type FeGe, which contain magnetic skyrmions and were prepared with focused ion beams (FIBs). Prospects for the future development of the technique are discussed.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7881992/files/Magnetic%20Field%20Mapping%20using%20Off-Axis%20Electron%20Holography%20in%20the%20Transmission%20Electron%20Microscope.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "The Analysis of the Ge VII spectrum. Inst. Spectrosc. Preprint no.11, 28 pp. (Troitsk, Moscow Region, Russia, 1986)",
+    "doi": "10.5281/zenodo.6133399",
+    "abstract": "The analysis of the 3d 8 &ndash; 3d 7 4p, 3p 6 3d 8 &ndash; 3p 5 3d 9 and 3d 7 4s &ndash; 3d 7 4p transitions in Ge VII is presented. Ge VII spectrum was excited in a vacuum spark with electric parameters: C = 1 &divide;10 &micro;F, L = 500 &divide; 1000 nH and U = 4 &divide; 10 kV. Spectrum in the wavelength range below 210&nbsp;&Aring; was recorded on a 3-m grazing incidence (5 o grazing angle) spectrograph having a grating with 3600&nbsp;l/mm. For the wavelengths above 700&nbsp;&Aring; a 6.65-m normal incidence spectrograph with the 1200&nbsp;l/mm grating was used. The wavelength uncertainties are estimated to be 0.004&nbsp;&Aring; in the short wavelength region and 0.007&nbsp;&Aring; in the long wavelength region. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The analysis resulted in the identification of 36 spectral lines of the 3p 6 3d 8 &ndash; 3p 5 3d 9 transitions in the range 123 &ndash; 142&nbsp;&Aring; and 235 lines of the 3d 7 4s &ndash; 3d 7 4p transitions in the range 671 &ndash; 987&nbsp;&Aring;. The wavelengths of the 3d 8 &ndash; 3d 7 4p transitions were remeasured and their identification was extended by 37 new lines. The 3d 8 &ndash; 3d 7 4p transition array consists now of 256 lines in the range 159 &ndash; 201&nbsp;&Aring;. All levels of the relevant configurations were found. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The Ge vii wavelengths presented in this Preprint were never published while the energy levels can be found in: L.I. Podobedova and A.N. Ryabtsev . Energy Levels of the First Excited Configurations of Ge&nbsp;VII. Opt. Spectrosc. 60 , 694&ndash;697 (1986).",
+    "keywords": [
+      "Atomic ion spectra, wavelengths, energy levels, transition probabilities, parametric calculations"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/6133399/files/Preprint.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "A cartridge-based turning specimen holder with wireless tilt angle measurement for magnetic induction mapping in the transmission electron microscope",
+    "doi": "10.1016/j.ultramic.2020.113098",
+    "abstract": "Magnetic induction mapping in the transmission electron microscope using phase contrast techniques such as off-axis electron holography and differential phase contrast imaging often requires the separation of the magnetic contribution to the recorded signal from the electrostatic contribution. When using off-axis electron holography, one of the experimental approaches that can be used to achieve this separation is to evaluate half of the difference between phase shift images that have been recorded before and after turning the sample over. Here, we introduce a cartridge-based sample mounting system, which is based on an existing on-axis tomography specimen holder and can be used to turn a sample over inside the electron microscope, thereby avoiding the need to remove the holder from the microscope to turn the sample over manually. We present three cartridge designs, which are compatible with all pole piece designs and can be used to support conventional 3-mm-diameter sample grids, Si3N4-based membrane chips and needle-shaped specimens. We make use of a wireless inclinometer that has a precision of 0.1&deg; to monitor the sample holder tilt angle independently of the microscope goniometer readout. We also highlight the need to remove geometrical image distortions when aligning pairs of phase shift images that have been recorded before and after turning the sample over. The capabilities of the cartridge-based specimen holder and the turning approach are demonstrated by using off-axis electron holography to record magnetic induction maps of lithographically-patterned soft magnetic Co elements, a focused ion beam milled hard magnetic Nd-Fe-B lamella and an array of four Fe3O4 nanocrystals.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7879014/files/A%20cartridge-based%20turning%20specimen%20holder%20with%20wireless%20tilt%20angle%20measurement%20for%20magnetic%20induction%20mapping%20in%20the%20transmission%20electron%20microscope.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Vibrational spectroscopy characterization of magnetron sputtered silicon oxide and silicon oxynitride films",
+    "doi": "10.5281/zenodo.14789042",
+    "abstract": "Vibrational (infrared and Raman) spectroscopy has been used to characterize SiO x N y and SiO x films prepared by magnetron sputtering on steel and silicon substrates. Interference bands in the infrared reflectivity measurements provided the film thickness and the dielectric function of the films. Vibrational modes bands were obtained both from infrared and Raman spectra providing useful information on the bonding structure and the microstructure (formation of nano-voids in some coatings) for these amorphous (or nanocrystalline) coatings. X-ray photoelectron spectroscopy (XPS) and scanning electron microscopy (SEM) analysis have also been carried out to determine the composition and texture of the films, and to correlate these data with the vibrational spectroscopy studies. The angular dependence of the reflectivity spectra provides the dispersion of vibrational and interference polaritons modes, what allows to separate these two types of bands especially in the frequency regions where overlaps/resonances occurred. Finally the attenuated total reflection Fourier transform infrared measurements have been also carried out demonstrating the feasibility and high sensitivity of the technique. Comparison of the spectra of the SiO x N y films prepared in various conditions demonstrates how films can be prepared from pure silicon oxide to silicon oxynitride with reduced oxygen content. &nbsp;",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/14789042/files/Vibrational%20spectroscopy%20characterization%20of%20magnetron%20sputtered%20silicon%20oxide%20and%20silicon%20oxynitride%20films.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Optogenetics in Brain Research: From a Strategy to Investigate Physiological Function to a Therapeutic Tool",
+    "doi": "10.3390/photonics6030092",
+    "abstract": "Dissecting the functional roles of neuronal circuits and their interaction is a crucial step in basic neuroscience and in all the biomedical field. Optogenetics is well-suited to this purpose since it allows us to study the functionality of neuronal networks on multiple scales in living organisms. This tool was recently used in a plethora of studies to investigate physiological neuronal circuit function in addition to dysfunctional or pathological conditions. Moreover, optogenetics is emerging as a crucial technique to develop new rehabilitative and therapeutic strategies for many neurodegenerative diseases in pre-clinical models. In this review, we discuss recent applications of optogenetics, starting from fundamental research to pre-clinical applications. Firstly, we described the fundamental components of optogenetics, from light-activated proteins to light delivery systems. Secondly, we showed its applications to study neuronal circuits in physiological or pathological conditions at the cortical and subcortical level, in vivo. Furthermore, the interesting findings achieved using optogenetics as a therapeutic and rehabilitative tool highlighted the potential of this technique for understanding and treating neurological diseases in pre-clinical models. Finally, we showed encouraging results recently obtained by applying optogenetics in human neuronal cells in-vitro",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/3541623/files/photonics-06-00092.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Microstructural insights into the coercivity enhancement of grain-boundary-diffusion-processed Tb-treated Nd-Fe-B sintered magnets beyond the core-shell formation mechanism",
+    "doi": "10.1016/j.jallcom.2021.158915",
+    "abstract": "We propose a dominant core-shell formation mechanism for grain-boundary-diffusion-processed (GBDP), Tb-treated, Nd2Fe14B sintered magnets. A depth-sensitive analysis of Tb-treated samples, relative to a non-GBDP Nd2Fe14B magnet, showed a 30% increase of the coercivity in the central part of the magnet. A structure-chemistry-magnetic-property analysis revealed the dominant GBDP mechanism. On the surface of the Tb-treated magnet, the Tb is released from the starting precursor following a cascade of chemical reactions between the Tb oxide and the Nd and/or the Nd-Fe-B. The released Tb diffuses along the grain boundaries, forming a core-shell structure. The calculated optimum concentration for a 30% increase in the coercivity was 50 ppm of Tb. Off-axis electron-holography measurements were used to quantitatively map the characteristic magnetic states of the samples, confirming a different magnetic domain structure in the shell than in the core. The magnetic induction in the core was found to be 26% higher than that of the shell, which has a lower magnetic saturation due to the presence of Tb. The results show that the measured increase in the coercivity is due to a structural effect, and not the magnetic contribution of the Tb. Our results pave the way towards grain-boundary-engineering studies that can be used to increase the coercivity of Nd-Fe-B magnets for e-mobility and eco-power applications.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7882888/files/Microstructural%20insights%20into%20the%20coercivity%20enhancement%20of%20grain-boundary-diffusion-processed%20Tb-treated%20Nd-Fe-B%20sintered%20magnets%20beyond%20the%20core-shell%20formation%20mechanism.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Continuous illumination picosecond imaging using a delay line detector in a transmission electron microscope",
+    "doi": "10.1016/j.ultramic.2021.113392",
+    "abstract": "Progress towards analysing transitions between steady states demands improvements in time-resolved imaging, both for fundamental research and for applications in information technology. Transmission electron microscopy is a powerful technique for investigating the atomic structure, chemical composition and electromagnetic properties of materials with high spatial resolution and precision. However, the extraction of information about dynamic processes in the ps time regime is often not possible without extensive modification to the instrument while requiring careful control of the operation conditions to not compromise the beam quality. Here, we avoid these drawbacks by combining a delay line detector with continuous illumination in a transmission electron microscope. We visualize the gyration of a magnetic vortex core in real space and show that magnetization dynamics up to frequencies of 2.3 GHz can be resolved with down to 122 ps temporal resolution by studying the interaction of an electron beam with a microwave magnetic field. In the future, this approach promises to provide access to resonant dynamics by combining high spatial resolution with sub-ns temporal resolution.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7883602/files/Continuous%20illumination%20picosecond%20imaging%20using%20a%20delay%20line%20detector%20in%20a%20transmission%20electron%20microscope.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Electron momentum spectroscopy and density functional theory investigation into the complete valence electronic structure of ethylene oxide",
+    "doi": "10.1088/0953-4075/32/13/313",
+    "abstract": "The technique of electron momentum spectroscopy has been employed to measure orbital momentum distributions for the complete valence electronic structure of ethylene oxide (C2H4O). The corresponding theoretical MDs were calculated using a plane wave impulse approximation model for the reaction mechanism and density functional theory for the wavefunction. Seven basis sets, at the local density approximation level and, additionally, one further that incorporated nonlocal correlation functional corrections, were studied. A critical comparison between the experimental and theoretical MDs allows us to determine the `optimum&#39; wavefunction from our basis sets. This wavefunction is then used to derive ethylene oxide&#39;s chemically interesting molecular properties, which are subsequently compared with the results of other workers.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4027070/files/Electron%20momentum%20spectroscopy%20and%20density%20functional%20theory%20investigation%20into%20the%20complete%20valence%20electronic%20structure%20of%20ethylene%20oxide.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Theoretical and (e,2e) Experimental Investigation into the Complete Valence Electronic Structure of [1.1.1]Propellane",
+    "doi": "10.1021/ja963058f",
+    "abstract": "An electronic structural study of the complete valence shell of [1.1.1]propellane is reported. Binding energy spectra were measured in the energy regime of 3.5&minus;46.5 eV over a range of different target electron momenta, so that momentum distributions (MDs) could be determined for each ion state. Each experimental electron momentum distribution is compared with those calculated in the plane wave impulse approximation using both a triple-&zeta; plus polarization level SCF wave function and a further 13 basis sets as calculated using density functional theory. A critical comparison between the experimental and theoretical momentum distributions allows us to determine the optimum wave function for [1.1.1]propellane from the basis sets we studied. In general, the level of agreement between the experimental and theoretical MDs for this optimum wave function for all of the respective valence orbitals is fair. The determination of this wave function then allows us to derive the chemically interesting molecular properties of [1.1.1]propellane. A summary of these results and a comparison of them with those of other workers are presented with the level of agreement typically being good. In particular, we note that we confirm the existence of the C1&minus;C3 bridging bond with a bond order of 0.70.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4027063/files/Theoretical_and_e2e_Experimental_Investigation_int.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Momentum distributions and molecular property information for trans 1,3 butadiene: An electron momentum spectroscopy and density functional theory investigation",
+    "doi": "10.1063/1.475564",
+    "abstract": "The technique of electron momentum spectroscopy (EMS) has been used to measure orbital momentum distributions (MDs) for the complete valence electronic structure of trans 1,3 butadiene. The corresponding theoretical MDs were calculated using a plane wave impulse approximation (PWIA) model for the reaction mechanism and density functional theory (DFT) for the wave function. Seven basis sets, at the local density approximation (LDA) level and, additionally, incorporating nonlocal correlation functional corrections, were studied. The sensitivity of the level of agreement between the experimental and theoretical MDs to the nonlocal corrections is considered. A critical comparison between the experimental and theoretical MDs allows us to determine the ``optimum&#39;&#39; wave function from our basis sets. This wave function is then used to derive butadiene&#39;s chemically interesting molecular properties, which are subsequently compared to the results of other workers. The sensitivity of the derived molecular property information to the nonlocal correlation functional corrections is also examined.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4027324/files/Momentum%20distributions%20and%20molecular%20property%20information%20for%20trans%201,3%20butadiene%20An%20electron%20momentum%20spectroscopy%20and%20density%20functional%20theory%20investigation.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Application of DFT and EMS to the Study of Strained Organic Molecules",
+    "doi": "10.1071/P97092",
+    "abstract": "Electron momentum spectroscopy (EMS) studies of the valence shells of (1.1.1)propellane, 1,3-butadiene, ethylene oxide and cubane are reviewed. Binding energy spectra were measured in the energy regime of 3&cent; 5{46&cent; 5 eV over a range of difierent target electron momenta, so that momentum distributions (MDs) could be determined for each ion state. Each experimental electron momentum distribution is compared with those calculated in the plane wave impulse approximation (PWIA) using both a triple-&Dagger; plus polarisation level self-consistent fleld (SCF) wave function and a further range of basis sets as calculated using density functional theory (DFT). A critical comparison between the experimental and theoretical momentum distributions allows us to determine the &#39;optimum&#39; wave function for each molecule from the basis sets we studied. This &#39;optimum&#39; wave function then allows us to investigate chemically or biologically signiflcant molecular properties of these molecules. EMS{DFT also shows promise in elucidating the character of molecular orbitals and the hybridisation state of atoms.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4027078/files/P97092.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Sto-CAV: A Distributed Simulation Platform for Connected and Automated Vehicles Running With Heterogeneous Technologies and Devices in the Loop",
+    "doi": "10.1109/ACCESS.2025.3572358",
+    "abstract": "The development and validation of vehicular applications require extensive testing, often constrained by high costs, logistical challenges, and safety concerns. To address these issues, we introduce Sto-CAV (SimulaTiOn platform for Connected and Automated Vehicles), a novel, flexible, and scalable simulation platform that enables remote access and modular testing for connected and automated vehicle applications. Sto-CAV integrates both virtual and physical components geographically distributed, allowing users to execute simulations without requiring local hardware or software. In addition, Sto-CAV supports heterogeneous vehicle-to-everything (V2X) radio access technologies, including ITS-G5 based on IEEE 802.11p, LTE-V2X and Visible Light Communication (VLC), facilitating the test of beyond 5G vehicular communication scenarios where traditional RF communications meet optical bands. Unlike existing solutions, Sto-CAV emphasizes ease of configuration, remote accessibility, and the integration of heterogeneous communication technologies, thus providing a comprehensive tool for testing vehicular systems, accessible to researchers and developers worldwide. This paper details the design, capabilities, and applications of Sto-CAV, highlighting its potential to advance the testing of innovative vehicle technologies, also when they are geographically distributed, allowing average latencies suitable for quasi-real time applications.",
+    "keywords": [
+      "CNMS MOST",
+      "Distributed simulation",
+      "heterogeneous technologies",
+      "hardware in the loop",
+      "connected vehicles",
+      "remotely accessible simulator",
+      "vehicular communication",
+      "vehicle-to-everything (V2X)",
+      "ITS-G5",
+      "LTE-V2X"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/16893341/files/Sto-CAV_A_Distributed_Simulation_Platform_for_Connected_and_Automated_Vehicles_Running_With_Heterogeneous_Technologies_and_Devices_in_the_Loop.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Visibility and Apparent Size of Néel-Type Magnetic Skyrmions in Fresnel Defocus Images of Multilayer Films",
+    "doi": "10.1017/S1431927621012927",
+    "abstract": "Multilayers that comprise thin films of heavy metals and ferromagnets have been shown to host N&eacute;el-type magnetic skyrmions at room temperature. Fresnel defocus imaging in Lorentz transmission electron microscopy is a widely used technique for recording magnetic information about skyrmions. However, the visibility of N&eacute;el-type skyrmions in Fresnel defocus images is typically low, both because only a small component of their magnetic field contributes to the signal and because of the presence of diffraction contrast from the polycrystalline multilayer structure. Here, we take advantage of the out-of-plane hysteresis in such samples to record background-subtracted Fresnel defocus images. We demonstrate an improvement in magnetic signal-to-noise ratio and spatial resolution by a factor of 3 for a (Pt/Co/NiFe)&times;5 multilayer. We also use simulated Fresnel defocus images of N&eacute;el-type magnetic skyrmions to understand the influence of defocus on apparent skyrmion size.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7883106/files/Visibility%20and%20Apparent%20Size%20of%20N%C3%A9el-Type%20Magnetic%20Skyrmions%20in%20Fresnel%20Defocus%20Images%20of%20Multilayer%20Films.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Enhanced Fluorescence in a Scattering Medium",
+    "doi": "10.1177/00037028211029312",
+    "abstract": "Often only small amounts of sample are available for spectroscopic analytical determinations. This work investigates the&nbsp;enhancement of signal in columns packed with silica particles. We propose that silica particles cause the light to scatter through the column, effectively increasing optical path length. Packed columns are shown to be effective with fluorescence spectroscopy, but results were inconclusive with absorbance spectroscopy.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/14625360/files/Published%20Article.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Electron momentum spectroscopy studies on atom and molecules using monochromated electrons",
+    "doi": "10.1051/jp4:1999626",
+    "abstract": "A recently developed electron monochromator has been used in noncoplanar symmetric electron momentum spectroscopy studies on atomic argon and molecular cubane. This (e,2e) monochromator typically produces beam currents of 30uA, at better than 98% focus to the inner Faraday cup, into the interaction region. Contemporary work has concentrated on incident electron beam energies in the range 500-1800 eV. At these energies the overall coincident energy resolution is usually in the range 0.50-0.62 eV (FWHM). Binding energy spectra, at different values of recoil momenta, for both argon and cubane, highlight the performance of the spectrometer and will be presented. In addition, selected momentum distributions (MDs) for the respective valence orbitals in both argon and cubane will also be given. These MDs are compared against theory calculations made within either a distorted wave impulse approximation (argon) or plane wave impulse approximation (cubane) reaction mechanism framework. For the argon calculations Hartree-Fock orbitals were employed, while for cubane an extensive range of density functional theory basis sets were used. Some of the ramifications of the present results will be discussed.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4027146/files/Electron%20momentum%20spectroscopy%20studies%20on%20atom%20and%20molecules%20using%20monochromated%20electrons.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Electron momentum spectroscopy of [1.1.1]propellane",
+    "doi": "10.1016/0009-2614(95)00962-4",
+    "abstract": "The first complete valence shell electron separation energy spectra are measured for [1.1.1]propellane by electron momentum spectroscopy at a total energy of 1000 eV. Momentum densities (cross sections) are obtained at two well-separated momenta, one close to zero (p &asymp; 0.16 au), the other at p &asymp; 0.77 au, to highlight respectively the s and p symmetries of the valence orbitals. Many-body calculations of the separation energies and spectroscopic factors using Green function methods are carried out and compared with the present data in order to interpret and understand the measured separation energy spectra.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4027134/files/1.ChemPhysLett_1995.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "A Density Functional Theory and Electron Momentum Spectroscopy Study into the Complete Valence Electronic Structure of Cubane",
+    "doi": "10.1021/ja9940423",
+    "abstract": "A study of the electronic structure of the complete valence shell of cubane is reported. Results from our many-body Green&#39;s function calculation, to the third-order algebraic diagrammatic construction (ADC(3)) level, for the binding energies and spectroscopic factors of the respective valence orbitals of cubane are presented. Binding-energy spectra were measured in the energy regime 6-35 eV over a range of different target electron momenta, so that momentum distributions (MDs) could be determined for each orbital. The corresponding theoretical MDs were calculated using a plane wave impulse approximation (PWIA) model for the reaction mechanism and density functional theory (DFT) for the wave function. Seven basis sets, at the local density approximation (LDA) level and, additionally, incorporating nonlocal correlation functional corrections, were studied. The sensitivity of the level of agreement between the experimental and theoretical MDs to the nonlocal corrections is considered. A critical comparison between the experimental and theoretical MDs allows us to determine the &quot;optimum&quot; wave function for cubane from the basis sets we studied. This wave function is then used to derive cubane&#39;s chemically interesting molecular properties. A summary of these results and a comparison of them with those of other workers is presented with the level of agreement typically being good.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4027059/files/A_Density_Functional_Theory_and_Electron_Momentum_.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "LiberTEM: Software platform for scalable multidimensional data processing in transmission electron microscopy",
+    "doi": "10.21105/joss.02006",
+    "abstract": "Increases in the data rates of detectors for electron microscopy (EM) have outpaced increases in network, mass storage and memory bandwidth by two orders of magnitude between 2009 and 2019 (Weber, 2018). The LiberTEM open source platform (Clausen et al., 2020) is designed to match the growing performance requirements of EM data processing (Weber, Clausen, &amp; Dunin-Borkowski, 2020).",
+    "keywords": [
+      "Transmission electron microscopy"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4737432/files/LiberTEM%20Software%20platform%20for%20scalable.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "NFFA-Europe Pilot - D15.1 - Design of platforms for liquid cells",
+    "doi": "10.5281/zenodo.7057924",
+    "abstract": "Technical specifications for the design of the liquid/gas cells are described based on target experiments and the requirements from the X-ray end stations. The first prototypes and preliminary tests are described.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7057924/files/nep_deliverable_D15.1_design-of-platforms-for-liquid-cells.pdf/content",
+    "curated": true,
+    "_stage": 1
+  }
+]

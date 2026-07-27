@@ -1,0 +1,142 @@
+[
+  {
+    "doi": "10.5281/zenodo.3851687",
+    "title": "Casmaria boblehmani Fedosov & Olivera & Watkins & Barkalova 2014, sp. nov.",
+    "download_url": "https://zenodo.org/api/records/3851687/files/treatment.html/content",
+    "keywords": [
+      "Biodiversity",
+      "Taxonomy",
+      "Animalia",
+      "Mollusca",
+      "Gastropoda",
+      "Littorinimorpha",
+      "Cassidae",
+      "Casmaria",
+      "Casmaria boblehmani"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.7817095",
+    "title": "DockSurf: A molecular modeling software for the prediction of protein/surface adhesion. Molecular dynamics dataset",
+    "download_url": "https://zenodo.org/api/records/7817095/files/Apolipoprotein.tar.gz/content",
+    "keywords": [
+      "Molecular Dynamics"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.1038/s41566-024-01436-9",
+    "title": "Attosecond core-level absorption spectroscopy reveals the electronic and nuclear dynamics of molecular ring opening",
+    "download_url": "https://zenodo.org/api/records/13685242/files/Furan-deposit.pdf/content",
+    "keywords": [
+      "Astronomia / física",
+      "Atomic and molecular physics, and optics",
+      "Electronic, optical and magnetic materials",
+      "Optics",
+      "Physics, applied",
+      "Química"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.7077771",
+    "title": "Allosteric rescue of catalytically impaired ATP phosphoribosyltransferase variants links protein dynamics to active-site electrostatic preorganisation",
+    "download_url": "https://zenodo.org/api/records/7077771/files/eq_nvt_1.in/content",
+    "keywords": [
+      "ATP phosphoribosyltransferases",
+      "allostery",
+      "molecular dynamics inputs",
+      "molecular dynamics parameters"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.1016/j.fuel.2019.116823",
+    "title": "CaO carbonation kinetics determined using micro-fluidized bed thermogravimetric analysis",
+    "download_url": "https://zenodo.org/api/records/5556085/files/1-s2.0-S0016236119321775-main.pdf/content",
+    "keywords": [
+      "Micro-fluidized bed thermogravimetric analysis (MFB-TGA) CaO carbonation reaction Kinetics"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.13685185",
+    "title": "A kinetic and mechanistic study of oxidation of N-Acetyl-DL-Methionine by pyridinium chlorochromate in aqueous DMF medium",
+    "download_url": "https://zenodo.org/api/records/13685185/files/GSCARR-2024-0311.pdf/content",
+    "keywords": [
+      "Kinetics",
+      "Oxidation",
+      "DMF (N",
+      "N-dimethylformamide)",
+      "N-Acetyl-DL-Methionine",
+      "PCC (pyridinium chlorochromate)"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.10969761",
+    "title": "Development of Microsoft Powerpoint Learning Media on Chemical Bonding Material",
+    "download_url": "https://zenodo.org/api/records/10969761/files/Development%20of%20Microsoft%20Powerpoint%20Learning%20Media%20on%20Chemical%20Bonding%20Material%20(1).pdf/content",
+    "keywords": [
+      "Microsoft Powerpoint; Learning; Media; Student Responses; Eligibility; Chemical"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.10715222",
+    "title": "Analytical Approach on the Influence of Some Chemical Constituents of Palm Nut Shells on Nut Cracking",
+    "download_url": "https://zenodo.org/api/records/10715222/files/EJAET-5-7-470-473.pdf/content",
+    "keywords": [
+      "Chemical constituent, Nut shell, Cracking, Covalent bond, Nut varieties"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.1021/acsphotonics.3c01436",
+    "title": "Linking High-Harmonic Generation and Strong-Field Ionization in Bulk Crystals",
+    "download_url": "https://zenodo.org/api/records/14603774/files/juergens_2024_10.1021-acsphotonics.3c01436.pdf/content",
+    "keywords": [
+      "Absorption",
+      "Crystal",
+      "Group Theory",
+      "Ionization",
+      "Magnesium oxide",
+      "high-harmonic generation",
+      "strong-field ionization",
+      "plasma formation",
+      "attosecond physics",
+      "strong-field physics",
+      "ultrafast optics",
+      "nonlinear optics"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.1109/ACCESS.2025.3572358",
+    "title": "Sto-CAV: A Distributed Simulation Platform for Connected and Automated Vehicles Running With Heterogeneous Technologies and Devices in the Loop",
+    "download_url": "https://zenodo.org/api/records/16893341/files/Sto-CAV_A_Distributed_Simulation_Platform_for_Connected_and_Automated_Vehicles_Running_With_Heterogeneous_Technologies_and_Devices_in_the_Loop.pdf/content",
+    "keywords": [
+      "CNMS MOST",
+      "Distributed simulation",
+      "heterogeneous technologies",
+      "hardware in the loop",
+      "connected vehicles",
+      "remotely accessible simulator",
+      "vehicular communication",
+      "vehicle-to-everything (V2X)",
+      "ITS-G5",
+      "LTE-V2X"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.21105/joss.02006",
+    "title": "LiberTEM: Software platform for scalable multidimensional data processing in transmission electron microscopy",
+    "download_url": "https://zenodo.org/api/records/4737432/files/LiberTEM%20Software%20platform%20for%20scalable.pdf/content",
+    "keywords": [
+      "Transmission electron microscopy"
+    ],
+    "open_license": true
+  }
+]

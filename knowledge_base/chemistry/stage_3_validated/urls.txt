@@ -1,0 +1,11 @@
+https://doi.org/10.5281/zenodo.3851687
+https://doi.org/10.5281/zenodo.7817095
+https://doi.org/10.1038/s41566-024-01436-9
+https://doi.org/10.5281/zenodo.7077771
+https://doi.org/10.1016/j.fuel.2019.116823
+https://doi.org/10.5281/zenodo.13685185
+https://doi.org/10.5281/zenodo.10969761
+https://doi.org/10.5281/zenodo.10715222
+https://doi.org/10.1021/acsphotonics.3c01436
+https://doi.org/10.1109/ACCESS.2025.3572358
+https://doi.org/10.21105/joss.02006
