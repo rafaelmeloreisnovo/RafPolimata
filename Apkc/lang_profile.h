@@ -137,7 +137,7 @@ static const LangProfile _lang_table[LP_COUNT] = {
                   0, 1, 0, 0,
                   1, 0, 0, 0, 0 },
 
-    [LP_CL] = { "cl", ".cl", 0, 0, 0, NULL,
+    [LP_CL] = { "cl", ".cl", 0, 0, 0, NULL, /* TOKEN_VAZIO: OpenCL runtime não disponível */
                 NULL, {NULL},
                 0, 1, 0, 0,
                 0, 1, 0, 0, 0 },
@@ -147,7 +147,7 @@ static const LangProfile _lang_table[LP_COUNT] = {
                   0, 1, 0, 0,
                   1, 0, 0, 0, 0 },
 
-    [LP_WGSL] = { "wgsl", ".wgsl", 0, 0, 0, NULL,
+    [LP_WGSL] = { "wgsl", ".wgsl", 0, 0, 0, NULL, /* TOKEN_VAZIO: WebGPU shaders não disponível */
                   NULL, {NULL},
                   0, 1, 0, 0,
                   0, 0, 1, 0, 0 },
@@ -157,7 +157,7 @@ static const LangProfile _lang_table[LP_COUNT] = {
                  0, 1, 0, 0,
                  0, 0, 0, 1, 0 },
 
-    [LP_TFLITE] = { "tflite", ".tflite", 0, 0, 0, NULL,
+    [LP_TFLITE] = { "tflite", ".tflite", 0, 0, 0, NULL, /* TOKEN_VAZIO: TFLite runtime não disponível */
                     NULL, {NULL},
                     0, 1, 0, 0,
                     0, 0, 0, 0, 1 },
