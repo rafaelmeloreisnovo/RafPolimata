@@ -51,11 +51,23 @@ esac
 
 OUTPUT_DIR="$(dirname "$OUTPUT")"
 mkdir -p "$OUTPUT_DIR"
-TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/rafaelia-native.XXXXXX")"
-COMMIT_TMP="$OUTPUT.tmp.$$"
 RECEIPT="$OUTPUT.receipt.json"
+COMMIT_TMP="$OUTPUT.tmp.$$"
 RECEIPT_TMP="$RECEIPT.tmp.$$"
-trap 'rm -rf "$TMP_ROOT"; rm -f "$COMMIT_TMP" "$RECEIPT_TMP"' EXIT
+TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/rafaelia-native.XXXXXX")"
+COMMITTED=0
+cleanup() {
+  rm -rf "$TMP_ROOT"
+  rm -f "$COMMIT_TMP" "$RECEIPT_TMP"
+  if [[ "$COMMITTED" -ne 1 ]]; then
+    rm -f "$OUTPUT" "$RECEIPT"
+  fi
+}
+trap cleanup EXIT HUP INT TERM
+
+# The invocation owns this output base. Remove prior pairs immediately so a
+# failed new attempt cannot be mistaken for a successful current build.
+rm -f "$OUTPUT" "$RECEIPT"
 
 LOWERED="$TMP_ROOT/lowered.c"
 REWRITTEN="$TMP_ROOT/rewritten.c"
@@ -126,7 +138,6 @@ COMPILER_VERSION="$($CLANG_BIN --version | head -n 1)"
 
 cp "$SEALED" "$COMMIT_TMP"
 chmod 0644 "$COMMIT_TMP"
-mv -f "$COMMIT_TMP" "$OUTPUT"
 
 "$PYTHON_BIN" - "$RECEIPT_TMP" "$LANGUAGE" "$ARCH" "$TARGET" "$SOURCE" \
   "$SOURCE_SHA" "$OUTPUT" "$OUTPUT_SHA" "$COMPILER_VERSION" \
@@ -170,23 +181,27 @@ receipt = {
         "no_rwx_load": "PASS",
         "no_executable_stack": "PASS",
         "no_build_id": "PASS",
-        "machine_identity": "PASS",
+        "machine_identity": "PASS"
     },
     "not_claimed": [
         "apk_signature",
         "android_installation",
         "android_runtime_launch",
         "device_driver_execution",
-        "full_source_language_semantics",
-    ],
+        "full_source_language_semantics"
+    ]
 }
 Path(receipt_path).write_text(
     json.dumps(receipt, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-    encoding="utf-8",
+    encoding="utf-8"
 )
 PY
+chmod 0644 "$RECEIPT_TMP"
+
+# Promote the pair. If the second rename fails, the EXIT trap removes the first.
+mv -f "$COMMIT_TMP" "$OUTPUT"
 mv -f "$RECEIPT_TMP" "$RECEIPT"
-chmod 0644 "$RECEIPT"
+COMMITTED=1
 
 printf 'apkc_strict_native_build: PASS lang=%s arch=%s output=%s sha256=%s\n' \
   "$LANGUAGE" "$ARCH" "$OUTPUT" "$OUTPUT_SHA"
