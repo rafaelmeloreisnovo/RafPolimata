@@ -17,7 +17,7 @@ int main(void) {
     if (!check_bytes(left, "bcdeff", 6u)) return 2;
 
     memset(copy, 0, sizeof(copy));
-    strcpy(copy, "raf");
+    strncpy(copy, "raf", sizeof(copy));
     if (strlen(copy) != 3u || strcmp(copy, "raf") != 0) return 3;
     if (memchr(copy, 'a', 3u) != copy + 1) return 4;
 
@@ -28,5 +28,7 @@ int main(void) {
 
     strncpy(copy, "xy", sizeof(copy));
     if (copy[0] != 'x' || copy[1] != 'y' || copy[2] != '\0') return 9;
+    if (atoi("214748364999") != INT_MAX) return 10;
+    if (atoi("-214748364999") != INT_MIN) return 11;
     return 0;
 }
