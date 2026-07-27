@@ -1,0 +1,57 @@
+name: Semantic Language Core
+
+on:
+  pull_request:
+    paths:
+      - "compiler/architectures.v2.json"
+      - "compiler/semantic-targets.v1.json"
+      - "compiler/targets.v1.json"
+      - "schemas/semantic-lexeme.schema.json"
+      - "data/semantics/lexemes.seed.v1.jsonl"
+      - "scripts/raf_semantic_ir.py"
+      - "scripts/raf_architecture_registry.py"
+      - "scripts/raf_lexical_semantics.py"
+      - "scripts/run_semantic_core_gate.sh"
+      - "tests/test_raf_semantic_ir.py"
+      - "tests/test_raf_architecture_registry.py"
+      - "tests/test_raf_lexical_semantics.py"
+      - "tests/fixtures/semantic_equivalence_mix32.v1.json"
+      - "docs/RAF_SEMANTIC_LANGUAGE_SEVEN_ARCH_V2.md"
+      - ".github/workflows/semantic-ir-core.yml"
+  push:
+    paths:
+      - "compiler/architectures.v2.json"
+      - "compiler/semantic-targets.v1.json"
+      - "compiler/targets.v1.json"
+      - "schemas/semantic-lexeme.schema.json"
+      - "data/semantics/lexemes.seed.v1.jsonl"
+      - "scripts/raf_semantic_ir.py"
+      - "scripts/raf_architecture_registry.py"
+      - "scripts/raf_lexical_semantics.py"
+      - "scripts/run_semantic_core_gate.sh"
+      - "tests/test_raf_semantic_ir.py"
+      - "tests/test_raf_architecture_registry.py"
+      - "tests/test_raf_lexical_semantics.py"
+      - "tests/fixtures/semantic_equivalence_mix32.v1.json"
+      - "docs/RAF_SEMANTIC_LANGUAGE_SEVEN_ARCH_V2.md"
+      - ".github/workflows/semantic-ir-core.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  semantic-language-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run offline semantic, architecture and lexical gate
+        run: sh scripts/run_semantic_core_gate.sh build/semantic-ci
+      - name: Upload semantic language receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semantic-language-core-receipt
+          path: build/semantic-ci/
+          if-no-files-found: warn

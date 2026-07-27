@@ -1,0 +1,295 @@
+{
+  "schema": "rafpolimata.multilingual-scripture-fixture.v1",
+  "fixture_id": "MSSC-DEMO-20260726",
+  "fixture_scope": "SHORT_EXCERPTS_FOR_ENGINEERING_VALIDATION_ONLY",
+  "claim_allowed": false,
+  "corpus_status": "TESTED_SYNTHETIC_LOCAL_WITH_SHORT_LINGUISTIC_EXCERPTS",
+  "units": [
+    {
+      "id": "GEN.1.1.hbo.excerpt",
+      "canonical_passage": "GEN.1.1",
+      "testament": "HB_OT",
+      "book": "Genesis",
+      "chapter": 1,
+      "verse": 1,
+      "language_tag": "hbo",
+      "script": "Hebr",
+      "text": "בְּרֵאשִׁית",
+      "source": {
+        "edition": "TOKEN_VAZIO_PENDING_AUTHORIZED_CORPUS",
+        "license": "TOKEN_VAZIO_PENDING_AUTHORIZED_CORPUS",
+        "status": "TOKEN_VAZIO"
+      },
+      "grammar": {
+        "clause_count": 1,
+        "tokens": [
+          {
+            "surface": "בְּרֵאשִׁית",
+            "lemma": "רֵאשִׁית",
+            "pos": "NOUN",
+            "morphology": ["PREPOSITION_PREFIX", "FEMININE", "SINGULAR", "CONSTRUCT_OR_ADVERBIAL_TOKEN_VAZIO"],
+            "head": 0
+          }
+        ]
+      },
+      "phonetics": {
+        "transliteration": "bə-rēʾšît",
+        "ipa": "TOKEN_VAZIO_REQUIRES_PRONUNCIATION_PROFILE",
+        "profile": "TIBERIAN_OR_OTHER_PROFILE_REQUIRED",
+        "approximate": true
+      },
+      "concepts": ["beginning", "temporal_origin"]
+    },
+    {
+      "id": "GEN.1.1.pt-BR.excerpt",
+      "canonical_passage": "GEN.1.1",
+      "testament": "HB_OT",
+      "book": "Gênesis",
+      "chapter": 1,
+      "verse": 1,
+      "language_tag": "pt-BR",
+      "script": "Latn",
+      "text": "No princípio",
+      "source": {
+        "edition": "ENGINEERING_GLOSS_NOT_A_BIBLE_EDITION",
+        "license": "GENERATED_FIXTURE",
+        "status": "TESTED_SYNTHETIC_LOCAL"
+      },
+      "grammar": {
+        "clause_count": 1,
+        "tokens": [
+          {
+            "surface": "No",
+            "lemma": "em+o",
+            "pos": "ADPOSITION_ARTICLE_CONTRACTION",
+            "morphology": ["MASCULINE", "SINGULAR"],
+            "head": 1
+          },
+          {
+            "surface": "princípio",
+            "lemma": "princípio",
+            "pos": "NOUN",
+            "morphology": ["MASCULINE", "SINGULAR"],
+            "head": 0
+          }
+        ]
+      },
+      "phonetics": {
+        "transliteration": "No princípio",
+        "ipa": "[nu pɾĩˈsipju]",
+        "profile": "pt-BR_GENERALIZED_NOT_REGION_NEUTRAL",
+        "approximate": true
+      },
+      "concepts": ["beginning", "temporal_origin"]
+    },
+    {
+      "id": "JHN.1.1.grc.excerpt",
+      "canonical_passage": "JHN.1.1",
+      "testament": "NT",
+      "book": "John",
+      "chapter": 1,
+      "verse": 1,
+      "language_tag": "grc",
+      "script": "Grek",
+      "text": "Ἐν ἀρχῇ",
+      "source": {
+        "edition": "TOKEN_VAZIO_PENDING_AUTHORIZED_CORPUS",
+        "license": "TOKEN_VAZIO_PENDING_AUTHORIZED_CORPUS",
+        "status": "TOKEN_VAZIO"
+      },
+      "grammar": {
+        "clause_count": 1,
+        "tokens": [
+          {
+            "surface": "Ἐν",
+            "lemma": "ἐν",
+            "pos": "PREPOSITION",
+            "morphology": ["GOVERNS_DATIVE"],
+            "head": 1
+          },
+          {
+            "surface": "ἀρχῇ",
+            "lemma": "ἀρχή",
+            "pos": "NOUN",
+            "morphology": ["DATIVE", "FEMININE", "SINGULAR"],
+            "head": 0
+          }
+        ]
+      },
+      "phonetics": {
+        "transliteration": "En archēi",
+        "ipa": "TOKEN_VAZIO_REQUIRES_KOINE_RECONSTRUCTION_PROFILE",
+        "profile": "KOINE_PROFILE_REQUIRED",
+        "approximate": true
+      },
+      "concepts": ["beginning", "temporal_origin"]
+    },
+    {
+      "id": "JHN.1.1.pt-BR.excerpt",
+      "canonical_passage": "JHN.1.1",
+      "testament": "NT",
+      "book": "João",
+      "chapter": 1,
+      "verse": 1,
+      "language_tag": "pt-BR",
+      "script": "Latn",
+      "text": "No princípio",
+      "source": {
+        "edition": "ENGINEERING_GLOSS_NOT_A_BIBLE_EDITION",
+        "license": "GENERATED_FIXTURE",
+        "status": "TESTED_SYNTHETIC_LOCAL"
+      },
+      "grammar": {
+        "clause_count": 1,
+        "tokens": [
+          {
+            "surface": "No",
+            "lemma": "em+o",
+            "pos": "ADPOSITION_ARTICLE_CONTRACTION",
+            "morphology": ["MASCULINE", "SINGULAR"],
+            "head": 1
+          },
+          {
+            "surface": "princípio",
+            "lemma": "princípio",
+            "pos": "NOUN",
+            "morphology": ["MASCULINE", "SINGULAR"],
+            "head": 0
+          }
+        ]
+      },
+      "phonetics": {
+        "transliteration": "No princípio",
+        "ipa": "[nu pɾĩˈsipju]",
+        "profile": "pt-BR_GENERALIZED_NOT_REGION_NEUTRAL",
+        "approximate": true
+      },
+      "concepts": ["beginning", "temporal_origin"]
+    },
+    {
+      "id": "DAN.2.4.arc.excerpt",
+      "canonical_passage": "DAN.2.4",
+      "testament": "HB_OT",
+      "book": "Daniel",
+      "chapter": 2,
+      "verse": 4,
+      "language_tag": "arc",
+      "script": "Hebr",
+      "text": "מַלְכָּא לְעָלְמִין חֱיִי",
+      "source": {
+        "edition": "TOKEN_VAZIO_PENDING_AUTHORIZED_CORPUS",
+        "license": "TOKEN_VAZIO_PENDING_AUTHORIZED_CORPUS",
+        "status": "TOKEN_VAZIO"
+      },
+      "grammar": {
+        "dialect": "Biblical Aramaic",
+        "clause_count": 1,
+        "tokens": [
+          {
+            "surface": "מַלְכָּא",
+            "lemma": "מֶלֶךְ",
+            "pos": "NOUN",
+            "morphology": ["EMPHATIC_STATE", "MASCULINE", "SINGULAR"],
+            "head": 2
+          },
+          {
+            "surface": "לְעָלְמִין",
+            "lemma": "עָלַם",
+            "pos": "NOUN_ADVERBIAL",
+            "morphology": ["PREPOSITION_PREFIX", "PLURAL"],
+            "head": 2
+          },
+          {
+            "surface": "חֱיִי",
+            "lemma": "חיה",
+            "pos": "VERB",
+            "morphology": ["IMPERATIVE", "MASCULINE", "SINGULAR"],
+            "head": 0
+          }
+        ]
+      },
+      "phonetics": {
+        "transliteration": "malkā lə-ʿālmîn ḥĕyî",
+        "ipa": "TOKEN_VAZIO_REQUIRES_BIBLICAL_ARAMAIC_PROFILE",
+        "profile": "BIBLICAL_ARAMAIC_RECONSTRUCTION_REQUIRED",
+        "approximate": true
+      },
+      "concepts": ["king", "life", "duration"]
+    },
+    {
+      "id": "DAN.2.4.pt-BR.excerpt",
+      "canonical_passage": "DAN.2.4",
+      "testament": "HB_OT",
+      "book": "Daniel",
+      "chapter": 2,
+      "verse": 4,
+      "language_tag": "pt-BR",
+      "script": "Latn",
+      "text": "Ó rei, vive para sempre",
+      "source": {
+        "edition": "ENGINEERING_GLOSS_NOT_A_BIBLE_EDITION",
+        "license": "GENERATED_FIXTURE",
+        "status": "TESTED_SYNTHETIC_LOCAL"
+      },
+      "grammar": {
+        "clause_count": 1,
+        "tokens": [
+          {"surface": "Ó", "lemma": "ó", "pos": "VOCATIVE_PARTICLE", "morphology": [], "head": 1},
+          {"surface": "rei", "lemma": "rei", "pos": "NOUN", "morphology": ["VOCATIVE", "MASCULINE", "SINGULAR"], "head": 2},
+          {"surface": "vive", "lemma": "viver", "pos": "VERB", "morphology": ["IMPERATIVE_OR_PRESENT_TOKEN_VAZIO", "SECOND_OR_THIRD_PERSON_TOKEN_VAZIO"], "head": 0},
+          {"surface": "para", "lemma": "para", "pos": "PREPOSITION", "morphology": [], "head": 4},
+          {"surface": "sempre", "lemma": "sempre", "pos": "ADVERB", "morphology": [], "head": 2}
+        ]
+      },
+      "phonetics": {
+        "transliteration": "Ó rei, vive para sempre",
+        "ipa": "TOKEN_VAZIO_REQUIRES_REGIONAL_PROFILE_AND_CONNECTED_SPEECH",
+        "profile": "pt-BR_REGIONAL_PROFILE_REQUIRED",
+        "approximate": true
+      },
+      "concepts": ["king", "life", "duration"]
+    }
+  ],
+  "relations": [
+    {
+      "id": "REL-GEN-HBO-PT",
+      "source": "GEN.1.1.hbo.excerpt",
+      "target": "GEN.1.1.pt-BR.excerpt",
+      "type": "translation_alignment",
+      "status": "TESTED_SYNTHETIC_LOCAL",
+      "authorial_intent_claimed": false,
+      "evidence": ["shared_canonical_passage", "engineering_gloss"],
+      "limitations": ["not_word_aligned", "not_authorized_edition"]
+    },
+    {
+      "id": "REL-JHN-GRC-PT",
+      "source": "JHN.1.1.grc.excerpt",
+      "target": "JHN.1.1.pt-BR.excerpt",
+      "type": "translation_alignment",
+      "status": "TESTED_SYNTHETIC_LOCAL",
+      "authorial_intent_claimed": false,
+      "evidence": ["shared_canonical_passage", "engineering_gloss"],
+      "limitations": ["not_word_aligned", "not_authorized_edition"]
+    },
+    {
+      "id": "REL-DAN-ARC-PT",
+      "source": "DAN.2.4.arc.excerpt",
+      "target": "DAN.2.4.pt-BR.excerpt",
+      "type": "translation_alignment",
+      "status": "TESTED_SYNTHETIC_LOCAL",
+      "authorial_intent_claimed": false,
+      "evidence": ["shared_canonical_passage", "engineering_gloss"],
+      "limitations": ["not_word_aligned", "not_authorized_edition"]
+    },
+    {
+      "id": "REL-GEN-JHN-BEGINNING",
+      "source": "GEN.1.1.hbo.excerpt",
+      "target": "JHN.1.1.grc.excerpt",
+      "type": "thematic",
+      "status": "HYPOTHESIS",
+      "authorial_intent_claimed": false,
+      "evidence": ["concept_label_beginning", "opening_position_in_each_work"],
+      "limitations": ["no_automatic_quotation_claim", "requires_scholarly_sources", "different_grammar_and_context"]
+    }
+  ]
+}

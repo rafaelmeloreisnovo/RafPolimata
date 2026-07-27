@@ -10,6 +10,8 @@
 #define RAF_ARCH_RV64 3
 #define RAF_ARCH_UNKNOWN 4
 
+/* Stable compiler IDs. Existing IDs are preserved; profiles added later are
+ * appended. ApkC LP_* IDs have their own order and are mapped by name. */
 #define RAF_LANG_C 0
 #define RAF_LANG_CPP 1
 #define RAF_LANG_S 2
@@ -22,15 +24,20 @@
 #define RAF_LANG_JS 9
 #define RAF_LANG_PHP 10
 #define RAF_LANG_JSX 11
-/* hardware-direct compute languages (mirror APKc LP_GLSL…LP_TFLITE) */
-#define RAF_LANG_GLSL   12
-#define RAF_LANG_CL     13
-#define RAF_LANG_HLSL   14
-#define RAF_LANG_WGSL   15
-#define RAF_LANG_DSP    16
+#define RAF_LANG_GLSL 12
+#define RAF_LANG_CL 13
+#define RAF_LANG_HLSL 14
+#define RAF_LANG_WGSL 15
+#define RAF_LANG_DSP 16
 #define RAF_LANG_TFLITE 17
-#define RAF_LANG_UNKNOWN 18
-#define RAF_LANG_COUNT 19
+#define RAF_LANG_GO 18
+#define RAF_LANG_RB 19
+#define RAF_LANG_SWIFT 20
+#define RAF_LANG_GROOVY 21
+#define RAF_LANG_CLJ 22
+#define RAF_LANG_UNKNOWN 23
+#define RAF_LANG_COUNT 24
+#define RAF_RECOGNIZED_LANG_COUNT 23
 
 #define RAF_OPT_0 0
 #define RAF_OPT_1 1
@@ -58,7 +65,9 @@
 #define RAF_ASM_CAP (1u << 15)
 #define RAF_ASM_LINE 128
 #define RAF_HEX_CAP (1u << 20)
-#define RAF_SOURCE_CAP (1u << 20)
+/* RAF_SOURCE_MAX is the exact accepted payload. CAP includes one NUL byte. */
+#define RAF_SOURCE_MAX (1u << 20)
+#define RAF_SOURCE_CAP (RAF_SOURCE_MAX + 1u)
 
 typedef enum { IR_NOP = 0, IR_MOVIMM, IR_RET } RafIROp;
 typedef uint64_t RafIR;
@@ -132,29 +141,35 @@ int raf_compile_file(RafCtx *ctx, const char *src_path, const char *out_base,
 void raf_ctx_report(const RafCtx *ctx);
 
 /* Language × architecture routing matrix.
- * A value of 1 means that a route exists; it does not by itself prove the
- * external toolchain, driver, Android runtime or generated artifact. */
+ * A value of 1 means that a hosted or direct route exists; it does not prove
+ * that the strict final binary is freestanding. M063 applies the final-runtime
+ * policy separately in ApkC/lang_freestanding_policy.h. */
 static const uint8_t RAF_CAP_MATRIX[RAF_LANG_COUNT][5] = {
- /* lang             x86_64 arm64 arm32 rv64 unk */
- /* C       fork */   { 0, 1, 0, 0, 0 },
- /* CPP     fork */   { 0, 1, 0, 0, 0 },
- /* ASM     asm  */   { 1, 1, 1, 0, 0 },
- /* PY      scr  */   { 1, 1, 1, 0, 1 },
- /* RS      fork */   { 0, 1, 0, 0, 0 },
- /* KT      fork */   { 0, 1, 0, 0, 0 },
- /* JAVA    fork */   { 0, 1, 0, 0, 0 },
- /* SH      scr  */   { 1, 1, 1, 0, 1 },
- /* PL      scr  */   { 1, 1, 1, 0, 1 },
- /* JS      scr  */   { 1, 1, 1, 0, 1 },
- /* PHP     scr  */   { 1, 1, 1, 0, 1 },
- /* JSX     fork */   { 0, 1, 0, 0, 0 },
- /* GLSL    gpu  */   { 0, 1, 0, 0, 0 },
- /* CL      gpu  */   { 0, 1, 0, 0, 0 },
- /* HLSL    gpu  */   { 0, 1, 0, 0, 0 },
- /* WGSL    gpu  */   { 0, 1, 0, 0, 0 },
- /* DSP     dsp  */   { 0, 1, 0, 0, 0 },
- /* TFLITE  npu  */   { 0, 1, 0, 0, 0 },
- /* UNKNOWN      */   { 0, 0, 0, 0, 0 },
+ /* lang               x86_64 arm64 arm32 rv64 unk */
+ /* C         fork */   { 0, 1, 0, 0, 0 },
+ /* CPP       fork */   { 0, 1, 0, 0, 0 },
+ /* ASM       asm  */   { 1, 1, 1, 0, 0 },
+ /* PY        scr  */   { 1, 1, 1, 0, 1 },
+ /* RS        fork */   { 0, 1, 0, 0, 0 },
+ /* KT        fork */   { 0, 1, 0, 0, 0 },
+ /* JAVA      fork */   { 0, 1, 0, 0, 0 },
+ /* SH        scr  */   { 1, 1, 1, 0, 1 },
+ /* PL        scr  */   { 1, 1, 1, 0, 1 },
+ /* JS        scr  */   { 1, 1, 1, 0, 1 },
+ /* PHP       scr  */   { 1, 1, 1, 0, 1 },
+ /* JSX       fork */   { 0, 1, 0, 0, 0 },
+ /* GLSL      gpu  */   { 0, 1, 0, 0, 0 },
+ /* CL        gpu  */   { 0, 1, 0, 0, 0 },
+ /* HLSL      gpu  */   { 0, 1, 0, 0, 0 },
+ /* WGSL      gpu  */   { 0, 1, 0, 0, 0 },
+ /* DSP       dsp  */   { 0, 1, 0, 0, 0 },
+ /* TFLITE    npu  */   { 0, 1, 0, 0, 0 },
+ /* GO        fork */   { 0, 1, 0, 0, 0 },
+ /* RUBY      scr  */   { 1, 1, 1, 0, 1 },
+ /* SWIFT     fork */   { 0, 1, 0, 0, 0 },
+ /* GROOVY    fork */   { 0, 1, 0, 0, 0 },
+ /* CLOJURE   scr  */   { 1, 1, 1, 0, 1 },
+ /* UNKNOWN        */   { 0, 0, 0, 0, 0 },
 };
 
 static inline int raf_cap_query(uint8_t lang, uint8_t arch) {
@@ -162,28 +177,33 @@ static inline int raf_cap_query(uint8_t lang, uint8_t arch) {
     return (int)RAF_CAP_MATRIX[lang][arch];
 }
 
-/* Maps RAF_LANG_* to the APKc lang_profile name string. */
+/* Maps stable RAF_LANG_* ids to ApkC profile names. */
 static inline const char *raf_lang_to_apkc_name(uint8_t lang) {
     switch (lang) {
-    case RAF_LANG_C:      return "c";
-    case RAF_LANG_CPP:    return "cpp";
-    case RAF_LANG_S:      return "asm";
-    case RAF_LANG_PY:     return "py";
-    case RAF_LANG_RS:     return "rs";
-    case RAF_LANG_KT:     return "kt";
-    case RAF_LANG_JAVA:   return "java";
-    case RAF_LANG_SH:     return "sh";
-    case RAF_LANG_PL:     return "pl";
-    case RAF_LANG_JS:     return "js";
-    case RAF_LANG_PHP:    return "php";
-    case RAF_LANG_JSX:    return "jsx";
-    case RAF_LANG_GLSL:   return "glsl";
-    case RAF_LANG_CL:     return "cl";
-    case RAF_LANG_HLSL:   return "hlsl";
-    case RAF_LANG_WGSL:   return "wgsl";
-    case RAF_LANG_DSP:    return "dsp";
-    case RAF_LANG_TFLITE: return "tflite";
-    default:              return (const char *)0;
+    case RAF_LANG_C:       return "c";
+    case RAF_LANG_CPP:     return "cpp";
+    case RAF_LANG_S:       return "asm";
+    case RAF_LANG_PY:      return "py";
+    case RAF_LANG_RS:      return "rs";
+    case RAF_LANG_KT:      return "kt";
+    case RAF_LANG_JAVA:    return "java";
+    case RAF_LANG_SH:      return "sh";
+    case RAF_LANG_PL:      return "pl";
+    case RAF_LANG_JS:      return "js";
+    case RAF_LANG_PHP:     return "php";
+    case RAF_LANG_JSX:     return "jsx";
+    case RAF_LANG_GLSL:    return "glsl";
+    case RAF_LANG_CL:      return "cl";
+    case RAF_LANG_HLSL:    return "hlsl";
+    case RAF_LANG_WGSL:    return "wgsl";
+    case RAF_LANG_DSP:     return "dsp";
+    case RAF_LANG_TFLITE:  return "tflite";
+    case RAF_LANG_GO:      return "go";
+    case RAF_LANG_RB:      return "rb";
+    case RAF_LANG_SWIFT:   return "swift";
+    case RAF_LANG_GROOVY:  return "groovy";
+    case RAF_LANG_CLJ:     return "clj";
+    default:               return (const char *)0;
     }
 }
 

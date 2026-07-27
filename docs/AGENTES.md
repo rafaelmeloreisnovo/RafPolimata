@@ -39,6 +39,9 @@ clang --target=aarch64-linux-gnu -fsyntax-only -nostdlib -nostdinc \
 
 Falha bloqueia promoção.
 
+Rota local sem Gradle/SDK/rede para a entrada assembly interna:
+`sh scripts/apkc_termux_hermetic_build.sh --abi both`. O contrato e os limites estão em `docs/APKC_HERMETIC_TERMUX.md`.
+
 ## 2. Papéis funcionais
 
 | Papel | Responsabilidade | Autoriza merge? |

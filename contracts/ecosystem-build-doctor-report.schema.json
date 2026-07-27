@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafaelia.local/contracts/ecosystem-build-doctor-report.schema.json",
+  "title": "RAFAELIA Ecosystem Build Doctor Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "repos",
+    "summary",
+    "findings",
+    "claim_boundary"
+  ],
+  "properties": {
+    "schema": {
+      "const": "raf.ecosystem-build-doctor-report.v1"
+    },
+    "repos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "root"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "root": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "highest_severity",
+        "findings",
+        "by_severity",
+        "by_code",
+        "by_repo"
+      ],
+      "properties": {
+        "state": {
+          "enum": ["PASS", "PASS_LIMITED", "REVIEW_REQUIRED"]
+        },
+        "highest_severity": {
+          "enum": ["none", "info", "low", "medium", "high", "critical"]
+        },
+        "findings": {"type": "integer", "minimum": 0},
+        "by_severity": {"$ref": "#/$defs/counter"},
+        "by_code": {"$ref": "#/$defs/counter"},
+        "by_repo": {"$ref": "#/$defs/counter"}
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/finding"}
+    },
+    "claim_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "static_analysis",
+        "build_execution",
+        "runtime_correctness",
+        "automatic_deletion"
+      ],
+      "properties": {
+        "static_analysis": {"const": "VERIFIED_BY_EXECUTION"},
+        "build_execution": {"const": "TOKEN_VAZIO"},
+        "runtime_correctness": {"const": "TOKEN_VAZIO"},
+        "automatic_deletion": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "counter": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "code",
+        "severity",
+        "path",
+        "line",
+        "message",
+        "evidence",
+        "next_action"
+      ],
+      "properties": {
+        "repo": {"type": "string", "minLength": 1},
+        "code": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+        "severity": {
+          "enum": ["info", "low", "medium", "high", "critical"]
+        },
+        "path": {"type": "string", "minLength": 1},
+        "line": {"type": "integer", "minimum": 1},
+        "message": {"type": "string", "minLength": 1},
+        "evidence": {"type": "string"},
+        "next_action": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

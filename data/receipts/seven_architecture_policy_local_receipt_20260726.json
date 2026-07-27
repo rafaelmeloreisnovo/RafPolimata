@@ -1,0 +1,62 @@
+{
+  "active_count": 7,
+  "active_ids": [
+    "aarch64",
+    "armv7a",
+    "x86_64",
+    "riscv64",
+    "mips64r6el",
+    "s390x",
+    "loongarch64"
+  ],
+  "claim_allowed": false,
+  "created_at": "2026-07-26T22:05:56Z",
+  "registry_sha256": "80a33e4322a12e5a426aa3b47a30b49b3a2b525dfc8bef48c26df8a902292a98",
+  "retired_i386_active_occurrences": 0,
+  "schema": "rafaelia.architecture-registry-receipt.v2",
+  "state": "PASS_SEVEN_ARCHITECTURE_POLICY",
+  "toolchain_probe": [
+    {
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING",
+      "id": "aarch64",
+      "qemu_path": "TOKEN_VAZIO_COMMAND_ABSENT",
+      "qemu_user": "qemu-aarch64"
+    },
+    {
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING",
+      "id": "armv7a",
+      "qemu_path": "TOKEN_VAZIO_COMMAND_ABSENT",
+      "qemu_user": "qemu-arm"
+    },
+    {
+      "execution": "TOKEN_VAZIO_SEVEN_ARCH_RECEIPT_PENDING",
+      "id": "x86_64",
+      "qemu_path": "TOKEN_VAZIO_COMMAND_ABSENT",
+      "qemu_user": "qemu-x86_64"
+    },
+    {
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING",
+      "id": "riscv64",
+      "qemu_path": "TOKEN_VAZIO_COMMAND_ABSENT",
+      "qemu_user": "qemu-riscv64"
+    },
+    {
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING",
+      "id": "mips64r6el",
+      "qemu_path": "TOKEN_VAZIO_COMMAND_ABSENT",
+      "qemu_user": "qemu-mips64el"
+    },
+    {
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING",
+      "id": "s390x",
+      "qemu_path": "TOKEN_VAZIO_COMMAND_ABSENT",
+      "qemu_user": "qemu-s390x"
+    },
+    {
+      "execution": "TOKEN_VAZIO_RECEIPT_PENDING",
+      "id": "loongarch64",
+      "qemu_path": "TOKEN_VAZIO_COMMAND_ABSENT",
+      "qemu_user": "qemu-loongarch64"
+    }
+  ]
+}

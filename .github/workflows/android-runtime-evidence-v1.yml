@@ -1,0 +1,39 @@
+name: Android Runtime Evidence v1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/compile_android_runtime_evidence.py"
+      - "tests/test_android_runtime_evidence.py"
+      - "tests/fixtures/android-runtime-receipt.dispatched.json"
+      - "docs/ANDROID_FEDERATED_RUNTIME_EVIDENCE_V1.md"
+      - ".github/workflows/android-runtime-evidence-v1.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  evidence-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Run evidence ladder tests
+        run: python3 -m unittest tests.test_android_runtime_evidence
+      - name: Compile bounded fixture
+        run: |
+          mkdir -p artifacts
+          python3 scripts/compile_android_runtime_evidence.py \
+            tests/fixtures/android-runtime-receipt.dispatched.json \
+            --out artifacts/android-runtime-evidence.json
+      - name: Upload bounded evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-runtime-evidence-v1
+          if-no-files-found: error
+          path: artifacts/android-runtime-evidence.json

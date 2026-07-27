@@ -1,0 +1,27 @@
+name: M062 four-organ anchor
+
+on:
+  pull_request:
+    paths:
+      - 'RAF_062_quaternary_anchor_eight_gate.c'
+      - 'docs/METHOD_M062_QUATERNARY_ANCHOR.md'
+      - 'scripts/test_m062_anchor.sh'
+      - '.github/workflows/m062-anchor.yml'
+  push:
+    paths:
+      - 'RAF_062_quaternary_anchor_eight_gate.c'
+      - 'docs/METHOD_M062_QUATERNARY_ANCHOR.md'
+      - 'scripts/test_m062_anchor.sh'
+      - '.github/workflows/m062-anchor.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strict C11 selftest
+        run: bash scripts/test_m062_anchor.sh

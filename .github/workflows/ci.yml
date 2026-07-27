@@ -5,10 +5,18 @@ on:
     branches: ["**"]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: rafpolimata-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   semantic-coherence:
     name: Semantic coherence and falsifiability gates
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,19 +30,33 @@ jobs:
       - name: Host C syntax check
         run: bash RAF_host_syntax_check.sh
 
-      - name: Build compiler (strict warnings)
+      - name: Validate complete compiler-station inventory
+        run: python3 scripts/validate_compiler_station_contract.py
+
+      - name: Build compiler with strict warnings
         run: |
           gcc -std=c11 -Wall -Wextra -Werror \
             raf_main.c raf_frontend.c raf_cpu.c raf_asm_emit.c raf_precomp.c \
             -o raf_compile
 
-      - name: Smoke test compiler
+      - name: Smoke test transactional source-dependent compiler
         run: |
           ./raf_compile --help
-          ./raf_compile raf_main.c ci_out
+          ./raf_compile tests/fixtures/raf_return_42.c ci_out --native
+          test -s ci_out.bin
+          test -s ci_out.ops
+          grep -qx 'ops_schema=4' ci_out.ops
+          grep -qx 'transaction_state=COMMITTED' ci_out.ops
+          grep -qx 'ir_value=42' ci_out.ops
+          python3 scripts/validate_ops_manifest.py ci_out.ops --expect-rollback 0
 
-      - name: Validate operational manifest
+      - name: Validate operational manifests and deterministic replay
         run: bash scripts/test_ops_manifest.sh
+
+      - name: Audit M063 and complete APKc HOTFIX station
+        run: |
+          bash scripts/ci_freestanding_audit.sh
+          bash scripts/audit_language_freestanding_contract.sh
 
       - name: Audit repository structure
         run: python3 scripts/audit_repository_structure.py --depth 5
@@ -58,9 +80,6 @@ jobs:
       - name: Validate Android ABI plan
         run: bash scripts/android_build_matrix.sh --plan
 
-      - name: Audit ApkC freestanding invariants
-        run: bash scripts/ci_freestanding_audit.sh
-
       - name: RAF TraceBuf freestanding smoke gate
         run: |
           gcc -std=c11 -Wall -Wextra -Werror \
@@ -73,33 +92,30 @@ jobs:
       - name: ARM64 encoder golden tests
         run: python3 tests/test_arm64_encoders.py
 
-      - name: ARM32 encoder golden tests (L5 mnemonic coverage)
+      - name: ARM32 encoder golden tests
         run: python3 tests/test_arm32_encoders.py
 
       - name: APKc assembler roundtrip smoke test
         run: sh tests/test_asm_roundtrip.sh
 
-      - name: ApkC compile transcript (F1 chain-of-custody)
+      - name: APKc compile transcript — F1 chain of custody
         run: |
           mkdir -p Apkc/proofs/out
-          gcc -std=c11 -O2 -Wall -Wextra \
-            -target aarch64-linux-gnu -nostdlib -ffreestanding -I Apkc \
-            -fsyntax-only Apkc/apkc.c 2>&1 | tee Apkc/proofs/out/apkc-compile.txt || true
-          # Also record host-native compile (for CI runners without cross-compiler)
-          gcc -std=c11 -O2 -Wall -I Apkc Apkc/apkc.c -o apkc_host 2>&1 \
-            | tee -a Apkc/proofs/out/apkc-compile.txt || true
+          clang -std=c11 -O2 -Wall -Wextra -Werror \
+            -target aarch64-linux-gnu -nostdlib -nostdinc -ffreestanding -I Apkc \
+            -fsyntax-only Apkc/apkc.c 2>&1 | tee Apkc/proofs/out/apkc-compile.txt
           echo "F1: apkc-compile.txt generated ($(wc -l < Apkc/proofs/out/apkc-compile.txt) lines)"
 
-      - name: Validate ApkC proof protocol
+      - name: Validate APKc proof protocol
         run: bash scripts/apkc_validate.sh
 
-      - name: ApkC language coverage (asm + script modes)
+      - name: APKc language coverage
         run: bash scripts/apkc_lang_coverage.sh
 
-      - name: ApkC API/ABI matrix (minSdkVersion proof in binary AXML)
+      - name: APKc API and ABI matrix
         run: bash scripts/apkc_api_abi_matrix.sh
 
-      - name: Build and smoke-test verbovivo (T7 toroid + Fiber-H engine)
+      - name: Build and smoke-test verbovivo
         run: |
           gcc -std=c11 -O2 -I. -IBenchmark -DVERBOVIVO_MAIN \
             rafaelia/verbovivo.c rafaelia/fiber_relmat.c -lm -o verbovivo_ci
@@ -109,11 +125,10 @@ jobs:
             ./verbovivo_ci Apkc/hello.apk /dev/null 2>&1 | \
             grep -E 'verbovivo:.*phi=' || echo 'TOKEN_VAZIO: hello.apk ausente'
           echo 'RAFAELIA relmat smoke test' | ./verbovivo_ci -s -m < /dev/stdin > /dev/null 2>&1 || true
-          # A4/B4: SVG engram gate — validate verbovivo produces SVG output
           mkdir -p ci/reports
           echo 'SVG gate test vector for engram' | ./verbovivo_ci -s > ci/reports/engram.svg 2>&1 || true
           grep -q '<svg' ci/reports/engram.svg && echo 'SVG gate: PASS' \
-            || echo 'SVG gate: TOKEN_VAZIO (verbovivo -s did not produce SVG — check verbovivo.c)'
+            || echo 'SVG gate: TOKEN_VAZIO (verbovivo -s did not produce SVG)'
 
       - name: Coherence phi_fst golden tests (C1-C6, Item C)
         run: |
@@ -136,7 +151,7 @@ jobs:
             tools/raf_codegen_select_test.c -o build_codegen_select_test
           ./build_codegen_select_test
 
-      - name: Bus throughput test (S23)
+      - name: Bus throughput test
         run: |
           gcc -std=c11 -Wall -Wextra -Werror -IBenchmark \
             Benchmark/raf_bus_throughput_test.c -o build_bus_throughput_test
@@ -162,22 +177,34 @@ jobs:
           path: ci/reports/watt-proxy.md
           if-no-files-found: warn
 
-      - name: Falsificabilidade P(k) — gate automático (A9)
+      - name: Falsifiability P(k) gate
         run: |
           python3 scripts/first_test_pk.py \
             --data data/pk_observado.csv \
             --output results/first_test_report.json
-          echo "P(k) RRMSE gate: PASS"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('results/first_test_report.json').read_text(encoding='utf-8'))
+          verdict = report['verdict']
+          assert verdict in {'PASS', 'FAIL'}
+          print('P(k) verdict:', verdict)
+          if verdict == 'FAIL':
+              raise SystemExit('P(k) gate FAIL')
+          PY
 
-      - name: Try ApkC debug signing proof (TOKEN_VAZIO allowed)
+      - name: Try APKc debug signing proof
         run: bash scripts/apkc_sign_debug.sh
 
-      - name: Upload ApkC proof artifacts
+      - name: Upload APKc proof and HOTFIX artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: apkc-proofs-out
-          path: Apkc/proofs/out/
+          name: apkc-proofs-and-hotfix-${{ github.run_id }}
+          path: |
+            Apkc/proofs/out/
+            ci/reports/language-freestanding-contract.md
+            ci/contracts/apkc_compiler_station_v2.json
           if-no-files-found: warn
 
       - name: Upload clean-proof-run snapshots
@@ -187,17 +214,3 @@ jobs:
           name: apkc-proof-runs
           path: Apkc/proofs/runs/
           if-no-files-found: warn
-
-      - name: Generate P(k) falsifiability report
-        run: |
-          python3 scripts/first_test_pk.py --output results/first_test_report.json
-          python3 - <<'PY'
-          import json, sys
-          from pathlib import Path
-          report = json.loads(Path('results/first_test_report.json').read_text(encoding='utf-8'))
-          verdict = report['verdict']
-          assert verdict in {'PASS', 'FAIL'}
-          print('P(k) verdict:', verdict)
-          if verdict == 'FAIL':
-              raise SystemExit('P(k) gate FAIL')
-          PY

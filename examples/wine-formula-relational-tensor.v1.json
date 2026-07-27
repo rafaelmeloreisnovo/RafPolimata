@@ -1,0 +1,54 @@
+{
+  "schema_version": "rafaelia.contextual-relational-tensor/v1",
+  "case_id": "case:wine-formula-v1",
+  "blocking_gaps": [
+    "TV-DEF:origin_not_recovered",
+    "TV-SOURCE:literature_not_observed",
+    "TV-DATA:dataset_absent",
+    "TV-UNIT:units_absent"
+  ],
+  "paths": [
+    {
+      "path_id": "path:lexical-oracle",
+      "description": "Responder apenas pela proximidade das palavras vinho, clima e preço.",
+      "features": {
+        "lexical_match": 1.0,
+        "source_support": 0.1,
+        "provenance": 0.1,
+        "layer_coherence": 0.2,
+        "unit_completeness": 0.0,
+        "temporal_fit": 0.1,
+        "counterevidence": 0.7,
+        "gap_penalty": 1.0
+      }
+    },
+    {
+      "path_id": "path:climate-direct-price",
+      "description": "Pular diretamente de clima para preço.",
+      "features": {
+        "lexical_match": 0.8,
+        "source_support": 0.25,
+        "provenance": 0.2,
+        "layer_coherence": 0.15,
+        "unit_completeness": 0.1,
+        "temporal_fit": 0.3,
+        "counterevidence": 0.8,
+        "gap_penalty": 0.9
+      }
+    },
+    {
+      "path_id": "path:climate-phenology-yield-quality-market-price",
+      "description": "Separar mediações agronômicas, estatísticas, temporais e econômicas.",
+      "features": {
+        "lexical_match": 0.6,
+        "source_support": 0.45,
+        "provenance": 0.5,
+        "layer_coherence": 0.9,
+        "unit_completeness": 0.2,
+        "temporal_fit": 0.7,
+        "counterevidence": 0.2,
+        "gap_penalty": 0.7
+      }
+    }
+  ]
+}

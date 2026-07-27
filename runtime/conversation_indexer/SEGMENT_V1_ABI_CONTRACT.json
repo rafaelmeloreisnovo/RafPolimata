@@ -1,0 +1,98 @@
+{
+  "schema": "raf.segment-abi-contract.v1",
+  "contract_state": "FROZEN_IMPLEMENTED_ABI",
+  "claim_allowed": false,
+  "source_base_commit": "b230f79b4519f398d6a0f32c2235527966f14a36",
+  "source_files": [
+    "runtime/conversation_indexer/raf_segment_v1.h",
+    "runtime/conversation_indexer/raf_segment_v1.c",
+    "runtime/conversation_indexer/test_segment_v1.c"
+  ],
+  "file_header": {
+    "magic_ascii": "RAFSEG1\\0",
+    "version_hex": "0x00010000",
+    "serialized_size": 64,
+    "endianness": "little",
+    "header_crc32c_offset": 52,
+    "reserved_range": [56, 64]
+  },
+  "record_envelope": {
+    "kind_offset": 0,
+    "size_offset": 4,
+    "conversation_kind": 1,
+    "message_kind": 2
+  },
+  "conversation_record": {
+    "serialized_size": 96,
+    "fields": [
+      {"name": "flags", "offset": 8, "width": 4},
+      {"name": "message_count", "offset": 12, "width": 4},
+      {"name": "id_hi", "offset": 16, "width": 8},
+      {"name": "id_lo", "offset": 24, "width": 8},
+      {"name": "source_offset", "offset": 32, "width": 8},
+      {"name": "source_length", "offset": 40, "width": 8},
+      {"name": "title_offset", "offset": 48, "width": 8},
+      {"name": "title_length", "offset": 56, "width": 8},
+      {"name": "first_message_index", "offset": 64, "width": 8},
+      {"name": "create_time_us", "offset": 72, "width": 8},
+      {"name": "update_time_us", "offset": 80, "width": 8},
+      {"name": "title_crc32c", "offset": 88, "width": 4},
+      {"name": "record_crc32c", "offset": 92, "width": 4}
+    ]
+  },
+  "message_record": {
+    "serialized_size": 128,
+    "fields": [
+      {"name": "flags", "offset": 8, "width": 4},
+      {"name": "role", "offset": 12, "width": 4},
+      {"name": "conversation_index", "offset": 16, "width": 8},
+      {"name": "message_index", "offset": 24, "width": 8},
+      {"name": "parent_index", "offset": 32, "width": 8},
+      {"name": "id_hi", "offset": 40, "width": 8},
+      {"name": "id_lo", "offset": 48, "width": 8},
+      {"name": "source_offset", "offset": 56, "width": 8},
+      {"name": "source_length", "offset": 64, "width": 8},
+      {"name": "author_offset", "offset": 72, "width": 8},
+      {"name": "author_length", "offset": 80, "width": 8},
+      {"name": "content_offset", "offset": 88, "width": 8},
+      {"name": "content_length", "offset": 96, "width": 8},
+      {"name": "create_time_us", "offset": 104, "width": 8},
+      {"name": "content_crc32c", "offset": 112, "width": 4},
+      {"name": "author_crc32c", "offset": 116, "width": 4},
+      {"name": "record_crc32c", "offset": 120, "width": 4},
+      {"name": "reserved", "offset": 124, "width": 4}
+    ]
+  },
+  "roles": {
+    "UNKNOWN": 0,
+    "USER": 1,
+    "ASSISTANT": 2,
+    "SYSTEM": 3,
+    "TOOL": 4
+  },
+  "identity": {
+    "serialized_width_bits": 128,
+    "fields": ["id_hi", "id_lo"],
+    "current_semantics": "OPAQUE_CALLER_SUPPLIED_128",
+    "blake3_integration": "TOKEN_VAZIO_CRYPTO_GATE",
+    "forbidden_labels": [
+      "BLAKE3_FULL_256",
+      "BLAKE3_32_BYTE_ID"
+    ],
+    "future_allowed_mode_after_crypto_gate": "BLAKE3_128_TRUNCATED_WITH_FULL_256_IN_MANIFEST_OR_EXTENSION"
+  },
+  "compatibility_decision": {
+    "segment_v1": "PRESERVE_CURRENT_CODEC_AND_WIRE_LAYOUT",
+    "task_02_32_byte_identity_layout": "RECLASSIFY_AS_SEGMENT_V2_CANDIDATE",
+    "in_place_role_renumbering": "FORBIDDEN",
+    "in_place_record_relayout": "FORBIDDEN",
+    "writer_gate": "MUST_DECLARE_IDENTITY_MODE_AND_ABI_CONTRACT_SHA256"
+  },
+  "known_spec_conflicts": [
+    "TASK_02 proposes 32-byte id_hash while frozen v1 stores 16-byte opaque identity",
+    "TASK_02 role numbers SYSTEM=1 USER=2 ASSISTANT=3 conflict with frozen v1 USER=1 ASSISTANT=2 SYSTEM=3",
+    "TASK_02 conversation message_count width 64 conflicts with frozen v1 width 32",
+    "TASK_02 source_start/source_end semantics differ from frozen source_offset/source_length",
+    "TASK_02 message layout contains parent_id_hash/content_type while frozen v1 contains indices/author spans/CRC32C"
+  ]
+}
