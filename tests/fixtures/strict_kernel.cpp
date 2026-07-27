@@ -1,5 +1,6 @@
-#include <cstdint>
-#include <cstring>
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
 
 RAF_EXPORT uint32_t raf_cpp_patch(uint32_t current, uint32_t value, uint32_t mask) {
     char probe[8];
