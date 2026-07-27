@@ -1,54 +1,89 @@
 # Operação técnica: compilar e pré-compilar com baixa fricção
 
-> **Entrada canônica:** `docs/AGENTES.md` §8 lista as entradas canônicas por subsistema,
-> incluindo `raf_compile_file()` como entry point do pipeline. Este documento detalha o ciclo
-> de compilação e pré-compilação determinística do núcleo `raf_compile`.
+> **Entrada canônica:** `raf_compile_file()` para o núcleo interno e `make compile` para o backend estrito C/RAF_KERNEL.
 
-Este protocolo transforma a visão multidimensional do projeto em uma rota executável e auditável para o núcleo `raf_compile`.
-
-## Ciclo 1 — pré-compilação determinística
+## Ciclo 1 — lowering determinístico dependente da fonte
 
 1. Detectar arquitetura, linguagem, otimização e recursos de CPU.
-2. Calcular `src_hash` por FNV-1a 64-bit, sem heap e sem dependência externa.
-3. Baixar a entrada para IR fixo com limite estático (`RAF_IR_CAP`).
-4. Registrar `rollback_code` imediatamente quando uma etapa falhar.
+2. Calcular `src_hash` por FNV-1a 64-bit, sem heap.
+3. Localizar `RAF_RETURN(...)`, `return ...` ou `exit ...` fora de comentários e strings.
+4. Avaliar o subset inteiro constante com precedência formal.
+5. Emitir `IR_MOVIMM(valor_u32)` + `IR_RET`.
+6. Falhar quando a fonte contém variável, chamada, divisão por zero ou sintaxe não suportada.
 
-## Ciclo 2 — compilação e materialização
+Não existe mais fallback operacional para `return 42`. O valor 42 permanece apenas como fixture de teste.
 
-1. Emitir assembly textual mínimo.
-2. Emitir bytes hexadecimais reproduzíveis.
-3. Gerar manifesto operacional `.ops` com flags, hash, tamanho, tempo e código de rollback.
-4. Permitir comparação de artefatos entre execuções para FAILSAFE, FAILOVER e ROLLBACK.
+## Ciclo 2 — emissão e materialização
+
+1. Emitir assembly textual específico da arquitetura.
+2. Emitir bytes nativos para x86-64, ARM64, ARM32/Thumb-2 ou RV64.
+3. Gerar `.hex`, `.bin` opcional e manifesto `.ops`.
+4. Comparar duas execuções idênticas.
+5. Exigir divergência entre fontes semanticamente diferentes.
+
+## Ciclo 3 — assimilação C e linguagens hospedadas
+
+A rota estrita de produção é:
+
+```text
+C/C++
+→ raf_c_rewrite.py
+→ raf_libc_emu.h
+→ clang/lld freestanding
+→ ELF sem símbolo indefinido e sem PT_INTERP
+```
+
+Para linguagens que normalmente exigem VM, GC ou interpretador:
+
+```text
+fonte hospedada
+→ RAF_KERNEL nome(args)=expressão
+→ raf_kernel_lower.py
+→ C estrito
+→ mesmo backend freestanding
+```
+
+Isso assimila kernels puros sem transportar Python, JVM, Node, Go runtime, Swift runtime ou Clojure para o artefato final.
+
+## Biblioteca C internalizada
+
+Implementados sem heap:
+
+- memória: `memcpy`, `memmove`, `memset`, `memcmp`;
+- strings: `strlen`, `strnlen`, `strcmp`, `strncmp`, `strchr`, `strrchr`;
+- conversão: `atoi`, `strtoul`;
+- saída mínima: `putchar`, `puts`, `raf_write` por syscall.
+
+Heap, `printf`, FILE, threads, dynamic loading e execução de processo falham fechados no rewriter estrito.
+
+## Comandos
+
+```bash
+make compiler-selftest
+make language-contract
+
+make compile RAF_LANG=c RAF_ARCH=arm64 \
+  SRC=tests/fixtures/strict_kernel.c \
+  OUT=build/strict/libmain.so
+```
 
 ## Critérios operacionais
 
-- Sem `malloc/free` no núcleo de compilação.
-- Sem garbage collector.
-- Buffers estáticos e limites explícitos.
-- Flags derivadas de matriz por arquitetura, linguagem, nível de otimização e feature bits.
-- Falha visível: retorno diferente de zero e `rollback_code` negativo.
+- sem heap/GC no artefato final;
+- buffers e limites explícitos;
+- mesma fonte produz os mesmos bytes;
+- fontes 42 e 1337 não podem produzir bytes idênticos;
+- falha gera retorno não zero e manifesto de rollback;
+- ARM64 e ARM32 são construídos e verificados por `readelf`;
+- ausência de evidência nunca é transformada em PASS.
 
-## Entrega enterprise incremental
+## Separação de estados
 
-O caminho de produção recomendado é manter o compilador pequeno, mensurável e falsificável. Novos backends devem adicionar manifesto, teste de smoke, teste de falha e medição de artefato antes de ativação ampla.
+```text
+COMPILER_STATION_PASS
+≠ APK_SIGNED
+≠ INSTALLED_ON_DEVICE
+≠ ANDROID_RUNTIME_PROVEN
+```
 
-## Mitigações implementadas
-
-- Tempo operacional passa a usar contador monotônico (`CLOCK_MONOTONIC`) em vez de `clock()` de C padrão.
-- Rotas de erro escrevem manifesto parcial com `rollback_code` negativo sempre que o caminho de saída `.ops` já é conhecido.
-- A matriz de flags diferencia x86-64 SSE4/AVX2/AVX512, ARM64 SIMD, ARM32 NEON/ARMv7 e RV64GC.
-- `scripts/test_ops_manifest.sh` valida manifesto de sucesso, manifesto de falha e comparação determinística entre dois `.ops`.
-
-## Lacunas estruturais exploráveis
-
-- Manifestos pequenos e comparáveis são uma superfície de estabilidade que muitos pipelines legados negligenciam.
-- O próximo nível é tratar metadados de compilação como contrato invaríavel: hash, flags, arquitetura, IR, bytes e rollback devem ser testados como ABI operacional.
-- A inovação prática está em provar invariantes simples antes de adicionar modelos grandes: menos símbolos, menos estado oculto, mais rollback verificável.
-
-## Android 9–16+ e interoperabilidade de instalação
-
-- A rota Android mínima é API 28 (Android 9), mantendo compatibilidade planejada até Android 16+ por perfis explícitos.
-- `armeabi-v7a` representa ARM32/v7 com NEON quando disponível; `arm64-v8a` representa ARM64/v8 com SIMD.
-- `scripts/android_build_matrix.sh --plan` gera um plano auditável de instalação por ABI sem exigir NDK no host.
-- `scripts/android_build_matrix.sh --build` tenta compilar com Android NDK quando `ANDROID_NDK_HOME` ou `ANDROID_NDK_ROOT` está definido.
-- O manifesto `.ops` agora inclui `ops_schema` e `ops_signature` para assinatura determinística dos campos estáveis, facilitando interoperabilidade entre empacotamento, instalação e rollback.
+A estação do compilador está fechada. Assinatura, instalação, `logcat` e backends de dispositivo permanecem gates próprios.
