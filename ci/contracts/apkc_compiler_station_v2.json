@@ -14,14 +14,7 @@
   },
   "planes": {
     "build": {
-      "allowed_tools": [
-        "python3",
-        "clang",
-        "lld",
-        "readelf_or_llvm-readelf",
-        "nm_or_llvm-nm",
-        "sha256sum_or_shasum"
-      ],
+      "allowed_tools": ["python3", "clang", "lld", "readelf_or_llvm-readelf", "nm_or_llvm-nm", "sha256sum_or_shasum"],
       "hidden_dependency_allowed": false
     },
     "final_runtime": {
@@ -34,7 +27,8 @@
       "executable_stack": false,
       "rwx_load_segment": false,
       "android_loader_metadata": "PT_DYNAMIC_AND_DT_SONAME_ALLOWED",
-      "memory_ownership": "STATIC_OR_CALLER_OWNED"
+      "memory_ownership": "STATIC_OR_CALLER_OWNED",
+      "unbounded_string_copy": false
     }
   },
   "routes": [
@@ -49,7 +43,7 @@
     {
       "id": "STRICT_C_REWRITE",
       "input_languages": ["c", "cpp"],
-      "accepted_contract": "Single translation unit using only emulated headers and runtime surfaces",
+      "accepted_contract": "Single translation unit using only emulated headers and capacity-aware runtime surfaces",
       "output": ["android_shared_object", "strict_native_receipt"],
       "architectures": ["arm64", "arm32", "x86_64", "rv64"],
       "semantic_scope": "bounded_freestanding_subset"
@@ -87,98 +81,32 @@
     "hosted_raf_kernel_rv64",
     "direct_assembly_all_targets"
   ],
-  "emulated_headers": [
-    "stddef.h",
-    "stdint.h",
-    "stdbool.h",
-    "stdio.h",
-    "stdlib.h",
-    "string.h"
-  ],
+  "emulated_headers": ["stddef.h", "stdint.h", "stdbool.h", "stdio.h", "stdlib.h", "string.h"],
   "emulated_functions": [
-    "memcpy",
-    "memmove",
-    "memset",
-    "memcmp",
-    "memchr",
-    "strlen",
-    "strnlen",
-    "strcmp",
-    "strncmp",
-    "strcpy",
-    "strncpy",
-    "strchr",
-    "strrchr",
-    "atoi",
-    "strtoul",
-    "raf_write",
-    "putchar",
-    "puts"
+    "memcpy", "memmove", "memset", "memcmp", "memchr",
+    "strlen", "strnlen", "strcmp", "strncmp", "strncpy", "strchr", "strrchr",
+    "atoi", "strtoul", "raf_write", "putchar", "puts"
   ],
   "forbidden_runtime_surfaces": [
-    "malloc",
-    "calloc",
-    "realloc",
-    "free",
-    "aligned_alloc",
-    "printf_family",
-    "FILE_streams",
-    "system",
-    "popen",
-    "dlopen",
-    "dlsym",
-    "pthread_create",
-    "fork",
-    "execve",
-    "setjmp",
-    "longjmp",
-    "atexit",
-    "exit",
-    "abort"
+    "malloc", "calloc", "realloc", "free", "aligned_alloc",
+    "strcpy", "strcat", "gets",
+    "printf_family", "FILE_streams", "system", "popen", "dlopen", "dlsym",
+    "pthread_create", "fork", "execve", "setjmp", "longjmp", "atexit", "exit", "abort"
   ],
   "artifacts": [
-    {
-      "suffix": ".s",
-      "producer": "raf_compile",
-      "meaning": "Textual architecture emission",
-      "transactional": true
-    },
-    {
-      "suffix": ".hex",
-      "producer": "raf_compile",
-      "meaning": "Canonical hexadecimal machine-byte stream",
-      "transactional": true
-    },
-    {
-      "suffix": ".bin",
-      "producer": "raf_compile --native",
-      "meaning": "Raw target instruction stream, not an ELF",
-      "transactional": true
-    },
-    {
-      "suffix": ".ops",
-      "producer": "raf_compile",
-      "meaning": "Signed operational receipt schema 4",
-      "transactional": true
-    },
-    {
-      "suffix": ".so",
-      "producer": "apkc_strict_native_build.sh",
-      "meaning": "Sealed self-contained Android shared object",
-      "transactional": true
-    },
-    {
-      "suffix": ".so.receipt.json",
-      "producer": "apkc_strict_native_build.sh",
-      "meaning": "Hash, toolchain, gates and claim-boundary receipt",
-      "transactional": true
-    }
+    {"suffix": ".s", "producer": "raf_compile", "meaning": "Textual architecture emission", "transactional": true},
+    {"suffix": ".hex", "producer": "raf_compile", "meaning": "Canonical hexadecimal machine-byte stream", "transactional": true},
+    {"suffix": ".bin", "producer": "raf_compile --native", "meaning": "Raw target instruction stream, not an ELF", "transactional": true},
+    {"suffix": ".ops", "producer": "raf_compile", "meaning": "Signed operational receipt schema 4", "transactional": true},
+    {"suffix": ".so", "producer": "apkc_strict_native_build.sh", "meaning": "Sealed self-contained Android shared object", "transactional": true},
+    {"suffix": ".so.receipt.json", "producer": "apkc_strict_native_build.sh", "meaning": "Hash, toolchain, gates and claim-boundary receipt", "transactional": true}
   ],
   "blocking_gates": [
     "source_exists_and_is_bounded",
     "unique_and_valid_lowering_contract",
     "unsupported_headers_fail_closed",
     "forbidden_runtime_surfaces_fail_closed",
+    "unbounded_string_copy_fails_closed",
     "strict_object_compilation",
     "link_no_undefined_symbols",
     "no_pt_interp",
@@ -193,7 +121,8 @@
     "manifest_tamper_rejection",
     "rollback_removes_stale_artifacts",
     "c_and_cpp_export_names_unmangled",
-    "libc_overlap_and_conversion_selftests"
+    "libc_overlap_and_conversion_selftests",
+    "strict_native_output_and_receipt_commit_together"
   ],
   "custody": {
     "ops_schema": 4,
@@ -227,6 +156,7 @@
     "scripts/validate_ops_manifest.py",
     "scripts/compare_ops_manifest.py",
     "scripts/test_compiler_station.sh",
+    "scripts/validate_compiler_station_contract.py",
     "tests/raf_libc_emu_selftest.c",
     "docs/APKC_COMPILER_STATION_COMPLETE.md",
     "docs/APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md"
