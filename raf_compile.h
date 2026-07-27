@@ -29,8 +29,14 @@
 #define RAF_LANG_WGSL   15
 #define RAF_LANG_DSP    16
 #define RAF_LANG_TFLITE 17
-#define RAF_LANG_UNKNOWN 18
-#define RAF_LANG_COUNT 19
+/* additional fork/script languages mirroring LP_GO…LP_CLJ */
+#define RAF_LANG_GO      18
+#define RAF_LANG_RB      19
+#define RAF_LANG_SWIFT   20
+#define RAF_LANG_GROOVY  21
+#define RAF_LANG_CLJ     22
+#define RAF_LANG_UNKNOWN 23
+#define RAF_LANG_COUNT   24
 
 #define RAF_OPT_0 0
 #define RAF_OPT_1 1
@@ -154,6 +160,11 @@ static const uint8_t RAF_CAP_MATRIX[RAF_LANG_COUNT][5] = {
  /* WGSL    gpu  */   { 0, 1, 0, 0, 0 },
  /* DSP     dsp  */   { 0, 1, 0, 0, 0 },
  /* TFLITE  npu  */   { 0, 1, 0, 0, 0 },
+ /* GO      fork */   { 0, 1, 0, 0, 0 },
+ /* RB      scr  */   { 1, 1, 1, 0, 1 },
+ /* SWIFT   fork */   { 0, 1, 0, 0, 0 },
+ /* GROOVY  fork */   { 0, 1, 0, 0, 0 },
+ /* CLJ     scr  */   { 1, 1, 1, 0, 1 },
  /* UNKNOWN      */   { 0, 0, 0, 0, 0 },
 };
 
@@ -183,6 +194,11 @@ static inline const char *raf_lang_to_apkc_name(uint8_t lang) {
     case RAF_LANG_WGSL:   return "wgsl";
     case RAF_LANG_DSP:    return "dsp";
     case RAF_LANG_TFLITE: return "tflite";
+    case RAF_LANG_GO:     return "go";
+    case RAF_LANG_RB:     return "rb";
+    case RAF_LANG_SWIFT:  return "swift";
+    case RAF_LANG_GROOVY: return "groovy";
+    case RAF_LANG_CLJ:    return "clj";
     default:              return (const char *)0;
     }
 }

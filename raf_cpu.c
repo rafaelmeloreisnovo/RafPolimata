@@ -230,6 +230,11 @@ uint8_t raf_lang_from_ext(const char *path) {
     if (!strcmp(dot, ".wgsl"))                      return RAF_LANG_WGSL;
     if (!strcmp(dot, ".dsp"))                       return RAF_LANG_DSP;
     if (!strcmp(dot, ".tflite"))                    return RAF_LANG_TFLITE;
+    if (!strcmp(dot, ".go"))                        return RAF_LANG_GO;
+    if (!strcmp(dot, ".rb"))                        return RAF_LANG_RB;
+    if (!strcmp(dot, ".swift"))                     return RAF_LANG_SWIFT;
+    if (!strcmp(dot, ".groovy"))                    return RAF_LANG_GROOVY;
+    if (!strcmp(dot, ".clj"))                       return RAF_LANG_CLJ;
     return RAF_LANG_UNKNOWN;
 }
 
