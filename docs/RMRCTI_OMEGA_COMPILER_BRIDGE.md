@@ -1,116 +1,88 @@
 # RMR-CTI / Ω → RafPolimata compiler bridge
 
-> **Entrada canônica:** `docs/AGENTES.md` §8 (entradas canônicas por subsistema — `Apkc/omega_classifier.h` e `Apkc/codegen_select.h`) e §5 (pipeline operacional — invariante: source bytes → signed Omega ops profile → CI evidence).
+**Entrada canônica:** `Apkc/omega_classifier.h`, `Apkc/codegen_select.h`, `raf_frontend.c` e `ci/contracts/apkc_compiler_station_v2.json`.  
+**Estado:** `RUNTIME_WITH_TEST_GATE / ENGINEERING_METADATA_ONLY`.
 
-Status: `RUNTIME_WITH_TEST_GATE`
+## 1. Propósito
 
-## Purpose
+A ponte integra classificação determinística de bytes da família RMR-CTI/Ω ao compilador e às famílias de encoding ASM, sem copiar UI hospedada, CSV, heap, floating point ou claims sem prova para o núcleo freestanding.
 
-This bridge integrates deterministic byte classification from the RMR-CTI/Ω
-family into RafPolimata's compiler and ASM code-generation paths without
-copying hosted UI, CSV, arena or floating-point code into the freestanding
-compiler.
-
-The oral reference `gbc color 3.6.h` resolves to the concrete file:
+A referência oral `gbc color 3.6.h` resolve para:
 
 ```text
 llamaRafaelia/rmrCti/gbs3_color.c
 ```
 
-That program is a hosted Termux/BBS application. It reads `triad_trace.csv`,
-computes the measured association
+Esse programa hospedado mede:
 
 ```text
 ΔP = P(stable_any=1 | peak) - P(stable_any=1 | nonpeak)
 ```
 
-and uses the value in reports and an interactive arena. The repository contract
-explicitly says that `ΔP ≈ 0.18` is a stability candidate, not a proven universal
-constant or attractor. Therefore **ΔP is not used as a compiler constant or ASM
-threshold**.
+`ΔP≈0.18` permanece candidato medido naquele contexto. Não é constante universal, limiar do compilador ou prova de atrator.
 
-## Source ideas retained
+## 2. Ideias retidas e fronteiras
 
-| Source | Retained idea | Not copied |
+| Fonte | Ideia retida | Não incorporado ao núcleo |
 |---|---|---|
-| `gbs3_color.c` | deterministic trace fields and separation of measurement from presentation | ANSI UI, CSV I/O, malloc/realloc, float, time-based arena RNG |
-| `omega_forest.c` | five routing labels: PROCESSUAL, VOID, FORGOTTEN, MENOSPREZADO, URGENT | corpus-specific IC/PP/CV thresholds, k-means, decay claims |
-| `omega_layersbit.h` | fixed-state fold, 42-attractor mapping, no heap/libc, branchless-friendly byte processing | 4096-bit table-heavy engine and GF tables |
-| `Apkc/coherence.h` | `phi=(1-H)×C` in integer form | treating the metric as semantic truth |
+| `gbs3_color.c` | separar medição, evidência e apresentação | ANSI UI, CSV, arena, heap, RNG temporal |
+| `omega_forest.c` | cinco rótulos de roteamento | k-means e limiares de corpus como verdade universal |
+| `omega_layersbit.h` | fold determinístico e 42 posições | engine tabular integral sem orçamento explícito |
+| `Apkc/coherence.h` | métrica inteira `phi=(1-H)×C` | interpretação ética ou semântica automática |
 
-## New implementation
+## 3. Classificador atual
 
-```text
-Apkc/omega_classifier.h
-```
-
-The header is:
+`Apkc/omega_classifier.h` é:
 
 - freestanding;
 - header-only;
-- no libc;
-- no malloc/heap;
-- no floating point;
-- deterministic;
-- fixed local state: two 256-bit maps (`seen` and `fold`).
+- sem libc e heap;
+- sem ponto flutuante;
+- determinístico;
+- limitado por estado local fixo.
 
-For each byte stream it records:
+Para cada fluxo de bytes registra:
 
 ```text
-bytes
-unique byte count
-byte transitions
-printable/control/zero counts
-256-bit fold occupancy
-entropy proxy [0,8000]
-structural coherence Q16
-phi Q16
-attractor [0,41]
-flags
-five-path Ω routing label
+bytes e bytes únicos
+transições
+contagens printable/control/zero
+ocupação de fold 256-bit
+proxy de entropia [0,8000]
+coerência Q16 e phi Q16
+atrator [0,41]
+flags e rota Ω
 ```
 
-The entropy proxy follows the already present RafPolimata integer form:
+O proxy:
 
 ```text
 H_milli = unique*6000/256 + transitions*2000/(n-1)
 ```
 
-It is a deterministic engineering feature, not Shannon entropy proof.
+é feature de engenharia reproduzível, não prova de entropia de Shannon.
 
-## Five compiler routing labels
+## 4. Cinco rótulos de roteamento
 
-| Label | Compiler meaning |
+| Rótulo | Significado operacional |
 |---|---|
-| `VOID` | no bytes were supplied |
-| `FORGOTTEN` | stream is too short or degenerate to support routing evidence |
-| `MENOSPREZADO` | structural/textual signal exists and may justify optimization review |
-| `URGENT` | high-coherence textual stream eligible for strict priority review |
-| `PROCESSUAL` | ordinary stream; continue through baseline path |
+| `VOID` | nenhuma entrada |
+| `FORGOTTEN` | fluxo curto ou degenerado |
+| `MENOSPREZADO` | sinal estrutural que merece revisão |
+| `URGENT` | stream de alta coerência elegível à prioridade |
+| `PROCESSUAL` | rota ordinária |
 
-These labels do not declare product maturity, scientific value or semantic
-correctness. They are deterministic routing metadata.
+Esses rótulos não declaram maturidade, valor científico, significado ou correção semântica.
 
-## ASM application
+## 5. Aplicação no codegen
 
-`Apkc/codegen_select.h` now calls:
+`Apkc/codegen_select.h` usa:
 
 ```c
 raf_omega_codegen_index(emitted_buf, emitted_len, num_variants)
 ```
 
-The selected key combines:
-
-```text
-attractor
-⊕ path class
-⊕ entropy proxy
-⊕ phi
-⊕ classifier flags
-```
-
-The result is used **only** inside verified-equivalent instruction families.
-The current family is:
+A chave combina atrator, rota, proxy de entropia, `phi` e flags. Ela só pode selecionar membros previamente provados equivalentes, por exemplo:
 
 ```text
 MOV Xd,Xm
@@ -119,90 +91,91 @@ MOV Xd,Xm
 ≡ SUB Xd,Xm,#0
 ```
 
-Thus Ω classification may change encoding bits while preserving the logical
-operation. It must never select between instructions with different outputs,
-flags, exceptions or memory effects.
+A classificação nunca pode escolher entre operações com saída, flags, exceções ou efeitos de memória diferentes. Equivalência arquitetural também não prova equivalência de timing, energia ou side channel.
 
-## Root compiler manifest
+## 6. Compilador raiz após o HOTFIX
 
-`raf_compile` now classifies the source bytes before lowering and writes a
-signed `ops_schema=2` record containing:
+A descrição antiga de `return 42` fixo foi removida. O fluxo operacional atual é:
 
 ```text
-omega_entropy_milli
-omega_phi_q16
-omega_attractor
-omega_flags
-omega_path
-omega_path_name
+bytes reais da fonte
+→ classificação Ω
+→ exatamente uma expressão u32 válida
+→ IR_MOVIMM(valor da fonte) + IR_RET
+→ emissão específica da arquitetura
+→ .s/.hex/.bin
+→ .ops schema 4 transacional
 ```
 
-The numeric Omega fields participate in `ops_signature`, so changing a source
-classification changes the operational fingerprint. Missing source input starts
-as `VOID`; a successfully read source is classified from its real bytes.
+O recibo `.ops` assina com FNV-1a 64 canônico:
 
-This applies to every language currently recognized by the root compiler. It
-does not imply that all those languages already have source-dependent native
-lowering: `raf_precomp.c` remains an explicit deterministic `return 42` anchor.
-The APKc language profiles are a separate and more advanced packaging path.
+```text
+arquitetura + marca + cores
++ linguagem/flags/features
++ tamanho/hash da fonte
++ métricas Ω
++ IR/ASM/BIN + ir_value + emitter_schema
++ estado native
++ rollback_code + transaction_state
+```
 
-## Proof gates
+Estados:
+
+```text
+COMMITTED   = artefatos atuais e coerentes
+ROLLED_BACK = nenhum binário anterior preservado
+```
+
+A classificação Ω participa da impressão operacional, mas não substitui parsing, lowering, compilação, auditoria ELF ou prova de runtime.
+
+## 7. Gates
 
 ```text
 tools/raf_omega_classifier_test.c
-tools/raf_codegen_select_test.c
+ tools/raf_codegen_select_test.c
 scripts/test_ops_manifest.sh
 scripts/validate_ops_manifest.py
 scripts/compare_ops_manifest.py
+scripts/test_compiler_station.sh
+scripts/validate_compiler_station_contract.py
 .github/workflows/ci.yml
 ```
 
-The gates verify:
+Eles verificam:
 
-1. empty stream → `VOID`;
-2. degenerate repeated stream → `FORGOTTEN`;
-3. text/binary flags are distinguished;
-4. metrics and selector replay deterministically;
-5. attractor and selector stay in bounds;
-6. MOV encodings remain bit-distinct and semantically equivalent;
-7. Omega fields are range-checked, name-matched and covered by the `.ops`
-   signature;
-8. two builds of the same source preserve identical stable Omega fields.
+1. estados `VOID` e `FORGOTTEN`;
+2. distinção de flags textuais/binárias;
+3. replay determinístico;
+4. limites de atrator e métricas;
+5. equivalência lógica das famílias de encoding;
+6. assinatura `.ops` recomputável;
+7. adulteração rejeitada;
+8. mesma fonte com mesmos campos estáveis;
+9. fontes com valores diferentes gerando bytes diferentes;
+10. rollback eliminando artefatos antigos.
 
-## Boundaries
+## 8. O que a ponte não prova
 
-This bridge does **not** prove:
+- universalidade das cinco classes;
+- `phi` como medida de ética, significado ou consciência;
+- `ΔP≈0.18` como invariante;
+- compilação geral das 23 linguagens registradas;
+- equivalência microarquitetural ou de side channel;
+- assinatura, instalação ou launch de APK;
+- runtime Android, GPU, DSP ou NPU observado.
 
-- that the five paths are universal semantic classes;
-- that `phi` measures ethics or meaning;
-- that `ΔP≈0.18` is a compiler invariant;
-- that different instruction encodings have identical power, timing or
-  microarchitectural leakage;
-- that equivalent architectural semantics imply equivalent side channels;
-- that the root `raf_compile` already performs complete language parsing and
-  source-dependent lowering.
+Para código sensível a timing, fixar a variante de encoding e auditar a microarquitetura alvo separadamente.
 
-For security-sensitive or constant-time code, force a fixed encoding family
-member and audit the target microarchitecture independently.
-
-## Placement of the remaining Omega programs
-
-| Program | Correct compiler role |
-|---|---|
-| `omega_neuro_full.c` | hosted post-build/source profiler; not part of the freestanding encoder because it uses heap, libc, floating point, token sets and timing |
-| `omega_forest.c` | artifact/corpus routing after metrics exist; its IC/PP/CV and k-means rules are not instruction-selection semantics |
-| `omega_frames_export.c` | export/curation bridge for memory frames; belongs after classification, not inside assembly emission |
-| `omega_layersbit.h` | strongest future candidate for an optional full 4096-bit compiler profile when table size and stack/BSS cost are explicitly accepted |
-
-## Invariant
+## 9. Invariante
 
 ```text
 source bytes
-→ signed Omega ops profile
-→ RMR-CTI measurement discipline
-→ verified ASM equivalence family
-→ reproducible machine-code choice
-→ CI evidence
+→ Ω engineering profile
+→ bounded source-dependent lowering
+→ verified architecture emission
+→ transactional signed receipt
+→ strict ELF and reproducibility gates
+→ claim only inside the tested scope
 ```
 
 FIAT LUX.
