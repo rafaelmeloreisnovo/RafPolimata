@@ -97,11 +97,13 @@ def main() -> int:
 
     rewriter = (ROOT / "scripts" / "raf_c_rewrite.py").read_text(encoding="utf-8")
     lowerer = (ROOT / "scripts" / "raf_kernel_lower.py").read_text(encoding="utf-8")
+    compiler_header = (ROOT / "raf_compile.h").read_text(encoding="utf-8")
     frontend = (ROOT / "raf_frontend.c").read_text(encoding="utf-8")
     precompiler = (ROOT / "raf_precomp.c").read_text(encoding="utf-8")
     libc_emu = (ROOT / "Apkc" / "raf_libc_emu.h").read_text(encoding="utf-8")
     elf_audit = (ROOT / "scripts" / "audit_strict_elf.sh").read_text(encoding="utf-8")
     builder = (ROOT / "scripts" / "apkc_strict_native_build.sh").read_text(encoding="utf-8")
+    runtime_truth = (ROOT / "scripts" / "validate_runtime_truth_local.sh").read_text(encoding="utf-8")
 
     for header in emulated_headers:
         require(f'"{header}"' in rewriter, f"rewriter does not register header {header}")
@@ -116,6 +118,10 @@ def main() -> int:
     require('"strcpy"' in rewriter and "RAF_UNBOUNDED_STRING_COPY_FORBIDDEN" in libc_emu,
             "strcpy fail-closed enforcement absent")
 
+    require("#define RAF_SOURCE_MAX (1u << 20)" in compiler_header,
+            "root source maximum mismatch")
+    require("#define RAF_SOURCE_CAP (RAF_SOURCE_MAX + 1u)" in compiler_header,
+            "root NUL capacity must be separate from payload maximum")
     require("MAX_SOURCE_BYTES = 1 << 20" in rewriter, "rewriter source bound mismatch")
     require("MAX_SOURCE_BYTES = 1 << 20" in lowerer, "lowerer source bound mismatch")
     require("MAX_EXPRESSION_CHARS = 4096" in lowerer, "lowerer expression bound mismatch")
@@ -125,6 +131,8 @@ def main() -> int:
     require("#define RAF_EXPR_MAX_DEPTH 64u" in precompiler, "root depth bound mismatch")
     require("#define RAF_EXPR_MAX_TOKENS 1024u" in precompiler, "root token bound mismatch")
     require("MAX_SOURCE_BYTES=$((1 << 20))" in builder, "strict builder source bound mismatch")
+    require("src_len=1048576" in runtime_truth and "exact + b'x'" in runtime_truth,
+            "exact-max and one-byte-over boundary test absent")
 
     require("#define RAF_OPS_SCHEMA 4u" in frontend, "ops schema 4 not active")
     require("transaction_state" in frontend and "ir_value" in frontend, "transaction receipt fields absent")
