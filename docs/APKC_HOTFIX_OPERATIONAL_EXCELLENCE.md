@@ -4,95 +4,94 @@
 **Escopo:** compilador raiz `u32`, assimilação C/C++, lowering `RAF_KERNEL`, emissão nativa, recibos, rollback e auditoria ELF.  
 **Fronteira:** não promove assinatura, instalação ou execução de APK em dispositivo.
 
-## 1. Por que o HOTFIX foi necessário
-
-A estação anterior eliminou o retorno fixo `42` e criou rotas executáveis, mas a auditoria posterior encontrou defeitos que impediam chamar a cadeia de **excelência operacional**:
+## 1. Defeitos que exigiram o HOTFIX
 
 | Severidade | Defeito localizado | Risco |
 |---|---|---|
-| P0 | offset FNV-1a incorreto no validador `.ops` | recibo legítimo não podia ser recomputado corretamente |
-| P0 | produtor e validador assinavam conjuntos diferentes de campos | cadeia de custódia inconsistente |
-| P0 | falha sobre o mesmo `out_base` podia deixar `.bin/.s/.hex` anteriores | artefato antigo poderia parecer resultado da tentativa nova |
-| P1 | `memmove` ordenava ponteiros não relacionados diretamente | comportamento indefinido em C |
-| P1 | headers sem emulação eram removidos silenciosamente | compilação poderia perder semântica sem diagnóstico claro |
-| P1 | manifests intermediários usavam `claim_allowed=true` | promoção epistemológica antes do ELF final |
-| P1 | C++ exportava símbolos sujeitos a name mangling | loader Android poderia não localizar os entrypoints |
-| P1 | auditoria ELF tratava EXEC e Android `.so` como o mesmo perfil | política contraditória para `PT_DYNAMIC` |
-| P1 | parser podia escolher a primeira entre múltiplas ocorrências | lowering ambíguo em vez de falha fechada |
+| P0 | offset FNV-1a incorreto no validador `.ops` | assinatura operacional impossível de recomputar corretamente |
+| P0 | produtor e validador assinavam campos diferentes | cadeia de custódia inconsistente |
+| P0 | falha podia preservar `.bin/.s/.hex` anteriores | artefato stale parecer resultado novo |
+| P0 | `.so` podia ser promovido antes da criação do recibo | binário órfão sem fechamento de custódia |
+| P1 | `memmove` comparava ponteiros não relacionados | comportamento indefinido em C |
+| P1 | headers sem emulação eram removidos silenciosamente | perda semântica sem diagnóstico |
+| P1 | manifests intermediários usavam `claim_allowed=true` | claim antes do ELF final |
+| P1 | C++ podia aplicar name mangling nos exports | loader Android não localizar entrypoints |
+| P1 | EXEC e Android `.so` usavam a mesma política ELF | contradição sobre `PT_DYNAMIC` |
+| P1 | parser podia selecionar a primeira ocorrência | lowering ambíguo |
+| P1 | `strcpy` e overflow de `atoi` não tinham política segura | overflow de buffer ou aritmética indefinida |
 
-## 2. Correções aplicadas
+## 2. Correções
 
-### 2.1 Recibo operacional `.ops` schema 4
-
-O produtor e o validador usam agora o mesmo contrato assinado:
+### 2.1 `.ops` schema 4
 
 ```text
 arquitetura + marca + cores + linguagem + otimização + features + flags
-+ tamanho/hash da fonte
-+ métricas Ω
-+ contagens IR/ASM/BIN
-+ ir_value + emitter_schema
++ tamanho/hash da fonte + métricas Ω
++ IR/ASM/BIN + ir_value + emitter_schema
 + native_requested/native_written
 + rollback_code + transaction_state
 → FNV-1a 64 canônico
 ```
 
-Estados permitidos:
-
 ```text
 COMMITTED   → rollback_code=0 e artefatos coerentes
-ROLLED_BACK → rollback_code!=0 e nenhum binário antigo preservado
+ROLLED_BACK → rollback_code!=0 e nenhum executável antigo preservado
 ```
 
 Qualquer alteração em campo assinado invalida `ops_signature`.
 
-### 2.2 Escrita transacional
-
-A compilação escreve primeiro em arquivos temporários e somente depois promove por `rename`:
+### 2.2 Transação da saída raiz
 
 ```text
-.tmp → flush/close → rename atômico → COMMITTED
+.tmp → flush/close → rename → COMMITTED
+erro → apagar temporários + apagar .s/.hex/.bin antigos → escrever .ops ROLLED_BACK
 ```
 
-Em erro:
+`FILE_EXISTS ≠ PASS` virou comportamento, não apenas documentação.
+
+### 2.3 Transação do `.so + receipt`
+
+A saída selada e seu recibo formam uma unidade:
 
 ```text
-remover temporários
-remover .s/.hex/.bin anteriores do mesmo out_base
-escrever apenas .ops com ROLLED_BACK
+ELF temporário
+→ auditoria
+→ receipt temporário
+→ promover os dois
 ```
 
-Assim, `FILE_EXISTS ≠ PASS` deixa de ser apenas regra documental e vira comportamento executável.
+Falha antes do fechamento remove a saída nova. Não existe estado válido `OUTPUT_WITHOUT_RECEIPT`.
 
-### 2.3 Emulação C/C++ endurecida
+### 2.4 Emulação C/C++
 
-`Apkc/raf_libc_emu.h` contém uma superfície explícita, sem heap:
+Superfície permitida:
 
 ```text
 memcpy memmove memset memcmp memchr
-strlen strnlen strcmp strncmp strcpy strncpy strchr strrchr
+strlen strnlen strcmp strncmp strncpy strchr strrchr
 atoi strtoul raf_write putchar puts
 ```
 
-Correções relevantes:
+Políticas:
 
-- `memmove` usa ordem de endereços por `uintptr_t`, evitando comparação relacional indefinida entre ponteiros;
+- `memmove` usa ordenação por `uintptr_t` nos targets de endereço plano;
+- `atoi` satura em `INT_MIN/INT_MAX`;
 - `strtoul` valida base, prefixo, `endptr`, sinal e overflow;
-- larguras inteiras recebem assertions de compilação;
+- `strncpy` exige capacidade explícita;
+- `strcpy`, `strcat` e `gets` são proibidos;
 - `RAF_EXPORT` usa `extern "C"` em C++;
-- heap continua proibido por construção.
+- larguras inteiras têm assertions;
+- heap permanece proibido.
 
-### 2.4 Rewriter fail-closed
+### 2.5 Rewriter fail-closed
 
-Somente estes headers podem ser assimilados:
+Headers assimiláveis:
 
 ```text
 stddef.h stdint.h stdbool.h stdio.h stdlib.h string.h
 ```
 
-A presença do header não libera toda sua API. Chamadas fora da superfície emulada continuam bloqueadas. Headers como `ctype.h`, `errno.h`, `time.h`, `unistd.h` e includes locais não resolvidos são rejeitados — nunca removidos silenciosamente.
-
-O manifesto de rewrite é apenas evidência intermediária:
+A presença do header não libera toda a API. Header não emulado, include local sem resolução ou função fora da superfície falha antes do objeto.
 
 ```json
 {
@@ -102,100 +101,85 @@ O manifesto de rewrite é apenas evidência intermediária:
 }
 ```
 
-### 2.5 Lowering `RAF_KERNEL` delimitado
+### 2.6 `RAF_KERNEL`
 
-O marcador precisa existir exatamente uma vez e em linha de anotação independente. Não é reconhecido dentro de string comum.
-
-Semântica:
-
+- exatamente uma anotação em linha independente;
 - até quatro argumentos `uint32_t`;
-- soma, subtração, multiplicação e operações bitwise;
-- divisão/módulo somente por constante não nula;
-- shift somente por constante entre 0 e 31;
-- zero chamadas, atributos, índices, estado ou alocação;
-- resultado `uint32_modulo`.
+- operações aritméticas/bitwise delimitadas;
+- divisão e módulo apenas por constante não nula;
+- shift constante `0..31`;
+- zero chamadas, estado ou alocação;
+- resultado `uint32_modulo`;
+- manifesto intermediário `claim_allowed=false`.
 
-O manifesto de lowering também permanece `claim_allowed=false` até o ELF ser selado.
-
-### 2.6 Dois perfis ELF
+### 2.7 Perfis ELF
 
 ```text
 exec       → ELF EXEC, sem PT_DYNAMIC
 android-so → ELF DYN, PT_DYNAMIC + DT_SONAME permitidos
 ```
 
-Em ambos:
+Ambos bloqueiam:
 
-- sem `PT_INTERP`;
-- sem `DT_NEEDED`;
-- sem símbolo indefinido;
-- sem build-id;
-- sem segmento LOAD RWX;
-- sem pilha executável;
-- sem `RPATH`, `RUNPATH` ou `TEXTREL`;
-- máquina precisa coincidir com o target.
+- `PT_INTERP`;
+- `DT_NEEDED`;
+- símbolos indefinidos;
+- build-id;
+- LOAD RWX;
+- pilha executável;
+- `RPATH/RUNPATH/TEXTREL`;
+- máquina diferente do target.
 
-O perfil Android aceita somente relocação relativa autorizada quando necessária ao loader.
+O perfil Android admite somente relocação relativa autorizada.
 
-### 2.7 Recibo SHA-256 do `.so`
+### 2.8 Recibo SHA-256
 
-Cada compilação estrita aprovada produz:
+Cada saída aprovada produz:
 
 ```text
 libmain.so
 libmain.so.receipt.json
 ```
 
-O recibo registra:
+O recibo registra hashes, arquitetura, target, compilador, dependências de build, zero dependência externa de runtime, gates e claims não promovidos.
 
-- hashes SHA-256 da fonte e saída;
-- target e arquitetura;
-- versão do compilador;
-- dependências do plano de build;
-- zero dependência externa no runtime final;
-- resultado de cada gate;
-- claims permitidos e não reivindicados.
-
-## 3. Matriz real de rotas
+## 3. Matriz real
 
 | Rota | Entrada | Resultado | Limite |
 |---|---|---|---|
-| `ROOT_U32_IR` | uma expressão constante | `.s/.hex/.bin/.ops` | não é parser geral da linguagem |
-| `STRICT_C_REWRITE` | C/C++ no subset explícito | `.so` Android selado | tradução unitária sem includes externos |
-| `HOSTED_RAF_KERNEL` | anotação em 14 perfis | C estrito → `.so` | kernel puro, não linguagem completa |
-| `DIRECT_ASSEMBLY` | ASM do target | `.so` Android selado | validade depende da ISA/toolchain alvo |
+| `ROOT_U32_IR` | uma expressão constante | `.s/.hex/.bin/.ops` | não é parser geral |
+| `STRICT_C_REWRITE` | C/C++ no subset | `.so + receipt` | uma translation unit |
+| `HOSTED_RAF_KERNEL` | anotação em 14 perfis | C estrito → `.so + receipt` | kernel puro |
+| `DIRECT_ASSEMBLY` | ASM do target | `.so + receipt` | depende da ISA |
 
-O inventário canônico está em:
+Inventário:
 
 ```text
 ci/contracts/apkc_compiler_station_v2.json
-```
-
-E é validado por:
-
-```text
 scripts/validate_compiler_station_contract.py
 ```
 
-## 4. Gates adversariais adicionados
+## 4. Gates adversariais
 
 ```text
 ✓ memmove com sobreposição nos dois sentidos
-✓ strtoul: zero, prefixo hexadecimal, sinal e base inválida
-✓ C ARM64 repetido produz byte a byte o mesmo .so
+✓ atoi com saturação positiva/negativa
+✓ strtoul com zero, prefixo, sinal e base inválida
+✓ strcpy proibido; cópia exige capacidade
+✓ C ARM64 reproduzível byte a byte
 ✓ C ARM32
-✓ C++ ARM64 com exports não mangled
+✓ C++ ARM64 sem name mangling
 ✓ Python RAF_KERNEL → ARM64
 ✓ header sem emulação falha antes do objeto
 ✓ múltiplos return falham
 ✓ operador ++ malformado falha
-✓ comentário de bloco não esconde token posterior
-✓ falha sobre saída antiga elimina .s/.hex/.bin
-✓ alteração de ir_value invalida assinatura .ops
-✓ recibo JSON contém somente claims aprovadas pelos gates
+✓ comentário não esconde token posterior
+✓ rollback elimina artefatos antigos
+✓ alteração de ir_value invalida `.ops`
+✓ `.so` e recibo fecham juntos
 ```
 
-## 5. Comandos canônicos
+## 5. Comandos
 
 ```bash
 make compiler-contract
@@ -210,50 +194,43 @@ make compile \
   OUT=build/strict/libmain.so
 ```
 
-## 6. Verdade operacional após o HOTFIX
+## 6. Verdade operacional
 
 ```text
 IMPLEMENTADO:
   lowering u32 dependente da fonte
-  emissão x86-64 / ARM64 / ARM32 Thumb-2 / RV64
-  rewrite C/C++ delimitado
+  x86-64 / ARM64 / ARM32 Thumb-2 / RV64
+  rewrite C/C++ fail-closed
   14 rotas RAF_KERNEL
-  emulação C sem heap
+  emulação sem heap e sem strcpy
   .ops schema 4 transacional
   .so Android sem DT_NEEDED
-  recibos SHA-256
-  testes adversariais e inventário canônico
+  recibos SHA-256 transacionais
+  inventário e testes adversariais
 
-AINDA EXIGE EVIDÊNCIA EXTERNA:
-  assinatura do APK
-  instalação no Android
-  lançamento e logcat
-  ANativeActivity_onCreate observado no dispositivo
-  loaders GPU/DSP/NPU
-  execução x86-64/RV64 quando não houver target disponível
-  semântica geral das linguagens fora dos contratos delimitados
+AINDA EXIGE EVIDÊNCIA:
+  workflows verdes deste commit/PR
+  assinatura e instalação do APK
+  launch e logcat no Android
+  NativeActivity observada
+  GPU/DSP/NPU físico
+  x86-64/RV64 quando não executados no target
+  semântica geral fora dos contratos
 ```
 
-## 7. Promoção de estado
-
-Antes do CI:
+## 7. Promoção
 
 ```text
-IMPLEMENTED_HOTFIX / claim_allowed=false
+antes do CI: IMPLEMENTED_HOTFIX / claim_allowed=false
+após todos os gates: HOTFIX_VERIFIED_BY_CI
 ```
 
-Somente após todos os jobs bloqueantes:
-
-```text
-HOTFIX_VERIFIED_BY_CI / claim_allowed=true
-```
-
-A promoção vale apenas para a estação descrita aqui. Não converte automaticamente o projeto em APK runtime-proven.
+A promoção vale somente para a estação. `HOTFIX_VERIFIED_BY_CI ≠ APK_RUNTIME_PROVEN`.
 
 ## R3
 
 ```text
-F_ok   = cadeia transacional + assinatura reparada + ELF perfilado + testes adversariais
-F_gap  = prova de dispositivo e rotas condicionais sem target executado
-F_next = usar a saída selada no empacotador APK e capturar uma única prova de assinatura→instalação→launch
+F_ok   = transação + FNV reparado + superfície segura + ELF perfilado
+F_gap  = CI do branch, dispositivo e targets condicionais
+F_next = empacotar a saída selada e capturar assinatura→instalação→launch
 ```
