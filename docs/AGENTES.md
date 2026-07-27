@@ -302,6 +302,7 @@ Status remoto, arquivo YAML ou checkbox não substituem a execução do gate.
 | T^7/Fiber-H | `rafaelia/verbovivo.c`, `rafaelia/verbovivo.h` |
 | runtime router | `Benchmark/raf_runtime_router.h` |
 | segmentação | `runtime/conversation_indexer/` |
+| aprendizado científico | `scripts/science_learning_engine.py` → `knowledge_base/` |
 
 ## 11. Referências
 

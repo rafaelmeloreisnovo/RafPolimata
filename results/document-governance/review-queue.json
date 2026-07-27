@@ -1,15 +1,7 @@
 {
   "blockers": [],
-  "broken_references": {
-    "scripts/ci_freestanding_audit.sh": [
-      "stdlib|stdio|string|stdint|unistd|fcntl"
-    ],
-    "tests/test_audit_repository_structure.py": [
-      "docs/guide.md",
-      "missing.md"
-    ]
-  },
-  "commit": "0b896e1507ae1651c656e934c762300eeb407bce",
+  "broken_references": {},
+  "commit": "08b71841a7832195ee9e6cf0c7f190ab3933baba",
   "review_queue": [
     {
       "age_days": 7,
@@ -152,41 +144,6 @@
       "sha256": "9f14bc7d13e6e2a7e43c6598022229aaee749f8ecad8b81cbb769f83dc0fc17e",
       "size_bytes": 257,
       "state_markers": []
-    },
-    {
-      "age_days": 7,
-      "area": "tests",
-      "broken_references": 3,
-      "classification": "INTERNAL",
-      "duplicate_group": null,
-      "evidence_grade": "E2",
-      "inbound_references": 0,
-      "indexed": false,
-      "last_commit": "1df7824f9df99664fc3ddd96015519ff81a2f7f5",
-      "last_modified_at": "2026-07-19T20:15:17-03:00",
-      "lifecycle": "EVIDENCE",
-      "line_count": 87,
-      "media_class": "automation",
-      "normalized_duplicate_group": null,
-      "normalized_sha256": "d199c8e39f61f92025e134473e42447130e64dbd73eb9de644e28c89f30631fc",
-      "outbound_references": 0,
-      "owner_role": "quality-assurance",
-      "path": "tests/test_audit_repository_structure.py",
-      "policy_flags": [],
-      "quality_score": 35,
-      "review_due": false,
-      "review_interval_days": 90,
-      "risk_score": 55,
-      "route": "REFERENCE_REPAIR",
-      "route_reason": "referência local quebrada",
-      "schema": "raf.document-record.v1",
-      "sensitivity_flags": [],
-      "sha256": "e6794487a45f86cba93193c1cb655337d24fb27d5c3286602f7f8861fa10c203",
-      "size_bytes": 3110,
-      "state_markers": [
-        "AUDIT",
-        "FAIL"
-      ]
     },
     {
       "age_days": 16,
@@ -10197,42 +10154,6 @@
       "sha256": "00013a2d3eea65ff22e7aa681022e1761b01beae26eb1403d3d4e4914b81b904",
       "size_bytes": 1143,
       "state_markers": []
-    },
-    {
-      "age_days": 42,
-      "area": "automation",
-      "broken_references": 1,
-      "classification": "INTERNAL",
-      "duplicate_group": null,
-      "evidence_grade": "E2",
-      "inbound_references": 2,
-      "indexed": true,
-      "last_commit": "907b4653ae4a91407748ffdee371d3ec0eac38b0",
-      "last_modified_at": "2026-06-15T09:14:59-03:00",
-      "lifecycle": "ACTIVE",
-      "line_count": 46,
-      "media_class": "automation",
-      "normalized_duplicate_group": null,
-      "normalized_sha256": "b171cb0f216e306d34716c32facc07117938537c438ed7412891b053434eb03e",
-      "outbound_references": 0,
-      "owner_role": "automation-maintainer",
-      "path": "scripts/ci_freestanding_audit.sh",
-      "policy_flags": [],
-      "quality_score": 75,
-      "review_due": false,
-      "review_interval_days": 90,
-      "risk_score": 5,
-      "route": "REFERENCE_REPAIR",
-      "route_reason": "referência local quebrada",
-      "schema": "raf.document-record.v1",
-      "sensitivity_flags": [],
-      "sha256": "ccb573045ea14583ef87f934e58c2491c2b3c83f99c1fbba11d9620a0be84eed",
-      "size_bytes": 1393,
-      "state_markers": [
-        "FAIL",
-        "PASS",
-        "TOKEN_VAZIO"
-      ]
     }
   ],
   "schema": "raf.document-governance.v1",

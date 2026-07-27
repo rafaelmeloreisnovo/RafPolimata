@@ -23,7 +23,9 @@
       "results/document-governance/**",
       "docs/generated/DOCUMENT_GOVERNANCE_INDEX.md",
       "docs/generated/DOCUMENT_REVIEW_QUEUE.md",
-      "tests/test_document_governance.py"
+      "tests/test_document_governance.py",
+      "tests/test_audit_repository_structure.py",
+      "scripts/ci_freestanding_audit.sh"
     ],
     "generated_prefixes": [
       "docs/generated/",

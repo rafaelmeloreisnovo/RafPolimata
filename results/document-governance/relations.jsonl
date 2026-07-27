@@ -240,7 +240,6 @@
 {"evidence": "inline-path", "relation": "references", "source": "docs/AGENTES.md", "target": "rafaelia/verbovivo.c"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/AGENTES.md", "target": "rafaelia/verbovivo.h"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/AGENTES.md", "target": "scripts/audit_repository_structure.py"}
-{"evidence": "inline-path", "relation": "references", "source": "docs/AGENTES.md", "target": "scripts/ci_freestanding_audit.sh"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/AGENTES.md", "target": "scripts/document_governance.py"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/AGENTES.md", "target": "scripts/first_test_pk.py"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/AGENTES.md", "target": "scripts/validate_apkc_formats.py"}
@@ -286,7 +285,6 @@
 {"evidence": "inline-path", "relation": "references", "source": "docs/APKC_VALUE_AND_GAPS.md", "target": "docs/LACUNAS_PROFUNDAS_MVP_PRODUTO.md"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/APKC_VALUE_AND_GAPS.md", "target": "scripts/apkc_api_abi_matrix.sh"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/APKC_VALUE_AND_GAPS.md", "target": "scripts/apkc_lang_coverage.sh"}
-{"evidence": "inline-path", "relation": "references", "source": "docs/APKC_VALUE_AND_GAPS.md", "target": "scripts/ci_freestanding_audit.sh"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/APKC_VALUE_AND_GAPS.md", "target": "scripts/first_test_pk.py"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/APKC_VALUE_AND_GAPS.md", "target": "tests/test_arm64_encoders.py"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/ARQUITETURA_21_NIVEIS.md", "target": "docs/AGENTES.md"}

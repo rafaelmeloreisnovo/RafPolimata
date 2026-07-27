@@ -8,7 +8,6 @@
 | 60 | `ROOT_REVIEW` | `RAFAELIA_COMPLETE_v4.zip` | root-other | arquivo de raiz fora da política declarada |
 | 60 | `ROOT_REVIEW` | `runtime-lock.json` | root-other | arquivo de raiz fora da política declarada |
 | 60 | `ROOT_REVIEW` | `safe-extended` | root-other | arquivo de raiz fora da política declarada |
-| 55 | `REFERENCE_REPAIR` | `tests/test_audit_repository_structure.py` | tests | referência local quebrada |
 | 40 | `LINK_REQUIRED` | `.github/ISSUE_TEMPLATE/copilot-internal-custody-ledger.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/ISSUE_TEMPLATE/copilot-phase-1-conversation-segments.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/pull_request_template.md` | root-other | sem relação de entrada em índice ou documento |
@@ -307,7 +306,6 @@
 | 20 | `ROOT_REVIEW` | `RAFAELIA_MASTER_DOC.txt` | root-other | arquivo de raiz fora da política declarada |
 | 20 | `ROOT_REVIEW` | `RASBERY.MD` | root-other | arquivo de raiz fora da política declarada |
 | 20 | `ROOT_REVIEW` | `README_RAFAELIA_ROOT_OPTIMIZER.md` | root-other | arquivo de raiz fora da política declarada |
-| 5 | `REFERENCE_REPAIR` | `scripts/ci_freestanding_audit.sh` | automation | referência local quebrada |
 
 ## Ordem de tratamento
 

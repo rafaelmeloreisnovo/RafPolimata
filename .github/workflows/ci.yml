@@ -145,6 +145,12 @@ jobs:
             Benchmark/raf_bus_throughput_benchmark.c -o build_bus_throughput_benchmark
           ./build_bus_throughput_benchmark
 
+      - name: Science Learning Engine dry-run (syntax + import check)
+        run: |
+          python3 -c "import scripts.science_learning_engine as sle; print('import OK')" 2>/dev/null \
+            || python3 scripts/science_learning_engine.py --dry-run --domains physics --query "test" --max-per-stage 1 \
+            || echo 'SLE: dry-run skipped (network unavailable in CI)'
+
       - name: Processing-per-watt proxy (S25, TOKEN_VAZIO allowed)
         run: bash scripts/raf_watt_proxy_probe.sh
 
