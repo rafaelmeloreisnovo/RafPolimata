@@ -24,6 +24,27 @@ PYTHON_BIN="${PYTHON:-python3}"
 
 command -v "$CLANG_BIN" >/dev/null 2>&1 || { echo "missing compiler: $CLANG_BIN" >&2; exit 69; }
 command -v "$PYTHON_BIN" >/dev/null 2>&1 || { echo "missing python: $PYTHON_BIN" >&2; exit 69; }
+
+OUTPUT_DIR="$(dirname "$OUTPUT")"
+mkdir -p "$OUTPUT_DIR"
+RECEIPT="$OUTPUT.receipt.json"
+COMMIT_TMP="$OUTPUT.tmp.$$"
+RECEIPT_TMP="$RECEIPT.tmp.$$"
+TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/rafaelia-native.XXXXXX")"
+COMMITTED=0
+cleanup() {
+  rm -rf "$TMP_ROOT"
+  rm -f "$COMMIT_TMP" "$RECEIPT_TMP"
+  if [[ "$COMMITTED" -ne 1 ]]; then
+    rm -f "$OUTPUT" "$RECEIPT"
+  fi
+}
+trap cleanup EXIT HUP INT TERM
+
+# Once the output base was supplied, the invocation owns it. Any failed attempt
+# invalidates a previous pair so existence cannot be confused with freshness.
+rm -f "$OUTPUT" "$RECEIPT"
+
 [[ -s "$SOURCE" ]] || { echo "source missing or empty: $SOURCE" >&2; exit 66; }
 SOURCE_BYTES="$(wc -c < "$SOURCE")"
 [[ "$SOURCE_BYTES" -le "$MAX_SOURCE_BYTES" ]] || {
@@ -54,26 +75,6 @@ case "$ARCH" in
     ;;
   *) echo "unsupported architecture: $ARCH" >&2; exit 65 ;;
 esac
-
-OUTPUT_DIR="$(dirname "$OUTPUT")"
-mkdir -p "$OUTPUT_DIR"
-RECEIPT="$OUTPUT.receipt.json"
-COMMIT_TMP="$OUTPUT.tmp.$$"
-RECEIPT_TMP="$RECEIPT.tmp.$$"
-TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/rafaelia-native.XXXXXX")"
-COMMITTED=0
-cleanup() {
-  rm -rf "$TMP_ROOT"
-  rm -f "$COMMIT_TMP" "$RECEIPT_TMP"
-  if [[ "$COMMITTED" -ne 1 ]]; then
-    rm -f "$OUTPUT" "$RECEIPT"
-  fi
-}
-trap cleanup EXIT HUP INT TERM
-
-# This invocation owns its output base. A failed current attempt must not leave
-# a previous pair that a file-existence check could mistake for the new result.
-rm -f "$OUTPUT" "$RECEIPT"
 
 LOWERED="$TMP_ROOT/lowered.c"
 REWRITTEN="$TMP_ROOT/rewritten.c"
@@ -141,7 +142,6 @@ sha256_file() {
 SOURCE_SHA="$(sha256_file "$SOURCE")"
 OUTPUT_SHA="$(sha256_file "$SEALED")"
 COMPILER_VERSION="$($CLANG_BIN --version | head -n 1)"
-
 cp "$SEALED" "$COMMIT_TMP"
 chmod 0644 "$COMMIT_TMP"
 
@@ -210,8 +210,8 @@ with open(receipt_path, "w", encoding="utf-8", newline="") as handle:
 PY
 chmod 0644 "$RECEIPT_TMP"
 
-# Receipt-first promotion is crash-safer: a power loss can leave metadata
-# without executable output, but never an executable output without custody.
+# Receipt-first is crash-safer: a power loss can leave metadata without output,
+# but never executable output without a custody record.
 mv -f "$RECEIPT_TMP" "$RECEIPT"
 mv -f "$COMMIT_TMP" "$OUTPUT"
 COMMITTED=1
