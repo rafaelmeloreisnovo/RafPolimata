@@ -1,34 +1,77 @@
 #!/usr/bin/env python3
-"""Rewrite a bounded C/C++ subset onto RAFAELIA's freestanding compatibility layer."""
+"""Rewrite a bounded C/C++ subset onto RAFAELIA's freestanding layer.
+
+A header is removed only when its surface is explicitly provided by
+``Apkc/raf_libc_emu.h``. Input is UTF-8 and bounded to the same 1 MiB envelope
+used by the compiler core.
+"""
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import os
 import re
+import tempfile
 from pathlib import Path
 
-SCHEMA = "rafaelia.c.rewrite.v1"
-REPLACED_HEADERS = {
-    "assert.h", "ctype.h", "errno.h", "inttypes.h", "limits.h", "stdbool.h",
-    "stddef.h", "stdint.h", "stdio.h", "stdlib.h", "string.h", "strings.h",
+SCHEMA = "rafaelia.c.rewrite.v2"
+MAX_SOURCE_BYTES = 1 << 20
+EMULATED_HEADERS = {
+    "stddef.h", "stdint.h", "stdbool.h", "stdio.h", "stdlib.h", "string.h",
+}
+UNSUPPORTED_HOSTED_HEADERS = {
+    "assert.h", "ctype.h", "errno.h", "inttypes.h", "limits.h",
+    "setjmp.h", "signal.h", "strings.h", "time.h", "unistd.h",
 }
 EMULATED_CALLS = {
-    "memcpy", "memmove", "memset", "memcmp", "strlen", "strnlen", "strcmp",
-    "strncmp", "strchr", "strrchr", "atoi", "strtoul", "putchar", "puts",
+    "memcpy", "memmove", "memset", "memcmp", "memchr",
+    "strlen", "strnlen", "strcmp", "strncmp", "strncpy",
+    "strchr", "strrchr", "atoi", "strtoul", "putchar", "puts",
 }
 FORBIDDEN_CALLS = {
-    "malloc", "calloc", "realloc", "free", "printf", "fprintf", "sprintf",
-    "snprintf", "vprintf", "vfprintf", "fopen", "fdopen", "fread", "fwrite",
-    "fseek", "ftell", "fclose", "system", "popen", "dlopen", "dlsym",
-    "pthread_create", "fork", "execve", "setjmp", "longjmp", "atexit",
+    "malloc", "calloc", "realloc", "free", "aligned_alloc",
+    "strcpy", "strcat", "gets",
+    "printf", "fprintf", "sprintf", "snprintf", "vprintf", "vfprintf",
+    "fopen", "fdopen", "fread", "fwrite", "fseek", "ftell", "fclose",
+    "system", "popen", "dlopen", "dlsym", "pthread_create", "fork",
+    "execve", "setjmp", "longjmp", "atexit", "exit", "abort",
 }
-FORBIDDEN_TOKENS = {"FILE", "jmp_buf", "pthread_t"}
+FORBIDDEN_TOKENS = {"FILE", "jmp_buf", "pthread_t", "va_list"}
 INJECT = '#include "raf_libc_emu.h"\n'
 
 
 def sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def read_bounded_text(path: Path) -> str:
+    raw = path.read_bytes()
+    if not raw:
+        raise ValueError("source is empty")
+    if len(raw) > MAX_SOURCE_BYTES:
+        raise ValueError(f"source exceeds {MAX_SOURCE_BYTES} bytes")
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError("source is not valid UTF-8") from exc
+
+
+def atomic_write_text(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=str(path.parent))
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="") as handle:
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp_name, path)
+    except BaseException:
+        try:
+            os.unlink(tmp_name)
+        except FileNotFoundError:
+            pass
+        raise
 
 
 def mask_comments_and_literals(src: str) -> str:
@@ -84,23 +127,39 @@ def mask_comments_and_literals(src: str) -> str:
 
 
 def rewrite(src: str) -> tuple[str, dict[str, object]]:
+    source_size = len(src.encode("utf-8"))
+    if source_size == 0:
+        raise ValueError("source is empty")
+    if source_size > MAX_SOURCE_BYTES:
+        raise ValueError(f"source exceeds {MAX_SOURCE_BYTES} bytes")
+
     stripped_headers: list[str] = []
+    unresolved_headers: list[str] = []
     lines: list[str] = []
-    include_re = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]\s*(?://.*)?$')
+    include_re = re.compile(r'^\s*#\s*include\s*([<"])([^>"]+)[>"]\s*(?://.*)?$')
     already_injected = False
+
     for line in src.splitlines(keepends=True):
         match = include_re.match(line.rstrip("\r\n"))
-        if match:
-            header = match.group(1)
-            if header == "raf_libc_emu.h":
-                already_injected = True
-                lines.append(line)
-                continue
-            if header in REPLACED_HEADERS:
-                stripped_headers.append(header)
-                lines.append(f"/* RAF_REWRITE stripped <{header}> */\n")
-                continue
-        lines.append(line)
+        if not match:
+            lines.append(line)
+            continue
+        delimiter, header = match.groups()
+        if header == "raf_libc_emu.h":
+            already_injected = True
+            lines.append(line)
+        elif header in EMULATED_HEADERS:
+            stripped_headers.append(header)
+            lines.append(f"/* RAF_REWRITE emulated <{header}> */\n")
+        elif header in UNSUPPORTED_HOSTED_HEADERS or delimiter == "<":
+            unresolved_headers.append(header)
+        else:
+            unresolved_headers.append(header)
+
+    if unresolved_headers:
+        raise ValueError(
+            "unsupported/unresolved include(s): " + ", ".join(sorted(set(unresolved_headers)))
+        )
 
     body = "".join(lines)
     masked = mask_comments_and_literals(body)
@@ -115,36 +174,55 @@ def rewrite(src: str) -> tuple[str, dict[str, object]]:
     for name in sorted(EMULATED_CALLS):
         if re.search(rf"\b{re.escape(name)}\s*\(", masked):
             emulated.append(name)
-
     if forbidden:
         raise ValueError("forbidden hosted/runtime token(s): " + ", ".join(forbidden))
 
     rewritten = body if already_injected else INJECT + body
     manifest = {
         "schema": SCHEMA,
+        "stage": "SOURCE_REWRITE_ONLY",
+        "source_limit_bytes": MAX_SOURCE_BYTES,
+        "source_bytes": source_size,
         "input_sha256": sha256_text(src),
         "output_sha256": sha256_text(rewritten),
         "stripped_headers": sorted(set(stripped_headers)),
         "emulated_calls": emulated,
+        "unresolved_headers": [],
         "forbidden_calls": [],
         "heap": False,
-        "claim_allowed": True,
+        "claim_allowed": False,
+        "promotion_gate": "STRICT_ELF_AUDIT_AND_REPRODUCIBILITY",
     }
     return rewritten, manifest
 
 
 def selftest() -> int:
-    src = '#include <string.h>\n#include <stdint.h>\nuint32_t f(void){char a[4]; memset(a,0,4); return strlen(a);}\n'
+    src = (
+        '#include <string.h>\n#include <stdint.h>\n'
+        'uint32_t f(void){char a[4]; memset(a,0,4); strncpy(a,"x",sizeof(a)); return strlen(a);}\n'
+    )
     out, manifest = rewrite(src)
     assert out.startswith(INJECT)
-    assert "<string.h>" in out and "RAF_REWRITE stripped" in out
-    assert manifest["emulated_calls"] == ["memset", "strlen"]
-    try:
-        rewrite("void *f(void){ return malloc(4); }\n")
-    except ValueError as exc:
-        assert "malloc" in str(exc)
-    else:
-        raise AssertionError("malloc must fail closed")
+    assert "RAF_REWRITE emulated" in out
+    assert manifest["emulated_calls"] == ["memset", "strlen", "strncpy"]
+    assert manifest["source_bytes"] == len(src.encode("utf-8"))
+    assert manifest["claim_allowed"] is False
+
+    for bad, expected in [
+        ("", "empty"),
+        ("void *f(void){ return malloc(4); }\n", "malloc"),
+        ('char *f(char *d){ return strcpy(d,"x"); }\n', "strcpy"),
+        ("#include <ctype.h>\nint f(int x){return isalpha(x);}\n", "ctype.h"),
+        ('#include "project_local.h"\nint f(void){return 0;}\n', "project_local.h"),
+    ]:
+        try:
+            rewrite(bad)
+        except ValueError as exc:
+            assert expected in str(exc)
+        else:
+            raise AssertionError(f"must reject: {expected}")
+
+    rewrite('int f(void){ const char *s="malloc(4)"; /* free(0) */ return s[0]; }\n')
     print("raf_c_rewrite selftest: PASS")
     return 0
 
@@ -160,17 +238,17 @@ def main() -> int:
         return selftest()
     if not args.source or not args.output:
         parser.error("source and output are required")
-    src = Path(args.source).read_text(encoding="utf-8")
     try:
+        src = read_bounded_text(Path(args.source))
         rewritten, manifest = rewrite(src)
-    except ValueError as exc:
+    except (ValueError, OSError) as exc:
         print(f"raf_c_rewrite: FAIL — {exc}")
         return 65
-    Path(args.output).write_text(rewritten, encoding="utf-8")
+    atomic_write_text(Path(args.output), rewritten)
     if args.manifest:
-        Path(args.manifest).write_text(
+        atomic_write_text(
+            Path(args.manifest),
             json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
         )
     print(f"raf_c_rewrite: PASS — {args.output}")
     return 0

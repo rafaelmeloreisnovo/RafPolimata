@@ -1,123 +1,220 @@
-# APKc / RAF Compiler — Estação concluída
+# APKc / RAF Compiler — Estação completa e endurecida
 
-Estado: `IMPLEMENTED / TESTED_LOCAL / CI_GATED`  
-Escopo: compilação determinística de núcleo `u32`, assimilação de C freestanding, lowering portátil entre linguagens e emissão estrita ARM64/ARM32.  
-Política: ausência de suporte falha fechada; nenhum valor fixo é emitido como se fosse compilação real.
+**Estado no código:** `IMPLEMENTED_HOTFIX`  
+**Estado da evidência neste branch:** `CI_PENDING / claim_allowed=false`  
+**Escopo:** núcleo `u32`, C/C++ estrito, lowering `RAF_KERNEL`, emissão nativa, transação e selagem de `.so` Android.  
+**HOTFIX detalhado:** [`APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md`](APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md).
 
-## 1. O que foi encerrado
-
-A antiga pré-compilação emitia sempre `return 42`, independentemente da fonte. Essa âncora foi removida do caminho operacional. O pipeline agora é:
+## Pipeline canônico
 
 ```text
 fonte
-→ detecção de linguagem
-→ lowering dependente da fonte
-→ IR_MOVIMM(valor real da expressão)
-→ emissão por arquitetura
-→ bytes nativos
-→ manifesto .ops
-→ gates de reprodutibilidade e divergência
+→ detectar rota
+→ validar contrato delimitado
+→ rewrite/lowering dependente da fonte
+→ objeto freestanding
+→ link estrito
+→ auditoria ELF por perfil
+→ promoção atômica do artefato e recibo
 ```
 
-O núcleo interno reconhece um contrato limitado e explícito de retorno `u32`:
-
-```c
-RAF_RETURN((0x100 + 7) ^ 3)
-return 6 * 7;
-```
-
-Operadores aceitos: `+ - * / % << >> & ^ | ~` e parênteses. Expressão variável, chamada de função, divisão por zero ou sintaxe fora do contrato falha com rollback; não há fallback para 42, NOP ou sucesso textual.
-
-## 2. Emissão real por arquitetura
-
-`raf_asm_emit.c` decodifica o valor do IR e produz bytes diferentes para fontes diferentes:
-
-- x86-64: `mov eax, imm32; ret`;
-- ARM64: `movz` + `movk` quando necessário + `ret`;
-- ARM32/Thumb-2: `movw` + `movt` quando necessário + `bx lr`;
-- RV64: `lui/addi` ou `addi` + `jalr`.
-
-O gate compara duas compilações da mesma fonte e exige igualdade, depois compara fontes `42` e `1337` e exige bytes diferentes.
-
-## 3. C sem libc final
-
-`Apkc/raf_libc_emu.h` fornece implementações internas, bounded e sem heap para:
+O compilador raiz mantém a rota compacta:
 
 ```text
-memcpy memmove memset memcmp
-strlen strnlen strcmp strncmp strchr strrchr
-atoi strtoul putchar puts
+exatamente um RAF_RETURN / return / exit constante
+→ IR_MOVIMM(u32)
+→ emissão por arquitetura
+→ .s + .hex + .bin + .ops schema 4
 ```
 
-`malloc`, `calloc`, `realloc` e `free` falham por construção. `printf`, arquivos hospedados, threads, dynamic loading e saltos de runtime são rejeitados pelo rewriter.
+Não existe retorno fixo, NOP de sucesso ou reclassificação silenciosa.
 
-`scripts/raf_c_rewrite.py`:
+## Rotas existentes
 
-1. remove headers hospedados assimiláveis;
-2. injeta `raf_libc_emu.h`;
-3. identifica chamadas emuladas;
-4. rejeita runtime proibido;
-5. grava hashes de entrada/saída e manifesto de transformação.
+| Rota | Contrato | Saída | Limite |
+|---|---|---|---|
+| `ROOT_U32_IR` | uma expressão constante | `.s/.hex/.bin/.ops` | não é parser geral |
+| `STRICT_C_REWRITE` | C/C++ na superfície explícita | `.so + receipt` | uma translation unit, sem includes externos |
+| `HOSTED_RAF_KERNEL` | uma anotação pura em 14 perfis | C estrito → `.so + receipt` | não compila a linguagem completa |
+| `DIRECT_ASSEMBLY` | assembler do target | `.so + receipt` | depende da ISA/toolchain alvo |
 
-A ferramenta externa pode existir no plano de construção. O `.so` final é ligado com `-nostdlib`, `-nostartfiles`, `-nodefaultlibs`, `--no-undefined`, sem `PT_INTERP` e sem símbolo indefinido.
+Inventário de máquina:
 
-## 4. Linguagens hospedadas sem carregar seus runtimes
+```text
+ci/contracts/apkc_compiler_station_v2.json
+```
 
-Para Kotlin, Java, Python, Shell, Perl, JavaScript, PHP, JSX, Go, Ruby, Swift, Groovy, Clojure e Rust assimilado, o contrato portátil é uma anotação única:
+## Emissão
+
+O backend raiz codifica o valor real:
+
+- x86-64: `mov eax, imm32; ret`;
+- ARM64: `movz/movk/ret`;
+- ARM32 Thumb-2: `movw/movt/bx lr`;
+- RV64: `lui/addi/jalr`.
+
+Os gates exercitam C ARM64, C ARM32, C++ ARM64, `RAF_KERNEL` Python ARM64, arquitetura host e semântica local da emulação. Outras combinações permanecem implementadas, mas condicionais à prova no target.
+
+## Superfície C assimilada
+
+```text
+memcpy memmove memset memcmp memchr
+strlen strnlen strcmp strncmp strncpy strchr strrchr
+atoi strtoul raf_write putchar puts
+```
+
+Propriedades:
+
+- zero heap e GC;
+- storage estático ou do chamador;
+- `memmove` sem comparação relacional indefinida de ponteiros;
+- `atoi/strtoul` com overflow determinístico;
+- `strncpy` exige capacidade explícita;
+- `strcpy`, `strcat` e `gets` são proibidos;
+- exports C++ usam `extern "C"`;
+- larguras inteiras são verificadas na compilação.
+
+Headers assimiláveis:
+
+```text
+stddef.h stdint.h stdbool.h stdio.h stdlib.h string.h
+```
+
+A presença do header não libera toda a API. Função não emulada, header hospedado ou include local sem resolução falha fechado.
+
+## `RAF_KERNEL`
+
+Perfis:
+
+```text
+rs kt java py sh pl js php jsx go rb swift groovy clj
+```
+
+Forma:
 
 ```text
 RAF_KERNEL mix(a,b) = ((a ^ b) + 7) & 0xffffffff
 ```
 
-`scripts/raf_kernel_lower.py` valida a expressão, gera C estrito e encaminha para o mesmo backend ARM64/ARM32. A anotação extrai um kernel puro; ela não afirma compilar toda a semântica da linguagem original.
+Regras:
 
-Sem `RAF_KERNEL`, a rota estrita falha. O runtime de Python, JVM, Node, Go, Swift ou Clojure nunca é ocultado dentro do claim freestanding.
+- uma anotação independente;
+- até quatro `uint32_t`;
+- nenhuma chamada ou estado;
+- divisão/módulo por constante não nula;
+- shift constante `0..31`;
+- semântica `uint32_modulo`.
 
-## 5. Entrada operacional única
+Rewrite e lowering continuam `claim_allowed=false`; somente o ELF selado que atravessou todos os gates recebe recibo `STRICT_ELF_PASS`.
+
+## Cadeia de custódia
+
+### `.ops` schema 4
+
+Assina arquitetura, marca, cores, linguagem, flags, hash da fonte, métricas Ω, IR/ASM/BIN, `ir_value`, emissor, estado nativo, rollback e transação com FNV-1a 64 canônico.
+
+```text
+COMMITTED   → artefatos atuais e coerentes
+ROLLED_BACK → nenhum .s/.hex/.bin anterior
+```
+
+### `.so.receipt.json`
+
+Registra SHA-256 da fonte/saída, target, compilador, gates, dependências de build e zero dependência externa no runtime final. `.so` e recibo são tratados como uma única transação: se o recibo não fechar, a saída não permanece promovida.
+
+## Perfis ELF
+
+### `exec`
+
+```text
+ELF EXEC
+sem PT_INTERP
+sem PT_DYNAMIC
+sem relocação residual
+```
+
+### `android-so`
+
+```text
+ELF DYN
+PT_DYNAMIC + DT_SONAME permitidos
+sem PT_INTERP
+sem DT_NEEDED
+sem símbolo indefinido
+somente relocação relativa autorizada
+```
+
+Ambos bloqueiam build-id, pilha executável, LOAD RWX, `RPATH`, `RUNPATH`, `TEXTREL` e seções de exceção/runtime.
+
+## Transação
+
+```text
+.tmp → flush/close → auditoria → rename → COMMITTED
+erro → remover temporários e saídas antigas → ROLLED_BACK
+```
+
+```text
+FILE_EXISTS ≠ PASS
+OLD_FILE ≠ NEW_RESULT
+OUTPUT_WITHOUT_RECEIPT ≠ COMMITTED
+```
+
+## Comandos
 
 ```bash
+make compiler-contract
+make compiler-selftest
+make language-contract
+make hotfix-audit
+
 make compile \
   RAF_LANG=c \
   RAF_ARCH=arm32 \
   SRC=tests/fixtures/strict_kernel.c \
   OUT=build/strict/libmain.so
-
-make compiler-selftest
-make language-contract
 ```
 
-O target `compile-plan` continua disponível somente para auditoria. O target `compile` executa de fato.
-
-## 6. Gates fechados
+## Gates bloqueantes
 
 ```text
-G0 source exists
-G1 rewrite/lowering valid
-G2 strict object compiles
-G3 shared ELF links with no undefined symbols
-G4 no PT_INTERP
-G5 ARM64 and ARM32 class/machine validated
-G6 same source → same bytes/manifest
-G7 different source value → different bytes
-G8 invalid expression/runtime → nonzero rollback
+G00 inventário canônico
+G01 source bounded
+G02 contrato único
+G03 superfície hosted fail-closed
+G04 libc adversarial
+G05 objeto estrito
+G06 link sem undefined
+G07 perfil ELF e máquina
+G08 sem PT_INTERP/DT_NEEDED/RWX/exec-stack/build-id
+G09 mesma fonte → mesma saída
+G10 valores diferentes → bytes diferentes
+G11 assinatura .ops recomposta
+G12 adulteração rejeitada
+G13 rollback remove stale
+G14 C++ sem mangling
+G15 .so + receipt transacionais
 ```
 
-## 7. Limite preservado
+## Não reivindicado
 
-A estação do compilador está concluída no escopo acima. Permanecem como gates externos, não como lacunas do compilador:
+- compilador geral de C/C++ ou linguagens hospedadas;
+- assinatura, instalação e launch de APK;
+- NativeActivity observada em dispositivo;
+- runtime GPU/DSP/NPU;
+- equivalência de timing, energia ou side channel;
+- execução x86-64/RV64 sem target;
+- verdade científica ou semântica derivada de Ω.
 
-- assinatura APK;
-- instalação e lançamento em Android real;
-- `ANativeActivity_onCreate` observado em `logcat`;
-- drivers e loaders GPU/DSP/NPU;
-- compilação geral e irrestrita de todas as construções de C/C++/Rust ou linguagens hospedadas.
+Após CI verde:
 
-Esses itens exigem dispositivo, toolchain ou semântica adicional e continuam separados para impedir promoção falsa.
+```text
+HOTFIX_VERIFIED_BY_CI ≠ APK_RUNTIME_PROVEN
+```
 
 ## R3
 
 ```text
-F_ok   = lowering dependente da fonte + libc assimilada + ARM64/ARM32 + CI bloqueante
-F_gap  = prova Android no dispositivo e semântica geral fora do subset puro
-F_next = usar o compilador concluído para gerar o primeiro APK assinado e capturar runtime no mesmo run
+F_ok   = compilador delimitado + transação + recibos + gates adversariais
+F_gap  = dispositivo Android e targets condicionais
+F_next = empacotar a saída selada numa prova única assinatura→instalação→launch→logcat
 ```

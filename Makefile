@@ -1,5 +1,5 @@
 # RafPolimata — canonical release/compiler entrypoints
-SHELL    := /bin/sh
+SHELL    := /bin/bash
 VERBOVIVO := verbovivo_ci
 SYNTAX_CC := clang -target aarch64-linux-gnu -fsyntax-only -nostdlib -nostdinc -ffreestanding -I Apkc Apkc/apkc.c
 AUDIT_OUT ?= ci/reports/library-assimilation.json
@@ -8,7 +8,7 @@ RAF_ARCH ?= arm64
 SRC ?= tests/fixtures/strict_kernel.c
 OUT ?= build/strict/libmain.so
 
-.PHONY: help syntax verbovivo verbovivo-demo encoders proof audit language-contract compile compile-plan compiler-selftest library-audit strict-elf report clean
+.PHONY: help syntax verbovivo verbovivo-demo encoders proof audit language-contract compile compile-plan compiler-contract compiler-selftest hotfix-audit library-audit strict-elf report clean
 
 help:
 	@echo 'RafPolimata — make targets:'
@@ -19,13 +19,15 @@ help:
 	@echo '  encoders          ARM32 + ARM64 encoder golden tests'
 	@echo '  proof             one clean reproducible proof run (tools/raf_clean_proof_run.sh)'
 	@echo '  audit             freestanding invariant audit (scripts/ci_freestanding_audit.sh)'
-	@echo '  language-contract M063: 23-language lowering/freestanding/bit-patch gate'
+	@echo '  language-contract M063: policies, compiler station and strict ELF gates'
 	@echo '  compile           execute strict compiler: RAF_LANG/RAF_ARCH/SRC/OUT'
-	@echo '  compile-plan      emit the deterministic JSON plan without executing'
-	@echo '  compiler-selftest close the compiler station end to end'
+	@echo '  compile-plan      emit deterministic JSON plan without executing'
+	@echo '  compiler-contract validate the complete machine-readable station inventory'
+	@echo '  compiler-selftest run transactional, custody and adversarial gates'
+	@echo '  hotfix-audit      contract + station + M063 blocking audit'
 	@echo '  library-audit     use LIB/RAF_LANG; writes AUDIT_OUT=$(AUDIT_OUT)'
-	@echo '  strict-elf        audit ELF=$(ELF) for zero interpreter/dynamic/runtime residue'
-	@echo '  report            point at Apkc/proofs/out + latest run dir (PASS/TOKEN_VAZIO)'
+	@echo '  strict-elf        audit ELF=$(ELF) [ELF_PROFILE=exec|android-so]'
+	@echo '  report            show curated proof and latest run state'
 	@echo '  clean             remove generated compiler/demo artifacts'
 
 syntax:
@@ -66,8 +68,14 @@ compile-plan:
 	@test -n "$(RAF_ARCH)" && test -n "$(SRC)" && test -n "$(OUT)" || { echo 'RAF_ARCH, SRC e OUT são obrigatórios' >&2; exit 64; }
 	python3 scripts/raf_strict_compile_plan.py --language "$(RAF_LANG)" --arch "$(RAF_ARCH)" --source "$(SRC)" --output "$(OUT)"
 
+compiler-contract:
+	python3 scripts/validate_compiler_station_contract.py
+
 compiler-selftest:
 	bash scripts/test_compiler_station.sh
+
+hotfix-audit: compiler-contract compiler-selftest language-contract
+	@echo 'RAFAELIA compiler HOTFIX audit: PASS'
 
 library-audit:
 	@test -n "$(LIB)" && test -n "$(RAF_LANG)" || { echo 'Uso: make library-audit LIB=vendor/lib RAF_LANG=c [AUDIT_OUT=...]' >&2; exit 64; }
@@ -75,8 +83,8 @@ library-audit:
 	@echo "library-audit: $(AUDIT_OUT)"
 
 strict-elf:
-	@test -n "$(ELF)" || { echo 'Uso: make strict-elf ELF=out/programa.elf' >&2; exit 64; }
-	bash scripts/audit_strict_elf.sh "$(ELF)"
+	@test -n "$(ELF)" || { echo 'Uso: make strict-elf ELF=out/programa.elf [ELF_PROFILE=exec|android-so]' >&2; exit 64; }
+	bash scripts/audit_strict_elf.sh --profile "$(or $(ELF_PROFILE),exec)" "$(ELF)"
 
 report:
 	@echo '== RafPolimata proof report =='
@@ -96,4 +104,5 @@ report:
 clean:
 	rm -f $(VERBOVIVO) /tmp/engram.svg *.o raf_compile apkc_host
 	rm -rf build/strict build_host_check/ops_manifest
+	find . -maxdepth 4 -type f \( -name '*.tmp.*' -o -name '*.so.receipt.json' \) -delete
 	@echo 'clean: done'

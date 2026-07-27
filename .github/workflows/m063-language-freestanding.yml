@@ -5,19 +5,28 @@ on:
     paths:
       - 'Apkc/lang_freestanding_policy.h'
       - 'Apkc/raf_libc_emu.h'
+      - 'Apkc/proofs/GAPS.md'
       - 'rafaelia/raf_lane16_patch.h'
       - 'RAF_063_language_completion_freestanding.c'
       - 'raf_compile.h'
       - 'raf_cpu.c'
+      - 'raf_frontend.c'
       - 'raf_precomp.c'
       - 'raf_asm_emit.c'
       - 'tests/test_capability_matrix.py'
+      - 'tests/raf_libc_emu_selftest.c'
       - 'tests/fixtures/strict_kernel.c'
+      - 'tests/fixtures/strict_kernel.cpp'
       - 'tests/fixtures/kernel.py'
+      - 'tests/fixtures/unsupported_header.c'
       - 'tests/fixtures/raf_return_42.c'
       - 'tests/fixtures/raf_return_1337.py'
       - 'tests/fixtures/raf_return_invalid.c'
+      - 'tests/fixtures/raf_return_ambiguous.c'
+      - 'tests/fixtures/raf_return_plusplus.c'
+      - 'tests/fixtures/raf_return_comment_tail.c'
       - 'ci/contracts/rafaelia_language_completion_v1.tsv'
+      - 'ci/contracts/apkc_compiler_station_v2.json'
       - 'scripts/audit_language_freestanding_contract.sh'
       - 'scripts/audit_strict_elf.sh'
       - 'scripts/raf_library_assimilation_audit.py'
@@ -27,12 +36,17 @@ on:
       - 'scripts/apkc_strict_native_build.sh'
       - 'scripts/test_compiler_station.sh'
       - 'scripts/test_ops_manifest.sh'
+      - 'scripts/validate_ops_manifest.py'
+      - 'scripts/compare_ops_manifest.py'
+      - 'scripts/validate_compiler_station_contract.py'
+      - 'scripts/validate_runtime_truth_local.sh'
       - 'docs/LANGUAGE_COMPLETION_FREESTANDING_METHODOLOGY.md'
       - 'docs/LIBRARY_ASSIMILATION_AUDIT.md'
       - 'docs/APKC_COMPILER_STATION_COMPLETE.md'
+      - 'docs/APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md'
       - 'docs/OPERACAO_COMPILAR_PRECOMPILAR.md'
+      - 'docs/RMRCTI_OMEGA_COMPILER_BRIDGE.md'
       - 'docs/templates/RAFAELIA_LIBRARY_ASSIMILATION_MANIFEST.yaml'
-      - 'Apkc/proofs/GAPS.md'
       - 'Makefile'
       - '.github/workflows/ci.yml'
       - '.github/workflows/m063-language-freestanding.yml'
@@ -40,19 +54,28 @@ on:
     paths:
       - 'Apkc/lang_freestanding_policy.h'
       - 'Apkc/raf_libc_emu.h'
+      - 'Apkc/proofs/GAPS.md'
       - 'rafaelia/raf_lane16_patch.h'
       - 'RAF_063_language_completion_freestanding.c'
       - 'raf_compile.h'
       - 'raf_cpu.c'
+      - 'raf_frontend.c'
       - 'raf_precomp.c'
       - 'raf_asm_emit.c'
       - 'tests/test_capability_matrix.py'
+      - 'tests/raf_libc_emu_selftest.c'
       - 'tests/fixtures/strict_kernel.c'
+      - 'tests/fixtures/strict_kernel.cpp'
       - 'tests/fixtures/kernel.py'
+      - 'tests/fixtures/unsupported_header.c'
       - 'tests/fixtures/raf_return_42.c'
       - 'tests/fixtures/raf_return_1337.py'
       - 'tests/fixtures/raf_return_invalid.c'
+      - 'tests/fixtures/raf_return_ambiguous.c'
+      - 'tests/fixtures/raf_return_plusplus.c'
+      - 'tests/fixtures/raf_return_comment_tail.c'
       - 'ci/contracts/rafaelia_language_completion_v1.tsv'
+      - 'ci/contracts/apkc_compiler_station_v2.json'
       - 'scripts/audit_language_freestanding_contract.sh'
       - 'scripts/audit_strict_elf.sh'
       - 'scripts/raf_library_assimilation_audit.py'
@@ -62,12 +85,17 @@ on:
       - 'scripts/apkc_strict_native_build.sh'
       - 'scripts/test_compiler_station.sh'
       - 'scripts/test_ops_manifest.sh'
+      - 'scripts/validate_ops_manifest.py'
+      - 'scripts/compare_ops_manifest.py'
+      - 'scripts/validate_compiler_station_contract.py'
+      - 'scripts/validate_runtime_truth_local.sh'
       - 'docs/LANGUAGE_COMPLETION_FREESTANDING_METHODOLOGY.md'
       - 'docs/LIBRARY_ASSIMILATION_AUDIT.md'
       - 'docs/APKC_COMPILER_STATION_COMPLETE.md'
+      - 'docs/APKC_HOTFIX_OPERATIONAL_EXCELLENCE.md'
       - 'docs/OPERACAO_COMPILAR_PRECOMPILAR.md'
+      - 'docs/RMRCTI_OMEGA_COMPILER_BRIDGE.md'
       - 'docs/templates/RAFAELIA_LIBRARY_ASSIMILATION_MANIFEST.yaml'
-      - 'Apkc/proofs/GAPS.md'
       - 'Makefile'
       - '.github/workflows/ci.yml'
       - '.github/workflows/m063-language-freestanding.yml'
@@ -75,17 +103,24 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: m063-compiler-station-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   contract:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+
+      - name: Validate machine-readable compiler inventory
+        run: python3 scripts/validate_compiler_station_contract.py
 
       - name: Validate M063 static core and completed compiler station
         run: bash scripts/audit_language_freestanding_contract.sh
 
-      - name: Validate strict ELF gate with syscall-only specimen
+      - name: Validate strict executable ELF profile
         shell: bash
         run: |
           cat > /tmp/rafaelia-m063-minimal.S <<'ASM'
@@ -98,14 +133,17 @@ jobs:
           ASM
           cc -nostdlib -nostartfiles -nodefaultlibs -no-pie \
             -Wl,--build-id=none -Wl,-e,_start -Wl,--strip-all \
-            /tmp/rafaelia-m063-minimal.S -o /tmp/rafaelia-m063-minimal.elf
-          bash scripts/audit_strict_elf.sh /tmp/rafaelia-m063-minimal.elf
+            -Wl,-z,noexecstack /tmp/rafaelia-m063-minimal.S \
+            -o /tmp/rafaelia-m063-minimal.elf
+          bash scripts/audit_strict_elf.sh --profile exec /tmp/rafaelia-m063-minimal.elf
 
-      - name: Upload M063 audit report
+      - name: Upload M063 and compiler hotfix report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: m063-language-freestanding-${{ github.run_id }}
-          path: ci/reports/language-freestanding-contract.md
+          path: |
+            ci/reports/language-freestanding-contract.md
+            ci/contracts/apkc_compiler_station_v2.json
           if-no-files-found: warn
-          retention-days: 7
+          retention-days: 14

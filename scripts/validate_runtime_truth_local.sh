@@ -21,9 +21,12 @@ printf 'int main(void){return 0;}\n' > "$BUILD/input.c"
 for suffix in s hex bin ops; do
   test -s "$BUILD/out.$suffix"
 done
-grep -qx 'ops_schema=3' "$BUILD/out.ops"
+grep -qx 'ops_schema=4' "$BUILD/out.ops"
+grep -qx 'transaction_state=COMMITTED' "$BUILD/out.ops"
+grep -qx 'ir_value=0' "$BUILD/out.ops"
 grep -qx 'native_requested=1' "$BUILD/out.ops"
 grep -qx 'native_written=1' "$BUILD/out.ops"
+python3 scripts/validate_ops_manifest.py "$BUILD/out.ops" --expect-rollback 0
 
 printf '%s\n' '[4/9] optional output-base parsing'
 (
@@ -31,26 +34,43 @@ printf '%s\n' '[4/9] optional output-base parsing'
   "$BUILD/raf_compile" input.c --native
   test -s raf_out.bin
   grep -qx 'native_written=1' raf_out.ops
+  grep -qx 'transaction_state=COMMITTED' raf_out.ops
 )
 
-printf '%s\n' '[5/9] unknown extension and oversized source rejection'
+printf '%s\n' '[5/9] unknown extension and exact source bound'
 printf 'not a C source\n' > "$BUILD/input.unknown"
 if "$BUILD/raf_compile" "$BUILD/input.unknown" "$BUILD/unknown"; then
   echo 'FAIL unknown extension was accepted as C' >&2
   exit 1
 fi
 grep -qx 'rollback_code=-6' "$BUILD/unknown.ops"
+grep -qx 'transaction_state=ROLLED_BACK' "$BUILD/unknown.ops"
+python3 scripts/validate_ops_manifest.py "$BUILD/unknown.ops" --expect-rollback -6
 
-python3 - "$BUILD/oversized.c" <<'PY'
+python3 - "$BUILD/exact-limit.c" "$BUILD/oversized.c" <<'PY'
 from pathlib import Path
 import sys
-Path(sys.argv[1]).write_bytes(b'x' * (1024 * 1024))
+maximum = 1 << 20
+prefix = b'int main(void){return 0;}\n/*'
+suffix = b'*/\n'
+assert len(prefix) + len(suffix) < maximum
+exact = prefix + (b'x' * (maximum - len(prefix) - len(suffix))) + suffix
+assert len(exact) == maximum
+Path(sys.argv[1]).write_bytes(exact)
+Path(sys.argv[2]).write_bytes(exact + b'x')
 PY
+"$BUILD/raf_compile" "$BUILD/exact-limit.c" "$BUILD/exact-limit" --native
+grep -qx 'src_len=1048576' "$BUILD/exact-limit.ops"
+grep -qx 'transaction_state=COMMITTED' "$BUILD/exact-limit.ops"
+python3 scripts/validate_ops_manifest.py "$BUILD/exact-limit.ops" --expect-rollback 0
+
 if "$BUILD/raf_compile" "$BUILD/oversized.c" "$BUILD/oversized"; then
-  echo 'FAIL oversized source was silently accepted' >&2
+  echo 'FAIL one-byte oversized source was accepted' >&2
   exit 1
 fi
 grep -qx 'rollback_code=-5' "$BUILD/oversized.ops"
+grep -qx 'transaction_state=ROLLED_BACK' "$BUILD/oversized.ops"
+python3 scripts/validate_ops_manifest.py "$BUILD/oversized.ops" --expect-rollback -5
 
 printf '%s\n' '[6/9] source-level honesty invariants'
 python3 - <<'PY'
@@ -69,7 +89,10 @@ checks = {
     'optional output base': 'if (argc > 2 && !is_flag(argv[2]))' in main,
     'native no longer discarded': '(void)do_native' not in frontend,
     'canonical FNV offset': '14695981039346656037' in frontend,
-    'source capacity explicit': 'RAF_SOURCE_CAP' in header,
+    'transactional schema': '#define RAF_OPS_SCHEMA 4u' in frontend,
+    'atomic manifest replacement': 'rename(tmp, ctx->out_ops)' in frontend,
+    'exact source maximum': '#define RAF_SOURCE_MAX (1u << 20)' in header,
+    'terminator capacity separated': '#define RAF_SOURCE_CAP (RAF_SOURCE_MAX + 1u)' in header,
     'unknown language explicit': 'RAF_LANG_UNKNOWN' in header and 'return RAF_LANG_UNKNOWN;' in cpu,
     'presence-only accelerator flags': 'RAF_FEAT_GPU_NODE' in header and '_linux_detect_hw_nodes' in cpu,
     'runtime core count': '_SC_NPROCESSORS_ONLN' in cpu,

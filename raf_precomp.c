@@ -1,18 +1,29 @@
 #include "raf_compile.h"
 
 /* Source-dependent bounded lowering for the canonical u32 kernel contract.
- * Accepted forms (outside comments/strings):
+ * Accepted outside comments/literals:
  *   RAF_RETURN(<constant expression>)
- *   return <constant expression>;
- *   exit <constant expression>
+ *   exactly one return <constant expression>;
+ *   exactly one exit <constant expression>
  * Operators: + - * / % << >> & ^ | ~ and parentheses.
- * No heap, no symbol table and no silent fixed-value fallback. */
+ * Arithmetic is uint64 modulo arithmetic, narrowed explicitly to uint32.
+ */
+
+#define RAF_EXPR_MAX_DEPTH 64u
+#define RAF_EXPR_MAX_TOKENS 1024u
 
 typedef struct {
     const char *p;
     const char *end;
+    unsigned depth;
+    unsigned tokens;
     int err;
 } RafExpr;
+
+typedef struct {
+    const char *after_first;
+    unsigned count;
+} RafKeywordHits;
 
 static int raf_is_ident(char c) {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
@@ -23,12 +34,48 @@ static void raf_skip_ws(RafExpr *e) {
     while (e->p < e->end && (*e->p == ' ' || *e->p == '\t' || *e->p == '\r')) ++e->p;
 }
 
+static int raf_take_token(RafExpr *e) {
+    if (e->tokens >= RAF_EXPR_MAX_TOKENS) {
+        e->err = 1;
+        return 0;
+    }
+    ++e->tokens;
+    return 1;
+}
+
+static int raf_enter(RafExpr *e) {
+    if (e->depth >= RAF_EXPR_MAX_DEPTH) {
+        e->err = 1;
+        return 0;
+    }
+    ++e->depth;
+    return 1;
+}
+
+static void raf_leave(RafExpr *e) {
+    if (e->depth != 0u) --e->depth;
+}
+
+static int raf_single_operator_is_doubled(const char *p, const char *end, char op) {
+    return p + 1 < end && p[0] == op && p[1] == op;
+}
+
 static int raf_match(RafExpr *e, const char *token) {
+    if (e->err) return 0;
     raf_skip_ws(e);
     const char *p = e->p;
     const char *t = token;
+
+    if (token[0] != '\0' && token[1] == '\0') {
+        const char op = token[0];
+        if ((op == '+' || op == '-' || op == '*') &&
+            raf_single_operator_is_doubled(p, e->end, op)) return 0;
+        if (op == '/' && p + 1 < e->end && (p[1] == '/' || p[1] == '*')) return 0;
+    }
+
     while (*t && p < e->end && *p == *t) { ++p; ++t; }
     if (*t) return 0;
+    if (!raf_take_token(e)) return 0;
     e->p = p;
     return 1;
 }
@@ -39,25 +86,31 @@ static uint64_t raf_parse_number(RafExpr *e) {
     raf_skip_ws(e);
     unsigned base = 10u;
     if (e->p + 2 <= e->end && e->p[0] == '0' && (e->p[1] == 'x' || e->p[1] == 'X')) {
-        base = 16u; e->p += 2;
+        base = 16u;
+        e->p += 2;
     } else if (e->p + 2 <= e->end && e->p[0] == '0' && (e->p[1] == 'b' || e->p[1] == 'B')) {
-        base = 2u; e->p += 2;
+        base = 2u;
+        e->p += 2;
     }
+
     uint64_t value = 0u;
     unsigned digits = 0u;
     while (e->p < e->end) {
         unsigned d;
-        char c = *e->p;
+        const char c = *e->p;
         if (c >= '0' && c <= '9') d = (unsigned)(c - '0');
         else if (c >= 'a' && c <= 'f') d = (unsigned)(c - 'a' + 10);
         else if (c >= 'A' && c <= 'F') d = (unsigned)(c - 'A' + 10);
         else break;
         if (d >= base) break;
-        value = value * base + d;
+        value = value * (uint64_t)base + (uint64_t)d;
         ++digits;
         ++e->p;
     }
-    if (digits == 0u) { e->err = 1; return 0u; }
+    if (digits == 0u || !raf_take_token(e)) {
+        e->err = 1;
+        return 0u;
+    }
     while (e->p < e->end && (*e->p == 'u' || *e->p == 'U' || *e->p == 'l' || *e->p == 'L')) ++e->p;
     return value;
 }
@@ -65,7 +118,9 @@ static uint64_t raf_parse_number(RafExpr *e) {
 static uint64_t raf_parse_primary(RafExpr *e) {
     raf_skip_ws(e);
     if (raf_match(e, "(")) {
-        uint64_t value = raf_parse_or(e);
+        if (!raf_enter(e)) return 0u;
+        const uint64_t value = raf_parse_or(e);
+        raf_leave(e);
         if (!raf_match(e, ")")) e->err = 1;
         return value;
     }
@@ -73,9 +128,24 @@ static uint64_t raf_parse_primary(RafExpr *e) {
 }
 
 static uint64_t raf_parse_unary(RafExpr *e) {
-    if (raf_match(e, "+")) return raf_parse_unary(e);
-    if (raf_match(e, "-")) return (uint64_t)(0u - raf_parse_unary(e));
-    if (raf_match(e, "~")) return ~raf_parse_unary(e);
+    if (raf_match(e, "+")) {
+        if (!raf_enter(e)) return 0u;
+        const uint64_t value = raf_parse_unary(e);
+        raf_leave(e);
+        return value;
+    }
+    if (raf_match(e, "-")) {
+        if (!raf_enter(e)) return 0u;
+        const uint64_t value = raf_parse_unary(e);
+        raf_leave(e);
+        return (uint64_t)(0u - value);
+    }
+    if (raf_match(e, "~")) {
+        if (!raf_enter(e)) return 0u;
+        const uint64_t value = raf_parse_unary(e);
+        raf_leave(e);
+        return ~value;
+    }
     return raf_parse_primary(e);
 }
 
@@ -84,11 +154,11 @@ static uint64_t raf_parse_mul(RafExpr *e) {
     for (;;) {
         if (raf_match(e, "*")) value *= raf_parse_unary(e);
         else if (raf_match(e, "/")) {
-            uint64_t rhs = raf_parse_unary(e);
+            const uint64_t rhs = raf_parse_unary(e);
             if (rhs == 0u) { e->err = 1; return 0u; }
             value /= rhs;
         } else if (raf_match(e, "%")) {
-            uint64_t rhs = raf_parse_unary(e);
+            const uint64_t rhs = raf_parse_unary(e);
             if (rhs == 0u) { e->err = 1; return 0u; }
             value %= rhs;
         } else break;
@@ -110,11 +180,11 @@ static uint64_t raf_parse_shift(RafExpr *e) {
     uint64_t value = raf_parse_add(e);
     for (;;) {
         if (raf_match(e, "<<")) {
-            uint64_t rhs = raf_parse_add(e);
+            const uint64_t rhs = raf_parse_add(e);
             if (rhs >= 64u) { e->err = 1; return 0u; }
             value <<= (unsigned)rhs;
         } else if (raf_match(e, ">>")) {
-            uint64_t rhs = raf_parse_add(e);
+            const uint64_t rhs = raf_parse_add(e);
             if (rhs >= 64u) { e->err = 1; return 0u; }
             value >>= (unsigned)rhs;
         } else break;
@@ -150,13 +220,18 @@ static uint64_t raf_parse_or(RafExpr *e) {
     return value;
 }
 
-static const char *raf_find_keyword(const char *src, size_t len, const char *keyword) {
+static RafKeywordHits raf_scan_keyword(const char *src, size_t len, const char *keyword) {
+    RafKeywordHits hits;
+    hits.after_first = (const char *)0;
+    hits.count = 0u;
+
     size_t kw_len = 0u;
     while (keyword[kw_len]) ++kw_len;
     int state = 0; /* 0 code, 1 line comment, 2 block comment, 3 string, 4 char */
+
     for (size_t i = 0u; i < len; ++i) {
-        char c = src[i];
-        char n = i + 1u < len ? src[i + 1u] : '\0';
+        const char c = src[i];
+        const char n = i + 1u < len ? src[i + 1u] : '\0';
         if (state == 0) {
             if (c == '/' && n == '/') { state = 1; ++i; continue; }
             if (c == '/' && n == '*') { state = 2; ++i; continue; }
@@ -165,48 +240,83 @@ static const char *raf_find_keyword(const char *src, size_t len, const char *key
             if ((i == 0u || !raf_is_ident(src[i - 1u])) && i + kw_len <= len) {
                 size_t j = 0u;
                 while (j < kw_len && src[i + j] == keyword[j]) ++j;
-                if (j == kw_len && (i + kw_len == len || !raf_is_ident(src[i + kw_len])))
-                    return src + i + kw_len;
+                if (j == kw_len && (i + kw_len == len || !raf_is_ident(src[i + kw_len]))) {
+                    ++hits.count;
+                    if (hits.after_first == (const char *)0) hits.after_first = src + i + kw_len;
+                    i += kw_len - 1u;
+                }
             }
         } else if (state == 1) {
             if (c == '\n') state = 0;
         } else if (state == 2) {
             if (c == '*' && n == '/') { state = 0; ++i; }
-        } else if (state == 3 || state == 4) {
+        } else {
             if (c == '\\' && n != '\0') { ++i; continue; }
             if ((state == 3 && c == '"') || (state == 4 && c == '\'')) state = 0;
         }
     }
-    return (const char *)0;
+    return hits;
+}
+
+static int raf_skip_tail_space_and_comments(RafExpr *e) {
+    for (;;) {
+        while (e->p < e->end && (*e->p == ' ' || *e->p == '\t' || *e->p == '\r')) ++e->p;
+        if (e->p + 1 < e->end && e->p[0] == '/' && e->p[1] == '/') {
+            e->p += 2;
+            while (e->p < e->end && *e->p != '\n') ++e->p;
+            return 1;
+        }
+        if (e->p + 1 < e->end && e->p[0] == '/' && e->p[1] == '*') {
+            e->p += 2;
+            while (e->p + 1 < e->end && !(e->p[0] == '*' && e->p[1] == '/')) ++e->p;
+            if (e->p + 1 >= e->end) return 0;
+            e->p += 2;
+            continue;
+        }
+        return 1;
+    }
 }
 
 static int raf_expression_tail_ok(RafExpr *e, int marker_parenthesized) {
-    raf_skip_ws(e);
+    if (!raf_skip_tail_space_and_comments(e)) return 0;
     if (marker_parenthesized) {
         if (e->p >= e->end || *e->p != ')') return 0;
         ++e->p;
-        raf_skip_ws(e);
+        if (!raf_skip_tail_space_and_comments(e)) return 0;
     }
     if (e->p >= e->end) return 1;
-    return *e->p == ';' || *e->p == '\n' || *e->p == '\r' || *e->p == '}' ||
-           (e->p + 1 < e->end && e->p[0] == '/' && (e->p[1] == '/' || e->p[1] == '*'));
+    return *e->p == ';' || *e->p == '\n' || *e->p == '\r' || *e->p == '}';
 }
 
 int raf_precompile(RafCtx *ctx) {
     if (!ctx || !ctx->src) return -1;
-    const char *start = raf_find_keyword(ctx->src, ctx->src_len, "RAF_RETURN");
-    int marker_parenthesized = 0;
-    if (start) {
-        while (start < ctx->src + ctx->src_len && (*start == ' ' || *start == '\t' || *start == '\r')) ++start;
-        if (start < ctx->src + ctx->src_len && *start == '(') { ++start; marker_parenthesized = 1; }
-    } else {
-        start = raf_find_keyword(ctx->src, ctx->src_len, "return");
-        if (!start) start = raf_find_keyword(ctx->src, ctx->src_len, "exit");
-    }
-    if (!start) return -2;
+    ctx->ir.n = 0u;
 
-    RafExpr expr = { start, ctx->src + ctx->src_len, 0 };
-    uint64_t value = raf_parse_or(&expr);
+    const RafKeywordHits marker = raf_scan_keyword(ctx->src, ctx->src_len, "RAF_RETURN");
+    const char *start = (const char *)0;
+    int marker_parenthesized = 0;
+
+    if (marker.count != 0u) {
+        if (marker.count != 1u) return -2;
+        start = marker.after_first;
+        while (start < ctx->src + ctx->src_len && (*start == ' ' || *start == '\t' || *start == '\r')) ++start;
+        if (start >= ctx->src + ctx->src_len || *start != '(') return -3;
+        ++start;
+        marker_parenthesized = 1;
+    } else {
+        const RafKeywordHits returns = raf_scan_keyword(ctx->src, ctx->src_len, "return");
+        const RafKeywordHits exits = raf_scan_keyword(ctx->src, ctx->src_len, "exit");
+        if (returns.count + exits.count != 1u) return -2;
+        start = returns.count == 1u ? returns.after_first : exits.after_first;
+    }
+
+    RafExpr expr;
+    expr.p = start;
+    expr.end = ctx->src + ctx->src_len;
+    expr.depth = 0u;
+    expr.tokens = 0u;
+    expr.err = 0;
+    const uint64_t value = raf_parse_or(&expr);
     if (expr.err || !raf_expression_tail_ok(&expr, marker_parenthesized)) return -3;
 
     ctx->ir.n = 2u;
