@@ -779,7 +779,6 @@
 {"evidence": "inline-path", "relation": "references", "source": "tests/fixtures/README.md", "target": "Apkc/proofs/runs/2026-06-14-tv/sha256.txt"}
 {"evidence": "inline-path", "relation": "references", "source": "tests/fixtures/README.md", "target": "tests/test_format_fixtures.py"}
 {"evidence": "inline-path", "relation": "references", "source": "tests/fixtures/README.md", "target": "tests/test_zip_negative.py"}
-{"evidence": "markdown-link", "relation": "references", "source": "tests/test_document_governance.py", "target": "docs/INDEX.md"}
 {"evidence": "inline-path", "relation": "references", "source": "tools/rafbbs/ENTERPRISE_BAREMETAL.md", "target": "tools/rafbbs/rafbbs_baremetal.h"}
 {"evidence": "inline-path", "relation": "references", "source": "tools/rafbbs/ENTERPRISE_BAREMETAL.md", "target": "tools/rafbbs/rafbbs_host.h"}
 {"evidence": "inline-path", "relation": "references", "source": "tools/rafbbs/ENTERPRISE_BAREMETAL.md", "target": "tools/rafbbs/rafbbs_manifest_bin.h"}

@@ -22,7 +22,8 @@
       ".idea/**",
       "results/document-governance/**",
       "docs/generated/DOCUMENT_GOVERNANCE_INDEX.md",
-      "docs/generated/DOCUMENT_REVIEW_QUEUE.md"
+      "docs/generated/DOCUMENT_REVIEW_QUEUE.md",
+      "tests/test_document_governance.py"
     ],
     "generated_prefixes": [
       "docs/generated/",

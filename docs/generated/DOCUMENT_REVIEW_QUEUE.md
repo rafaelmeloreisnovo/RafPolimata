@@ -4,7 +4,6 @@
 
 | Risco | Rota | Arquivo | Área | Motivo |
 |---:|---|---|---|---|
-| 90 | `QUARANTINE_REVIEW` | `tests/test_document_governance.py` | tests | material potencialmente secreto; conteúdo não é exposto no relatório |
 | 80 | `SENSITIVITY_REVIEW` | `scripts/apkc_verified_build.py` | automation | padrão sensível candidato; requer revisão humana |
 | 60 | `ROOT_REVIEW` | `RAFAELIA_COMPLETE_v4.zip` | root-other | arquivo de raiz fora da política declarada |
 | 60 | `ROOT_REVIEW` | `runtime-lock.json` | root-other | arquivo de raiz fora da política declarada |

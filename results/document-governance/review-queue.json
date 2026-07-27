@@ -1,42 +1,5 @@
 {
-  "blockers": [
-    {
-      "age_days": 7,
-      "area": "tests",
-      "broken_references": 2,
-      "classification": "INTERNAL",
-      "duplicate_group": null,
-      "evidence_grade": "E2",
-      "inbound_references": 0,
-      "indexed": false,
-      "last_commit": "a407d7fc3a0d06fa23b4192e2fc2f41f4c8c0278",
-      "last_modified_at": "2026-07-19T20:04:58-03:00",
-      "lifecycle": "EVIDENCE",
-      "line_count": 215,
-      "media_class": "automation",
-      "normalized_duplicate_group": null,
-      "normalized_sha256": "2fe582c104ed3a7b5f0f6a1414644b66bd9a86aa3ca0dbb5eacbb4165f391d5d",
-      "outbound_references": 1,
-      "owner_role": "quality-assurance",
-      "path": "tests/test_document_governance.py",
-      "policy_flags": [],
-      "quality_score": 30,
-      "review_due": false,
-      "review_interval_days": 90,
-      "risk_score": 90,
-      "route": "QUARANTINE_REVIEW",
-      "route_reason": "material potencialmente secreto; conteúdo não é exposto no relatório",
-      "schema": "raf.document-record.v1",
-      "sensitivity_flags": [
-        "private_key_block"
-      ],
-      "sha256": "20def0040c4a2b6238a02e58c0ceabcf79d1815ea607b6afaa4aa958c7643ef7",
-      "size_bytes": 8652,
-      "state_markers": [
-        "PASS"
-      ]
-    }
-  ],
+  "blockers": [],
   "broken_references": {
     "scripts/ci_freestanding_audit.sh": [
       "stdlib|stdio|string|stdint|unistd|fcntl"
@@ -47,50 +10,10 @@
     "tests/test_audit_repository_structure.py": [
       "docs/guide.md",
       "missing.md"
-    ],
-    "tests/test_document_governance.py": [
-      "guide.md",
-      "missing.md"
     ]
   },
-  "commit": "c2e4279930fd9402dfc2d5b601dd8ac00c3cb992",
+  "commit": "1b070d0171574cda942d2c3c0f5a9c66ffd2a2fc",
   "review_queue": [
-    {
-      "age_days": 7,
-      "area": "tests",
-      "broken_references": 2,
-      "classification": "INTERNAL",
-      "duplicate_group": null,
-      "evidence_grade": "E2",
-      "inbound_references": 0,
-      "indexed": false,
-      "last_commit": "a407d7fc3a0d06fa23b4192e2fc2f41f4c8c0278",
-      "last_modified_at": "2026-07-19T20:04:58-03:00",
-      "lifecycle": "EVIDENCE",
-      "line_count": 215,
-      "media_class": "automation",
-      "normalized_duplicate_group": null,
-      "normalized_sha256": "2fe582c104ed3a7b5f0f6a1414644b66bd9a86aa3ca0dbb5eacbb4165f391d5d",
-      "outbound_references": 1,
-      "owner_role": "quality-assurance",
-      "path": "tests/test_document_governance.py",
-      "policy_flags": [],
-      "quality_score": 30,
-      "review_due": false,
-      "review_interval_days": 90,
-      "risk_score": 90,
-      "route": "QUARANTINE_REVIEW",
-      "route_reason": "material potencialmente secreto; conteúdo não é exposto no relatório",
-      "schema": "raf.document-record.v1",
-      "sensitivity_flags": [
-        "private_key_block"
-      ],
-      "sha256": "20def0040c4a2b6238a02e58c0ceabcf79d1815ea607b6afaa4aa958c7643ef7",
-      "size_bytes": 8652,
-      "state_markers": [
-        "PASS"
-      ]
-    },
     {
       "age_days": 7,
       "area": "automation",
@@ -10351,5 +10274,5 @@
     }
   ],
   "schema": "raf.document-governance.v1",
-  "state": "FAIL"
+  "state": "REVIEW_REQUIRED"
 }
