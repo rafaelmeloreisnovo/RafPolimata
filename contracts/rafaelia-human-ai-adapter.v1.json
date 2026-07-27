@@ -1,0 +1,39 @@
+{
+  "schema": "raf.human-ai.adapter.v1",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "default_branch": "main",
+  "role": "DETERMINISTIC_STRUCTURER",
+  "contract": {
+    "repository": "rafaelmeloreisnovo/RafGitTools",
+    "path": "contracts/human-ai-middleware-v1.schema.json",
+    "version": "1.0.0",
+    "commit_pin": "fd184197f72b1669102fc76be771d52e02fc3902"
+  },
+  "allowed_inputs": ["authorized_job", "bounded_source"],
+  "allowed_outputs": ["segments", "validation_report", "runtime_receipt"],
+  "allowed_effects": ["READ_ONLY", "LOCAL_WRITE"],
+  "forbidden_effects": ["SENSOR_READ", "GIT_WRITE", "NETWORK_WRITE", "PUBLIC_WRITE"],
+  "privacy": {
+    "mode": "LOCAL_FIRST",
+    "raw_secrets_allowed": false,
+    "public_private_data_allowed": false,
+    "minimization_required": true
+  },
+  "human_control": {
+    "approval_for_write": true,
+    "approval_for_sensitive_data": true,
+    "revocation": true,
+    "appeal": true
+  },
+  "token_vazio": {
+    "preserved": true,
+    "requires_reason": true,
+    "requires_next_step": true,
+    "loop_budget_enforced": true
+  },
+  "evidence": {
+    "implementation_state": "IMPLEMENTED",
+    "runtime_state": "TOKEN_VAZIO",
+    "claim_allowed": false
+  }
+}

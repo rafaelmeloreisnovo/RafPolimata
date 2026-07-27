@@ -34,6 +34,10 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 | Documento | Função |
 |---|---|
 | [ARQUITETURA_21_NIVEIS.md](ARQUITETURA_21_NIVEIS.md) | arquitetura semântica em 21 níveis |
+| [LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md](LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md) | matriz multilíngue, operadores e promoção 0,1 por evidência |
+| [LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01_ERRATA_V1_1.md](LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01_ERRATA_V1_1.md) | corrige a escada universal: teto 0,5 e perfis próprios acima dele |
+| [LINGUAGEM/COERENCIA_COMMIT_FRACTAL_OMEGA.md](LINGUAGEM/COERENCIA_COMMIT_FRACTAL_OMEGA.md) | commits, fixture SHA-256, sete direções e fechamento Ω |
+| [LINGUAGEM/ATLAS_ARCOS_FLUXOS_LIVROS_ATOS_CRENCAS_MATEMATICA.md](LINGUAGEM/ATLAS_ARCOS_FLUXOS_LIVROS_ATOS_CRENCAS_MATEMATICA.md) | posições metodológicas, árvore canônica aberta, arcos textuais e semântica dos números |
 | [DEZ_DIMENSOES_SEMANTICAS.md](DEZ_DIMENSOES_SEMANTICAS.md) | dimensões e dinâmicas do sentido |
 | [CONVERGENCIA_UNICA_METODOLOGICA.md](CONVERGENCIA_UNICA_METODOLOGICA.md) | convergência metodológica auditável |
 | [CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md](CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md) | relações com repositórios irmãos |
@@ -44,6 +48,8 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 
 | Documento | Função |
 |---|---|
+| [REPOSITORY_COMMIT_TRACKER_OMEGA.md](REPOSITORY_COMMIT_TRACKER_OMEGA.md) | rastreamento bounded de repositórios, forks, commits, shards e snapshots |
+| [REPOSITORY_PR_CONTEXT_SIDECAR.md](REPOSITORY_PR_CONTEXT_SIDECAR.md) | sidecar de contexto temporal e semântico dos pull requests |
 | [EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md](EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md) | governança de otimização, fallback e rollback |
 | [ROTINA_OPERACIONAL_BENCHMARKS.md](ROTINA_OPERACIONAL_BENCHMARKS.md) | rotina de benchmark e estatística operacional |
 | [PROTOCOLO_FALSIFICABILIDADE_PK.md](PROTOCOLO_FALSIFICABILIDADE_PK.md) | falsificabilidade mínima em P(k) |
@@ -119,9 +125,16 @@ python3 -m unittest \
   tests.test_document_governance \
   tests.test_audit_repository_structure \
   tests.test_validate_root_file_decisions \
-  tests.test_audit_zip_artifact
+  tests.test_audit_zip_artifact \
+  tests.test_language_matrix \
+  tests.test_language_commit_evidence \
+  tests.test_repo_commit_tracker \
+  tests.test_repo_pr_context_tracker
 
 python3 scripts/validate_root_file_decisions.py
+python3 scripts/language_matrix.py --state data/language/language-matrix-state.v1.json
+python3 scripts/language_commit_evidence.py
+python3 scripts/repo_commit_tracker.py --validate-only
 python3 scripts/document_governance.py --write --print-summary
 python3 scripts/document_governance.py --check --print-summary
 ```

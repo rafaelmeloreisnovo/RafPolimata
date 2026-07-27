@@ -39,6 +39,9 @@ clang --target=aarch64-linux-gnu -fsyntax-only -nostdlib -nostdinc \
 
 Falha bloqueia promoção.
 
+Rota local sem Gradle/SDK/rede para a entrada assembly interna:
+`sh scripts/apkc_termux_hermetic_build.sh --abi both`. O contrato e os limites estão em `docs/APKC_HERMETIC_TERMUX.md`.
+
 ## 2. Papéis funcionais
 
 | Papel | Responsabilidade | Autoriza merge? |
@@ -302,6 +305,7 @@ Status remoto, arquivo YAML ou checkbox não substituem a execução do gate.
 | T^7/Fiber-H | `rafaelia/verbovivo.c`, `rafaelia/verbovivo.h` |
 | runtime router | `Benchmark/raf_runtime_router.h` |
 | segmentação | `runtime/conversation_indexer/` |
+| aprendizado científico | `scripts/science_learning_engine.py` → `knowledge_base/` |
 
 ## 11. Referências
 

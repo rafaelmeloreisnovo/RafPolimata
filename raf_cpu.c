@@ -210,9 +210,11 @@ void raf_cpu_detect(RafCPU *cpu) {
 }
 
 uint8_t raf_lang_from_ext(const char *path) {
-    const char *dot = strrchr(path, '.');
+    const char *dot;
+    if (path == (const char *)0) return RAF_LANG_UNKNOWN;
+    dot = strrchr(path, '.');
     if (!dot) return RAF_LANG_UNKNOWN;
-    if (!strcmp(dot, ".c"))                         return RAF_LANG_C;
+    if (!strcmp(dot, ".c"))                           return RAF_LANG_C;
     if (!strcmp(dot, ".cpp") || !strcmp(dot, ".cc")) return RAF_LANG_CPP;
     if (!strcmp(dot, ".s") || !strcmp(dot, ".S")) return RAF_LANG_S;
     if (!strcmp(dot, ".py"))                        return RAF_LANG_PY;
@@ -294,10 +296,15 @@ void raf_flag_matrix_get(uint8_t arch, uint8_t lang, uint8_t opt, uint32_t feat,
         lang_flags = " -ffreestanding -fno-builtin";
     }
 
+    /* Hosted and managed routes are recorded, not promoted to strict native
+     * flags. M063 requires lowering before a freestanding final claim. */
     if (lang == RAF_LANG_PY || lang == RAF_LANG_JAVA ||
         lang == RAF_LANG_KT || lang == RAF_LANG_SH ||
         lang == RAF_LANG_PL || lang == RAF_LANG_JS ||
-        lang == RAF_LANG_PHP || lang == RAF_LANG_JSX) {
+        lang == RAF_LANG_PHP || lang == RAF_LANG_JSX ||
+        lang == RAF_LANG_GO || lang == RAF_LANG_RB ||
+        lang == RAF_LANG_SWIFT || lang == RAF_LANG_GROOVY ||
+        lang == RAF_LANG_CLJ) {
         lang_flags = "";
     }
 

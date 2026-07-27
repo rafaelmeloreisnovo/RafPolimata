@@ -1,0 +1,52 @@
+name: forensic-deception-lab
+
+on:
+  pull_request:
+    paths:
+      - "tools/forensic_deception_lab.py"
+      - "tests/test_forensic_deception_lab.py"
+      - "docs/FORENSIC_DECEPTION_LAB_V1.md"
+      - ".github/workflows/forensic-deception-lab.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-lab:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile
+        run: python -m py_compile tools/forensic_deception_lab.py tests/test_forensic_deception_lab.py
+      - name: Unit tests
+        run: python -m unittest -v tests/test_forensic_deception_lab.py
+      - name: Generate bounded report
+        run: |
+          mkdir -p build/forensic-deception
+          python tools/forensic_deception_lab.py \
+            --output build/forensic-deception/report.json
+      - name: Validate report boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("build/forensic-deception/report.json").read_text())
+          assert report["claim_allowed"] is False
+          assert report["manifest_valid"] is True
+          assert report["business_invariant"]["preserved"] is True
+          assert report["candidate_ranking"][0]["score"] == 1.0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: forensic-deception-report-py${{ matrix.python-version }}
+          path: build/forensic-deception/report.json
+          if-no-files-found: error

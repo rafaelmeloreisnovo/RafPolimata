@@ -1,0 +1,95 @@
+name: Runtime Truth Receipt
+
+on:
+  pull_request:
+    paths:
+      - 'raf_*.c'
+      - 'raf_*.h'
+      - 'Apkc/raf_libc_emu.h'
+      - 'runtime/conversation_indexer/**'
+      - 'scripts/validate_runtime_truth_local.sh'
+      - 'scripts/validate_ops_manifest.py'
+      - 'scripts/compare_ops_manifest.py'
+      - 'scripts/validate_compiler_station_contract.py'
+      - 'scripts/test_compiler_station.sh'
+      - 'scripts/raf_c_rewrite.py'
+      - 'scripts/raf_kernel_lower.py'
+      - 'scripts/apkc_strict_native_build.sh'
+      - 'scripts/audit_strict_elf.sh'
+      - 'scripts/validate_ecosystem_runtime_state.py'
+      - 'scripts/ecosystem_build_doctor.py'
+      - 'scripts/toroidal_research_router.py'
+      - 'scripts/run_runtime_truth_receipt.sh'
+      - 'tests/raf_libc_emu_selftest.c'
+      - 'tests/fixtures/raf_return_*.c'
+      - 'tests/fixtures/strict_kernel.*'
+      - 'tests/fixtures/kernel.py'
+      - 'tests/fixtures/unsupported_header.c'
+      - 'tests/test_ecosystem_build_doctor.py'
+      - 'tests/test_toroidal_research_router.py'
+      - 'ci/contracts/apkc_compiler_station_v2.json'
+      - 'contracts/**'
+      - 'examples/toroidal_research_router.example.json'
+      - 'ECOSYSTEM_RUNTIME_STATE.json'
+      - '.github/workflows/runtime-truth-receipt.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-truth-receipt-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  local-truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+
+      - name: Execute full gate and preserve receipts
+        env:
+          RAFPOLIMATA_IMPLEMENTATION_BASE_COMMIT: b230f79b4519f398d6a0f32c2235527966f14a36
+        run: bash scripts/run_runtime_truth_receipt.sh artifacts/runtime-truth
+
+      - name: Validate receipt envelopes
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/runtime-truth')
+          receipt_path = root / 'runtime_truth_receipt.json'
+          toolchain_path = root / 'toolchain_manifest.json'
+
+          if not receipt_path.is_file():
+              raise SystemExit('missing runtime_truth_receipt.json')
+          if not toolchain_path.is_file():
+              raise SystemExit('missing toolchain_manifest.json')
+
+          receipt = json.loads(receipt_path.read_text())
+          toolchain = json.loads(toolchain_path.read_text())
+
+          assert receipt['schema'] == 'raf.runtime-truth-receipt.v1'
+          assert receipt['cycle_id'] == 'C02'
+          assert receipt['claim_allowed'] is False
+          assert receipt['claim_boundary']['android_build'] == 'TOKEN_VAZIO'
+          assert receipt['claim_boundary']['apk_install'] == 'TOKEN_VAZIO'
+          assert receipt['claim_boundary']['physical_runtime'] == 'TOKEN_VAZIO'
+          assert toolchain['schema'] == 'raf.runtime-truth-toolchain-manifest.v1'
+          assert toolchain['claim_allowed'] is False
+          print('PASS runtime-truth receipt envelopes')
+          PY
+
+      - name: Upload evidence packet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rafpolimata-runtime-truth-${{ github.sha }}
+          path: artifacts/runtime-truth/
+          if-no-files-found: error
+          retention-days: 30

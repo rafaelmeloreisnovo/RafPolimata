@@ -1,0 +1,46 @@
+schema: rafaelia.library.assimilation.v1
+source:
+  project: TOKEN_VAZIO
+  language: TOKEN_VAZIO
+  version_or_commit: TOKEN_VAZIO
+  source_hash: TOKEN_VAZIO
+  license: TOKEN_VAZIO
+  license_compatible: false
+selection:
+  exported_api: []
+  pure_kernels: []
+  rejected_components: []
+  duplicate_kernel_ids: []
+runtime_inventory:
+  heap_calls: TOKEN_VAZIO
+  gc_runtime: TOKEN_VAZIO
+  exceptions_or_unwind: TOKEN_VAZIO
+  rtti_or_reflection: TOKEN_VAZIO
+  tls_or_threads: TOKEN_VAZIO
+  syscalls_or_io: TOKEN_VAZIO
+  dynamic_loading: TOKEN_VAZIO
+lowering:
+  route: TOKEN_VAZIO
+  raf_ir_ops: []
+  canonical_kernel_id: TOKEN_VAZIO
+  caller_owned_buffer_bytes: TOKEN_VAZIO
+  static_storage_bytes: TOKEN_VAZIO
+  bit_patch_granularity: TOKEN_VAZIO
+  max_independent_lanes: TOKEN_VAZIO
+architecture:
+  arm32: TOKEN_VAZIO
+  arm64: TOKEN_VAZIO
+  neon: TOKEN_VAZIO
+  simd: TOKEN_VAZIO
+  gpu: TOKEN_VAZIO
+  dsp: TOKEN_VAZIO
+  npu: TOKEN_VAZIO
+proof:
+  source_equivalence_vectors: []
+  cycle_counts: []
+  final_binary_sha256: TOKEN_VAZIO
+  zero_undefined_symbols: TOKEN_VAZIO
+  zero_external_runtime: TOKEN_VAZIO
+  zero_heap: TOKEN_VAZIO
+  reproducible_build: TOKEN_VAZIO
+claim_allowed: false

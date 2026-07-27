@@ -1,0 +1,54 @@
+{
+  "claim_allowed": false,
+  "environment_class": "OPENAI_CONTAINER_LOCAL_SANDBOX",
+  "host": {
+    "machine": "x86_64",
+    "platform": "Linux-6.12.13-x86_64-with-glibc2.41",
+    "python": "3.13.5"
+  },
+  "inputs": {
+    "fixture_sha256": "c4b9e8d19f04cfea2487d2276be3e8603353968b677d912faaf7ea42619ac9c7",
+    "script_sha256": "95f3222b9f469ab63da39302e8f9787bb347b0dafea91d0ca1bac977d8b8deac",
+    "tests_sha256": "92820e099ae2ed1e9dcc02717c88ed65662ee0e24ae137f3d5b53d9efffa16e9"
+  },
+  "install_executed": false,
+  "launch_executed": false,
+  "limitations": [
+    "No qemu-i386 or qemu-x86_64 was available in the sandbox.",
+    "ELF32 generation is not execution.",
+    "Native x86_64 execution is not virtualized execution.",
+    "The semantic frontend is a strict scalar expression subset, not complete language support."
+  ],
+  "next_gate": "Materialize provenance-pinned QEMU user-mode and rerun with --require-virtualized-both.",
+  "observed_at": "2026-07-26",
+  "schema": "rafaelia.semantic-local-evidence.v1",
+  "semantic": {
+    "freestanding_object_sha256": "9ca85c843b01be5ace0d9490dcc47857fc28d986b42b8e4f06a43a093ad2d175",
+    "frontends": 10,
+    "generated_c_sha256": "8075dfcc85cee9dc8b7df2bb3c3f1a89b261a0c48a05fce99c5bce899f7e1c04",
+    "kernel_id": "rafk1-1718e9fa2de1d91fba5fe8d93d8896ccb6fe958dce6fdd9a3e4f404f7220d43b",
+    "receipt_sha256": "93c78d48b9ce3ad7e642c8fc29a921b9e1d87681c6f0b144d945793e935ab4ee",
+    "state": "PASS_SEMANTIC_EQUIVALENCE",
+    "unit_tests": {
+      "executed": 8,
+      "failed": 0,
+      "passed": 8
+    },
+    "vectors": 4
+  },
+  "toolchain": {
+    "cc": "/usr/bin/cc: cc (Debian 14.2.0-19) 14.2.0",
+    "qemu_i386": "TOKEN_VAZIO_COMMAND_ABSENT",
+    "qemu_x86_64": "TOKEN_VAZIO_COMMAND_ABSENT",
+    "readelf": "/usr/bin/readelf: GNU readelf (GNU Binutils for Debian) 2.44"
+  },
+  "x3264": {
+    "elf32_generation": "PASS",
+    "elf64_generation": "PASS",
+    "full_virtualized_equivalence": "TOKEN_VAZIO",
+    "i386_virtualized_execution": "TOKEN_VAZIO_EMULATOR_ABSENT",
+    "receipt_sha256": "d7cafeaa0d43d4d2027c6d4b5327a5f22b94b8fa0da2514fe0aeb6ebf9123829",
+    "state": "PARTIAL_X64_PASS_X32_TOKEN_VAZIO_EMULATOR_ABSENT",
+    "x86_64_native_vectors_passed": 4
+  }
+}

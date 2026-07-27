@@ -1,0 +1,25 @@
+{
+  "artifact_root_algorithm": "SHA-256(path NUL file_sha256 LF, sorted by path)",
+  "claim_allowed": false,
+  "commercial_policy": {
+    "communication_is_authorization": false,
+    "separate_executed_agreement_required": true
+  },
+  "compile_gate": "VERIFY_BEFORE_COMPILE",
+  "coupling_id": "APKC-RMR-RESEARCH-CORE-V1-20260726",
+  "required_source_markers": [
+    "Coupling-ID: APKC-RMR-RESEARCH-CORE-V1-20260726",
+    "Contract-Role:",
+    "License-Role:",
+    "Normative comment:"
+  ],
+  "schema": "raf.apkc-rmr-coupling-contract.v1",
+  "stub_policy": {
+    "allowed_states": [
+      "FORBIDDEN",
+      "TOKEN_VAZIO",
+      "NOT_AUTHORIZED"
+    ],
+    "success_state_allowed": false
+  }
+}

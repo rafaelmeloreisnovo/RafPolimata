@@ -1,0 +1,3 @@
+TOKEN_VAZIO: physics — nenhum registro atingiu o estágio 4.
+Critério: ≥ 2 domínios cruzados com DOI comum.
+Estado: PENDING — ampliar queries ou aguardar publicações cruzadas.

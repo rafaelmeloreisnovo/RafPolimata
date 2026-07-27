@@ -10,6 +10,8 @@
 #define RAF_ARCH_RV64 3
 #define RAF_ARCH_UNKNOWN 4
 
+/* Stable compiler IDs. Existing IDs are preserved; profiles added later are
+ * appended. ApkC LP_* IDs have their own order and are mapped by name. */
 #define RAF_LANG_C 0
 #define RAF_LANG_CPP 1
 #define RAF_LANG_S 2
@@ -22,12 +24,11 @@
 #define RAF_LANG_JS 9
 #define RAF_LANG_PHP 10
 #define RAF_LANG_JSX 11
-/* hardware-direct compute languages (mirror APKc LP_GLSL…LP_TFLITE) */
-#define RAF_LANG_GLSL   12
-#define RAF_LANG_CL     13
-#define RAF_LANG_HLSL   14
-#define RAF_LANG_WGSL   15
-#define RAF_LANG_DSP    16
+#define RAF_LANG_GLSL 12
+#define RAF_LANG_CL 13
+#define RAF_LANG_HLSL 14
+#define RAF_LANG_WGSL 15
+#define RAF_LANG_DSP 16
 #define RAF_LANG_TFLITE 17
 /* additional fork/script languages mirroring LP_GO…LP_CLJ */
 #define RAF_LANG_GO      18
@@ -64,7 +65,9 @@
 #define RAF_ASM_CAP (1u << 15)
 #define RAF_ASM_LINE 128
 #define RAF_HEX_CAP (1u << 20)
-#define RAF_SOURCE_CAP (1u << 20)
+/* RAF_SOURCE_MAX is the exact accepted payload. CAP includes one NUL byte. */
+#define RAF_SOURCE_MAX (1u << 20)
+#define RAF_SOURCE_CAP (RAF_SOURCE_MAX + 1u)
 
 typedef enum { IR_NOP = 0, IR_MOVIMM, IR_RET } RafIROp;
 typedef uint64_t RafIR;
@@ -138,8 +141,9 @@ int raf_compile_file(RafCtx *ctx, const char *src_path, const char *out_base,
 void raf_ctx_report(const RafCtx *ctx);
 
 /* Language × architecture routing matrix.
- * A value of 1 means that a route exists; it does not by itself prove the
- * external toolchain, driver, Android runtime or generated artifact. */
+ * A value of 1 means that a hosted or direct route exists; it does not prove
+ * that the strict final binary is freestanding. M063 applies the final-runtime
+ * policy separately in ApkC/lang_freestanding_policy.h. */
 static const uint8_t RAF_CAP_MATRIX[RAF_LANG_COUNT][5] = {
  /* lang             x86_64 arm64 arm32 rv64 unk */
  /* C       fork */   { 0, 1, 0, 0, 0 },
@@ -173,7 +177,7 @@ static inline int raf_cap_query(uint8_t lang, uint8_t arch) {
     return (int)RAF_CAP_MATRIX[lang][arch];
 }
 
-/* Maps RAF_LANG_* to the APKc lang_profile name string. */
+/* Maps stable RAF_LANG_* ids to ApkC profile names. */
 static inline const char *raf_lang_to_apkc_name(uint8_t lang) {
     switch (lang) {
     case RAF_LANG_C:      return "c";
