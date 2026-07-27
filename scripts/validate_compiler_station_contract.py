@@ -43,10 +43,21 @@ def main() -> int:
     hosted_languages = unique_nonempty(hosted.get("input_languages"), "hosted languages")
     require(len(hosted_languages) == 14, f"expected 14 hosted annotation routes, found {len(hosted_languages)}")
 
+    planes = data.get("planes")
+    require(isinstance(planes, dict), "planes object missing")
+    runtime_plane = planes.get("final_runtime")
+    require(isinstance(runtime_plane, dict), "final_runtime plane missing")
+    require(runtime_plane.get("heap") is False, "heap must be false")
+    require(runtime_plane.get("dt_needed") is False, "DT_NEEDED must be false")
+    require(runtime_plane.get("unbounded_string_copy") is False, "unbounded string copy must be false")
+
     emulated_headers = unique_nonempty(data.get("emulated_headers"), "emulated_headers")
     emulated_functions = unique_nonempty(data.get("emulated_functions"), "emulated_functions")
+    forbidden = unique_nonempty(data.get("forbidden_runtime_surfaces"), "forbidden_runtime_surfaces")
     require("memmove" in emulated_functions and "strtoul" in emulated_functions,
             "critical emulation surfaces absent")
+    require("strcpy" not in emulated_functions and "strcpy" in forbidden,
+            "strcpy must be fail-closed, not emulated")
     require("ctype.h" not in emulated_headers, "unsupported ctype.h cannot be advertised")
 
     gates = unique_nonempty(data.get("blocking_gates"), "blocking_gates")
@@ -56,6 +67,8 @@ def main() -> int:
         "rollback_removes_stale_artifacts",
         "no_dt_needed",
         "c_and_cpp_export_names_unmangled",
+        "unbounded_string_copy_fails_closed",
+        "strict_native_output_and_receipt_commit_together",
     ):
         require(gate in gates, f"missing blocking gate: {gate}")
 
@@ -77,22 +90,23 @@ def main() -> int:
     for header in emulated_headers:
         require(f'"{header}"' in rewriter, f"rewriter does not register header {header}")
     for function in emulated_functions:
-        if function == "raf_write":
-            require(re.search(r"\braf_write\s*\(", libc_emu) is not None, "raf_write implementation absent")
-        else:
-            require(re.search(rf"\b{re.escape(function)}\s*\(", libc_emu) is not None,
-                    f"libc emulation absent: {function}")
+        require(re.search(rf"\b{re.escape(function)}\s*\(", libc_emu) is not None,
+                f"libc emulation absent: {function}")
 
     require('SCHEMA = "rafaelia.c.rewrite.v2"' in rewriter, "rewriter schema mismatch")
     require('SCHEMA = "rafaelia.kernel.lower.v2"' in lowerer, "lowering schema mismatch")
-    require("claim_allowed\": False" in rewriter, "rewriter claim gate must be false")
-    require("claim_allowed\": False" in lowerer, "lowerer claim gate must be false")
+    require('"claim_allowed": False' in rewriter, "rewriter claim gate must be false")
+    require('"claim_allowed": False' in lowerer, "lowerer claim gate must be false")
+    require('"strcpy"' in rewriter and "RAF_UNBOUNDED_STRING_COPY_FORBIDDEN" in libc_emu,
+            "strcpy fail-closed enforcement absent")
     require("#define RAF_OPS_SCHEMA 4u" in frontend, "ops schema 4 not active")
     require("transaction_state" in frontend and "ir_value" in frontend, "transaction receipt fields absent")
     require("extern \"C\"" in libc_emu, "C++ export de-mangling absent")
     require("--profile exec|android-so" in elf_audit, "ELF audit profiles absent")
     require("STRICT_ELF_PASS" in builder and "runtime_external_dependencies" in builder,
             "strict native receipt boundary absent")
+    require("COMMITTED=1" in builder and 'rm -f "$OUTPUT" "$RECEIPT"' in builder,
+            "strict output/receipt transaction absent")
 
     artifacts = data.get("artifacts")
     require(isinstance(artifacts, list) and len(artifacts) == 6, "artifact registry must contain six types")
