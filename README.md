@@ -37,6 +37,7 @@ A ordem de leitura é:
 | Contrato do Build Doctor | [`contracts/ecosystem-build-doctor-report.schema.json`](contracts/ecosystem-build-doctor-report.schema.json) | envelope de achados, severidade e fronteira de claims |
 | Política documental | [`configs/document-governance.v1.json`](configs/document-governance.v1.json) | áreas, responsáveis, revisão e sensibilidade |
 | Catálogo documental | [`scripts/document_governance.py`](scripts/document_governance.py) | identidade, relações, duplicidade e fila |
+| Aprendizado científico | [`scripts/science_learning_engine.py`](scripts/science_learning_engine.py) | ORCID + Zenodo → 4 estágios → `knowledge_base/` → `vv_scan_buf()` |
 
 > A ausência de execução não vira PASS. GitHub Actions, Safe Extended e Termux são meios de execução; a evidência precisa registrar commit, ambiente, comando, stdout/stderr e hashes.
 

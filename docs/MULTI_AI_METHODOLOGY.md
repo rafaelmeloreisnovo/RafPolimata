@@ -1,6 +1,6 @@
 # Multi-AI Methodology — RafPolimata
 
-> **Entrada canônica:** docs/AGENTES.md §2 (taxonomia de agentes — matriz Claude/Codex/ChatGPT/humano com scope de decisão) e §4 (regras de não-colisão — as 6 regras numeradas que previnem colisão entre agentes). Este documento é a metodologia detalhada de colaboração multi-AI para o projeto.
+> **Entrada canônica:** docs/AGENTES.md §2 (taxonomia de agentes — matriz Claude/Codex/ChatGPT/humano com scope de decisão) e §4 (regras de não-colisão — as 8 regras numeradas que previnem colisão entre agentes). Este documento é a metodologia detalhada de colaboração multi-AI para o projeto.
 
 ## Purpose
 
@@ -75,6 +75,7 @@ These rules prevent two AIs from breaking each other's work:
 3. **Never add an ARM64 instruction encoder** without:
    - The `static inline u32` function in `arch_arm64.h`
    - A corresponding `case` (or `if` block) in `asm_insn64()` in `apkc.c`
+   - A golden test in `tests/test_arm64_encoders.py` (sem os três corpos, estado = PENDING)
 
 4. **Never commit a NULL-dereference path**. `lang_profile_find()` returns NULL
    for unknown names — guard with: `if (!prof) { pr_err(...); return 1; }`
@@ -89,6 +90,14 @@ These rules prevent two AIs from breaking each other's work:
 
 6. **Buffer limits are hard**: never write past static buffer sizes. All are
    documented in `CLAUDE.md` under "Buffer limits".
+
+7. **Documento novo exige rota**: todo arquivo novo deve receber área + responsável
+   lógico + ciclo de vida + referência de entrada. Executar após adicionar:
+   `python3 scripts/document_governance.py --write --print-summary`
+
+8. **Resultado gerado não é editado manualmente**: arquivos em `docs/generated/` e
+   `results/document-governance/` são derivados. Para corrigir: ajuste a política
+   ou o executor e regenere — nunca edite diretamente.
 
 ---
 

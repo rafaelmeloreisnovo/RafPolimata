@@ -1,0 +1,19 @@
+[VERBOVIVO AUDIT]
+  Signature    : RAFAELIA_VV_V1
+  Compliance   : 0x0F [OK]
+  Chunks       : 1
+  Bytes        : 3728
+  Messages     : 79
+  Engrams      : 1 / 64
+  Uptime       : 0.000 s
+  SVG requests : 0
+<svg width='900' height='900' xmlns='http://www.w3.org/2000/svg' style='background:#0b132b'>
+<title>VerbVivo — Engram Convergence Map</title>
+<g stroke='#2ec4b6' stroke-width='1'>
+</g>
+<circle cx='60' cy='749' r='5' fill='#ff37fe' opacity='0.9'>
+  <title>id=0 hash=abdc5169 attn=1.000 hdiv=1.000</title>
+</circle>
+<text x='10' y='20' fill='#2ec4b6' font-family='monospace' font-size='11'>VerbVivo — n=1 chunks=1</text>
+<text x='10' y='36' fill='#888' font-family='monospace' font-size='9'>blue=novel  green=familiar  size=attention</text>
+</svg>

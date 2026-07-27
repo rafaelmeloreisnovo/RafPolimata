@@ -1,0 +1,137 @@
+[
+  {
+    "doi": "10.5281/zenodo.20966693",
+    "title": "从经典到量子:经济学的范式革命(From Classic to Quantum: A Paradigm Revolution in Economics)",
+    "download_url": "https://zenodo.org/api/records/20966693/files/%E4%BB%8E%E7%BB%8F%E5%85%B8%E5%88%B0%E9%87%8F%E5%AD%90%EF%BC%9A%E7%BB%8F%E6%B5%8E%E5%AD%A6%E7%9A%84%E8%8C%83%E5%BC%8F%E9%9D%A9%E5%91%BD.pdf/content",
+    "keywords": [
+      "量子微观经济学"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.14725302",
+    "title": "Soluções numéricas de estados ligados para o potencial δ(x) duplo imerso num poço quadrado infinto assimétrico",
+    "download_url": "https://zenodo.org/api/records/14725302/files/Solu%C3%A7%C3%B5es_num%C3%A9ricas_de_estados_ligados_para_o_potencial_%CE%B4_x__duplo_imerso_num_po%C3%A7o_quadrado_infinito_assim%C3%A9trico_.pdf/content",
+    "keywords": [
+      "Equações transcendentes",
+      "Mecânica Quântica",
+      "Delta de Dirac",
+      "Transcendent equations",
+      "Quantum Mechanics",
+      "Dirac Delta"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.52326/jes.utm.2021.28(1).08",
+    "title": "QUANTUM COMPUTING",
+    "download_url": "https://zenodo.org/api/records/4971743/files/10.52326jes.utm.2021.28(1).08.pdf/content",
+    "keywords": [
+      "Quantum theory",
+      "quantum information",
+      "quantum mechanics",
+      "photon teleportation",
+      "quantum computer",
+      "EPR paradox",
+      "qbits"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.20809568",
+    "title": "Contribution to the improvement of scroll compressors operating under two-phase conditions",
+    "download_url": "https://zenodo.org/api/records/20809568/files/Thesis_NLeclercq_V3.0.pdf/content",
+    "keywords": [
+      "Two-phase compression",
+      "Scroll compressor",
+      "Experimental testing",
+      "Deterministic modeling",
+      "Oil-refrigerant mixture"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.17244130",
+    "title": "PEMFC durability testing using heavy-duty load cycles",
+    "download_url": "https://zenodo.org/api/records/17244130/files/EFCF-2025_Paper_A1008_10889_PEMFC-durability-in-HD-conditions_Mitz.pdf/content",
+    "keywords": [
+      "EFCF2025",
+      "H2",
+      "LowTemp. Fuel Cells & Electrolysers",
+      "Heavy-Duty",
+      "Mission Profile",
+      "Hybridization Strategy",
+      "Life Time"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.5713532",
+    "title": "Continuous Adjoint Shape Optimization of Internally Cooled Turbine Blade",
+    "download_url": "https://zenodo.org/api/records/5713532/files/2021_ETC_ContinuousAdjointShapeOptimizationOfInternallyCooledTurbineBlade.pdf/content",
+    "keywords": [
+      "Internally Cooled Turbine Blades",
+      "Conjugate Heat Transfer",
+      "Shape Optimization",
+      "Continuous Adjoint"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.11507840",
+    "title": "Sobre la paradoja de la segunda ley de la termodinámica en la arqueología de los fenómenos sociales",
+    "download_url": "https://zenodo.org/api/records/11507840/files/AI5315.pdf/content",
+    "keywords": [
+      "Paradox",
+      "second law",
+      "thermodynamics",
+      "archaeology",
+      "social phenomena",
+      "entropy",
+      "conflict",
+      "irreversible process",
+      "instability"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.20233412",
+    "title": "Microwave Heating and Cancer Risk: Scientific Evidence, Mechanisms, and Public Health Perspectives",
+    "download_url": "https://zenodo.org/api/records/20233412/files/1%20microwave.docx/content",
+    "keywords": [
+      "Microwave",
+      "cancer",
+      "tumor",
+      "link"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.10050420",
+    "title": "ANALYSIS OF THE EFFECTS OF ELECTROMAGNETIC RADIATION ON PLANTS DEVELOPMENT",
+    "download_url": "https://zenodo.org/api/records/10050420/files/WMO-23-014_R1_O01.pdf/content",
+    "keywords": [
+      "Electromagnetic radiation",
+      "Corn"
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.3541096",
+    "title": "Physical meaning of transformation equations between two reference frames",
+    "download_url": "https://zenodo.org/api/records/3541096/files/Physical%20meaning%20of%20transformation%20equations%20between%20two%20reference%20frames.pdf/content",
+    "keywords": [
+      "Lorentz transformation; Galilean transformation; special relativity; space and time; covariance; Maxwell; physics."
+    ],
+    "open_license": true
+  },
+  {
+    "doi": "10.5281/zenodo.3593417",
+    "title": "In-depth logical analysis of special relativity",
+    "download_url": "https://zenodo.org/api/records/3593417/files/In-depth%20logical%20analysis%20of%20special%20relativity.pdf/content",
+    "keywords": [
+      "special relativity; logical transformation;  Lorentz transformation; Lorentz factor; covariance; Galilean transformation; relativistic mechanics; space time; fundamental physics theory; Maxwell; Einstein; observation; logical; derivation; covariant."
+    ],
+    "open_license": true
+  }
+]

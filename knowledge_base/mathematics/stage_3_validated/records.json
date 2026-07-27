@@ -1,0 +1,255 @@
+[
+  {
+    "source": "zenodo",
+    "title": "INVERSE SCATTERING PROBLEM FOR A SYSTEM OF EQUATIONS DIRAC ON THE WHOLE LINE",
+    "doi": "10.5281/zenodo.7878609",
+    "abstract": "Abstract In this paper, we study the inverse scattering problem for the Dirac operator on the whole line with real continuous coefficients &nbsp;and , which tend to zero &nbsp;rather quickly as and the Dirac operator with these coefficients considered on the semiaxis &nbsp;has a purely discrete spectrum. For the Dirac operator under consideration, the &ndash;function is introduced, its properties are studied, the Gelfand&ndash;Levitan&ndash;Marchenko integral equation is derived, and the procedure for restoring the coefficients &nbsp;and &nbsp;is given.",
+    "keywords": [
+      "Dirac operator, Jost function, Weyl solution, Weil–Titchmarsh function, potential matrix function, inverse scattering problem,  –function, spectrum, analytic function, Gelfand–Levitan–Marchenko integral equation, meromorphic function, spectral function, Gelfand–Levitan method"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7878609/files/DSJ_71-36-50.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Exactness: A Generalized Approach to Solve 1st order 1st Degree Ordinary Differential Equations",
+    "doi": "10.5281/zenodo.4312261",
+    "abstract": "Numerous sorts of 1st order -1st degree ordinary differential equation (ODE) are there along with their well-designed solution techniques depending on the assemblies of the equations. In this paper it is unveiled a single well-established solution procedure, exactness method, that can be used to solve all regular types of 1st order- 1st degree ODE. The transformation to exactness from the regular form has been demonstrated notionally and explicated with solved cases.",
+    "keywords": [
+      "Exact and Non-Exact, Ordinary Differential Equation"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4312261/files/Exactness%20is%20the%20general%20procedure%20to%20solve.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Integrating Factor for Non-exact Reducible to Homogeneous Ordinary Differential Equations",
+    "doi": "10.5281/zenodo.4590203",
+    "abstract": "1 st order 1 st degree reducible homogeneous ordinary differential equations (ODE) are usually solved by variable separable method after reduced it to homogeneous. In this note an integrating factor technique is proposed to solve the reducible to homogeneous ODE after reduced it to homogeneous form in an unconventional way",
+    "keywords": [
+      "Reducible homogeneous first order first degree differential equation, Exact equations, Non-exact equations, Integrating factor"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4590203/files/Integrating%20factor%20for%20non-exact%20reducible.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Existence, uniqueness and monotonicity of positive solutions for hybrid fractional integro-differential equations",
+    "doi": "10.5281/zenodo.4311353",
+    "abstract": "In this paper, we study the existence, uniqueness, and monotonicity of&nbsp;positive solutions of hybrid nonlinear fractional integro-differential&nbsp;equations by the method of upper and lower solutions and using the Dhage and&nbsp;Banach fixed point theorems. Two examples of the obtained results are given.",
+    "keywords": [
+      "Fractional integro-differential equations",
+      "Fixed point theorems",
+      "Existence",
+      "Positivity",
+      "Monotonicity"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4311353/files/AM-2012-3017.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Applications of Autonomous Differential Equations",
+    "doi": "10.5281/zenodo.21290939",
+    "abstract": "In this paper, the some concepts of autonomous differential equations are introduced. And then,&nbsp; the mathematical formulation of autonomous differential equations is presented. Moreover, the&nbsp; initial value problems for autonomous differential equations are solved. Finally, some examples&nbsp; of autonomous systems of differential equations with direction fields are illustrated. &nbsp;",
+    "keywords": [
+      "Autonomous Differential Equations",
+      "Direction Fields"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/21290939/files/Shun%20Lelt%20Lelt%20May1,%20Mu%20Mu%20Han2,%20Yee%20Yee%20Thin%20DURJ%20_%20Vol.17_2026.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Periodic Solution for Nonlinear System of Differential Equations of some Operators with Impulsive Action",
+    "doi": "10.5281/zenodo.10666444",
+    "abstract": "ABSTRACT In this paper we investigate the periodic solution for nonlinear system of differential equations of some operators with impulsive action, by using the numerical-analytic method for periodic solutions which is given by Samoilenko. Theorems on existence and uniqueness of solutions are established under some necessary and sufficient conductions on compact space. This investigation leads us to the improving and extending to the above method and expands the results gained by Butris.",
+    "keywords": [
+      "Numerical-analytic method, periodic solutions, differential equations, impulsive action of operators"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/10666444/files/EJAET-7-5-27-32.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Loewner Functions for a Class of Nonlinear Differential-Algebraic Systems",
+    "doi": "10.1109/CDC51059.2022.9992912",
+    "abstract": "We consider the Loewner functions associated to four behaviourally equivalent differential-algebraic systems with the goal of simplifying the partial differential equation (PDE) defining the tangential generalized observability function. Although the systems may have different tangential generalized observability functions, it is shown that all four systems yield the exact same family of Loewner equivalent interpolants provided that solutions to the PDEs exist.",
+    "keywords": [
+      "Differential algebraic equations, nonlinear differential equations."
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7993314/files/Simard%20CDC22.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Enhancing Structural Topology Optimization with Deep Learning: A Stress Field-Based Approach",
+    "doi": "10.5281/zenodo.8003313",
+    "abstract": "Traditional structural topology optimization process depends on series of finite element analysis (FEA) which is a computationally expensive process. As an attempt to minimize this, in this work a deep-learning (DL) based approach for structural topology optimization is proposed. In addition to increased computational efficiency the approach is designed to scale across various load and boundary condition (BC) combinations. The DL topology predictor model which is built using the Attention-Res-U-Net architecture is trained on the data generated by employing the automated FEA data generation technique. Incorporating an input image encoding technique, that utilizes the stress field of the structure to encode both load and BC, the model is capable of predicting the optimal structure of different load cases directly. The approach is validated by implementing it in a cantilevered beam problem. The result exhibited prediction accuracy above 96%. When compared against conventional FEA methods the proposed approach was able to predict solutions within 5% of VF error while outperforming in terms of computational efficiency by taking 1/10 th of their total time",
+    "keywords": [
+      "Convolutional neural network, deep-learning, semantic segmentation, topology optimization"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/8003313/files/Enhancing%20Structural%20Topology%20Optimization.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Постановка задачі топологічної оптимізації конструкцій рухомого складу та спеціальної техніки залізниць з урахуванням комплексних обмежень на міцність",
+    "doi": "10.15802/stp2013/17969",
+    "abstract": "Мета. &nbsp;Головна мета статті полягає в розвитку наукових основ теорії топологічної оптимізації конструкцій у частині розв&rsquo;язання складних задач оптимізації конструкцій рухомого складу і спеціальної техніки залізниць.&nbsp; Методика. &nbsp;Математичне програмування й математичне моделювання як інструменти постановки задач топологічної оптимізації конструкцій рухомого складу і спеціальної техніки залізниць.&nbsp; Результати. &nbsp;Виконано ґрунтовний огляд і аналіз сучасного стану теорії топологічної оптимізації конструкцій. Наведено класичну варіаційну та скінченно-елементну постановки задач топологічної оптимізації. Розглянуто ідею та особливості реалізації SIMP-методу для їх розв&rsquo;язання. Подано постановку задачі топологічної оптимізації у вигляді мінімізації маси конструкції з урахуванням обмежень на напруження. Детально розглянуто низку проблем, що виникають у разі введення таких обмежень до задачі оптимізації.&nbsp; Наукова новизна . Наукова новизна статті полягає в розвитку теорії оптимального проектування конструкцій рухомого складу і спеціальної техніки залізниць шляхом запропонування постановки задачі топологічної оптимізації, адаптованої до вирішення означених задач.&nbsp; Практична значимість. &nbsp;Практична значимість дослідження полягає в адаптації існуючих постановок задач топологічної оптимізації до задач залізничного машинобудування.",
+    "keywords": [
+      "топологічна оптимізація",
+      "МСЕ",
+      "SIMP-метод",
+      "обмеження на напруження",
+      "утомна міцність",
+      "мінімум ваги"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/6521936/files/17969-%D0%A2%D0%B5%D0%BA%D1%81%D1%82%20%D1%81%D1%82%D0%B0%D1%82%D1%82%D1%96-29321-1-10-20131203.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Topology Optimization and Lightweight Chassis Design for Electric Vehicles: A Review Based on Finite Element Analysis",
+    "doi": "10.5281/zenodo.18655272",
+    "abstract": "The rapid growth of electric vehicles (EVs) has intensified the need for lightweight and structurally efficient chassis systems to improve driving range, safety, and energy efficiency. Reducing vehicle weight directly lowers energy consumption and enhances battery performance; however, weight reduction must not compromise strength, stiffness, or crashworthiness. This review paper summarizes recent research progress in topology optimization and finite element analysis (FEA) techniques applied to electric vehicle chassis design. Various optimization approaches such as density-based methods, evolutionary algorithms, and size&ndash;shape&ndash;topology optimization are discussed. The use of advanced lightweight materials including aluminum alloys, high-strength steel, and composite materials is reviewed with respect to manufacturability and cost. Case studies from the literature demonstrate that topology optimization effectively identifies material distribution while FEA validates stress, deformation, modal behavior, and crash performance of optimized chassis structures. Challenges such as multi-objective optimization, fatigue life prediction, integration of battery pack loads, and real-world crash scenarios are highlighted. The review concludes that the combined use of topology optimization and FEA provides a powerful framework for achieving lightweight, safe, and efficient EV chassis designs, and future research should focus on AI-driven optimization, digital twins, and sustainability-based design criteria.",
+    "keywords": [
+      "Electric VEHICLE (EV), chassis design; topology optimization, lightweight structures, finite element analysis (FEA), structural optimization, crashworthiness, composite materials, modal analysis, battery integration"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/18655272/files/Topology%20Optimization%20and%20Lightweight%20Chassis.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Multi fuzzifying topology",
+    "doi": "10.5281/zenodo.13949291",
+    "abstract": "In this paper, characterizations of stratified and transitive L&nbsp;-topologies and multi-fuzzifying topology are introduced. First we introduce the concepts of stratified and transitive L -co-topology&nbsp;and stratified and transitive L -closure operator to characterize&nbsp;the concept of stratified and transitive L -topology, where L&nbsp; is a complete MV -algebra. Second, we introduce the concepts of multi-fuzzifying topology, L-fuzzifying co-neighborhood system, L-fuzzifying co-contiguity, L -fuzzifying interior operator and L -fuzzifying closure operator to characterize multi-fuzzifying topology, where L is a completely distributive complete residuated lattice satisfying the double negation law, characterizations of stratified and transitive L -topology are introduced where L&nbsp; is a complete MV -algebra, characterizations of multi-fuzzifying topology are introduced where L is a completely distributive complete residuated lattice in which the double negation law is satisfied.",
+    "keywords": [
+      "Multi Fuzzifying Topology",
+      "L-fuzzifying co-contiguity",
+      "MV -algebra"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/13949291/files/AM-2408-8205.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Advantages in Public Procurement: Goal-Setting, Modern Practice, Vectors of Development of Legal Retortion",
+    "doi": "10.5281/zenodo.7198483",
+    "abstract": "First, the current state of the contract system was investigated, its modern features were identified both in economic and regulatory aspects in order to determine and generalize those economic prerequisites that became the harbingers of the formation of the institution of advantages. The second direction consisted in the study of the current state of preferential regimes, the study of foreign approaches, acts of international law. Special attention was paid to the most complex and urgent issue of the implementation of the import substitution policy in recent years.",
+    "keywords": [
+      "contract system",
+      "complex analysis"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7198483/files/SSRN-id3860690.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Formalizing Mechanical Analysis Using Sweeping Net Methods II: Written Without Complex Analysis and With Complex Analysis",
+    "doi": "10.5281/zenodo.13968739",
+    "abstract": "Published with great thanksgiving for Yaohushua, the living One Yahowah, \"Jesus Christ.\" In previous work, Formalizing Mechanical Analysis Using Sweeping Net Methods I, sweeping net methods have been extended to complex analysis, relying on the argument of complex functions defined on the unit circle. In this paper, we reformulate these methods purely within a real-valued and geometric framework, avoiding the use of complex analysis. By redefining the sweeping net constructs and the associated theorems using real functions and geometric interpretations on the unit circle, we demonstrate how singularities and their approximations can be effectively analyzed without the need for imaginary numbers. This approach provides intuitive geometric insights and broadens the applicability of sweeping net methods in mathematical analysis.",
+    "keywords": [
+      "Modulus on Circle",
+      "Argument Analysis",
+      "Function Behavior",
+      "Singular Integral Equations",
+      "Discretization",
+      "Mapped Singularities",
+      "Topological Equivalence",
+      "Singularity Approximation",
+      "Parametrization",
+      "Open Unit Disk",
+      "Continuous Functions",
+      "Matplotlib",
+      "Numpy",
+      "Python",
+      "Computational Visualization",
+      "Poles",
+      "Essential Singularities",
+      "Cluster Sets",
+      "Angular Limits",
+      "Fourier Series",
+      "Harmonic Analysis",
+      "Meromorphic Functions",
+      "Schwarz Reflection Principle",
+      "Riemann Mapping Theorem",
+      "Boundary Behavior",
+      "Blaschke Product",
+      "Cauchy Integrals",
+      "Maximum Modulus Principle",
+      "Analytic Continuation",
+      "Winding Numbers",
+      "Conformal Mappings",
+      "Argument of Function",
+      "Theorems",
+      "Singularities",
+      "Analytic Functions",
+      "Sweeping Net Methods",
+      "Unit Circle",
+      "Complex Analysis"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/13968739/files/Formalizing%20Mechanical%20Analysis%20II%20-%20numbered%20correctly.zip/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Melolontha virescens",
+    "doi": "10.5281/zenodo.7814517",
+    "abstract": "Melolontha virescens (Brenske, 1896) (Figs. 2, 14, 42, 54) Hoplosternus virescens Brenske 1896b: 202 (type locality: Darjeeling, Sikkim); Brenske 1900: 154; Dalla Torre 1912: 265 (catalogue); Zhang 1988: 243 (new record, description in Chinese); Li &amp; Yang 2003: 223 (diagnosis, lectotype designation). Melolontha virescens : Bezd&ecaron;k 2006: 196 (catalogue); Li et al. 2010: 342 (key), 344 (checklist), fig. 11 [misspelt as Melolontha virescena ]; Keith &amp; Saltin 2012: 23 (distribution); Pathania et al. 2015a: 53, 54 (distribution); Pathania et al. 2015b: 131 (distribution); Bezd&ecaron;k 2016: 233 (catalogue). Melolontha amplipennis Frey 1975: 238 (type locality: Bhutan, Thimpu); Sabatinelli &amp; Migliaccio 1982: 109 (diagnosis), figs. 10, 11; Sabatinelli 1992: 615 (catalogue); Li &amp; Yang 2003: 223 (as a junior synonym of H . virescens ). Material examined. India, West Bengal : Darjeeling, v.1912, 03.v.1912, 1♁, leg. Carmichael (NZSI); Kurseong, 5,000ft. 1♁, leg. Lynch C. [NZSI]; Darjeeling, Sukhipokhari, 18.xi.1994, 1♁, leg. B.C. Nandi [NZSI]. India, Sikkim : Ranipool, 15.iv.1994, 1&female;, on grass, leg. P.H. Roy [NZSI]. India, Arunachal Pradesh : district Papumpare, Itanagar, ZSI Complex, 08.ii.2002, 1♁, at light, leg. P.B. Thapa [NZSI]; district Papumpare, Itanagar, ZSI Complex, 19.v.2002, 1♁, leg. P.T. Bhutia [NZSI]; district Tawang, Namtsering, 27.5337N, 91.6736E, 1,428m, 15.iv.2018, 3&female;, 17.iv.2018, 1&female;, leg. Jagdish Saini [NZSI]. Diagnosis . Refer to the key to the species groups. Distribution . India: Arunachal Pradesh (new record), Himachal Pradesh (Pathania et al. 2015a, 2015b), Sikkim (Brenske 1896b), and West Bengal (Darjeeling) (Brenske 1896b); Bhutan (Frey 1975), China (Dalla &amp; Torre 1912; Zhang 1988), Nepal (Sabatinelli &amp; Migliaccio 1982), and Pakistan (Keith &amp; Saltin 2012).",
+    "keywords": [
+      "Biodiversity",
+      "Taxonomy",
+      "Animalia",
+      "Arthropoda",
+      "Insecta",
+      "Coleoptera",
+      "Melolonthidae",
+      "Melolontha",
+      "Melolontha virescens"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7814517/files/treatment.html/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Uncertainty Estimation of Diagnostic Accuracy Measures under Parametric Distributions",
+    "doi": "10.5281/zenodo.20775515",
+    "abstract": "Background: Diagnostic accuracy measures (DAMs) are widely used to evaluate medical diagnostic tests, but their uncertainty is often underreported or inconsistently quantified, which may affect threshold-based interpretation in clinical practice. Methods: We developed a computational framework to estimate sampling uncertainty, analytical measurement uncertainty, and combined uncertainty for sixteen threshold-dependent DAMs under normal, lognormal, and gamma class-conditional measurement distributions. Analytical measurement uncertainty was represented using homoscedastic or heteroscedastic imprecision models, and uncertainty was propagated using a first-order Taylor-series approximation. The Wolfram Language program DiagAccU implements threshold-dependent estimation, uncertainty decomposition, confidence-interval calculation, and measure-specific threshold optimization. Results: Fasting plasma glucose for diabetes diagnosis was used as an illustrative case study. Ratio-type measures showed marked instability near boundary thresholds, with widened confidence intervals, whereas bounded agreement, association, and concordance-based indices were comparatively more stable in interior threshold regions. Confirmatory objectives favoured higher thresholds emphasizing specificity, whereas exclusionary objectives favoured lower thresholds emphasizing sensitivity. Conclusions: The framework provides a unified threshold-dependent approach for estimating uncertainty across multiple DAMs. It supports reproducible diagnostic-threshold evaluation, explicit uncertainty reporting, and clinically aligned interpretation for confirmatory diagnosis and diagnosis for exclusion.",
+    "keywords": [
+      "Diagnostic Accuracy"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20775515/files/hcsltr29.pdf/content",
+    "curated": true,
+    "_stage": 3
+  }
+]

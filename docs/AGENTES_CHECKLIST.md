@@ -14,7 +14,9 @@ Para contexto completo de cada item, consulte `docs/AGENTES.md`.
 
 [ ] 2. Confirmar branch destino:
        git branch --show-current
-       → deve ser: claude/operational-excellence-agents-mabjye
+       → para feature/fix: branch dedicado (ex: feat/scope-YYYYMMDD)
+       → para canonização: main (apenas via PR aprovado)
+       → ver AGENTES.md §3.3 para política de branches
 
 [ ] 3. Rodar syntax check freestanding:
        clang -target aarch64-linux-gnu -fsyntax-only -nostdlib -nostdinc \

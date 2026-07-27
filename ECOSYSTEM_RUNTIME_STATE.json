@@ -116,6 +116,29 @@
       ],
       "next_action": "Pin the paired PR head after review and implement the consumer without generic shell execution.",
       "commit": "aebabee3d0dc4ded95000b25a5972d03e0791404"
+    },
+    {
+      "id": "rafpolimata.science-learning-engine",
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "path": "scripts/science_learning_engine.py;knowledge_base/;docs/SCIENCE_LEARNING_ENGINE.md",
+      "implementation_state": "IMPLEMENTED",
+      "evidence_state": "VERIFIED",
+      "evidence": [
+        "320 records acquired (80/domain): physics, chemistry, biology, mathematics",
+        "169 stage-2 candidates with DOI + abstract >= 100 chars + keywords",
+        "55 stage-3 validated with open license + download_url (Zenodo curated)",
+        "Stage 4 TOKEN_VAZIO (expected: no cross-domain DOI overlap in first run)",
+        "SVG engrams generated via verbovivo -s for all 4 stage-3 bibliographies",
+        "ORCID pub.orcid.org/v3.0/search — no auth, Accept: application/json",
+        "Zenodo zenodo.org/api/records — open access only"
+      ],
+      "gaps": [
+        "Stage 4 canonical requires DOI shared across >= 2 domains — broaden queries",
+        "Stage-4 synthesis.txt for vv_scan_buf() pending first cross-domain hit",
+        "knowledge_base/ is generated — do not edit manually (AGENTES.md Rule 8)"
+      ],
+      "next_action": "Rerun with --query spanning multiple domains (e.g. 'information theory') to promote stage-4 canonical entries.",
+      "commit": "a359f85"
     }
   ]
 }

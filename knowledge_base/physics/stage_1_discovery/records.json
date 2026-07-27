@@ -1,0 +1,1102 @@
+[
+  {
+    "source": "zenodo",
+    "title": "Potential and Average Force in Quantum Mechanics",
+    "doi": "10.5281/zenodo.3994387",
+    "abstract": "Quantum mechanics makes use of a potential V(x) (or V(x,t)) which we argued in a previous note (1), may be written as V(x)= Sum over k V(k) exp(ikx) on what should be physical grounds. Thus, -d/dx V(x) is only an average force, which may in fact be zero, while the pieces -d/dx V(k) exp(ikx), which act at different times, give rise to forces and motion/acceleration to the left and right. The constraint is that the average force over time be zero. In this note, we argue that the exp(ikx) portion of&nbsp; force may itself be stochastic (with different probabilities at different x values) in addition to any given&nbsp; V(k) exp(ikx), which yields a momentum hit of k. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In this note, we consider the example of a particle in a box with an infinite potential at both ends. The wavefunction is proportional to sin(px) with p=2(3.14) n/L where L is the length of the box. It has been argued (2), that the Fourier transform of a step function brings in all momentum terms, thus for sin(px), p is an average momentum. Other momenta are stirred up because of the step function wall. We argue in this note, that other momenta may be stirred up if there is a constant potential because one may write: V constant = Sum over k V(k) exp(ikx). If this is true, a quantum free particle moving in a region with a potential, but no force, may also feel effects from V(k) exp(ikx). We argue this may be related to the Ehrenberg&ndash;Siday&ndash;Aharonov&ndash;Bohm effect. If one changes the value of the constant potential for the particle in a box, kinetic energy behaviour does not change, but total energy does. E in exp(iEt) (the time portion of the wavefunction) represents physical cycling even though it disappears from the spatial density expression. We argue this increased cycling is due to larger momentum hits from V(k) exp(ikx)&nbsp; (due to probability changes) because Vk changes. Thus, even though the spatial part of the wavefunction and average kinetic energy at each point remain unchanged, exp(iEt) and physical behaviour change.",
+    "keywords": [
+      "potential and fluctuations"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/3994387/files/physPotAveForce.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "The True Nature of Quantum Tunneling, Non-Signal Control Theory, and the PQ (Perception Quantum) Unified Model",
+    "doi": "10.5281/zenodo.17793166",
+    "abstract": "Abstract This paper presents a fundamental re-examination of quantum entanglement, nonlocality, and the limits of standard quantum mechanics by introducing a new theoretical framework: No-Signal Control Theory (NSC theory). The approach proposes that a quantum state cannot be fully described within a conventional single-layer Hilbert space. Instead, it must be formulated within a two-layer Hilbert-space structure, consisting of: An observable layer , and A structural layer . This two-layer Hilbert space model provides a unified explanation for several reproducible IBM Quantum device experiments that challenge standard interpretations of quantum mechanics. These experimentally confirmed and highly repeatable effects include: Nonlocal Hadamard switching: The H-gate changes a remote qubit&rsquo;s measurement probability (from 0&rarr;1/2 or 1&rarr;1/2), acting as a nonlocal structural switch without transmitting classical information. CNOT order dependence: The measurement distribution shifts significantly depending on whether the control and target qubits are swapped, indicating a structural asymmetry not accounted for by standard quantum theory. NS/EW basis stability asymmetry: Distinct stability differences between the north&ndash;south (NS) and east&ndash;west (EW) basis states, demonstrating the presence of a hidden structural layer. Collectively, these results suggest that remote operations do not transmit information but do transmit structure, preserving compatibility with the no-signaling principle while revealing a deeper mechanism behind nonlocal quantum behavior. This also connects directly to the proposed PQ (Perception Quantum) Unified Model, which interprets quantum tunneling, CNOT asymmetry, and structural recoil within the same two-layer framework. [Supplementary Material: Visual Guide (v2)] Title: Visual Guide to NSC Theory and the PQ Hypothesis Update Note (Version 2): Correction of Visual Mismatches This version corrects critical discrepancies between the figures and the explanatory text found in the previous version. Specifically, the visual representations of the \"Upper Layer (Window)\" and \"Lower Layer (Arrow)\" have been revised to accurately match the theoretical descriptions. Key Corrections: Fixed layout errors where diagrams did not correspond to the text. Refined visual models to prevent reader misunderstanding regarding the \"Invisible Structure\" concept. Ensured consistency between the visual guide and the main theoretical paper. We strongly recommend reading this revised version (v2) for a correct understanding of NSC Theory. Overview of the Guide: This supplementary document provides a visual and geometric interpretation of the proposed Two-Story Quantum Structure, complementing the theoretical and experimental results presented in the main paper. Visualization of the Two-Layer Structure: Diagrammatic representations of the Observation Layer (&ldquo;Window&rdquo;) and the Structure Layer (&ldquo;Arrow&rdquo;). Physical Interpretation of Quantum Gates: How the Hadamard (H) gate rotates the observation layer, and how the CNOT gate copies structural directionality, creating asymmetric recoil effects. Mechanism of Recoil &amp; Tunneling: Intuitive diagrams explaining the &ldquo;structural recoil&rdquo; in asymmetric CNOT operations and the time-reversal interpretation of quantum tunneling within the PQ unified framework. [Update Log] November 29, 2025: Added Supplementary Material B. This provides Python source code and experimental records verifying the Nonlocal Structural Switching and Resonance via IBM Quantum hardware. This serves as experimental proof of the NSC Theory. December 3, 2025: Added Supplementary Material 4. This document reports the historical realization of \"Bi-directional Real-time Quantum Communication (Quantum Transceiver)\" using the IBM Quantum ibm_fez processor (156 qubits). Experimental Success: Confirmed simultaneous, bi-directional chat communication between physically separated terminals (Alice &amp; Bob) without any classical connection (No TCP/IP, No shared memory). Evidence: Includes real-time execution logs proving that complex UTF-8 strings (Japanese text) were accurately reconstructed via structural resonance. Open Resource: Provides full Python source code , a beginner's guide for reproduction, and an \"Open Experimentation Declaration\" to encourage worldwide verification. Significance: Demonstrates the transition from probabilistic quantum mechanics to controllable structural mechanics , serving as definitive proof of the NSC Theory.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17793166/files/%E3%80%90EN%E3%80%91Zenodo%20Supplementary%20Material%204.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "the unification of general relativity  and quantum mechanics",
+    "doi": "10.5281/zenodo.4911114",
+    "abstract": "provide an ultimate solution to the unification of General relativity and quantum mechanics,absolutely appropriate,",
+    "keywords": [
+      "General relativity and Quantum Mechanics"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4911114/files/%E5%A4%A7%E4%B8%80%E7%BB%9F%E8%AE%BA%E6%96%87updated%20latest%20version.docx/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "从经典到量子:经济学的范式革命(From Classic to Quantum: A Paradigm Revolution in Economics)",
+    "doi": "10.5281/zenodo.20966693",
+    "abstract": "摘 &nbsp; 要 : 经济学自亚当 &middot; 斯密《国富论》问世以来历经多次范式转换,但其底层方法论始终未能突破经典物理学思维定式。本文系统论证经济学从经典范式向量子范式转换的必要性与可行性。首先,剖析传统微观经济学的牛顿力学根源及其在完全理性、偏好稳定性、均衡存在性等方面的内在矛盾,以 2008年 国际金融危机 揭示经典框架的系统性失败。其次,阐述量子力学六大基本原理 &mdash;&mdash;波粒二象性、不确定性原理、量子叠加、量子纠缠、测量问题、量子化&mdash;&mdash;及其对经济学的哲学启示,论证经济系统作为复杂适应系统所具有的量子特征。再次,从预测失败、解释局限、政策无力、数学不适四个维度论证经典框架的局限,并分析量子技术对经济系统的深层冲击。 最后,提出量子微观经济学的定义、六大核心假设、理论框架及 &ldquo; 经济量子 &rdquo; 概念,为 量子经济学 奠定方法论基础。 关键词 : 量子经济学;范式革命;量子力学;经济量子",
+    "keywords": [
+      "量子微观经济学"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20966693/files/%E4%BB%8E%E7%BB%8F%E5%85%B8%E5%88%B0%E9%87%8F%E5%AD%90%EF%BC%9A%E7%BB%8F%E6%B5%8E%E5%AD%A6%E7%9A%84%E8%8C%83%E5%BC%8F%E9%9D%A9%E5%91%BD.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "TRR-NOTIME: Theory of Relative Reality - Without Time",
+    "doi": "10.5281/zenodo.14784106",
+    "abstract": "TRR-NOTIME (Theory of Relative Reality - Without Time) presents an alternative perspective on physics, where time is not a fundamental quantity but merely a consequence of matter-energy interactions. This theory redefines the concept of gravity, nuclear decay, and quantum processes, enabling a unified understanding of physical reality without the need for a time dimension. The document summarizes the theory, its mathematical structure, and potential experimental validation.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/14784106/files/Theory%20of%20Relative%20Reality%20%E2%80%93%20Without%20Time.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "The Role of Gravitational Waves in Understanding the Universe's Formation",
+    "doi": "10.5281/zenodo.14603954",
+    "abstract": "This paper examines the transformative role of gravitational waves in elucidating the mysteries surrounding the universe&rsquo;s formation. Gravitational waves, predicted by Einstein&rsquo;s General Theory of Relativity and recently observed by the Laser Interferometer Gravitational-Wave Observatory (LIGO) and Virgo collaborations, carry unaltered information from the very instant of their emission, enabling us to probe the universe&rsquo;s earliest moments with unprecedented clarity. We review the theoretical underpinnings of gravitational waves, their detection methodologies, and their significant role in expanding our knowledge of the early universe. In particular, we delve into the prospective detection of primordial gravitational waves-ripples in space-time produced by the rapid expansion of the universe immediately following the Big Bang and their potential to verify the inflationary paradigm of cosmology. We discuss the limits of cosmic microwave background radiation and how gravitational waves could complement this information, shedding light on the initial conditions of the universe. We further explore future developments in gravitational wave astronomy and outline the challenges inherent to this budding field. Our review suggests that harnessing the insights borne from gravitational waves could revolutionize cosmology, providing novel pathways for probing the universe&rsquo;s formative epochs.",
+    "keywords": [
+      "LIGO; Gravitational waves; Early universe; Big bang"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/14603954/files/the-role-of-gravitational-waves-in-understanding-the-universes--formation.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Multimodal Brain Imaging Fusion Using Machine Learning for Enhanced Diagnostic Accuracy.",
+    "doi": "10.5281/zenodo.17636264",
+    "abstract": "",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17636264/files/Multimodal%20Brain%20Imaging%20Fusion%20Using%20Machine%20Learning%20for%20Enhanced%20Diagnostic%20Accuracy.docx/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "QUANTUM MECHANICS.",
+    "doi": "10.5281/zenodo.7207706",
+    "abstract": "This article gives a brief information to quantum mechanics. Quantum mechanics can be thought of roughly as the study of physics on very small length scales, although there are also certain macroscopic systems it directly applies to. The descriptor &ldquo;quantum&rdquo; arises because in contrast with classical mechanics, certain quantities take on only discrete values. However, some quantities still take on continuous values, as we&rsquo;ll see.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7207706/files/IBAST1019.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Bohmian Mechanics versus Madelung Quantum Hydrodynamics",
+    "doi": "10.13140/RG.2.1.3663.8245",
+    "abstract": "It is shown that the Bohmian mechanics and the Madelung quantum hydrodynamics are different theories and the latter is a better ontological interpretation of quantum mechanics. A new stochastic interpretation of quantum mechanics is proposed, which is the background of the Madelung quantum hydrodynamics. Its relation to the complex mechanics is also explored. A new complex hydrodynamics is proposed, which eliminates completely the Bohm quantum potential. It describes the quantum evolution of the probability density by a convective diffusion with imaginary transport coefficients.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/3820967/files/112.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "量子思维赋能新质生产力(Quantum thinking empowers new productive forces)",
+    "doi": "10.5281/zenodo.20070379",
+    "abstract": "摘 要: 新质生产力作为依托创新驱动、具备高科技与高质量特征的先进生产力新质态,是推进中国式现代化建设的核心动能。现有研究多聚焦技术特征、产业形态与政策路径的表层阐释,受机械论、线性因果与还原论思维约束,难以揭示新质生产力跨域共生、非线性演化、非连续跃迁的深层运行规律,理论建构长期受制于西方传统经济学范式。 量子思维以叠加态、纠缠关联、 能级 跃迁、观测内生性为底层逻辑,突破经典范式的确定性与孤立性假设,与新质生产力演化逻辑高度适配。 本文将量子思维引入生产力理论研究,重构新质生产力本体认知,系统剖析量子思维赋能新质生产力的内在机理,并结合中国现实场景,从生态构建、产业协同、临界突破、治理革新四维搭建实践进路。本研究打破传统生产力研究的线性分析桎梏,拓展新质生产力理论研究范式,为构建中国自主政治经济学知识体系提供原创性学理支撑,同时为我国因地制宜培育新质生产力提供思维指引与实践参考。 关键词: 量子思维;叠加态;量子跃迁;新质生产力",
+    "keywords": [
+      "量子经济学"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20070379/files/%E9%87%8F%E5%AD%90%E6%80%9D%E7%BB%B4%E8%B5%8B%E8%83%BD%E6%96%B0%E8%B4%A8%E7%94%9F%E4%BA%A7%E5%8A%9B.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "A Neuronal Interpretation of Some  Mechanics of the Quantum",
+    "doi": "10.5281/zenodo.15838105",
+    "abstract": "All interpretations of Quantum Mechanics are unsatisfactory and/or produce paradoxes. This paper presents an interpretation of some mechanics of the quantum as being that of the system referred to as 7.1M which is modelled from neuronal dynamics and the AI agent referred to as 3.1M. However, the mechanics of the quantum considered here are only those for non-relativistic massive particles that abide by the Schrodinger equation. The features of 7.1M are presented then its dynamics are demonstrated to be similar to the considered mechanics of the quantum. They do not yield logical problems (e.g., measurement problem and retro-causality) and paradoxical concepts &nbsp;(e.g., Wigner's friend). 7.1M is used to explain some known experiments in Quantum Mechanics, such as, the delayed choice quantum eraser. An experiment is also explored that can falsify or support 7.1M as suitable tool to interpret the considered mechanics of the quantum.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/15838105/files/BasicPrinciples.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "100 Years of Quantum Mechanics Literature – A New Baseline",
+    "doi": "10.5281/zenodo.15560701",
+    "abstract": "A qualitative survey of the literature on quantum mechanics (QM) has been conducted. Keywords: Quantum Mechanics, Quantum Theory, Literature, Textbooks",
+    "keywords": [
+      "Literature",
+      "Quantum Mechanics",
+      "Textbooks"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/15560701/files/100QM.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Experimental Equivalence of Real and Complex Quantum Mechanics: Resolving the CHSH$_3$ No-Go Result",
+    "doi": "10.5281/zenodo.20340701",
+    "abstract": "A recent study by Renou et al. (Nature \\textbf{600}, 625, 2021) reported that quantum theory formulated over real numbers can be experimentally falsified via a gap in the maximal Clauser&ndash;Horne&ndash;Shimony&ndash;Holt CHSH$_3$ violation. Here, we show that this apparent distinction is not fundamental but arises from an incomplete composition rule for composite systems. Using a structure‑preserving real representation of quantum mechanics (Singh, Ann. Phys. 487, 170368, 2026), we demonstrate that the maximal violation $6\\sqrt{2}$ is achieved using only real arithmetic. Our explicit construction for the tripartite entanglement‑swapping scenario reproduces exactly the complex quantum prediction. We further establish an algebraic isomorphism between real and complex quantum mechanics that extends to a structure-preserving strict monoidal functor. This establishes an operational equivalence between real and complex quantum mechanics, demonstrating that all quantum correlations can be realized without invoking complex numbers. Our formulation exploits the canonical algebraic identification \\(\\mathbb{C} \\cong \\mathbb{R}^2\\)&nbsp;to realize quantum mechanics entirely within a real representation.&nbsp; Keywords: Quantum foundations, Real quantum mechanics, Symplectic geometry, Tensor product structure, Real Hilbert space, Real-complex isomorphism, Bell nonlocality, Entanglement, Quantum correlations.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20340701/files/EERCQM_MS_v2.pdf.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Quantum Hamilton mechanics: Hamilton equations of quantum motion, origin of quantum operators, and proof of quantization axiom",
+    "doi": "10.1016/j.aop.2006.07.008",
+    "abstract": "Annals of Physics Volume 321, Issue 12, December 2006, Pages 2876-2926 Quantum Hamilton mechanics: Hamilton equations of quantum motion, origin of quantum operators, and proof of quantization axiom Author links open overlay panelCiann-DongYang Department of Aeronautics and Astronautics, National Cheng Kung University, Tainan 701, Taiwan Received 14 January 2006, Accepted 24 July 2006, Available online 8 September 2006. &nbsp; https://doi.org/10.1016/j.aop.2006.07.008 Get rights and content Abstract This paper gives a thorough investigation on formulating and solving quantum problems by extended analytical mechanics that extends canonical variables to complex domain. With this complex extension, we show that quantum mechanics becomes a part of analytical mechanics and hence can be treated integrally with classical mechanics. Complex canonical variables are governed by Hamilton equations of motion, which can be derived naturally from Schr&ouml;dinger equation. Using complex canonical variables, a formal proof of the quantization axiom p &rarr; p&circ; = &minus;iℏ&nabla;, which is the kernel in constructing quantum-mechanical systems, becomes a one-line corollary of Hamilton mechanics. The derivation of quantum operators from Hamilton mechanics is coordinate independent and thus allows us to derive quantum operators directly under any coordinate system without transforming back to Cartesian coordinates. Besides deriving quantum operators, we also show that the various prominent quantum effects, such as quantization, tunneling, atomic shell structure, Aharonov&ndash;Bohm effect, and spin, all have the root in Hamilton mechanics and can be described entirely by Hamilton equations of motion.",
+    "keywords": [
+      "Hamilton mechanics",
+      "Complex extension",
+      "Quantum motion",
+      "Quantum operator"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5110974/files/Quantum_Hamilton_Mechanics_-_Hamilton_Equations_of_Quantum_Motion__Origin_of_Quantum_Operators__and_Proof_of_Quantization_Axiom_CDY.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Soluções numéricas de estados ligados para o potencial δ(x) duplo imerso num poço quadrado infinto assimétrico",
+    "doi": "10.5281/zenodo.14725302",
+    "abstract": "A Função Delta de Dirac é crucial na mecânica quântica para modelar potenciais bem localizados que afetam as funções de onda das partículas. Ele permite a análise de estados quânticos e fenômenos como tunelamento. Vários potenciais tipo delta de Dirac têm diversas implicações na química quântica e na física do estado sólido, influenciando os estados ligados e de espalhamento, e são fundamentais para os avanços da nanotecnologia. Além disso, a função delta de Dirac tem várias outras aplicações em várias áreas de física além da mecânica quântica, como exemplo, podemos citar o cálculo de funções de Green, em problemas de contorno não homogêneos, na determinação das flutuações térmicas de partículas puntuais em mecânica estatística e localização espacial de distribuições de cargas dentro da eletrostática. Diante disso, um bom entendimento sobre este tipo de função se faz necessário. Dentro dessa perspectiva, este trabalho faz um estudo sobre as possíveis soluções de estados ligados dentro do poço quadrado infinito na presença de um potencial delta de Dirac duplo.",
+    "keywords": [
+      "Equações transcendentes",
+      "Mecânica Quântica",
+      "Delta de Dirac",
+      "Transcendent equations",
+      "Quantum Mechanics",
+      "Dirac Delta"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/14725302/files/Solu%C3%A7%C3%B5es_num%C3%A9ricas_de_estados_ligados_para_o_potencial_%CE%B4_x__duplo_imerso_num_po%C3%A7o_quadrado_infinito_assim%C3%A9trico_.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Generalizations of Stirling Numbers and Normal Ordering",
+    "doi": "10.5281/zenodo.15753533",
+    "abstract": "",
+    "keywords": [
+      "quantum mechanics, harmonic oscillator, coherent states, Stirling numbers, q-deformation, Heisenberg algebra, quantum operators, potential systems."
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/15753533/files/Master_s_report%20(2).pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Beyond Quantum Mechanics: Black Holes, Information, Unification, Extra Dimensions and the Future of Theoretical Physics",
+    "doi": "10.5281/zenodo.16793345",
+    "abstract": "Commemorating the first hundred years of quantum mechanics, in this article we discuss some foundational ideas in quantum mechanics and some approaches toward a theory of quantum gravity.&nbsp;",
+    "keywords": [
+      "Quantum mechanics",
+      "Quantum gravity",
+      "Unification",
+      "Quantum foundations"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/16793345/files/Beyond%20Quantum%20Mechanics.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "On the 1D Infinitely Deep Square Quantum Well",
+    "doi": "10.5281/zenodo.4076810",
+    "abstract": "The one-dimensional infinitely deep square quantum well inherited its name from an ordinary rigid box (the properties of the box), and is considered to be one of the most elementary problems in non-relativistic quantum mechanics due to its simplicity. Given the nature of the problem, we discuss several methods and their solutions which are limited to the one-dimensional time-independent Schr&ouml;dinger equation&ndash;1D TISE. We will consider: (i) non-relativistic quantum mechanics, (ii) supersymmetric quantum mechanics (SUSYQM), (iii) fractional quantum mechanics, (iv)&nbsp;q-quantum mechanics, and (v) the&nbsp;q-hypergeometric differential equation. Ultimately, we show by using an appropriate substitution that it is possible to transform the 1D TISE, such that it becomes the&nbsp;q-hypergeometric differ- ential equation. To sum up, the non-compact&nbsp;q-deformed Lie group&mdash;SUq(1,1)&mdash;and Lie algebra&mdash;suq(1,1)&mdash;are described since the former gives the&nbsp;dynamical group&nbsp;or the&nbsp;spec- trum generating algebra&nbsp;of the system.",
+    "keywords": [
+      "q-hypergeometric equation, fractional quantum mechanics, q-quantum mechan- ics, supersymmetric quantum mechanics"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4076810/files/1dqmech.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "HILBERT SPACES AND THEIR APPLICATIONS IN QUANTUM MECHANICS",
+    "doi": "10.5281/zenodo.14930665",
+    "abstract": "This paper explores the concept of Hilbert spaces and their applications in quantum mechanics. First, the definition and properties of Hilbert spaces are analyzed, followed by an explanation of their use in quantum mechanics. Additionally, fundamental concepts of quantum mechanics, including wave functions and expectation value operators, are described in terms of Hilbert spaces. The paper also presents mathematical solutions to key applications of Hilbert spaces in quantum mechanics.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/14930665/files/HILBERT%20SPACES%20AND%20THEIR%20APPLICATIONS%20IN%20QUANTUM%20MECHANICS.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "QUANTUM COMPUTING",
+    "doi": "10.52326/jes.utm.2021.28(1).08",
+    "abstract": "The quantum computer, is a &quot;supercomputer&quot; that relies on the phenomena of quantum mechanics to perform operations on data. Object of suppositions, sometimes far-fetched, quantum mechanics gave birth to the quantum computer, a machine capable of processing data tens of millions of times faster than a conventional computer. A quantum computer doesn&#39;t use the same memory as a conventional computer. Rather than a sequence of 0 and 1, it works with qubits or quantum bits. The quantum computer is a combination of two major scientific fields: quantum mechanics and computer science. Quantum mechanics, on which this computer is based, governs the movement of bodies in the atomic, molecular and corpuscular domains, is a theory whose logic is totally contrary to intuition and it is essential to use mathematics to fully grasp it. Quantum computing is the sub-domain of computer science that deals with quantum computers using quantum mechanical phenomena, as opposed to those of electricity exclusively, for so-called &quot;classical&quot; computing. The quantum phenomena used are quantum entanglement and superposition. The article examines some aspects related to the development, operation, advantages and difficulties, applications and future of the quantum computer.",
+    "keywords": [
+      "Quantum theory",
+      "quantum information",
+      "quantum mechanics",
+      "photon teleportation",
+      "quantum computer",
+      "EPR paradox",
+      "qbits"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4971743/files/10.52326jes.utm.2021.28(1).08.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Off-Design Modeling and Performance Assessment of a Thermally Integrated 6 kWe Pumped Thermal Energy Storage System Using a Reversible ORC/HP",
+    "doi": "10.5281/zenodo.20286512",
+    "abstract": "This study explores the development of an off-design model of a 6 kWe thermally integrated&nbsp;pumped thermal energy storage system using a reversible organic rankine cycle/heat pump.&nbsp;Thermally integrated pumped thermal energy provides a promising solution to close the gap&nbsp;between energy supply and demand caused by the increasing production of renewable energy.&nbsp;The reversible nature of the proposed design allows for component reuse, reducing both costs&nbsp;and complexity. Additionally, the thermal integration of the system leverages low-temperature&nbsp;heat sources, such as district heating, to enhance operational flexibility. The focus of this&nbsp;research is the creation of an off-design model to assess the performances of the system under&nbsp;varying external conditions, including fluctuating district heating and storage temperatures, as&nbsp;well as ambient temperature. Detailed component models are developed, and a comprehensive&nbsp;system model is established for both heat pump and organic rankine cycle operating modes.&nbsp;Using this detailed model, performance maps of the system are generated by simulating its&nbsp;operation across defined boundary conditions. These performance maps serve as a guideline for&nbsp;system behavior under varying conditions and help define the operating range of the test bench&nbsp;before conducting the initial experimental tests.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20286512/files/2025_Neven_et_al_ECOS.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Generation of compressed air by cascaded thermocompressors – project status",
+    "doi": "10.1051/e3sconf/202131304003",
+    "abstract": "Compressed air is one of the most widely used industrial energy sources, and its production by mechanical compressors is extremely expensive and, in addition, inefficient. Therefore, the utilization of waste heat, which accrues on a large scale in many industrial applications, by means of a thermocompressor is an obvious alternative. This contribution presents a design approach to experimentally investigate a reciprocating thermocompressor with a self-actuated overdriven free displacer. These experiments shall be the basis for the design and realization of a cascade of identical stages, which has so far only been investigated by means of analytical modelling and theoretical similarity considerations. The main advantage of this approach is its extreme constructive simplicity and the expected self-regulating effect, which both facilitate a cost-effective production and operation. As the minimization of dead volume and fluid friction losses is essential, the heat exchangers and the regenerator are plainly realized by an annular gap around the displacer in the proposed design, thus further increasing its simplicity. The design parameters are determined by an optimization based on an analytical model extended by various losses and heat transfer limitations.",
+    "keywords": [
+      "Reciprocating thermocompressor",
+      "Thermal compression",
+      "Stirling engine",
+      "Stirling cycle",
+      "Compressed air",
+      "Waste heat utilization",
+      "Overdriven mode"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7408685/files/e3sconf_isec2021_04003.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "A Mathematical Model for the Simulation of Two-Phase Compression in Thermal non-Equlibrium",
+    "doi": "10.5281/zenodo.20383709",
+    "abstract": "Abstract When a pure refrigerant in a two-phase state undergoes a reduction of volume, the volume of the vapour phase is going to follow closely the total reduction of volume, while the liquid phase volume variation is negligible in comparison to this total reduction. This variation of vapour volume induces a rise in temperature, creating a thermal disequilibrium between the two phases, whereas the mechanical equilibrium is maintained. Heat transfer, condensation and evaporation are thereby going to occur between the two phases, leading to variations in pressure that are difficult to predict. In this paper, a mathematical model for simulating a two-phase compression (or expansion) assuming a thermal non-equilibrium is proposed. This model is intended to be used as a core model for the simulation of displacement compressors using deterministic modelling. The model is applied to a piston-cylinder setup simulating a simple variation of volume over time, as well as a resting phase allowing to reach a final state in both thermal and mechanical equilibrium. External heat transfers and leakages are considered in the equations but will be set at zero in the simulation. The simulated fluid is the refrigerant R1233zd(E). The results of this application are discussed in terms of work consumption and isentropic efficiency, showing that irreversibilities are unavoidable when working in thermal non- equilibrium. &nbsp;",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20383709/files/Carnot2024_Proceedings_Paper%20ID%2068.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "MolMod: An open access database of force fields for molecular simulations of fluids",
+    "doi": "10.1080/08927022.2019.1601191",
+    "abstract": "The MolMod database is presented, which is openly accessible at http://molmod.boltzmann-zuse.de/ and contains intermolecular force fields for over 150 pure fluids at present. It was developed and is maintained by the Boltzmann-Zuse Society for Computational Molecular Engineering (BZS). The set of molecular models in the MolMod database provides a coherent framework for molecular simulations of fluids. The molecular models in the MolMod database consist of Lennard-Jones interaction sites, point charges, and point dipoles and quadrupoles, which can be equivalently represented by multiple point charges. The force fields can be exported as input files for the simulation programmes ms2 and ls1 mardyn, GROMACS, and LAMMPS. To characterise the semantics associated with the numerical database content, a force field nomenclature is introduced that can also be used in other contexts in materials modelling at the atomistic and mesoscopic levels. The models of the pure substances that are included in the database were generally optimised such as to yield good representations of experimental data of the vapour&ndash;liquid equilibrium with a focus on the vapour pressure and the saturated liquid density. In many cases, the models also yield good predictions of caloric, transport, and interfacial properties of the pure fluids. For all models, references to the original works in which they were developed are provided. The models can be used straightforwardly for predictions of properties of fluid mixtures using established combination rules. Input errors are a major source of errors in simulations. The MolMod database contributes to reducing such errors.",
+    "keywords": [
+      "Computational molecular engineering",
+      "process data technology",
+      "molecular modelling and simulation"
+    ],
+    "open_license": false,
+    "download_url": null,
+    "curated": true,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Start-up behaviour and first operation of a fully reversible Heat Pump–ORC system using fixed-speed scroll machines",
+    "doi": "10.5281/zenodo.21156963",
+    "abstract": "Europe&rsquo;s energy transition requires an increase in both renewable electricity generation and renewable heating and cooling supply. Achieving these goals calls for flexible energy system capable of converting, storing, and dispatching energy across multiple vectors. Reversible Organic Rankine Cycle/Heat Pump (rev. ORC/HP) systems offer such versatility, as they can switch between power production and heating modes while sharing key components. Although recent research has examined the steady-state behaviour of rev. ORC/HP systems, their transient operation &ndash; particularly during start-up &ndash; remains insufficiently understood. This work experimentally investigates the start-up dynamics of a fully rev. ORC/HP system equipped with fixed-speed reversible volumetric machines. The paper examines different electrical grid-connection strategies for reversible volumetric machines, highlighting their respective operational constraints, benefits, and limitations. The start-up procedures for both HP and ORC modes are then analysed in detail, with a focus on how fixed-speed operation shapes transient behaviour. Finally, the study proposed practical measures to mitigate the challenges associated with fixed-speed reversible machines.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/21156963/files/IEAHP26_Paper_EN_FlexGeo.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Contribution to the improvement of scroll compressors operating under two-phase conditions",
+    "doi": "10.5281/zenodo.20809568",
+    "abstract": "Doctoral Thesis Contribution to the improvement of scroll&nbsp;compressors operating under two-phase&nbsp;conditions Abstract Supplying a scroll compressor with a two-phase oil-refrigerant mixture can, under certain circumstances, improve both machine and cycle performance. For instance, simulations of a heat pump operating with two-phase conditions at the compressor inlet indicate that supplying the compressor with a vapor quality of 40% can increase the coefficient of performance by 20%, assuming a compressor isentropic efficiency of 70%, due to a better temperature profiles matching within the condenser. These results, along with promising findings reported in the literature, motivate research on two-phase compression, in this case, using scroll compressors. To better understand the behavior of scroll compressors operating under two-phase conditions, numerical and experimental investigations are required. First, a modeling methodology for two-phase oil-refrigerant mixtures is required to describe their behavior during compression. Several mixture property models are proposed and validated against experimental data. These property models are applied to formulate the \"desolubilization\" assumption, which eliminates the dependence among pressure, temperature, and vapor quality when oil is present in the mixture and consequently simplifies the subsequent numerical calculations. Experimental investigations are carried out using a test bench dedicated to measuring the performance of compressors under controlled two-phase operating conditions. Four experimental campaigns are performed using a retrofitted compressor and a lab-scale prototype designed for two-phase applications. This lab-scale prototype includes an integrated dynamic pressure sensor, enabling partial acquisition of the pressure-volume diagram and improved validation of the model. The results are analyzed with respect to five operating variables: inlet pressure and vapor quality, pressure ratio, compressor speed, and oil circulation ratio. The results show a significant decrease in compressor performance with decreasing vapor quality. Finally, a deterministic compressor model incorporating several physics-based features is developed and validated against experimental measurements of power consumption, mass flow rate, and pressure evolution (for the prototype). The model shows good agreement with experiments, with average relative deviations below 3.2% for the prototype and 4.45% for the retrofitted compressor. Performance analyses are then carried out to eventually propose an optimized scroll compressor geometry featuring improved sealing, reduced friction, a larger discharge port and a larger compressor size. Simulations indicate that this design can reach an isentropic efficiency close to 70% at a vapor quality of 50%, compared to 53% for the prototype under similar conditions.",
+    "keywords": [
+      "Two-phase compression",
+      "Scroll compressor",
+      "Experimental testing",
+      "Deterministic modeling",
+      "Oil-refrigerant mixture"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20809568/files/Thesis_NLeclercq_V3.0.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "D3.9 Demonstrator of the further three lab-scale prototypes of two-phase expanders",
+    "doi": "10.5281/zenodo.20810617",
+    "abstract": "This report constitutes proof for building three expander assemblies. A first assembly has already been built and presented in Deliverable 3.7. However, the testing of this assembly severely damaged the expander lab-scale prototype. Therefore, since the partner in charge of the machines&rsquo; manufacturing left the project, an off-the-shelf compressor retrofitted into an expander will replace the prototype. Initially, the other two-phase epander was supposed to be a prototype; however, this machine could not be manufactured. Therefore, ULi&egrave;ge took over the activities to prepare a commercial machine instead of the prototype for the final plant. The third expander, working in the superheated region, is supposed to be a commercial machine since the beginning of the project. Therefore, in this report, three expander assemblies using commercial machines are presented. Their operating conditions are given, and the pulley ratios are designed according to the mass flow rate required at these operating conditions. Then, the methodology applied to retrofit the commercial compressors into expanders is presented. Finally, pictures of the final assemblies are provided. All the pieces manufactured to install these expanders on the final REGEN-BY-2 plant are also shown in this report. This deliverable is written in parallel with Deliverable 4.9, which presents the same work applied to the compressors of the plant.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20810617/files/REGEN-BY-2_WP3_D3.9_Demonstrator%20of%20the%20further%20three%20lab-scale%20prototypes%20of%20two-phase%20expanders_NTUA.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "PEMFC durability testing using heavy-duty load cycles",
+    "doi": "10.5281/zenodo.17244130",
+    "abstract": "PEMFC is a key technology for the decarbonization of the transport sector. The use of hydrogen powered vehicles appears as most promising solution to maintain driving range and refueling time competitive to traditional combustion engine vehicles. Both aspects are of high importance for Heavy-Duty Vehicles (HDV), but the PEMFC implementation in this type of vehicles has been addressed only recently. Thereby, the main focus of development has shifted towards operation at higher voltages to increase fuel efficiency and towards durability. The PEMTASTIC project [1] aims to meet these key technical challenges for the membrane-electrode assembly (MEA) by a combination of model-based MEA design and innovative materials tailored for heavy duty operation at elevated temperatures. In contrast to the automotive application, there is still a lack of harmonized load cycles for heavy-duty application. Therefore, this work will demonstrate how to select a representative mission profile and how to derive a PEMFC load cycle from this profile based on the selected vehicle characteristics and hybridization strategy (Figure 1). In this way, a HD representative cycle is defined for durability tests on stack level by a current density profile and for differential cells by a cell voltage profile. This approach enables the break-down of degradation analysis to differential cells. Most important parameters for reliable and reproducible durability characterization will be demonstrated. Furthermore, results of degradation tests for different MEAs using this HD load cycle will be presented together with in-situ and ex-situ characterization results to demonstrate the importance of such a HD representative load cycle and its impact on the different materials of the MEA components. The project PEMTASTIC (GA number: 10110143) is supported by the Clean Hydrogen Partnership and its members Hydrogen Europe and Hydrogen Europe Research.",
+    "keywords": [
+      "EFCF2025",
+      "H2",
+      "LowTemp. Fuel Cells & Electrolysers",
+      "Heavy-Duty",
+      "Mission Profile",
+      "Hybridization Strategy",
+      "Life Time"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17244130/files/EFCF-2025_Paper_A1008_10889_PEMFC-durability-in-HD-conditions_Mitz.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "D4.9 Demonstrator of the further two lab-scale prototypes of two-phase compressors",
+    "doi": "10.5281/zenodo.20810772",
+    "abstract": "This report constitutes proof for the building of the two other compressor assemblies. A first assembly has already been built and presented in Deliverable 4.7. Initially, the compressor following the cascade compression was supposed to be a prototype; however, the partner manufacturing the compressors unfortunately left the project consortium. Therefore, ULi&egrave;ge took over the activities to prepare a commercial machine instead of the prototype for the final plant. The third compressor, working in the superheated region, is supposed to be a commercial machine since the beginning of the project. Therefore, in this report, two compressor assemblies using commercial&nbsp;machines are presented. Their operating conditions are given, and the pulley ratios are designed according to the mass flow rate required at these operating conditions. Finally, pictures of the final assemblies are provided. All the pieces manufactured to install these compressors on the final REGEN-BY-2 plant are also shown in this report. This deliverable is written in parallel with Deliverable 3.9, which presents the same work applied to the expanders of the plant.&nbsp;",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20810772/files/REGEN-BY-2_WP4_D4.9_Demonstrator%20of%20the%20further%20two%20lab-scale%20prototypes%20of%20two-phase%20compressors_ULIEGE.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "A PCM-WATER HEAT EXCHANGER WITH POLYMERIC HOLLOW FIBRES FOR LATENT HEAT THERMAL ENERGY STORAGE: A PARAMETRIC STUDY OF DISCHARGING STAGE",
+    "doi": "10.15632/jtam-pl.54.4.1285",
+    "abstract": "The paper presents a theoretical parametric study into latent heat thermal energy storage (LHTES) employing polymeric hollow fibres embedded in a phase change material (PCM). The polymeric hollow fibres of five inner diameters between 0.5mm and 1.5mm are considered in the study. The effectiveness-NTU method is employed to calculate the thermal performance of a theoretical LHTES unit of the shell-and-tube design. The results indicate that the hollow fibres embedded in a PCM can mitigate the drawback of low thermal conductivity of phase change materials. For the same packing fraction, the total heat transfer rates between the heat transfer fluid and the PCM increase with the decreasing diameter of the hollow fibres. This increase in the heat transfer rate and thus the efficiency of the heat exchange to some extent compensate for the energy consumption of the pump that also increases with the decreasing fibre diameter.",
+    "keywords": [
+      "polymeric hollow fibre",
+      "heat exchanger",
+      "latent heat thermal energy storage",
+      "phase change materials"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/1120039/files/10.15632_jtam-pl.54.4.1285.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Thermodynamics",
+    "doi": "10.5281/zenodo.17296761",
+    "abstract": "Thermodynamics is a comprehensive guide that explores the fundamental laws governing energy, heat, and work, and their vital applications in science and engineering. This book presents a balanced blend of theory, practical examples, and problem-solving techniques, making it an essential resource for students, educators, and professionals alike.&nbsp;Starting from the basic concepts and the laws of thermodynamics, the text gradually progresses to advanced topics, including cycles, energy systems, and real-world engineering applications. Each chapter is supported with clear explanations, illustrative diagrams, solved examples, and exercises designed to strengthen understanding and application skills.&nbsp;Special emphasis is placed on connecting theoretical principles to practical engineering challenges in fields such as power generation, refrigeration, air conditioning, renewable energy, and industrial processes. The book also integrates modern computational approaches, highlighting the evolving role of technology in thermodynamic analysis.&nbsp;Whether used as a textbook for academic courses or as a reference for professionals, this book aims to simplify learning while maintaining rigor and depth. With its structured approach, accessible style, and focus on both fundamentals and applications, Thermodynamics serves as a reliable companion for anyone seeking to master this cornerstone of engineering science.",
+    "keywords": [
+      "Dynamics",
+      "Thermodynamics"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17296761/files/Quill_Tech_File_Thermodynamics.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Thermodynamics",
+    "doi": "10.5281/zenodo.17507946",
+    "abstract": "Thermodynamics is a comprehensive textbook meticulously designed to provide a deep and structured understanding of the fundamental principles that govern energy, heat, and work in engineering systems. Tailored for undergraduate and postgraduate students in aeronautical, mechanical, and aerospace engineering , this book blends classical concepts with modern applications, bridging theoretical knowledge and practical insight.&nbsp;The text systematically covers key topics including the laws of thermodynamics, entropy, air-standard and vapor power cycles, propulsion fundamentals, and heat transfer mechanisms . Each chapter features clear explanations, illustrative diagrams, solved examples, and end-of-chapter exercises that enhance conceptual understanding and problem-solving skills.&nbsp;The book also emphasizes the real-world relevance of thermodynamics in aerospace propulsion, energy conversion systems, and sustainable technologies , aligning with current academic curricula and industry practices. Written collaboratively by experienced academicians and researchers, it serves as both a learning companion and reference guide for students, educators, and professionals seeking to master the science of energy transformation.",
+    "keywords": [
+      "Second Law and Entropy",
+      "Air Standard Cycles",
+      "Vapour Power Cycles",
+      "Propulsion and Heat Transfer"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17507946/files/Quill_Tech_File_Aero_Thermodynamics_.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Thermodynamics",
+    "doi": "10.1016/0016-0032(87)90235-3",
+    "abstract": "n/a",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/2364877/files/article.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Effects of seated posture and automotive seat on human thermal response",
+    "doi": "10.5281/zenodo.1404569",
+    "abstract": "Peer-reviewed extended abstract submitted to 12i3m, 29-30 September 2018, St. Gallen, Switzerland",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/1404569/files/Fojtlin12i3m.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Continuous Adjoint Shape Optimization of Internally Cooled Turbine Blade",
+    "doi": "10.5281/zenodo.5713532",
+    "abstract": "This paper presents an adjoint-based shape optimization framework and its demonstration in a Conjugate Heat Transfer problem in a turbine blading. The gradient of the objective function is computed based on the continuous adjoint method which also includes the adjoint to the turbulence model. The developed software was used to optimize both the blade shape of the internally cooled linear C3X turbine blade and the position of cooling channels aiming at (a) minimum total pressure drop of the hot gas flow and (b) minimum highest temperature within the blade. A free-form parameterization tool, based on volumetric NURBS, controls the blade airfoil contour while the cooling channels are free to move inside the blade, being controlled by the coordinates of their centers. Geometric and flow constraints are included in the performed optimizations keeping the cooling channels away from the airfoil sides and retaining the turbine inlet capacity and flow turning.",
+    "keywords": [
+      "Internally Cooled Turbine Blades",
+      "Conjugate Heat Transfer",
+      "Shape Optimization",
+      "Continuous Adjoint"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5713532/files/2021_ETC_ContinuousAdjointShapeOptimizationOfInternallyCooledTurbineBlade.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "THERMODYNAMICS: THEORY, INNOVATIONS, AND INDUSTRIAL APPLICATIONS",
+    "doi": "10.5281/zenodo.20347892",
+    "abstract": "This article explores the fundamental principles of Thermodynamics, its modern theoretical developments, and innovative applications across various industrial sectors.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20347892/files/Ochildiyev%20H.832-836%20acu%20(2).pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Modeling and Experimental Validation of the Thermophysical  Properties of a POE+R1233zd(E) Mixture",
+    "doi": "10.5281/zenodo.20377818",
+    "abstract": "Reliable data of the properties of lubricant + refrigerant mixtures are essential in many applications to assess the&nbsp; behavior of refrigeration and heat pump systems. The accurate modeling of all required thermophysical properties&nbsp; (including density, viscosity, thermal conductivity, enthalpy, entropy, and phase equilibria) remains a key challenge&nbsp; today.&nbsp; In this work, thermophysical property measurements of a \"pure\" POE lubricant and its mixture with the refrigerant&nbsp; R1233zd(E) were carried out in the temperature range from 283.15 to 373.15 K with pressures up to 1.2 MPa, using&nbsp; experimental facitilies from the Technische Universitat Dresden. Based on the modelling approach developed by Yang&nbsp; et al. (Ind. Eng. Chem. Res. 2023, 44, 18736-18749), the thermophysical properties of the \"pure\" POE and its mixture&nbsp; with R1233zd(E) are modeled in much larger temperature and pressure ranges. This model is a semi-empirical approach&nbsp; making use of a small amount of experimental data ( density, viscosity, thermal conductivity and heat capacity) of the&nbsp; pure lubricant to obtain the lubricant's fluid constants ( e.g., critical temperature). Subsequently, some experimental&nbsp; bubble point pressure data of the mixture were used to fit the binary interaction parameters in mixing rules, which&nbsp; enable mixture predictions. The predictions of this model are compared with those of the classical empirical models&nbsp; employed for lubricant + refrigerant mixtures, specifically the Henderson equations for density and viscosity, and&nbsp; the Cavestri equation for the vapor pressure. The results show a better agreement with the experimental data for the&nbsp; empirical modeling approach for both the density and viscosity, while the vapor pressure data prediction accuracies&nbsp; are even for both approaches. In particular, the viscosity prediction of the thermodynamic approach are not good for&nbsp; the mixture, with a root mean square relative error of 40%. Finally, the two modelling approaches are compared on&nbsp; other modeling aspects than accuracy, for instance, the number of experimental data required, the ability to predict&nbsp; other properties and the physical sense of the calibrated parameters, making the approach developed by Yang et al. a&nbsp; convenient option in many applications.&nbsp;",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20377818/files/Modeling%20and%20Experimental%20Validation%20of%20the%20Thermophysical%20Properties%20of%20a%20POE+R1233zd(E)%20Mixture.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Sobre la paradoja de la segunda ley de la termodinámica en la arqueología de los fenómenos sociales",
+    "doi": "10.5281/zenodo.11507840",
+    "abstract": "Una nueva contribuci&oacute;n de la &laquo;arqueolog&iacute;a de los fen&oacute;menos sociales&raquo; demuestra que la segunda ley de la termodin&aacute;mica no siempre se cumple entre las sociedades humanas porque la entrop&iacute;a, representada por la conflictividad social, no aumenta en todos los casos analizados cuando el proceso es irreversible; en cambio, s&iacute; lo hace la inestabilidad social.",
+    "keywords": [
+      "Paradox",
+      "second law",
+      "thermodynamics",
+      "archaeology",
+      "social phenomena",
+      "entropy",
+      "conflict",
+      "irreversible process",
+      "instability"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/11507840/files/AI5315.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Graphical thermodynamics",
+    "doi": "10.2475/ajs.s3-49.289.21",
+    "abstract": "n/a",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/2104901/files/article.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Engineering Thermodynamics",
+    "doi": "10.5281/zenodo.11350331",
+    "abstract": "",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/11350331/files/Engineering%20Thermodynamics.jpeg/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Tbit/s Single Channel 53 km Free-Space Optical Transmission -Assessing the Feasibility of Optical GEO-Satellite Feeder Links",
+    "doi": "10.5281/zenodo.7449554",
+    "abstract": "A 1 Tbit/s 53km single channel free-space optical (FSO) link is demonstrated. High bandwidth, high order modulation formats and advanced adaptive optics are utilized. We show that the absence of a nonlinear-Shannon limit in combination with adaptive optics enables record data-transmission with low link failures.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7449554/files/Bitachon_ETHZ_2208_ECOC_VERTIGO_PDP_v5.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Plasmonic Modulators for Future Highest-Speed Free Space Optical Communications",
+    "doi": "10.5281/zenodo.7452804",
+    "abstract": "Plasmonic modulators have been assessed for operation up to 200&nbsp;GBaud in a turbulent 53&nbsp;km free-space-optical link. They are shown to withstand space radiation and large temperature ranges making them ideal for space applications",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7452804/files/Kulmer_ETHZ_2210_OFC_Vertigo_Plasmonic_final.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Synergistic Integration of Polypyrrole, Graphene Oxide, and Silver Nanowires into Flexible Polymeric Films for EMI Shielding Applications",
+    "doi": "10.3390/molecules30214221",
+    "abstract": "Research paper pubished in Molecules &nbsp; 2025 ,&nbsp; 30 (21), 4221;&nbsp; https://doi.org/10.3390/molecules30214221",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17481083/files/molecules-30-04221.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Coherent Biology:  Life in Electromagnetic and Plasma-Structured Environments",
+    "doi": "10.5281/zenodo.18217838",
+    "abstract": "Biological life on Earth is traditionally defined in terms of carbon chemistry, liquid water, and narrow thermodynamic ranges. However, plasma physics, space physics, and electromagnetic field theory demonstrate that large-scale, long-lived, phase-stable environments exist that are not governed primarily by neutral fluid dynamics. Earth&rsquo;s ionosphere, magnetosphere, and coupled plasma systems form coherent electromagnetic structures, including ducts, filaments, cavities, and resonant regions that persist over time and space. This paper proposes a generalizable biological framework in which life is classified not only by molecular substrate but by coupling to electromagnetic and plasma coherence. A field-based definition of habitability is introduced, extending biological possibility into environments where energy, geometry, and phase stability are controlled by electromagnetic structure rather than chemical equilibrium alone. This framework integrates known plasma self-organization, biophysical electromagnetism, and nervous-system phase regulation into a unified theory of coherent life. coherent biology, plasma life, electromagnetic ecology, ionosphere, magnetosphere, field-based life, bioelectromagnetics, plasma self-organization, neural coherence, phase locking, astrobiology, space plasma, field-coupled organisms, hybrid biology, electromagnetic habitats, coherent fields &nbsp;",
+    "keywords": [
+      "coherent biology, plasma life, electromagnetic ecology, ionosphere, magnetosphere, field-based life, bioelectromagnetics, plasma self-organization, neural coherence, phase locking, astrobiology, space plasma, field-coupled organisms, hybrid biology, electromagnetic habitats, coherent fields"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/18217838/files/Coherent%20Biology.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "电磁场:从U(1)到SU(2)",
+    "doi": "10.5281/zenodo.19896385",
+    "abstract": "传统物理学认为,电磁场属于 U ( 1 ),无源真空中,电磁波无法自我弯曲,或者即使如艾里光束产生弯曲,也只是某种干涉效应。这些固有观念,可能主要的原因在于对于无源真空中散度为 0 的约束的笼统理解和对于源的认识错误。 本文通过对电磁场在无源真空中自洽性的几何分析,得出了电磁场可以构成 SU(2) 构型的初步结论。",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/19896385/files/%E7%94%B5%E7%A3%81%E5%9C%BA%EF%BC%9A%E4%BB%8EU(1)%E5%88%B0SU%20(V1.0).pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Microwave Heating and Cancer Risk: Scientific Evidence, Mechanisms, and Public Health Perspectives",
+    "doi": "10.5281/zenodo.20233412",
+    "abstract": "&nbsp; Abstract Microwave heating technology is widely used in households, medicine, telecommunications, and industrial applications. Concerns about a possible relationship between microwave radiation exposure and cancer development have persisted for decades, particularly with the increasing use of microwave ovens, wireless communication systems, and radiofrequency-emitting devices. This article critically examines the scientific evidence regarding the association between microwave heating and cancer risk. The biological mechanisms of microwave radiation, epidemiological findings, experimental studies, and positions of international health organizations are reviewed. Current evidence indicates that microwave radiation belongs to the category of non-ionizing electromagnetic radiation and lacks sufficient energy to directly damage DNA in the manner of ionizing radiation such as X-rays or gamma rays. However, prolonged or high-level exposure to radiofrequency electromagnetic fields (RF-EMFs) remains an area of scientific investigation. International agencies such as the International Agency for Research on Cancer and the World Health Organization classify RF electromagnetic fields as &ldquo;possibly carcinogenic to humans&rdquo; (Group 2B), mainly based on limited evidence related to glioma and acoustic neuroma. This review evaluates current knowledge, controversies, and future research directions concerning microwave heating and cancer. Introduction Microwave radiation represents electromagnetic waves with frequencies ranging approximately from 300 MHz to 300 GHz. Microwave heating occurs when microwave energy causes polar molecules, particularly water, to oscillate and generate heat. Microwave ovens generally operate at 2.45 GHz, while wireless communication devices use various radiofrequency bands within the microwave spectrum. Public concern about microwave exposure intensified with the rapid expansion of mobile phone usage, wireless networks, radar systems, and microwave cooking appliances. Questions have emerged regarding whether chronic exposure to microwave radiation may increase cancer risk. Scientific interest has therefore focused on understanding the biological effects of radiofrequency electromagnetic fields (RF-EMFs) and their potential carcinogenicity. The International Agency for Research on Cancer evaluated radiofrequency electromagnetic fields in 2011 and classified them as &ldquo;possibly carcinogenic to humans&rdquo; (Group 2B). ( IARC Publications ) This classification indicates limited evidence in humans and less than sufficient evidence in experimental animals. Principles of Microwave Heating Microwave heating is based on dielectric heating. Polar molecules absorb microwave energy and rotate rapidly, generating thermal energy through molecular friction. Unlike ionizing radiation, microwave radiation does not possess enough photon energy to break chemical bonds or directly mutate DNA. The energy of electromagnetic radiation depends on frequency according to: E = h\\nu where: (E) = photon energy (h) = Planck&rsquo;s constant (\\nu) = frequency of radiation Ionizing radiation, including X-rays and gamma rays, has sufficiently high frequency to remove electrons from atoms and directly damage DNA. Microwave radiation lies in the non-ionizing region of the electromagnetic spectrum and primarily produces thermal effects. Biological Effects of Microwave Radiation Thermal Effects The principal recognized biological effect of microwave exposure is tissue heating. Excessive microwave exposure can elevate tissue temperature, leading to burns, cataracts, or heat stress. Occupational exposure in industrial or military settings may produce localized heating effects if safety standards are not followed. Non-Thermal Effects Some researchers have proposed non-thermal biological effects of microwave radiation, including oxidative stress, altered gene expression, membrane instability, and changes in cellular signaling pathways. However, many reported findings remain inconsistent and difficult to reproduce experimentally. Several animal and cellular studies have explored whether long-term RF exposure can influence carcinogenesis. Some experiments reported increased oxidative stress markers or altered cellular proliferation, while others found no significant effects. ( MDPI ) Epidemiological Evidence Linking Microwave Radiation and Cancer Mobile Phones and Brain Tumors Most epidemiological investigations have focused on mobile phone exposure because mobile devices emit radiofrequency electromagnetic fields within the microwave spectrum. Certain case-control studies reported possible associations between prolonged mobile phone use and increased risk of glioma or acoustic neuroma. However, cohort studies and large population analyses have generally shown inconsistent or weak associations. The International Agency for Research on Cancer concluded that evidence in humans was limited but sufficient to justify classification of RF electromagnetic fields as Group 2B carcinogens. ( IARC Publications ) Meta-Analyses Several meta-analyses have attempted to evaluate cumulative evidence regarding RF-EMF exposure and cancer risk. Some analyses reported modest increases in brain tumor risk among heavy or long-term users of wireless devices. ( Clinical Medicine Journals ) However, methodological limitations such as recall bias, exposure misclassification, and confounding variables complicate interpretation. Microwave Ovens and Cancer No convincing scientific evidence demonstrates that properly functioning household microwave ovens increase cancer risk. Microwave ovens are heavily shielded to minimize radiation leakage, and exposure levels outside the appliance remain far below international safety limits. Microwave ovens produce non-ionizing radiation, which cannot directly alter DNA structure. Most health authorities consider microwave ovens safe when used according to manufacturer guidelines. Experimental Animal Studies Animal studies have produced mixed findings regarding RF radiation and cancer development. Some rodent experiments suggested possible increases in certain tumor types under prolonged high-intensity exposure conditions. Other studies failed to reproduce these observations. A systematic review of animal studies concluded that evidence remains insufficient to establish a definitive causal relationship between radiofrequency exposure and carcinogenesis. ( MDPI ) Mechanisms Potentially Involved in Carcinogenesis Although direct DNA ionization by microwaves is not possible, several hypothetical mechanisms have been investigated: Oxidative stress induction Increased reactive oxygen species (ROS) formation Altered calcium signaling pathways Heat-shock protein activation Cellular membrane permeability changes Chronic tissue inflammation However, no universally accepted mechanism has been conclusively demonstrated. International Safety Standards International organizations have established exposure limits to protect public health. Key organizations include: World Health Organization International Commission on Non-Ionizing Radiation Protection International Agency for Research on Cancer These organizations recommend exposure guidelines based primarily on preventing excessive tissue heating. The World Health Organization states that current evidence does not confirm adverse health consequences from low-level environmental RF exposure below international guideline limits. ( PMC ) Public Misconceptions About Microwave Heating A common misconception is that microwave ovens make food radioactive or carcinogenic. Microwave heating only transfers thermal energy to food molecules and does not alter atomic nuclei or create ionizing radiation. Another misconception is that all electromagnetic radiation causes cancer. In reality, carcinogenic potential depends strongly on radiation frequency and energy. The electromagnetic spectrum ranges from low-energy radio waves to high-energy gamma rays: \\text{Radio waves} &lt; \\text{Microwaves} &lt; \\text{Infrared} &lt; \\text{Visible light} &lt; \\text{Ultraviolet} &lt; \\text{X-rays} &lt; \\text{Gamma rays} Only ionizing radiation possesses sufficient energy to directly damage DNA. Future Research Directions Future investigations should focus on: Long-term cohort studies with accurate exposure assessment Biological mechanisms underlying RF interactions with cells Effects of emerging 5G and higher-frequency technologies Combined environmental and occupational exposures Genetic susceptibility to RF-induced biological effects Advances in molecular biology and bioinformatics may improve understanding of subtle biological effects associated with chronic microwave exposure. Conclusion Microwave radiation is a form of non-ionizing electromagnetic radiation that primarily produces thermal effects rather than direct DNA damage. Current scientific evidence does not establish a definitive causal relationship between microwave heating and cancer. However, limited evidence linking prolonged radiofrequency electromagnetic field exposure to certain brain tumors has led the International Agency for Research on Cancer to classify RF-EMFs as possibly carcinogenic to humans. Properly functioning household microwave ovens are considered safe under existing international standards. Continued research remains important because of the rapidly increasing global exposure to wireless communication technologies and RF-emitting devices. References &nbsp; &nbsp;",
+    "keywords": [
+      "Microwave",
+      "cancer",
+      "tumor",
+      "link"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/20233412/files/1%20microwave.docx/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "New Electromagnetic Interference  Shielding Materials: Biochars,  Scaffolds, Rare Earth, and Ferrite Based Materials",
+    "doi": "10.3390/nano15070541",
+    "abstract": "Research paper published in &nbsp;Nanomaterials 2025, 15, 541",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17294367/files/nanomaterials-15-00541-with-cover.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Test results of different electrometric variometer sensors",
+    "doi": "10.5281/zenodo.5593609",
+    "abstract": "http://elibrary.ru/item.asp?id=27450221",
+    "keywords": [
+      "electric fields, sensors of electric fields, electromagnetic measurements, electromagnetic monitoring"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5593609/files/%D0%A1%D0%BE%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%BD%D0%B0%D1%83%D1%87%D0%BD%D1%8B%D0%B9%20%D0%B2%D0%B5%D1%81%D1%82%D0%BD%D0%B8%D0%BA.jpg/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Investigation of the interactions  and electromagnetic shielding  properties of graphene oxide/  platinum nanoparticle composites  prepared under low-dose gamma  irradiation",
+    "doi": "10.1038/s41598-025-12655-7",
+    "abstract": "Research paper published in &nbsp;Scientific Reports&nbsp;",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17293391/files/s41598-025-12655-7.pdf/content",
+    "curated": true,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Interaction of Complex Scalar Fields and Electromagnetic Fields in Klein-Gordon-Maxwell Theory in Cosmological Inertial Frame",
+    "doi": "10.5281/zenodo.5520027",
+    "abstract": "We found equations of complex scalar fields and electromagnetic fields on interaction of complex scalar fields and electromagnetic fields in Klein-Gordon-Maxwell theory from Type A of wave function and Type B of expanded distance in cosmological inertial frame.",
+    "keywords": [
+      "Klein-Gordon-Maxwell Theory",
+      "Cosmological Inertial Frame",
+      "Complex Scalar fields",
+      "Electromagnetic fields"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/5520027/files/A.38.Interaction%20of%20Complex%20Scalar%20Fields.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "THE EFFECT OF ELECTROMAGNETIC RADIATION ON THE ENVIRONMENT AND THE HUMAN BODY",
+    "doi": "10.5281/zenodo.10810662",
+    "abstract": "Humans are exposed to various electromagnetic fields from natural and artificial sources. These fields cause the electric field in the body to move ions, heat, neuromuscular stimulation, and various other effects. The biological effect of these waves is highly dependent on the waveform, the frequency between the applied fields and the Earth's magnetic field, and their duration. Electromagnetic fields generated by conventional devices are at a standard level and appear to be harmless to humans. But studies on specific people, such as those who live and work near radar stations, high-pressure posts, and high-power telecommunications and radio transmitters, show that they have harmful effects and that those living nearby are not immune. Today's life on Earth is actually affected by natural electromagnetic fields. Electromagnetic waves, or electromagnetic radiation, is the effect of the electromagnetic field created by electric current on the environment. As a result of the use of electromagnetic fields and other physical fields in modern technology, man-made sources that are completely different from natural sources have appeared. Such man-made sources can deliberately change the natural background. During the years of existence of electromagnetic waves, it has been gradually playing a bigger role in almost all spheres of human activity. It should be noted that the types, number and power of electromagnetic emitters are constantly increasing. Especially household electronic equipment - telephones, computers, microwave ovens, etc. the use of other household appliances has reached a very high level in modern times. Each of these devices generates electromagnetic radiation of a certain frequency and power, creating certain dangers and problems for the human body. The bands with the greatest biological impact in the electromagnetic radiation spectrum are radio frequency and extremely high frequency bands.",
+    "keywords": [
+      "electromagnetic, physiotherapy, radio wave, radio frequency, infrared, radiation, laser, intensity"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/10810662/files/Slovak%20international%20scientific%20journal%20%E2%84%9681,%202024-64-66.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "ELECTROMAGNETIC THEORY || an illustration approach for a better Understanding ||",
+    "doi": "10.5281/zenodo.7944270",
+    "abstract": "Electromagnetic Theory is a fundamental subject in physics and electrical engineering that deals with the study of electromagnetic fields and their effects. This course is designed to provide a comprehensive understanding of electromagnetic theory, covering various topics such as electrostatics, magnetostatics, electrodynamic fields, and electromagnetic waves. In Chapter 2, students will be introduced to the sources and effects of electromagnetic fields, including Coulomb&#39;s Law, electric field intensity, and Gauss&#39;s Law. The course will also cover coordinate systems, vector fields, gradient, divergence, curl, and theorems and applications. Chapter 3 focuses on electrostatics and includes topics such as electric potential, electric field and equipotential plots, uniform and non-uniform field, electric field in free space, conductors, and dielectrics. Students will also learn about dielectric polarization, dielectric strength, boundary conditions, Poisson&#39;s and Laplace&#39;s equations, capacitance, energy density, and their applications. In Chapter 4, the course will cover magnetostatics, including Lorentz force, magnetic field intensity, Biot-Savart&#39;s Law, Ampere&#39;s Circuit Law, magnetic flux density, magnetization, and magnetic field in multiple media. Students will also learn about boundary conditions, scalar and vector potential, Poisson&#39;s Equation, magnetic force, torque, inductance, energy density, and their applications. Electromagnetic Theory 8 In Chapter 5, students will be introduced to electrodynamic fields, including magnetic circuits, Faraday&#39;s Law, transformer and motional EMF, displacement current, and Maxwell&#39;s equations in differential and integral form. They will also learn about the relationship between field theory and circuit theory and their applications. Chapter 6 covers electromagnetic waves, including electromagnetic wave generation and equations, wave parameters such as velocity, intrinsic impedance, propagation constant, and waves in free space, lossy and lossless dielectrics, conductors, and skin depth. Students will also learn about the Poynting vector and its applications. Chapter 7 is a conclusion section. Overall, the Electromagnetic Theory course provides a fundamental understanding of electromagnetic fields and their applications in various fields, including telecommunications, power generation, and medical imaging.",
+    "keywords": [
+      "Electromagnetic theory",
+      "Electric potential",
+      "Magnetic flex density"
+    ],
+    "open_license": false,
+    "download_url": null,
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "INFLUENCE OF ELECTROMAGNETIC FIELD ON LIFE STRUCTURE AND ITS MEANING IN DIAGNOSIS AND THERAPY",
+    "doi": "10.5281/zenodo.14415030",
+    "abstract": "The effect of the electromagnetic field on living structures: Electromagnetic fields can be created by living structures. Exposure to electric and magnetic fields can restore interactions within these structures. Electromagnetic radiation (EMR) and its effects can cause damage in the processes of living structures.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/14415030/files/JARTES20240431.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "STUDIU PRIVIND IMPACTUL FOLOSIRII DISPOZITIVELOR ELECTROMAGNETICE ASUPRA DEZVOLTĂRII ANTEPREȘCOLARILOR (1-3 ANI)",
+    "doi": "10.5281/zenodo.13761563",
+    "abstract": "Summary. Electromagnetic radiation is the propagation of electric and magnetic waves through&nbsp; space that appear in various forms and are generated by devices and things that involve electricity&nbsp; and voltage. In some cases, electromagnetic fields are unwanted side effects of high voltage cables,&nbsp; transformers or large motors in factories. Other times, electromagnetic waves are voluntarily generated to create wireless connections such as 5G, 4G, WIFI, TV, radio, radar, wireless networks. Analysis of the association between exposure to electromagnetic fields of non-ionizing radiation (EMF) and health in preschool children is hampered by limited data availability, mainly due to&nbsp; difficulties encountered in exposure assessment1 . In the study on the impact of non-ionizing radiation&nbsp; emitted by electromagnetic devices operating near preschool children, we can classify them by application, depending on the complexity and diversity of the devices in a modern household. Basically,&nbsp; most electronic and electrical equipment around us involves the use of electromagnetic principles in&nbsp; one way or another. Key words: electromagnetic radiation, electromagnetic fields, electronic equipment, pre-schoolers",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/13761563/files/Bibire.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "ANALYSIS OF THE EFFECTS OF ELECTROMAGNETIC RADIATION ON PLANTS DEVELOPMENT",
+    "doi": "10.5281/zenodo.10050420",
+    "abstract": "The population growth of the last decades has created the need to look for new ways to increase the productivity of crops. Knowing this, several studies began to be carried out in order to analyze the influence of electromagnetic radiation on the development of plants. With that in mind, the present work presents an experiment carried out to analyze the influence of the irradiation of an electromagnetic wave of 2.3625 GHz in the development of a corn crop by comparing the growth of this plant exposed to this extra radiation with another that is only exposed to the ambient radiation. The results demonstrate that the plant exposed to the radiation set at a specified frequency has a decrease in root size.&nbsp;",
+    "keywords": [
+      "Electromagnetic radiation",
+      "Corn"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/10050420/files/WMO-23-014_R1_O01.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "ELECTROMAGNETIC INTERFERENCE (EMI) PRODUCED BY HIGH VOLTAGE TRANSMISSION LINES",
+    "doi": "10.21303/2461-4262.2020.001398",
+    "abstract": "Electromagnetic interference in high voltage transmission lines has been an interest topic due to its effect on human health, plants, electrical and telecommunication equipment. Extremely high voltages (EHV) in transmission lines are reasons of electrostatic effects, while short circuit currents and line loading currents are responsible for electromagnetic effects. The aim of this research is to analyze electromagnetic fields in high voltage transmission lines in theoretical study and calculating its level in overhead T. L and therefore estimated the EMI produced, by employing a mathematical model of 230&nbsp;KV tower double circuit configurations of high voltage transmission lines. The calculation is based on computer aided analysis (CAA) by using fields and corona effects software (FACE). It&#39;s found that the overhead power lines of general frequency (50&nbsp;Hz) generates a highly intense magnetic field, the electromagnetic fields depends on the distance from sources and the type of line configuration. They decrease as the distance increase from the tower and conductors and increase with a high current. The strength of an electric field is proportional to the voltage of the line and the magnetic field strength is proportional to the current in the high voltage transmission lines. Distribution line with a high current load may produce a magnetic field that is as high as those produced by some high voltage transmission lines. &nbsp;Some techniques of reduction of the effects of electromagnetic interference have suggested such as rearrangement conductors of transmission line, and distance from phase conductor and grounding system. The study recommended to keep safety distance operation in high voltage transmission lines with the necessity for engineer to take into account the effect of electromagnetic interference in the design stage of high voltage transmission power system, and to avoid any addition cost may be occur due to neglected effects of electromagnetic interference that produces by high voltage transmission lines",
+    "keywords": [
+      "electric field",
+      "electromagnetic interference (EMI)",
+      "high voltage transmission lines (HVTL)",
+      "field effects"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4066623/files/ELECTROMAGNETIC%20INTERFERENCE%20(EMI)%20PRODUCED%20BY%20HIGH%20VOLTAGE%20TRANSMISSION%20LINES.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "On the Ghosts We Cannot Get Rid Of. An Inquiry into the Four Fundamental Fields of Nature",
+    "doi": "10.5281/zenodo.15505521",
+    "abstract": "Background: The unification of the four fundamental fields of nature&mdash;gravitational, electromagnetic, weak, and strong interactions&mdash;has long been a central pursuit in theoretical physics. Traditional approaches often rely on additional assumptions or complex frameworks to achieve this unification. Material and Methods: &nbsp; This study employs an approach grounded in the established principles of general relativity and classical field theory, to identify the fundamental fields without introducing extraneous assumptions. The methodology involves analyzing tensorial relationships and leveraging the intrinsic structures of spacetime curvature. Results: &nbsp; The analysis successfully identifies the four fundamental fields through the geometric properties of spacetime. Notably, the electromagnetic energy-momentum tensor \\( b_{\\mu \\nu} \\) &nbsp;expressed as: \\[ b_{\\mu \\nu} = \\left( \\frac{1}{\\mu_0} &nbsp; \\left( F_{\\mu \\alpha} F_{\\nu}^{\\;\\alpha}&nbsp; -&nbsp; \\frac{1}{4} g_{\\mu \\nu} F_{\\alpha \\beta} F^{\\alpha \\beta} \\right) \\right) \\] changes under the condition \\( d_{\\mu\\nu} = - \\Lambda g_{\\mu\\nu} \\), to: \\[ b_{\\mu \\nu} = \\left( \\dfrac{R}{2} \\right) g_{\\mu \\nu} + \\Lambda g_{\\mu\\nu} \\] This result suggests a profound connection between electromagnetic fields and spacetime curvature. Conclusion: The findings demonstrate that the fundamental fields can be derived from geometric considerations alone, without additional assumptions. The potential geometrization of these fields, particularly the electromagnetic field, offers a promising avenue for further research into the unified description of fundamental interactions.",
+    "keywords": [
+      "Unified Field Theory",
+      "General relativity",
+      "Ilija Barukčić",
+      "Ilija Barukcic",
+      "Barukčić, Ilija",
+      "Barukcic, Ilija",
+      "Barukcic",
+      "Barukčić"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/15505521/files/Barukcic_fields_Causation_2026_Vol_21_No_0_pp_5_35.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Non-Invasive Electromagnetic Field translation- A Novel Approach to Thought-to-Speech Communication Using Helicopter AI",
+    "doi": "10.5281/zenodo.15011318",
+    "abstract": "This preprint introduces the Electromagnetic Field (EMF) Translator, a non-invasive system that converts brainwave activity into speech using Helicopter AI&rsquo;s Automatic Toggling Intelligence (ATI) and Dual Validation System (DVS). Inspired by nature&mdash;where sharks detect prey through electromagnetic fields&mdash;this research explores how human brain-generated EMFs can be captured, processed, and translated into audible words without implants or invasive procedures. &nbsp; Current Brain-Computer Interfaces (BCIs) face significant challenges, including low accuracy in EEG systems and ethical concerns surrounding invasive neural implants. The EMF Translator overcomes these issues by leveraging AI-driven real-time signal processing, noise filtering, and probabilistic validation to enhance thought-to-speech accuracy. &nbsp; Key topics covered include: &bull;&nbsp;Scientific basis for EMF-based neural communication &bull;&nbsp;Advanced AI signal processing via Helicopter AI&rsquo;s ATI &amp; DVS &bull;&nbsp;Potential applications in medicine, defense, AI assistants, and silent communication &bull;&nbsp;Ethical considerations and commercialization pathways &nbsp; This work is a groundbreaking step toward direct human-AI communication and paves the way for next-generation neurotechnology.",
+    "keywords": [
+      "Electromagnetic Fields",
+      "Brain Computer Interfaces",
+      "Thought-to-SpeechAI Signal Processing",
+      "Non-Invasive Neurotechnology",
+      "Helicopter AI",
+      "Automatic Toggling Intelligence (ATI)",
+      "Ambidextrous Intelligence (AI)",
+      "Dual Validation System (DVS)",
+      "Human-AI Interaction",
+      "Cyborg Intelligence Network (CIN)"
+    ],
+    "open_license": false,
+    "download_url": "https://zenodo.org/api/records/15011318/files/Non-Invasive%20Electromagnetic%20Field%20Translation-%20A%20Novel%20Approach%20to%20Thought-to-Speech%20Communication%20Using%20Helicopter%20AI.pdf/content",
+    "curated": true,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Statistical Electromagnetics for EMC Risk Prediction: A Physics-Based Framework for Safety- Critical Systems",
+    "doi": "10.5281/zenodo.17186364",
+    "abstract": "Electromagnetic compatibility (EMC) is typically assessed through standardized emissions and immunity tests that yield binary pass/fail outcomes. While such testing is essential for demonstrating compliance, it does not quantify the reliability of system operation in real electromagnetic environments. These environments are stochastic in nature, and devices respond nonlinearly near susceptibility thresholds, resulting in rare but consequential failure events that may not be in scope for compliance testing. The intention of this paper is to extend EMC assurance from compliance evaluation to probabilistic reliability prediction. A framework grounded in statistical electromagnetics is presented that incorporates random field theory, coupling-path characterization, and nonlinear response modeling. The framework defines the Probability of EMC-Induced Hazard (PEMH), a metric that quantifies how frequently electromagnetic disturbances produce functional failures that can propagate into hazardous failures. By following a structured execution process, the framework provides quantitative reliability data in addition to compliance results. A case study on industrial safety control input demonstrates that systems may satisfy regulatory standards yet still exhibit measurable failure probabilities. This approach reframes EMC from a conformity exercise into a predictive reliability discipline, directly supporting functional safety objectives.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17186364/files/Statistical%20Electromagnetics%20for%20EMC%20Risk%20Prediction.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Time-Domain vs Frequency-Domain Approaches in Electromagnetic Compatibility (EMC)",
+    "doi": "10.5281/zenodo.17186764",
+    "abstract": "Time-domain (TD) and frequency-domain (FD) techniques are both fundamental in EMC design, diagnostics, and compliance. FD methods align with CISPR/IEC receiver masks , whereas TD methods capture impulsive and sequence-dependent phenomena such as ESD, EFT, and surge&nbsp; that often drive field failures. This paper (i) states a prescriptive workflow for selecting and translating between TD and FD; (ii) validates the key equations used in translation and accuracy estimation (ENBW&harr;RBW, detector behavior, jitter-limited SNR, crest factor, leakage/scalloping) with references to established EMC texts ; (iii) defines a validation protocol with measurable acceptance criteria; and (iv) demonstrates the method with two quantitative case studies where TD and FD can diverge and how to reconcile them .",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/17186764/files/Time-Domain%20vs%20Frequency-Domain%20Approaches%20in%20Electromagnetic%20Compatibility.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Relativity",
+    "doi": "10.1038/106113c0",
+    "abstract": "n/a",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/2346451/files/article.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Relativity",
+    "doi": "10.1126/science.56.1456.603",
+    "abstract": "n/a",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/1639173/files/article.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Is General Relativity really General Relativity?",
+    "doi": "10.5281/zenodo.14604084",
+    "abstract": "In this short paper we briefly discuss the issue of the theory of general relativity as a supposed generalization of the theory of special relativity to see if general relativity did really generalize special relativity as a relativity theory. The simple conclusion that we reach in this discussion is that the theory of general relativity is not actually a generalization of the theory of special relativity and hence general relativity is neither a general theory nor a relativity theory. In short, the so-called &ldquo;general theory of relativity&rdquo; should more appropriately be called the &ldquo;special theory of general covariance&rdquo; since it is special in content (as it is essentially a gravitation theory) and it lacks the physical substance of relativity (as it is actually about mathematical artwork of general covariance rather than about physical relativity).",
+    "keywords": [
+      "Special relativity",
+      "general relativity",
+      "general covariance",
+      "principle of relativity",
+      "gravitation",
+      "epistemology of science",
+      "philosophy of science",
+      "contemporary physics",
+      "fundamental physics",
+      "modern physics"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/14604084/files/7.GRObjOut.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Using General Relativity Violates General Relativity",
+    "doi": "10.5281/zenodo.15872749",
+    "abstract": "General Relativity forbids the assumptions necessary for its own practical use: stable objects, continuous observers, and conserved mass. This paper shows that using General Relativity necessarily involves violating it.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/15872749/files/Using_General_Relativity_Violates_General_Relativity_v1.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Physical meaning of transformation equations between two reference frames",
+    "doi": "10.5281/zenodo.3541096",
+    "abstract": "When time is an independent variable, the time is physical time, which is defined by physics; when time is a dependent variable, the time is mathematical time, which is defined by an equation. When a frame is selected as reference frame, the frame is a stationary frame, and other frames are moving frames. The two-frame setup we usually use for transformation is only for one-dimensional motion. Above three points is what we discussed in this paper since they are easily confused.&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;In this paper, we state the necessary and sufficient conditions to verify the correctness of transformation equations between two reference frames. This criterion is based on the concept and physical meaning of transformation between two reference frames. It is important to clarify the physical meaning of transformation and verify whether a transformation equation is correct; otherwise, it will lead to various surprising conclusions due to misconception.&nbsp;&nbsp;&nbsp;&nbsp; This paper also explains why Galilean transformation does not apply to electromagnetic motion, the physical meaning of Lorentz covariance and the relationship between Lorentz covariance and the principle of relativity. This paper is a preparation for our next three papers.",
+    "keywords": [
+      "Lorentz transformation; Galilean transformation; special relativity; space and time; covariance; Maxwell; physics."
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/3541096/files/Physical%20meaning%20of%20transformation%20equations%20between%20two%20reference%20frames.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "In-depth logical analysis of special relativity",
+    "doi": "10.5281/zenodo.3593417",
+    "abstract": "In this paper, we deeply analysis Einstein&#39;s two famous papers that regard special relativity in every aspect. We discuss in every detail with respect to inconsistency of the simultaneity, relativity of length and time, derivations and interpretations of Lorentz transformation. We identified that the special relativity is only a postulate. This postulate is for eliminating the conflict between the observation (𝑐&#39; = 𝑐&nbsp;&nbsp; ̵̶ 𝑣) as per Galilean transformation (assuming it is correct) and the principle of relativity (𝑐&#39; = 𝑐). The time dilation is based on a thought experiment of inconsistency of simultaneity, and length contraction is based on time dilation. We have concluded in previous paper that Galilean transformation is incorrect, and have identified in this paper that inconsistency of simultaneity does not exists, therefore, the reason for the postulate of special relativity is not convincing. This paper derived Logical transformation to replace Lorentz transformation. We identified the derivations and interpretations of Lorentz transformation do not satisfy logical self-consistent. We concluded when we observe particle motions in a moving frame, the moving frame&#39;s math time is not equal to its physical time.",
+    "keywords": [
+      "special relativity; logical transformation;  Lorentz transformation; Lorentz factor; covariance; Galilean transformation; relativistic mechanics; space time; fundamental physics theory; Maxwell; Einstein; observation; logical; derivation; covariant."
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/3593417/files/In-depth%20logical%20analysis%20of%20special%20relativity.pdf/content",
+    "curated": true,
+    "_stage": 3
+  },
+  {
+    "source": "zenodo",
+    "title": "Spin & Relativity",
+    "doi": "10.5281/zenodo.3525985",
+    "abstract": "The relativistic transformation between inertial frames is derived using the Cayley-Hamilton theorem on exponential Pauli matrices.",
+    "keywords": [
+      "Relativistic transformation, Cayley-Hamilton theorem, Pauli matrices"
+    ],
+    "open_license": false,
+    "download_url": "https://zenodo.org/api/records/3525985/files/Spin&Relativity.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Trigonometric Relativity",
+    "doi": "10.5281/zenodo.16933149",
+    "abstract": "Trigonometric spawning of Special Relativity misses the mark.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/16933149/files/trig_SR.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Hyperbolic Relativity",
+    "doi": "10.5281/zenodo.15692412",
+    "abstract": "Hyperbolic frame composition does indeed show Einstein addition in disguise.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/15692412/files/Hyper_SR.pdf/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Composing Relativity",
+    "doi": "10.5281/zenodo.3540985",
+    "abstract": "Composition of relativistic frames in matrix format yields the famed addition of velocities formula for free.",
+    "keywords": [
+      "Relativistic transformation, Frame composition"
+    ],
+    "open_license": false,
+    "download_url": "https://zenodo.org/api/records/3540985/files/Composing_Relativity.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Deconstructing Relativity",
+    "doi": "10.5281/zenodo.3534311",
+    "abstract": "The relativistic concepts of &#39;length contraction&#39;, &#39;time dilation&#39;, and &#39;local time&#39; are seamlessly embedded in the relativistic transformation in Einstein matrix form.",
+    "keywords": [
+      "Relativistic transformation, UDL matrix composition"
+    ],
+    "open_license": false,
+    "download_url": "https://zenodo.org/api/records/3534311/files/Deconstructing_Relativity.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Relativity Cosmology",
+    "doi": "10.5281/zenodo.10203695",
+    "abstract": "",
+    "keywords": [],
+    "open_license": true,
+    "download_url": null,
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Unifying Special and General Relativity Through Universal Relativity",
+    "doi": "10.5281/zenodo.15001242",
+    "abstract": "This publication has been amended to correct a mathematical formulation in the general relativity equation, please see publication: 10.5281/zenodo.15011480 &nbsp; This paper proposes a unification of Special and General Relativity through the framework of Universal Relativity (UR). By incorporating scale-dependent transformations, we demonstrate that both the time dilation of Special Relativity and the gravitational time dilation of General Relativity can be derived from a single scaling equation. This approach resolves apparent contradictions in gravitational time dilation and provides a unified perspective on relativistic effects.",
+    "keywords": [
+      "special relativity",
+      "general relativity",
+      "unifying",
+      "scale-dependent",
+      "universal relativity",
+      "cosmology",
+      "quantum mechanics"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/15001242/files/UR%20paper-%20unifying%20SR%20and%20GR.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Anti Einstein – Refutation of Einstein's General Theory of Relativity",
+    "doi": "10.5281/zenodo.18319380",
+    "abstract": "More than ninety years after publication, Einstein's general relativity theory is still a highly successful theory of gravitation. Meanwhile, general relativity theory has passed a lot of observational and experimental tests, opportunities to test the validity of general relativity are increasing. Yet more and more, some recent observational data (dark energy) indicate the need to test the logical consistency of Einstein's general relativity theory. The present investigation will refute Einstein's general relativity theory by the proof that Einstein's general relativity theory is not a complete physical theory .",
+    "keywords": [
+      "Quantum mechanics",
+      "Relativity theory",
+      "Cosmological constant",
+      "Ricci tensor",
+      "Lambda",
+      "Anti lambda",
+      "Barukčić, Ilija",
+      "Ilija Barukčić",
+      "Barukcic",
+      "Barukčić"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/18319380/files/Barukcic_2015_Anti_Einstein.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Dynamic sources, Dynamic Multi-folds, and General Relativity Lense-Thirring and Frame Dragging Effects",
+    "doi": "10.5281/zenodo.14737011",
+    "abstract": "In a multi-fold universe, gravity emerges from entanglement through the multi-fold mechanisms. As a result, gravity-like effects appear in between entangled particles, whether they are real or virtual. Long range, massless gravity results from entanglement of massless virtual particles. Entanglement of massive virtual particles leads to massive gravity contributions at very smalls scales. Multi-folds mechanisms also result into a spacetime that is discrete, with a random walk fractal structure, and non-commutative geometry, which is Lorentz invariant, and where spacetime nodes, and particles, can be modeled with microscopic black holes. All these recover General Relativity (GR) at large scales, and semi-classical model remain valid till smaller scale than usually expected. Gravity can therefore be added to the Standard Model (SM) resulting into what we define as SM G . This can contribute to resolving several open issues with the Standard Model without new Physics other than gravity, as well as to open issues with the Standard Cosmological Model &nbsp; The paper discusses how multi-folds apply when sources of gravity, or the center of mass of entangled systems, are dynamically moving: multi-folds mechanisms remain the same but using the evolving center of mass. As a result gravity, or gravity-like, contributions are to be vectorially integrated over the retarded multi-fold spacetime location that can contribute to a point at a certain time (spacetime location), instead of all the multi-folds for all directions. It is illustrated in the case of a rotating sphere as source of gravity: we recover the Lense-Thirring results with its centripetal, Coriolis and axial contributions. The analysis allows us to settle contradictory, and incorrect, results encountered in the literature. It also shows how non-linearity of General Relativity (GR) appears in the multi-fold mechanisms, something that may not have been obvious to all in the original papers. The ability for the multi-fold mechanisms to explain such GR effects help better understand these effects, but more importantly, it is another way to illustrate and validate that multi-folds recover GR and GR recovers the multi-folds.",
+    "keywords": [
+      "Frame dragging",
+      "lense",
+      "Dynamics",
+      "Kinematics",
+      "Multi-fold mechanisms",
+      "Multi-folds",
+      "Multi-fold universe",
+      "General relativity",
+      "Gravity",
+      "Quantum Gravity",
+      "Thirring",
+      "Black Holes",
+      "jets",
+      "center of mass",
+      "centripetal",
+      "Coriolis",
+      "Effective potential",
+      "Entanglement",
+      "Energy",
+      "mass",
+      "non-linear",
+      "potential energy",
+      "retarded",
+      "rotating sphere",
+      "rotating hollow sphere",
+      "rotational frame dragging",
+      "dynamic multi-fold mechanisms",
+      "Lense-Thirring"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/14737011/files/Multi-fold_dynamics_GR_LT_Framedragging_sm_1_24_25_2_pub.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "A DISCUSSION ABOUT TIME DILATION BASED ON SPECIAL RELATIVITY",
+    "doi": "10.5281/zenodo.4618575",
+    "abstract": "This article discusses time dilation based on special relativity. An experiment is designed to examine time dilation effects deduced from special relativity. This experiment is similar to but different from the famous &ldquo;twin paradox&rdquo; because this experiment doesn&rsquo;t involve any accelerating process, or decelerating process, or change of travelling directions. Impossible results of the experiment are deduced by using special relativity. Thus it can be concluded that the theory of relativity (special relativity) is incorrect.",
+    "keywords": [
+      "Special Relativity, Theory of Relativity, Albert Einstein, Speed of Light, Frame of Reference, Theoretical Physics, Time Dilation, Space Travel & Time Expansion"
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/4618575/files/241.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "ABSOLUTE SIMULTANEITY REDEFINED",
+    "doi": "10.5281/zenodo.21257157",
+    "abstract": "ABSOLUTE SIMULTANEITY REDEFINED \"... no longer a coordinate artifact ( arte factum ), but a physical fact ( factum ) &mdash; twins of&nbsp;Latin facere , though only the latter is granted reality by nature. \" Absolute (adj.) A monadic, invariant geometric property of an object's state relative to the background manifold; recovered from the underlying&nbsp; spacetime structure and preserved across coordinate transformations. Not arising from a dyadic relation to arbitrary inertial frames. &nbsp; At the beginning of the twentieth century, physics underwent a radical change in its understanding of space and time. In 1904, Hendrik Lorentz refined the transformation laws that would later bear his name, showing how electromagnetic phenomena could retain their form for bodies moving through the ether. In 1905, Albert Einstein took the decisive conceptual step: he removed the need for an undetectable ether and grounded relativity in operational measurements made with clocks, rods, and light signals. Simultaneity, in Einstein&rsquo;s formulation, was no longer absolute. It depended on how observers in relative motion synchronized distant clocks with light pulses in their respective inertial frames. Then, in 1908, Hermann Minkowski gave Einstein&rsquo;s theory its geometric form. Space by itself and time by itself, Minkowski declared, were &ldquo;doomed to fade away into mere shadows&rdquo;; only their union would preserve independent reality. Relativity was no longer merely a theory of moving observers. It became a theory of spacetime. Absolute Simultaneity Redefined begins from that historical turning point. This book does not reject Einstein&rsquo;s relativity, alter the Lorentz transformation, or add new physical laws. Instead, it asks whether Minkowski spacetime contains more recoverable structure than the standard interpretation usually assigns to it. If the time experienced by an object along its path through spacetime is fixed by invariant geometry, can time dilation be understood as absolute, monadic, and spacetime-geometric? And if spacetime itself is the deeper reality, can a determinate simultaneity relation be recovered from its own geometric structure without returning to Newtonian absolute time or an ether-like preferred frame? Daniel William Ho develops this question through the theory of the Law of Relativity and Absolutes and the theoretical framework of the Privileged Frame. In this framework, the absolute is not space alone or time alone, but a geometric property recovered from the spacetime manifold. Beginning with Minkowski&rsquo;s spacetime picture, the book revisits the hyperboloidal geometry of Lorentz transformations: a 3+1-dimensional spacetime structure in which each admissible timelike direction defines a possible simultaneity hypersurface. Once such a hypersurface is selected, the construction turns to the ellipsoidal spatial geometry within it. This geometry is not separate from relativity; it arises from the Minkowski metric as measured on the spacelike hypersurface orthogonal to the chosen timelike direction. The Privileged Frame is recovered where that direction defines a simultaneity hypersurface on which spatial relations, timing relations, and physical correlations can be assigned a common geometric footing. From there, the book moves beyond flat spacetime. Special Relativity serves as the foundation, but not the limit. The Privileged Frame is developed as a recovered foliation whose significance extends into curved geometry, quantum coherence, and phase-sensitive correlations. The aim is not to replace General Relativity or quantum mechanics, but to ask whether a common geometric timing structure can clarify where observer-dependent description ends and physical correlation begins. The result is a reinterpretation of relativity&rsquo;s most famous lesson. Simultaneity remains relative under Einstein&rsquo;s original synchronization convention. But from the physical structure of spacetime itself, this book asks whether simultaneity may also possess a deeper, recoverable meaning. From Lorentz&rsquo;s transformations, to Einstein&rsquo;s clocks, to Minkowski&rsquo;s spacetime, this book follows the historical path of relativity&mdash;and then asks a question still open to interpretation at its foundations: Is time merely a coordinate assignment, or can it also be recovered as a physical relation within spacetime geometry itself&mdash;where even Einstein&rsquo;s &ldquo;spooky action at a distance&rdquo; may find a deeper geometric meaning?&nbsp;",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/21257157/files/Book_Absolute_Simultaneity_Redefined_by_Daniel_William_Ho_v8_2026-07-08.tex/content",
+    "curated": false,
+    "_stage": 1
+  },
+  {
+    "source": "zenodo",
+    "title": "Complete Solution of the Einstein Field Equations for a Spherical Distribution of Polytropic Matter",
+    "doi": "10.5281/zenodo.8359913",
+    "abstract": "We determine the complete solution of the Einstein field equations for the case of a spherically symmetric distribution of gaseous matter, characterized by a polytropic equation of state. We show that the field equations automatically generate two sharp boundaries for the gas, an inner one and an outer one, given by radial positions r1 and r2, and thus define a shell of gaseous matter outside of which the energy density is exactly zero. Hence this shell is surrounded by an outer vacuum region, and surrounds an inner vacuum region. Therefore, the solution is given in three regions, one being the well-known analytical Schwarzschild exterior solution in the outer vacuum region, one being determined analytically in the inner vacuum region, and one being determined partially analytically and partially numerically, within the matter region, between the two boundary values r1 and r2 of the Schwarzschild radial coordinate r. This solution is therefore somewhat similar to the one previously found for a spherically symmetric shell of liquid fluid, and is in fact exactly the same in the cases of the inner and outer vacuum regions. The main difference is that here the boundary values r1 and r2 are not chosen arbitrarily, but are instead determined by the dynamics of the system. As was shown in the case of the liquid shell, also in this solution there is a singularity at the origin, that just as in that case does not correspond to an infinite concentration of matter, but in fact to zero matter energy density at the center. Also as in the case of the liquid shell, the spacetime within the spherical cavity is not flat, so that there is a non-trivial gravitational field there, in contrast with Newtonian gravitation. This inner gravitational field has the effect of repelling matter and energy away from the origin, thus avoiding a concentration of matter at that point.",
+    "keywords": [
+      "General Relativity, Einstein Equations, Boundary Conditions, Polytropes."
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/8359913/files/Text-I.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Exact Solution of the Einstein Field Equations for a Spherical Shell of Fluid Matter",
+    "doi": "10.5281/zenodo.8359816",
+    "abstract": "We determine the exact solution of the Einstein field equations for the case of a spherically symmetric shell of liquid matter, characterized by an energy density which is constant with the Schwarzschild radial coordinate r between two values r1 and r2. The solution is given in three regions, one being the well-known analytical Schwarzschild solution in the outer vacuum region, one being determined analytically in the inner vacuum region, and one being determined mostly analytically but partially numerically, within the matter region. The solutions for the temporal coefficient of the metric and for the pressure within this region are given in terms of a non-elementary but fairly straightforward real integral. For some values of the parameters this integral can be written in terms of elementary functions. We show that in this solution there is a singularity at the origin, and give the parameters of that singularity in terms of the geometrical and physical parameters of the shell. This does not correspond to an infinite concentration of matter, but in fact to zero energy density at the center. It does, however, imply that the spacetime within the spherical cavity is not flat, so that there is a non-trivial gravitational field there, in contrast with Newtonian gravitation. This gravitational field is repulsive with respect to the origin, and thus has the effect of stabilizing the geometrical configuration of the matter, since any particle of the matter that wanders out into either one of the vacuum regions tends to be brought back to the bulk of the matter by the gravitational field.",
+    "keywords": [
+      "General Relativity, Einstein Equations, Boundary Conditions, Exact Solution."
+    ],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/8359816/files/Text-I.pdf/content",
+    "curated": false,
+    "_stage": 2
+  },
+  {
+    "source": "zenodo",
+    "title": "Revision of General Relativity Guided by Enthalpy Conservation",
+    "doi": "10.5281/zenodo.7069107",
+    "abstract": "The theory of general relativity boasts incomparable accuracy in both predicting and explaining phenomena to which the exterior Schwarzschild solution is applicable. &nbsp;However, as far as those related to the FLRW metric and the interior Schwarzschild metric are concerned, it has left with us more controversies than legacies.&nbsp; In this paper, I will provide a revision of Einstein&rsquo;s field equation guided by a newly proposed principle of enthalpy conservation, and present a simpler alternative theory of gravity which is compatible with Maxwellian electromagnetism.",
+    "keywords": [],
+    "open_license": true,
+    "download_url": "https://zenodo.org/api/records/7069107/files/Revision%20of%20the%20General%20Relativity%20Guided%20by%20Enthalpy%20Conservation%20(Yuan%20Liu).pdf/content",
+    "curated": false,
+    "_stage": 1
+  }
+]

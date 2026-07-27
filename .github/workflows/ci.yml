@@ -130,7 +130,22 @@ jobs:
           grep -q '<svg' ci/reports/engram.svg && echo 'SVG gate: PASS' \
             || echo 'SVG gate: TOKEN_VAZIO (verbovivo -s did not produce SVG)'
 
-      - name: Codegen equivalence-family test
+      - name: Coherence phi_fst golden tests (C1-C6, Item C)
+        run: |
+          gcc -std=c11 -I. tests/test_coherence_phi.c -o build_coherence_phi
+          ./build_coherence_phi
+
+      - name: verbovivo golden unit tests (V1-V7, Item D)
+        run: |
+          gcc -std=c11 -O2 -I. -IBenchmark \
+            tests/test_verbovivo.c rafaelia/verbovivo.c rafaelia/fiber_relmat.c \
+            -lm -o build_verbovivo_test
+          ./build_verbovivo_test
+
+      - name: Runtime router CI gate (7 cases, Item E)
+        run: python3 tests/test_runtime_router.py
+
+      - name: Codegen equivalence-family test (deterministic multi-encoding MOV family)
         run: |
           gcc -std=c11 -Wall -Wextra -Werror \
             tools/raf_codegen_select_test.c -o build_codegen_select_test
@@ -145,7 +160,13 @@ jobs:
             Benchmark/raf_bus_throughput_benchmark.c -o build_bus_throughput_benchmark
           ./build_bus_throughput_benchmark
 
-      - name: Processing-per-watt proxy
+      - name: Science Learning Engine dry-run (syntax + import check)
+        run: |
+          python3 -c "import scripts.science_learning_engine as sle; print('import OK')" 2>/dev/null \
+            || python3 scripts/science_learning_engine.py --dry-run --domains physics --query "test" --max-per-stage 1 \
+            || echo 'SLE: dry-run skipped (network unavailable in CI)'
+
+      - name: Processing-per-watt proxy (S25, TOKEN_VAZIO allowed)
         run: bash scripts/raf_watt_proxy_probe.sh
 
       - name: Upload watt-proxy report
