@@ -1,0 +1,77 @@
+{
+  "schema_version": "s7f-omega.v1",
+  "created_at": "2026-07-28",
+  "authorial_origin": "∆RafaelVerboΩ",
+  "claim_allowed": false,
+  "global_state": "RESEARCH_CANDIDATE",
+  "epistemic_rule": "absence_in_search_is_not_proof_of_global_novelty",
+  "constructions": [
+    {
+      "id": "S7F-01",
+      "name": "state_parameterized_hyperbolic_radial_map",
+      "state": "CANDIDATE_ADAPTIVE_RADIAL_MAP",
+      "known_core": "hyperboloid_to_poincare_maps_and_radial_reparameterizations",
+      "candidate_delta": "dynamic_tensor_state_parameter_in_denominator",
+      "gaps": ["domain", "codomain", "curvature", "inverse", "novel_property", "prior_art"]
+    },
+    {
+      "id": "S7F-02",
+      "name": "reclusion_operator",
+      "state": "STANDARD_FORM_NOVEL_SEMANTICS_CANDIDATE",
+      "known_core": "boundary_integral_of_hodge_dual",
+      "candidate_delta": "confined_information_semantics_and_attention_coupling",
+      "gaps": ["form_degree", "orientation", "metric", "units", "entropy_relation"]
+    },
+    {
+      "id": "S7F-03",
+      "name": "reciprocal_loglog_regularizer",
+      "state": "EXACT_FUNCTION_CANDIDATE_WITH_BROAD_PRIOR_ART",
+      "known_core": "loglog_calculus_and_logarithmic_penalties",
+      "candidate_delta": "exact_reciprocal_function_and_application",
+      "known_singularity_radius": 1.3108324944320862,
+      "gaps": ["positive_domain", "boundedness", "gradient", "convexity", "training_stability", "prior_art"]
+    },
+    {
+      "id": "S7F-04",
+      "name": "hyperbolic_attention_with_typed_void",
+      "state": "PARTIAL_PRIOR_ART_FORMULATION_REQUIRES_CORRECTION",
+      "known_core": "hyperbolic_attention_and_explicit_masks",
+      "candidate_delta": "typed_void_as_active_boundary_condition",
+      "invalid_claim": "poincare_origin_has_infinite_distance",
+      "gaps": ["mask_semantics", "abstention_test", "temperature", "normalization"]
+    },
+    {
+      "id": "S7F-05",
+      "name": "BLENDDIGS",
+      "state": "AUTHORIAL_NOTATION_UNDERDEFINED",
+      "known_core": "mixed_radix_and_mixed_base_representation",
+      "candidate_delta": "specific_cross_base_operator_composition",
+      "gaps": ["oplus", "otimes", "base_semantics", "domain", "codomain", "coefficients", "carry", "collision_rate"]
+    },
+    {
+      "id": "S7F-06",
+      "name": "hyperbolic_attention_source_pde",
+      "state": "HYBRID_PDE_CANDIDATE_UNPROVEN",
+      "known_core": "semilinear_pdes_neural_operators_and_attention_for_pdes",
+      "candidate_delta": "exact_hyperbolic_laplacian_damping_attention_source_combination",
+      "gaps": ["function_space", "initial_conditions", "boundary_conditions", "attention_operator", "existence", "uniqueness", "energy_estimate"]
+    },
+    {
+      "id": "S7F-07",
+      "name": "loglog_chern_attention_action",
+      "state": "ACTION_INCOMPLETE_REQUIRES_VARIATIONAL_COUPLING",
+      "known_core": "kinetic_mass_terms_and_chern_simons_actions",
+      "candidate_delta": "explicit_attention_variational_coupling_not_yet_written",
+      "gaps": ["dimension_consistency", "chern_form_degree", "attention_functional", "metric_variation", "equations_of_motion"]
+    }
+  ],
+  "F_ok": ["seven_candidates_separated_from_known_cores", "two_formal_inconsistencies_identified", "claim_gate_closed"],
+  "F_gap": ["exhaustive_prior_art", "formal_proofs", "numerical_experiments", "independent_review"],
+  "F_next": "freeze_definitions_then_run_mechanism_level_prior_art_and_deterministic_tests",
+  "prior_art_search": {
+    "scope": "mechanism_level_non_exhaustive",
+    "searched_at": "2026-07-28",
+    "global_novelty_proven": false,
+    "primary_references": ["arXiv:1805.09112", "arXiv:1805.09786", "arXiv:2105.14686", "arXiv:2205.13671", "arXiv:2405.19798", "arXiv:hep-th/0502193", "arXiv:1712.05190"]
+  }
+}
