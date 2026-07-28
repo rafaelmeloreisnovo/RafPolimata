@@ -48,7 +48,7 @@ jobs:
       - name: Claim gate assertion
         run: |
           ! grep -R --line-number -E \
-            'stage_3_validated|stage_4_canonical|claim_allowed["'"']?:[[:space:]]*true' \
+            "stage_3_validated|stage_4_canonical|claim_allowed[\"']?:[[:space:]]*true" \
             scripts/science_learning_engine.py \
             scripts/science_learning_engine_v2.py \
             docs/SCIENCE_LEARNING_ENGINE.md
