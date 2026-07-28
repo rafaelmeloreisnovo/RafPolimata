@@ -105,6 +105,28 @@ class ScienceLearningEngineIntegrityTests(unittest.TestCase):
         self.assertFalse(promoted["physics"][0]["claim_allowed"])
         self.assertIn("claim_allowed=false", synthesis["physics"])
 
+    def test_orcid_uses_vendor_json_media_type(self):
+        with mock.patch.dict(os.environ, {"ORCID_ACCESS_TOKEN": "fixture-token"}, clear=True):
+            self.assertEqual(sle._orcid_headers()["Accept"], "application/vnd.orcid+json")
+
+    def test_dedup_keeps_highest_relevance_and_bibtex(self):
+        weak = {
+            "source": "orcid", "sources": ["orcid"], "title": "Shared",
+            "doi": "10.1/shared", "abstract": "", "keywords": [],
+            "_relevance_score": 0, "claim_allowed": False,
+        }
+        rich = {
+            "source": "zenodo", "sources": ["zenodo"], "title": "Shared",
+            "doi": "10.1/shared", "abstract": "A" * 150, "keywords": ["quantum"],
+            "_relevance_score": 3, "claim_allowed": False,
+        }
+        merged = sle._deduplicate([weak, rich])[0]
+        self.assertEqual(merged["_relevance_score"], 3)
+        with tempfile.TemporaryDirectory() as temporary:
+            merged["_stage"] = 2
+            sle._write_stage(Path(temporary), "physics", 2, [merged], False)
+            self.assertTrue((Path(temporary) / "physics/stage_2_candidate/bibliography.bib").is_file())
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
