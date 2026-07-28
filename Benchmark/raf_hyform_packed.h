@@ -26,6 +26,7 @@ _Static_assert(sizeof(raf_hyedge16_t) == 2u, "HYEDGE16 must be 16 bits");
 #define RAF_HYFORM_PHASE_LAYER_DEFINED 0u
 #define RAF_HYFORM_ASM_REQUIRED 0u
 
+/* HYFORM32 bit layout. */
 #define RAF_HYFORM_LEVEL_SHIFT 0u
 #define RAF_HYFORM_SECTOR_SHIFT 3u
 #define RAF_HYFORM_OPERATOR_SHIFT 6u
@@ -52,6 +53,7 @@ _Static_assert(sizeof(raf_hyedge16_t) == 2u, "HYEDGE16 must be 16 bits");
 #define RAF_HYFORM_TOKEN_VAZIO ((raf_hyform32_t)1u << 30u)
 #define RAF_HYFORM_VALID ((raf_hyform32_t)1u << 31u)
 
+/* HYEDGE16: source[0..5], target[6..11], relation[12..15]. */
 #define RAF_HYEDGE_SOURCE_SHIFT 0u
 #define RAF_HYEDGE_TARGET_SHIFT 6u
 #define RAF_HYEDGE_RELATION_SHIFT 12u
@@ -93,17 +95,34 @@ static inline u8 raf_hyform_primary_state(u8 sector, u8 level) {
 }
 
 static inline raf_hyform32_t raf_hyform32_pack_checked(
-    u8 level, u8 sector, u8 operator_id, u8 geometry, u8 recurrence,
-    u8 layer, u8 epistemic, u8 polarity, u8 source_present,
-    u8 unit_defined, u8 test_defined, u8 receipt_present,
-    u8 claim_allowed, u8 token_vazio
+    u8 level,
+    u8 sector,
+    u8 operator_id,
+    u8 geometry,
+    u8 recurrence,
+    u8 layer,
+    u8 epistemic,
+    u8 polarity,
+    u8 source_present,
+    u8 unit_defined,
+    u8 test_defined,
+    u8 receipt_present,
+    u8 claim_allowed,
+    u8 token_vazio
 ) {
     raf_hyform32_t value;
 
-    if (level >= RAF_HYFORM_LEVEL_COUNT || sector >= RAF_HYFORM_SECTOR_COUNT) return 0u;
+    if (level >= RAF_HYFORM_LEVEL_COUNT || sector >= RAF_HYFORM_SECTOR_COUNT) {
+        return 0u;
+    }
     if (operator_id > 15u || geometry > 15u || recurrence > 7u || layer > 7u ||
-        epistemic > 7u || polarity > 3u) return 0u;
-    if (claim_allowed != 0u && token_vazio != 0u) return 0u;
+        epistemic > 7u || polarity > 3u) {
+        return 0u;
+    }
+    /* A gap-bearing state cannot authorize a claim in this contract. */
+    if (claim_allowed != 0u && token_vazio != 0u) {
+        return 0u;
+    }
 
     value = RAF_HYFORM_VALID;
     value |= ((raf_hyform32_t)level << RAF_HYFORM_LEVEL_SHIFT);
@@ -114,23 +133,48 @@ static inline raf_hyform32_t raf_hyform32_pack_checked(
     value |= ((raf_hyform32_t)layer << RAF_HYFORM_LAYER_SHIFT);
     value |= ((raf_hyform32_t)epistemic << RAF_HYFORM_EPISTEMIC_SHIFT);
     value |= ((raf_hyform32_t)polarity << RAF_HYFORM_POLARITY_SHIFT);
+
     if (source_present != 0u) value |= RAF_HYFORM_SOURCE_PRESENT;
     if (unit_defined != 0u) value |= RAF_HYFORM_UNIT_DEFINED;
     if (test_defined != 0u) value |= RAF_HYFORM_TEST_DEFINED;
     if (receipt_present != 0u) value |= RAF_HYFORM_RECEIPT_PRESENT;
     if (claim_allowed != 0u) value |= RAF_HYFORM_CLAIM_ALLOWED;
     if (token_vazio != 0u) value |= RAF_HYFORM_TOKEN_VAZIO;
+
     return value;
 }
 
-static inline u8 raf_hyform32_level(raf_hyform32_t v) { return (u8)((v & RAF_HYFORM_LEVEL_MASK) >> RAF_HYFORM_LEVEL_SHIFT); }
-static inline u8 raf_hyform32_sector(raf_hyform32_t v) { return (u8)((v & RAF_HYFORM_SECTOR_MASK) >> RAF_HYFORM_SECTOR_SHIFT); }
-static inline u8 raf_hyform32_operator(raf_hyform32_t v) { return (u8)((v & RAF_HYFORM_OPERATOR_MASK) >> RAF_HYFORM_OPERATOR_SHIFT); }
-static inline u8 raf_hyform32_geometry(raf_hyform32_t v) { return (u8)((v & RAF_HYFORM_GEOMETRY_MASK) >> RAF_HYFORM_GEOMETRY_SHIFT); }
-static inline u8 raf_hyform32_recurrence(raf_hyform32_t v) { return (u8)((v & RAF_HYFORM_RECURRENCE_MASK) >> RAF_HYFORM_RECURRENCE_SHIFT); }
-static inline u8 raf_hyform32_layer(raf_hyform32_t v) { return (u8)((v & RAF_HYFORM_LAYER_MASK) >> RAF_HYFORM_LAYER_SHIFT); }
-static inline u8 raf_hyform32_epistemic(raf_hyform32_t v) { return (u8)((v & RAF_HYFORM_EPISTEMIC_MASK) >> RAF_HYFORM_EPISTEMIC_SHIFT); }
-static inline u8 raf_hyform32_polarity(raf_hyform32_t v) { return (u8)((v & RAF_HYFORM_POLARITY_MASK) >> RAF_HYFORM_POLARITY_SHIFT); }
+static inline u8 raf_hyform32_level(raf_hyform32_t value) {
+    return (u8)((value & RAF_HYFORM_LEVEL_MASK) >> RAF_HYFORM_LEVEL_SHIFT);
+}
+
+static inline u8 raf_hyform32_sector(raf_hyform32_t value) {
+    return (u8)((value & RAF_HYFORM_SECTOR_MASK) >> RAF_HYFORM_SECTOR_SHIFT);
+}
+
+static inline u8 raf_hyform32_operator(raf_hyform32_t value) {
+    return (u8)((value & RAF_HYFORM_OPERATOR_MASK) >> RAF_HYFORM_OPERATOR_SHIFT);
+}
+
+static inline u8 raf_hyform32_geometry(raf_hyform32_t value) {
+    return (u8)((value & RAF_HYFORM_GEOMETRY_MASK) >> RAF_HYFORM_GEOMETRY_SHIFT);
+}
+
+static inline u8 raf_hyform32_recurrence(raf_hyform32_t value) {
+    return (u8)((value & RAF_HYFORM_RECURRENCE_MASK) >> RAF_HYFORM_RECURRENCE_SHIFT);
+}
+
+static inline u8 raf_hyform32_layer(raf_hyform32_t value) {
+    return (u8)((value & RAF_HYFORM_LAYER_MASK) >> RAF_HYFORM_LAYER_SHIFT);
+}
+
+static inline u8 raf_hyform32_epistemic(raf_hyform32_t value) {
+    return (u8)((value & RAF_HYFORM_EPISTEMIC_MASK) >> RAF_HYFORM_EPISTEMIC_SHIFT);
+}
+
+static inline u8 raf_hyform32_polarity(raf_hyform32_t value) {
+    return (u8)((value & RAF_HYFORM_POLARITY_MASK) >> RAF_HYFORM_POLARITY_SHIFT);
+}
 
 static inline u8 raf_hyform32_is_valid(raf_hyform32_t value) {
     if ((value & RAF_HYFORM_VALID) == 0u) return 0u;
@@ -141,24 +185,41 @@ static inline u8 raf_hyform32_is_valid(raf_hyform32_t value) {
     return 1u;
 }
 
-static inline raf_hyedge16_t raf_hyedge16_pack_checked(u8 source, u8 target, u8 relation) {
+static inline raf_hyedge16_t raf_hyedge16_pack_checked(
+    u8 source,
+    u8 target,
+    u8 relation
+) {
     if (source >= RAF_HYFORM_PRIMARY_STATE_COUNT ||
-        target >= RAF_HYFORM_PRIMARY_STATE_COUNT || relation > 15u) {
+        target >= RAF_HYFORM_PRIMARY_STATE_COUNT ||
+        relation > 15u) {
         return RAF_HYEDGE_INVALID;
     }
-    return (raf_hyedge16_t)(((raf_hyedge16_t)source << RAF_HYEDGE_SOURCE_SHIFT) |
-                            ((raf_hyedge16_t)target << RAF_HYEDGE_TARGET_SHIFT) |
-                            ((raf_hyedge16_t)relation << RAF_HYEDGE_RELATION_SHIFT));
+    return (raf_hyedge16_t)(
+        ((raf_hyedge16_t)source << RAF_HYEDGE_SOURCE_SHIFT) |
+        ((raf_hyedge16_t)target << RAF_HYEDGE_TARGET_SHIFT) |
+        ((raf_hyedge16_t)relation << RAF_HYEDGE_RELATION_SHIFT)
+    );
 }
 
-static inline u8 raf_hyedge16_source(raf_hyedge16_t v) { return (u8)((v >> RAF_HYEDGE_SOURCE_SHIFT) & RAF_HYEDGE_NODE_MASK); }
-static inline u8 raf_hyedge16_target(raf_hyedge16_t v) { return (u8)((v >> RAF_HYEDGE_TARGET_SHIFT) & RAF_HYEDGE_NODE_MASK); }
-static inline u8 raf_hyedge16_relation(raf_hyedge16_t v) { return (u8)((v >> RAF_HYEDGE_RELATION_SHIFT) & RAF_HYEDGE_RELATION_MASK); }
+static inline u8 raf_hyedge16_source(raf_hyedge16_t value) {
+    return (u8)((value >> RAF_HYEDGE_SOURCE_SHIFT) & RAF_HYEDGE_NODE_MASK);
+}
+
+static inline u8 raf_hyedge16_target(raf_hyedge16_t value) {
+    return (u8)((value >> RAF_HYEDGE_TARGET_SHIFT) & RAF_HYEDGE_NODE_MASK);
+}
+
+static inline u8 raf_hyedge16_relation(raf_hyedge16_t value) {
+    return (u8)((value >> RAF_HYEDGE_RELATION_SHIFT) & RAF_HYEDGE_RELATION_MASK);
+}
 
 static inline u8 raf_hyedge16_is_valid(raf_hyedge16_t value) {
     if (value == RAF_HYEDGE_INVALID) return 0u;
-    return (u8)(raf_hyedge16_source(value) < RAF_HYFORM_PRIMARY_STATE_COUNT &&
-                raf_hyedge16_target(value) < RAF_HYFORM_PRIMARY_STATE_COUNT);
+    return (u8)(
+        raf_hyedge16_source(value) < RAF_HYFORM_PRIMARY_STATE_COUNT &&
+        raf_hyedge16_target(value) < RAF_HYFORM_PRIMARY_STATE_COUNT
+    );
 }
 
-#endif
+#endif /* RAF_HYFORM_PACKED_H */
