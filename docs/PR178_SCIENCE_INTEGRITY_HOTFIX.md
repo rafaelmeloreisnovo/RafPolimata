@@ -18,10 +18,13 @@ PR #178 introduced useful acquisition infrastructure but contained three materia
 |---|---|
 | ORCID | Two-phase `search -> ORCID iD -> works -> work-summary` flow |
 | Authentication | `ORCID_ACCESS_TOKEN` required; absence becomes explicit `TOKEN_VAZIO` |
+| Media type | ORCID requests use `application/vnd.orcid+json` |
 | Stage 3 | Renamed to `repository_qualified` |
 | Stage 4 | Renamed to `cross_domain_candidate` |
 | Claims | `claim_allowed=false` is invariant at every automated stage |
 | Relevance | Stage 2 requires positive configured-domain relevance |
+| Deduplication | Normalized DOI merge preserves the strongest relevance evidence |
+| Output compatibility | `bibliography.bib` and Markdown acquisition artifacts remain generated |
 | Mutation safety | Cross-domain promotion deep-copies records instead of mutating source-domain records |
 | CI | Dedicated offline workflow; no `|| true`, fallback success or network dependency |
 | Historical data | Original counts preserved, evidence interpretation corrected |
@@ -32,7 +35,7 @@ Executed locally against the branch-equivalent files:
 
 ```text
 python3 -m py_compile ...                         PASS
-python3 tests/test_science_learning_engine.py     7/7 PASS
+python3 tests/test_science_learning_engine.py     9/9 PASS
 legacy command --dry-run --offline                PASS
 forbidden-claim grep                              PASS
 ```
@@ -42,9 +45,12 @@ The regression suite covers:
 - DOI normalization;
 - ORCID identifier extraction;
 - ORCID two-phase work resolution;
+- ORCID vendor JSON media type;
 - zero-network behavior without token;
 - Stage 3 repository qualification semantics;
 - relevance gate;
+- deduplication relevance preservation;
+- BibTeX output compatibility;
 - Stage 4 non-mutation and `claim_allowed=false`.
 
 ## Epistemic state
