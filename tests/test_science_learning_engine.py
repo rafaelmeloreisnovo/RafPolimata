@@ -9,7 +9,7 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from scripts import science_learning_engine as sle  # noqa: E402
+from scripts import science_learning_engine_v2 as sle  # noqa: E402
 
 
 class ScienceLearningEngineIntegrityTests(unittest.TestCase):
