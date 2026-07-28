@@ -59,7 +59,7 @@ def _http_get(url: str, params: Optional[dict], headers: dict) -> Optional[dict]
 
 def _orcid_headers() -> Optional[dict]:
     token = os.environ.get("ORCID_ACCESS_TOKEN", "").strip()
-    return {"Accept": "application/json", "Authorization": f"Bearer {token}"} if token else None
+    return {"Accept": "application/vnd.orcid+json", "Authorization": f"Bearer {token}"} if token else None
 
 
 def _extract_orcid_ids(payload: dict) -> List[str]:
@@ -165,6 +165,7 @@ def _merge(left: dict, right: dict) -> dict:
     out["repository_community"] = bool(out.get("repository_community") or right.get("repository_community"))
     if right.get("source") == "zenodo":
         out["source"] = "zenodo"
+    out["_relevance_score"] = max(int(out.get("_relevance_score", 0)), int(right.get("_relevance_score", 0)))
     out["claim_allowed"] = False
     return out
 
@@ -202,8 +203,20 @@ def _write_stage(base: Path, domain: str, stage: int, records: List[dict], dry_r
     _write(directory / "urls.txt", "\n".join(f"https://doi.org/{r['doi']}" for r in records if r.get("doi")), dry_run)
     if stage >= 2:
         md = ["# Acquisition candidates\n\n> claim_allowed=false\n\n"]
+        bib = []
         for index, record in enumerate(records, 1):
+            title = str(record.get("title") or "Untitled").replace("{", "").replace("}", "")
+            key = re.sub(r"[^a-z0-9]", "_", (record.get("doi") or f"ref{index}").lower())[:48]
+            doi = record.get("doi") or "TOKEN_VAZIO"
+            bib.append(
+                f"@misc{{{key},\n"
+                f"  title = {{{title}}},\n"
+                f"  doi = {{{doi}}},\n"
+                f"  note = {{stage={_stage_name(stage)}; claim_allowed=false}},\n"
+                "}\n"
+            )
             md.append(f"### {index}. {record.get('title', 'Untitled')}\n- DOI: {record.get('doi') or 'TOKEN_VAZIO'}\n- Stage: {_stage_name(stage)}\n- Relevance: {record.get('_relevance_score', 0)}\n- claim_allowed: false\n\n")
+        _write(directory / "bibliography.bib", "\n".join(bib), dry_run)
         _write(directory / "bibliography.md", "".join(md), dry_run)
     if stage >= 3:
         metadata = [{"doi": r.get("doi"), "title": r.get("title"), "download_url": r.get("download_url"), "license": r.get("license"), "qualification": "repository_qualified", "claim_allowed": False} for r in records]
