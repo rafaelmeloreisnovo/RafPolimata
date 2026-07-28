@@ -1,0 +1,62 @@
+name: Science Learning Integrity
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/science_learning_engine.py'
+      - 'scripts/science_learning_engine_v2.py'
+      - 'tests/test_science_learning_engine.py'
+      - 'docs/SCIENCE_LEARNING_ENGINE.md'
+      - '.github/workflows/science-learning-integrity.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/science_learning_engine.py'
+      - 'scripts/science_learning_engine_v2.py'
+      - 'tests/test_science_learning_engine.py'
+      - 'docs/SCIENCE_LEARNING_ENGINE.md'
+      - '.github/workflows/science-learning-integrity.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  offline-integrity-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.12', '3.14']
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Python syntax gate
+        run: |
+          python -m py_compile \
+            scripts/science_learning_engine.py \
+            scripts/science_learning_engine_v2.py \
+            tests/test_science_learning_engine.py
+
+      - name: Deterministic offline regression tests
+        run: python tests/test_science_learning_engine.py
+
+      - name: Network-free command smoke test
+        run: |
+          python scripts/science_learning_engine.py \
+            --dry-run --offline \
+            --domains physics \
+            --query 'integrity fixture' \
+            --max-per-stage 1
+
+      - name: Claim gate assertion
+        run: |
+          ! grep -R --line-number -E \
+            "stage_3_validated|stage_4_canonical|claim_allowed[\"']?:[[:space:]]*true" \
+            scripts/science_learning_engine.py \
+            scripts/science_learning_engine_v2.py \
+            docs/SCIENCE_LEARNING_ENGINE.md
