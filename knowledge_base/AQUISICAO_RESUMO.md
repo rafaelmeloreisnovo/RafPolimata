@@ -1,38 +1,30 @@
-# AQUISICAO_RESUMO — Science Learning Engine
+# AQUISICAO_RESUMO — Historical Receipt from PR #178
 
-Gerado: 2026-07-27T18:27:00.303059+00:00
+Generated: 2026-07-27T18:27:00.303059+00:00  
+Integrity correction applied: 2026-07-27
 
-## Totais por domínio e estágio
+> **Acquisition history only.** The original labels overstated the evidence level. Under the v2 integrity contract, every row has `claim_allowed=false`.
 
-| Domínio | Estágio 1 | Estágio 2 | Estágio 3 | Estágio 4 | Estado |
-|---------|----------:|----------:|----------:|----------:|--------|
+## Preserved counts
+
+| Domain | Stage 1 discovery | Stage 2 candidate | Stage 3 repository-qualified | Stage 4 cross-domain candidate | State |
+|---|---:|---:|---:|---:|---|
 | physics | 80 | 41 | 11 | 0 | TOKEN_VAZIO |
 | chemistry | 80 | 38 | 11 | 0 | TOKEN_VAZIO |
 | biology | 80 | 45 | 18 | 0 | TOKEN_VAZIO |
 | mathematics | 80 | 45 | 15 | 0 | TOKEN_VAZIO |
 
-## DOIs canônicos (estágio 4)
+## Corrected interpretation
 
-_Nenhum registro atingiu o estágio 4 nesta execução._
+- Stage 3 proves only repository/access qualification: Zenodo community metadata, open licence and downloadable file.
+- Stage 3 does not prove peer review, methodological validity, absence of retraction, reproducibility or scientific truth.
+- Stage 4 would indicate retrieval overlap of the same normalized DOI in multiple configured domains; it would not establish canonicity.
+- No DOI reached stage 4 in this historical execution.
 
-## Instrução de uso — verbovivo/vv_scan_buf()
-
-Os textos em `stage_4_canonical/synthesis.txt` são compatíveis com `vv_scan_buf()`:
-
-```bash
-# Compilar verbovivo:
-gcc -std=c11 -O2 -I. -IBenchmark -DVERBOVIVO_MAIN \
-    rafaelia/verbovivo.c rafaelia/fiber_relmat.c -lm -o verbovivo
-
-# Alimentar com sínteses canônicas:
-for domain in physics chemistry biology mathematics; do
-    f="knowledge_base/${domain}/stage_4_canonical/synthesis.txt"
-    [ -f "$f" ] && cat "$f" | ./verbovivo -s > "engram_${domain}.svg" || true
-done
+```text
+claim_allowed=false
 ```
 
-## Referência estrutural
+## Next verifiable gate
 
-> **Entrada canônica:** `docs/AGENTES.md §7` (governança documental) e `§6` (excelência operacional).  
-> Script: `scripts/science_learning_engine.py`  
-> Documentação: `docs/SCIENCE_LEARNING_ENGINE.md`
+Regenerate with `scripts/science_learning_engine.py` v2 and attach a reproducibility receipt containing the executed command, timestamp, source counts and content hashes. Scientific promotion requires an independent review receipt beyond the acquisition engine.
