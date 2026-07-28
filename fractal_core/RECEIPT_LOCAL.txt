@@ -1,0 +1,17 @@
+RAFAELIA_FRACTAL_CORE_LOCAL_RECEIPT
+platform=x86_64-linux
+compiler=gcc-14.2.0
+assembler_leaf=true
+syscalls=0
+libc_core=0
+malloc=0
+heap=0
+global_mutable_bss=0
+warnings=0
+undefined_symbols=0
+asm_text_bytes=1140
+c_fallback_text_bytes=1036
+host_test_steps=2000
+host_test_status=PASS
+claim_allowed=false
+notes=Exact projective compactification and Mandelbrot anchor are mathematical; exact infinite Mandelbrot membership is not claimed.
