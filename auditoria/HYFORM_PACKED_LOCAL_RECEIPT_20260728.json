@@ -1,0 +1,20 @@
+{
+  "asm_required": false,
+  "claim_allowed": false,
+  "compiler": "cc (Debian 14.2.0-19) 14.2.0",
+  "failures": 0,
+  "generated_at": "2026-07-28T07:51:13Z",
+  "header_sha256": "6531ac272800d19e23ba817c7a3a8d91b4fa76aa6383c3e091464b28a14edbd2",
+  "heap_dependency": false,
+  "libc_dependency_in_production_contract": false,
+  "passes": 9,
+  "platform": "Linux-6.12.13-x86_64-with-glibc2.41",
+  "primary_state_count": 42,
+  "probe_object_sha256": "f56254174f34c7e85807aa67ed56defc4c98589bb247264c2fac64e166df7e83",
+  "receipt_id": "raf-hyform-a9ed9f15fe6f4a2d38ef",
+  "second_phase_layer_state": "TOKEN_VAZIO_DEFINITION",
+  "state": "LOCAL_PASS",
+  "syscalls_in_production_contract": false,
+  "tests": 9,
+  "undefined_symbols": []
+}
