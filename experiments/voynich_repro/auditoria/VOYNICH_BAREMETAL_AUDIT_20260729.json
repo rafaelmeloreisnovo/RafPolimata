@@ -1,0 +1,56 @@
+{
+  "event_id": "VOYNICH-BAREMETAL-AUDIT-20260729T025800-0300",
+  "timestamp_local": "2026-07-29T02:58:00-03:00",
+  "timezone": "America/Sao_Paulo",
+  "status": "BUILD_AND_INTEGRITY_PASS_END_TO_END_ANGULAR_VALIDATION_FAIL",
+  "claim_allowed": false,
+  "source_modified": false,
+  "input": {
+    "files": 10,
+    "prebuilt_sha256": "c6ad7c8708e7fd87d9854dcdb9d51ebe8d2f3544ae2cf7adbaea8d2eec21b426",
+    "angular_source_sha256": "4fbdee1bc655e31d3c9bdfc70a1d5649f37263326a919770d39c1c0d71dc7902",
+    "core_source_sha256": "5b6f19f67cb7caebfef41aa28bc7122e7ae60e4c35c9e8d7877f85d2c9fa6087"
+  },
+  "observed": {
+    "prebuilt_static_x86_64": true,
+    "prebuilt_no_dynamic_dependencies": true,
+    "prebuilt_rebuilt_test_output_identical": true,
+    "original_synthetic_detected": 4,
+    "original_angles_deg": [45, 45, 45, 45],
+    "original_confidence_percent": [0, 0, 0, 0],
+    "original_chi2x100": 0,
+    "original_crc32c": "ABDEF93D",
+    "readme_arm64_command_compiles": false,
+    "direct_entry_process_abi_valid": false,
+    "readme_512x512_accepted": false,
+    "original_x86_openat_mode_valid": false
+  },
+  "corrected": {
+    "pytest": "14/14 PASS",
+    "v5_angle_kernel_deg": [21, 54, 90, 130],
+    "v5_end_to_end_angles_deg": [45, 50, 90, 90],
+    "v5_end_to_end_validated": false,
+    "v5_small_sample_gate": "TOKEN_VAZIO_SAMPLE_TOO_SMALL",
+    "chi2_critical_df7_p005_x100": 1407,
+    "minimum_asymptotic_sample_n": 40,
+    "x86_runtime": true,
+    "aarch64_cross_compile": true,
+    "aarch64_runtime": "TOKEN_VAZIO_RUNTIME_RECEIPT_PENDING",
+    "core_output_modes": "0644",
+    "core_deterministic": true,
+    "exact_1m_lacuna_count": 0,
+    "over_1m_lacuna_count": 1,
+    "token_identity": "FNV32 prefilter + exact source-byte comparison",
+    "overflow_policy": "INVALID_INDEX + TOKEN_VAZIO lacuna, no index-0 contamination"
+  },
+  "blocking_gaps": [
+    "TOKEN_VAZIO_REAL_VOYNICH_PGM_PROVENANCE",
+    "TOKEN_VAZIO_ANNOTATED_Q_GLYPH_GROUND_TRUTH",
+    "TOKEN_VAZIO_DETECTOR_PRECISION_RECALL",
+    "TOKEN_VAZIO_END_TO_END_ANGLE_MAE_ACCEPTANCE",
+    "TOKEN_VAZIO_EXACT_SMALL_SAMPLE_TEST_OR_N_GE_40",
+    "TOKEN_VAZIO_ROTATION_AND_RANDOMIZATION_CONTROLS",
+    "TOKEN_VAZIO_AARCH64_PHYSICAL_RUN_RECEIPT",
+    "TOKEN_VAZIO_HYPERTEXT_CAUSAL_MECHANISM"
+  ]
+}
