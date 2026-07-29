@@ -1,0 +1,63 @@
+{
+  "claim_allowed": false,
+  "cycles": {
+    "floyd": {
+      "found": false,
+      "mu": null,
+      "period": null,
+      "witness_hash": null
+    },
+    "hashing": {
+      "found": false,
+      "mu": null,
+      "period": null,
+      "witness_hash": null
+    }
+  },
+  "final_ch": {
+    "c": 0.5073671237494883,
+    "h": 0.5522792715824711
+  },
+  "integrity": {
+    "crc32": "084e0a30",
+    "fnv1a64": "9aa7fc8f1eea7123",
+    "merkle_root": "d97a585e6e188f59da5f9271694cc17ecda85fe98b5a60209953b8fd37b980f0",
+    "sha256": "84a55e608a295677ad62fef0c0ad6faace43dd997cecf717efd21c4e831eff5c"
+  },
+  "metrics": {
+    "bits_geom_bins16": 7.0,
+    "entropy_milli_axis0_q8": 6676
+  },
+  "parameters": {
+    "alpha": 0.25,
+    "seed": 144000,
+    "steps": 128
+  },
+  "psi": {
+    "count": 128,
+    "max": 0.6908346261496991,
+    "min": -0.5368455557853783
+  },
+  "remaining_gaps": [
+    "TOKEN_VAZIO_REAL_VOYNICH_DATASET_CONTRACT",
+    "TOKEN_VAZIO_H_CARDIO_DOMAIN_JUSTIFICATION",
+    "TOKEN_VAZIO_CYCLE_ATTRACTOR_EXTERNAL_VALIDATION",
+    "TOKEN_VAZIO_BITS_GEOM_SCIENTIFIC_CALIBRATION",
+    "TOKEN_VAZIO_INDEPENDENT_REPLICATION"
+  ],
+  "report_sha256": "a20b730ac973f7075e75cc8befd75a7e3ef0efdb21e1fa7498e4938066bdc504",
+  "spectrum": {
+    "bins": 65,
+    "cardio_correlation_r": 0.2326997475190792
+  },
+  "status": "SYNTHETIC_LOCAL_MODEL_ONLY",
+  "toroidal_first_q64": [
+    "634e943ab8639a19",
+    "59d2ac4d45312cba",
+    "4159176867eca0f6",
+    "ab2ea2a1a8e5189a",
+    "ca34251a281d3f43",
+    "73906929a1c48d3c",
+    "929f20792316ea53"
+  ]
+}
