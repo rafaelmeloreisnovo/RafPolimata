@@ -1,0 +1,30 @@
+{
+  "checks": {
+    "action_attention_coupling_gap_preserved": true,
+    "blenddigs_definition_gap_preserved": true,
+    "claim_gate_closed": true,
+    "contract_has_seven_ordered_records": true,
+    "poincare_origin_distance_finite_inside_ball": true,
+    "reciprocal_loglog_negative_on_unit_ball_samples": true,
+    "reciprocal_loglog_singularity_detected": true,
+    "typed_void_infinite_origin_claim_rejected": true
+  },
+  "claim_allowed": false,
+  "limitations": [
+    "does_not_prove_novelty",
+    "does_not_prove_physical_validity",
+    "does_not_prove_patentability",
+    "does_not_replace_peer_review"
+  ],
+  "poincare_origin_distances": {
+    "0.0": 0.0,
+    "0.25": 0.5108256237659907,
+    "0.5": 1.0986122886681096,
+    "0.9": 2.9444389791664407,
+    "0.999": 7.600402334500399
+  },
+  "reciprocal_loglog_singularity_radius": 1.3108324944320862,
+  "state": "LOCAL_PASS",
+  "tests": "9/9 PASS",
+  "execution_environment": "local stdlib-only validation"
+}
