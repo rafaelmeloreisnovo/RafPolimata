@@ -1,5 +1,9 @@
 # Excelência Operacional — RafPolimata
 
+**Estado:** `CANONICAL`  
+**Proprietário lógico:** `documentation-governance`  
+**Âncora no mapa:** [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md §4 · docs`](../MAPA_ESTRUTURAL_REPOSITORIO.md)
+
 Este diretório define o contrato canônico para transformar fontes brutas em artefatos estruturados, limitados, reproduzíveis e auditáveis.
 
 ## Missão

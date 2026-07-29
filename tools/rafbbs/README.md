@@ -1,5 +1,9 @@
 # RafBBS Operator Console — Diretório Operacional do RafPolimata
 
+**Estado:** `ACTIVE`  
+**Proprietário lógico:** `automation-maintainer`  
+**Âncora no mapa:** [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md §4 · tools`](../../docs/MAPA_ESTRUTURAL_REPOSITORIO.md)
+
 O `tools/rafbbs/` é a camada operacional humana e automatizável do RafPolimata. Ele não substitui o núcleo técnico: organiza comandos reais em uma rotina simples, guiada, observável e comprovável.
 
 Princípio: GUI/BBS para operar; CLI para reutilizar; Syslog para entender; log TXT para registrar; manifesto para provar; `TOKEN_VAZIO` para não mentir.

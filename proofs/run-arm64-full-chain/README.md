@@ -1,5 +1,9 @@
 # Prova Android Full Chain — ARM64 / RafPolimata
 
+**Estado:** `EVIDENCE / TOKEN_VAZIO` (gates G3–G5 pendentes de run ARM64)  
+**Proprietário lógico:** `apkc-maintainer`  
+**Âncora no mapa:** [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md §4 · apk-android`](../../docs/MAPA_ESTRUTURAL_REPOSITORIO.md)
+
 Status: `PROOF_CAPTURE_PROTOCOL`  
 Data: 2026-06-15  
 Escopo: fechar os gaps de execução que impedem promover o RafPolimata de MVP técnico para demonstração Android rastreável.

@@ -1,5 +1,9 @@
 # RAFAELIA ROOT C→ASM Optimizer
 
+**Estado:** `ACTIVE`  
+**Proprietário lógico:** `compiler-maintainer`  
+**Âncora no mapa:** [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md §4 · root-compiler`](docs/MAPA_ESTRUTURAL_REPOSITORIO.md)
+
 Versão com raiz: parser explícito, AST mínimo, IR auditável, scheduler por bloco básico, branchless real para `if/else` simples e backends separados para ARM64 e x86-64.
 
 ## Escopo honesto

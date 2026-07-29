@@ -1,6 +1,8 @@
 # Núcleo Multilíngue de Escrituras e Semântica — MSSC V1
 
-**Estado:** `DISABLED_BY_DEFAULT / EMULATION_ONLY / claim_allowed=false`  
+**Estado:** `REFERENCE / EMULATION_ONLY` — `claim_allowed=false`  
+**Proprietário lógico:** `semantic-research`  
+**Âncora no mapa:** [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md §4 · research`](../../docs/MAPA_ESTRUTURAL_REPOSITORIO.md)  
 **Integração de runtime:** inexistente.  
 **Importação de corpus:** bloqueada nesta geração.
 

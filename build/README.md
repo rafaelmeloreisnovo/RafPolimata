@@ -1,5 +1,9 @@
 # `build/` — outputs efêmeros e reproduzíveis
 
+**Estado:** `EVIDENCE`  
+**Proprietário lógico:** `ci-governance`  
+**Âncora no mapa:** [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md §4 · ci`](../docs/MAPA_ESTRUTURAL_REPOSITORIO.md)
+
 Este diretório é a raiz canônica dos artefatos gerados localmente e pela CI.
 
 ## Repository tracker

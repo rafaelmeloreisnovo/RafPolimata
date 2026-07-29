@@ -71,6 +71,29 @@ A política é `configs/document-governance.v1.json`; o contrato de registro é 
 | `assets` | `assets/` | ativos auxiliares | `documentation-governance` | `SUPPORTING` |
 | `root-methods` | `RAF_001_*.c` … `RAF_056_*.c` | métodos C de baixo nível | `low-level-methods-maintainer` | `ACTIVE/PENDING` |
 | `root-compiler` | `raf_*.c`, `raf_*.h`, `raiz_*` | compilador e otimizadores | `compiler-maintainer` | `RUNTIME` |
+| `research` | `research/` | núcleos de pesquisa (APKC-RMR, MSSC) | `research-governance` | `REFERENCE` |
+
+## 4a. README Files — artefatos governados
+
+Todos os arquivos `README.md` do repositório são artefatos de governança com estado canônico e proprietário lógico. A ausência de estado declarado implica revisão pendente.
+
+| Arquivo | Área (§4) | Proprietário lógico | Estado |
+|---|---|---|---|
+| [`README.md`](../README.md) | root | `documentation-governance` | `CANONICAL` |
+| [`README_RAFAELIA_ROOT_OPTIMIZER.md`](../README_RAFAELIA_ROOT_OPTIMIZER.md) | root-compiler | `compiler-maintainer` | `ACTIVE` |
+| [`Apkc/proofs/README.md`](../Apkc/proofs/README.md) | apk-android | `apkc-maintainer` | `EVIDENCE` |
+| [`build/README.md`](../build/README.md) | ci | `ci-governance` | `EVIDENCE` |
+| [`docs/CI_COMPILER_EXCELLENCE/README.md`](CI_COMPILER_EXCELLENCE/README.md) | docs/ci | `ci-governance` | `CANONICAL` |
+| [`docs/excelencia_operacional/README.md`](excelencia_operacional/README.md) | docs | `documentation-governance` | `CANONICAL` |
+| [`fractal_core/README.md`](../fractal_core/README.md) | root-methods | `low-level-methods-maintainer` | `ACTIVE` |
+| [`native/rafaelia_omega_v32/README.md`](../native/rafaelia_omega_v32/README.md) | rafaelia | `runtime-maintainer` | `EVIDENCE` |
+| [`proofs/run-arm64-full-chain/README.md`](../proofs/run-arm64-full-chain/README.md) | apk-android | `apkc-maintainer` | `EVIDENCE` |
+| [`research/APKC_RMR_RESEARCH_CORE/README.md`](../research/APKC_RMR_RESEARCH_CORE/README.md) | research | `apkc-maintainer` | `REFERENCE` |
+| [`research/APKC_RMR_RESEARCH_CORE/receipts/README.md`](../research/APKC_RMR_RESEARCH_CORE/receipts/README.md) | research | `evidence-custodian` | `EVIDENCE` |
+| [`research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/README.md`](../research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/README.md) | research | `semantic-research` | `REFERENCE / EMULATION_ONLY` |
+| [`tests/fixtures/README.md`](../tests/fixtures/README.md) | tests | `quality-assurance` | `EVIDENCE` |
+| [`tools/rafbbs/README.md`](../tools/rafbbs/README.md) | tools | `automation-maintainer` | `ACTIVE` |
+| [`tools/rafbbs/tests/README.md`](../tools/rafbbs/tests/README.md) | tools | `quality-assurance` | `EVIDENCE` |
 
 ## 5. Entradas obrigatórias
 

@@ -190,6 +190,26 @@ O índice completo e curado está em [`docs/INDEX.md`](docs/INDEX.md). Entre os 
 - convergência do ecossistema;
 - ciência formal e rastreabilidade informacional.
 
+## Arquivos README neste repositório
+
+| Arquivo | Área | Estado | Proprietário lógico |
+|---|---|---|---|
+| [`README.md`](README.md) | raiz | `CANONICAL` | `documentation-governance` |
+| [`README_RAFAELIA_ROOT_OPTIMIZER.md`](README_RAFAELIA_ROOT_OPTIMIZER.md) | root-compiler | `ACTIVE` | `compiler-maintainer` |
+| [`Apkc/proofs/README.md`](Apkc/proofs/README.md) | apk-android | `EVIDENCE` | `apkc-maintainer` |
+| [`build/README.md`](build/README.md) | ci | `EVIDENCE` | `ci-governance` |
+| [`docs/CI_COMPILER_EXCELLENCE/README.md`](docs/CI_COMPILER_EXCELLENCE/README.md) | docs/ci | `CANONICAL` | `ci-governance` |
+| [`docs/excelencia_operacional/README.md`](docs/excelencia_operacional/README.md) | docs | `CANONICAL` | `documentation-governance` |
+| [`fractal_core/README.md`](fractal_core/README.md) | root-methods | `ACTIVE` | `low-level-methods-maintainer` |
+| [`native/rafaelia_omega_v32/README.md`](native/rafaelia_omega_v32/README.md) | rafaelia | `EVIDENCE` | `runtime-maintainer` |
+| [`proofs/run-arm64-full-chain/README.md`](proofs/run-arm64-full-chain/README.md) | apk-android | `EVIDENCE` | `apkc-maintainer` |
+| [`research/APKC_RMR_RESEARCH_CORE/README.md`](research/APKC_RMR_RESEARCH_CORE/README.md) | research | `REFERENCE` | `apkc-maintainer` |
+| [`research/APKC_RMR_RESEARCH_CORE/receipts/README.md`](research/APKC_RMR_RESEARCH_CORE/receipts/README.md) | research | `EVIDENCE` | `evidence-custodian` |
+| [`research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/README.md`](research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/README.md) | research | `REFERENCE / EMULATION_ONLY` | `semantic-research` |
+| [`tests/fixtures/README.md`](tests/fixtures/README.md) | tests | `EVIDENCE` | `quality-assurance` |
+| [`tools/rafbbs/README.md`](tools/rafbbs/README.md) | tools | `ACTIVE` | `automation-maintainer` |
+| [`tools/rafbbs/tests/README.md`](tools/rafbbs/tests/README.md) | tools | `EVIDENCE` | `quality-assurance` |
+
 ## Aviso jurídico e científico
 
 Este material é técnico-acadêmico. Não substitui parecer jurídico profissional, auditoria de segurança, certificação normativa ou revisão científica independente.

@@ -1,5 +1,9 @@
 # RAFAELIA Fractal Core — Mandelbrot, arco projetivo e Fibonacci
 
+**Estado:** `ACTIVE`  
+**Proprietário lógico:** `low-level-methods-maintainer`  
+**Âncora no mapa:** [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md §4 · root-methods`](../docs/MAPA_ESTRUTURAL_REPOSITORIO.md)
+
 Núcleo freestanding, sem syscall, sem libc, sem `malloc`, sem heap, sem GC,
 sem ponto flutuante e sem estado global mutável.
 

@@ -1,5 +1,10 @@
 # Regression Corpus — Format Fixtures (audit lacuna L17)
 
+**Estado:** `EVIDENCE` (casos 1, 2, 10: PASS; casos 3–9: TOKEN\_VAZIO aguardando ARM64)  
+**Proprietário lógico:** `quality-assurance`  
+**Âncora no mapa:** [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md §4 · tests`](../../docs/MAPA_ESTRUTURAL_REPOSITORIO.md)  
+**Última verificação de estados:** 2026-07-29
+
 This directory documents the **regressive corpus of formats** plan for the APKc
 output (ELF / AXML / DEX / ZIP-APK). It closes audit lacuna **L17 — Corpus
 regressivo de formatos** as far as is tractable on a host with **no ARM

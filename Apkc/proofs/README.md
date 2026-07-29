@@ -1,5 +1,9 @@
 # ApkC proofs
 
+**Estado:** `EVIDENCE`  
+**Proprietário lógico:** `apkc-maintainer`  
+**Âncora no mapa:** [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md §4 · apk-android`](../../docs/MAPA_ESTRUTURAL_REPOSITORIO.md)
+
 Esta pasta contém provas reproduzíveis do **ApkC**. O objetivo é separar evidência técnica, plano de build, assinatura, instalação, documentação e lacunas sem afirmar sucesso que ainda não foi medido.
 
 ## Estados padronizados
