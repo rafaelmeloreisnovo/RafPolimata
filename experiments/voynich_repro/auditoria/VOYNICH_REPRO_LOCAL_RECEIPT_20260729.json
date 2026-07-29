@@ -4,7 +4,8 @@
   "timezone": "America/Sao_Paulo",
   "repository": "rafaelmeloreisnovo/RafPolimata",
   "branch": "feature/voynich-repro-tools-v1-20260729",
-  "status": "MATERIALIZED_WITH_LOCAL_EQUIVALENT_PASS",
+  "pull_request": 184,
+  "status": "MATERIALIZED_LOCAL_PASS_REMOTE_INFRA_FAILURE_UNRESOLVED",
   "claim_allowed": false,
   "local_validation": {
     "state": "LOCAL_PASS",
@@ -14,7 +15,32 @@
     "duration_seconds": 0.13,
     "scope": "byte-local compact implementation equivalent in behavior to the materialized toolkit"
   },
-  "github_branch_execution": "TOKEN_VAZIO_NOT_EXECUTED_AFTER_MATERIALIZATION",
+  "github_branch_execution": {
+    "state": "REMOTE_WORKFLOWS_COMPLETED_FAILURE_NO_STEPS_NO_LOGS",
+    "root_cause": "TOKEN_VAZIO_UNKNOWN_UNKNOWN",
+    "observed_head_sha": "6fa0c41c381180f6e1f345d3b4af62cf38afd5a0",
+    "runs": [
+      {
+        "id": 30425147839,
+        "name": "Formal Science Orchestrator",
+        "conclusion": "failure",
+        "job_id": 90489885740,
+        "job_name": "Units, evidence, statistics and time gates",
+        "steps_observed": 0,
+        "logs": "UNAVAILABLE_BLOB_NOT_FOUND"
+      },
+      {
+        "id": 30425147796,
+        "name": "CI",
+        "conclusion": "failure",
+        "job_id": 90489885631,
+        "job_name": "Semantic coherence and falsifiability gates",
+        "steps_observed": 0,
+        "logs": "UNAVAILABLE"
+      }
+    ],
+    "interpretation": "failure is observed, but no technical step or log currently attributes it to the Voynich toolkit"
+  },
   "synthetic_run": {
     "seed": 144000,
     "steps": 128,
@@ -36,9 +62,9 @@
     "TOKEN_VAZIO_CYCLE_ATTRACTOR_EXTERNAL_VALIDATION",
     "TOKEN_VAZIO_BITS_GEOM_SCIENTIFIC_CALIBRATION",
     "TOKEN_VAZIO_INDEPENDENT_REPLICATION",
-    "TOKEN_VAZIO_GITHUB_BRANCH_EXECUTION"
+    "TOKEN_VAZIO_REMOTE_WORKFLOW_ROOT_CAUSE"
   ],
-  "F_ok": "toolkit materialized; local equivalent passed 8/8; deterministic synthetic report preserved",
-  "F_gap": "branch execution, real dataset contract, scientific calibration, out-of-sample and independent replication",
-  "F_next": "execute pytest from the PR branch and freeze a permitted real-data fixture without changing definitions"
+  "F_ok": "toolkit materialized; local equivalent passed 8/8; deterministic synthetic report preserved; remote failure state recorded without false attribution",
+  "F_gap": "remote workflow root cause, direct branch pytest receipt, real dataset contract, scientific calibration, out-of-sample and independent replication",
+  "F_next": "recover workflow steps/logs or add a narrowly scoped direct pytest gate, then freeze a permitted real-data fixture without changing definitions"
 }
