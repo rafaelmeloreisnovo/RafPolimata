@@ -1,0 +1,76 @@
+{
+  "schema": "rafaelia-voynich-batch-audit-v1",
+  "event_id": "VOYNICH-BATCH-AUDIT-20260729T033600-0300",
+  "timestamp_local": "2026-07-29T03:36:00-03:00",
+  "status": "LOCAL_MULTI_LAYER_AUDIT_COMPLETE_CLAIMS_BLOCKED",
+  "claim_allowed": false,
+  "inputs": {
+    "voy_core_c_sha256": "a4447a99905ffa81606f12f867552cf65c14832cb86afa025234324611618b18",
+    "voy_py_sha256": "36c70d9f6cfdaba4da9b4b58965b85c5638c45a7b4b348a8db4112dcd4cefcf6",
+    "voynich_exacordex_c_sha256": "0b3486d72d912d94e5a6cd9f9d2669271918d3f29400e08e54b7df4034cdc062",
+    "voynich_toroidal_c_sha256": "6f056ff231c1bb7f3e5c9e5a3b1e1c153f578d2d98498ccde381d1f08c1f99e5",
+    "vectra_proof_suite_sha256": "e4f012b1bf9b83117bc4f4ff3d716785bd178480b51a51297a8ec494001a8df3",
+    "sementes_zip_sha256": "6bbbb8988b9f547820d32d0eb876b205c80c8af060cfe31d4eb60819b49e3342",
+    "sample_voy_groups_sha256": "351e7034ad9da4391cd096b039b95b71e2728aaff7cb3bf2653f74718fc4c591",
+    "voy_zip_sha256": "66032c9dcbca0dd51ca9afafd7c661627616dc7f106bd49aef42d60ad05731bc",
+    "voynich_downloader_c_sha256": "094490902afa87c768ab09d0cf95c1cfaba672a87906a08b7377f481c5a27432",
+    "voynich_analysis_py_sha256": "ee64fbe6c5c0eaca5b81ebc5928fa8b14a1521c4896774e64f52c3da2da8900c"
+  },
+  "archive_safety": {
+    "vectra_entries": 23,
+    "sementes_entries": 106,
+    "voy_entries": 5,
+    "unsafe_entries": 0
+  },
+  "voy_core": {
+    "status": "BUILD_PASS_END_TO_END_ANGLE_FAIL",
+    "expected_angles": [20, 55, 90, 130],
+    "reported_angles": [45, 45, 45, 45],
+    "confidence_percent": [0, 0, 0, 0],
+    "chi2x100": 0,
+    "crc32c": "ABDEF93D"
+  },
+  "toroidal_original": {
+    "status": "SIMULATION_NONDETERMINISTIC_UNSUITABLE_FOR_CLAIM",
+    "content_counts_seeds_1_8": [242, 241, 228, 227, 251, 249, 232, 231],
+    "negative_rgb_cells_seeds_1_8": [209, 206, 201, 203, 221, 217, 201, 196]
+  },
+  "image_analysis_original": {
+    "synthetic_images": 8,
+    "jpeg_equals_gif_order": true,
+    "claim_gate": "FAIL_UNCONDITIONAL_CONCLUSION"
+  },
+  "group_counts": {
+    "individual_matching": "15/20",
+    "prefix_declared_vs_observed": {
+      "qo": [5228, 5258],
+      "ch": [5974, 5983],
+      "da": [2328, 2339],
+      "sh": [3221, 3238]
+    }
+  },
+  "vectra": {
+    "manifest_hashes": "16/16 PASS",
+    "cross_elf_sha256": "95f2d5ff249e14a05baf729aed5b78848e1c92e09ea2073300866cf5fcc61345",
+    "rebuild_byte_identical": true,
+    "physical_execution": "TOKEN_VAZIO_NOT_EXECUTED_X86_64_HOST"
+  },
+  "sementes": {
+    "source_hashes": "14/14 PASS",
+    "generated_hashes": "59/59 PASS",
+    "scripts_executed": false
+  },
+  "corrected_gates": {
+    "toroidal_werror_build": "PASS",
+    "toroidal_two_runs_identical": "PASS",
+    "python_tests": "2/2 PASS",
+    "network_execution": "NOT_EXECUTED"
+  },
+  "remaining_gaps": [
+    "TOKEN_VAZIO_GROUND_TRUTH_GLYPH_ANGLES",
+    "TOKEN_VAZIO_OFFICIAL_IMAGE_CORPUS_FROZEN_HASHES",
+    "TOKEN_VAZIO_ARMV7_PHYSICAL_VECTRA_V2_RUN",
+    "TOKEN_VAZIO_INDEPENDENT_REPLICATION",
+    "TOKEN_VAZIO_SEMANTIC_BLIND_TEST"
+  ]
+}
