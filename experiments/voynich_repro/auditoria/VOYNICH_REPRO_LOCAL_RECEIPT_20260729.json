@@ -1,0 +1,70 @@
+{
+  "event_id": "VOYNICH-REPRO-V1-20260729T021700-0300",
+  "timestamp_local": "2026-07-29T02:17:00-03:00",
+  "timezone": "America/Sao_Paulo",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "branch": "feature/voynich-repro-tools-v1-20260729",
+  "pull_request": 184,
+  "status": "MATERIALIZED_LOCAL_PASS_REMOTE_INFRA_FAILURE_UNRESOLVED",
+  "claim_allowed": false,
+  "local_validation": {
+    "state": "LOCAL_PASS",
+    "tests_passed": 8,
+    "tests_failed": 0,
+    "command": "python -m pytest",
+    "duration_seconds": 0.13,
+    "scope": "byte-local compact implementation equivalent in behavior to the materialized toolkit"
+  },
+  "github_branch_execution": {
+    "state": "REMOTE_WORKFLOWS_COMPLETED_FAILURE_NO_STEPS_NO_LOGS",
+    "root_cause": "TOKEN_VAZIO_UNKNOWN_UNKNOWN",
+    "observed_head_sha": "6fa0c41c381180f6e1f345d3b4af62cf38afd5a0",
+    "runs": [
+      {
+        "id": 30425147839,
+        "name": "Formal Science Orchestrator",
+        "conclusion": "failure",
+        "job_id": 90489885740,
+        "job_name": "Units, evidence, statistics and time gates",
+        "steps_observed": 0,
+        "logs": "UNAVAILABLE_BLOB_NOT_FOUND"
+      },
+      {
+        "id": 30425147796,
+        "name": "CI",
+        "conclusion": "failure",
+        "job_id": 90489885631,
+        "job_name": "Semantic coherence and falsifiability gates",
+        "steps_observed": 0,
+        "logs": "UNAVAILABLE"
+      }
+    ],
+    "interpretation": "failure is observed, but no technical step or log currently attributes it to the Voynich toolkit"
+  },
+  "synthetic_run": {
+    "seed": 144000,
+    "steps": 128,
+    "alpha": 0.25,
+    "output": "reports/synthetic_report.json",
+    "file_sha256": "cdf5258a0f5287cdaf924b76325184494c07f4bd0aad8432ad7e315ca87d80ac",
+    "embedded_report_sha256": "a20b730ac973f7075e75cc8befd75a7e3ef0efdb21e1fa7498e4938066bdc504"
+  },
+  "observed_results": {
+    "cardio_correlation_r": 0.2326997475190792,
+    "entropy_milli_axis0_q8": 6676,
+    "bits_geom_bins16": 7.0,
+    "floyd_cycle_found": false,
+    "hashing_cycle_found": false
+  },
+  "gaps": [
+    "TOKEN_VAZIO_REAL_VOYNICH_DATASET_CONTRACT",
+    "TOKEN_VAZIO_H_CARDIO_DOMAIN_JUSTIFICATION",
+    "TOKEN_VAZIO_CYCLE_ATTRACTOR_EXTERNAL_VALIDATION",
+    "TOKEN_VAZIO_BITS_GEOM_SCIENTIFIC_CALIBRATION",
+    "TOKEN_VAZIO_INDEPENDENT_REPLICATION",
+    "TOKEN_VAZIO_REMOTE_WORKFLOW_ROOT_CAUSE"
+  ],
+  "F_ok": "toolkit materialized; local equivalent passed 8/8; deterministic synthetic report preserved; remote failure state recorded without false attribution",
+  "F_gap": "remote workflow root cause, direct branch pytest receipt, real dataset contract, scientific calibration, out-of-sample and independent replication",
+  "F_next": "recover workflow steps/logs or add a narrowly scoped direct pytest gate, then freeze a permitted real-data fixture without changing definitions"
+}
