@@ -1,5 +1,9 @@
 # `build/` — outputs efêmeros e reproduzíveis
 
+**Estado:** `EVIDENCE`  
+**Proprietário lógico:** `ci-governance`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `build/README.md`
+
 Este diretório é a raiz canônica dos artefatos gerados localmente e pela CI.
 
 ## Repository tracker

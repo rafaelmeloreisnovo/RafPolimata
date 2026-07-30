@@ -1,5 +1,9 @@
 # Núcleo Multilíngue de Escrituras e Semântica — MSSC V1
 
+**Estado:** `REFERENCE`  
+**Proprietário lógico:** `semantic-research`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/README.md`
+
 **Estado:** `DISABLED_BY_DEFAULT / EMULATION_ONLY / claim_allowed=false`  
 **Integração de runtime:** inexistente.  
 **Importação de corpus:** bloqueada nesta geração.

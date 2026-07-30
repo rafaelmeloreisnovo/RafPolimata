@@ -1,5 +1,9 @@
 # RAFAELIA Ω v3.2 — Ablation & Propagation Lab
 
+**Estado:** `EVIDENCE`  
+**Proprietário lógico:** `runtime-maintainer`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `native/rafaelia_omega_v32/README.md`
+
 This directory records the validated ARM32 evidence for the RAFAELIA Ω v3.2 ablation and propagation experiment executed on 10 July 2026.
 
 ## Scope

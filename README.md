@@ -1,5 +1,9 @@
 # RafPolimata
 
+**Estado:** `CANONICAL`  
+**Proprietário lógico:** `documentation-governance`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `README.md`
+
 RafPolimata é uma arquitetura semântica, tecnológica e jurídica para sistemas complexos que combinam:
 
 - modelagem matemática e dinâmica discreta;
@@ -195,3 +199,24 @@ O índice completo e curado está em [`docs/INDEX.md`](docs/INDEX.md). Entre os 
 Este material é técnico-acadêmico. Não substitui parecer jurídico profissional, auditoria de segurança, certificação normativa ou revisão científica independente.
 
 Afirmações de produção, conformidade, desempenho e segurança só podem ser promovidas depois dos gates específicos e da evidência reproduzível correspondente.
+
+
+## README Files neste Repositório
+
+| Arquivo | Estado | Proprietário lógico |
+|---|---|---|
+| [`README.md`](README.md) | CANONICAL | documentation-governance |
+| [`README_RAFAELIA_ROOT_OPTIMIZER.md`](README_RAFAELIA_ROOT_OPTIMIZER.md) | ACTIVE | compiler-maintainer |
+| [`Apkc/proofs/README.md`](Apkc/proofs/README.md) | EVIDENCE | apkc-maintainer |
+| [`build/README.md`](build/README.md) | EVIDENCE | ci-governance |
+| [`docs/CI_COMPILER_EXCELLENCE/README.md`](docs/CI_COMPILER_EXCELLENCE/README.md) | CANONICAL | ci-governance |
+| [`docs/excelencia_operacional/README.md`](docs/excelencia_operacional/README.md) | CANONICAL | documentation-governance |
+| [`fractal_core/README.md`](fractal_core/README.md) | ACTIVE | low-level-methods-maintainer |
+| [`native/rafaelia_omega_v32/README.md`](native/rafaelia_omega_v32/README.md) | EVIDENCE | runtime-maintainer |
+| [`proofs/run-arm64-full-chain/README.md`](proofs/run-arm64-full-chain/README.md) | EVIDENCE | apkc-maintainer |
+| [`research/APKC_RMR_RESEARCH_CORE/README.md`](research/APKC_RMR_RESEARCH_CORE/README.md) | REFERENCE | apkc-maintainer |
+| [`research/APKC_RMR_RESEARCH_CORE/receipts/README.md`](research/APKC_RMR_RESEARCH_CORE/receipts/README.md) | EVIDENCE | evidence-custodian |
+| [`research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/README.md`](research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/README.md) | REFERENCE | semantic-research |
+| [`tests/fixtures/README.md`](tests/fixtures/README.md) | EVIDENCE | quality-assurance |
+| [`tools/rafbbs/README.md`](tools/rafbbs/README.md) | ACTIVE | automation-maintainer |
+| [`tools/rafbbs/tests/README.md`](tools/rafbbs/tests/README.md) | EVIDENCE | quality-assurance |

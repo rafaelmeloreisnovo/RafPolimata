@@ -1,5 +1,9 @@
 # Excelência Operacional — RafPolimata
 
+**Estado:** `CANONICAL`  
+**Proprietário lógico:** `documentation-governance`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `docs/excelencia_operacional/README.md`
+
 Este diretório define o contrato canônico para transformar fontes brutas em artefatos estruturados, limitados, reproduzíveis e auditáveis.
 
 ## Missão
