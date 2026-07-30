@@ -1,5 +1,9 @@
 # ApkC proofs
 
+**Estado:** `EVIDENCE`  
+**Proprietário lógico:** `apkc-maintainer`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `Apkc/proofs/README.md`
+
 Esta pasta contém provas reproduzíveis do **ApkC**. O objetivo é separar evidência técnica, plano de build, assinatura, instalação, documentação e lacunas sem afirmar sucesso que ainda não foi medido.
 
 ## Estados padronizados

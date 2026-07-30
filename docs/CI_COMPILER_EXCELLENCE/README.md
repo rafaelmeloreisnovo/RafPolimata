@@ -1,5 +1,9 @@
 # CI Compiler Excellence — condução operacional
 
+**Estado:** `CANONICAL`  
+**Proprietário lógico:** `ci-governance`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `docs/CI_COMPILER_EXCELLENCE/README.md`
+
 > **Entrada canônica:** docs/AGENTES.md §7 (CI gates — 15+ gates em `.github/workflows/ci.yml`, condução freestanding-first) e §5 (pipeline operacional VOID → VALIDATED — este diretório implementa a prova de evidência de cada gate).
 
 Este diretório descreve a condução técnica para transformar o CI em um **compilador de evidências**: pequeno, auditável, freestanding-first, sem heap no núcleo ApkC, com rollback/failsafe documentados e sem alegar prova que não existe.

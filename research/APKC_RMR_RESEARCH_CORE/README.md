@@ -1,5 +1,9 @@
 # APKC–RMR Research Core
 
+**Estado:** `REFERENCE`  
+**Proprietário lógico:** `apkc-maintainer`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `research/APKC_RMR_RESEARCH_CORE/README.md`
+
 **Coupling ID:** `APKC-RMR-RESEARCH-CORE-V1-20260726`  
 **Status:** `RESEARCH_SOURCE_AVAILABLE / NONCOMMERCIAL`  
 **Commercial use:** prohibited unless a separate written commercial license is executed.  

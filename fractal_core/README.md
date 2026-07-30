@@ -1,5 +1,9 @@
 # RAFAELIA Fractal Core — Mandelbrot, arco projetivo e Fibonacci
 
+**Estado:** `ACTIVE`  
+**Proprietário lógico:** `low-level-methods-maintainer`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `fractal_core/README.md`
+
 Núcleo freestanding, sem syscall, sem libc, sem `malloc`, sem heap, sem GC,
 sem ponto flutuante e sem estado global mutável.
 

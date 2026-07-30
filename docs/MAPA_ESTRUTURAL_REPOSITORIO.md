@@ -167,3 +167,24 @@ estrutura íntegra
 ```
 
 A condição melhora governança e confiança, mas não substitui prova funcional ou científica do conteúdo.
+
+
+## § README Files — Artefatos Governados
+
+| Arquivo | Estado | Proprietário lógico |
+|---|---|---|
+| `README.md` | CANONICAL | documentation-governance |
+| `README_RAFAELIA_ROOT_OPTIMIZER.md` | ACTIVE | compiler-maintainer |
+| `Apkc/proofs/README.md` | EVIDENCE | apkc-maintainer |
+| `build/README.md` | EVIDENCE | ci-governance |
+| `docs/CI_COMPILER_EXCELLENCE/README.md` | CANONICAL | ci-governance |
+| `docs/excelencia_operacional/README.md` | CANONICAL | documentation-governance |
+| `fractal_core/README.md` | ACTIVE | low-level-methods-maintainer |
+| `native/rafaelia_omega_v32/README.md` | EVIDENCE | runtime-maintainer |
+| `proofs/run-arm64-full-chain/README.md` | EVIDENCE | apkc-maintainer |
+| `research/APKC_RMR_RESEARCH_CORE/README.md` | REFERENCE | apkc-maintainer |
+| `research/APKC_RMR_RESEARCH_CORE/receipts/README.md` | EVIDENCE | evidence-custodian |
+| `research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/README.md` | REFERENCE | semantic-research |
+| `tests/fixtures/README.md` | EVIDENCE | quality-assurance |
+| `tools/rafbbs/README.md` | ACTIVE | automation-maintainer |
+| `tools/rafbbs/tests/README.md` | EVIDENCE | quality-assurance |

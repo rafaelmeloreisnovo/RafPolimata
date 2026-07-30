@@ -1,5 +1,9 @@
 # Prova Android Full Chain — ARM64 / RafPolimata
 
+**Estado:** `EVIDENCE`  
+**Proprietário lógico:** `apkc-maintainer`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `proofs/run-arm64-full-chain/README.md`
+
 Status: `PROOF_CAPTURE_PROTOCOL`  
 Data: 2026-06-15  
 Escopo: fechar os gaps de execução que impedem promover o RafPolimata de MVP técnico para demonstração Android rastreável.

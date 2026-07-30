@@ -1,5 +1,9 @@
 # RAFAELIA ROOT C→ASM Optimizer
 
+**Estado:** `ACTIVE`  
+**Proprietário lógico:** `compiler-maintainer`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `README_RAFAELIA_ROOT_OPTIMIZER.md`
+
 Versão com raiz: parser explícito, AST mínimo, IR auditável, scheduler por bloco básico, branchless real para `if/else` simples e backends separados para ARM64 e x86-64.
 
 ## Escopo honesto

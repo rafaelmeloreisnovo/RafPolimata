@@ -1,5 +1,9 @@
 # Regression Corpus — Format Fixtures (audit lacuna L17)
 
+**Estado:** `EVIDENCE`  
+**Proprietário lógico:** `quality-assurance`  
+**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `tests/fixtures/README.md`
+
 This directory documents the **regressive corpus of formats** plan for the APKc
 output (ELF / AXML / DEX / ZIP-APK). It closes audit lacuna **L17 — Corpus
 regressivo de formatos** as far as is tractable on a host with **no ARM
