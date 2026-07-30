@@ -1,0 +1,27 @@
+{
+  "schema": "orquestrador_omega_excellence_v1",
+  "event_id": "ORQ-OMEGA-EXCELLENCE-V1-20260730T021531Z",
+  "created_at_utc": "2026-07-30T02:15:31Z",
+  "authority": {"repository": "rafaelmeloreisnovo/Mapa", "role": "FEDERATED_CONTROL_AND_KNOWLEDGE_PLANE", "human_authority": "usuario_local"},
+  "source_snapshots": [
+    {"id": "DRIVE_CANON", "title": "RAFAELIA — Implementação Latentes e Papers — Drive GitHub V1", "document_id": "1g3eVD3zLMuwk0jevAwVL3wSmxhEMkKsAUPFQh2wEn88"},
+    {"id": "SEMENTEIRA_GATE_V1", "state": "LOCAL_STRUCTURAL_AUDIT_PASS", "invariants_pass": "9/9", "claim_allowed": false},
+    {"id": "MAPA_PR93", "state": "OPEN_DRAFT", "role": "conceptual_work_control_plane"}
+  ],
+  "principle": "Excellence is non-compensatory: documentation, aesthetics or hashes cannot replace execution, evidence, domain validity, human authority or ethics.",
+  "sustaining_invariant": {"formula": "K_OMEGA = O * I * U * P * S * H * M * X * E * R * D * F", "factors": ["origin", "identity", "unit_layer", "provenance_time", "scope_authority", "human_limit", "model_implementation", "execution", "evidence_falsifier", "relations_index", "delta", "feedback_omega"], "gate_rule": "any_missing_mandatory_factor_blocks_promotion", "claim_allowed": false},
+  "epistemic_cycle": ["fact", "gap", "invariant", "variant", "proof", "parable", "feedback"],
+  "needs": [
+    {"id": "N01", "name": "ORIGIN_AUTHORSHIP"}, {"id": "N02", "name": "IDENTITY_TYPING"}, {"id": "N03", "name": "LAYER_UNIT"}, {"id": "N04", "name": "PROVENANCE_TIME"}, {"id": "N05", "name": "SCOPE_AUTHORITY"}, {"id": "N06", "name": "HUMAN_ETHICAL_LIMIT"}, {"id": "N07", "name": "MODEL_IMPLEMENTATION"}, {"id": "N08", "name": "EXECUTION_ENVIRONMENT"}, {"id": "N09", "name": "EVIDENCE_FALSIFIER"}, {"id": "N10", "name": "INDEX_MAP_RELATIONS"}, {"id": "N11", "name": "STRATEGY_TACTICS_COGNITION"}, {"id": "N12", "name": "DELTA_FEEDBACK_CONTINUITY"}
+  ],
+  "vectors": [
+    {"id": "V01", "name": "CORRECTNESS"}, {"id": "V02", "name": "REPRODUCIBILITY"}, {"id": "V03", "name": "SAFETY_ETHICS"}, {"id": "V04", "name": "PERFORMANCE_EFFICIENCY"}, {"id": "V05", "name": "PORTABILITY_RESILIENCE"}, {"id": "V06", "name": "OBSERVABILITY_AUDIT"}, {"id": "V07", "name": "STRATEGY"}, {"id": "V08", "name": "TACTICS"}, {"id": "V09", "name": "COGNITIVE_HUMAN"}, {"id": "V10", "name": "EVOLUTIONARY"}, {"id": "V11", "name": "GEOMETRIC_MULTIDIMENSIONAL"}, {"id": "V12", "name": "OMEGA_COHERENCE"}
+  ],
+  "matrix_contract": {"rows": 12, "columns": 12, "expected_cells": 144, "cell_id_pattern": "N[01..12]-V[01..12]", "non_compensatory": true, "generation": "cartesian_product(needs.id, vectors.id)", "cell_defaults_ref": "cell_defaults"},
+  "promotion_gates": [
+    {"id": "G0", "name": "SOURCE_CAPTURED"}, {"id": "G1", "name": "IDENTITY_AND_RIGHTS"}, {"id": "G2", "name": "MODEL_AND_BOUNDARY"}, {"id": "G3", "name": "IMPLEMENTED"}, {"id": "G4", "name": "LOCALLY_TESTED"}, {"id": "G5", "name": "RUNTIME_RECEIPT"}, {"id": "G6", "name": "ADVERSARIAL_AND_NEGATIVE_TESTS"}, {"id": "G7", "name": "DOMAIN_EVIDENCE"}, {"id": "G8", "name": "INDEPENDENT_REVIEW"}, {"id": "G9", "name": "FEDERATED_INTEGRATION"}, {"id": "G10", "name": "HUMAN_RELEASE_DECISION"}, {"id": "G11", "name": "LONGITUDINAL_FEEDBACK_AND_ROLLBACK"}
+  ],
+  "global_state": {"structure": "FORMAL_SPEC_V1", "matrix": "144_ADDRESSABLE_CELLS", "runtime": "LOCAL_VALIDATOR_PASS_8_OF_8", "independent_review": "TOKEN_VAZIO", "claim_allowed": false},
+  "cell_defaults": {"state": "TOKEN_VAZIO_UNASSESSED", "authority": "HUMAN_REVIEW_REQUIRED", "invariants": ["origin_preserved", "claim_allowed_false_until_evidence"], "F_ok": "cell_addressable_and_typed", "F_gap": "evidence_and_domain_assessment_pending", "F_next": "attach_source_evidence_test_and_owner"},
+  "cell_overrides": []
+}
