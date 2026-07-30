@@ -1,0 +1,24 @@
+{
+  "event_id": "ORQ-OMEGA-EXCELLENCE-V1-20260730T021531Z-LOCAL",
+  "timestamp_utc": "2026-07-30T02:15:31Z",
+  "operation": "LOCAL_GENERATED_SOURCE_VALIDATION",
+  "branch": "feature/orquestrador-omega-excellence-v1-20260729",
+  "commits_observed": [
+    "53cd88b54bb173e52f121ec206f3b9ac9a88df44",
+    "bf6f6f7fd35f100e2769d9a4430fb7746e971e63",
+    "75505ebc9bc19eb597772c42ba2c4813ad6b0ac5",
+    "6e787b8feba64286e6faf25069868723e765e9c4"
+  ],
+  "validator": "PASS",
+  "tests": "8/8 PASS",
+  "needs": 12,
+  "vectors": 12,
+  "generated_cells": 144,
+  "claim_allowed": false,
+  "repository_checkout_execution": "TOKEN_VAZIO_NOT_EXECUTED_BY_CONNECTOR",
+  "remote_ci": "TOKEN_VAZIO_NOT_OBSERVED",
+  "independent_review": "TOKEN_VAZIO",
+  "F_ok": "equivalent generated source passed standard-library validator and eight adversarial tests locally",
+  "F_gap": "checkout-real receipt, remote CI, domain evidence and independent review",
+  "F_next": "execute commands from tools/orchestrator_omega/README.md on a real checkout and append its hashes and exit codes"
+}
