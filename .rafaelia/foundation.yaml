@@ -1,0 +1,64 @@
+{
+  "governance": {
+    "claim_allowed": false,
+    "destructive_operations": false,
+    "network_required": false,
+    "remote_ci_substituted": false,
+    "token_vazio_is_valid": true
+  },
+  "inputs": {
+    "required_paths": [
+      "README.md",
+      "raf_compile.h",
+      "raf_main.c",
+      "raf_frontend.c",
+      "raf_cpu.c",
+      "raf_asm_emit.c",
+      "raf_precomp.c",
+      "scripts/validate_runtime_truth_local.sh",
+      "scripts/rafpolimata_foundation_compiler_gate.py"
+    ],
+    "source": "raf_main.c"
+  },
+  "profiles": {
+    "compiler-local-gate": {
+      "commands": [
+        [
+          "python3",
+          "scripts/rafpolimata_foundation_compiler_gate.py",
+          "--out",
+          "{{OUT}}/test-summary.json"
+        ]
+      ],
+      "description": "Execute RafPolimata's tracked nine-block compiler gate and emit explicit test accounting.",
+      "mode": "COMMANDS",
+      "required_paths": [
+        "scripts/validate_runtime_truth_local.sh",
+        "scripts/rafpolimata_foundation_compiler_gate.py"
+      ],
+      "requires_source": true
+    },
+    "documentation": {
+      "commands": [],
+      "description": "Validate RafPolimata's declared document boundary without executing a build.",
+      "mode": "DOCUMENTATION",
+      "required_paths": [
+        "README.md"
+      ],
+      "requires_source": false
+    }
+  },
+  "project": {
+    "adapter": "rafpolimata-compiler-gate/v1",
+    "id": "rafpolimata-local",
+    "kind": "rafpolimata-compiler-gate",
+    "repository": "rafaelmeloreisnovo/RafPolimata"
+  },
+  "runtime": {
+    "append_only_receipts": true,
+    "class": "ANDROID_TERMUX_LOCAL",
+    "output_directory": "COMPILA"
+  },
+  "schema": "rafaelia.foundation.manifest/v1",
+  "version": "1.0.0"
+}
