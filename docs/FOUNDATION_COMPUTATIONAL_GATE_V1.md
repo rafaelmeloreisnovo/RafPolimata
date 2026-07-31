@@ -1,7 +1,7 @@
 # RafPolimata — Foundation computational gate V1
 
 **Estado:** `IMPLEMENTED_TARGET_ADAPTER_PENDING_TERMUX_RECEIPT`  
-**Origem da Foundation:** `rafaelmeloreisnovo/Mapa`, PR #102, head `fe82981077d0d8eff52c3d676353ef318dc716f6`  
+**Origem da Foundation:** `rafaelmeloreisnovo/Mapa`, PR #102, head `d713d884c7174d37aceb642f80149e037426686e`  
 **Executor:** checkout RafPolimata + Termux local  
 **Claim permitido:** `false`
 
