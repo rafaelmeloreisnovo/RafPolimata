@@ -1,0 +1,86 @@
+{
+  "schema": "rafaelia.repository-role-adapter/v1",
+  "schema_version": "1.0.0",
+  "status": "DECLARATION_ONLY",
+  "policy": {
+    "append_only": true,
+    "destructive_writes": false,
+    "automatic_promotion": false,
+    "claim_allowed": false
+  },
+  "federated_control_plane": {
+    "repository": "rafaelmeloreisnovo/Mapa",
+    "authority_matrix": {
+      "path": "governance/AUTHORITY_MATRIX_V1.yaml",
+      "ref": "b2a5d10fb3f386a69b26029cbc6d4355dc7ce0ed"
+    },
+    "role_contract": {
+      "path": "contracts/vertical_slice_v1_repository_adapters.json",
+      "ref": "b2a5d10fb3f386a69b26029cbc6d4355dc7ce0ed"
+    }
+  },
+  "data_boundary": {
+    "raw_private_content": "FORBIDDEN",
+    "credentials_and_secrets": "FORBIDDEN",
+    "permitted_inputs": [
+      "descriptor-only records",
+      "immutable source references",
+      "hashes and checksums",
+      "bounded metadata",
+      "explicitly authorized test inputs"
+    ],
+    "deletion_move_share_or_publication": "NOT_AUTHORIZED_BY_THIS_ADAPTER"
+  },
+  "evidence_envelope": {
+    "required_for_any_result": [
+      "source locator",
+      "immutable version",
+      "method or command",
+      "environment when executed",
+      "output artifact or explicit absence",
+      "checksum when bytes exist",
+      "failure mode",
+      "next verifiable step"
+    ],
+    "invariant": "SOURCE != IMPLEMENTATION != EXECUTION != EVIDENCE != CLAIM"
+  },
+  "claim_policy": {
+    "claim_allowed": false,
+    "no_automatic_promotion": true,
+    "missing_evidence_state": "TOKEN_VAZIO",
+    "ci_or_merge_is_not_execution_proof": true
+  },
+  "adapter_id": "adapter:rafpolimata-evidence-lab-v1",
+  "repository": {
+    "full_name": "rafaelmeloreisnovo/RafPolimata",
+    "default_branch": "main",
+    "observed_base_commit": "e76b68f2b8d0b71e09a86b167700594fcfad4a65"
+  },
+  "role": "DETERMINISTIC_EVIDENCE_LAB",
+  "input_contract": [
+    "source descriptors and immutable references",
+    "bounded claims",
+    "falsifiers",
+    "test protocol"
+  ],
+  "output_contract": [
+    "tests",
+    "metrics",
+    "errata",
+    "parseable receipts"
+  ],
+  "authority_boundary": {
+    "may_authorize": [
+      "test_result",
+      "metric",
+      "receipt",
+      "errata"
+    ],
+    "may_not_authorize": [
+      "physical_device_success_without_device_receipt",
+      "scientific_validity",
+      "publication_readiness"
+    ]
+  },
+  "next_verifiable_step": "Run the bounded host validators for C02/C03 on the pinned commit and emit receipts with command, environment, output hashes, exit code, and unresolved gaps."
+}
