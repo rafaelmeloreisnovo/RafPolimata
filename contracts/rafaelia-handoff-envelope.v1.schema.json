@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafaelia.local/contracts/rafaelia-handoff-envelope.v1.schema.json",
+  "title": "RAFAELIA Handoff Envelope V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","artifact_id","producer","source_commit","artifact","hashes","target","dependencies","limits","rollback","claim_allowed","epistemic_state"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "artifact_id": {"type": "string", "minLength": 8, "maxLength": 160, "pattern": "^[A-Za-z0-9._:-]+$"},
+    "producer": {"type": "string", "minLength": 3},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path","format","size_bytes"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "format": {"enum": ["ELF32","ELF64","APK","DEX","ZIP","JSON","OTHER"]},
+        "size_bytes": {"type": "integer", "minimum": 0}
+      }
+    },
+    "hashes": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sha256"],
+      "properties": {
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "blake3": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "git_blob_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["runtime","abi"],
+      "properties": {
+        "runtime": {"enum": ["Vectras-VM-Android","Termux","Linux","Android"]},
+        "abi": {"enum": ["armeabi-v7a","arm64-v8a","x86","x86_64","any"]}
+      }
+    },
+    "dependencies": {"type": "array", "items": {"type": "object", "required": ["name","version","provenance"], "additionalProperties": false, "properties": {"name":{"type":"string"},"version":{"type":"string"},"provenance":{"type":"string"}}}},
+    "limits": {"type": "object", "required": ["timeout_seconds","memory_mb","network_allowed"], "additionalProperties": false, "properties": {"timeout_seconds":{"type":"integer","minimum":1,"maximum":3600},"memory_mb":{"type":"integer","minimum":16,"maximum":65536},"network_allowed":{"const":false}}},
+    "rollback": {"type": "object", "required": ["strategy","previous_artifact_sha256"], "additionalProperties": false, "properties": {"strategy":{"enum":["restore_previous_verified","abort_only"]},"previous_artifact_sha256":{"type":"string","pattern":"^([0-9a-f]{64}|TOKEN_VAZIO)$"}}},
+    "claim_allowed": {"const": false},
+    "epistemic_state": {"enum": ["PROVADO","EVIDENCIADO","HIPÓTESE","MODELO_ANALÓGICO","PARÁBOLA","REFUTADO","TOKEN_VAZIO"]}
+  }
+}
