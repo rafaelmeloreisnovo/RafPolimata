@@ -34,6 +34,7 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 | Documento | Função |
 |---|---|
 | [ARQUITETURA_21_NIVEIS.md](ARQUITETURA_21_NIVEIS.md) | arquitetura semântica em 21 níveis |
+| [RAFAELIA_MULTIFILAMENT_EXECUTION_CONTRACT_V1.md](RAFAELIA_MULTIFILAMENT_EXECUTION_CONTRACT_V1.md) | contrato produtor RafPolimata → Vectras, com proveniência, handoff, rollback, fail-safe e watchdog |
 | [LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md](LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md) | matriz multilíngue, operadores e promoção 0,1 por evidência |
 | [LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01_ERRATA_V1_1.md](LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01_ERRATA_V1_1.md) | corrige a escada universal: teto 0,5 e perfis próprios acima dele |
 | [LINGUAGEM/COERENCIA_COMMIT_FRACTAL_OMEGA.md](LINGUAGEM/COERENCIA_COMMIT_FRACTAL_OMEGA.md) | commits, fixture SHA-256, sete direções e fechamento Ω |
