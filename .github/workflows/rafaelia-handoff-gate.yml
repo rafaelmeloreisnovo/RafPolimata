@@ -1,0 +1,41 @@
+name: RAFAELIA Handoff Gate
+on:
+  push:
+    paths:
+      - 'contracts/rafaelia-handoff-envelope.v1.schema.json'
+      - 'scripts/validate_rafaelia_handoff.py'
+      - 'tests/test_validate_rafaelia_handoff.py'
+      - '.github/workflows/rafaelia-handoff-gate.yml'
+  pull_request:
+    paths:
+      - 'contracts/rafaelia-handoff-envelope.v1.schema.json'
+      - 'scripts/validate_rafaelia_handoff.py'
+      - 'tests/test_validate_rafaelia_handoff.py'
+      - '.github/workflows/rafaelia-handoff-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile validator
+        run: python -m py_compile scripts/validate_rafaelia_handoff.py tests/test_validate_rafaelia_handoff.py
+      - name: Run adversarial tests
+        run: python -m unittest -v tests.test_validate_rafaelia_handoff
+      - name: Preserve bounded receipt
+        if: always()
+        run: |
+          mkdir -p results/rafaelia-handoff
+          printf '{"workflow":"rafaelia-handoff-gate","claim_allowed":false,"commit":"%s","run_id":"%s"}\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" > results/rafaelia-handoff/receipt.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rafaelia-handoff-receipt
+          path: results/rafaelia-handoff/receipt.json
+          retention-days: 14
