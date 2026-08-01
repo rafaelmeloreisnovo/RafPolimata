@@ -1,0 +1,53 @@
+{
+  "receipt_version": 1,
+  "event_id": "BITRAF-MATRIX-8000-4096-V1-LOCAL-20260801",
+  "timestamp_date": "2026-08-01",
+  "environment": {
+    "architecture": "x86_64",
+    "clang": "clang 17.0.0 (swiftlang llvm-project 10999b6d034fe318f3d56c83bddb6572593a8bb0)",
+    "gcc": "gcc 14.2.0",
+    "python": "3.13.5"
+  },
+  "commands": [
+    "python3 -m unittest tests/test_bitraf_matrix.py -v",
+    "clang -std=c11 -O2 -Wall -Wextra -Werror tests/bitraf_matrix_test.c -o /tmp/bitraf-clang",
+    "gcc -std=c11 -O2 -Wall -Wextra -Werror tests/bitraf_matrix_test.c -o /tmp/bitraf-gcc",
+    "python3 scripts/bitraf_matrix_manifest.py --out /tmp/bitraf_manifest --csv core"
+  ],
+  "results": {
+    "python_tests": "4/4 PASS",
+    "state_roundtrip": "8000/8000 PASS",
+    "core_roundtrip": "4096/4096 PASS",
+    "shell_partition": "3904 PASS",
+    "base20_bijection": "8000/8000 PASS",
+    "opposite_involution": "PASS",
+    "rotation_order_4": "PASS",
+    "bounded_b3_embedding": "PASS",
+    "clang_gcc_stdout_identical": true,
+    "prime_indices_0_7999": 1007,
+    "max_norm2_q32": 2378956800
+  },
+  "hashes_sha256": {
+    "rafaelia/bitraf_matrix.h": "47e4237fd272aaf1e0bb96f28dcc138bf866d471c79ab8269d3d1f0da3965714",
+    "tests/bitraf_matrix_test.c": "2a4a43847d92ec21e16b534464d4819348b44e3cafc6415215e0bac4822423a8",
+    "tests/test_bitraf_matrix.py": "c0c7199969c8dc4953f1915f4762dd88b248f8ab02248ba40d8d1c0e53ddb380",
+    "scripts/bitraf_matrix_manifest.py": "04ccd58a252d3cf921e748f8d42c094f9eb6dc35a3adac2e7116aa6e66718b64",
+    "data/encoding_timeline.v1.json": "b0fb03c335fe023ee360555e3924da9ea334986594135672b3c597598f6d155c",
+    "docs/BITRAF_MATRIX_8000_4096_V1.md": "66e9423451171c7c775b1f1ff3bd804e04df46d60859ac74bf0771ebe262e4f6",
+    "generated_manifest.json": "ec17d2043fcf4c924f84204bb14a21cda5f2e760143581df0bf2420a79fd907e",
+    "clang_binary": "0f1f155c79431abf205147fbb2f5af9c82fe169ef33a1ab41ec7bd7df994285a",
+    "gcc_binary": "80c9aebb64ab5821b6fb4e0aa0894ca6712a125c35473ce0b61ca8c636f6715e",
+    "stdout": "e2c6b82b309d5403735820b35cdd90e0b3a8c567487e18130620cd12ed8800ff"
+  },
+  "epistemic_state": {
+    "computational_model": "LOCAL_PASS",
+    "historical_registry": "PRIMARY_SOURCE_ANCHORED_WITH_EXPLICIT_GAPS",
+    "physical_claim": "NOT_CLAIMED",
+    "claim_allowed": false
+  },
+  "r3": {
+    "F_ok": "Exact 20^3 carrier, reversible 2^12 core, typed relations and deterministic outputs.",
+    "F_gap": "ARMv7/AArch64 physical Termux execution and semantic calibration remain pending.",
+    "F_next": "Run the same receipt on Android ARM and connect the carrier to the existing AllStar Matrix through a non-destructive adapter."
+  }
+}
