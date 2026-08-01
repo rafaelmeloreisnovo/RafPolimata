@@ -1,0 +1,25 @@
+{
+  "schema": "rafaelia.local-receipt/v1",
+  "event_id": "RAFPOLIMATA-LIVING-BOOK-DOMAIN-IR-V1-20260801",
+  "environment": "CONTAINER_REFERENCE",
+  "source_scope": "LOCALLY_GENERATED_EQUIVALENT_SOURCE",
+  "branch_refetch_execution": "TOKEN_VAZIO_NOT_EXECUTED",
+  "tests": "8/8 PASS",
+  "python_compile": "PASS",
+  "covered_invariants": [
+    "execution action rejected",
+    "cell digest tamper rejected",
+    "raw private text rejected",
+    "AI approval rejected",
+    "technical prerequisite rejected",
+    "seed summary not copied to IR",
+    "forbidden capabilities explicit",
+    "IR digest internally consistent"
+  ],
+  "claim_allowed": false,
+  "execution_allowed": false,
+  "publication_allowed": false,
+  "F_ok": "bounded non-executable IR compiler and adversarial tests on equivalent local source",
+  "F_gap": "exact branch refetch test, real Termux checkout receipt and independent review",
+  "F_next": "review branch files, then transport only the compiled IR digest through RafGitTools"
+}
