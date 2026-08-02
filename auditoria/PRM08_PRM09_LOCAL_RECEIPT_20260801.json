@@ -1,0 +1,53 @@
+{
+  "environment": {
+    "external_dependencies": 0,
+    "platform": "Linux x86_64",
+    "python": "3.13.5",
+    "type": "OpenAI container"
+  },
+  "hashes_sha256": {
+    ".github/workflows/prm08-prm09-gate.yml": "4fad27cb258dfa73aed209e8d7c33e0310def8d03611b91d0b26475d54429b50",
+    "auditoria/PRM08_TRIANGLE_MMS_CANONICAL_20260801.json": "8bdfbc9e34881c0f7610b0a8498fa65c1758355449c7b2f07e22a4c215779ff7",
+    "auditoria/PRM09_U1_TRIANGLE_CANONICAL_20260801.json": "38098155512a42f68b3f495049bc6fb942b1f787227fda59624fdac5f873c66c",
+    "docs/math/NAVIER_STOKES_TRIANGLE_MMS_V1.md": "69458f88caf8b92af71bd38b8bddbdf45c93706d0b0c1dac701c211b9d186098",
+    "docs/math/YANG_MILLS_U1_TRIANGLE_V1.md": "eae156b8a328ac820f173f7d2d4e0b82d6974e730fda63df26b3e2d22525edb8",
+    "experiments/navier_stokes_triangle_mms/mms2d.py": "96d12f82286b848610ffdfce0bd4baf923cd4b6212018dc1878a5d4c8f494ac2",
+    "experiments/yang_mills_u1_triangle/u1_triangle.py": "8ee70bb053da05d68c24ed3a1db7eb20ee80fdb3316e684050e9f25937d5571c",
+    "scripts/run_prm08_prm09_gate.sh": "efa653602e0719614233b31eacedde109714d7d31b66142ae2ad4ddf9898bcae",
+    "tests/test_navier_stokes_triangle_mms.py": "5e8a0e6c077e4a4e4b1a5fed131656e08a98fe10131825d90bfb98db8ad6b64c",
+    "tests/test_yang_mills_u1_triangle.py": "0641e3d75ad8c1e43b6d5dec593ff3955281477d33a35c7a1786757767c711d7"
+  },
+  "next_gate": [
+    "run the exact gate on Termux without modifying source files",
+    "build a shared-edge triangular mesh for PRM-08",
+    "build a canonical oriented complex for PRM-09",
+    "measure convergence and refinement rather than extrapolate from one face"
+  ],
+  "observed_at": "2026-08-01T23:00:00-03:00",
+  "results": {
+    "claim_allowed": false,
+    "gate_script_exit_code": 0,
+    "independent_replication": "TOKEN_VAZIO",
+    "physical_termux_execution": "TOKEN_VAZIO",
+    "prm08": {
+      "divergence_gate": "PASS",
+      "momentum_residual_gate": "PASS",
+      "navier_stokes_3d_solution": "NOT_CLAIMED",
+      "solver_convergence": "TOKEN_VAZIO",
+      "triangle_flux_balance_gate": "PASS"
+    },
+    "prm09": {
+      "constant_field_holonomy_gate": "PASS",
+      "continuum_limit": "TOKEN_VAZIO",
+      "gauge_invariance_gate": "PASS",
+      "refinement_gate": "PASS",
+      "unit_modulus_gate": "PASS",
+      "yang_mills_mass_gap": "NOT_CLAIMED"
+    },
+    "unit_tests": {
+      "failed": 0,
+      "passed": 17
+    }
+  },
+  "schema": "raf.prm08-prm09.local-receipt.v1"
+}

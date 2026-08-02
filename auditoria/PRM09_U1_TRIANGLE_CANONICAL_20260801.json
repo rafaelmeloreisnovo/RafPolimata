@@ -1,0 +1,48 @@
+{
+  "boundaries": {
+    "continuum_limit": "TOKEN_VAZIO",
+    "independent_replication": "TOKEN_VAZIO",
+    "mass_gap": "NOT_CLAIMED",
+    "yang_mills_quantum_4d_construction": "NOT_CLAIMED"
+  },
+  "claim_allowed": false,
+  "invariants": {
+    "gauge_holonomy_error": 1.5700924586837752e-16,
+    "max_constant_field_error": 1.1102230246251565e-16,
+    "refinement_holonomy_error": 1.5700924586837752e-16
+  },
+  "reports": {
+    "reversed_orientation": {
+      "expected_holonomy": [0.9393727128473789, -0.34289780745545134],
+      "holonomy": [0.9393727128473789, -0.34289780745545134],
+      "holonomy_error": 0.0,
+      "links": [[1.0, 0.0], [0.9393727128473789, -0.34289780745545134], [1.0, 0.0]],
+      "magnetic_field": 0.7,
+      "signed_area": -0.5,
+      "vertices": [[0.0, 0.0], [0.0, 1.0], [1.0, 0.0]],
+      "wilson_action": 0.06062728715262111
+    },
+    "right_unit": {
+      "expected_holonomy": [0.9393727128473789, 0.34289780745545134],
+      "holonomy": [0.9393727128473789, 0.34289780745545134],
+      "holonomy_error": 0.0,
+      "links": [[1.0, 0.0], [0.9393727128473789, 0.34289780745545134], [1.0, 0.0]],
+      "magnetic_field": 0.7,
+      "signed_area": 0.5,
+      "vertices": [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]],
+      "wilson_action": 0.06062728715262111
+    },
+    "skew": {
+      "expected_holonomy": [0.8141688724958928, 0.580628148696536],
+      "holonomy": [0.8141688724958926, 0.580628148696536],
+      "holonomy_error": 1.1102230246251565e-16,
+      "links": [[0.9992589665398547, -0.038490489600700166], [0.8472551110134161, 0.5311861979208834], [0.995201841970541, 0.09784320997617732]],
+      "magnetic_field": 0.7,
+      "signed_area": 0.885,
+      "vertices": [[-0.2, 0.1], [1.3, -0.1], [0.4, 1.2]],
+      "wilson_action": 0.18583112750410735
+    }
+  },
+  "schema": "raf.prm09.u1-triangle.v1",
+  "scope": "classical 2D U(1) triangular holonomy gate"
+}
