@@ -1,0 +1,62 @@
+{
+  "boundaries": {
+    "independent_replication": "TOKEN_VAZIO",
+    "navier_stokes_3d_regularity_solution": "NOT_CLAIMED",
+    "numerical_solver_convergence": "TOKEN_VAZIO"
+  },
+  "claim_allowed": false,
+  "equation": "(u·grad)u = -grad(p) + nu*laplacian(u) + f",
+  "reports": {
+    "equilateral": {
+      "centroid": [0.5, 0.28867513459481287],
+      "edge_fluxes": [0.0, -0.1584936490538903, 0.1584936490538903],
+      "flux_balance": 0.0,
+      "pressure_at_centroid": 0.7886751345948129,
+      "residual_at_centroid": [-2.7755575615628914e-17, 8.326672684688674e-17],
+      "signed_area": 0.4330127018922193,
+      "velocity_at_centroid": [-0.038675134594812866, -0.20534180126147955],
+      "vertices": [[0.0, 0.0], [1.0, 0.0], [0.5, 0.8660254037844386]],
+      "viscosity": 0.1
+    },
+    "isosceles_10_85_85": {
+      "centroid": [0.0, 0.3320648993639152],
+      "edge_fluxes": [0.0, 0.0, 0.0],
+      "flux_balance": 0.0,
+      "pressure_at_centroid": 0.3320648993639152,
+      "residual_at_centroid": [-0.0, 0.0],
+      "signed_area": 0.08682408883346517,
+      "velocity_at_centroid": [0.0, 0.11026709738956712],
+      "vertices": [[-0.08715574274765817, 0.0], [0.08715574274765817, 0.0], [0.0, 0.9961946980917455]],
+      "viscosity": 0.1
+    },
+    "right_30_60_90": {
+      "centroid": [0.5773502691896257, 0.3333333333333333],
+      "edge_fluxes": [0.0, 0.0, 0.0],
+      "flux_balance": 0.0,
+      "pressure_at_centroid": 0.910683602522959,
+      "residual_at_centroid": [-1.1102230246251565e-16, 2.7755575615628914e-17],
+      "signed_area": 0.8660254037844386,
+      "velocity_at_centroid": [-0.051566846126417154, -0.27378906834863936],
+      "vertices": [[0.0, 0.0], [1.7320508075688772, 0.0], [0.0, 1.0]],
+      "viscosity": 0.1
+    },
+    "right_45_45_90": {
+      "centroid": [0.3333333333333333, 0.3333333333333333],
+      "edge_fluxes": [0.0, 0.0, 0.0],
+      "flux_balance": 0.0,
+      "pressure_at_centroid": 0.6666666666666666,
+      "residual_at_centroid": [1.1102230246251565e-16, 1.1102230246251565e-16],
+      "signed_area": 0.5,
+      "velocity_at_centroid": [-0.1111111111111111, -0.1111111111111111],
+      "vertices": [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]],
+      "viscosity": 0.1
+    }
+  },
+  "schema": "raf.prm08.triangle-mms.v1",
+  "scope": "2D manufactured incompressible triangular conservation gate",
+  "summary": {
+    "max_flux_balance_error": 0.0,
+    "max_momentum_residual": 1.1102230246251565e-16,
+    "triangle_families": 4
+  }
+}
