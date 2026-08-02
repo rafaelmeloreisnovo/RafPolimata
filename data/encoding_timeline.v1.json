@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-01",
+  "scope": "Primary-source anchors for major telegraph, ASCII, EBCDIC and Unicode encoding families; extensible registry, not an exhaustive list of every code page.",
+  "latest_checked_at": "2026-08-01",
+  "encodings": [
+    {
+      "id": "ITA2",
+      "family": "telegraph",
+      "code_unit_bits": 5,
+      "cardinality": 32,
+      "first_anchor": {"label": "International Telegraph Alphabet No. 2", "date": null},
+      "latest_anchor": {"label": "ITU-T S.1 (03/1993)", "date": "1993-03", "status": "in_force"},
+      "epistemic_state": "TOKEN_VAZIO_FIRST_EDITION",
+      "sources": ["https://www.itu.int/rec/T-REC-S.1/en"]
+    },
+    {
+      "id": "ASCII",
+      "family": "7-bit character set",
+      "code_unit_bits": 7,
+      "cardinality": 128,
+      "first_anchor": {"label": "ASCII 63 / USASCII 63", "date": "1963"},
+      "latest_anchor": {"label": "USAS X3.4-1968 network anchor via RFC 20", "date": "1968"},
+      "epistemic_state": "VERIFIED_PRIMARY_SOURCE",
+      "sources": ["https://www.rfc-editor.org/info/rfc0020"]
+    },
+    {
+      "id": "ECMA-6",
+      "family": "7-bit coded character set",
+      "code_unit_bits": 7,
+      "cardinality": 128,
+      "first_anchor": {"label": "ECMA-6 first edition", "date": null},
+      "latest_anchor": {"label": "ECMA-6 6th edition", "date": "1991-12"},
+      "epistemic_state": "TOKEN_VAZIO_FIRST_EDITION",
+      "sources": ["https://ecma-international.org/publications-and-standards/standards/ecma-6/"]
+    },
+    {
+      "id": "EBCDIC-037",
+      "family": "IBM EBCDIC code pages",
+      "code_unit_bits": 8,
+      "cardinality": 256,
+      "first_anchor": {"label": "EBCDIC family", "date": null},
+      "latest_anchor": {"label": "IBM code page 037 documentation in current z/OS family", "date": "2026"},
+      "epistemic_state": "FAMILY_NO_SINGLE_LATEST_VERSION",
+      "sources": ["https://www.ibm.com/docs/en/zos/3.2.0?topic=sequences-ebcdic"]
+    },
+    {
+      "id": "UNICODE",
+      "family": "universal coded character set",
+      "code_unit_bits": null,
+      "cardinality": 159801,
+      "first_anchor": {"label": "Unicode 1.0.0", "date": "1991-10"},
+      "latest_anchor": {"label": "Unicode 17.0.0", "date": "2025-09-09", "status": "latest_published_as_checked"},
+      "epistemic_state": "VERIFIED_PRIMARY_SOURCE",
+      "sources": [
+        "https://www.unicode.org/history/publicationdates.html",
+        "https://www.unicode.org/versions/Unicode17.0.0/"
+      ]
+    },
+    {
+      "id": "UTF-8",
+      "family": "Unicode encoding form",
+      "code_unit_bits": 8,
+      "cardinality": 1112064,
+      "first_anchor": {"label": "FSS-UTF / UTF-2 ancestry", "date": null},
+      "latest_anchor": {"label": "RFC 3629 / STD 63", "date": "2003-11", "status": "internet_standard"},
+      "epistemic_state": "TOKEN_VAZIO_FIRST_EDITION",
+      "sources": ["https://www.rfc-editor.org/info/rfc3629/"]
+    },
+    {
+      "id": "UTF-16",
+      "family": "Unicode encoding form",
+      "code_unit_bits": 16,
+      "cardinality": 1112064,
+      "first_anchor": {"label": "RFC 2781", "date": "2000-02"},
+      "latest_anchor": {"label": "Unicode 17.0 definition", "date": "2025-09-09"},
+      "epistemic_state": "VERIFIED_PRIMARY_SOURCE",
+      "sources": [
+        "https://www.rfc-editor.org/info/rfc2781/",
+        "https://www.unicode.org/versions/Unicode17.0.0/core-spec/chapter-3/"
+      ]
+    },
+    {
+      "id": "UTF-32",
+      "family": "Unicode encoding form",
+      "code_unit_bits": 32,
+      "cardinality": 1112064,
+      "first_anchor": {"label": "Unicode 3.1 integration", "date": "2001-03"},
+      "latest_anchor": {"label": "Unicode 17.0 definition", "date": "2025-09-09"},
+      "epistemic_state": "VERIFIED_PRIMARY_SOURCE",
+      "sources": [
+        "https://www.unicode.org/reports/tr27/",
+        "https://www.unicode.org/versions/Unicode17.0.0/core-spec/chapter-3/"
+      ]
+    }
+  ],
+  "invariants": [
+    "character_set_is_not_encoding_form",
+    "code_point_is_not_glyph",
+    "historical_anchor_is_not_a_claim_of_exhaustive_version_history",
+    "unknown_first_or_latest_version_is_preserved_as_TOKEN_VAZIO",
+    "ASCII_subset_identity_is_preserved_in_UTF_8_for_U_0000_to_U_007F"
+  ]
+}
