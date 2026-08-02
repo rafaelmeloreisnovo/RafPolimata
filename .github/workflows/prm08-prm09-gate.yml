@@ -1,0 +1,35 @@
+name: PRM-08 PRM-09 focused gate
+
+on:
+  push:
+    branches:
+      - "research/prm08-prm09-triangular-models-v1-20260801"
+  pull_request:
+    paths:
+      - "experiments/navier_stokes_triangle_mms/**"
+      - "experiments/yang_mills_u1_triangle/**"
+      - "tests/test_navier_stokes_triangle_mms.py"
+      - "tests/test_yang_mills_u1_triangle.py"
+      - "scripts/run_prm08_prm09_gate.sh"
+      - ".github/workflows/prm08-prm09-gate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  focused-math-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run standard-library-only gate
+        run: sh scripts/run_prm08_prm09_gate.sh
+
+      - name: Upload runtime receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prm08-prm09-receipt-${{ github.run_id }}
+          path: build/prm08_prm09/
+          if-no-files-found: error
