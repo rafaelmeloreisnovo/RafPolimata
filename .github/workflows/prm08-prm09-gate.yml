@@ -20,6 +20,11 @@ jobs:
   focused-math-gate:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      RAF_EXECUTOR_LAYER: L3
+      RAF_ENVIRONMENT_IDENTITY: github-actions/ubuntu-latest
+      RAF_SOURCE_COMMIT: ${{ github.sha }}
+      RAF_RUN_OR_RECEIPT_ID: github-actions-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v4
 
