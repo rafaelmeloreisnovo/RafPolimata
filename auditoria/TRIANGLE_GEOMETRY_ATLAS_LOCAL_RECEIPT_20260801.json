@@ -1,0 +1,18 @@
+{
+  "schema": "raf.local-receipt.v1",
+  "event_id": "TRIANGLE-GEOMETRY-ATLAS-V1-20260801",
+  "environment": "OpenAI container; not Android/Termux physical runtime",
+  "tests": {"framework": "unittest", "passed": 10, "failed": 0},
+  "reference_output": "generated locally from experiments/triangle_geometry_atlas/triangle_atlas.py",
+  "hashes": {
+    "triangle_atlas_py_sha256": "4099fdc689cdb3279438b269ec3b76f8673d2aebf31eee4047fdb36f3f69ab25",
+    "test_triangle_geometry_atlas_py_sha256": "e63ca257511d56a0dfcb81f3c63256b0f271404095175148a221e4bb4e1f888d",
+    "reference_json_sha256": "abfc8191113e7e490cf84e0207d14473f5525f53c329745462ca32db48d8c77e"
+  },
+  "claim_allowed": false,
+  "navier_stokes_solution": "NOT_CLAIMED",
+  "yang_mills_mass_gap": "NOT_CLAIMED",
+  "f_ok": "Euclidean triangle identities and deterministic atlas validated locally",
+  "f_gap": "No mesh PDE solver, lattice gauge solver, convergence proof, physical Termux runtime, or independent replication",
+  "f_next": "Implement numerical baselines on frozen meshes and produce independent receipts"
+}
