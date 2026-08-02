@@ -1,0 +1,30 @@
+{
+  "schema": "raf.peer-review-math-7d-receipt.v1",
+  "timestamp": "2026-08-01T22:33:00-03:00",
+  "environment": "OpenAI container",
+  "subject": "peer-review mathematical 7-direction validator",
+  "results": {
+    "manifest_validation": "PASS",
+    "unit_tests": {
+      "passed": 11,
+      "failed": 0
+    },
+    "packages": 12,
+    "directions": 7,
+    "gates": 8,
+    "claim_allowed": false
+  },
+  "hashes_sha256": {
+    "peer_review_math_7d_matrix.v1.json": "26495ba1e7e0b692e2b2d98c2da97834c6e74289158eccc42986b3a810765ce7",
+    "validate_peer_review_math_7d.py": "e13f427a98ec89e2d7bf90994f266b41d19e7dd4a04bcabf6737d6be9f17f40a",
+    "test_peer_review_math_7d.py": "187c2032af2df27bcb9bb74125be4c59e2db537c50c2245db55ae95e484e0921",
+    "PROTOCOLO_7_DIRECOES_PROGRAMAS_MATEMATICOS_V1.md": "d0164a3883d66d00a5982d491a40c24c5846a0599a6f630f380e17d48c323aa2",
+    "PEER_REVIEW_MATH_7D_EXECUTION_MAP_V1.md": "2d6da713684e8baef62875ef1dc957b2e9eaf1e59223c46f41735ca459b2843f"
+  },
+  "boundaries": {
+    "physical_termux_execution": "TOKEN_VAZIO",
+    "independent_replication": "TOKEN_VAZIO",
+    "github_actions_observed": "TOKEN_VAZIO_PENDING_COMMIT",
+    "publication_ready": false
+  }
+}
