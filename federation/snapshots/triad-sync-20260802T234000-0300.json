@@ -1,0 +1,96 @@
+{
+  "schema": "rafaelia.repository-triad-sync.v1",
+  "version": "1.0.0",
+  "sync_id": "triad-sync-20260802T234000-0300",
+  "generated_at": "2026-08-02T23:40:00-03:00",
+  "mode": "declarative_snapshot",
+  "claim_allowed": false,
+  "repositories": [
+    {
+      "full_name": "rafaelmeloreisnovo/RafGitTools",
+      "role": "control_plane",
+      "base_branch": "main",
+      "observed_head": "c3c74595c391010d0c0c6173b4579641a072a5a2",
+      "state": "OBSERVED",
+      "relation": "AUTHORIZES_ROUTES_AND_REGISTERS"
+    },
+    {
+      "full_name": "rafaelmeloreisnovo/RafPolimata",
+      "role": "semantic_governance_and_evidence",
+      "base_branch": "main",
+      "observed_head": "e73c18cd7e40673523fccc26f293ddfb717e6ea2",
+      "state": "OBSERVED",
+      "relation": "VALIDATES_AND_COMPILES_EVIDENCE"
+    },
+    {
+      "full_name": "rafaelmeloreisnovo/Mapa",
+      "role": "ecosystem_navigation_and_index",
+      "base_branch": "main",
+      "observed_head": "4c949a1a12ff9a878f5cb11065a97a2a1e8f9b50",
+      "state": "OBSERVED",
+      "relation": "INDEXES_AND_EXPLAINS_ROUTES"
+    }
+  ],
+  "canonical_references": [
+    {
+      "repository": "rafaelmeloreisnovo/RafGitTools",
+      "path": "configs/rafaelia-federation.json",
+      "commit": "c3c74595c391010d0c0c6173b4579641a072a5a2",
+      "relation": "CONTROL_PLANE_SOURCE_OF_TRUTH"
+    },
+    {
+      "repository": "rafaelmeloreisnovo/RafGitTools",
+      "path": "docs/excelencia_operacional/CONTRATO_RAFGITTOOLS_RAFPOLIMATA.md",
+      "commit": "c3c74595c391010d0c0c6173b4579641a072a5a2",
+      "relation": "CROSS_REPOSITORY_RESPONSIBILITY_CONTRACT"
+    },
+    {
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "path": "configs/repository-tracker.v1.json",
+      "commit": "e73c18cd7e40673523fccc26f293ddfb717e6ea2",
+      "relation": "TRACKING_ORDER_AND_SCOPE"
+    },
+    {
+      "repository": "rafaelmeloreisnovo/Mapa",
+      "path": "docs/federation/RAFAELIA_FEDERATED_MAP_V1.md",
+      "commit": "4c949a1a12ff9a878f5cb11065a97a2a1e8f9b50",
+      "relation": "HUMAN_NAVIGATION_PROJECTION"
+    }
+  ],
+  "invariants": [
+    "repository_local_truth_is_not_overwritten",
+    "same_sync_id_and_payload_across_all_three_repositories",
+    "observed_heads_are_evidence_anchors_not_forced_merge_targets",
+    "private_payloads_are_not_mirrored",
+    "missing_runtime_evidence_is_TOKEN_VAZIO",
+    "merge_requires_repository_local_gates",
+    "rollback_is_repository_local_and_reversible"
+  ],
+  "validation": {
+    "canonical_preimage_sha256": "4ef45dbab9ec2d19d67299d05bc3ae9a6baeb2ce2c18bc54f717a266a16f7b61",
+    "hash_scope": "canonical JSON with validation.canonical_preimage_sha256 set to TOKEN_VAZIO",
+    "cross_repository_payload_equality": "EXPECTED_AFTER_THREE_PRS",
+    "repository_local_ci": "TOKEN_VAZIO",
+    "runtime_execution": "TOKEN_VAZIO",
+    "independent_replication": "TOKEN_VAZIO"
+  },
+  "R3": {
+    "F_ok": [
+      "three_repository_roles_resolved",
+      "exact_main_heads_captured",
+      "existing_control_plane_tracker_and_map_reused",
+      "non_destructive_draft_pr_strategy_selected"
+    ],
+    "F_gap": [
+      "repository_local_ci_not_yet_observed_for_sync_branches",
+      "payload_equality_not_yet_verified_after_merge",
+      "runtime_behavior_not_changed_or_tested"
+    ],
+    "F_next": [
+      "open_one_draft_pr_per_repository_with_identical_payload",
+      "cross_link_sibling_pull_requests",
+      "merge_only_after_local_review_and_gate_results",
+      "verify_same_payload_sha256_on_merged_main_branches"
+    ]
+  }
+}
