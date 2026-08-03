@@ -1,0 +1,8 @@
+{
+  "state": "PASS_LIMITED",
+  "errors": [],
+  "claim_allowed": false,
+  "generated_at": "2026-08-03T04:10:00-03:00",
+  "script_sha256": "b727a71ecb4b32435fdd77d15b1f86804c172e6f3f17af05459bb23c2029428a",
+  "contract_sha256": "cd3c2b79e0251fb9b3a69344d09912cdd5cfe239ab6270405622ed44119f1e22"
+}

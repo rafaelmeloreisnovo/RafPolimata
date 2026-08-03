@@ -1,0 +1,28 @@
+{
+  "schema": "RAFAELIA_T7_EVIDENCE_GATE/v1",
+  "product_id": "T7-P03",
+  "owner_repository": "rafaelmeloreisnovo/RafPolimata",
+  "generated_at": "2026-08-03T04:10:00-03:00",
+  "claim_allowed": false,
+  "required_fields": ["artifact_id","source_locator","source_revision","method","environment","result_state","evidence_sha256"],
+  "allowed_states": ["PASS_LIMITED","FAIL","BLOCKED","TOKEN_VAZIO","REFUTADO"],
+  "benchmark_required_when_claimed": ["baseline","sample_count","warmup","p50","p95","p99","raw_log_sha256"],
+  "identity_rule": "same_title_or_embedding_never_implies_same_artifact",
+  "gates": ["O1","O7","O8","O11","O12"],
+  "self_test_cases": [
+    {
+      "name": "valid_limited",
+      "record": {
+        "artifact_id": "a",
+        "source_locator": "repo://x",
+        "source_revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "method": "static",
+        "environment": "python",
+        "result_state": "PASS_LIMITED",
+        "evidence_sha256": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "expect": "PASS"
+    },
+    {"name":"false_pass","record":{"artifact_id":"a","result_state":"PASS"},"expect":"FAIL"}
+  ]
+}
