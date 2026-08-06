@@ -1,0 +1,44 @@
+name: Cognitive operator reference
+
+on:
+  pull_request:
+    paths:
+      - "scripts/cognitive_operator_reference.py"
+      - "tests/test_cognitive_operator_reference.py"
+      - "docs/COGNITIVE_OPERATOR_REFERENCE_V1.md"
+      - "reports/evidence_runs/cognitive_operator_reference_20260806.json"
+      - ".github/workflows/cognitive-operator-reference.yml"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/cognitive_operator_reference.py"
+      - "tests/test_cognitive_operator_reference.py"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile
+        run: |
+          python -m py_compile \
+            scripts/cognitive_operator_reference.py \
+            tests/test_cognitive_operator_reference.py
+      - name: Unit tests
+        run: python -m unittest -v tests/test_cognitive_operator_reference.py
+      - name: Analytic reference report
+        run: |
+          python scripts/cognitive_operator_reference.py \
+            --output build/cognitive-operator-reference/report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cognitive-operator-reference-report
+          path: build/cognitive-operator-reference/report.json
+          if-no-files-found: error
