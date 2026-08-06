@@ -1,0 +1,40 @@
+{
+  "schema": "raf.cognitive-operators-local-receipt.v1",
+  "timestamp": "2026-08-06T10:43:00-03:00",
+  "environment": "OpenAI container; not Android/Termux physical runtime",
+  "subject": "RAFAELIA cognitive operators 71-126 runtime index and fail-closed validator",
+  "source_heads": {
+    "Mapa": "c3d99c423b01e57e1949578c67f0ba547dbba1b9",
+    "RafPolimata_before_receipt": "95edb1210f6a87ffa24dadeab625c751f61fce77"
+  },
+  "results": {
+    "manifest_validation": "PASS",
+    "operator_count": 56,
+    "first_id": 71,
+    "last_id": 126,
+    "unit_tests": {"passed": 5, "failed": 0},
+    "class_counts": {
+      "ADAPTED_STANDARD": 25,
+      "MODEL_ANALOGY": 20,
+      "CORRECTED_STANDARD": 4,
+      "FORMAL_SPECIFICATION": 4,
+      "RESEARCH_AGENDA_ONLY": 3
+    }
+  },
+  "hashes_sha256": {
+    "operators.index.v1.json": "b4175f01b7d463bd5db1bd68e33960102c92135f1fd2c76f3be8095e10cb2951",
+    "validate_cognitive_operators_runtime_index.py": "5b8f813843f52c0c1c315ad55d3050fd02a7d6153b6c29c93967684a97d46834",
+    "test_cognitive_operators_runtime_index.py": "3183a735092a1457e7af14c3aead738aee7fa265021f5be97697e903539b2f65"
+  },
+  "boundaries": {
+    "bibliographic_novelty": "TOKEN_VAZIO",
+    "physical_termux_execution": "TOKEN_VAZIO",
+    "github_actions_remote_gate": "TOKEN_VAZIO_PENDING_PR",
+    "independent_replication": "TOKEN_VAZIO",
+    "publication_ready": false,
+    "claim_allowed": false
+  },
+  "f_ok": "Runtime index continuity, class counts, bindings and fail-closed rules validated locally.",
+  "f_gap": "No physical Android/Termux execution, remote CI result, systematic novelty review or independent replication.",
+  "f_next": "Open draft PRs, save the full editorial manuscript in Drive and execute priority operators individually."
+}
