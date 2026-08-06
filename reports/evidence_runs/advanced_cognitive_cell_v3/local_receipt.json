@@ -1,0 +1,37 @@
+{
+  "receipt_version": "1.0",
+  "artifact_id": "RAFAELIA-ACC-V3-20260806",
+  "observed_at": "2026-08-06T10:16:00-03:00",
+  "canonical_source": {
+    "repository": "rafaelmeloreisnovo/GAIA_phi",
+    "pull_request": 71,
+    "branch": "feat/advanced-cognitive-cell-v3-20260806",
+    "head_sha": "271c2ff4599737a61840d185096ecefd24bdfc78"
+  },
+  "environment": {
+    "python": "3.13.5",
+    "torch": "2.10.0+cpu",
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.41",
+    "machine": "x86_64"
+  },
+  "command": "python tests/test_advanced_cognitive_cell_v3.py",
+  "returncode": 0,
+  "stdout": "ADVANCED_COGNITIVE_CELL_V3_TESTS_PASS",
+  "stderr": "",
+  "source_hashes": {
+    "advanced_cognitive_cell_v3.py": "4f3baae01254e812fbd0d8b17f5f0798ec7709cb8d2bca66854c317ed2f76c0f",
+    "test_advanced_cognitive_cell_v3.py": "b7339b38624462db680bbc31417f961d9dc9cdbacbe144f183d8e89abc887b90",
+    "ADVANCED_COGNITIVE_CELL_V3.md": "ea6b5048c1218f6494175fe8f217a5504afc1a099e9cdb71258151c5bf4fbfe5",
+    "ADVANCED_COGNITIVE_CELL_V3_CLAIMS.json": "627077c7416f79676ce6b35cacbbdf9e2d621fd9324c19df7bcdc6ddc79dbf25"
+  },
+  "gates": {
+    "shape_gradient_finiteness": "PASS",
+    "causal_prefix_isolation": "PASS",
+    "explicit_state_purity": "PASS",
+    "invalid_state_rejection": "PASS",
+    "remote_ci": "TOKEN_VAZIO",
+    "training_benchmark": "TOKEN_VAZIO",
+    "deployment_benchmark": "TOKEN_VAZIO"
+  },
+  "claim_allowed": false
+}
