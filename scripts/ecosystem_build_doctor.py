@@ -139,12 +139,57 @@ class RepoTarget:
     root: Path
 
 
+GENERATED_MARKERS = {
+    "CMakeCache.txt",
+    "build.ninja",
+    ".ninja_log",
+    "compile_commands.json",
+    "Makefile.in",
+}
+
+TOPLEVEL_BUILD_DIRS = {"build", "out", "dist", "target"}
+
+
+def has_generated_markers(dir_path: Path) -> bool:
+    """Check if directory contains markers indicating it's generated output."""
+    try:
+        for item in dir_path.iterdir():
+            if item.name in GENERATED_MARKERS or item.name.startswith(".ninja"):
+                return True
+    except OSError:
+        return False
+    return False
+
+
 def is_excluded(path: Path, root: Path, extra_parts: set[str]) -> bool:
     try:
         rel = path.relative_to(root)
     except ValueError:
         return True
-    return any(part.lower() in extra_parts for part in rel.parts)
+
+    parts = rel.parts
+
+    # Check if any part of the path is a build-like directory with generated markers
+    for i, part in enumerate(parts):
+        part_lower = part.lower()
+        if part_lower in TOPLEVEL_BUILD_DIRS:
+            # Reconstruct the path to this build-like directory
+            build_dir = root
+            for j in range(i + 1):
+                build_dir = build_dir / parts[j]
+            try:
+                if has_generated_markers(build_dir):
+                    return True
+            except OSError:
+                return True
+
+    # Exclude paths where any part is in DEFAULT_EXCLUDE_PARTS (except build-like dirs)
+    for part in parts:
+        part_lower = part.lower()
+        if part_lower in extra_parts and part_lower not in TOPLEVEL_BUILD_DIRS:
+            return True
+
+    return False
 
 
 def relative_posix(path: Path, root: Path) -> str:
@@ -160,12 +205,42 @@ def bounded_text(path: Path, max_bytes: int) -> str | None:
         return None
 
 
-def collect_files(root: Path, max_bytes: int) -> tuple[list[Path], dict[Path, str]]:
+def collect_files(root: Path, max_bytes: int, report_exclusions: bool = False) -> tuple[list[Path], dict[Path, str], list[dict]]:
     files: list[Path] = []
     texts: dict[Path, str] = {}
+    exclusions: list[dict] = []
+
     for path in sorted(root.rglob("*")):
-        if not path.is_file() or is_excluded(path, root, DEFAULT_EXCLUDE_PARTS):
+        if not path.is_file():
             continue
+
+        excluded = is_excluded(path, root, DEFAULT_EXCLUDE_PARTS)
+        if excluded:
+            if report_exclusions:
+                rel = relative_posix(path, root)
+                rel_path = Path(rel)
+                reason = "unknown"
+
+                # Determine exclusion reason
+                if rel_path.parts[0].lower() in TOPLEVEL_BUILD_DIRS:
+                    try:
+                        top_path = root / rel_path.parts[0]
+                        if has_generated_markers(top_path):
+                            reason = f"generated_markers_in_{rel_path.parts[0]}"
+                    except OSError:
+                        reason = "access_error"
+                else:
+                    for part in rel_path.parts:
+                        if part.lower() in DEFAULT_EXCLUDE_PARTS:
+                            reason = f"excluded_path_component_{part}"
+                            break
+
+                exclusions.append({
+                    "path": rel,
+                    "reason": reason,
+                })
+            continue
+
         files.append(path)
         if (
             path.name in BUILD_FILE_NAMES
@@ -176,7 +251,8 @@ def collect_files(root: Path, max_bytes: int) -> tuple[list[Path], dict[Path, st
             text = bounded_text(path, max_bytes)
             if text is not None:
                 texts[path] = text
-    return files, texts
+
+    return files, texts, exclusions
 
 
 def line_number(text: str, offset: int) -> int:
@@ -531,8 +607,8 @@ def analyze_binaries(target: RepoTarget, files: Sequence[Path]) -> list[Finding]
     return findings
 
 
-def analyze_repo(target: RepoTarget, max_bytes: int) -> list[Finding]:
-    files, texts = collect_files(target.root, max_bytes)
+def analyze_repo(target: RepoTarget, max_bytes: int, report_exclusions: bool = False) -> tuple[list[Finding], list[dict]]:
+    files, texts, exclusions = collect_files(target.root, max_bytes, report_exclusions=report_exclusions)
     builds = build_files(texts)
     findings: list[Finding] = []
     for path, text in builds.items():
@@ -542,7 +618,7 @@ def analyze_repo(target: RepoTarget, max_bytes: int) -> list[Finding]:
     findings.extend(analyze_source_markers(target, texts))
     findings.extend(analyze_diagnostics(target, texts))
     findings.extend(analyze_binaries(target, files))
-    return sorted(set(findings), key=Finding.key)
+    return sorted(set(findings), key=Finding.key), exclusions
 
 
 def summarize(findings: Sequence[Finding]) -> dict[str, object]:
@@ -567,15 +643,21 @@ def summarize(findings: Sequence[Finding]) -> dict[str, object]:
     }
 
 
-def build_report(targets: Sequence[RepoTarget], max_bytes: int) -> dict[str, object]:
+def build_report(targets: Sequence[RepoTarget], max_bytes: int, report_exclusions: bool = False) -> dict[str, object]:
     findings: list[Finding] = []
-    repo_records: list[dict[str, str]] = []
+    repo_records: list[dict[str, object]] = []
+    all_exclusions: list[dict] = []
+
     for target in sorted(targets, key=lambda item: item.name):
-        repo_findings = analyze_repo(target, max_bytes)
+        repo_findings, exclusions = analyze_repo(target, max_bytes, report_exclusions=report_exclusions)
         findings.extend(repo_findings)
-        repo_records.append({"name": target.name, "root": str(target.root.resolve())})
+        all_exclusions.extend(exclusions)
+        repo_records.append({
+            "name": target.name,
+        })
+
     findings = sorted(set(findings), key=Finding.key)
-    return {
+    report_dict: dict[str, object] = {
         "schema": SCHEMA,
         "repos": repo_records,
         "summary": summarize(findings),
@@ -587,6 +669,11 @@ def build_report(targets: Sequence[RepoTarget], max_bytes: int) -> dict[str, obj
             "automatic_deletion": False,
         },
     }
+
+    if report_exclusions and all_exclusions:
+        report_dict["exclusions"] = all_exclusions
+
+    return report_dict
 
 
 def markdown_report(report: dict[str, object]) -> str:
