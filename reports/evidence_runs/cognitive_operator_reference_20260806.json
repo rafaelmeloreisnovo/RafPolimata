@@ -1,0 +1,43 @@
+{
+  "schema": "rafaelia.cognitive-operator-reference-receipt/v1",
+  "generated_at": "2026-08-06T10:38:00-03:00",
+  "canonical_registry": {
+    "repository": "rafaelmeloreisnovo/Mapa",
+    "pull_request": 161,
+    "claim_allowed": false
+  },
+  "producer": {
+    "repository": "rafaelmeloreisnovo/RafPolimata",
+    "branch": "feat/cognitive-operator-reference-v1"
+  },
+  "implemented_operators": [
+    "COG-015",
+    "COG-016",
+    "COG-018",
+    "COG-019",
+    "COG-024"
+  ],
+  "local_validation": {
+    "scope": "LOCAL_SANDBOX_VERIFIED_LIMITED",
+    "python_dependencies": "stdlib only",
+    "tests_total": 10,
+    "tests_passed": 10,
+    "tests_failed": 0,
+    "analytic_fixtures": "PASS_LOCAL_ANALYTIC_FIXTURES"
+  },
+  "remote_validation": "TOKEN_VAZIO_RUNNER",
+  "claim_allowed": false,
+  "token_vazio": [
+    "convergence study across multiple step sizes",
+    "independent symbolic or automatic differentiation comparison",
+    "Termux ARM32 and ARM64 execution",
+    "p50 p95 p99 benchmark",
+    "scientific or cognitive generalization"
+  ],
+  "boundaries": [
+    "finite difference is not exact derivative",
+    "operator 19 assumes a constant denominator",
+    "analytic fixture PASS is not production PASS",
+    "implementation is not physical evidence"
+  ]
+}
