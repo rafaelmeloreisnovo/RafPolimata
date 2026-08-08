@@ -25,7 +25,7 @@ typedef __UINTPTR_TYPE__ uintptr_t;
 typedef __PTRDIFF_TYPE__ ssize_t;
 
 #ifndef ULONG_MAX
-#define ULONG_MAX __ULONG_MAX__
+#define ULONG_MAX (~0ul)
 #endif
 #ifndef INT_MAX
 #define INT_MAX __INT_MAX__
