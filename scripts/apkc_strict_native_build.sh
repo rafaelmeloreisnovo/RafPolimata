@@ -120,7 +120,11 @@ if [[ "$LANGUAGE" != asm ]]; then
   "$CLANG_BIN" "${CFLAGS[@]}" -c "$REWRITTEN" -o "$OBJECT"
 fi
 
-SONAME="$(basename "$OUTPUT")"
+# SONAME is part of the ELF byte stream. Deriving it from OUTPUT made identical
+# source/toolchain builds differ solely because callers chose different paths.
+# Canonicalize it by semantic build identity so same_source_same_output is a
+# real reproducibility invariant rather than a basename-dependent accident.
+SONAME="librafaelia-${LANGUAGE}-${ARCH}.so"
 "$CLANG_BIN" --target="$TARGET" "${ARCH_CFLAGS[@]}" -fuse-ld=lld \
   -nostdlib -nostartfiles -nodefaultlibs -shared \
   -Wl,--no-undefined -Wl,-z,defs -Wl,-Bsymbolic -Wl,--gc-sections \
