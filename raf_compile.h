@@ -37,6 +37,7 @@
 #define RAF_LANG_GROOVY  21
 #define RAF_LANG_CLJ     22
 #define RAF_LANG_UNKNOWN 23
+#define RAF_RECOGNIZED_LANG_COUNT 23
 #define RAF_LANG_COUNT   24
 
 #define RAF_OPT_0 0
@@ -158,70 +159,47 @@ static const uint8_t RAF_CAP_MATRIX[RAF_LANG_COUNT][5] = {
  /* JS      scr  */   { 1, 1, 1, 0, 1 },
  /* PHP     scr  */   { 1, 1, 1, 0, 1 },
  /* JSX     fork */   { 0, 1, 0, 0, 0 },
- /* GLSL    gpu  */   { 0, 1, 0, 0, 0 },
- /* CL      gpu  */   { 0, 1, 0, 0, 0 },
- /* HLSL    gpu  */   { 0, 1, 0, 0, 0 },
- /* WGSL    gpu  */   { 0, 1, 0, 0, 0 },
- /* DSP     dsp  */   { 0, 1, 0, 0, 0 },
- /* TFLITE  npu  */   { 0, 1, 0, 0, 0 },
+ /* GLSL    fork */   { 0, 1, 0, 0, 0 },
+ /* CL      fork */   { 0, 1, 0, 0, 0 },
+ /* HLSL    fork */   { 0, 1, 0, 0, 0 },
+ /* WGSL    fork */   { 0, 1, 0, 0, 0 },
+ /* DSP     fork */   { 0, 1, 0, 0, 0 },
+ /* TFLITE  fork */   { 0, 1, 0, 0, 0 },
  /* GO      fork */   { 0, 1, 0, 0, 0 },
  /* RB      scr  */   { 1, 1, 1, 0, 1 },
  /* SWIFT   fork */   { 0, 1, 0, 0, 0 },
  /* GROOVY  fork */   { 0, 1, 0, 0, 0 },
- /* CLJ     scr  */   { 1, 1, 1, 0, 1 },
- /* UNKNOWN      */   { 0, 0, 0, 0, 0 },
+ /* CLJ     fork */   { 0, 1, 0, 0, 0 },
+ /* UNKNOWN      */   { 0, 0, 0, 0, 0 }
 };
 
-static inline int raf_cap_query(uint8_t lang, uint8_t arch) {
-    if (lang >= RAF_LANG_COUNT || arch > RAF_ARCH_UNKNOWN) return 0;
-    return (int)RAF_CAP_MATRIX[lang][arch];
-}
-
-/* Maps stable RAF_LANG_* ids to ApkC profile names. */
 static inline const char *raf_lang_to_apkc_name(uint8_t lang) {
-    switch (lang) {
-    case RAF_LANG_C:      return "c";
-    case RAF_LANG_CPP:    return "cpp";
-    case RAF_LANG_S:      return "asm";
-    case RAF_LANG_PY:     return "py";
-    case RAF_LANG_RS:     return "rs";
-    case RAF_LANG_KT:     return "kt";
-    case RAF_LANG_JAVA:   return "java";
-    case RAF_LANG_SH:     return "sh";
-    case RAF_LANG_PL:     return "pl";
-    case RAF_LANG_JS:     return "js";
-    case RAF_LANG_PHP:    return "php";
-    case RAF_LANG_JSX:    return "jsx";
-    case RAF_LANG_GLSL:   return "glsl";
-    case RAF_LANG_CL:     return "cl";
-    case RAF_LANG_HLSL:   return "hlsl";
-    case RAF_LANG_WGSL:   return "wgsl";
-    case RAF_LANG_DSP:    return "dsp";
+  switch (lang) {
+    case RAF_LANG_C: return "c";
+    case RAF_LANG_CPP: return "cpp";
+    case RAF_LANG_S: return "asm";
+    case RAF_LANG_PY: return "py";
+    case RAF_LANG_RS: return "rs";
+    case RAF_LANG_KT: return "kt";
+    case RAF_LANG_JAVA: return "java";
+    case RAF_LANG_SH: return "sh";
+    case RAF_LANG_PL: return "pl";
+    case RAF_LANG_JS: return "js";
+    case RAF_LANG_PHP: return "php";
+    case RAF_LANG_JSX: return "jsx";
+    case RAF_LANG_GLSL: return "glsl";
+    case RAF_LANG_CL: return "cl";
+    case RAF_LANG_HLSL: return "hlsl";
+    case RAF_LANG_WGSL: return "wgsl";
+    case RAF_LANG_DSP: return "dsp";
     case RAF_LANG_TFLITE: return "tflite";
-    case RAF_LANG_GO:     return "go";
-    case RAF_LANG_RB:     return "rb";
-    case RAF_LANG_SWIFT:  return "swift";
+    case RAF_LANG_GO: return "go";
+    case RAF_LANG_RB: return "rb";
+    case RAF_LANG_SWIFT: return "swift";
     case RAF_LANG_GROOVY: return "groovy";
-    case RAF_LANG_CLJ:    return "clj";
-    default:              return (const char *)0;
-    }
-}
-
-/* Selects only verified compute-capability bits. Presence-only *_NODE flags
- * never promote a backend automatically. */
-static inline const char *raf_hw_select_compute_lang(uint32_t feat) {
-    if (feat & RAF_FEAT_GPU_VK)   return "glsl";
-    if (feat & RAF_FEAT_GPU_CL)   return "cl";
-    if (feat & RAF_FEAT_DSP_HXN)  return "dsp";
-    if (feat & RAF_FEAT_NPU)      return "tflite";
-    return "c";
-}
-
-static inline void raf_cpu_to_apkc_modes(const RafCPU *cpu,
-                                          int *do64, int *do32) {
-    *do64 = (cpu->arch == RAF_ARCH_ARM64)
-         || (cpu->arch == RAF_ARCH_UNKNOWN && (cpu->feat & RAF_FEAT_NEON));
-    *do32 = (cpu->arch == RAF_ARCH_ARM32);
+    case RAF_LANG_CLJ: return "clj";
+    default: return "unknown";
+  }
 }
 
 #endif
