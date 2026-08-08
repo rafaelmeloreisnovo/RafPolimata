@@ -7,7 +7,8 @@ ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 REPORT="$ROOT/ci/reports/freestanding-audit.md"
 mkdir -p "$ROOT/ci/reports"
 TMP=$(mktemp)
-trap 'rm -f "$TMP"' EXIT HUP INT TERM
+TMP_FILTERED=$(mktemp)
+trap 'rm -f "$TMP" "$TMP_FILTERED"' EXIT HUP INT TERM
 
 {
   echo '# Freestanding audit — ApkC'
@@ -24,27 +25,28 @@ scan_pattern(){
   pattern=$2
 
   # GitHub-hosted runners do not guarantee ripgrep. Keep the audit portable:
-  # prefer rg when available, otherwise use POSIX-shell + GNU grep over the same
-  # first-level ApkC C/header files. A missing search tool must never be
-  # interpreted as "pattern absent".
+  # prefer rg when available, otherwise use grep over the same first-level
+  # ApkC C/header files. A missing search tool must never be interpreted as
+  # "pattern absent".
+  : > "$TMP"
   if command -v rg >/dev/null 2>&1; then
-    if rg -n --glob 'Apkc/*.[ch]' "$pattern" "$ROOT" > "$TMP"; then
-      found=1
-    else
-      found=0
-    fi
+    rg -n --glob 'Apkc/*.[ch]' "$pattern" "$ROOT" > "$TMP" || true
   elif command -v grep >/dev/null 2>&1; then
-    if grep -En "$pattern" "$ROOT"/Apkc/*.[ch] > "$TMP" 2>/dev/null; then
-      found=1
-    else
-      found=0
-    fi
+    grep -En "$pattern" "$ROOT"/Apkc/*.[ch] > "$TMP" 2>/dev/null || true
   else
     echo "| $name | FAIL | nenhum mecanismo de busca disponível (rg/grep) |" >> "$REPORT"
     return 1
   fi
 
-  if [ "$found" -eq 1 ]; then
+  # raf_libc_emu.h intentionally defines heap names as fail-closed macros.
+  # They are enforcement sentinels, not allocations. Ignore only those
+  # preprocessor definitions; any real invocation remains a failure.
+  if [ "$name" = "heap_calls" ]; then
+    grep -Ev '#[[:space:]]*define[[:space:]]+(malloc|calloc|realloc|free)[[:space:]]*\(' "$TMP" > "$TMP_FILTERED" || true
+    cp "$TMP_FILTERED" "$TMP"
+  fi
+
+  if [ -s "$TMP" ]; then
     echo "| $name | FAIL | padrão proibido encontrado |" >> "$REPORT"
     sed 's/^/- /' "$TMP" >> "$REPORT"
     return 1
