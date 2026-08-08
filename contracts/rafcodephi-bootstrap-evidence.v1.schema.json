@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafaelia.local/contracts/rafcodephi-bootstrap-evidence.v1.schema.json",
+  "title": "RAFCODEPHI Bootstrap Evidence V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "identity",
+    "inputs",
+    "architectures",
+    "structural_state",
+    "package_repo_runtime_state",
+    "apt_update_guard",
+    "device_runtime_state",
+    "api_runtime_state",
+    "overall_state",
+    "blockers",
+    "claim_allowed"
+  ],
+  "properties": {
+    "schema": {"const": "rafcodephi.bootstrap-evidence/v1"},
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["main_app_package", "api_package", "prefix", "api_receiver_component", "api_access_control"],
+      "properties": {
+        "main_app_package": {"const": "com.termux.rafacodephi"},
+        "api_package": {"const": "com.termux.rafacodephi.api"},
+        "prefix": {"const": "/data/data/com.termux.rafacodephi/files/usr"},
+        "api_receiver_component": {"const": "com.termux.rafacodephi.api/com.termux.api.TermuxApiReceiver"},
+        "api_access_control": {"const": "SIGNATURE_PERMISSION_NO_SHARED_UID"}
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_manifest_sha256", "import_matrix_sha256"],
+      "properties": {
+        "source_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "import_matrix_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "device_receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "architectures": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["arm", "aarch64"],
+      "properties": {
+        "arm": {"$ref": "#/$defs/architectureEvidence"},
+        "aarch64": {"$ref": "#/$defs/architectureEvidence"}
+      }
+    },
+    "structural_state": {"const": "PASS"},
+    "package_repo_runtime_state": {"const": "BLOCKED_CUSTOM_REPOSITORY_NOT_PUBLISHED"},
+    "apt_update_guard": {"const": "RAFCODEPHI_PACKAGE_REPOSITORY_NOT_PUBLISHED"},
+    "device_runtime_state": {"type": "string", "minLength": 1},
+    "api_runtime_state": {"type": "string", "minLength": 1},
+    "overall_state": {"enum": ["STRUCTURAL_PASS_LIMITED", "DEVICE_RECEIPT_UNBOUND", "BLOCKED"]},
+    "blockers": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "claim_allowed": {"const": false}
+  },
+  "$defs": {
+    "architectureEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bootstrap_sha256", "import_receipt_sha256", "termux_api_cli"],
+      "properties": {
+        "bootstrap_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "import_receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "termux_api_cli": {"const": "EMBEDDED"}
+      }
+    }
+  }
+}
