@@ -22,7 +22,29 @@ trap 'rm -f "$TMP"' EXIT HUP INT TERM
 scan_pattern(){
   name=$1
   pattern=$2
-  if rg -n --glob 'Apkc/*.[ch]' "$pattern" "$ROOT" > "$TMP"; then
+
+  # GitHub-hosted runners do not guarantee ripgrep. Keep the audit portable:
+  # prefer rg when available, otherwise use POSIX-shell + GNU grep over the same
+  # first-level ApkC C/header files. A missing search tool must never be
+  # interpreted as "pattern absent".
+  if command -v rg >/dev/null 2>&1; then
+    if rg -n --glob 'Apkc/*.[ch]' "$pattern" "$ROOT" > "$TMP"; then
+      found=1
+    else
+      found=0
+    fi
+  elif command -v grep >/dev/null 2>&1; then
+    if grep -En "$pattern" "$ROOT"/Apkc/*.[ch] > "$TMP" 2>/dev/null; then
+      found=1
+    else
+      found=0
+    fi
+  else
+    echo "| $name | FAIL | nenhum mecanismo de busca disponível (rg/grep) |" >> "$REPORT"
+    return 1
+  fi
+
+  if [ "$found" -eq 1 ]; then
     echo "| $name | FAIL | padrão proibido encontrado |" >> "$REPORT"
     sed 's/^/- /' "$TMP" >> "$REPORT"
     return 1
