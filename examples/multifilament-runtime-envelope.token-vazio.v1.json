@@ -1,0 +1,28 @@
+{
+  "schema_version": "multifilament-runtime-envelope.v1",
+  "artifact_id": "TOKEN_VAZIO_UNTIL_BUILD",
+  "producer": "RafPolimata",
+  "consumer": "Vectras-VM-Android",
+  "source_commit": "TOKEN_VAZIO",
+  "target": "TOKEN_VAZIO",
+  "format": "TOKEN_VAZIO",
+  "toolchain": {
+    "id": "TOKEN_VAZIO",
+    "version": "TOKEN_VAZIO"
+  },
+  "commands": [],
+  "hashes": {},
+  "validators": [],
+  "dependencies": [],
+  "epistemic_state": "TOKEN_VAZIO",
+  "claim_allowed": false,
+  "rollback": {
+    "strategy": "restore_previous_verified_artifact",
+    "verified": false,
+    "receipt_ref": null
+  },
+  "receipt": {
+    "status": "TOKEN_VAZIO",
+    "ref": null
+  }
+}
