@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafaelia.local/schemas/multifilament-runtime-envelope.v1.schema.json",
+  "title": "RAFAELIA Multifilament Runtime Envelope V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "producer",
+    "consumer",
+    "source_commit",
+    "target",
+    "format",
+    "toolchain",
+    "commands",
+    "hashes",
+    "validators",
+    "dependencies",
+    "epistemic_state",
+    "claim_allowed",
+    "rollback",
+    "receipt"
+  ],
+  "properties": {
+    "schema_version": {"const": "multifilament-runtime-envelope.v1"},
+    "artifact_id": {"type": "string", "minLength": 1},
+    "producer": {"const": "RafPolimata"},
+    "consumer": {"type": "string", "minLength": 1},
+    "source_commit": {"type": "string", "pattern": "^(TOKEN_VAZIO|[0-9a-f]{40})$"},
+    "target": {"enum": ["armv7", "aarch64", "x86_64", "TOKEN_VAZIO"]},
+    "format": {"enum": ["ELF", "APK", "DEX", "ZIP", "REPORT", "TOKEN_VAZIO"]},
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1}
+      }
+    },
+    "commands": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "hashes": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "pattern": "^[0-9a-fA-F]+$"}
+    },
+    "validators": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "status"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "status": {"enum": ["PASS", "FAIL", "TOKEN_VAZIO"]},
+          "detail": {"type": "string"}
+        }
+      }
+    },
+    "dependencies": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "epistemic_state": {"enum": ["TOKEN_VAZIO", "BLOCKED", "FAIL", "VALID_LIMITED", "VALID"]},
+    "claim_allowed": {"type": "boolean"},
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "verified"],
+      "properties": {
+        "strategy": {"type": "string", "minLength": 1},
+        "verified": {"type": "boolean"},
+        "receipt_ref": {"type": ["string", "null"]}
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "ref"],
+      "properties": {
+        "status": {"enum": ["TOKEN_VAZIO", "PRESENT"]},
+        "ref": {"type": ["string", "null"]}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"claim_allowed": {"const": true}}},
+      "then": {
+        "properties": {
+          "epistemic_state": {"enum": ["VALID_LIMITED", "VALID"]},
+          "source_commit": {"pattern": "^[0-9a-f]{40}$"},
+          "hashes": {"minProperties": 1},
+          "validators": {"minItems": 1},
+          "receipt": {
+            "properties": {
+              "status": {"const": "PRESENT"},
+              "ref": {"type": "string", "minLength": 1}
+            }
+          },
+          "rollback": {"properties": {"verified": {"const": true}}}
+        }
+      }
+    }
+  ]
+}
