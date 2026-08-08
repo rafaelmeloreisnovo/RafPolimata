@@ -1,0 +1,47 @@
+name: multifilament-envelope-gate
+
+on:
+  pull_request:
+    paths:
+      - 'schemas/multifilament-runtime-envelope.v1.schema.json'
+      - 'examples/multifilament-runtime-envelope*.json'
+      - 'tools/validate_multifilament_envelope.py'
+      - '.github/workflows/multifilament-envelope-gate.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'schemas/multifilament-runtime-envelope.v1.schema.json'
+      - 'examples/multifilament-runtime-envelope*.json'
+      - 'tools/validate_multifilament_envelope.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: multifilament-envelope-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse schema
+        run: python3 -m json.tool schemas/multifilament-runtime-envelope.v1.schema.json >/dev/null
+      - name: Validate TOKEN_VAZIO fixture
+        run: python3 tools/validate_multifilament_envelope.py examples/multifilament-runtime-envelope.token-vazio.v1.json
+      - name: Assert unsafe promotion is rejected
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('examples/multifilament-runtime-envelope.token-vazio.v1.json')
+          o = json.loads(p.read_text())
+          o['claim_allowed'] = True
+          Path('/tmp/unsafe.json').write_text(json.dumps(o))
+          PY
+          if python3 tools/validate_multifilament_envelope.py /tmp/unsafe.json; then
+            echo 'unsafe promotion unexpectedly passed' >&2
+            exit 1
+          fi
