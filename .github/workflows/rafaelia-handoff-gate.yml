@@ -1,4 +1,6 @@
 name: RAFAELIA Handoff Gate
+
+run-name: "TORRE / RafPolimata / ${{ inputs.torre_correlation_id || github.run_id }}"
 on:
   push:
     paths:
@@ -13,8 +15,18 @@ on:
       - 'tests/test_validate_rafaelia_handoff.py'
       - '.github/workflows/rafaelia-handoff-gate.yml'
   workflow_dispatch:
+    inputs:
+      torre_correlation_id:
+        description: Correlation ID supplied by the TORRE controller
+        required: false
+        default: ""
+        type: string
 permissions:
   contents: read
+
+concurrency:
+  group: torre-unit-rafpolimata-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   validate:
     runs-on: ubuntu-latest
