@@ -1,0 +1,61 @@
+{
+  "version": "1.0.0",
+  "status": "METHOD_DEFINED",
+  "claim_allowed_default": false,
+  "inherit_core_gate": true,
+  "core_invariants": [
+    "type_before_operation",
+    "explicit_scope_and_assumptions",
+    "provenance_required",
+    "negative_evidence_append_only",
+    "critical_TOKEN_VAZIO_blocks_promotion",
+    "first_answer_has_no_epistemic_privilege"
+  ],
+  "adapters": {
+    "formal_mathematics": {
+      "allowed_kinds": ["DEMONSTRATION", "CONVENTION", "HYPOTHESIS", "TOKEN_VAZIO"],
+      "minimum_gates": ["definitions", "derivation_or_proof", "counterexample_criterion", "independent_checker_or_review"],
+      "notes": "Formal proof is not empirical falsification; defeat occurs through counterexample, invalid inference, inconsistent assumptions, or checker/review failure."
+    },
+    "software_runtime": {
+      "allowed_kinds": ["DEMONSTRATION", "HYPOTHESIS", "CONVENTION", "TOKEN_VAZIO"],
+      "minimum_gates": ["source_commit", "build_environment", "clean_build", "positive_tests", "negative_tests", "boundary_or_malformed_inputs", "runtime_receipt"],
+      "conditional_gates": ["sanitizers_if_supported", "determinism_test_if_claimed", "architecture_specific_execution_if_claimed", "performance_distribution_if_benchmarked"]
+    },
+    "statistics_data_science": {
+      "allowed_kinds": ["HYPOTHESIS", "CONVENTION", "DEMONSTRATION", "TOKEN_VAZIO"],
+      "minimum_gates": ["dataset_identity_and_hash", "frozen_metric", "decision_rule", "uncertainty", "negative_control", "sensitivity_analysis"],
+      "conditional_gates": ["multiple_testing_control", "holdout_or_cross_validation", "missing_data_policy", "robustness_to_outliers", "independent_replication"]
+    },
+    "cosmology_observational": {
+      "allowed_kinds": ["HYPOTHESIS", "CONVENTION", "TOKEN_VAZIO"],
+      "minimum_gates": ["dataset_release_and_covariance", "likelihood_definition", "baseline_model", "priors", "sampler_or_optimizer_configuration", "uncertainty", "model_comparison_rule", "reproduction_receipt"],
+      "conditional_gates": ["independent_dataset", "bayesian_evidence_uncertainty", "prior_sensitivity", "systematics_budget", "blind_analysis_or_disclosure_of_post_hoc_choices"]
+    },
+    "engineering_physical_system": {
+      "allowed_kinds": ["HYPOTHESIS", "CONVENTION", "DEMONSTRATION", "TOKEN_VAZIO"],
+      "minimum_gates": ["units", "instrument_identity", "calibration", "measurement_uncertainty", "control_condition", "safety_boundary", "raw_data_provenance", "repeat_measurement"],
+      "conditional_gates": ["independent_lab_replication", "environmental_covariates", "failure_mode_test", "load_or_stress_test"]
+    },
+    "biology_biomedicine": {
+      "allowed_kinds": ["HYPOTHESIS", "CONVENTION", "TOKEN_VAZIO"],
+      "minimum_gates": ["ethics_and_consent_if_applicable", "sample_definition", "controls", "endpoint_definition", "uncertainty", "data_provenance", "adverse_or_negative_results"],
+      "conditional_gates": ["power_or_sample_size_justification", "preregistration_or_post_hoc_disclosure", "multiple_testing_control", "independent_replication", "clinical_validation_before_clinical_claim"]
+    },
+    "legal_governance": {
+      "allowed_kinds": ["CONVENTION", "DEMONSTRATION", "HYPOTHESIS", "TOKEN_VAZIO"],
+      "minimum_gates": ["jurisdiction", "effective_date", "primary_source", "version_or_identifier", "scope_and_exceptions", "human_review_for_material_legal_claim"],
+      "notes": "Legal validity is not established by empirical falsifiability alone; authority, jurisdiction, effective date and interpretation control."
+    },
+    "provenance_memory_chain_of_custody": {
+      "allowed_kinds": ["DEMONSTRATION", "CONVENTION", "HYPOTHESIS", "TOKEN_VAZIO"],
+      "minimum_gates": ["identity", "origin", "content_hash", "version_or_timestamp", "append_only_event", "relation_to_parent", "verification_command_or_receipt"],
+      "notes": "Integrity/provenance can prove continuity or identity properties; it does not by itself prove the truth of the artifact's scientific content."
+    },
+    "symbolic_parabolic": {
+      "allowed_kinds": ["PARABLE", "CONVENTION", "TOKEN_VAZIO"],
+      "minimum_gates": ["explicit_PARABLE_label", "mapping_scope", "no_empirical_promotion"],
+      "forbidden_promotions": ["PARABLE_to_PUBLIC_SCIENTIFIC", "symbolic_similarity_as_physical_evidence"]
+    }
+  }
+}
