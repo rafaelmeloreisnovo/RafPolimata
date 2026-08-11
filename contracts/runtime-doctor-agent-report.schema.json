@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafaelia.local/contracts/runtime-doctor-agent-report.schema.json",
+  "title": "RAFAELIA Runtime Doctor Agent Report",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "generated_at",
+    "mode",
+    "summary",
+    "skill_routes",
+    "probes",
+    "runtime_routes",
+    "claim_boundary",
+    "F_ok",
+    "F_gap",
+    "F_next"
+  ],
+  "properties": {
+    "schema": {"const": "raf.runtime-doctor-agent-report.v1"},
+    "generated_at": {"type": "string", "minLength": 1},
+    "mode": {"const": "READ_ONLY_DIAGNOSTIC"},
+    "summary": {
+      "type": "object",
+      "required": [
+        "state",
+        "selected_skills",
+        "probes_executed",
+        "failed_probes",
+        "runtime_routes",
+        "unresolved_repositories"
+      ],
+      "properties": {
+        "state": {
+          "enum": ["PASS_LIMITED", "RUNTIME_OBSERVED_LIMITED", "REVIEW_REQUIRED"]
+        },
+        "selected_skills": {"type": "integer", "minimum": 0},
+        "probes_executed": {"type": "integer", "minimum": 0},
+        "failed_probes": {"type": "integer", "minimum": 0},
+        "runtime_routes": {"type": "integer", "minimum": 0},
+        "unresolved_repositories": {"type": "integer", "minimum": 0}
+      }
+    },
+    "skill_routes": {"type": "array"},
+    "probes": {"type": "array"},
+    "runtime_routes": {"type": "array"},
+    "trace": {"type": "array"},
+    "claim_boundary": {
+      "type": "object",
+      "required": [
+        "static_mapping",
+        "runtime_execution",
+        "gpu_library_presence",
+        "llm_performance",
+        "vm_guest_boot",
+        "automatic_repair",
+        "automatic_install",
+        "automatic_delete",
+        "claim_allowed"
+      ],
+      "properties": {
+        "automatic_repair": {"const": false},
+        "automatic_install": {"const": false},
+        "automatic_delete": {"const": false},
+        "claim_allowed": {"const": false}
+      }
+    },
+    "F_ok": {"type": "string"},
+    "F_gap": {"type": "string"},
+    "F_next": {"type": "string"}
+  }
+}
