@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafaelia.local/schemas/epistemic-claim.v1.schema.json",
+  "title": "RAFAELIA Epistemic Claim V1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "claim_id",
+    "proposition",
+    "claim_kind",
+    "state",
+    "domain",
+    "falsifier",
+    "protocol",
+    "data_provenance",
+    "code_provenance",
+    "evidence",
+    "negative_evidence",
+    "replication",
+    "limitations",
+    "token_vazio",
+    "claim_allowed"
+  ],
+  "properties": {
+    "claim_id": {"type": "string", "minLength": 1},
+    "proposition": {"type": "string", "minLength": 1},
+    "claim_kind": {
+      "enum": ["DEMONSTRATION", "CONVENTION", "HYPOTHESIS", "PARABLE", "TOKEN_VAZIO"]
+    },
+    "state": {
+      "enum": [
+        "METAPHOR", "FORMALIZED", "METHOD_DEFINED", "SIMULATED",
+        "EVIDENCE_LINKED", "REPLICATED", "CLAIM_ALLOWED",
+        "TOKEN_VAZIO", "CONTRADICTION"
+      ]
+    },
+    "domain": {"type": "string", "minLength": 1},
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "h0": {"type": ["string", "null"]},
+    "h1": {"type": ["string", "null"]},
+    "falsifier": {"type": ["string", "null"]},
+    "protocol": {
+      "type": "object",
+      "required": ["version", "frozen"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "frozen": {"type": "boolean"},
+        "procedure": {"type": ["string", "null"]}
+      }
+    },
+    "metric": {"type": ["string", "null"]},
+    "threshold": {"type": ["string", "number", "integer", "null"]},
+    "data_provenance": {"type": "array", "items": {"type": "object"}},
+    "code_provenance": {"type": "array", "items": {"type": "object"}},
+    "environment": {"type": "object"},
+    "evidence": {"type": "array", "items": {"type": "object"}},
+    "negative_evidence": {"type": "array", "items": {"type": "object"}},
+    "replication": {
+      "type": "object",
+      "required": ["level"],
+      "properties": {
+        "level": {
+          "enum": [
+            "NONE", "VERIFIED_INTERNAL", "REPRODUCED_SAME_ENV",
+            "REPRODUCED_CLEAN_ENV", "REPLICATED_INDEPENDENT", "EXTERNAL_CLAIM_READY"
+          ]
+        },
+        "independent": {"type": "boolean"}
+      }
+    },
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "token_vazio": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["missing", "critical", "next_verifiable_action"],
+        "properties": {
+          "missing": {"type": "string", "minLength": 1},
+          "critical": {"type": "boolean"},
+          "next_verifiable_action": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "claim_allowed": {"type": "boolean"}
+  }
+}
