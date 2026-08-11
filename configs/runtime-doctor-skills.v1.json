@@ -1,0 +1,115 @@
+{
+  "schema": "raf.runtime-doctor-skills.v1",
+  "policy": {
+    "default_mode": "read_only",
+    "automatic_repair": false,
+    "automatic_delete": false,
+    "automatic_install": false,
+    "claim_allowed": false,
+    "learning_mode": "append_only_outcome_weighting"
+  },
+  "levels": [
+    {"id": "L0", "name": "inventory"},
+    {"id": "L1", "name": "host_android_termux"},
+    {"id": "L2", "name": "accelerator_gpu"},
+    {"id": "L3", "name": "vm_qemu"},
+    {"id": "L4", "name": "llm_inference"},
+    {"id": "L5", "name": "build_and_evidence"},
+    {"id": "L6", "name": "context_and_routes"},
+    {"id": "L7", "name": "prescription_and_receipt"}
+  ],
+  "skills": [
+    {
+      "id": "termux_host_diagnostic",
+      "level": "L1",
+      "repo": "termux-app-rafacodephi",
+      "role": "Probe ABI, CPU features, cache, RAM, page size, OOM, GPU libraries and local toolchain.",
+      "probe": ["sh", "Arme/Add/diagnose.sh", "--json"],
+      "keywords": ["termux", "android", "abi", "arm32", "arm64", "neon", "oom", "memory", "page"],
+      "evidence": "runtime_json"
+    },
+    {
+      "id": "termux_gpu_orchestrator",
+      "level": "L2",
+      "repo": "termux-app-rafacodephi",
+      "role": "Classify OpenCL/Vulkan availability and CPU/GPU routing candidates without assuming a usable driver.",
+      "probe": ["sh", "Arme/Add/diagnose.sh", "--json"],
+      "keywords": ["gpu", "opencl", "vulkan", "thermal", "scheduler", "offload"],
+      "evidence": "runtime_json"
+    },
+    {
+      "id": "termux_packages_build_surface",
+      "level": "L5",
+      "repo": "termux-packages",
+      "role": "Static build/package surface inspected through the existing Ecosystem Build Doctor.",
+      "probe": [],
+      "keywords": ["package", "pkg", "apt", "recipe", "build-package", "termux-packages"],
+      "evidence": "static_analysis"
+    },
+    {
+      "id": "vectras_vm_runtime",
+      "level": "L3",
+      "repo": "Vectras-VM-Android",
+      "role": "Inspect the Vectras Android/VM execution surface and device constraints.",
+      "probe": ["sh", "Rafaelia/diagnose.sh", "--json"],
+      "keywords": ["vectras", "vm", "guest", "android-vm", "virtualization"],
+      "evidence": "runtime_json"
+    },
+    {
+      "id": "qemu_runtime",
+      "level": "L3",
+      "repo": "qemu_rafaelia",
+      "role": "Route QEMU build/boot/runtime questions; execution remains gated by a dedicated guest-boot receipt.",
+      "probe": [],
+      "keywords": ["qemu", "boot", "guest", "tcg", "emulation", "virtualization"],
+      "evidence": "dedicated_runtime_receipt_required"
+    },
+    {
+      "id": "llama_backend_doctor",
+      "level": "L4",
+      "repo": "llamaRafaelia",
+      "role": "Choose CPU/NEON or Vulkan candidate routes from observed host capabilities; benchmark evidence is required before performance claims.",
+      "probe": [],
+      "keywords": ["llama", "ggml", "gguf", "model", "inference", "tokens", "vulkan", "backend"],
+      "evidence": "benchmark_receipt_required"
+    },
+    {
+      "id": "rafpolimata_evidence_doctor",
+      "level": "L5",
+      "repo": "RafPolimata",
+      "role": "Use Build Doctor and Runtime Truth Receipt as the authority for static findings, gates, hashes and epistemic boundaries.",
+      "probe": [],
+      "keywords": ["receipt", "evidence", "build", "linker", "warning", "provenance", "token_vazio"],
+      "evidence": "receipt"
+    },
+    {
+      "id": "gaia_context_router",
+      "level": "L6",
+      "repo": "GAIA_phi",
+      "role": "Context/API/session routing only; GAIA does not override hardware/runtime evidence.",
+      "probe": [],
+      "keywords": ["gaia", "route", "context", "session", "module", "api"],
+      "evidence": "context_only"
+    },
+    {
+      "id": "rafaeliaprivate_context",
+      "level": "L6",
+      "repo": "TOKEN_VAZIO_REPOSITORY_NOT_FOUND",
+      "role": "Reserved route for the user-named rafaeliaprivate repository until an exact accessible repository is resolved.",
+      "probe": [],
+      "keywords": ["rafaeliaprivate", "private", "corpus"],
+      "evidence": "TOKEN_VAZIO_REPOSITORY_NOT_FOUND"
+    }
+  ],
+  "route_graph": [
+    ["termux_host_diagnostic", "termux_gpu_orchestrator"],
+    ["termux_gpu_orchestrator", "llama_backend_doctor"],
+    ["termux_host_diagnostic", "vectras_vm_runtime"],
+    ["vectras_vm_runtime", "qemu_runtime"],
+    ["termux_packages_build_surface", "rafpolimata_evidence_doctor"],
+    ["qemu_runtime", "rafpolimata_evidence_doctor"],
+    ["llama_backend_doctor", "rafpolimata_evidence_doctor"],
+    ["gaia_context_router", "rafpolimata_evidence_doctor"],
+    ["rafpolimata_evidence_doctor", "L7"]
+  ]
+}
