@@ -11,6 +11,8 @@
 ## Related artifacts
 
 - `configs/epistemic-claim.v1.schema.json` — governed claim contract.
+- `configs/epistemic-domain-adapters.v1.json` — domain-specific gates for mathematics, software/runtime, statistics/data science, cosmology, engineering physical systems, biology/biomedicine, legal/governance, provenance/memory and symbolic/parabolic work.
+- `templates/epistemic-claim.v1.template.json` — safe fail-closed starting state; begins as `TOKEN_VAZIO` and `claim_allowed=false`.
 - `scripts/epistemic_claim_gate.py` — fail-closed procedural gate.
 - `tests/test_epistemic_claim_gate.py` — adversarial unit tests.
 - `.github/workflows/epistemic-claim-gate.yml` — remote execution gate.
