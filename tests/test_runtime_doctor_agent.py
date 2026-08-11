@@ -1,5 +1,5 @@
 import importlib.util
-import json
+import sys
 from pathlib import Path
 
 
@@ -8,6 +8,7 @@ MODULE_PATH = ROOT / "scripts" / "runtime_doctor_agent.py"
 SPEC = importlib.util.spec_from_file_location("runtime_doctor_agent", MODULE_PATH)
 assert SPEC and SPEC.loader
 RDA = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = RDA
 SPEC.loader.exec_module(RDA)
 
 
