@@ -37,6 +37,30 @@ gate_line=$(grep '^gate_exit_code=' "$EXIT_REC" || true)
   exit 67
 }
 
+# The producer only emits SHA-256 entries for regular files at run-dir depth 1.
+# Reject absolute/parent/subdirectory paths so a forged receipt cannot broaden
+# the verifier's trust boundary.
+if grep -Ev '^[0-9a-fA-F]{64}  \./[^/]+$' "$RECEIPT" | grep -q .; then
+  printf '%s\n' 'FAIL: receipt contains malformed or out-of-scope path entries' >&2
+  exit 71
+fi
+
+# Custody-critical files must themselves be covered by the receipt.
+grep -Eq '^[0-9a-fA-F]{64}  \./finalization-status\.txt$' "$RECEIPT" || {
+  printf '%s\n' 'FAIL: finalization-status.txt omitted from receipt coverage' >&2
+  exit 72
+}
+grep -Eq '^[0-9a-fA-F]{64}  \./run-exit\.txt$' "$RECEIPT" || {
+  printf '%s\n' 'FAIL: run-exit.txt omitted from receipt coverage' >&2
+  exit 73
+}
+
+# Self-reference and mutable verifier output are forbidden by the producer contract.
+if grep -Eq '  \./(receipt\.sha256|receipt-verify\.txt)$' "$RECEIPT"; then
+  printf '%s\n' 'FAIL: receipt illegally covers self/verifier output' >&2
+  exit 74
+fi
+
 # Receipt entries are relative to the run directory; verify from there.
 (
   cd "$RUN_DIR"
