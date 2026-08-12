@@ -45,6 +45,14 @@ if grep -Ev '^[0-9a-fA-F]{64}  \./[^/]+$' "$RECEIPT" | grep -q .; then
   exit 71
 fi
 
+# Reject duplicate path entries. A receipt is a one-to-one manifest, not a
+# multiset where the same artifact can be asserted more than once.
+receipt_paths=$(sed 's/^[0-9a-fA-F]\{64\}  //' "$RECEIPT")
+if printf '%s\n' "$receipt_paths" | LC_ALL=C sort | uniq -d | grep -q .; then
+  printf '%s\n' 'FAIL: receipt contains duplicate path entries' >&2
+  exit 75
+fi
+
 # Custody-critical files must themselves be covered by the receipt.
 grep -Eq '^[0-9a-fA-F]{64}  \./finalization-status\.txt$' "$RECEIPT" || {
   printf '%s\n' 'FAIL: finalization-status.txt omitted from receipt coverage' >&2
@@ -59,6 +67,26 @@ grep -Eq '^[0-9a-fA-F]{64}  \./run-exit\.txt$' "$RECEIPT" || {
 if grep -Eq '  \./(receipt\.sha256|receipt-verify\.txt)$' "$RECEIPT"; then
   printf '%s\n' 'FAIL: receipt illegally covers self/verifier output' >&2
   exit 74
+fi
+
+# Completeness invariant: the producer hashes every regular depth-1 file except
+# receipt.sha256 and receipt-verify.txt. Reconstruct that eligible set from the
+# archived run and require exact equality with the receipt path set. This closes
+# omission attacks where a payload (for example hello.apk) is removed from the
+# manifest while all remaining listed hashes still verify.
+expected_paths=$(
+  cd "$RUN_DIR"
+  find . -maxdepth 1 -type f ! -name 'receipt.sha256' ! -name 'receipt-verify.txt' -print \
+    | LC_ALL=C sort
+)
+listed_paths=$(printf '%s\n' "$receipt_paths" | LC_ALL=C sort)
+if [ "$expected_paths" != "$listed_paths" ]; then
+  printf '%s\n' 'FAIL: receipt coverage is incomplete or contains non-eligible files' >&2
+  printf '%s\n' 'EXPECTED:' >&2
+  printf '%s\n' "$expected_paths" >&2
+  printf '%s\n' 'LISTED:' >&2
+  printf '%s\n' "$listed_paths" >&2
+  exit 76
 fi
 
 # Receipt entries are relative to the run directory; verify from there.
@@ -77,4 +105,4 @@ status_gate=$(grep '^gate_exit_code=' "$STATUS" || true)
   exit 70
 }
 
-printf 'PASS: custody receipt verified; %s; claim_allowed remains false\n' "$gate_line"
+printf 'PASS: custody receipt verified with complete unique coverage; %s; claim_allowed remains false\n' "$gate_line"
