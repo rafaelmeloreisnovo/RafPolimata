@@ -1,0 +1,31 @@
+{
+  "schema": "rafaelia.evidence.v1",
+  "artifact": "RAFAELIA V4.2 ARMv7 closure -> last-mile Ω physical gate",
+  "parent": "COMPILA/rafaelia-v4.1-hardened",
+  "source_artifact": "RAFAELIA_COMPLETE_v4.zip",
+  "source_sha256": "d71656be2e649f4344ebebf1e1fdeee75052f3ed9db51551bbb51fefa5cbe454",
+  "parent_v4_1_patch_sha256": "739d0123f953c3bde2546095788dc2fc62143fcf0e016997b2ce2615378c4c68",
+  "v4_1_to_v4_2_patch_sha256": "50aa730140f0577f2672c205f3294ce6acf02b07302cec57c8dc847e071a2a56",
+  "status": "VERIFIED_LIMITED_ARMV7_CROSS_CLOSED",
+  "claim_allowed": false,
+  "append_only_evidence": true,
+  "closed_gates": [
+    "V4 -> V4.1 -> V4.2 reconstruction: byte-match PASS",
+    "host shell syntax: PASS",
+    "host rafaelia_core.c ASan+UBSan: PASS",
+    "host rafaelia_orchestrator.c ASan+UBSan 42/42 CRC_ERR=0: PASS",
+    "baremetal_nomalloc.c -Werror: PASS",
+    "RafaeliaCore.java -Xlint:all: PASS",
+    "OpenCL real-kernel smoke source host build -Werror: PASS",
+    "ARMv7 assembly: 9/9 PASS under clang integrated assembler",
+    "ARMv7 static link: 9/9 PASS with LLD --no-undefined",
+    "ARMv7 ELF contract: 9/9 ELF32 ARM EABI5 soft-float, no PT_INTERP"
+  ],
+  "token_vazio": [
+    {"claim":"android-ndk-cross-build","state":"TOKEN_VAZIO","evidence":"ndk-build absent in reference container","next_gate":"run V4.2 verifier where Android NDK is installed"},
+    {"claim":"armv7-real-device-execution","state":"TOKEN_VAZIO","next_gate":"run RUN_OMEGA_ON_DEVICE.sh on physical ARM32 Termux"},
+    {"claim":"android-jni-device-load-and-call","state":"TOKEN_VAZIO","next_gate":"build dual ABI with NDK and load/call JNI on Android"},
+    {"claim":"gpu-opencl-kernel-real-device-execution","state":"TOKEN_VAZIO","evidence":"host smoke returns 77: libOpenCL unavailable","next_gate":"run real XOR OpenCL kernel on physical Android GPU"}
+  ],
+  "last_mile": {"script":"RUN_OMEGA_ON_DEVICE.sh","success_terminal":"STATUS=OMEGA_PHYSICAL_PASS / CLAIM_ALLOWED=true / PASS OMEGA_FINAL","fail_closed":true}
+}
