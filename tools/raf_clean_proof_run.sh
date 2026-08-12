@@ -43,30 +43,61 @@ ver(){ command -v "$1" >/dev/null 2>&1 && "$@" 2>&1 | head -1 || echo "$1: TOKEN
 
 PASS=0
 TOKV=0
+FAIL=0
 # gate <id> <STATUS> <evidence>
 gate(){
   printf '%-22s %-12s %s\n' "$1" "$2" "$3" >> "$GATES"
   case "$2" in
     PASS) PASS=$((PASS+1));;
     TOKEN_VAZIO) TOKV=$((TOKV+1));;
-    FAIL) ;;
+    FAIL) FAIL=$((FAIL+1));;
   esac
 }
 
-# --- Gate 1: freestanding aarch64 syntax check ------------------------------
-G1LOG="$RUNDIR/g1_syntax.txt"
-if clang -target aarch64-linux-gnu -fsyntax-only -nostdlib -nostdinc \
-     -ffreestanding -I Apkc Apkc/apkc.c > "$G1LOG" 2>&1; then
-  gate freestanding-syntax PASS 'clang aarch64 -fsyntax-only clean -> g1_syntax.txt'
+# --- Gate 0: source-cap hardening transformer + real-source consumption -----
+# Never compile the vulnerable anchor in this proof path. If the transform or
+# its falsifier fails, downstream compiler gates fail closed.
+G0LOG="$RUNDIR/g0_source_cap.txt"
+HARD_SRC="$RUNDIR/apkc_hardened.c"
+HARDENED_OK=0
+if python3 tests/test_apkc_source_cap_patch.py > "$G0LOG" 2>&1 \
+   && python3 scripts/patch_apkc_source_cap.py Apkc/apkc.c "$HARD_SRC" >> "$G0LOG" 2>&1 \
+   && grep -q 'source exceeds SRC_CAP' "$HARD_SRC" \
+   && ! grep -Fq 'if (n<=0) break;' "$HARD_SRC"; then
+  SRC_SHA=$(sha256sum Apkc/apkc.c 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
+  HARD_SHA=$(sha256sum "$HARD_SRC" 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
+  {
+    echo "source_sha256: $SRC_SHA"
+    echo "hardened_sha256: $HARD_SHA"
+    echo "guard: source exceeds SRC_CAP"
+    echo "legacy_anchor_present: no"
+  } >> "$G0LOG"
+  HARDENED_OK=1
+  gate source-cap-hardening PASS "transform+falsifier+real-source consumption; sha256=$HARD_SHA"
 else
-  gate freestanding-syntax FAIL 'see g1_syntax.txt'
+  gate source-cap-hardening FAIL 'transform/falsifier/anchor gate failed -> g0_source_cap.txt'
 fi
 
-# --- Gate 2: cross-compile apkc to AArch64 ELF object -----------------------
+# --- Gate 1: freestanding aarch64 syntax check ------------------------------
+G1LOG="$RUNDIR/g1_syntax.txt"
+if [ "$HARDENED_OK" -eq 1 ]; then
+  if clang -target aarch64-linux-gnu -fsyntax-only -nostdlib -nostdinc \
+       -ffreestanding -I Apkc "$HARD_SRC" > "$G1LOG" 2>&1; then
+    gate freestanding-syntax PASS 'clang aarch64 hardened source -fsyntax-only clean -> g1_syntax.txt'
+  else
+    gate freestanding-syntax FAIL 'hardened source syntax failed -> g1_syntax.txt'
+  fi
+else
+  echo 'FAIL: hardened source unavailable; refusing vulnerable-source syntax gate.' > "$G1LOG"
+  gate freestanding-syntax FAIL 'blocked by source-cap-hardening'
+fi
+
+# --- Gate 2: cross-compile hardened apkc to AArch64 ELF object --------------
 G2OBJ="$RUNDIR/apkc_a64.o"
 G2LOG="$RUNDIR/g2_object.txt"
-if clang -target aarch64-linux-gnu -ffreestanding -nostdlib -nostdinc -I Apkc \
-     -c Apkc/apkc.c -o "$G2OBJ" > "$G2LOG" 2>&1; then
+if [ "$HARDENED_OK" -eq 1 ] && \
+   clang -target aarch64-linux-gnu -ffreestanding -nostdlib -nostdinc -I Apkc \
+     -c "$HARD_SRC" -o "$G2OBJ" > "$G2LOG" 2>&1; then
   if command -v readelf >/dev/null 2>&1; then
     readelf -h "$G2OBJ" >> "$G2LOG" 2>&1 || true
     CLASS=$(readelf -h "$G2OBJ" 2>/dev/null | sed -n 's/.*Class:[[:space:]]*//p' | head -1)
@@ -76,9 +107,9 @@ if clang -target aarch64-linux-gnu -ffreestanding -nostdlib -nostdinc -I Apkc \
   fi
   SHA=$(sha256sum "$G2OBJ" 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
   echo "sha256: $SHA" >> "$G2LOG"
-  gate cross-object-a64 PASS "Class=$CLASS Machine=$MACH sha256=$SHA"
+  gate cross-object-a64 PASS "hardened source Class=$CLASS Machine=$MACH sha256=$SHA"
 else
-  gate cross-object-a64 FAIL 'cross-compile to AArch64 object failed -> g2_object.txt'
+  gate cross-object-a64 FAIL 'hardened cross-compile to AArch64 object failed/blocked -> g2_object.txt'
 fi
 
 # --- Gate 3: verbovivo build + smoke ----------------------------------------
@@ -115,16 +146,20 @@ fi
 # --- Gate 6: actual APK generation by running apkc --------------------------
 # apkc is freestanding ARM64 code; it is not runnable on this x86 host.
 G6LOG="$RUNDIR/g6_apk_generation.txt"
-echo 'TOKEN_VAZIO: apkc is freestanding ARM64, not runnable on x86 host; needs ARM/Termux/qemu.' > "$G6LOG"
-gate apk-generation TOKEN_VAZIO 'requires ARM/NDK/device -> g6_apk_generation.txt'
+echo 'TOKEN_VAZIO: hardened apkc is freestanding ARM64, not runnable on x86 host; needs ARM/Termux/qemu.' > "$G6LOG"
+gate apk-generation TOKEN_VAZIO 'requires ARM/Termux/qemu/device -> g6_apk_generation.txt'
 
-# --- summary ----------------------------------------------------------------
+# --- summary / global fail-closed -------------------------------------------
 {
   echo "commit_sha : $COMMIT"
   echo "date_utc   : $DATE_UTC"
   echo "host_arch  : $HOST_ARCH"
-  echo "clean-proof-run: $PASS PASS, $TOKV TOKEN_VAZIO"
+  echo "clean-proof-run: $PASS PASS, $FAIL FAIL, $TOKV TOKEN_VAZIO"
 } > "$SUMMARY"
 
 echo "run_dir: $RUNDIR"
-echo "clean-proof-run: $PASS PASS, $TOKV TOKEN_VAZIO"
+echo "clean-proof-run: $PASS PASS, $FAIL FAIL, $TOKV TOKEN_VAZIO"
+
+# A host-tractable FAIL is a failing proof run. TOKEN_VAZIO remains auditable
+# but does not masquerade as failure or PASS.
+[ "$FAIL" -eq 0 ]
