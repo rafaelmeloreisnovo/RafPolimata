@@ -4,6 +4,7 @@
 # The canonical proof is promoted only when BOTH required targets are built,
 # identified by an ELF reader and reproduced byte-for-byte. Failed or partial
 # runs are preserved under Apkc/proofs/runs/ and never become a false PASS.
+# Anti-retraction: raw Apkc/apkc.c is never compiled directly.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -17,7 +18,7 @@ elif [ -n "${1:-}" ]; then
     exit 2
 fi
 
-for cmd in git clang sha256sum cmp date uname mkdir cp head grep awk; do
+for cmd in git clang sha256sum cmp date uname mkdir cp head grep awk python3; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
         printf 'source-to-binary proof: missing command: %s\n' "$cmd" >&2
         exit 127
@@ -48,7 +49,9 @@ CLANGV="$(clang --version 2>/dev/null | head -1)" || CLANGV="clang: TOKEN_VAZIO"
 LLDV="$(ld.lld --version 2>/dev/null | head -1)" || LLDV="lld: TOKEN_VAZIO"
 ELFV="$($ELF_READER --version 2>/dev/null | head -1)" || ELFV="$ELF_READER"
 
-SRC="Apkc/apkc.c"
+RAW_SRC="Apkc/apkc.c"
+SRC="$RUN_DIR/apkc_hardened.c"
+HARD_LOG="$RUN_DIR/source-cap-hardening.txt"
 A64_1="$RUN_DIR/apkc-aarch64-run1.elf"
 A64_2="$RUN_DIR/apkc-aarch64-run2.elf"
 A32_1="$RUN_DIR/apkc-arm32-run1.o"
@@ -59,6 +62,27 @@ A64_HDR="$RUN_DIR/readelf-aarch64.txt"
 A32_HDR="$RUN_DIR/readelf-arm32.txt"
 TRANSCRIPT="$RUN_DIR/apkc-compile.txt"
 STATUS_JSON="$RUN_DIR/status.json"
+
+# Mandatory hardening gate before any compiler invocation.
+if [ ! -f scripts/patch_apkc_source_cap.py ] || [ ! -f tests/test_apkc_source_cap_patch.py ]; then
+    printf 'source-to-binary proof: source-cap transformer/falsifier missing\n' >&2
+    exit 1
+fi
+if ! python3 tests/test_apkc_source_cap_patch.py >"$HARD_LOG" 2>&1 ||
+   ! python3 scripts/patch_apkc_source_cap.py "$RAW_SRC" "$SRC" >>"$HARD_LOG" 2>&1 ||
+   ! grep -q 'source exceeds SRC_CAP' "$SRC" ||
+   grep -Fq 'if (n<=0) break;' "$SRC"; then
+    printf 'source-to-binary proof: source-cap hardening failed; see %s\n' "$HARD_LOG" >&2
+    exit 1
+fi
+RAW_SHA="$(sha256sum "$RAW_SRC" | awk '{print $1}')"
+HARD_SHA="$(sha256sum "$SRC" | awk '{print $1}')"
+{
+    printf 'raw_source_sha256=%s\n' "$RAW_SHA"
+    printf 'hardened_source_sha256=%s\n' "$HARD_SHA"
+    printf '%s\n' 'guard=source exceeds SRC_CAP'
+    printf '%s\n' 'legacy_anchor_present=no'
+} >>"$HARD_LOG"
 
 COMMON=(clang -ffreestanding -fno-builtin -nostdlib -nostdinc -I Apkc)
 A64_CMD=("${COMMON[@]}" --target=aarch64-linux-gnu -fuse-ld=lld \
@@ -93,7 +117,10 @@ print_cmd() {
     printf 'toolchain:   %s\n' "$CLANGV"
     printf 'lld:         %s\n' "$LLDV"
     printf 'elf_reader:  %s\n' "$ELFV"
-    printf 'source:      %s\n\n' "$SRC"
+    printf 'raw_source:  %s\n' "$RAW_SRC"
+    printf 'raw_sha256:  %s\n' "$RAW_SHA"
+    printf 'source:      %s\n' "$SRC"
+    printf 'source_sha:  %s\n\n' "$HARD_SHA"
     printf '[A64] command:\n'
     print_cmd "${A64_CMD[@]}"
 } > "$TRANSCRIPT"
@@ -180,12 +207,15 @@ fi
 
 cat > "$STATUS_JSON" <<JSON
 {
-  "schema": "raf.apkc.source-to-binary-proof.v2",
+  "schema": "raf.apkc.source-to-binary-proof.v3",
   "run_id": "$RUN_ID",
   "date_utc": "$DATE_UTC",
   "commit": "$COMMIT",
   "host_arch": "$HOST_ARCH",
   "elf_reader": "$ELF_READER",
+  "raw_source_sha256": "$RAW_SHA",
+  "hardened_source_sha256": "$HARD_SHA",
+  "source_cap_hardening": "PASS",
   "aarch64": {
     "build": "$A64_BUILD",
     "identity": "$A64_IDENTITY",
