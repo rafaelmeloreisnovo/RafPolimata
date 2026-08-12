@@ -57,19 +57,24 @@ case "$REQUESTED_DO_SIGN" in
     ;;
 esac
 
-[ -x "$BASE_CAPTURE" ] || {
-  write_token_vazio "$TARGET_FILE" 'base capture missing or not executable'
+[ -f "$BASE_CAPTURE" ] || {
+  write_token_vazio "$TARGET_FILE" 'base capture missing'
   exit 87
 }
-[ -x "$SIGN_GATE" ] || {
-  write_token_vazio "$TARGET_FILE" 'sign gate missing or not executable'
+[ -f "$SIGN_GATE" ] || {
+  write_token_vazio "$TARGET_FILE" 'sign gate missing'
   exit 88
+}
+command -v bash >/dev/null 2>&1 || {
+  write_token_vazio "$TARGET_FILE" 'bash unavailable'
+  exit 97
 }
 
 # Build/evidence phase only. Force legacy capture not to sign or install, so its
-# historical raw fallback cannot cross the hardened trust boundary.
+# historical raw fallback cannot cross the hardened trust boundary. Invoke via
+# bash so repository mode bits cannot silently block an otherwise valid gate.
 if ! DO_SIGN=0 DO_INSTALL=0 OUT_DIR="$OUT_DIR" APK_NAME="$APK_NAME" PKG="$PKG" LIB="$LIB" \
-     "$BASE_CAPTURE"; then
+     bash "$BASE_CAPTURE"; then
   append_status "hardened_bridge" "FAIL" "capture_android_proof_chain_hardened.sh" "base capture returned non-zero"
   write_token_vazio "$TARGET_FILE" 'base capture failed; signing/install blocked'
   exit 89
@@ -84,7 +89,7 @@ fi
 rm -rf "$SIGN_DIR"
 mkdir -p "$SIGN_DIR"
 set +e
-DO_SIGN="$REQUESTED_DO_SIGN" "$SIGN_GATE" "$APK_RAW" "$APK_SIGNED" "$SIGN_DIR"
+DO_SIGN="$REQUESTED_DO_SIGN" bash "$SIGN_GATE" "$APK_RAW" "$APK_SIGNED" "$SIGN_DIR"
 gate_rc=$?
 set -e
 if [ "$gate_rc" -ne 0 ]; then
