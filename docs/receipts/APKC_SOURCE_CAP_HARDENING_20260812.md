@@ -37,6 +37,47 @@ This is a monotonic hardening change: previously proved encoder/verbovivo gates 
 
 Audit-environment shell parse of the exact replacement script: `sh -n` PASS. This proves shell syntax only, not execution of the repository proof suite.
 
+## Change C — validator raw-source bypass removed
+Commit `f7830498bd4a77f59fb4269c4b09262d70b99d20` updates `scripts/apkc_validate.sh`.
+
+Before this change, every compile fallback in the validator consumed raw `Apkc/apkc.c`, so validation could bypass the source-cap mitigation even though `make proof` was hardened.
+
+The validator now:
+
+- requires the source-cap transformer and falsifier before compilation;
+- emits `H0 TOKEN_VAZIO` and exits non-zero when Python is unavailable, rather than compiling an unverified raw source;
+- applies the transformer to a run-scoped `apkc_hardened.c`;
+- checks the overflow guard and absence of the legacy vulnerable anchor;
+- records raw and hardened SHA-256 values;
+- routes native, cross-AArch64, ARM64-object and syntax fallback compilation only through the hardened source;
+- preserves each compiler attempt and exit code in `apkc-compile.txt` rather than overwriting prior attempts;
+- separates ARM64/ARM32 ELF gates as `F6A` / `F6B`, eliminating the duplicated F6 identifier.
+
+Audit-environment shell parse of the exact replacement: `sh -n` PASS.
+Local replacement-text SHA-256: `f49e3cd59d0038d68e8f1df86ec9d8fe65f19f3fb097ec8acc179cbebe1adaab`.
+GitHub content blob after write: `8ca2d690e4a207cfb2bde9a2ad9815ee96c8a102`.
+
+## Change D — Termux hermetic build raw-source bypass removed
+Commit `c5d939c67e5016c02dfc5428dff2637c1d1b3e2a` updates `scripts/apkc_termux_hermetic_build.sh`, the physical/on-device build route.
+
+Before this change the script explicitly compiled raw `Apkc/apkc.c` into `apkc-host`. It now fails closed before any compiler command unless the source-cap transformer/falsifier can be executed successfully.
+
+The hermetic build now:
+
+- requires Python3 plus the transformer/falsifier;
+- creates and preserves `build/apkc-hermetic/apkc-hardened.c` as chain-of-custody material;
+- rejects missing guard or surviving vulnerable anchor;
+- records raw and hardened source SHA-256 values;
+- compiles only the hardened translation unit with `-I Apkc`;
+- records `hardening=SOURCE_CAP_VERIFIED` in the build log and receipt;
+- advances receipt schema to `raf.apkc.hermetic-build.v2`;
+- binds raw source SHA → hardened source SHA → ApkC host ELF SHA → unsigned/signed APK SHA when those later artifacts exist;
+- keeps `claim_allowed=false`, `structural_validation=TOKEN_VAZIO`, and `install_and_runtime=TOKEN_VAZIO` until their respective evidence exists.
+
+Audit-environment shell parse of the exact replacement: `sh -n` PASS.
+Local replacement-text SHA-256: `f93f777e5321f5deaa8e066506a90be50c31af9385310c549de2438131881fd2`.
+GitHub content blob after write: `4d90f0092c8a30307026316a8762970d6210415d`.
+
 ## Prior local evidence
 Executed in the audit environment:
 
@@ -49,37 +90,35 @@ Recorded SHA-256 from the earlier local execution:
 - transformer: `238736d72ee7288b31b2994c78c62838779603371b9f914d4ad829eadbc0d0dc`
 - test: `176689a7793c38c4b47d910ab783c355735d401571cee10883960f447edac982`
 
-## Current CI / provenance state
-Head after canonical proof wiring: `c730a6d7597bfa34de7705064479fdfbb1a2388e`.
+## CI / runner provenance
+For earlier head `c730a6d7597bfa34de7705064479fdfbb1a2388e`, CI `31593003144`, ApkC First Part Closure `31593003181`, Formal Science Orchestrator `31593003292`, and Document Governance `31593003301` all concluded `failure`, while their jobs reported `steps: []`, `runner_id: 0`, and empty runner names. Classification: `TOKEN_VAZIO_RUNNER`, not code failure.
 
-GitHub Actions runs observed for this head:
-
-- CI `31593003144`;
-- ApkC First Part Closure `31593003181`;
-- Formal Science Orchestrator `31593003292`;
-- Document Governance `31593003301`.
-
-All four concluded `failure`, but each corresponding job reported `steps: []`, `runner_id: 0`, and an empty runner name. Classification: `TOKEN_VAZIO_RUNNER`, not code failure. No repository proof execution may be claimed from these runs.
+For head `c5d939c67e5016c02dfc5428dff2637c1d1b3e2a`, GitHub reported six workflow runs. Formal Science Orchestrator run `31593551034` concluded `failure`; its single job again reported `steps: []`, `runner_id: 0`, and empty runner name. This independently confirms the runner/infrastructure condition persists on the new head. No repository proof execution is claimed from that workflow conclusion.
 
 ## Contract / epistemic state
 
 - `SOURCE_CAP_TRANSFORMER`: VERIFIED.
 - `TRANSFORMER_FALSIFIER_LOCAL`: VERIFIED.
 - `CANONICAL_PROOF_WIRING`: VERIFIED_STATIC.
+- `VALIDATOR_HARDENED_WIRING`: VERIFIED_STATIC.
+- `HERMETIC_TERMUX_HARDENED_WIRING`: VERIFIED_STATIC.
 - `CANONICAL_PROOF_EXECUTION`: TOKEN_VAZIO_RUNNER.
-- `DIRECT_CANONICAL_SOURCE_HARDENED`: TOKEN_VAZIO — `Apkc/apkc.c` itself still contains the vulnerable anchor; the proof path consumes a hardened generated translation unit.
+- `VALIDATOR_EXECUTION_ON_BRANCH`: TOKEN_VAZIO_RUNNER.
+- `HERMETIC_TERMUX_EXECUTION_ON_BRANCH`: TOKEN_VAZIO_PHYSICAL_ARM.
+- `DIRECT_CANONICAL_SOURCE_HARDENED`: TOKEN_VAZIO — `Apkc/apkc.c` itself still contains the vulnerable anchor; hardened consumers transform it before compilation.
 - `ARM_BOUNDARY_RUNTIME`: TOKEN_VAZIO.
 - `END_TO_END_APK_FROM_HARDENED_SOURCE`: TOKEN_VAZIO.
-- `claim_allowed`: false for end-to-end/runtime claims.
+- `claim_allowed`: false for end-to-end/runtime conclusions.
 
-## Urgency / closure gates
-P0 remains the bypass risk: build paths outside the canonical proof can still compile raw `Apkc/apkc.c` unless they explicitly consume the transformer.
+## Urgency / provenance / closure gates
+The largest bypasses identified in the canonical proof, validator, and hermetic Termux build paths are now mitigated statically. This does **not** establish repository-wide absence of every possible direct compile of raw `Apkc/apkc.c`; code search still returns additional references that require classification as documentation, historical evidence, test-only use, or executable build path.
 
-Closure order:
+Priority order:
 
-1. harden `Apkc/apkc.c` directly or enforce one shared hardened-source entrypoint across every build/validation path;
-2. run `make proof` on a runner that actually starts steps and archive `g0_source_cap.txt`, `g1_syntax.txt`, `g2_object.txt`, hashes and exit code;
-3. on ARM/Termux execute the boundary triad: `< 1048575` bytes PASS; `1048575` bytes PASS; `1048576` bytes FAIL with non-zero exit and no APK output;
-4. bind source SHA → hardened/source SHA → apkc ELF SHA → APK SHA → unzip/readelf/sign/install/runtime receipt.
+1. enumerate remaining executable references to `Apkc/apkc.c` and either route them through the hardened entrypoint or prove they are non-build/document-only;
+2. harden `Apkc/apkc.c` directly once all consumers of the exact-anchor transformer are migrated, preventing the transformer itself from becoming a regression dependency;
+3. run `make proof` and `scripts/apkc_validate.sh` on a runner that actually starts steps and archive hardening logs, hashes and exit codes;
+4. on ARM/Termux execute the boundary triad: `< 1048575` bytes PASS; `1048575` bytes PASS; `1048576` bytes FAIL with non-zero exit and no APK output;
+5. execute the hardened hermetic build and bind raw source SHA → hardened source SHA → ApkC ELF SHA → APK SHA → unzip/readelf/sign/install/runtime receipts.
 
-No gap is closed by narrative or workflow conclusion alone.
+No gap is closed by narrative, workflow conclusion, screenshot alone, or inference. Evidence from an earlier APK installation remains historical evidence until its exact source/ELF/APK hashes are bound to this branch.
