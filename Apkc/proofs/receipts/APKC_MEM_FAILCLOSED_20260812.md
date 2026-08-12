@@ -58,23 +58,48 @@ Probe coverage:
 Harness source SHA-256: `e45c2b3d3532a67e400868abe713625afca40d08511c8e35dbae6fa5605ee7a7`  
 Harness binary SHA-256: `98e59fbfba9c830ee97a64138e7c476d34ae442d404d2ec0ee488e2e314a67ca`
 
+## Call-site census
+
+Repository code search for `apk_alloc(` and `tmp_alloc(` returned only `Apkc/mem.h` itself at the base commit. No active caller was found. This means the change hardens a dormant/public utility path and should not alter the currently exercised ApkC build path.
+
+This also changes the next priority: active-path hardening should target input/build/output paths rather than waiting for allocator consumers that do not currently exist.
+
+## CI observation after draft PR creation
+
+Draft PR: `#216` (`audit/apkc-mem-failclosed-20260812`).
+
+Runs observed for head `edac479425257409e9f91a5bd8ff067aaa2c93ea`:
+
+- `Formal Science Orchestrator` run `31586082725`: workflow conclusion `failure`; job `94080117180` returned zero steps.
+- `CI` run `31586082737`: workflow conclusion `failure`; job `94080117575` returned zero steps; log fetch returned unavailable/404.
+- `ApkC First Part Closure` run `31586082795`: workflow reported `failure`, while job `94080118361` was still reported `queued` with zero steps.
+
+Per the fail-closed evidence contract these are **not attributed to the code change**. They are classified `TOKEN_VAZIO_RUNNER` / infrastructure-inconclusive until job steps/logs exist. A generic workflow-level `failure` with `steps=0` is not a code-test failure.
+
+## Newly exposed active-path gap
+
+Inspection of `Apkc/apkc.c` shows `_src_local[0x100000]` is filled only while `src_len < sizeof(_src_local)-1`; after the loop the compiler does not probe for an additional byte. Therefore an input at or above the buffer limit can be silently truncated and compiled from a prefix. This is an active fail-closed gap and is higher priority than dormant allocator call sites.
+
+Status: `KNOWN_GAP / claim_allowed=false` until patched and falsified with an oversized-input negative test.
+
 ## Limitations / TOKEN_VAZIO
 
 - `TOKEN_VAZIO`: the host harness replays the exact allocator body but does not include the repository `sys.h`, because that header intentionally emits ARM inline assembly and this receipt environment is x86_64.
 - `TOKEN_VAZIO`: ARM32 physical runtime not executed in this receipt.
 - `TOKEN_VAZIO`: ARM64 physical runtime not executed in this receipt.
-- `TOKEN_VAZIO`: downstream call sites have not yet been audited to ensure every `NULL` return is converted into an explicit build error rather than a later fault.
+- `TOKEN_VAZIO_RUNNER`: current PR workflows did not provide executable job steps/logs sufficient to classify the code.
+- `TOKEN_VAZIO`: active `_src_local` truncation gap is identified but not yet patched in this receipt.
 
 ## Closure gate
 
-This gap is not fully closed until:
+This allocator gap is locally contained, but full branch promotion requires:
 
-1. ARM-target compilation of the branch passes;
+1. ARM-target compilation of the branch passes with real job steps/logs;
 2. relevant existing ApkC validation/CI stays non-regressive;
-3. all `apk_alloc` / `tmp_alloc` call sites either check `NULL` or a central fail-closed gate proves the OOM latch before use.
+3. the active source-input truncation path is made fail-closed and receives an oversized-input negative test.
 
 ## R3
 
-- `F_ok`: fixed-pool overflow no longer advances the allocator; deterministic host boundary probe PASS.
-- `F_gap`: ARM execution and downstream NULL-consumer audit remain open.
-- `F_next`: enumerate allocator call sites and harden the first unchecked consumer, then run the repository ApkC validation workflow.
+- `F_ok`: fixed-pool overflow no longer advances allocator state; deterministic host boundary probe PASS; repository census found no active allocator consumers, reducing regression risk.
+- `F_gap`: CI runner evidence is inconclusive; ARM physical execution remains open; active source-buffer truncation can still silently compile a prefix.
+- `F_next`: patch `apkc_main` source ingestion to detect any byte beyond `_src_local` capacity and return a hard build error before `build_apk()`.
