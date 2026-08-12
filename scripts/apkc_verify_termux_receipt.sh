@@ -26,16 +26,30 @@ for f in "$RECEIPT" "$STATUS" "$EXIT_REC"; do
   }
 done
 
-grep -Fxq 'receipt_status=PASS' "$STATUS" || {
-  printf '%s\n' 'FAIL: finalization-status does not assert receipt_status=PASS' >&2
-  exit 66
-}
+# Producer metadata is a canonical two-file protocol, not an extensible bag of
+# key/value lines. Enforce exact line count/order and one bounded POSIX exit code
+# so contradictory duplicate keys cannot be smuggled into an otherwise valid hash.
+status_lines=$(wc -l < "$STATUS" | tr -d ' ')
+if [ "$status_lines" != 2 ] || ! sed -n '1p' "$STATUS" | grep -Fxq 'receipt_status=PASS'; then
+  printf '%s\n' 'FAIL: finalization-status schema is non-canonical or ambiguous' >&2
+  exit 77
+fi
+status_gate=$(sed -n '2p' "$STATUS")
+if ! printf '%s\n' "$status_gate" | grep -Eq '^gate_exit_code=([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$'; then
+  printf '%s\n' 'FAIL: finalization-status gate_exit_code is missing/out-of-range/ambiguous' >&2
+  exit 77
+fi
 
-gate_line=$(grep '^gate_exit_code=' "$EXIT_REC" || true)
-[ -n "$gate_line" ] || {
-  printf '%s\n' 'FAIL: run-exit.txt lacks gate_exit_code' >&2
-  exit 67
-}
+exit_lines=$(wc -l < "$EXIT_REC" | tr -d ' ')
+if [ "$exit_lines" != 1 ]; then
+  printf '%s\n' 'FAIL: run-exit schema is non-canonical or ambiguous' >&2
+  exit 78
+fi
+gate_line=$(sed -n '1p' "$EXIT_REC")
+if ! printf '%s\n' "$gate_line" | grep -Eq '^gate_exit_code=([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$'; then
+  printf '%s\n' 'FAIL: run-exit gate_exit_code is missing/out-of-range/ambiguous' >&2
+  exit 78
+fi
 
 # The producer only emits SHA-256 entries for regular files at run-dir depth 1.
 # Reject absolute/parent/subdirectory paths so a forged receipt cannot broaden
@@ -99,10 +113,9 @@ fi
 }
 
 # The status file must preserve the same original gate result as run-exit.txt.
-status_gate=$(grep '^gate_exit_code=' "$STATUS" || true)
 [ "$status_gate" = "$gate_line" ] || {
-  printf 'FAIL: gate exit mismatch: run=%s status=%s\n' "$gate_line" "${status_gate:-TOKEN_VAZIO}" >&2
+  printf 'FAIL: gate exit mismatch: run=%s status=%s\n' "$gate_line" "$status_gate" >&2
   exit 70
 }
 
-printf 'PASS: custody receipt verified with complete unique coverage; %s; claim_allowed remains false\n' "$gate_line"
+printf 'PASS: custody receipt verified with complete unique coverage + canonical metadata; %s; claim_allowed remains false\n' "$gate_line"
