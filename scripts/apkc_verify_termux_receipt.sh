@@ -51,28 +51,36 @@ if ! printf '%s\n' "$gate_line" | grep -Eq '^gate_exit_code=([0-9]|[1-9][0-9]|1[
   exit 78
 fi
 
-# The producer only emits SHA-256 entries for regular files at run-dir depth 1.
-# Reject absolute/parent/subdirectory paths so a forged receipt cannot broaden
-# the verifier's trust boundary.
-if grep -Ev '^[0-9a-fA-F]{64}  \./[^/]+$' "$RECEIPT" | grep -q .; then
-  printf '%s\n' 'FAIL: receipt contains malformed or out-of-scope path entries' >&2
+# The producer only emits lowercase SHA-256 entries for regular files at run-dir
+# depth 1. Enforce that exact textual form so one evidence set has one canonical
+# receipt representation instead of multiple equivalent encodings.
+if grep -Ev '^[0-9a-f]{64}  \./[^/]+$' "$RECEIPT" | grep -q .; then
+  printf '%s\n' 'FAIL: receipt contains malformed, non-canonical or out-of-scope path entries' >&2
   exit 71
 fi
 
 # Reject duplicate path entries. A receipt is a one-to-one manifest, not a
 # multiset where the same artifact can be asserted more than once.
-receipt_paths=$(sed 's/^[0-9a-fA-F]\{64\}  //' "$RECEIPT")
+receipt_paths=$(sed 's/^[0-9a-f]\{64\}  //' "$RECEIPT")
 if printf '%s\n' "$receipt_paths" | LC_ALL=C sort | uniq -d | grep -q .; then
   printf '%s\n' 'FAIL: receipt contains duplicate path entries' >&2
   exit 75
 fi
 
+# Producer order is canonical LC_ALL=C pathname order. A valid set with a
+# different line permutation is rejected to keep receipts byte-deterministic.
+listed_paths=$(printf '%s\n' "$receipt_paths" | LC_ALL=C sort)
+if [ "$receipt_paths" != "$listed_paths" ]; then
+  printf '%s\n' 'FAIL: receipt path order is non-canonical' >&2
+  exit 79
+fi
+
 # Custody-critical files must themselves be covered by the receipt.
-grep -Eq '^[0-9a-fA-F]{64}  \./finalization-status\.txt$' "$RECEIPT" || {
+grep -Eq '^[0-9a-f]{64}  \./finalization-status\.txt$' "$RECEIPT" || {
   printf '%s\n' 'FAIL: finalization-status.txt omitted from receipt coverage' >&2
   exit 72
 }
-grep -Eq '^[0-9a-fA-F]{64}  \./run-exit\.txt$' "$RECEIPT" || {
+grep -Eq '^[0-9a-f]{64}  \./run-exit\.txt$' "$RECEIPT" || {
   printf '%s\n' 'FAIL: run-exit.txt omitted from receipt coverage' >&2
   exit 73
 }
@@ -85,15 +93,12 @@ fi
 
 # Completeness invariant: the producer hashes every regular depth-1 file except
 # receipt.sha256 and receipt-verify.txt. Reconstruct that eligible set from the
-# archived run and require exact equality with the receipt path set. This closes
-# omission attacks where a payload (for example hello.apk) is removed from the
-# manifest while all remaining listed hashes still verify.
+# archived run and require exact equality with the receipt path set.
 expected_paths=$(
   cd "$RUN_DIR"
   find . -maxdepth 1 -type f ! -name 'receipt.sha256' ! -name 'receipt-verify.txt' -print \
     | LC_ALL=C sort
 )
-listed_paths=$(printf '%s\n' "$receipt_paths" | LC_ALL=C sort)
 if [ "$expected_paths" != "$listed_paths" ]; then
   printf '%s\n' 'FAIL: receipt coverage is incomplete or contains non-eligible files' >&2
   printf '%s\n' 'EXPECTED:' >&2
@@ -118,4 +123,4 @@ fi
   exit 70
 }
 
-printf 'PASS: custody receipt verified with complete unique coverage + canonical metadata; %s; claim_allowed remains false\n' "$gate_line"
+printf 'PASS: custody receipt verified with canonical deterministic coverage + metadata; %s; claim_allowed remains false\n' "$gate_line"
