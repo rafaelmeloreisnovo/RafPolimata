@@ -1,0 +1,97 @@
+diff --git a/Android.mk b/Android.mk
+new file mode 100644
+index 0000000..baa2843
+--- /dev/null
++++ b/Android.mk
+@@ -0,0 +1,19 @@
++# Android.mk — RAFAELIA V4.1 hardened baseline
++# C/JNI-only shared library. ARM assembly is intentionally excluded until
++# each .S passes architecture-specific assemble/link/run gates on real devices.
++LOCAL_PATH := $(call my-dir)
++
++include $(CLEAR_VARS)
++LOCAL_MODULE := rafaelia_core
++LOCAL_SRC_FILES := baremetal_nomalloc.c rafaelia_jni_direct.c
++LOCAL_C_INCLUDES := $(LOCAL_PATH)
++LOCAL_CFLAGS := -O2 -fno-stack-protector -DNDEBUG -D_GNU_SOURCE
++ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
++LOCAL_CFLAGS += -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=softfp -DHAS_NEON
++endif
++ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
++LOCAL_CFLAGS += -march=armv8-a -DHAS_NEON -DRAF_ARCH64
++endif
++LOCAL_LDFLAGS := -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384 -Wl,--gc-sections -Wl,-z,relro -Wl,-z,now
++LOCAL_LDLIBS := -llog -ldl -lm
++include $(BUILD_SHARED_LIBRARY)
+diff --git a/RafaeliaCore.java b/RafaeliaCore.java
+index 0a12d14..3082d9f 100644
+--- a/RafaeliaCore.java
++++ b/RafaeliaCore.java
+@@ -27,13 +27,15 @@ public final class RafaeliaCore {
+         OUT_BUF   = ByteBuffer.allocateDirect(OUT_CAP).order(ByteOrder.nativeOrder());
+         STATE_BUF = ByteBuffer.allocateDirect(STATE_CAP).order(ByteOrder.nativeOrder());
+ 
+-        // Inicializa estado no buffer nativo
++        // Inicializa estado no buffer nativo com atribuição única do blank-final.
++        boolean loaded;
+         try {
+             System.loadLibrary("rafaelia_core");
+-            _libLoaded = true;
++            loaded = true;
+         } catch (UnsatisfiedLinkError e) {
+-            _libLoaded = false;
++            loaded = false;
+         }
++        _libLoaded = loaded;
+     }
+ 
+     private static final boolean _libLoaded;
+diff --git a/baremetal_nomalloc.c b/baremetal_nomalloc.c
+index 5db9410..cce4dfd 100644
+--- a/baremetal_nomalloc.c
++++ b/baremetal_nomalloc.c
+@@ -11,7 +11,7 @@
+  * Copyright (c) instituto-Rafael — GPLv3
+  */
+ 
+-#include "baremetal.h"
++#include "baremetal_nomalloc.h"
+ 
+ #include <stdint.h>
+ #include <stddef.h>
+@@ -34,7 +34,6 @@
+ static unsigned char __attribute__((aligned(64)))
+     g_bm_arena_buf[BM_ARENA_SZ];
+ 
+-static size_t g_bm_arena_off = 0;
+ 
+ /* arena pública (exposta via header) */
+ static mx_arena_t g_bm_arena_hdr = {
+@@ -78,7 +77,11 @@ static bm_caps_t g_caps = {0,0,0,0};
+ /* lê auxv sem getauxval (sem libc pesada) */
+ static int bm_read_auxv(unsigned long *hwcap, unsigned long *hwcap2) {
+     struct { unsigned long type; unsigned long val; } ent;
+-    int fd = open("/proc/self/auxv", O_RDONLY | O_CLOEXEC);
++    int flags = O_RDONLY;
++#ifdef O_CLOEXEC
++    flags |= O_CLOEXEC;
++#endif
++    int fd = open("/proc/self/auxv", flags);
+     if (fd < 0) return 0;
+     int got = 0;
+     *hwcap = 0; *hwcap2 = 0;
+@@ -98,7 +101,8 @@ static void bm_init_caps(void) {
+ #if defined(HAS_NEON) || defined(__ARM_NEON) || defined(__ARM_NEON__)
+     bin |= CAP_NEON | CAP_ASIMD;
+ #endif
+-#if defined(HAS_AVX2);  bin |= CAP_AVX2; bin |= CAP_AVX; }
++#if defined(HAS_AVX2)
++    bin |= CAP_AVX2 | CAP_AVX;
+ #endif
+ #if defined(HAS_AVX)
+     bin |= CAP_AVX;
+@@ -223,7 +227,9 @@ int bstr_cmp(const char *a, const char *b) {
+     return *(const unsigned char *)a - *(const unsigned char *)b;
+ }
+ char *bstr_cpy(char *d, const char *s) {
+-    char *p = d; while ((*p++

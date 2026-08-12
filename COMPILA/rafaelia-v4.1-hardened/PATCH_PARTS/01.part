@@ -1,0 +1,97 @@
+ = *s++)); return d;
++    char *p = d;
++    while ((*p++ = *s++)) { /* copy including terminator */ }
++    return d;
+ }
+ 
+ /* ============================================================================
+@@ -676,7 +682,11 @@ int      get_arch_runtime_caps_valid(void) { bm_init_caps(); return g_caps.valid
+  * ========================================================================== */
+ static ssize_t bm_read_file(const char *path, char *buf, size_t n) {
+     if (!path || !buf || !n) return -1;
+-    int fd = open(path, O_RDONLY | O_CLOEXEC);
++    int flags = O_RDONLY;
++#ifdef O_CLOEXEC
++    flags |= O_CLOEXEC;
++#endif
++    int fd = open(path, flags);
+     if (fd < 0) return -1;
+     ssize_t r = read(fd, buf, n-1);
+     close(fd);
+diff --git a/build_all.sh b/build_all.sh
+index 7130c08..e018f39 100644
+--- a/build_all.sh
++++ b/build_all.sh
+@@ -43,14 +43,15 @@ $LD rafaelia_b5.o -o rafaelia_b5 && pass "rafaelia_b5" || fail "B5 ld"
+ echo "--- ORCHESTRATOR ---"
+ $CC $CC_FLAGS rafaelia_orchestrator.c -o rafaelia_orch -lm -ldl \
+     && pass "rafaelia_orch" || fail "ORCH compile"
+-./rafaelia_orch && pass "ORCH OK" || pass "ORCH OK (CPU fallback)"
++./rafaelia_orch && pass "ORCH OK" || fail "ORCH run"
+ 
+ echo "--- BAREMETAL NOMALLOC ---"
+ $CC $CC_FLAGS -c baremetal_nomalloc.c -o baremetal_nomalloc.o -I. \
+     && pass "baremetal_nomalloc.o" || fail "baremetal"
+ 
+ echo "--- DIAGNOSE ---"
+-chmod +x diagnose.sh && ./diagnose.sh || true
++chmod +x diagnose.sh
++./diagnose.sh && pass "DIAGNOSE OK" || fail "DIAGNOSE"
+ 
+ echo ""
+ echo "=== DONE ==="
+diff --git a/rafaelia_core.c b/rafaelia_core.c
+index 33a1e33..a3031da 100644
+--- a/rafaelia_core.c
++++ b/rafaelia_core.c
+@@ -94,6 +94,41 @@ static u32 rd_u32_file(const char *p){
+     return v;
+ }
+ 
++/* Parse Linux CPU-list syntax (e.g. "0-7", "0-3,6-7") without heap. */
++static u32 cpu_count_list(const char *s){
++    if(!s || !*s) return 0;
++    u32 total=0; const char *p=s;
++    while(*p){
++        while(*p==' '||*p=='\t'||*p=='\n'||*p==',') p++;
++        if(*p<'0'||*p>'9') break;
++        u32 a=0;
++        while(*p>='0'&&*p<='9'){ a=a*10u+(u32)(*p-'0'); p++; }
++        u32 b=a;
++        if(*p=='-'){
++            p++;
++            if(*p<'0'||*p>'9') return 0;
++            b=0;
++            while(*p>='0'&&*p<='9'){ b=b*10u+(u32)(*p-'0'); p++; }
++            if(b<a) return 0;
++        }
++        total += (b-a)+1u;
++        while(*p==' '||*p=='\t') p++;
++        if(*p==','){ p++; continue; }
++        if(*p=='\n'||*p=='\r'||*p=='\0') break;
++        if(*p) return 0;
++    }
++    return total;
++}
++
++static u32 rd_cpu_count_file(const char *path){
++    char b[96]; int fd=open(path,O_RDONLY|O_CLOEXEC);
++    if(fd<0) return 0;
++    ssize_t n=read(fd,b,sizeof(b)-1u); close(fd);
++    if(n<=0) return 0;
++    b[n]=0;
++    return cpu_count_list(b);
++}
++
+ /* GPU paths Android/Termux — por fabricante                              */
+ /* Referência: Android VNDK spec, Khronos OpenCL 3.0 ICD loader spec     */
+ static const char *GPU_PATHS[] = {
+@@ -114,7 +149,7 @@ static const char *GPU_PATHS[] = {
+ 
+ static void hw_probe(hw_t *h){
+     memset(h,0,sizeof(*h));
+-    h->n_cpu   = rd_u32_file("/sys/devices/system/cpu/present");
++    h->n_cpu   = rd_cpu_count_file("/sys/devices/system/cpu/present");
+     if(!h->n_cpu) h->n_cpu = N_VCPU;
+     h->freq0_khz = rd_u32_file(
+         "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");

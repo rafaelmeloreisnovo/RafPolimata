@@ -1,0 +1,90 @@
+x_arm32_build.sh
+@@ -1024,7 +1024,7 @@ clang $CFLAGS raf_asm_b1.S -o raf_b1 2>/dev/null \
+         as $AFLAGS raf_asm_b1.S -o raf_b1.o 2>/dev/null \
+             && ld $LDFLAGS_BARE raf_b1.o -o raf_b1 2>/dev/null \
+             && pass "raf_b1 (as+ld)" \
+-            || log "raf_b1 asm skipped (normal em emulador x86)"
++            || fail "raf_b1 ASM failed"
+     }
+ 
+ # Compila módulos dos zips anteriores se existirem
+@@ -1034,7 +1034,7 @@ for src in rafaelia_orchestrator.c rafaelia_glue.c rafaelia_bitraf.c \
+     BIN="${src%.c}"
+     section "$src"
+     clang $TCF "$src" -o "$BIN" -lm -ldl 2>/dev/null \
+-        && pass "$BIN" || log "$BIN skipped"
++        && pass "$BIN" || fail "$BIN compile failed"
+ done
+ 
+ # =============================================================================
+diff --git a/verify_hardened.sh b/verify_hardened.sh
+new file mode 100755
+index 0000000..a3307ef
+--- /dev/null
++++ b/verify_hardened.sh
+@@ -0,0 +1,65 @@
++#!/bin/sh
++set -eu
++
++SELF_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
++cd "$SELF_DIR"
++CC="${CC:-clang}"
++JAVAC="${JAVAC:-javac}"
++OUT="${1:-.verify-hardened}"
++mkdir -p "$OUT/classes"
++
++pass() { printf 'PASS %s\n' "$*"; }
++fail() { printf 'FAIL %s\n' "$*" >&2; exit 1; }
++tv()   { printf 'TOKEN_VAZIO %s\n' "$*"; }
++
++for f in *.sh; do
++    sh -n "$f" || fail "shell-syntax:$f"
++done
++pass shell-syntax
++
++"$CC" -std=c11 -D_GNU_SOURCE -O1 -g -fsanitize=address,undefined \
++  -fno-omit-frame-pointer rafaelia_core.c -o "$OUT/rafaelia_core" -lm -ldl \
++  || fail core-build
++ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1 \
++  "$OUT/rafaelia_core" >"$OUT/core.out" 2>"$OUT/core.err" || fail core-run
++[ ! -s "$OUT/core.err" ] || fail core-sanitizer
++pass core-asan-ubsan
++
++"$CC" -std=c11 -O1 -g -fsanitize=address,undefined \
++  -fno-omit-frame-pointer rafaelia_orchestrator.c -o "$OUT/rafaelia_orchestrator" -lm -ldl \
++  || fail orchestrator-build
++ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1 \
++  "$OUT/rafaelia_orchestrator" >"$OUT/orchestrator.out" 2>"$OUT/orchestrator.err" \
++  || fail orchestrator-run
++[ ! -s "$OUT/orchestrator.err" ] || fail orchestrator-sanitizer
++grep -q '^OK: 42$' "$OUT/orchestrator.out" || fail orchestrator-42-of-42
++grep -q '^CRC_ERR: 0$' "$OUT/orchestrator.out" || fail orchestrator-crc
++pass orchestrator-asan-ubsan-42of42
++
++"$CC" -std=c11 -D_GNU_SOURCE -O2 -Wall -Wextra -Werror \
++  -c baremetal_nomalloc.c -o "$OUT/baremetal_nomalloc.o" || fail baremetal-werror
++pass baremetal-werror
++
++"$JAVAC" -Xlint:all -d "$OUT/classes" RafaeliaCore.java \
++  >"$OUT/javac.out" 2>"$OUT/javac.err" || fail java-xlint
++[ ! -s "$OUT/javac.err" ] || fail java-xlint-stderr
++pass java-xlint
++
++asm_pass=0
++asm_fail=0
++: >"$OUT/armv7-asm.log"
++for f in *.S; do
++    if "$CC" --target=armv7a-linux-gnueabihf -march=armv7-a -mfpu=neon-vfpv4 \
++        -c "$f" -o "$OUT/${f%.S}.armv7.o" >>"$OUT/armv7-asm.log" 2>&1; then
++        asm_pass=$((asm_pass + 1))
++    else
++        asm_fail=$((asm_fail + 1))
++    fi
++done
++printf 'ARMV7_ASM_PASS=%s ARMV7_ASM_FAIL=%s\n' "$asm_pass" "$asm_fail"
++[ "$asm_fail" -eq 0 ] || tv "armv7-asm-closure:$asm_fail-failures"
++
++tv android-ndk-device-build-run
++tv armv7-real-device-execution
++tv gpu-kernel-execution-current-path-is-cpu-fallback
++printf 'CLAIM_ALLOWED=false\nSTATUS=VERIFIED_LIMITED\n'
