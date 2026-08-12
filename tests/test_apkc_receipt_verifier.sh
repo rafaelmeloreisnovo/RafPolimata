@@ -72,8 +72,7 @@ cp -R "$TMP/ok" "$TMP/extra"
 printf 'unexpected\n' > "$TMP/extra/unlisted.txt"
 expect_rc 76 "$VERIFY" "$TMP/extra"
 
-# Metadata ambiguity attack: append contradictory status while rehashing all
-# bytes. Hash integrity alone must not allow semantically contradictory status.
+# Metadata ambiguity attack: append contradictory status while rehashing all bytes.
 cp -R "$TMP/ok" "$TMP/status-conflict"
 printf 'receipt_status=FAIL\n' >> "$TMP/status-conflict/finalization-status.txt"
 rehash_run "$TMP/status-conflict"
@@ -85,12 +84,26 @@ printf 'gate_exit_code=0\n' >> "$TMP/run-exit-duplicate/run-exit.txt"
 rehash_run "$TMP/run-exit-duplicate"
 expect_rc 78 "$VERIFY" "$TMP/run-exit-duplicate"
 
-# Exit codes are canonical POSIX process status values (0..255), not arbitrary
-# integers; recomputing the receipt must not broaden that semantic domain.
+# Exit codes are canonical POSIX process status values (0..255).
 cp -R "$TMP/ok" "$TMP/gate-out-of-range"
 printf 'receipt_status=PASS\ngate_exit_code=999\n' > "$TMP/gate-out-of-range/finalization-status.txt"
 printf 'gate_exit_code=999\n' > "$TMP/gate-out-of-range/run-exit.txt"
 rehash_run "$TMP/gate-out-of-range"
 expect_rc 77 "$VERIFY" "$TMP/gate-out-of-range"
 
-printf '%s\n' 'PASS: ApkC verifier positive + omission + duplicate + tamper + extra-file + metadata ambiguity cases'
+# Canonical representation attack: valid hashes in a different line order must
+# be rejected even though sha256sum -c would otherwise accept every line.
+cp -R "$TMP/ok" "$TMP/reordered"
+sed -n '2,$p' "$TMP/reordered/receipt.sha256" > "$TMP/reordered/receipt.new"
+sed -n '1p' "$TMP/reordered/receipt.sha256" >> "$TMP/reordered/receipt.new"
+mv "$TMP/reordered/receipt.new" "$TMP/reordered/receipt.sha256"
+expect_rc 79 "$VERIFY" "$TMP/reordered"
+
+# Producer sha256sum emits lowercase hex. Uppercase is cryptographically
+# equivalent but non-canonical and therefore rejected by the custody protocol.
+cp -R "$TMP/ok" "$TMP/uppercase"
+tr 'abcdef' 'ABCDEF' < "$TMP/uppercase/receipt.sha256" > "$TMP/uppercase/receipt.new"
+mv "$TMP/uppercase/receipt.new" "$TMP/uppercase/receipt.sha256"
+expect_rc 71 "$VERIFY" "$TMP/uppercase"
+
+printf '%s\n' 'PASS: ApkC verifier positive + omission + duplicate + tamper + extra-file + metadata + canonical-order/hex cases'
