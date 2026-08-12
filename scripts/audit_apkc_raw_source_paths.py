@@ -6,8 +6,8 @@ import sys
 from pathlib import Path
 
 RAW_MARKERS = ("Apkc/apkc.c", "$APKC/apkc.c", "${APKC}/apkc.c")
-HARDENING_MARKERS = ("patch_apkc_source_cap.py", "patch_apkc_runtime_source.py")
-EXEC_SUFFIXES = {".sh", ".py", ".bash"}
+HARDENING_MARKERS = ("patch_apkc_source_cap.py", "patch_apkc_runtime_source.py", "apkc-hardened-source")
+EXEC_SUFFIXES = {".sh", ".py", ".bash", ".yml", ".yaml"}
 EXEC_NAMES = {"Makefile"}
 
 
