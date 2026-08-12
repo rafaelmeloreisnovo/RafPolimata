@@ -1,0 +1,62 @@
+{
+  "schema": "rafaelia.evidence.v1",
+  "artifact": "RAFAELIA_COMPLETE_v4 -> RafPolimata V4.1 hardened",
+  "source_artifact": "RAFAELIA_COMPLETE_v4.zip",
+  "source_sha256": "d71656be2e649f4344ebebf1e1fdeee75052f3ed9db51551bbb51fefa5cbe454",
+  "source_zip_entries": 34,
+  "status": "VERIFIED_LIMITED",
+  "claim_allowed": false,
+  "append_only_evidence": true,
+  "verified_host_gates": [
+    "shell syntax: PASS",
+    "rafaelia_core.c: ASan+UBSan build/run PASS; stderr 0 bytes",
+    "rafaelia_orchestrator.c: ASan+UBSan build/run PASS; OK=42; CRC_ERR=0; stderr 0 bytes",
+    "baremetal_nomalloc.c: -Wall -Wextra -Werror compile PASS",
+    "RafaeliaCore.java: javac -Xlint:all PASS; stderr 0 bytes"
+  ],
+  "token_vazio": [
+    {
+      "claim": "armv7-assembly-closure",
+      "state": "TOKEN_VAZIO",
+      "evidence": "cross-assembler probe: 0 PASS / 9 FAIL",
+      "next_gate": "repair ARMv7 assembly and rerun assembler/linker gate"
+    },
+    {
+      "claim": "armv7-real-device-execution",
+      "state": "TOKEN_VAZIO",
+      "next_gate": "execute receipts on physical ARM32 Termux"
+    },
+    {
+      "claim": "android-ndk-device-build-run",
+      "state": "TOKEN_VAZIO",
+      "next_gate": "NDK build for armeabi-v7a and arm64-v8a, then device run"
+    },
+    {
+      "claim": "gpu-kernel-execution",
+      "state": "TOKEN_VAZIO",
+      "evidence": "current runtime reports CPU fallback",
+      "next_gate": "implement and execute a real OpenCL/Vulkan compute kernel with receipt"
+    }
+  ],
+  "governance": {
+    "network_required_for_local_gate": false,
+    "remote_ci_substituted": false,
+    "hardware_claims_from_host_cross_checks": false
+  },
+  "repository_representation": {
+    "mode": "content-addressed-source-reference-plus-unified-patch",
+    "path": "COMPILA/rafaelia-v4.1-hardened",
+    "materializer": "MATERIALIZE_AND_VERIFY.sh",
+    "source_embedded": false,
+    "source_sha256_gate": true,
+    "patch_storage": "ordered-fragments",
+    "patch_parts": [
+      "PATCH_PARTS/00.part",
+      "PATCH_PARTS/01.part",
+      "PATCH_PARTS/02.part",
+      "PATCH_PARTS/03.part",
+      "PATCH_PARTS/04.part"
+    ],
+    "reassembled_patch_sha256": "739d0123f953c3bde2546095788dc2fc62143fcf0e016997b2ce2615378c4c68"
+  }
+}

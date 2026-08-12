@@ -1,0 +1,104 @@
+
+ else
+-    log "assembler not found — skipping .S blocks"
++    log "TOKEN_VAZIO: ARM32 assembly not executed on ABI=$ABI"
+ fi
+ 
+ 
+@@ -1090,15 +1091,15 @@ section "running C binaries"
+ 
+ run_bin() {
+     BIN="$1"; DESC="$2"
+-    [ -x "./$BIN" ] || { log "$BIN not built — skip"; return; }
++    [ -x "./$BIN" ] || fail "$BIN not built"
+     OUT=$(./"$BIN" 2>&1)
+     RC=$?
+     if [ $RC -eq 0 ]; then
+         pass "$DESC"
+         echo "$OUT" | head -4 | sed 's/^/    /'
+     else
+-        log "$DESC exit=$RC"
+         echo "$OUT" | tail -3 | sed 's/^/    /'
++        fail "$DESC exit=$RC"
+     fi
+ }
+ 
+@@ -1107,10 +1108,14 @@ run_bin rafaelia_bitraf "BitRAF 1008"
+ run_bin rafaelia_orch   "Orchestrator GPU+CPU"
+ run_bin rafaelia_glue   "Glue all modules"
+ 
+-# Assembly binaries (só em ARM)
+-for n in 1 2 3 4 5 6 7 8; do
+-    run_bin "rafaelia_b${n}" "B${n} ASM"
+-done
++# Assembly binaries: only valid under the ARM32 target ABI.
++if [ "$ABI" = "armeabi-v7a" ]; then
++    for n in 1 2 3 4 5 6 7 8; do
++        run_bin "rafaelia_b${n}" "B${n} ASM"
++    done
++else
++    log "TOKEN_VAZIO: ARM32 assembly runtime not verified on ABI=$ABI"
++fi
+ 
+ # =============================================================================
+ # BLOCO 10: DIAGNOSE
+@@ -1126,7 +1131,7 @@ cd ..
+ ZIP_NAME="rafaelia_complete_$(date +%Y%m%d_%H%M%S).zip"
+ find rafaelia_root -maxdepth 1 -type f | \
+     xargs zip -j "$ZIP_NAME" 2>/dev/null && pass "ZIP: $ZIP_NAME" \
+-    || log "zip failed"
++    || fail "zip failed"
+ 
+ cd rafaelia_root
+ 
+diff --git a/rafaelia_orchestrator.c b/rafaelia_orchestrator.c
+index 1184686..a50f072 100644
+--- a/rafaelia_orchestrator.c
++++ b/rafaelia_orchestrator.c
+@@ -282,14 +282,18 @@ static uint8_t hz_to_layer(uint32_t hz_q16) {
+     if (hz_q16 > 45000u) return MEM_L2;
+     if (hz_q16 > 30000u) return MEM_BUF;
+     if (hz_q16 > 15000u) return MEM_RAM;
+-    return MEM_STOR;
++    /* MEM_STOR has no executable buffer; lowest band stays in RAM. */
++    return MEM_RAM;
+ }
+ 
+ static void vcpu_init(hw_t *h) {
+     /* base Hz relativo = cluster_freq mapeado para Q16.16
+      * normalizado em 65536 */
+-    uint32_t base0 = h->cluster_freq[0] / 1000u; /* kHz */
+-    uint32_t base1 = h->cluster_freq[1] / 1000u;
++    uint32_t max_cluster = h->cluster_freq[0] > h->cluster_freq[1]
++        ? h->cluster_freq[0] : h->cluster_freq[1];
++    if (!max_cluster) max_cluster = 1u;
++    uint32_t base0 = (uint32_t)(((uint64_t)h->cluster_freq[0] << 16) / max_cluster);
++    uint32_t base1 = (uint32_t)(((uint64_t)h->cluster_freq[1] << 16) / max_cluster);
+ 
+     for (uint32_t i = 0; i < N_VCPU; i++) {
+         /* cores 0-3: cluster0, cores 4-7: cluster1 */
+@@ -422,8 +426,10 @@ static void mem_init(void) {
+         g_mem[i].dirty = 0;
+         g_mem[i].hits  = 0;
+         g_mem[i].misses = 0;
+-        if (g_mem[i].buf)
++        if (g_mem[i].buf) {
+             memset(g_mem[i].buf, 0, szs[i]);
++            g_mem[i].crc = crc32c(g_mem[i].buf, szs[i]);
++        }
+     }
+     /* storage: sem buffer */
+     g_mem[MEM_STOR].buf = 0;
+@@ -790,7 +796,7 @@ static void p_u32(uint32_t v) {
+ }
+ 
+ static void p_hex(uint32_t v) {
+-    char buf[10];
++    char buf[11];
+     buf[0]='0'; buf[1]='x';
+     for (int i = 0; i < 8; i++)
+         buf[2+i] = HEX[(v >> (28 - i*4)) & 0xF];
+diff --git a/termux_arm32_build.sh b/termux_arm32_build.sh
+index 0b03d37..87a1085 100644
+--- a/termux_arm32_build.sh
++++ b/termu

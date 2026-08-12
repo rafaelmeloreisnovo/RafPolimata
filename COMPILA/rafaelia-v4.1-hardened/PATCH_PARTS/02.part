@@ -1,0 +1,85 @@
+
+@@ -254,7 +289,8 @@ static u32    g_commits=0, g_rollbacks=0;
+ #define CG_PROC   0x2u
+ #define CG_VERIFY 0x4u
+ #define CG_COMMIT 0x8u
+-#define CG_ALL    0xFu
++#define CG_PRECOMMIT (CG_LOAD|CG_PROC|CG_VERIFY)
++#define CG_ALL       (CG_PRECOMMIT|CG_COMMIT)
+ 
+ static void cg_step(u32 core){
+     vcpu_t *v=&g_vcpu[core];
+@@ -277,9 +313,11 @@ static void cg_step(u32 core){
+         g_cg_bm[core]=0; g_rollbacks++; return;
+     }
+     g_cg_bm[core]|=CG_VERIFY;
+-    /* COMMIT */
+-    if((g_cg_bm[core]&CG_ALL)==CG_ALL){
+-        v->crc_s=sc; g_cg_bm[core]=0; g_commits++;
++    /* COMMIT: prerequisites first, then atomically expose commit state. */
++    if((g_cg_bm[core]&CG_PRECOMMIT)==CG_PRECOMMIT){
++        g_cg_bm[core]|=CG_COMMIT;
++        v->crc_s=sc; g_commits++;
++        g_cg_bm[core]=0;
+     }
+ }
+ 
+@@ -374,7 +412,7 @@ int main(void){
+     );
+     ws("vCPU: "); wu32(hw.n_cpu); wn();
+     ws("NEON: "); ws(hw.has_neon?"YES":"NO"); wn();
+-    ws("GPU:  "); ws(hw.gpu_found?hw.gpu_path:"CPU-NEON"); wn();
++    ws("GPU:  "); ws(hw.gpu_found?hw.gpu_path:(hw.has_neon?"CPU-NEON":"CPU-SCALAR")); wn();
+     ws("PAGE: "); wu32(hw.page_sz); wn();
+     wlabel("FREQ0_kHz: ",(u32)hw.freq0_khz);
+     wlabel("FREQ1_kHz: ",(u32)hw.freq1_khz);
+diff --git a/rafaelia_master.sh b/rafaelia_master.sh
+index dc84a07..2e5b389 100644
+--- a/rafaelia_master.sh
++++ b/rafaelia_master.sh
+@@ -1045,41 +1045,42 @@ section() { printf "\n\033[1;36m--- %s ---\033[0m\n" "$*"; }
+ 
+ section "sigma_omega"
+ $CC $CC_FLAGS rafaelia_sigma_omega.c -o sigma_omega -lm \
+-    && pass "sigma_omega" || { log "sigma_omega failed (math unavail?)"; true; }
++    && pass "sigma_omega" || fail "sigma_omega compile error"
+ 
+ section "bitraf"
+ $CC $CC_FLAGS rafaelia_bitraf.c -o rafaelia_bitraf \
+-    && pass "rafaelia_bitraf" || log "bitraf compile error"
++    && pass "rafaelia_bitraf" || fail "bitraf compile error"
+ 
+ section "gpu_mid"
+ $CC $CC_FLAGS -c rafaelia_gpu_mid.c -o rafaelia_gpu_mid.o \
+-    && pass "rafaelia_gpu_mid.o" || log "gpu_mid compile error"
++    && pass "rafaelia_gpu_mid.o" || fail "gpu_mid compile error"
+ 
+ section "orchestrator"
+ $CC $CC_FLAGS rafaelia_orchestrator.c -o rafaelia_orch -lm -ldl \
+-    && pass "rafaelia_orch" || log "orch compile error"
++    && pass "rafaelia_orch" || fail "orch compile error"
+ 
+ section "glue (all modules)"
+ $CC $CC_FLAGS rafaelia_glue.c -o rafaelia_glue -lm -ldl \
+-    && pass "rafaelia_glue" || log "glue compile error"
++    && pass "rafaelia_glue" || fail "glue compile error"
+ 
+ # =============================================================================
+ # BLOCO 8: COMPILE ASSEMBLY BLOCKS (se AS disponível)
+ # =============================================================================
+ section "assembly blocks"
+-if command -v "$AS" >/dev/null 2>&1; then
++if [ "$ABI" = "armeabi-v7a" ]; then
++    command -v "$AS" >/dev/null 2>&1 || fail "ARM32 assembler not found"
+     for n in 1 2 3 4 5 6 7 8; do
+         SRC="rafaelia_b${n}.S"
+         BIN="rafaelia_b${n}"
+         OBJ="rafaelia_b${n}.o"
+-        [ -f "$SRC" ] || { log "missing $SRC"; continue; }
++        [ -f "$SRC" ] || fail "missing $SRC"
+         $AS $AS_FLAGS "$SRC" -o "$OBJ" 2>/dev/null \
+             && $LD "$OBJ" -o "$BIN" 2>/dev/null \
+             && pass "B${n}" \
+-            || log "B${n} asm/ld failed (normal on non-ARM host)"
++            || fail "B${n} asm/ld failed"
+     done
