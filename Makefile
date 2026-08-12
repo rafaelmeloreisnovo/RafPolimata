@@ -1,19 +1,21 @@
 # RafPolimata — canonical release/compiler entrypoints
 SHELL    := /bin/bash
 VERBOVIVO := verbovivo_ci
-SYNTAX_CC := clang -target aarch64-linux-gnu -fsyntax-only -nostdlib -nostdinc -ffreestanding -I Apkc Apkc/apkc.c
+APKC_HARDENED_SRC := build/generated/Apkc/apkc.source-cap-hardened.c
+SYNTAX_CC := clang -target aarch64-linux-gnu -fsyntax-only -nostdlib -nostdinc -ffreestanding -I Apkc $(APKC_HARDENED_SRC)
 AUDIT_OUT ?= ci/reports/library-assimilation.json
 RAF_LANG ?= c
 RAF_ARCH ?= arm64
 SRC ?= tests/fixtures/strict_kernel.c
 OUT ?= build/strict/libmain.so
 
-.PHONY: help syntax verbovivo verbovivo-demo encoders proof audit language-contract compile compile-plan compiler-contract compiler-selftest hotfix-audit library-audit strict-elf report clean
+.PHONY: help syntax apkc-hardened-source verbovivo verbovivo-demo encoders proof audit language-contract compile compile-plan compiler-contract compiler-selftest hotfix-audit library-audit strict-elf report clean
 
 help:
 	@echo 'RafPolimata — make targets:'
 	@echo '  help              this list (default)'
-	@echo '  syntax            freestanding aarch64 syntax check (Apkc/apkc.c)'
+	@echo '  apkc-hardened-source  generate + falsify source-cap hardened ApkC TU'
+	@echo '  syntax            freestanding aarch64 syntax check (hardened ApkC TU)'
 	@echo '  verbovivo         build $(VERBOVIVO) (T^7 toroid pipeline)'
 	@echo '  verbovivo-demo    build + smoke run, asserts verbovivo: ... phi='
 	@echo '  encoders          ARM32 + ARM64 encoder golden tests'
@@ -30,9 +32,20 @@ help:
 	@echo '  report            show curated proof and latest run state'
 	@echo '  clean             remove generated compiler/demo artifacts'
 
-syntax:
+apkc-hardened-source:
+	@command -v python3 >/dev/null 2>&1 || { echo 'apkc-hardened-source: FAIL — python3 required' >&2; exit 127; }
+	@test -f scripts/patch_apkc_source_cap.py || { echo 'apkc-hardened-source: FAIL — transformer missing' >&2; exit 1; }
+	@test -f tests/test_apkc_source_cap_patch.py || { echo 'apkc-hardened-source: FAIL — falsifier missing' >&2; exit 1; }
+	@mkdir -p "$(dir $(APKC_HARDENED_SRC))"
+	python3 tests/test_apkc_source_cap_patch.py
+	python3 scripts/patch_apkc_source_cap.py Apkc/apkc.c "$(APKC_HARDENED_SRC)"
+	@grep -q 'source exceeds SRC_CAP' "$(APKC_HARDENED_SRC)" || { echo 'apkc-hardened-source: FAIL — overflow guard absent' >&2; exit 1; }
+	@! grep -Fq 'if (n<=0) break;' "$(APKC_HARDENED_SRC)" || { echo 'apkc-hardened-source: FAIL — vulnerable anchor survived' >&2; exit 1; }
+	@printf 'apkc-hardened-source: PASS sha256='; sha256sum "$(APKC_HARDENED_SRC)" | cut -d' ' -f1
+
+syntax: apkc-hardened-source
 	$(SYNTAX_CC)
-	@echo 'syntax: PASS'
+	@echo 'syntax: PASS hardened-source'
 
 verbovivo:
 	gcc -std=c11 -O2 -I. -IBenchmark -DVERBOVIVO_MAIN rafaelia/verbovivo.c rafaelia/fiber_relmat.c -lm -o $(VERBOVIVO)
@@ -65,7 +78,7 @@ compile:
 
 compile-plan:
 	@test -n "$(RAF_LANG)" || { echo 'Uso: make compile-plan RAF_LANG=c RAF_ARCH=arm32 SRC=kernel.c OUT=kernel.o' >&2; exit 64; }
-	@test -n "$(RAF_ARCH)" && test -n "$(SRC)" && test -n "$(OUT)" || { echo 'RAF_ARCH, SRC e OUT são obrigatórios' >&2; exit 64; }
+	@test -n "$(RAF_ARCH)" && test -n "$(SRC)" && test -n "$(OUT)" || { echo 'RAF_ARCH, RAF_LANG, SRC e OUT são obrigatórios' >&2; exit 64; }
 	python3 scripts/raf_strict_compile_plan.py --language "$(RAF_LANG)" --arch "$(RAF_ARCH)" --source "$(SRC)" --output "$(OUT)"
 
 compiler-contract:
@@ -103,6 +116,6 @@ report:
 
 clean:
 	rm -f $(VERBOVIVO) /tmp/engram.svg *.o raf_compile apkc_host
-	rm -rf build/strict build_host_check/ops_manifest
+	rm -rf build/strict build_host_check/ops_manifest build/generated/Apkc
 	find . -maxdepth 4 -type f \( -name '*.tmp.*' -o -name '*.so.receipt.json' \) -delete
 	@echo 'clean: done'
