@@ -98,13 +98,22 @@ jobs:
       - name: APKc assembler roundtrip smoke test
         run: sh tests/test_asm_roundtrip.sh
 
+      - name: APKc raw-source anti-bypass gate
+        run: |
+          python3 tests/test_apkc_raw_source_gate.py
+          python3 scripts/audit_apkc_raw_source_paths.py | tee Apkc/proofs/out/raw-source-gate.json
+
       - name: APKc compile transcript — F1 chain of custody
         run: |
           mkdir -p Apkc/proofs/out
+          make apkc-hardened-source 2>&1 | tee Apkc/proofs/out/apkc-source-cap-ci.txt
           clang -std=c11 -O2 -Wall -Wextra -Werror \
             -target aarch64-linux-gnu -nostdlib -nostdinc -ffreestanding -I Apkc \
-            -fsyntax-only Apkc/apkc.c 2>&1 | tee Apkc/proofs/out/apkc-compile.txt
-          echo "F1: apkc-compile.txt generated ($(wc -l < Apkc/proofs/out/apkc-compile.txt) lines)"
+            -fsyntax-only build/generated/Apkc/apkc.source-cap-hardened.c \
+            2>&1 | tee Apkc/proofs/out/apkc-compile.txt
+          grep -q 'source exceeds SRC_CAP' build/generated/Apkc/apkc.source-cap-hardened.c
+          ! grep -Fq 'if (n<=0) break;' build/generated/Apkc/apkc.source-cap-hardened.c
+          echo "F1: hardened apkc-compile.txt generated ($(wc -l < Apkc/proofs/out/apkc-compile.txt) lines)"
 
       - name: Validate APKc proof protocol
         run: bash scripts/apkc_validate.sh
