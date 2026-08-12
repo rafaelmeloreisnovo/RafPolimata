@@ -2,14 +2,17 @@
 set -eu
 
 # ApkC/RAFAELIA — evidence-first Termux ARM32 validator.
-# Purpose: reproduce the already observed working path from
-# docs/APKC_TERMUX_ARM32_PROOF.md while preserving fail-closed behavior.
-# This script never upgrades runtime claims: claim_allowed remains false
-# until runtime/logcat evidence is captured separately.
+# Reproduces the physically observed path while preserving fail-closed,
+# append-only evidence and claim_allowed=false for unmeasured runtime claims.
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 APKC="$ROOT/Apkc"
-OUT="$APKC/proofs/termux-arm32"
+BASE_OUT="$APKC/proofs/termux-arm32"
+COMMIT=$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || printf TOKEN_VAZIO)
+COMMIT_SHORT=$(printf '%s' "$COMMIT" | cut -c1-12)
+RUN_STAMP=$(date -u '+%Y%m%dT%H%M%SZ')
+RUN_ID="${RUN_STAMP}_${COMMIT_SHORT}_$$"
+OUT="$BASE_OUT/runs/$RUN_ID"
 EXEC_ROOT=${APKC_EXEC_ROOT:-"${TMPDIR:-$PREFIX/tmp}/apkc_termux_arm32_$$"}
 mkdir -p "$OUT" "$EXEC_ROOT"
 trap 'rm -rf "$EXEC_ROOT"' EXIT HUP INT TERM
@@ -19,19 +22,21 @@ RECEIPT="$OUT/receipt.sha256"
 HARD_SRC="$EXEC_ROOT/apkc_hardened.c"
 EXE="$EXEC_ROOT/apkc"
 APK="$OUT/hello.apk"
+APK_REPRO="$OUT/hello.repro.apk"
 
 : > "$SUMMARY"
 status(){ printf '| %s | %s | %s |\n' "$1" "$2" "$3" >> "$SUMMARY"; }
 need(){ command -v "$1" >/dev/null 2>&1 || { status "$2" TOKEN_VAZIO "$1 ausente"; printf 'TOKEN_VAZIO: %s ausente\n' "$1" >&2; exit 1; }; }
 
 DATE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-COMMIT=$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || printf TOKEN_VAZIO)
 {
   echo '# ApkC Termux ARM32 validation'
   echo
   echo "- date_utc: $DATE"
+  echo "- run_id: $RUN_ID"
   echo "- commit: $COMMIT"
   echo '- evidence_model: measured/local'
+  echo '- evidence_storage: append-only/run-scoped'
   echo '- claim_allowed: false'
   echo '- runtime_claim: TOKEN_VAZIO'
   echo
@@ -53,19 +58,32 @@ status H0 PASS 'transformação + falsificador source-cap PASS'
 [ -s "$APKC/hello.s.txt" ] || { status F0 FAIL 'Apkc/hello.s.txt ausente/vazio'; exit 1; }
 status F0 PASS 'Apkc/hello.s.txt presente'
 
-# F1: use the command shape physically proven on Termux ARM32.
+# F1: command shape physically proven on Termux ARM32.
 need cc F1
 cc -std=c11 -Oz -Wno-unused-function -nostartfiles -Wl,-e,_start \
   "$HARD_SRC" -o "$EXE" > "$OUT/apkc-compile.txt" 2>&1 || { status F1 FAIL 'compilação nativa com -nostartfiles falhou'; exit 1; }
 chmod 700 "$EXE"
 [ -x "$EXE" ] || { status F1 FAIL 'binário apkc não executável'; exit 1; }
-status F1 PASS 'apkc hardened compilado nativamente com caminho comprovado -nostartfiles'
+status F1 PASS 'apkc hardened compilado com caminho comprovado -nostartfiles'
 
-# F2: generation with the package/name/ABI parameters from the observed proof.
+# F2: generation with parameters from observed proof.
 "$EXE" "$APKC/hello.s.txt" -o "$APK" -p com.rafael.teste -l RafaelTeste -n hello -32 \
   > "$OUT/apkc-generate.txt" 2>&1 || { status F2 FAIL 'geração hello.apk falhou'; exit 1; }
 [ -s "$APK" ] || { status F2 FAIL 'hello.apk ausente/vazio após exit 0'; exit 1; }
 status F2 PASS 'hello.apk gerado pelo apkc hardened'
+
+# F2D: same binary + same input + same arguments must reproduce byte-identical APK.
+"$EXE" "$APKC/hello.s.txt" -o "$APK_REPRO" -p com.rafael.teste -l RafaelTeste -n hello -32 \
+  > "$OUT/apkc-generate-repro.txt" 2>&1 || { status F2D FAIL 'segunda geração falhou'; exit 1; }
+[ -s "$APK_REPRO" ] || { status F2D FAIL 'hello.repro.apk ausente/vazio'; exit 1; }
+if cmp -s "$APK" "$APK_REPRO"; then
+  sha256sum "$APK" "$APK_REPRO" > "$OUT/apk-repro.sha256"
+  status F2D PASS 'duas gerações byte-idênticas no mesmo ambiente/processo de validação'
+else
+  sha256sum "$APK" "$APK_REPRO" > "$OUT/apk-repro.sha256"
+  status F2D FAIL 'saídas divergentes; determinismo não demonstrado'
+  exit 1
+fi
 
 # F3: ZIP/APK structure must contain the three minimum artifacts.
 need unzip F3
@@ -76,7 +94,7 @@ for p in AndroidManifest.xml classes.dex lib/armeabi-v7a/libhello.so; do
 done
 status F3 PASS 'ZIP íntegro e entradas mínimas presentes'
 
-# F4: AXML is evidence only when aapt is available; absence remains TOKEN_VAZIO.
+# F4: AXML evidence exists only when aapt is available.
 if command -v aapt >/dev/null 2>&1; then
   aapt dump xmltree "$APK" AndroidManifest.xml > "$OUT/aapt-xmltree.txt" 2>&1 || { status F4 FAIL 'aapt não parseou AndroidManifest.xml'; exit 1; }
   grep -q 'com.rafael.teste' "$OUT/aapt-xmltree.txt" || { status F4 FAIL 'package esperado não encontrado no AXML'; exit 1; }
@@ -87,27 +105,22 @@ else
   status F4 TOKEN_VAZIO 'aapt ausente; claim AXML não elevado nesta execução'
 fi
 
-# F5: DEX signature and checksum boundary.
+# F5: DEX signature boundary.
 python3 - "$APK" > "$OUT/dex-sha1.txt" <<'PY'
 import hashlib, sys, zipfile
-apk=sys.argv[1]
-with zipfile.ZipFile(apk) as z:
+with zipfile.ZipFile(sys.argv[1]) as z:
     d=z.read('classes.dex')
 if len(d) < 32 or d[:8] != b'dex\n035\x00':
-    print('FAIL: DEX magic/length')
-    raise SystemExit(1)
-h=d[12:32]
-c=hashlib.sha1(d[32:]).digest()
-print('header_sha1='+h.hex())
-print('computed_sha1='+c.hex())
+    print('FAIL: DEX magic/length'); raise SystemExit(1)
+h=d[12:32]; c=hashlib.sha1(d[32:]).digest()
+print('header_sha1='+h.hex()); print('computed_sha1='+c.hex())
 if h != c:
-    print('FAIL')
-    raise SystemExit(1)
+    print('FAIL'); raise SystemExit(1)
 print('PASS')
 PY
 status F5 PASS 'classes.dex magic + SHA-1 interno conferem'
 
-# F6: native library must be real ELF32 ARM and export the Android entry symbols.
+# F6: native library must be ELF32 ARM with Android entry symbols.
 need readelf F6
 unzip -p "$APK" lib/armeabi-v7a/libhello.so > "$EXEC_ROOT/libhello.so" || { status F6 FAIL 'extração libhello.so falhou'; exit 1; }
 readelf -h "$EXEC_ROOT/libhello.so" > "$OUT/readelf-header.txt" 2>&1 || { status F6 FAIL 'readelf -h falhou'; exit 1; }
@@ -118,20 +131,21 @@ grep -q 'ANativeActivity_onCreate' "$OUT/readelf-symbols.txt" || { status F6 FAI
 grep -q 'android_main' "$OUT/readelf-symbols.txt" || { status F6 FAIL 'android_main ausente'; exit 1; }
 status F6 PASS 'libhello.so = ELF32 ARM; símbolos NativeActivity presentes'
 
-# Finalize claim state BEFORE hashing the evidence set. No evidence file is
-# modified after the authoritative receipt is created.
-status F7 PASS 'receipt será criado sobre o conjunto finalizado de evidências'
+# F7 is integrity/custody, not a claim that independently timestamped receipts are byte-identical.
+status F7 PASS 'receipt SHA-256 será criado após finalização do conjunto desta execução'
 {
   echo
   echo '## Claim gate'
   echo
   echo '- claim_allowed: false'
-  echo '- permitido nesta execução: build/generate/ZIP/DEX/ELF e AXML somente se F4=PASS.'
+  echo '- determinism_scope: F2D mede duas gerações com mesmo binário/entrada/args no mesmo ambiente.'
+  echo '- cross-build/cross-device determinism: TOKEN_VAZIO até reprodução independente.'
+  echo '- permitido: build/generate/ZIP/DEX/ELF e AXML somente se F4=PASS.'
   echo '- TOKEN_VAZIO: assinatura, instalação, abertura e comportamento runtime/logcat.'
-  echo '- próximo gate: executar assinatura + instalação + logcat em aparelho e anexar receipt separado.'
+  echo '- próximo gate: assinatura + instalação + logcat em aparelho com receipt separado.'
 } >> "$SUMMARY"
 
-# Authoritative deterministic receipt. Exclude only receipt files themselves.
+# Authoritative integrity receipt for this immutable run-scoped evidence directory.
 rm -f "$RECEIPT" "$OUT/receipt-verify.txt"
 (
   cd "$OUT"
@@ -141,4 +155,4 @@ rm -f "$RECEIPT" "$OUT/receipt-verify.txt"
 ) > "$RECEIPT"
 sha256sum -c "$RECEIPT" > "$OUT/receipt-verify.txt" 2>&1 || { printf '%s\n' 'FAIL: receipt SHA-256 não revalida' >&2; exit 1; }
 
-printf '%s\n' "PASS: validação estrutural ApkC ARM32 concluída; runtime permanece TOKEN_VAZIO / claim_allowed=false"
+printf '%s\n' "PASS: $OUT; runtime/cross-device determinism permanecem TOKEN_VAZIO / claim_allowed=false"
