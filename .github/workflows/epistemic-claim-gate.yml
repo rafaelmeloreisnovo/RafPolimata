@@ -1,0 +1,36 @@
+name: Epistemic Claim Gate
+
+on:
+  push:
+    branches:
+      - 'audit/academic-falsifiability-skill-v1-20260811'
+    paths:
+      - 'skills/academic-falsifiability/**'
+      - 'configs/epistemic-claim.v1.schema.json'
+      - 'scripts/epistemic_claim_gate.py'
+      - 'tests/test_epistemic_claim_gate.py'
+      - '.github/workflows/epistemic-claim-gate.yml'
+  pull_request:
+    paths:
+      - 'skills/academic-falsifiability/**'
+      - 'configs/epistemic-claim.v1.schema.json'
+      - 'scripts/epistemic_claim_gate.py'
+      - 'tests/test_epistemic_claim_gate.py'
+      - '.github/workflows/epistemic-claim-gate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  falsifiability-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Syntax gate
+        run: python -m py_compile scripts/epistemic_claim_gate.py tests/test_epistemic_claim_gate.py
+      - name: Adversarial unit gates
+        run: python -m unittest -v tests.test_epistemic_claim_gate

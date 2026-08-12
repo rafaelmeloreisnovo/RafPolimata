@@ -1,0 +1,37 @@
+{
+  "claim_id": "TOKEN_VAZIO",
+  "proposition": "TOKEN_VAZIO",
+  "claim_kind": "TOKEN_VAZIO",
+  "state": "TOKEN_VAZIO",
+  "domain": "TOKEN_VAZIO",
+  "intended_scope": "INTERNAL",
+  "assumptions": [],
+  "h0": null,
+  "h1": null,
+  "falsifier": null,
+  "protocol": {
+    "version": "v0",
+    "frozen": false,
+    "procedure": null
+  },
+  "metric": null,
+  "threshold": null,
+  "data_provenance": [],
+  "code_provenance": [],
+  "environment": {},
+  "evidence": [],
+  "negative_evidence": [],
+  "replication": {
+    "level": "NONE",
+    "independent": false
+  },
+  "limitations": [],
+  "token_vazio": [
+    {
+      "missing": "Classify the object and define the minimum evidence needed for the intended claim.",
+      "critical": true,
+      "next_verifiable_action": "Set claim_kind, domain, proposition and falsifier/proof criterion before collecting promotion evidence."
+    }
+  ],
+  "claim_allowed": false
+}
