@@ -67,7 +67,10 @@ finalize(){
     final_rc=1
   fi
 
-  printf 'final_exit_code=%s\n' "$final_rc" >> "$OUT/run-exit.txt"
+  # Do not mutate any receipt-covered file after the final verification.
+  # final_exit_code is intentionally recorded only in receipt-verify.txt,
+  # which is excluded from the receipt because it is the verifier output.
+  printf 'final_exit_code=%s\n' "$final_rc" >> "$OUT/receipt-verify.txt"
   rm -rf "$EXEC_ROOT"
   exit "$final_rc"
 }
@@ -203,7 +206,7 @@ status F7 TOKEN_VAZIO 'receipt ainda não emitido/verificado; finalizador EXIT d
   echo '- cross-build/cross-device determinism: TOKEN_VAZIO até reprodução independente.'
   echo '- permitido: build/generate/ZIP/DEX/ELF e AXML somente se F4=PASS.'
   echo '- TOKEN_VAZIO: assinatura, instalação, abertura e comportamento runtime/logcat.'
-  echo '- resultado negativo: preservado com gate_exit_code separado de final_exit_code.'
+  echo '- resultado negativo: gate_exit_code fica congelado no receipt; final_exit_code fica no verifier externo.'
   echo '- receipt válido: somente quando finalization-status.txt=receipt_status=PASS e receipt-verify.txt confirma todos os hashes.'
   echo '- próximo gate: assinatura + instalação + logcat em aparelho com receipt separado.'
 } >> "$SUMMARY"
