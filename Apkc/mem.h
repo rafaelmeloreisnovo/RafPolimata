@@ -12,20 +12,47 @@ static u8 _apk_buf[APK_CAP];
 static u8 _src_buf[SRC_CAP];
 static u8 _tmp_buf[TMP_CAP];
 static sz _apk_pos, _src_pos, _tmp_pos;
+static u8 _apk_oom, _tmp_oom;
 
 static inline u8  *apk_ptr(void)  { return _apk_buf; }
 static inline sz   apk_used(void) { return _apk_pos; }
-static inline void apk_reset(void){ _apk_pos = 0; }
-static inline void tmp_reset(void){ _tmp_pos = 0; }
+static inline u8   apk_oom(void)  { return _apk_oom; }
+static inline u8   tmp_oom(void)  { return _tmp_oom; }
+static inline void apk_reset(void){ _apk_pos = 0; _apk_oom = 0; }
+static inline void tmp_reset(void){ _tmp_pos = 0; _tmp_oom = 0; }
 
+/* Fail-closed bump allocators. Previous behavior advanced the cursor without
+ * checking capacity, allowing silent writes past the fixed BSS pools. Return
+ * NULL and latch an OOM bit instead; successful allocations remain 8-byte
+ * aligned and preserve the existing API for all in-range callers. */
 static inline u8 *apk_alloc(sz n) {
+    if (_apk_oom) return NULL;
+    if (_apk_pos > (sz)APK_CAP || n > (sz)APK_CAP - _apk_pos) {
+        _apk_oom = 1;
+        return NULL;
+    }
+    sz aligned = (n + 7u) & ~(sz)7u;
+    if (aligned > (sz)APK_CAP - _apk_pos) {
+        _apk_oom = 1;
+        return NULL;
+    }
     u8 *p = _apk_buf + _apk_pos;
-    _apk_pos += (n + 7u) & ~7u;
+    _apk_pos += aligned;
     return p;
 }
 static inline u8 *tmp_alloc(sz n) {
+    if (_tmp_oom) return NULL;
+    if (_tmp_pos > (sz)TMP_CAP || n > (sz)TMP_CAP - _tmp_pos) {
+        _tmp_oom = 1;
+        return NULL;
+    }
+    sz aligned = (n + 7u) & ~(sz)7u;
+    if (aligned > (sz)TMP_CAP - _tmp_pos) {
+        _tmp_oom = 1;
+        return NULL;
+    }
     u8 *p = _tmp_buf + _tmp_pos;
-    _tmp_pos += (n + 7u) & ~7u;
+    _tmp_pos += aligned;
     return p;
 }
 
