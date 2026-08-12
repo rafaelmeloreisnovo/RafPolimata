@@ -15,7 +15,6 @@ RUN_ID="${RUN_STAMP}_${COMMIT_SHORT}_$$"
 OUT="$BASE_OUT/runs/$RUN_ID"
 EXEC_ROOT=${APKC_EXEC_ROOT:-"${TMPDIR:-$PREFIX/tmp}/apkc_termux_arm32_$$"}
 mkdir -p "$OUT" "$EXEC_ROOT"
-trap 'rm -rf "$EXEC_ROOT"' EXIT HUP INT TERM
 
 SUMMARY="$OUT/validation-summary.md"
 RECEIPT="$OUT/receipt.sha256"
@@ -23,6 +22,33 @@ HARD_SRC="$EXEC_ROOT/apkc_hardened.c"
 EXE="$EXEC_ROOT/apkc"
 APK="$OUT/hello.apk"
 APK_REPRO="$OUT/hello.repro.apk"
+
+# Finalize every run, including failures. Negative evidence is first-class:
+# exit != 0 remains failure, but the partial evidence set still gets a receipt.
+finalize(){
+  rc=$?
+  trap - EXIT HUP INT TERM
+  printf 'exit_code=%s\n' "$rc" > "$OUT/run-exit.txt"
+  if command -v sha256sum >/dev/null 2>&1; then
+    rm -f "$RECEIPT" "$OUT/receipt-verify.txt"
+    (
+      cd "$OUT"
+      find . -maxdepth 1 -type f ! -name 'receipt.sha256' ! -name 'receipt-verify.txt' -print \
+        | LC_ALL=C sort \
+        | while IFS= read -r f; do sha256sum "$f"; done
+    ) > "$RECEIPT"
+    if ! sha256sum -c "$RECEIPT" > "$OUT/receipt-verify.txt" 2>&1; then
+      rc=1
+    fi
+  else
+    printf '%s\n' 'TOKEN_VAZIO: sha256sum ausente; receipt não materializado' > "$OUT/receipt-verify.txt"
+    rc=1
+  fi
+  rm -rf "$EXEC_ROOT"
+  exit "$rc"
+}
+trap finalize EXIT
+trap 'exit 130' HUP INT TERM
 
 : > "$SUMMARY"
 status(){ printf '| %s | %s | %s |\n' "$1" "$2" "$3" >> "$SUMMARY"; }
@@ -43,6 +69,10 @@ DATE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
   echo '| Gate | Status | Evidência |'
   echo '|---|---|---|'
 } > "$SUMMARY"
+
+# HC: chain-of-custody primitive is mandatory; without it this run must fail closed.
+need sha256sum HC
+status HC PASS 'sha256sum disponível para receipt final de sucesso ou falha'
 
 # H0: source-cap hardening is mandatory before compilation.
 need python3 H0
@@ -106,7 +136,7 @@ else
 fi
 
 # F5: DEX signature boundary.
-python3 - "$APK" > "$OUT/dex-sha1.txt" <<'PY'
+if python3 - "$APK" > "$OUT/dex-sha1.txt" <<'PY'
 import hashlib, sys, zipfile
 with zipfile.ZipFile(sys.argv[1]) as z:
     d=z.read('classes.dex')
@@ -118,7 +148,12 @@ if h != c:
     print('FAIL'); raise SystemExit(1)
 print('PASS')
 PY
-status F5 PASS 'classes.dex magic + SHA-1 interno conferem'
+then
+  status F5 PASS 'classes.dex magic + SHA-1 interno conferem'
+else
+  status F5 FAIL 'classes.dex magic/SHA-1 interno não conferem'
+  exit 1
+fi
 
 # F6: native library must be ELF32 ARM with Android entry symbols.
 need readelf F6
@@ -131,8 +166,9 @@ grep -q 'ANativeActivity_onCreate' "$OUT/readelf-symbols.txt" || { status F6 FAI
 grep -q 'android_main' "$OUT/readelf-symbols.txt" || { status F6 FAIL 'android_main ausente'; exit 1; }
 status F6 PASS 'libhello.so = ELF32 ARM; símbolos NativeActivity presentes'
 
-# F7 is integrity/custody, not a claim that independently timestamped receipts are byte-identical.
-status F7 PASS 'receipt SHA-256 será criado após finalização do conjunto desta execução'
+# F7 describes the finalizer contract. The receipt itself is emitted by EXIT trap
+# after run-exit.txt is frozen, for both success and failure paths.
+status F7 PASS 'finalizador append-only emitirá receipt SHA-256 desta execução'
 {
   echo
   echo '## Claim gate'
@@ -142,17 +178,8 @@ status F7 PASS 'receipt SHA-256 será criado após finalização do conjunto des
   echo '- cross-build/cross-device determinism: TOKEN_VAZIO até reprodução independente.'
   echo '- permitido: build/generate/ZIP/DEX/ELF e AXML somente se F4=PASS.'
   echo '- TOKEN_VAZIO: assinatura, instalação, abertura e comportamento runtime/logcat.'
+  echo '- resultado negativo: preservado com run-exit.txt + receipt quando sha256sum está disponível.'
   echo '- próximo gate: assinatura + instalação + logcat em aparelho com receipt separado.'
 } >> "$SUMMARY"
-
-# Authoritative integrity receipt for this immutable run-scoped evidence directory.
-rm -f "$RECEIPT" "$OUT/receipt-verify.txt"
-(
-  cd "$OUT"
-  find . -maxdepth 1 -type f ! -name 'receipt.sha256' ! -name 'receipt-verify.txt' -print \
-    | LC_ALL=C sort \
-    | while IFS= read -r f; do sha256sum "$f"; done
-) > "$RECEIPT"
-sha256sum -c "$RECEIPT" > "$OUT/receipt-verify.txt" 2>&1 || { printf '%s\n' 'FAIL: receipt SHA-256 não revalida' >&2; exit 1; }
 
 printf '%s\n' "PASS: $OUT; runtime/cross-device determinism permanecem TOKEN_VAZIO / claim_allowed=false"
