@@ -22,6 +22,16 @@ make_run() {
   ) > "$d/receipt.sha256"
 }
 
+rehash_run() {
+  d=$1
+  (
+    cd "$d"
+    find . -maxdepth 1 -type f ! -name 'receipt.sha256' ! -name 'receipt-verify.txt' -print \
+      | LC_ALL=C sort \
+      | while IFS= read -r f; do sha256sum "$f"; done
+  ) > "$d/receipt.sha256"
+}
+
 expect_rc() {
   expected=$1
   shift
@@ -62,4 +72,25 @@ cp -R "$TMP/ok" "$TMP/extra"
 printf 'unexpected\n' > "$TMP/extra/unlisted.txt"
 expect_rc 76 "$VERIFY" "$TMP/extra"
 
-printf '%s\n' 'PASS: ApkC receipt verifier positive + omission + duplicate + tamper + extra-file cases'
+# Metadata ambiguity attack: append contradictory status while rehashing all
+# bytes. Hash integrity alone must not allow semantically contradictory status.
+cp -R "$TMP/ok" "$TMP/status-conflict"
+printf 'receipt_status=FAIL\n' >> "$TMP/status-conflict/finalization-status.txt"
+rehash_run "$TMP/status-conflict"
+expect_rc 77 "$VERIFY" "$TMP/status-conflict"
+
+# Duplicate gate metadata must be rejected even if the receipt is recomputed.
+cp -R "$TMP/ok" "$TMP/run-exit-duplicate"
+printf 'gate_exit_code=0\n' >> "$TMP/run-exit-duplicate/run-exit.txt"
+rehash_run "$TMP/run-exit-duplicate"
+expect_rc 78 "$VERIFY" "$TMP/run-exit-duplicate"
+
+# Exit codes are canonical POSIX process status values (0..255), not arbitrary
+# integers; recomputing the receipt must not broaden that semantic domain.
+cp -R "$TMP/ok" "$TMP/gate-out-of-range"
+printf 'receipt_status=PASS\ngate_exit_code=999\n' > "$TMP/gate-out-of-range/finalization-status.txt"
+printf 'gate_exit_code=999\n' > "$TMP/gate-out-of-range/run-exit.txt"
+rehash_run "$TMP/gate-out-of-range"
+expect_rc 77 "$VERIFY" "$TMP/gate-out-of-range"
+
+printf '%s\n' 'PASS: ApkC verifier positive + omission + duplicate + tamper + extra-file + metadata ambiguity cases'
