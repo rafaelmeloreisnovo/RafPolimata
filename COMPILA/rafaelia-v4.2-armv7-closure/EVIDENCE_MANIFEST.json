@@ -22,10 +22,32 @@
     "ARMv7 ELF contract: 9/9 ELF32 ARM EABI5 soft-float, no PT_INTERP"
   ],
   "token_vazio": [
-    {"claim":"android-ndk-cross-build","state":"TOKEN_VAZIO","evidence":"ndk-build absent in reference container","next_gate":"run V4.2 verifier where Android NDK is installed"},
-    {"claim":"armv7-real-device-execution","state":"TOKEN_VAZIO","next_gate":"run RUN_OMEGA_ON_DEVICE.sh on physical ARM32 Termux"},
-    {"claim":"android-jni-device-load-and-call","state":"TOKEN_VAZIO","next_gate":"build dual ABI with NDK and load/call JNI on Android"},
-    {"claim":"gpu-opencl-kernel-real-device-execution","state":"TOKEN_VAZIO","evidence":"host smoke returns 77: libOpenCL unavailable","next_gate":"run real XOR OpenCL kernel on physical Android GPU"}
+    {
+      "claim": "android-ndk-cross-build",
+      "state": "TOKEN_VAZIO",
+      "evidence": "ndk-build absent in reference container",
+      "next_gate": "run V4.2 verifier where Android NDK is installed"
+    },
+    {
+      "claim": "armv7-real-device-execution",
+      "state": "TOKEN_VAZIO",
+      "next_gate": "run RUN_OMEGA_ON_DEVICE.sh on physical ARM32 Termux"
+    },
+    {
+      "claim": "android-jni-device-load-and-call",
+      "state": "TOKEN_VAZIO",
+      "next_gate": "build dual ABI with NDK and load/call JNI on Android"
+    },
+    {
+      "claim": "gpu-opencl-kernel-real-device-execution",
+      "state": "TOKEN_VAZIO",
+      "evidence": "host smoke returns 77: libOpenCL unavailable",
+      "next_gate": "run real XOR OpenCL kernel on physical Android GPU"
+    }
   ],
-  "last_mile": {"script":"RUN_OMEGA_ON_DEVICE.sh","success_terminal":"STATUS=OMEGA_PHYSICAL_PASS / CLAIM_ALLOWED=true / PASS OMEGA_FINAL","fail_closed":true}
+  "last_mile": {
+    "script": "RUN_OMEGA_ON_DEVICE.sh",
+    "success_terminal": "STATUS=OMEGA_PHYSICAL_PASS / CLAIM_ALLOWED=true / PASS OMEGA_FINAL",
+    "fail_closed": true
+  }
 }
