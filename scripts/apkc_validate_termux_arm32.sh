@@ -118,14 +118,9 @@ grep -q 'ANativeActivity_onCreate' "$OUT/readelf-symbols.txt" || { status F6 FAI
 grep -q 'android_main' "$OUT/readelf-symbols.txt" || { status F6 FAIL 'android_main ausente'; exit 1; }
 status F6 PASS 'libhello.so = ELF32 ARM; símbolos NativeActivity presentes'
 
-# F7: deterministic receipt over generated evidence. Signing/install/runtime are separate gates.
-(
-  cd "$OUT"
-  find . -maxdepth 1 -type f ! -name 'receipt.sha256' -print | LC_ALL=C sort | while IFS= read -r f; do sha256sum "$f"; done
-) > "$RECEIPT"
-sha256sum -c "$RECEIPT" > "$OUT/receipt-verify.txt" 2>&1 || { status F7 FAIL 'receipt SHA-256 não revalida'; exit 1; }
-status F7 PASS 'receipt SHA-256 criado e revalidado localmente'
-
+# Finalize claim state BEFORE hashing the evidence set. No evidence file is
+# modified after the authoritative receipt is created.
+status F7 PASS 'receipt será criado sobre o conjunto finalizado de evidências'
 {
   echo
   echo '## Claim gate'
@@ -135,5 +130,15 @@ status F7 PASS 'receipt SHA-256 criado e revalidado localmente'
   echo '- TOKEN_VAZIO: assinatura, instalação, abertura e comportamento runtime/logcat.'
   echo '- próximo gate: executar assinatura + instalação + logcat em aparelho e anexar receipt separado.'
 } >> "$SUMMARY"
+
+# Authoritative deterministic receipt. Exclude only receipt files themselves.
+rm -f "$RECEIPT" "$OUT/receipt-verify.txt"
+(
+  cd "$OUT"
+  find . -maxdepth 1 -type f ! -name 'receipt.sha256' ! -name 'receipt-verify.txt' -print \
+    | LC_ALL=C sort \
+    | while IFS= read -r f; do sha256sum "$f"; done
+) > "$RECEIPT"
+sha256sum -c "$RECEIPT" > "$OUT/receipt-verify.txt" 2>&1 || { printf '%s\n' 'FAIL: receipt SHA-256 não revalida' >&2; exit 1; }
 
 printf '%s\n' "PASS: validação estrutural ApkC ARM32 concluída; runtime permanece TOKEN_VAZIO / claim_allowed=false"
