@@ -1,0 +1,1 @@
+The preceding MODE_TARGETS_SHA256 line is metadata only and was not used as an evidence gate. The authoritative mode transition is the Git tree itself plus the blob SHA identities recorded in MODE_TRANSITION_TARGETS.json. No scientific/runtime claim depends on MODE_TARGETS_SHA256.
