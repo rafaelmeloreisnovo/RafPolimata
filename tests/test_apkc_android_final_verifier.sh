@@ -114,5 +114,29 @@ cp -a "$BASE" "$EXTRA"
 printf '%s\n' 'signing_status=PASS' > "$EXTRA/06_sign_gate/signing-status.txt"
 expect_fail eligible_file_omission_rejected bash "$VERIFIER" "$EXTRA"
 
+# Producer must reject a dot-segment alias even though it resolves to the same APK.
+PROD_DOT="$TMP/producer-dot-alias"
+mkdir -p "$PROD_DOT/06_sign_gate" "$PROD_DOT/07_signed"
+printf '%s\n' '07_signed/./app.apk' > "$PROD_DOT/06_sign_gate/install-target.txt"
+printf '%s\n' 'SIGNED_APK_BYTES' > "$PROD_DOT/07_signed/app.apk"
+printf '%s\n' 'install_rc=0' > "$PROD_DOT/08_install_hardened.txt"
+printf '%s\n' 'launch_rc=0' > "$PROD_DOT/09_launch_hardened.txt"
+printf '%s\n' 'logcat_capture=present_not_semantic_pass' > "$PROD_DOT/10_logcat_hardened.txt"
+printf '%s\n' 'claim_allowed=false' 'runtime_semantic_pass=TOKEN_VAZIO' > "$PROD_DOT/status.tsv"
+expect_fail producer_dot_segment_alias_rejected bash "$PRODUCER" "$PROD_DOT"
+
+# Verifier must reject the same alias even after the attacker recomputes every
+# affected digest and keeps manifest ordering/custody otherwise valid.
+DOT="$TMP/verifier-dot-alias-rehashed"
+cp -a "$BASE" "$DOT"
+printf '%s\n' '07_signed/./app.apk' > "$DOT/06_sign_gate/install-target.txt"
+sed -i 's#^install_target_rel=.*#install_target_rel=07_signed/./app.apk#' "$DOT/11_android_receipt/android-final-state.tsv"
+rehash_file_canonically "$DOT" '06_sign_gate/install-target.txt' || exit 3
+rehash_state_canonically "$DOT" || exit 3
+manifest="$DOT/11_android_receipt/receipt.sha256"
+awk '{ p=$2; if (p=="07_signed/app.apk") p="07_signed/./app.apk"; print $1 "  " p }' "$manifest" | LC_ALL=C sort -k2,2 > "$manifest.tmp"
+mv "$manifest.tmp" "$manifest"
+expect_fail verifier_dot_segment_alias_rehashed_rejected bash "$VERIFIER" "$DOT"
+
 printf 'RESULT pass=%d fail=%d claim_allowed=false runtime_semantic_pass=TOKEN_VAZIO\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ]
