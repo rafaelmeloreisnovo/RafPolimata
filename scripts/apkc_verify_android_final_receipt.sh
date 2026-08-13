@@ -42,11 +42,26 @@ OBSERVED_TARGET_SHA="$(sha256sum "$OUT_DIR/$TARGET_REL" | awk '{print $1}')" || 
 
 # install-target.txt is historical selection evidence. Relative form must equal the
 # canonical identity. Legacy absolute form is allowed for relocation compatibility,
-# but remains covered by the receipt and cannot be silently rewritten.
+# but must end in the exact canonical relative identity. This binds the historical
+# selector to the frozen target without requiring the old OUT_DIR to still exist.
 [ "$(wc -l < "$TARGET_FILE" | tr -d ' ')" = 1 ] || { printf '%s\n' 'install target evidence must contain exactly one line' >&2; exit 72; }
 IFS= read -r TARGET_RAW < "$TARGET_FILE" || exit 72
 [ -n "$TARGET_RAW" ] && [ "$TARGET_RAW" != 'TOKEN_VAZIO' ] || { printf '%s\n' 'invalid install target evidence' >&2; exit 72; }
-case "$TARGET_RAW" in /*) : ;; *) [ "$TARGET_RAW" = "$TARGET_REL" ] || { printf '%s\n' 'relative install target disagrees with final state' >&2; exit 72; } ;; esac
+case "$TARGET_RAW" in *$'\n'*|*$'\r'*|*$'\t'*) printf '%s\n' 'install target evidence contains control character' >&2; exit 72 ;; esac
+case "$TARGET_RAW" in
+  /*)
+    case "$TARGET_RAW" in
+      *'/../'*|*/..|*/./*|*/.) printf '%s\n' 'legacy absolute install target is non-canonical' >&2; exit 72 ;;
+    esac
+    case "$TARGET_RAW" in
+      *"/$TARGET_REL") : ;;
+      *) printf '%s\n' 'legacy absolute install target disagrees with final state' >&2; exit 72 ;;
+    esac
+    ;;
+  *)
+    [ "$TARGET_RAW" = "$TARGET_REL" ] || { printf '%s\n' 'relative install target disagrees with final state' >&2; exit 72; }
+    ;;
+esac
 
 # Reconstruct the producer's exact eligible set independently.
 EXPECTED="$(mktemp)" || exit 73
