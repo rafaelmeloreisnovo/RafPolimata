@@ -65,6 +65,7 @@ PATH="$TMP/bin:$PATH" APKSIGNER_KEYSTORE=test DO_SIGN=1 DO_INSTALL=0 \
   bash "$BRIDGE"
 grep -Fxq "$OUT/x-signed.apk" "$OUT/06_sign_gate/install-target.txt"
 grep -Fxq 'status=PASS' "$OUT/06_sign_gate/signing-status.txt"
+grep -q $'path_canonicality_gate\tPASS' "$OUT/status.tsv"
 grep -q $'sign_install_gate\tPASS' "$OUT/status.tsv"
 grep -q $'android_install_hardened\tTOKEN_VAZIO' "$OUT/status.tsv"
 
@@ -96,6 +97,18 @@ expect_rc 92 env DO_SIGN=auto DO_INSTALL=0 OUT_DIR="$OUT" APK_NAME=x.apk \
   APKC_BASE_CAPTURE="$TMP/base-ok.sh" APKC_SIGN_GATE="$TMP/gate-forged.sh" bash "$BRIDGE"
 grep -Fxq 'TOKEN_VAZIO' "$OUT/06_sign_gate/install-target.txt"
 
+# Exact expected-target matching alone is insufficient when OUT_DIR itself
+# carries a textual alias. The independent PathGate must reject before install.
+mkdir -p "$TMP/dot-alias"
+OUT="$TMP/dot-alias/./run"
+expect_rc 101 env PATH="$TMP/bin:$PATH" APKSIGNER_KEYSTORE=test DO_SIGN=1 DO_INSTALL=0 \
+  OUT_DIR="$OUT" APK_NAME=x.apk APKC_BASE_CAPTURE="$TMP/base-ok.sh" APKC_SIGN_GATE="$GATE" \
+  bash "$BRIDGE"
+CANON_OUT="$TMP/dot-alias/run"
+grep -Fxq 'TOKEN_VAZIO' "$CANON_OUT/06_sign_gate/install-target.txt"
+grep -q $'path_canonicality_gate\tFAIL' "$CANON_OUT/status.tsv"
+[ ! -e "$CANON_OUT/08_install_hardened.txt" ]
+
 # Explicit compatibility mode remains allowed but carries no signing claim.
 OUT="$TMP/skip"
 DO_SIGN=0 DO_INSTALL=0 OUT_DIR="$OUT" APK_NAME=x.apk \
@@ -103,5 +116,6 @@ DO_SIGN=0 DO_INSTALL=0 OUT_DIR="$OUT" APK_NAME=x.apk \
 grep -Fxq "$OUT/x.apk" "$OUT/06_sign_gate/install-target.txt"
 grep -Fxq 'status=SKIPPED_EXPLICIT' "$OUT/06_sign_gate/signing-status.txt"
 grep -Fxq 'claim_allowed=false' "$OUT/06_sign_gate/signing-status.txt"
+grep -q $'path_canonicality_gate\tPASS' "$OUT/status.tsv"
 
-printf '%s\n' 'PASS: hardened bridge signed-target + fail-closed + forged-target + compatibility cases'
+printf '%s\n' 'PASS: hardened bridge signed-target + path-canonicality + fail-closed + forged-target + compatibility cases'
