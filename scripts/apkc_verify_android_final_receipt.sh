@@ -32,7 +32,7 @@ case "${S[3]:-}" in install_target_rel=*) TARGET_REL="${S[3]#install_target_rel=
 case "${S[4]:-}" in install_target_sha256=*) TARGET_SHA="${S[4]#install_target_sha256=}" ;; *) printf '%s\n' 'install_target_sha256 missing/out of order' >&2; exit 69 ;; esac
 [ "${S[5]:-}" = 'manifest_path_mode=OUT_DIR_RELATIVE_V1' ] || { printf '%s\n' 'manifest path mode mismatch' >&2; exit 69; }
 
-case "$TARGET_REL" in ''|/*|../*|*/../*|*/..|..|.|./*|*/./*|*/.) printf '%s\n' 'non-canonical install target path' >&2; exit 70 ;; esac
+case "$TARGET_REL" in ''|/*|../*|*/../*|*/..|..|.|./*|*/./*|*/.|*//*|*\\*) printf '%s\n' 'non-canonical install target path' >&2; exit 70 ;; esac
 case "$TARGET_REL" in *$'\n'*|*$'\r'*|*$'\t'*) printf '%s\n' 'install target contains control character' >&2; exit 70 ;; esac
 case "$TARGET_SHA" in *[!0-9a-f]*|'') printf '%s\n' 'non-canonical target digest' >&2; exit 70 ;; esac
 [ "${#TARGET_SHA}" = 64 ] || { printf '%s\n' 'target digest length mismatch' >&2; exit 70; }
@@ -51,7 +51,7 @@ case "$TARGET_RAW" in *$'\n'*|*$'\r'*|*$'\t'*) printf '%s\n' 'install target evi
 case "$TARGET_RAW" in
   /*)
     case "$TARGET_RAW" in
-      *'/../'*|*/..|*/./*|*/.) printf '%s\n' 'legacy absolute install target is non-canonical' >&2; exit 72 ;;
+      *'/../'*|*/..|*/./*|*/.|*//*|*\\*) printf '%s\n' 'legacy absolute install target is non-canonical' >&2; exit 72 ;;
     esac
     case "$TARGET_RAW" in
       *"/$TARGET_REL") : ;;
@@ -87,7 +87,7 @@ while IFS= read -r line; do
   [ "$rel" != "$line" ] || { printf '%s\n' 'malformed manifest line' >&2; exit 74; }
   case "$digest" in *[!0-9a-f]*|'') printf '%s\n' 'non-canonical manifest digest' >&2; exit 74 ;; esac
   [ "${#digest}" = 64 ] || { printf '%s\n' 'manifest digest length mismatch' >&2; exit 74; }
-  case "$rel" in ''|/*|../*|*/../*|*/..|..|.|./*|*/./*|*/.) printf '%s\n' 'non-canonical manifest path' >&2; exit 74 ;; esac
+  case "$rel" in ''|/*|../*|*/../*|*/..|..|.|./*|*/./*|*/.|*//*|*\\*) printf '%s\n' 'non-canonical manifest path' >&2; exit 74 ;; esac
   [ "$rel" != '11_android_receipt/receipt.sha256' ] || { printf '%s\n' 'manifest self-reference forbidden' >&2; exit 74; }
   [ "$rel" != '11_android_receipt/receipt-verify.txt' ] || { printf '%s\n' 'mutable verifier output forbidden' >&2; exit 74; }
   if [ -n "$PREV" ]; then
