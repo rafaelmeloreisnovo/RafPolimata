@@ -52,7 +52,7 @@ case "$TARGET" in
 esac
 TARGET_REL="${TARGET#"$OUT_DIR"/}"
 case "$TARGET_REL" in
-  ''|/*|../*|*/../*|*/..|..|.|./*|*/./*|*/.) fail 74 'install target contains non-canonical traversal or dot segment' ;;
+  ''|/*|../*|*/../*|*/..|..|.|./*|*/./*|*/.|*//*|*\\*) fail 74 'install target contains non-canonical path syntax' ;;
 esac
 case "$TARGET_REL" in
   *$'\n'*|*$'\r'*|*$'\t'*) fail 74 'install target contains forbidden control character' ;;
@@ -104,7 +104,7 @@ trap 'rm -f "$FILES"' EXIT HUP INT TERM
 : > "$MANIFEST"
 while IFS= read -r rel; do
   case "$rel" in
-    ''|/*|../*|*/../*|*/..|..|.|./*|*/./*|*/.) fail 80 "non-canonical receipt path: $rel" ;;
+    ''|/*|../*|*/../*|*/..|..|.|./*|*/./*|*/.|*//*|*\\*) fail 80 "non-canonical receipt path: $rel" ;;
   esac
   [ -f "$OUT_DIR/$rel" ] || fail 80 "receipt input disappeared: $rel"
   (cd "$OUT_DIR" && sha256sum "$rel") >> "$MANIFEST" || fail 81 "hash failed: $rel"
