@@ -26,6 +26,23 @@ make_fixture() {
   bash "$PRODUCER" "$d" >/dev/null 2>&1
 }
 
+rehash_state_canonically() {
+  d="$1"
+  state_rel='11_android_receipt/android-final-state.tsv'
+  manifest="$d/11_android_receipt/receipt.sha256"
+  new_hash="$(cd "$d" && sha256sum "$state_rel" | awk '{print $1}')" || return 1
+  : > "$manifest.tmp"
+  while IFS= read -r line; do
+    rel="${line#*  }"
+    if [ "$rel" = "$state_rel" ]; then
+      printf '%s  %s\n' "$new_hash" "$rel" >> "$manifest.tmp"
+    else
+      printf '%s\n' "$line" >> "$manifest.tmp"
+    fi
+  done < "$manifest"
+  mv "$manifest.tmp" "$manifest"
+}
+
 BASE="$TMP/base"
 make_fixture "$BASE" || { printf '%s\n' 'fixture producer failed' >&2; exit 2; }
 expect_pass positive bash "$VERIFIER" "$BASE"
@@ -54,30 +71,20 @@ cp -a "$BASE" "$DUP"
 head -n1 "$DUP/11_android_receipt/receipt.sha256" >> "$DUP/11_android_receipt/receipt.sha256"
 expect_fail duplicate_path_rejected bash "$VERIFIER" "$DUP"
 
-# Semantic state tamper with recomputed valid SHA-256 must still be rejected.
+# Semantic state tamper with a recomputed, still-canonical SHA-256 manifest must
+# be rejected by schema semantics rather than by formatting noise.
 SEM="$TMP/semantic"
 cp -a "$BASE" "$SEM"
 sed -i 's/^claim_allowed=false$/claim_allowed=true/' "$SEM/11_android_receipt/android-final-state.tsv"
-(
-  cd "$SEM" || exit 1
-  state_hash="$(sha256sum '11_android_receipt/android-final-state.tsv' | awk '{print $1}')"
-  awk -v h="$state_hash" '$2=="11_android_receipt/android-final-state.tsv" {$1=h} {print}' \
-    '11_android_receipt/receipt.sha256' > '11_android_receipt/r.tmp' &&
-  mv '11_android_receipt/r.tmp' '11_android_receipt/receipt.sha256'
-)
+rehash_state_canonically "$SEM" || exit 3
 expect_fail semantic_rehash_rejected bash "$VERIFIER" "$SEM"
 
-# Target digest claim tamper with recomputed manifest must still fail coherence.
+# Target digest claim tamper with recomputed canonical manifest must still fail
+# coherence against the actual selected APK bytes.
 TD="$TMP/target-digest"
 cp -a "$BASE" "$TD"
 sed -i 's/^install_target_sha256=.*/install_target_sha256=0000000000000000000000000000000000000000000000000000000000000000/' "$TD/11_android_receipt/android-final-state.tsv"
-(
-  cd "$TD" || exit 1
-  state_hash="$(sha256sum '11_android_receipt/android-final-state.tsv' | awk '{print $1}')"
-  awk -v h="$state_hash" '$2=="11_android_receipt/android-final-state.tsv" {$1=h} {print}' \
-    '11_android_receipt/receipt.sha256' > '11_android_receipt/r.tmp' &&
-  mv '11_android_receipt/r.tmp' '11_android_receipt/receipt.sha256'
-)
+rehash_state_canonically "$TD" || exit 3
 expect_fail target_digest_rehash_rejected bash "$VERIFIER" "$TD"
 
 # An optional producer-eligible evidence file added after finalization must make
