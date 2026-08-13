@@ -5,6 +5,7 @@ set -u
 # Phase 1 delegates build/evidence capture with signing+install disabled.
 # Phase 2 selects an install artifact only through apkc_sign_install_gate.sh.
 # Phase 3 installs/launches only that exact selected artifact.
+# Phase 4 freezes and verifies the final Android custody receipt.
 # This wrapper does not promote runtime claims; claim_allowed remains false.
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -18,6 +19,7 @@ DO_INSTALL="${DO_INSTALL:-1}"
 REQUESTED_DO_SIGN="${DO_SIGN:-auto}"
 BASE_CAPTURE="${APKC_BASE_CAPTURE:-$ROOT/scripts/capture_android_proof_chain.sh}"
 SIGN_GATE="${APKC_SIGN_GATE:-$ROOT/scripts/apkc_sign_install_gate.sh}"
+FINAL_RECEIPT="${APKC_ANDROID_FINAL_RECEIPT:-$ROOT/scripts/apkc_android_final_receipt.sh}"
 
 APK_RAW="$OUT_DIR/$APK_NAME"
 APK_SIGNED="$OUT_DIR/${APK_NAME%.apk}-signed.apk"
@@ -64,6 +66,10 @@ esac
 [ -f "$SIGN_GATE" ] || {
   write_token_vazio "$TARGET_FILE" 'sign gate missing'
   exit 88
+}
+[ -f "$FINAL_RECEIPT" ] || {
+  write_token_vazio "$TARGET_FILE" 'final Android receipt gate missing'
+  exit 98
 }
 command -v bash >/dev/null 2>&1 || {
   write_token_vazio "$TARGET_FILE" 'bash unavailable'
@@ -170,5 +176,13 @@ else
   exit 96
 fi
 
+# Freeze all mutable evidence before final hashing. No covered artifact or
+# status.tsv may be changed after this call. The finalizer independently
+# revalidates its SHA-256 manifest and remains claim_allowed=false.
 printf '%s\n' 'claim_allowed=false' > "$OUT_DIR/hardened-chain-claim.txt"
-printf '%s\n' '[ApkC hardened chain complete: runtime semantic claim remains TOKEN_VAZIO]'
+if ! bash "$FINAL_RECEIPT" "$OUT_DIR"; then
+  printf '%s\n' '[ApkC hardened chain FAIL: final Android receipt rejected]' >&2
+  exit 99
+fi
+
+printf '%s\n' '[ApkC hardened chain complete: custody receipt PASS; runtime semantic claim remains TOKEN_VAZIO]'
