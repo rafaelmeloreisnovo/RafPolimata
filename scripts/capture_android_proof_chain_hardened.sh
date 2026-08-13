@@ -5,6 +5,7 @@ set -u
 # Phase 1 delegates build/evidence capture with signing+install disabled.
 # Phase 2 selects an install artifact only through apkc_sign_install_gate.sh.
 # Phase 2.5 requires canonical path evidence before release to install.
+# Phase 2.6 binds the selected APK bytes to the immediate install boundary.
 # Phase 3 installs/launches only that exact selected artifact.
 # Phase 4 freezes and verifies the final Android custody receipt.
 # This wrapper does not promote runtime claims; claim_allowed remains false.
@@ -21,12 +22,14 @@ REQUESTED_DO_SIGN="${DO_SIGN:-auto}"
 BASE_CAPTURE="${APKC_BASE_CAPTURE:-$ROOT/scripts/capture_android_proof_chain.sh}"
 SIGN_GATE="${APKC_SIGN_GATE:-$ROOT/scripts/apkc_sign_install_gate.sh}"
 PATH_GATE="${APKC_PATH_GATE:-$ROOT/scripts/apkc_path_canonicality_gate.sh}"
+DIGEST_GATE="${APKC_INSTALL_DIGEST_GATE:-$ROOT/scripts/apkc_install_digest_gate.sh}"
 FINAL_RECEIPT="${APKC_ANDROID_FINAL_RECEIPT:-$ROOT/scripts/apkc_android_final_receipt.sh}"
 
 APK_RAW="$OUT_DIR/$APK_NAME"
 APK_SIGNED="$OUT_DIR/${APK_NAME%.apk}-signed.apk"
 SIGN_DIR="$OUT_DIR/06_sign_gate"
 TARGET_FILE="$SIGN_DIR/install-target.txt"
+DIGEST_DIR="$OUT_DIR/07_install_digest_gate"
 STATUS="$OUT_DIR/status.tsv"
 
 mkdir -p "$OUT_DIR" "$SIGN_DIR"
@@ -72,6 +75,10 @@ esac
 [ -f "$PATH_GATE" ] || {
   write_token_vazio "$TARGET_FILE" 'path canonicality gate missing'
   exit 100
+}
+[ -f "$DIGEST_GATE" ] || {
+  write_token_vazio "$TARGET_FILE" 'install digest gate missing'
+  exit 102
 }
 [ -f "$FINAL_RECEIPT" ] || {
   write_token_vazio "$TARGET_FILE" 'final Android receipt gate missing'
@@ -155,7 +162,28 @@ if [ "$DO_INSTALL" != 1 ]; then
   exit 0
 fi
 
+# Freeze the SHA-256 of the selected artifact after signing/path validation.
+rm -rf "$DIGEST_DIR"
+mkdir -p "$DIGEST_DIR"
+if ! bash "$DIGEST_GATE" freeze "$APK_TO_INSTALL" "$DIGEST_DIR" > "$DIGEST_DIR/freeze.out" 2>&1; then
+  printf 'TOKEN_VAZIO\n' > "$TARGET_FILE"
+  append_status "install_digest_binding" "FAIL" "07_install_digest_gate/freeze.out" "digest freeze failed; install blocked"
+  exit 103
+fi
+append_status "install_digest_binding" "FREEZE" "07_install_digest_gate/install-apk.sha256.freeze" "selected APK digest frozen; claim_allowed=false"
+
+verify_install_digest() {
+  if ! bash "$DIGEST_GATE" verify "$APK_TO_INSTALL" "$DIGEST_DIR" > "$DIGEST_DIR/verify.out" 2>&1; then
+    printf 'TOKEN_VAZIO\n' > "$TARGET_FILE"
+    append_status "install_digest_binding" "FAIL" "07_install_digest_gate/verify.out" "install-boundary digest mismatch/error; install blocked"
+    return 1
+  fi
+  append_status "install_digest_binding" "PASS" "07_install_digest_gate/install-apk.sha256.verify" "same selected bytes observed immediately pre-install; claim_allowed=false"
+  return 0
+}
+
 if command -v adb >/dev/null 2>&1; then
+  verify_install_digest || exit 104
   if run_capture "$OUT_DIR/08_install_hardened.txt" adb install -r "$APK_TO_INSTALL"; then
     append_status "android_install_hardened" "PASS" "08_install_hardened.txt" "adb install exit=0"
   else
@@ -172,6 +200,7 @@ if command -v adb >/dev/null 2>&1; then
   run_capture "$OUT_DIR/10_logcat_hardened.txt" sh -c "adb logcat -d | grep -i -E 'NativeActivity|AndroidRuntime|dlopen|fatal|crash|$PKG|lib${LIB}' || true" || true
   append_status "android_runtime_hardened" "AUDIT" "10_logcat_hardened.txt" "captured; semantic PASS remains TOKEN_VAZIO"
 elif command -v pm >/dev/null 2>&1; then
+  verify_install_digest || exit 104
   if run_capture "$OUT_DIR/08_install_hardened.txt" pm install -r "$APK_TO_INSTALL"; then
     append_status "android_install_hardened" "PASS" "08_install_hardened.txt" "pm install exit=0"
   else
