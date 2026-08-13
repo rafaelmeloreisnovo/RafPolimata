@@ -5,7 +5,8 @@ set -u
 # Phase 1 delegates build/evidence capture with signing+install disabled.
 # Phase 2 selects an install artifact only through apkc_sign_install_gate.sh.
 # Phase 2.5 requires canonical path evidence before release to install.
-# Phase 2.6 binds the selected APK bytes to the immediate install boundary.
+# Phase 2.6 binds the digest observed by apksigner verification to the freeze.
+# Phase 2.7 binds the frozen APK bytes to the immediate install boundary.
 # Phase 3 installs/launches only that exact selected artifact.
 # Phase 4 freezes and verifies the final Android custody receipt.
 # This wrapper does not promote runtime claims; claim_allowed remains false.
@@ -29,6 +30,7 @@ APK_RAW="$OUT_DIR/$APK_NAME"
 APK_SIGNED="$OUT_DIR/${APK_NAME%.apk}-signed.apk"
 SIGN_DIR="$OUT_DIR/06_sign_gate"
 TARGET_FILE="$SIGN_DIR/install-target.txt"
+VERIFIED_DIGEST_FILE="$SIGN_DIR/verified-apk.sha256"
 DIGEST_DIR="$OUT_DIR/07_install_digest_gate"
 STATUS="$OUT_DIR/status.tsv"
 
@@ -54,6 +56,14 @@ run_capture() {
     printf '\n# ---- stdout/stderr ----\n'
     "$@"
   } > "$out" 2>&1
+}
+
+is_sha256() {
+  local digest=${1:-}
+  case "$digest" in
+    ''|*[!0-9a-f]*) return 1 ;;
+  esac
+  [ "${#digest}" -eq 64 ]
 }
 
 case "$REQUESTED_DO_SIGN" in
@@ -171,6 +181,55 @@ if ! bash "$DIGEST_GATE" freeze "$APK_TO_INSTALL" "$DIGEST_DIR" > "$DIGEST_DIR/f
   exit 103
 fi
 append_status "install_digest_binding" "FREEZE" "07_install_digest_gate/install-apk.sha256.freeze" "selected APK digest frozen; claim_allowed=false"
+
+# Signing-enabled paths must carry the exact digest of the bytes that survived
+# apksigner verification. Compare it with the independently generated install
+# freeze. This closes the verify -> freeze TOCTOU window. Explicit DO_SIGN=0
+# remains compatible but cannot claim signing/digest provenance.
+if [ "$REQUESTED_DO_SIGN" = 0 ]; then
+  append_status "verification_digest_binding" "TOKEN_VAZIO" "06_sign_gate/verified-apk.sha256" "signing explicitly disabled; no verified digest claim"
+else
+  [ -f "$VERIFIED_DIGEST_FILE" ] || {
+    printf 'TOKEN_VAZIO\n' > "$TARGET_FILE"
+    append_status "verification_digest_binding" "FAIL" "06_sign_gate/verified-apk.sha256" "verified digest missing; install blocked"
+    exit 105
+  }
+  [ "$(wc -l < "$VERIFIED_DIGEST_FILE" | tr -d ' ')" = 1 ] || {
+    printf 'TOKEN_VAZIO\n' > "$TARGET_FILE"
+    append_status "verification_digest_binding" "FAIL" "06_sign_gate/verified-apk.sha256" "verified digest record malformed; install blocked"
+    exit 105
+  }
+  IFS= read -r VERIFIED_DIGEST < "$VERIFIED_DIGEST_FILE" || VERIFIED_DIGEST=''
+  is_sha256 "$VERIFIED_DIGEST" || {
+    printf 'TOKEN_VAZIO\n' > "$TARGET_FILE"
+    append_status "verification_digest_binding" "FAIL" "06_sign_gate/verified-apk.sha256" "verified digest invalid/TOKEN_VAZIO; install blocked"
+    exit 105
+  }
+  FROZEN_DIGEST="$(sed -n '3s/^selected_apk_sha256=//p' "$DIGEST_DIR/install-apk.sha256.freeze")"
+  is_sha256 "$FROZEN_DIGEST" || {
+    printf 'TOKEN_VAZIO\n' > "$TARGET_FILE"
+    append_status "verification_digest_binding" "FAIL" "07_install_digest_gate/install-apk.sha256.freeze" "frozen digest invalid; install blocked"
+    exit 105
+  }
+  if [ "$VERIFIED_DIGEST" != "$FROZEN_DIGEST" ]; then
+    printf 'TOKEN_VAZIO\n' > "$TARGET_FILE"
+    {
+      printf 'binding_status=FAIL\n'
+      printf 'claim_allowed=false\n'
+      printf 'verified_sha256=%s\n' "$VERIFIED_DIGEST"
+      printf 'frozen_sha256=%s\n' "$FROZEN_DIGEST"
+    } > "$DIGEST_DIR/verified-to-freeze.binding"
+    append_status "verification_digest_binding" "FAIL" "07_install_digest_gate/verified-to-freeze.binding" "apksigner-verified bytes differ from freeze; install blocked"
+    exit 105
+  fi
+  {
+    printf 'binding_status=PASS\n'
+    printf 'claim_allowed=false\n'
+    printf 'verified_sha256=%s\n' "$VERIFIED_DIGEST"
+    printf 'frozen_sha256=%s\n' "$FROZEN_DIGEST"
+  } > "$DIGEST_DIR/verified-to-freeze.binding"
+  append_status "verification_digest_binding" "PASS" "07_install_digest_gate/verified-to-freeze.binding" "same bytes verified by apksigner and frozen for install; claim_allowed=false"
+fi
 
 verify_install_digest() {
   if ! bash "$DIGEST_GATE" verify "$APK_TO_INSTALL" "$DIGEST_DIR" > "$DIGEST_DIR/verify.out" 2>&1; then
