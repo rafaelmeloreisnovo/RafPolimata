@@ -20,14 +20,41 @@ TARGET="$OUT_DIR/install-target.txt"
 STATUS="$OUT_DIR/signing-status.txt"
 VERIFY="$OUT_DIR/apksigner-verify.txt"
 SIGN_LOG="$OUT_DIR/apksigner-sign.txt"
+VERIFIED_DIGEST="$OUT_DIR/verified-apk.sha256"
 : > "$STATUS"
 printf 'TOKEN_VAZIO\n' > "$TARGET"
+printf 'TOKEN_VAZIO\n' > "$VERIFIED_DIGEST"
 
 fail() {
   code=$1
   shift
+  printf 'TOKEN_VAZIO\n' > "$TARGET"
+  printf 'TOKEN_VAZIO\n' > "$VERIFIED_DIGEST"
   printf 'status=FAIL\nreason=%s\nclaim_allowed=false\n' "$*" > "$STATUS"
   exit "$code"
+}
+
+sha256_file() {
+  local file=$1 digest
+  digest=$(sha256sum "$file" 2>/dev/null | awk '{print $1}') || return 1
+  case "$digest" in
+    ''|*[!0-9a-f]*) return 1 ;;
+  esac
+  [ "${#digest}" -eq 64 ] || return 1
+  printf '%s\n' "$digest"
+}
+
+verify_and_bind_digest() {
+  local apk=$1 before after
+  command -v sha256sum >/dev/null 2>&1 || fail 87 'sha256sum unavailable; verified digest cannot be bound'
+  before=$(sha256_file "$apk") || fail 87 'unable to hash APK before apksigner verification'
+  if ! apksigner verify --verbose --print-certs "$apk" >"$VERIFY" 2>&1; then
+    return 1
+  fi
+  after=$(sha256_file "$apk") || fail 87 'unable to hash APK after apksigner verification'
+  [ "$before" = "$after" ] || fail 87 'APK bytes changed during apksigner verification; target withheld'
+  printf '%s\n' "$after" > "$VERIFIED_DIGEST"
+  return 0
 }
 
 [ -s "$RAW" ] || fail 80 'raw APK missing/empty'
@@ -37,10 +64,10 @@ case "$DO_SIGN" in
 esac
 
 # Explicit compatibility escape hatch. The caller consciously disables this
-# signing gate; no signing claim is promoted.
+# signing gate; no signing claim is promoted and verified digest stays unknown.
 if [ "$DO_SIGN" = 0 ]; then
   printf '%s\n' "$RAW" > "$TARGET"
-  printf 'status=SKIPPED_EXPLICIT\nartifact=raw\nclaim_allowed=false\n' > "$STATUS"
+  printf 'status=SKIPPED_EXPLICIT\nartifact=raw\nverified_digest=TOKEN_VAZIO\nclaim_allowed=false\n' > "$STATUS"
   exit 0
 fi
 
@@ -52,12 +79,12 @@ if [ -n "${APKSIGNER_KEYSTORE:-}" ]; then
     rm -f "$SIGNED"
     fail 83 'signing failed or signed APK missing/empty'
   fi
-  if ! apksigner verify --verbose --print-certs "$SIGNED" >"$VERIFY" 2>&1; then
+  if ! verify_and_bind_digest "$SIGNED"; then
     rm -f "$SIGNED"
     fail 84 'signed APK failed verification'
   fi
   printf '%s\n' "$SIGNED" > "$TARGET"
-  printf 'status=PASS\nartifact=signed\nverification=apksigner_verbose_print_certs\nclaim_allowed=false\n' > "$STATUS"
+  printf 'status=PASS\nartifact=signed\nverification=apksigner_verbose_print_certs\nverified_digest_file=verified-apk.sha256\nclaim_allowed=false\n' > "$STATUS"
   exit 0
 fi
 
@@ -67,10 +94,10 @@ if [ "$DO_SIGN" = 1 ]; then
 fi
 
 # Auto mode may reuse an already-signed raw APK, but only after cryptographic
-# verification. The certificate details are preserved in apksigner-verify.txt.
-if apksigner verify --verbose --print-certs "$RAW" >"$VERIFY" 2>&1; then
+# verification. The certificate details and exact verified digest are preserved.
+if verify_and_bind_digest "$RAW"; then
   printf '%s\n' "$RAW" > "$TARGET"
-  printf 'status=PASS\nartifact=raw_already_signed\nverification=apksigner_verbose_print_certs\nclaim_allowed=false\n' > "$STATUS"
+  printf 'status=PASS\nartifact=raw_already_signed\nverification=apksigner_verbose_print_certs\nverified_digest_file=verified-apk.sha256\nclaim_allowed=false\n' > "$STATUS"
   exit 0
 fi
 
