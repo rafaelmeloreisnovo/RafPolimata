@@ -15,12 +15,12 @@ IFS= read -r TARGET_RAW < "$TARGET_FILE" || exit 70
 case "$TARGET_RAW" in
   /*)
     case "$TARGET_RAW" in
-      *'/../'*|*/..|*/./*|*/.|*\\*) printf '%s\n' 'non-canonical legacy absolute install target' >&2; exit 74 ;;
+      *//*|*'/../'*|*/..|*/./*|*/.|*\\*) printf '%s\n' 'non-canonical legacy absolute install target' >&2; exit 74 ;;
     esac
     ;;
   *)
     case "$TARGET_RAW" in
-      ''|/*|../*|*/../*|*/..|..|.|./*|*/./*|*/.|*\\*) printf '%s\n' 'non-canonical relative install target' >&2; exit 74 ;;
+      ''|/*|*//*|../*|*/../*|*/..|..|.|./*|*/./*|*/.|*\\*) printf '%s\n' 'non-canonical relative install target' >&2; exit 74 ;;
     esac
     ;;
 esac
@@ -30,5 +30,6 @@ esac
 
 printf '%s\n' 'path_canonicality=PASS'
 printf '%s\n' 'backslash_alias=REJECTED_BY_POLICY'
+printf '%s\n' 'redundant_slash_alias=REJECTED_BY_POLICY'
 printf '%s\n' 'claim_allowed=false'
 exit 0
