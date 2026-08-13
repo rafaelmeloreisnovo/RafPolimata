@@ -4,6 +4,7 @@ set -u
 # Hardened compatibility entrypoint for ApkC Android proof capture.
 # Phase 1 delegates build/evidence capture with signing+install disabled.
 # Phase 2 selects an install artifact only through apkc_sign_install_gate.sh.
+# Phase 2.5 requires canonical path evidence before release to install.
 # Phase 3 installs/launches only that exact selected artifact.
 # Phase 4 freezes and verifies the final Android custody receipt.
 # This wrapper does not promote runtime claims; claim_allowed remains false.
@@ -19,6 +20,7 @@ DO_INSTALL="${DO_INSTALL:-1}"
 REQUESTED_DO_SIGN="${DO_SIGN:-auto}"
 BASE_CAPTURE="${APKC_BASE_CAPTURE:-$ROOT/scripts/capture_android_proof_chain.sh}"
 SIGN_GATE="${APKC_SIGN_GATE:-$ROOT/scripts/apkc_sign_install_gate.sh}"
+PATH_GATE="${APKC_PATH_GATE:-$ROOT/scripts/apkc_path_canonicality_gate.sh}"
 FINAL_RECEIPT="${APKC_ANDROID_FINAL_RECEIPT:-$ROOT/scripts/apkc_android_final_receipt.sh}"
 
 APK_RAW="$OUT_DIR/$APK_NAME"
@@ -66,6 +68,10 @@ esac
 [ -f "$SIGN_GATE" ] || {
   write_token_vazio "$TARGET_FILE" 'sign gate missing'
   exit 88
+}
+[ -f "$PATH_GATE" ] || {
+  write_token_vazio "$TARGET_FILE" 'path canonicality gate missing'
+  exit 100
 }
 [ -f "$FINAL_RECEIPT" ] || {
   write_token_vazio "$TARGET_FILE" 'final Android receipt gate missing'
@@ -128,6 +134,19 @@ esac
   exit 93
 }
 
+# Defense-in-depth: exact target selection is not sufficient if OUT_DIR itself
+# contains a textual alias such as /a/./b. Require the independent canonicality
+# policy before any artifact can cross into the installation phase.
+set +e
+bash "$PATH_GATE" "$OUT_DIR" > "$OUT_DIR/07_path_canonicality_gate.txt" 2>&1
+path_gate_rc=$?
+set -e
+if [ "$path_gate_rc" -ne 0 ]; then
+  printf 'TOKEN_VAZIO\n' > "$TARGET_FILE"
+  append_status "path_canonicality_gate" "FAIL" "07_path_canonicality_gate.txt" "gate rc=$path_gate_rc; install target withheld"
+  exit 101
+fi
+append_status "path_canonicality_gate" "PASS" "07_path_canonicality_gate.txt" "canonical path policy satisfied; claim_allowed=false"
 append_status "sign_install_gate" "PASS" "06_sign_gate" "policy satisfied; claim_allowed=false"
 
 if [ "$DO_INSTALL" != 1 ]; then
