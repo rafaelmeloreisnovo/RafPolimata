@@ -26,21 +26,25 @@ make_fixture() {
   bash "$PRODUCER" "$d" >/dev/null 2>&1
 }
 
-rehash_state_canonically() {
+rehash_file_canonically() {
   d="$1"
-  state_rel='11_android_receipt/android-final-state.tsv'
+  rel="$2"
   manifest="$d/11_android_receipt/receipt.sha256"
-  new_hash="$(cd "$d" && sha256sum "$state_rel" | awk '{print $1}')" || return 1
+  new_hash="$(cd "$d" && sha256sum "$rel" | awk '{print $1}')" || return 1
   : > "$manifest.tmp"
   while IFS= read -r line; do
-    rel="${line#*  }"
-    if [ "$rel" = "$state_rel" ]; then
-      printf '%s  %s\n' "$new_hash" "$rel" >> "$manifest.tmp"
+    path="${line#*  }"
+    if [ "$path" = "$rel" ]; then
+      printf '%s  %s\n' "$new_hash" "$path" >> "$manifest.tmp"
     else
       printf '%s\n' "$line" >> "$manifest.tmp"
     fi
   done < "$manifest"
   mv "$manifest.tmp" "$manifest"
+}
+
+rehash_state_canonically() {
+  rehash_file_canonically "$1" '11_android_receipt/android-final-state.tsv'
 }
 
 BASE="$TMP/base"
@@ -86,6 +90,22 @@ cp -a "$BASE" "$TD"
 sed -i 's/^install_target_sha256=.*/install_target_sha256=0000000000000000000000000000000000000000000000000000000000000000/' "$TD/11_android_receipt/android-final-state.tsv"
 rehash_state_canonically "$TD" || exit 3
 expect_fail target_digest_rehash_rejected bash "$VERIFIER" "$TD"
+
+# A forged legacy absolute selector must not survive simply because the attacker
+# recomputed its manifest hash. It must identify the same canonical target suffix.
+LEGACY_BAD="$TMP/legacy-absolute-mismatch"
+cp -a "$BASE" "$LEGACY_BAD"
+printf '%s\n' '/historical/other/location/not-the-selected.apk' > "$LEGACY_BAD/06_sign_gate/install-target.txt"
+rehash_file_canonically "$LEGACY_BAD" '06_sign_gate/install-target.txt' || exit 3
+expect_fail legacy_absolute_mismatch_rehashed_rejected bash "$VERIFIER" "$LEGACY_BAD"
+
+# A genuine legacy absolute selector that ends in the frozen relative identity is
+# accepted after relocation; old OUT_DIR existence is deliberately not required.
+LEGACY_OK="$TMP/legacy-absolute-valid"
+cp -a "$BASE" "$LEGACY_OK"
+printf '%s\n' '/old/device/run/07_signed/app.apk' > "$LEGACY_OK/06_sign_gate/install-target.txt"
+rehash_file_canonically "$LEGACY_OK" '06_sign_gate/install-target.txt' || exit 3
+expect_pass legacy_absolute_suffix_accepted bash "$VERIFIER" "$LEGACY_OK"
 
 # An optional producer-eligible evidence file added after finalization must make
 # exact coverage fail instead of silently remaining outside custody.
