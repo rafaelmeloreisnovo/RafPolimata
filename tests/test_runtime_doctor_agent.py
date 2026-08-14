@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -103,6 +104,110 @@ def test_safe_probe_rejects_install_and_delete():
     assert RDA.safe_probe_command(("python3", "scripts/frida_runtime_probe.py", "--json"))
     assert not RDA.safe_probe_command(("sh", "-c", "pkg install x"))
     assert not RDA.safe_probe_command(("sh", "-c", "rm -rf x"))
+
+
+def test_build_report_executes_claim_boundary_without_name_error(tmp_path):
+    args = RDA.parser().parse_args(["--workspace", str(tmp_path)])
+    report = RDA.build_report(args)
+    assert report["claim_boundary"]["automatic_repair"] is False
+    assert report["claim_boundary"]["automatic_install"] is False
+    assert report["claim_boundary"]["automatic_delete"] is False
+    assert report["claim_boundary"]["claim_allowed"] is False
+    assert report["summary"]["state"] == "PASS_LIMITED"
+    assert any(gap["id"] == "GAP-RD-RUNTIME-EXECUTION" for gap in report["gap_ledger"])
+
+
+def test_identical_probe_is_executed_once_and_reused(tmp_path, monkeypatch):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    probe = ("python3", "probe.py", "--json")
+    skills = [
+        RDA.Skill("host", "L1", "repo", "host", probe, ("host",), "runtime_json"),
+        RDA.Skill("gpu", "L2", "repo", "gpu", probe, ("gpu",), "runtime_json"),
+    ]
+    calls = []
+
+    def fake_run_probe(skill, repo_root, timeout_s, trace):
+        calls.append((skill.id, repo_root, timeout_s))
+        return {
+            "skill_id": skill.id,
+            "state": "PASS",
+            "repo": skill.repo,
+            "exit_code": 0,
+            "command": list(skill.probe),
+            "payload": {"arch": "armv7l"},
+            "stdout_tail": "{}",
+            "stderr_tail": "",
+        }
+
+    monkeypatch.setattr(RDA, "run_probe", fake_run_probe)
+    results = RDA.execute_selected_probes(skills, {"repo": repo}, 5, RDA.Trace(False))
+    assert len(calls) == 1
+    assert len(results) == 2
+    assert results[0]["probe_cache"]["reused"] is False
+    assert results[1]["probe_cache"]["reused"] is True
+    assert results[1]["probe_cache"]["source_skill_id"] == "host"
+
+
+def test_reachable_route_graph_preserves_downstream_context():
+    registry = {
+        "route_graph": [
+            ["host", "frida"],
+            ["frida", "evidence"],
+            ["evidence", "L7"],
+            ["unrelated", "L7"],
+        ]
+    }
+    assert RDA.reachable_route_graph(registry, {"host"}) == [
+        ["host", "frida"],
+        ["frida", "evidence"],
+        ["evidence", "L7"],
+    ]
+
+
+def test_build_doctor_evidence_is_hash_bound_and_schema_checked(tmp_path):
+    report_path = tmp_path / "build-doctor.json"
+    report_path.write_text(
+        json.dumps(
+            {
+                "schema": "raf.ecosystem-build-doctor-report.v1",
+                "summary": {
+                    "state": "REVIEW_REQUIRED",
+                    "highest_severity": "high",
+                    "findings": 2,
+                    "by_code": {"example": 2},
+                    "by_repo": {"demo": 2},
+                },
+                "findings": [],
+                "claim_boundary": {
+                    "static_analysis": "VERIFIED_BY_EXECUTION",
+                    "build_execution": "TOKEN_VAZIO",
+                },
+            },
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+    records = RDA.load_build_doctor_reports([str(report_path)], RDA.Trace(False))
+    assert len(records) == 1
+    assert records[0]["state"] == "INGESTED_HASH_BOUND_REPORT"
+    assert records[0]["source_sha256"] == RDA.sha256_file(report_path)
+    assert records[0]["summary"]["state"] == "REVIEW_REQUIRED"
+    assert "source_path" not in records[0]
+
+
+def test_gap_ledger_marks_frida_physical_receipt_as_p0():
+    args = RDA.parser().parse_args([])
+    skill_routes = [
+        {
+            "skill_id": "frida_runtime_observer",
+            "repo_state": "AVAILABLE",
+        }
+    ]
+    gaps = RDA.build_gap_ledger(args, skill_routes, [], [])
+    physical = next(g for g in gaps if g["id"] == "GAP-RD-FRIDA-PHYSICAL")
+    assert physical["urgency"] == "P0"
+    assert physical["state"] == "TOKEN_VAZIO_PHYSICAL_DEVICE_RECEIPT_REQUIRED"
 
 
 def test_frida_device_parser_is_read_only_and_structured():
