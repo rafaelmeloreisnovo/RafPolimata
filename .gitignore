@@ -20,6 +20,7 @@ __pycache__/
 tests/results/
 tests/test_machine_branchless
 tests/test_apkc_branchless_integration
+tests/test_phase4_multilang
 
 # raf_shell orchestrator build artifacts
 raf_orchestrator
