@@ -65,6 +65,14 @@ jobs:
             scripts/apkc_structural_closure_receipt.py \
             scripts/patch_apkc_runtime_source.py
           sh -n scripts/raf_https_fetch.sh
+          sh -n scripts/apkc_install_sealed_stdin.sh
+          sh -n scripts/apkc_finalize_stdin_install_receipt.sh
+          sh -n scripts/apkc_termux_sealed_stdin_gate.sh
+          sh -n tests/test_apkc_probe_memfd_runtime.sh
+          sh -n tests/test_apkc_install_sealed_stdin.sh
+          sh -n tests/test_apkc_finalize_stdin_install_receipt.sh
+          sh -n tests/test_apkc_install_sealed_stdin_launcher.sh
+          sh -n tests/test_apkc_termux_sealed_stdin_gate.sh
           sh -n tools/raf_source_to_binary_proof.sh
           sh -n tools/raf_apkc_runtime_hardening_proof.sh
           python3 -m json.tool configs/browser-tls-capability.v1.json >/dev/null
@@ -81,6 +89,43 @@ jobs:
             tests.test_apkc_verified_build \
             tests.test_apkc_structural_closure_receipt \
             tests.test_patch_apkc_runtime_source
+
+      - name: Test sealed custody and stdin preflight hardening
+        id: custody_hardening
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          mkdir -p results /tmp/apkc-custody-hardening
+          {
+            echo '=== memfd runtime capability contract ==='
+            bash tests/test_apkc_probe_memfd_runtime.sh
+
+            echo '=== sealed memfd -> stdin helper ==='
+            clang -std=c11 -O2 -Wall -Wextra -Werror \
+              scripts/apkc_install_sealed_stdin.c \
+              -o /tmp/apkc-custody-hardening/apkc_install_sealed_stdin
+            bash tests/test_apkc_install_sealed_stdin.sh \
+              /tmp/apkc-custody-hardening/apkc_install_sealed_stdin
+
+            echo '=== stdin receipt finalizer ==='
+            bash tests/test_apkc_finalize_stdin_install_receipt.sh \
+              scripts/apkc_finalize_stdin_install_receipt.sh
+
+            echo '=== sealed stdin launcher ==='
+            bash tests/test_apkc_install_sealed_stdin_launcher.sh \
+              scripts/apkc_install_sealed_stdin.sh
+
+            echo '=== Termux/Android preflight logic (controlled fixtures only) ==='
+            bash tests/test_apkc_termux_sealed_stdin_gate.sh \
+              scripts/apkc_termux_sealed_stdin_gate.sh
+          } 2>&1 | tee results/apkc-custody-hardening-shell-tests.log
+          grep -q '^RESULT pass=8 fail=0 claim_allowed=false$' results/apkc-custody-hardening-shell-tests.log
+          grep -q '^RESULT pass=6 fail=0 claim_allowed=false$' results/apkc-custody-hardening-shell-tests.log
+          grep -q '^RESULT pass=7 fail=0 claim_allowed=false$' results/apkc-custody-hardening-shell-tests.log
+          grep -q '^RESULT pass=4 fail=0 claim_allowed=false$' results/apkc-custody-hardening-shell-tests.log
+          grep -q '^RESULT pass=9 fail=0 claim_allowed=false$' results/apkc-custody-hardening-shell-tests.log
+          test "$(grep -c '^RESULT pass=' results/apkc-custody-hardening-shell-tests.log)" -eq 5
+          ! grep -q '^claim_allowed=true$' results/apkc-custody-hardening-shell-tests.log
 
       - name: Build baseline reproducible AArch64 and ARM32 compiler artifacts
         id: source_proof
@@ -187,6 +232,7 @@ jobs:
             results/apkc-runtime-preflight.json
             results/apkc-runtime-source-hardening.json
             results/apkc-runtime-hardening-proof.json
+            results/apkc-custody-hardening-shell-tests.log
             build/generated/Apkc/apkc.runtime-hardened.c
             Apkc/proofs/out/hello.apk
             Apkc/proofs/out/apkc-qemu-aarch64.sh
@@ -203,6 +249,7 @@ jobs:
           TOOLING_OUTCOME: ${{ steps.tooling.outcome }}
           SYNTAX_OUTCOME: ${{ steps.syntax.outcome }}
           TESTS_OUTCOME: ${{ steps.tests.outcome }}
+          CUSTODY_HARDENING_OUTCOME: ${{ steps.custody_hardening.outcome }}
           SOURCE_PROOF_OUTCOME: ${{ steps.source_proof.outcome }}
           GENERATE_APK_OUTCOME: ${{ steps.generate_apk.outcome }}
           HARDENING_OUTCOME: ${{ steps.hardening.outcome }}
@@ -215,6 +262,7 @@ jobs:
             "$TOOLING_OUTCOME" \
             "$SYNTAX_OUTCOME" \
             "$TESTS_OUTCOME" \
+            "$CUSTODY_HARDENING_OUTCOME" \
             "$SOURCE_PROOF_OUTCOME" \
             "$GENERATE_APK_OUTCOME" \
             "$HARDENING_OUTCOME" \
