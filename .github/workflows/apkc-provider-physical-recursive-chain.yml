@@ -1,0 +1,40 @@
+name: ApkC Provider Physical Recursive Chain
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/apkc_provider_to_physical_receipted.sh'
+      - 'scripts/apkc_seal_receipt_tree.sh'
+      - 'scripts/apkc_verify_provider_c04_transfer.sh'
+      - 'scripts/apkc_termux_sealed_stdin_gate_receipted.sh'
+      - 'tests/test_apkc_provider_to_physical_receipted.sh'
+      - '.github/workflows/apkc-provider-physical-recursive-chain.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  provider-physical-recursive-custody:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/apkc_provider_to_physical_receipted.sh
+          bash -n tests/test_apkc_provider_to_physical_receipted.sh
+      - name: Provider-to-physical custody falsifiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash tests/test_apkc_provider_to_physical_receipted.sh | tee provider-physical-recursive-test.txt
+          grep -Fxq 'RESULT pass=7 fail=0 claim_allowed=false' provider-physical-recursive-test.txt
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkc-provider-physical-recursive-chain-evidence
+          path: provider-physical-recursive-test.txt
+          if-no-files-found: warn
