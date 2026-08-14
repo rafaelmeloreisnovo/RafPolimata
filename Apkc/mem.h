@@ -72,22 +72,6 @@ static inline void *m_cpy(void *d, const void *s, sz n) {
     for (; i < n; i++) dp[i] = sp[i];
     return d;
 }
-
-/* Compiler-runtime ABI shim for freestanding aggregate copies. Clang/LLVM may
- * lower a structure copy to an external memcpy libcall even under -ffreestanding
- * -fno-builtin. Hosted libc is intentionally unavailable to ApkC, so provide the
- * conventional symbol locally. Volatile byte accesses prevent the implementation
- * itself from being folded back into a memcpy libcall at higher optimization. */
-static __attribute__((noinline)) void *_apkc_memcpy_impl(void *d, const void *s, sz n) {
-    volatile u8 *dp = (volatile u8*)d;
-    const volatile u8 *sp = (const volatile u8*)s;
-    for (sz i = 0; i < n; i++) dp[i] = sp[i];
-    return d;
-}
-void *memcpy(void *d, const void *s, sz n) {
-    return _apkc_memcpy_impl(d, s, n);
-}
-
 /* branchless byte-level equality: returns 1 if equal */
 static inline u8 m_eq(const void *a, const void *b, sz n) {
     const u8 *x = (const u8*)a, *y = (const u8*)b;
