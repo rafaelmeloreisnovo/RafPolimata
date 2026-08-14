@@ -2,13 +2,15 @@
  *
  * No malloc, no libc, no abstractions. Direct control flow gates.
  * Ensures safe failure modes: never promote unknown state to PASS.
+ * Freestanding: no stdint.h, no stdlib.h, no external includes.
  */
 
 #ifndef HARDENING_FAIL_CLOSED_H
 #define HARDENING_FAIL_CLOSED_H 1
 
-#include <stdint.h>
-#include <stddef.h>
+typedef unsigned long uint64_t;
+typedef unsigned int uint32_t;
+typedef unsigned char uint8_t;
 
 /* Fail-closed result: exactly one state is set */
 enum failclosed_result {

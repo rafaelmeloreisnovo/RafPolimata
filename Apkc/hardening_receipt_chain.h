@@ -2,13 +2,16 @@
  *
  * No malloc, no libc, no abstractions. Direct evidence tracking.
  * Records SHA-256 snapshots, gate states, and custody transitions.
+ * Freestanding: no stdint.h, no stdlib.h, no external includes.
  */
 
 #ifndef HARDENING_RECEIPT_CHAIN_H
 #define HARDENING_RECEIPT_CHAIN_H 1
 
-#include <stdint.h>
-#include <stddef.h>
+typedef unsigned long uint64_t;
+typedef unsigned int uint32_t;
+typedef unsigned char uint8_t;
+typedef int int32_t;
 
 #define RECEIPT_CHAIN_MAX_DEPTH 16
 #define RECEIPT_SHA256_SIZE 32

@@ -2,13 +2,16 @@
  *
  * No malloc, no libc, no abstractions. Direct syscalls for assembly verification.
  * Validates ARMv7 EABI instruction encoding and binary object production.
+ * Freestanding: no stdint.h, no stdlib.h, no external includes.
  */
 
 #ifndef HARDENING_ARMV7_ASSEMBLER_H
 #define HARDENING_ARMV7_ASSEMBLER_H 1
 
-#include <stdint.h>
-#include <stddef.h>
+typedef unsigned int uint32_t;
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef int int32_t;
 
 #define ARM32_INSTRUCTION_SIZE 4
 #define ARM32_MAX_SECTION_SIZE 0x100000UL  /* 1 MiB per section */

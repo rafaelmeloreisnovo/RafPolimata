@@ -2,13 +2,17 @@
  *
  * No malloc, no libc, no abstractions. Pure loops, flags, symbols.
  * Validates source and APK capacity limits with exact fail-closed semantics.
+ * Freestanding: no stdint.h, no stdlib.h, no external includes.
  */
 
 #ifndef HARDENING_BOUNDARY_GATES_H
 #define HARDENING_BOUNDARY_GATES_H 1
 
-#include <stdint.h>
-#include <stddef.h>
+typedef unsigned long uint64_t;
+typedef unsigned int uint32_t;
+typedef unsigned char uint8_t;
+typedef signed long int64_t;
+typedef signed int int32_t;
 
 #define HARDENING_SOURCE_CAP 0x100000UL  /* 1 MiB source limit */
 #define HARDENING_APK_CAP    0x1000000UL /* 16 MiB APK limit */
