@@ -1,0 +1,11 @@
+; ApkC dual-ABI structural fixture — RAFAELIA evidence gate
+; Scope: assembly/parser + ELF/APK dual-ABI structure only.
+; Runtime behavior claim: TOKEN_VAZIO.
+; This source intentionally uses only tokens supported by both internal assemblers:
+; .sym1, .sym2 and nop. It does not use architecture-specific registers.
+
+.sym1
+    nop
+
+.sym2
+    nop
