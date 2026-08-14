@@ -19,6 +19,7 @@ mkdir -p "$OUT" "$EXEC_ROOT"
 SUMMARY="$OUT/validation-summary.md"
 RECEIPT="$OUT/receipt.sha256"
 HARD_SRC="$EXEC_ROOT/apkc_hardened.c"
+INPUT="$APKC/hello.dualabi.structural.s.txt"
 EXE="$EXEC_ROOT/apkc"
 APK="$OUT/hello.apk"
 APK_REPRO="$OUT/hello.repro.apk"
@@ -83,6 +84,7 @@ DATE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
   echo "- date_utc: $DATE"
   echo "- run_id: $RUN_ID"
   echo "- commit: $COMMIT"
+  echo "- structural_input: ${INPUT#$ROOT/}"
   echo '- evidence_model: measured/local'
   echo '- evidence_storage: append-only/run-scoped'
   echo '- claim_allowed: false'
@@ -111,9 +113,11 @@ HARD_SHA=$(sha256sum "$HARD_SRC" | cut -d' ' -f1)
 printf 'raw_source_sha256=%s\nhardened_source_sha256=%s\n' "$RAW_SHA" "$HARD_SHA" >> "$OUT/source-cap-verify.txt"
 status H0 PASS "transformação + falsificador + verificador estrutural exato PASS; hardened_sha256=$HARD_SHA"
 
-# F0: canonical input.
-[ -s "$APKC/hello.s.txt" ] || { status F0 FAIL 'Apkc/hello.s.txt ausente/vazio'; exit 1; }
-status F0 PASS 'Apkc/hello.s.txt presente'
+# F0: ARM32-compatible structural input. The historical hello.s.txt is ARM64-only.
+[ -s "$INPUT" ] || { status F0 FAIL 'fixture dual-ABI estrutural ausente/vazia'; exit 1; }
+INPUT_SHA=$(sha256sum "$INPUT" | cut -d' ' -f1)
+printf 'structural_input=%s\nstructural_input_sha256=%s\n' "${INPUT#$ROOT/}" "$INPUT_SHA" > "$OUT/structural-input.txt"
+status F0 PASS "fixture dual-ABI estrutural presente; sha256=$INPUT_SHA"
 
 # F1: command shape physically proven on Termux ARM32.
 need cc F1
@@ -123,14 +127,14 @@ chmod 700 "$EXE"
 [ -x "$EXE" ] || { status F1 FAIL 'binário apkc não executável'; exit 1; }
 status F1 PASS 'apkc hardened compilado com caminho comprovado -nostartfiles'
 
-# F2: generation with parameters from observed proof.
-"$EXE" "$APKC/hello.s.txt" -o "$APK" -p com.rafael.teste -l RafaelTeste -n hello -32 \
-  > "$OUT/apkc-generate.txt" 2>&1 || { status F2 FAIL 'geração hello.apk falhou'; exit 1; }
+# F2: structural ARM32 generation. No runtime behavior claim is inferred from this fixture.
+"$EXE" "$INPUT" -o "$APK" -p com.rafael.teste -l RafaelTeste -n hello -32 --strict \
+  > "$OUT/apkc-generate.txt" 2>&1 || { status F2 FAIL 'geração hello.apk ARM32 estrutural falhou'; exit 1; }
 [ -s "$APK" ] || { status F2 FAIL 'hello.apk ausente/vazio após exit 0'; exit 1; }
-status F2 PASS 'hello.apk gerado pelo apkc hardened'
+status F2 PASS 'hello.apk ARM32 gerado a partir da fixture estrutural dual-ABI; runtime permanece TOKEN_VAZIO'
 
 # F2D: same binary + same input + same arguments must reproduce byte-identical APK.
-"$EXE" "$APKC/hello.s.txt" -o "$APK_REPRO" -p com.rafael.teste -l RafaelTeste -n hello -32 \
+"$EXE" "$INPUT" -o "$APK_REPRO" -p com.rafael.teste -l RafaelTeste -n hello -32 --strict \
   > "$OUT/apkc-generate-repro.txt" 2>&1 || { status F2D FAIL 'segunda geração falhou'; exit 1; }
 [ -s "$APK_REPRO" ] || { status F2D FAIL 'hello.repro.apk ausente/vazio'; exit 1; }
 if cmp -s "$APK" "$APK_REPRO"; then
@@ -202,10 +206,11 @@ status F7 TOKEN_VAZIO 'receipt ainda não emitido/verificado; finalizador EXIT d
   echo '## Claim gate'
   echo
   echo '- claim_allowed: false'
+  echo '- input_scope: fixture estrutural dual-ABI, não comportamento aplicativo.'
   echo '- determinism_scope: F2D mede duas gerações com mesmo binário/entrada/args no mesmo ambiente.'
   echo '- cross-build/cross-device determinism: TOKEN_VAZIO até reprodução independente.'
   echo '- permitido: build/generate/ZIP/DEX/ELF e AXML somente se F4=PASS.'
-  echo '- TOKEN_VAZIO: assinatura, instalação, abertura e comportamento runtime/logcat.'
+  echo '- TOKEN_VAZIO: comportamento NativeActivity, assinatura, instalação, abertura e logcat.'
   echo '- resultado negativo: gate_exit_code fica congelado no receipt; final_exit_code fica no verifier externo.'
   echo '- receipt válido: somente quando finalization-status.txt=receipt_status=PASS e receipt-verify.txt confirma todos os hashes.'
   echo '- próximo gate: assinatura + instalação + logcat em aparelho com receipt separado.'
