@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 """Fail-closed static audit for browser and TLS capability claims.
 
-This tool intentionally distinguishes:
-- a terminal/local file browser;
-- an HTTPS transfer adapter backed by curl;
-- a web browser with HTTP/TLS/certificate/rendering subsystems;
-- an assembly implementation of that complete browser.
-
-Static source evidence never becomes runtime certification by itself.
+Distinguishes terminal/local browsing, an HTTPS transport adapter, a complete
+web browser/TLS stack, and an assembly implementation. Static evidence never
+becomes runtime certification by itself.
 """
 from __future__ import annotations
 
@@ -105,6 +101,25 @@ def collect_evidence(root: Path, paths: Iterable[Path]) -> dict[str, list[str]]:
     return {key: sorted(set(value)) for key, value in evidence.items()}
 
 
+def executable_shell_text(text: str) -> str:
+    """Return non-comment lines for conservative static option inspection."""
+    return "\n".join(
+        line for line in text.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    )
+
+
+def has_insecure_curl_flag(executable_text: str) -> bool:
+    """Detect an active -k/--insecure token, not documentation mentioning it."""
+    return bool(re.search(r"(^|[ \t\\])(?:-k|--insecure)(?=$|[ \t\\])", executable_text, re.M))
+
+
+def active_shell_option(text: str, option_pattern: str) -> bool:
+    """Compatibility helper for tests: inspect executable lines only."""
+    executable = executable_shell_text(text)
+    return bool(re.search(rf"(^|[ \t\\])(?:{option_pattern})(?=$|[ \t\\])", executable, re.M))
+
+
 def evaluate_level(name: str, requirements: list[str], evidence: dict[str, list[str]]) -> dict[str, object]:
     present = [item for item in requirements if evidence.get(item)]
     missing = [item for item in requirements if not evidence.get(item)]
@@ -121,22 +136,6 @@ def evaluate_level(name: str, requirements: list[str], evidence: dict[str, list[
     }
 
 
-def active_shell_option(text: str, option_pattern: str) -> bool:
-    """Detect an option in executable shell lines, excluding comments/documentation.
-
-    This intentionally avoids global substring scans: a safety comment such as
-    `No -k/--insecure` is evidence *about* policy and must not be mistaken for an
-    executed unsafe option. The match is restricted to option-shaped shell lines.
-    """
-    regex = re.compile(rf"(?m)^\s*(?:{option_pattern})(?:\s|\\|$)")
-    for line in text.splitlines():
-        if line.lstrip().startswith("#"):
-            continue
-        if regex.search(line):
-            return True
-    return False
-
-
 def audit(root: Path, config_path: Path) -> dict[str, object]:
     config = json.loads(config_path.read_text(encoding="utf-8"))
     evidence = collect_evidence(root, tracked_files(root))
@@ -144,18 +143,15 @@ def audit(root: Path, config_path: Path) -> dict[str, object]:
     for level, requirements in config["capability_levels"].items():
         levels[level] = evaluate_level(level, list(requirements), evidence)
 
-    # An HTTPS adapter is source-complete only when the audited script itself
-    # contains the policy markers. A static contract still does not prove a TLS
-    # handshake. Unsafe flags are searched only as executable shell options, not
-    # as ambiguous global substrings in comments or help text.
     adapter_path = root / "scripts/raf_https_fetch.sh"
     adapter_text = read_text(adapter_path) if adapter_path.is_file() else ""
-    insecure_option_active = active_shell_option(adapter_text, r"-k|--insecure")
+    adapter_exec_text = executable_shell_text(adapter_text)
+    insecure_option_active = has_insecure_curl_flag(adapter_exec_text)
     adapter_markers = {
         "https_only_policy": "--proto '=https'" in adapter_text and "--proto-redir '=https'" in adapter_text,
         "tls_1_2_request": "--tlsv1.2" in adapter_text,
         "tls_1_3_request": "--tlsv1.3" in adapter_text,
-        "system_ca_validation": not insecure_option_active and "No -k/--insecure" in adapter_text,
+        "system_ca_validation": not insecure_option_active,
         "hostname_verification": "certificate_and_hostname_validation_enabled" in adapter_text,
         "redirect_limit": "--max-redirs" in adapter_text,
         "timeout": "--connect-timeout" in adapter_text and "--max-time" in adapter_text,
@@ -176,8 +172,8 @@ def audit(root: Path, config_path: Path) -> dict[str, object]:
     transport_ok = adapter_path.is_file() and not adapter_missing
     web_ok = not levels["WEB_BROWSER_TLS"]["missing"]
     asm_ok = web_ok and not levels["ASM_WEB_BROWSER_TLS"]["missing"]
-
     summary_state = "PASS" if asm_ok else "REVIEW_REQUIRED" if (tui_ok or transport_ok) else "TOKEN_VAZIO"
+
     return {
         "schema": SCHEMA,
         "state": summary_state,
