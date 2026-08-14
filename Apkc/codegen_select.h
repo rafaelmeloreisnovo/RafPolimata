@@ -10,6 +10,7 @@
  */
 #pragma once
 #include "sys.h"
+#include "freestanding_intrinsics.h"
 #include "omega_classifier.h"
 
 static inline u32 codegen_select(const u8 *emitted_buf,
