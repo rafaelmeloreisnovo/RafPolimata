@@ -1,0 +1,24 @@
+{
+  "schema": "raf.runtime-doctor-gap-ledger.errata.v1",
+  "date": "2026-08-14",
+  "target": "data/governance/runtime-doctor-gap-ledger.v2.json",
+  "target_commit": "543041baf90e9952316cbeb008e5752ee90d23e8",
+  "reason": "Frontier priority counts were arithmetically inconsistent with the 9 non-closed items. Preserve the original artifact and supersede only the frontier count fields.",
+  "supersedes_only": "frontier",
+  "corrected_frontier": {
+    "closed_reference": 4,
+    "open_or_external_block": 9,
+    "P0_open": 3,
+    "P1_open": 3,
+    "P2_open_or_unknown": 3
+  },
+  "verification": {
+    "non_closed_ids": ["RD-GAP-005", "RD-GAP-006", "RD-GAP-007", "RD-GAP-008", "RD-GAP-009", "RD-GAP-010", "RD-GAP-011", "RD-GAP-012", "RD-GAP-013"],
+    "P0": ["RD-GAP-005", "RD-GAP-006", "RD-GAP-007"],
+    "P1": ["RD-GAP-008", "RD-GAP-009", "RD-GAP-011"],
+    "P2": ["RD-GAP-010", "RD-GAP-012", "RD-GAP-013"]
+  },
+  "claim_allowed": false,
+  "F_ok": "Counting inconsistency is contained append-only rather than silently rewritten.",
+  "F_next": "Consumers must apply this errata when reading the v2 frontier counts; item bodies are unchanged."
+}

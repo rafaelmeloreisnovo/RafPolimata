@@ -45,33 +45,36 @@ else
 fi
 
 # H0 — source-cap hardening obrigatório e fail-closed.
-# Se a transformação/falsificador não puder ser executado, nenhum build segue.
+# O falsificador é estrutural/exato: o padrão genérico `if (n<=0) break;`
+# pode existir legitimamente em outros loops e não representa, por si só,
+# regressão do contrato de leitura de source.
 if ! cmd_status python3; then
   echo 'TOKEN_VAZIO: python3 ausente; source-cap hardening não pode ser estabelecido.' > "$HARD_LOG"
   status H0 TOKEN_VAZIO 'python3 ausente; validação bloqueada antes da compilação'
   exit 1
 fi
-if ! test -f "$ROOT/scripts/patch_apkc_source_cap.py" || ! test -f "$ROOT/tests/test_apkc_source_cap_patch.py"; then
-  echo 'FAIL: transformer/test source-cap ausente.' > "$HARD_LOG"
-  status H0 FAIL 'transformer/test source-cap ausente; validação bloqueada'
+if ! test -f "$ROOT/scripts/patch_apkc_source_cap.py" \
+   || ! test -f "$ROOT/tests/test_apkc_source_cap_patch.py" \
+   || ! test -f "$ROOT/scripts/verify_apkc_source_cap_output.py"; then
+  echo 'FAIL: transformer/test/exact verifier source-cap ausente.' > "$HARD_LOG"
+  status H0 FAIL 'transformer/test/exact verifier source-cap ausente; validação bloqueada'
   exit 1
 fi
 
 if python3 "$ROOT/tests/test_apkc_source_cap_patch.py" > "$HARD_LOG" 2>&1 \
    && python3 "$ROOT/scripts/patch_apkc_source_cap.py" "$APKC/apkc.c" "$HARD_SRC" >> "$HARD_LOG" 2>&1 \
-   && grep -q 'source exceeds SRC_CAP' "$HARD_SRC" \
-   && ! grep -Fq 'if (n<=0) break;' "$HARD_SRC"; then
+   && python3 "$ROOT/scripts/verify_apkc_source_cap_output.py" "$HARD_SRC" >> "$HARD_LOG" 2>&1; then
   RAW_SHA=$(sha256sum "$APKC/apkc.c" 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
   HARD_SHA=$(sha256sum "$HARD_SRC" 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
   {
     echo "raw_source_sha256: $RAW_SHA"
     echo "hardened_source_sha256: $HARD_SHA"
     echo 'guard: source exceeds SRC_CAP'
-    echo 'legacy_anchor_present: no'
+    echo 'legacy_source_read_anchor_present: no'
   } >> "$HARD_LOG"
-  status H0 PASS "source-cap transform+falsifier; hardened_sha256=$HARD_SHA"
+  status H0 PASS "source-cap exact transform+falsifier; hardened_sha256=$HARD_SHA"
 else
-  status H0 FAIL 'source-cap hardening/falsifier/anchor gate falhou; ver source-cap-hardening.txt'
+  status H0 FAIL 'source-cap hardening/exact verifier gate falhou; ver source-cap-hardening.txt'
   exit 1
 fi
 

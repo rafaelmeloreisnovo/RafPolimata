@@ -45,8 +45,6 @@ finalize(){
 
     if sha256sum -c "$RECEIPT" > "$OUT/receipt-verify.txt" 2>&1; then
       printf 'receipt_status=PASS\ngate_exit_code=%s\n' "$gate_rc" > "$OUT/finalization-status.txt"
-      # finalization-status changed after initial hashing; regenerate once,
-      # then verify the frozen evidence set. receipt-verify remains excluded.
       (
         cd "$OUT"
         find . -maxdepth 1 -type f ! -name 'receipt.sha256' ! -name 'receipt-verify.txt' -print \
@@ -67,9 +65,6 @@ finalize(){
     final_rc=1
   fi
 
-  # Do not mutate any receipt-covered file after the final verification.
-  # final_exit_code is intentionally recorded only in receipt-verify.txt,
-  # which is excluded from the receipt because it is the verifier output.
   printf 'final_exit_code=%s\n' "$final_rc" >> "$OUT/receipt-verify.txt"
   rm -rf "$EXEC_ROOT"
   exit "$final_rc"
@@ -102,14 +97,19 @@ need sha256sum HC
 status HC PASS 'sha256sum disponível para receipt final de sucesso ou falha'
 
 # H0: source-cap hardening is mandatory before compilation.
+# Use the exact structural verifier; the generic `if (n<=0) break;` text may
+# legitimately exist in a different bounded I/O loop and is not a global falsifier.
 need python3 H0
 [ -f "$ROOT/scripts/patch_apkc_source_cap.py" ] || { status H0 FAIL 'patch_apkc_source_cap.py ausente'; exit 1; }
 [ -f "$ROOT/tests/test_apkc_source_cap_patch.py" ] || { status H0 FAIL 'test_apkc_source_cap_patch.py ausente'; exit 1; }
+[ -f "$ROOT/scripts/verify_apkc_source_cap_output.py" ] || { status H0 FAIL 'verify_apkc_source_cap_output.py ausente'; exit 1; }
 python3 "$ROOT/tests/test_apkc_source_cap_patch.py" > "$OUT/source-cap-test.txt" 2>&1 || { status H0 FAIL 'falsificador source-cap falhou'; exit 1; }
 python3 "$ROOT/scripts/patch_apkc_source_cap.py" "$APKC/apkc.c" "$HARD_SRC" > "$OUT/source-cap-transform.txt" 2>&1 || { status H0 FAIL 'transformação source-cap falhou'; exit 1; }
-grep -q 'source exceeds SRC_CAP' "$HARD_SRC" || { status H0 FAIL 'guard SRC_CAP ausente'; exit 1; }
-! grep -Fq 'if (n<=0) break;' "$HARD_SRC" || { status H0 FAIL 'âncora legada insegura presente'; exit 1; }
-status H0 PASS 'transformação + falsificador source-cap PASS'
+python3 "$ROOT/scripts/verify_apkc_source_cap_output.py" "$HARD_SRC" > "$OUT/source-cap-verify.txt" 2>&1 || { status H0 FAIL 'verificação estrutural exata source-cap falhou'; exit 1; }
+RAW_SHA=$(sha256sum "$APKC/apkc.c" | cut -d' ' -f1)
+HARD_SHA=$(sha256sum "$HARD_SRC" | cut -d' ' -f1)
+printf 'raw_source_sha256=%s\nhardened_source_sha256=%s\n' "$RAW_SHA" "$HARD_SHA" >> "$OUT/source-cap-verify.txt"
+status H0 PASS "transformação + falsificador + verificador estrutural exato PASS; hardened_sha256=$HARD_SHA"
 
 # F0: canonical input.
 [ -s "$APKC/hello.s.txt" ] || { status F0 FAIL 'Apkc/hello.s.txt ausente/vazio'; exit 1; }

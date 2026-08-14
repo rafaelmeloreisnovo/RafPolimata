@@ -113,6 +113,25 @@ raf.https-fetch-evidence.v1
             self.assertEqual(report["truth"]["certified_tls"], "TOKEN_VAZIO")
             self.assertFalse(report["claim_allowed"])
 
+    def test_actual_insecure_option_fails_https_adapter_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "scripts").mkdir()
+            self.write_adapter(root, unsafe=True)
+            report = MOD.audit(root, self.make_config(root))
+            adapter = report["levels"]["HTTPS_TRANSPORT_ADAPTER"]
+            self.assertTrue(adapter["unsafe_option_active"])
+            self.assertFalse(adapter["static_contract"]["system_ca_validation"])
+            self.assertIn("system_ca_validation", adapter["missing"])
+            self.assertFalse(report["facts"]["https_transport_adapter_static_evidence"])
+            self.assertFalse(report["claim_allowed"])
+
+    def test_comment_alone_never_counts_as_active_insecure_option(self) -> None:
+        text = "# No -k/--insecure\ncurl --proto '=https' https://example.invalid\n"
+        self.assertFalse(MOD.active_shell_option(text, r"-k|--insecure"))
+        self.assertTrue(MOD.active_shell_option("  --insecure \\\n", r"-k|--insecure"))
+        self.assertTrue(MOD.active_shell_option("  -k \\\n", r"-k|--insecure"))
+
     def test_empty_tree_is_token_vazio(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

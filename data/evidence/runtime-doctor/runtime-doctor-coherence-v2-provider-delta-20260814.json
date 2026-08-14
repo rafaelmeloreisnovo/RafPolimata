@@ -1,0 +1,93 @@
+{
+  "schema": "raf.runtime-doctor-coherence-provider-delta.v1",
+  "date": "2026-08-14",
+  "state": "PROVIDER_GATE_PASS_WITH_ORTHOGONAL_CI_FAILURE",
+  "claim_allowed": false,
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "pr": 241,
+  "tested_head": "128246f8958fd0c06772067bb78549f0c69c9289",
+  "provider": {
+    "ci": {
+      "run_id": 31808129067,
+      "job_id": 94791904304,
+      "runner_id": 1000131328,
+      "overall_conclusion": "failure",
+      "runtime_doctor_step": {
+        "number": 22,
+        "name": "Runtime Doctor coherence gate",
+        "conclusion": "success"
+      },
+      "orthogonal_failure": {
+        "number": 23,
+        "name": "Validate APKc proof protocol",
+        "conclusion": "failure"
+      },
+      "classification": "RUNTIME_DOCTOR_PROVIDER_GATE_PASS_APKC_ORTHOGONAL_FAILURE"
+    },
+    "runtime_truth_receipt": {
+      "run_id": 31808129020,
+      "conclusion": "success"
+    },
+    "formal_science_orchestrator": {
+      "run_id": 31808129086,
+      "conclusion": "success"
+    },
+    "m063_language_contract": {
+      "run_id": 31808129011,
+      "conclusion": "success"
+    }
+  },
+  "gap_delta": {
+    "RD-GAP-005A": {
+      "title": "Runtime Doctor provider coherence gate",
+      "state": "CLOSED_PROVIDER_EXECUTED",
+      "priority": "P0",
+      "evidence": "CI run 31808129067 step 22 success on tested_head",
+      "closed_reason": "A real GitHub runner checked out the branch and executed the stdlib Runtime Doctor coherence gate successfully."
+    },
+    "RD-GAP-005B": {
+      "title": "Full pytest suite for tests/test_runtime_doctor_agent.py",
+      "state": "OPEN",
+      "priority": "P1",
+      "evidence": "TOKEN_VAZIO_FULL_PYTEST_NOT_EXECUTED_BY_CURRENT_CI",
+      "F_next": "Execute python3 -m pytest -q tests/test_runtime_doctor_agent.py in a runtime with pytest available and bind command/exit/output to an exact head."
+    },
+    "RD-GAP-006": {
+      "state": "OPEN",
+      "priority": "P0",
+      "evidence": "TOKEN_VAZIO_PHYSICAL_TERMUX_RUNTIME"
+    },
+    "RD-GAP-007": {
+      "state": "OPEN",
+      "priority": "P0",
+      "evidence": "TOKEN_VAZIO_FRIDA_PHYSICAL_DEVICE_RECEIPT"
+    },
+    "RD-GAP-APKC-ORTHOGONAL": {
+      "state": "OPEN_ORTHOGONAL",
+      "priority": "P1",
+      "evidence": "CI run 31808129067 step 23 failure",
+      "F_next": "Diagnose scripts/apkc_validate.sh separately; do not regress or relabel Runtime Doctor because its preceding provider gate passed."
+    }
+  },
+  "frontier_after_provider_gate": {
+    "runtime_doctor_structural_reference_microgaps_closed": 4,
+    "runtime_doctor_provider_gate_closed": 1,
+    "runtime_doctor_P0_open": 2,
+    "runtime_doctor_P1_explicit": [
+      "RD-GAP-005B_FULL_PYTEST",
+      "RD-GAP-008_LLAMA_CPU_VULKAN_BENCHMARK",
+      "RD-GAP-009_QEMU_GUEST_BOOT",
+      "RD-GAP-011_PROVIDER_GOVERNANCE"
+    ]
+  },
+  "invariants": [
+    "GLOBAL_CI_FAILURE != RUNTIME_DOCTOR_FAILURE",
+    "STEP_LEVEL_EVIDENCE_OVERRIDES_WORKFLOW_LEVEL_AMBIGUITY_FOR_COMPONENT_CLASSIFICATION",
+    "PROVIDER_COHERENCE_GATE != FULL_PYTEST_SUITE",
+    "PROVIDER_LINUX_RUNTIME != PHYSICAL_ANDROID_TERMUX",
+    "TOKEN_VAZIO remains explicit for unexecuted layers"
+  ],
+  "F_ok": "Runtime Doctor coherence V2 now has direct provider-side execution evidence: its dedicated gate passed on a real GitHub Actions runner while Runtime Truth, Formal Science and M063 workflows also succeeded.",
+  "F_gap": "Full pytest and physical Termux/Frida remain unexecuted; APKc proof protocol is a separate failing surface.",
+  "F_next": "Keep PR draft; preserve the provider PASS, move Runtime Doctor P0 to physical Termux and Frida receipts, and diagnose APKc independently without contaminating Runtime Doctor evidence."
+}

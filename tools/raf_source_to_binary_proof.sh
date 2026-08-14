@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # raf_source_to_binary_proof.sh — reproducible, fail-closed source→binary proof.
+# Contract v3 supersedes source-to-binary-proof.v2; historical v2 evidence remains append-only.
 #
 # The canonical proof is promoted only when BOTH required targets are built,
 # identified by an ELF reader and reproduced byte-for-byte. Failed or partial

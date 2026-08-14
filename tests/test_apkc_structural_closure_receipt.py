@@ -16,9 +16,9 @@ COMMIT = "a" * 40
 DIGEST = "b" * 64
 
 
-def source_proof(commit: str = COMMIT) -> dict:
+def source_proof(commit: str = COMMIT, schema: str = "raf.apkc.source-to-binary-proof.v3") -> dict:
     return {
-        "schema": "raf.apkc.source-to-binary-proof.v2",
+        "schema": schema,
         "commit": commit,
         "aarch64": {
             "build": "PASS",
@@ -67,6 +67,7 @@ class ApkCStructuralClosureReceiptTest(unittest.TestCase):
         both_abis: bool = True,
         commit: str = COMMIT,
         first_part_state: str = "PASS",
+        proof_schema: str = "raf.apkc.source-to-binary-proof.v3",
     ):
         apk = root / "candidate.apk"
         with zipfile.ZipFile(apk, "w", compression=zipfile.ZIP_STORED) as archive:
@@ -76,7 +77,7 @@ class ApkCStructuralClosureReceiptTest(unittest.TestCase):
                 archive.writestr("lib/armeabi-v7a/libmain.so", make_elf32())
 
         proof = root / "source-proof.json"
-        proof.write_text(json.dumps(source_proof(commit)), encoding="utf-8")
+        proof.write_text(json.dumps(source_proof(commit, proof_schema)), encoding="utf-8")
         gate = root / "first-part.json"
         gate.write_text(json.dumps(first_part_gate(first_part_state)), encoding="utf-8")
         preflight = root / "preflight.json"
@@ -118,9 +119,20 @@ class ApkCStructuralClosureReceiptTest(unittest.TestCase):
         self.assertEqual(report["state"], "PASS_STRUCTURAL")
         self.assertTrue(report["structural_claim_allowed"])
         self.assertFalse(report["claim_allowed"])
+        self.assertEqual(report["source_to_binary"]["expected_schema"], "raf.apkc.source-to-binary-proof.v3")
         self.assertTrue(report["runtime_preflight"]["runtime_blocked"])
         self.assertFalse(report["runtime_boundary"]["source_contract_safe"])
         self.assertEqual(report["runtime_boundary"]["apk_installed"], "TOKEN_VAZIO")
+
+    def test_old_v2_source_proof_is_rejected_fail_closed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inputs = self.make_inputs(root, proof_schema="raf.apkc.source-to-binary-proof.v2")
+            completed, report = self.run_receipt(root, *inputs)
+        self.assertEqual(completed.returncode, 1)
+        self.assertEqual(report["state"], "FAIL")
+        self.assertTrue(any("unexpected source proof schema" in error for error in report["errors"]))
+        self.assertFalse(report["structural_claim_allowed"])
 
     def test_missing_apk_is_incomplete(self):
         with tempfile.TemporaryDirectory() as directory:

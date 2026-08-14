@@ -36,15 +36,47 @@
           "enum": ["PASS_LIMITED", "RUNTIME_OBSERVED_LIMITED", "REVIEW_REQUIRED"]
         },
         "selected_skills": {"type": "integer", "minimum": 0},
+        "probe_results": {"type": "integer", "minimum": 0},
         "probes_executed": {"type": "integer", "minimum": 0},
+        "probe_cache_hits": {"type": "integer", "minimum": 0},
         "failed_probes": {"type": "integer", "minimum": 0},
+        "incomplete_probes": {"type": "integer", "minimum": 0},
         "runtime_routes": {"type": "integer", "minimum": 0},
-        "unresolved_repositories": {"type": "integer", "minimum": 0}
+        "unresolved_repositories": {"type": "integer", "minimum": 0},
+        "build_doctor_reports": {"type": "integer", "minimum": 0},
+        "open_gaps": {"type": "integer", "minimum": 0}
       }
     },
     "skill_routes": {"type": "array"},
+    "route_graph_used": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": {"type": "string"}
+      }
+    },
     "probes": {"type": "array"},
     "runtime_routes": {"type": "array"},
+    "evidence_inputs": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "gap_ledger": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "urgency", "state", "provenance", "F_next"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "urgency": {"enum": ["P0", "P1", "P2"]},
+          "state": {"type": "string", "minLength": 1},
+          "provenance": {"type": "string", "minLength": 1},
+          "F_next": {"type": "string", "minLength": 1}
+        }
+      }
+    },
     "trace": {"type": "array"},
     "claim_boundary": {
       "type": "object",
@@ -60,6 +92,7 @@
         "claim_allowed"
       ],
       "properties": {
+        "build_doctor_evidence": {"type": "string"},
         "automatic_repair": {"const": false},
         "automatic_install": {"const": false},
         "automatic_delete": {"const": false},
