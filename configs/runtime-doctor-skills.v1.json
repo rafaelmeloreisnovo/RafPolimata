@@ -12,6 +12,7 @@
     {"id": "L0", "name": "inventory"},
     {"id": "L1", "name": "host_android_termux"},
     {"id": "L2", "name": "accelerator_gpu"},
+    {"id": "L2.5", "name": "dynamic_process_observability"},
     {"id": "L3", "name": "vm_qemu"},
     {"id": "L4", "name": "llm_inference"},
     {"id": "L5", "name": "build_and_evidence"},
@@ -36,6 +37,15 @@
       "probe": ["sh", "Arme/Add/diagnose.sh", "--json"],
       "keywords": ["gpu", "opencl", "vulkan", "thermal", "scheduler", "offload"],
       "evidence": "runtime_json"
+    },
+    {
+      "id": "frida_runtime_observer",
+      "level": "L2.5",
+      "repo": "RafPolimata",
+      "role": "Observe Frida tooling/device readiness for developer-mode runtime diagnosis; never attach, inject, patch or install automatically.",
+      "probe": ["python3", "scripts/frida_runtime_probe.py", "--json"],
+      "keywords": ["frida", "developer", "runtime", "hook", "jni", "gadget", "debug", "dynamic", "observe"],
+      "evidence": "runtime_readiness_receipt"
     },
     {
       "id": "termux_packages_build_surface",
@@ -103,6 +113,9 @@
   ],
   "route_graph": [
     ["termux_host_diagnostic", "termux_gpu_orchestrator"],
+    ["termux_host_diagnostic", "frida_runtime_observer"],
+    ["frida_runtime_observer", "rafpolimata_evidence_doctor"],
+    ["frida_runtime_observer", "gaia_context_router"],
     ["termux_gpu_orchestrator", "llama_backend_doctor"],
     ["termux_host_diagnostic", "vectras_vm_runtime"],
     ["vectras_vm_runtime", "qemu_runtime"],
