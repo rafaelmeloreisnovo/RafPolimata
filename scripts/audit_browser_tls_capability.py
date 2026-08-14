@@ -105,6 +105,23 @@ def collect_evidence(root: Path, paths: Iterable[Path]) -> dict[str, list[str]]:
     return {key: sorted(set(value)) for key, value in evidence.items()}
 
 
+def executable_shell_text(text: str) -> str:
+    """Return non-comment shell lines for literal option-policy inspection.
+
+    This is intentionally conservative and static: it ignores comment-only lines so
+    documentation such as ``# No -k/--insecure`` cannot count as an executable
+    insecure flag. It does not attempt to prove runtime shell expansion safety.
+    """
+    return "\n".join(
+        line for line in text.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    )
+
+
+def has_insecure_curl_flag(executable_text: str) -> bool:
+    return bool(re.search(r"(^|[ \t\\])(?:-k|--insecure)(?=$|[ \t\\])", executable_text, re.M))
+
+
 def evaluate_level(name: str, requirements: list[str], evidence: dict[str, list[str]]) -> dict[str, object]:
     present = [item for item in requirements if evidence.get(item)]
     missing = [item for item in requirements if not evidence.get(item)]
@@ -150,12 +167,12 @@ def audit(root: Path, config_path: Path) -> dict[str, object]:
     # as ambiguous global substrings in comments or help text.
     adapter_path = root / "scripts/raf_https_fetch.sh"
     adapter_text = read_text(adapter_path) if adapter_path.is_file() else ""
-    insecure_option_active = active_shell_option(adapter_text, r"-k|--insecure")
+    adapter_exec_text = executable_shell_text(adapter_text)
     adapter_markers = {
         "https_only_policy": "--proto '=https'" in adapter_text and "--proto-redir '=https'" in adapter_text,
         "tls_1_2_request": "--tlsv1.2" in adapter_text,
         "tls_1_3_request": "--tlsv1.3" in adapter_text,
-        "system_ca_validation": not insecure_option_active and "No -k/--insecure" in adapter_text,
+        "system_ca_validation": not has_insecure_curl_flag(adapter_exec_text),
         "hostname_verification": "certificate_and_hostname_validation_enabled" in adapter_text,
         "redirect_limit": "--max-redirs" in adapter_text,
         "timeout": "--connect-timeout" in adapter_text and "--max-time" in adapter_text,
