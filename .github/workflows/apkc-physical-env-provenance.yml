@@ -1,0 +1,37 @@
+name: ApkC Physical Environment Provenance
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/apkc_provider_to_physical_envbound.sh'
+      - 'tests/test_apkc_physical_env_provenance.sh'
+      - '.github/workflows/apkc-physical-env-provenance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  environment-provenance:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/apkc_provider_to_physical_envbound.sh
+          bash -n tests/test_apkc_physical_env_provenance.sh
+      - name: Environment provenance falsifiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash tests/test_apkc_physical_env_provenance.sh | tee apkc-physical-env-provenance.txt
+          grep -Fxq 'RESULT pass=8 total=8 claim_allowed=false' apkc-physical-env-provenance.txt
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkc-physical-env-provenance
+          path: apkc-physical-env-provenance.txt
+          if-no-files-found: error
