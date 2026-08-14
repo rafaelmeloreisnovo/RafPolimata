@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # raf_source_to_binary_proof.sh — reproducible, fail-closed source→binary proof.
+# schema: raf.apkc.source-to-binary-proof.v3; supersedes source-to-binary-proof.v2.
 #
 # The canonical proof is promoted only when BOTH required targets are built,
 # identified by an ELF reader and reproduced byte-for-byte. Failed or partial
@@ -64,14 +65,18 @@ TRANSCRIPT="$RUN_DIR/apkc-compile.txt"
 STATUS_JSON="$RUN_DIR/status.json"
 
 # Mandatory hardening gate before any compiler invocation.
+# The transformer itself is fail-closed on the exact source-read OLD block:
+# count != 1 raises ValueError, and successful replacement guarantees OLD is
+# absent. Do not globally ban "if (n<=0) break;": that guard is also valid in
+# unrelated output-write loops and caused a false negative in provider run
+# 31796421123.
 if [ ! -f scripts/patch_apkc_source_cap.py ] || [ ! -f tests/test_apkc_source_cap_patch.py ]; then
     printf 'source-to-binary proof: source-cap transformer/falsifier missing\n' >&2
     exit 1
 fi
 if ! python3 tests/test_apkc_source_cap_patch.py >"$HARD_LOG" 2>&1 ||
    ! python3 scripts/patch_apkc_source_cap.py "$RAW_SRC" "$SRC" >>"$HARD_LOG" 2>&1 ||
-   ! grep -q 'source exceeds SRC_CAP' "$SRC" ||
-   grep -Fq 'if (n<=0) break;' "$SRC"; then
+   ! grep -q 'source exceeds SRC_CAP' "$SRC"; then
     printf 'source-to-binary proof: source-cap hardening failed; see %s\n' "$HARD_LOG" >&2
     exit 1
 fi
@@ -81,7 +86,7 @@ HARD_SHA="$(sha256sum "$SRC" | awk '{print $1}')"
     printf 'raw_source_sha256=%s\n' "$RAW_SHA"
     printf 'hardened_source_sha256=%s\n' "$HARD_SHA"
     printf '%s\n' 'guard=source exceeds SRC_CAP'
-    printf '%s\n' 'legacy_anchor_present=no'
+    printf '%s\n' 'legacy_source_read_anchor_present=no_by_exact_transform_contract'
 } >>"$HARD_LOG"
 
 COMMON=(clang -ffreestanding -fno-builtin -nostdlib -nostdinc -I Apkc)
