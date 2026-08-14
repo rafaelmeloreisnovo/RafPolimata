@@ -1,0 +1,49 @@
+name: ApkC Recursive Receipt Tree
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/apkc_seal_receipt_tree.sh'
+      - 'scripts/apkc_termux_sealed_stdin_gate_receipted.sh'
+      - 'tests/test_apkc_recursive_receipt_tree.sh'
+      - 'tests/test_apkc_recursive_receipted_gate.sh'
+      - '.github/workflows/apkc-recursive-receipt-tree.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recursive-receipt-custody:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/apkc_seal_receipt_tree.sh
+          bash -n scripts/apkc_termux_sealed_stdin_gate_receipted.sh
+          bash -n tests/test_apkc_recursive_receipt_tree.sh
+          bash -n tests/test_apkc_recursive_receipted_gate.sh
+      - name: Receipt tree falsifiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash tests/test_apkc_recursive_receipt_tree.sh | tee receipt-tree-test.txt
+          grep -Fxq 'RESULT pass=5 fail=0 claim_allowed=false' receipt-tree-test.txt
+      - name: Receipted gate falsifiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash tests/test_apkc_recursive_receipted_gate.sh | tee receipted-gate-test.txt
+          grep -Fxq 'RESULT pass=5 fail=0 claim_allowed=false' receipted-gate-test.txt
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkc-recursive-receipt-tree-evidence
+          path: |
+            receipt-tree-test.txt
+            receipted-gate-test.txt
+          if-no-files-found: warn
