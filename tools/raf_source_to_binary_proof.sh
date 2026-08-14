@@ -64,14 +64,13 @@ TRANSCRIPT="$RUN_DIR/apkc-compile.txt"
 STATUS_JSON="$RUN_DIR/status.json"
 
 # Mandatory hardening gate before any compiler invocation.
-if [ ! -f scripts/patch_apkc_source_cap.py ] || [ ! -f tests/test_apkc_source_cap_patch.py ]; then
-    printf 'source-to-binary proof: source-cap transformer/falsifier missing\n' >&2
+if [ ! -f scripts/patch_apkc_source_cap.py ] || [ ! -f tests/test_apkc_source_cap_patch.py ] || [ ! -f scripts/verify_apkc_source_cap_output.py ]; then
+    printf 'source-to-binary proof: source-cap transformer/falsifier/verifier missing\n' >&2
     exit 1
 fi
 if ! python3 tests/test_apkc_source_cap_patch.py >"$HARD_LOG" 2>&1 ||
    ! python3 scripts/patch_apkc_source_cap.py "$RAW_SRC" "$SRC" >>"$HARD_LOG" 2>&1 ||
-   ! grep -q 'source exceeds SRC_CAP' "$SRC" ||
-   grep -Fq 'if (n<=0) break;' "$SRC"; then
+   ! python3 scripts/verify_apkc_source_cap_output.py "$SRC" >>"$HARD_LOG" 2>&1; then
     printf 'source-to-binary proof: source-cap hardening failed; see %s\n' "$HARD_LOG" >&2
     exit 1
 fi
@@ -81,7 +80,8 @@ HARD_SHA="$(sha256sum "$SRC" | awk '{print $1}')"
     printf 'raw_source_sha256=%s\n' "$RAW_SHA"
     printf 'hardened_source_sha256=%s\n' "$HARD_SHA"
     printf '%s\n' 'guard=source exceeds SRC_CAP'
-    printf '%s\n' 'legacy_anchor_present=no'
+    printf '%s\n' 'legacy_source_read_anchor_present=no'
+    printf '%s\n' 'verification=exact_contract_not_global_substring'
 } >>"$HARD_LOG"
 
 COMMON=(clang -ffreestanding -fno-builtin -nostdlib -nostdinc -I Apkc)
