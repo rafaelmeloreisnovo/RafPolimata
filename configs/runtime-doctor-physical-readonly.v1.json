@@ -1,0 +1,76 @@
+{
+  "schema": "raf.runtime-doctor-physical-readonly.v1",
+  "date": "2026-08-14",
+  "mode": "PHYSICAL_READONLY",
+  "claim_allowed": false,
+  "purpose": "Capture Android/Termux, Runtime Doctor and Frida readiness evidence without performing dynamic or build mutations.",
+  "allowed": [
+    "read environment metadata",
+    "read Android release SDK and ABI properties",
+    "run Runtime Doctor read-only probes",
+    "run Frida readiness probe",
+    "enumerate Frida device channel with privacy minimization",
+    "write local evidence files",
+    "compute SHA-256 receipts",
+    "verify receipt hashes"
+  ],
+  "forbidden_automatic_actions": {
+    "package_install": true,
+    "frida_install": true,
+    "process_attach": true,
+    "code_injection": true,
+    "method_hook": true,
+    "runtime_patch": true,
+    "privilege_escalation": true,
+    "root_transition": true,
+    "apk_build": true,
+    "apk_install": true,
+    "vm_boot": true,
+    "source_mutation": true
+  },
+  "evidence_outputs": [
+    "environment.json",
+    "frida-readiness.json",
+    "frida-readiness.stderr.txt",
+    "frida-readiness.exit.txt",
+    "runtime-doctor.json",
+    "runtime-doctor.md",
+    "runtime-doctor.stdout.txt",
+    "runtime-doctor.stderr.txt",
+    "runtime-doctor.exit.txt",
+    "physical-readonly-summary.json",
+    "receipt.sha256",
+    "receipt-verify.txt"
+  ],
+  "state_contract": {
+    "TOKEN_VAZIO_NOT_PHYSICAL_TERMUX": "The gate executed outside an Android+Termux-shaped environment. This is valid negative evidence, not a failure of the gate.",
+    "PHYSICAL_TERMUX_OBSERVED_FRIDA_GAP": "Android+Termux was observed but Frida device readiness was not fully observed.",
+    "PHYSICAL_READINESS_OBSERVED_LIMITED": "Android+Termux and Frida device enumeration were observed; attach/hook/patch remain untested.",
+    "REVIEW_REQUIRED_PROBE_EXIT": "A read-only probe returned a non-zero exit and must be inspected before any promotion."
+  },
+  "separation_invariants": [
+    "READINESS != ATTACH",
+    "ATTACH != HOOK",
+    "HOOK != PATCH",
+    "PATCH != SOURCE_FIX",
+    "PHYSICAL_READONLY != APKC_PHYSICAL_STRUCTURAL",
+    "PROVIDER_LINUX != PHYSICAL_ANDROID_TERMUX",
+    "FRIDA_TOOL_PRESENCE != FRIDA_DEVICE_READINESS",
+    "TOKEN_VAZIO is preserved until direct evidence closes it"
+  ],
+  "privacy": {
+    "raw_device_serial_stored": false,
+    "raw_termux_prefix_stored": false,
+    "frida_device_identifiers": "pseudonymized by frida_runtime_probe.py",
+    "claim_from_hash": "forbidden; hashes bind provenance but do not prove identity"
+  },
+  "physical_next_routes": {
+    "runtime_doctor": "PHYSICAL_READONLY -> receipt -> F_ok/F_gap/F_next",
+    "frida": "PHYSICAL_READONLY -> readiness receipt -> explicit authorized OBSERVE only",
+    "apkc": "separate explicit apkc_validate_termux_arm32.sh route; never invoked by PHYSICAL_READONLY",
+    "vm": "separate explicit VM/QEMU route; never invoked by PHYSICAL_READONLY"
+  },
+  "F_ok": "A non-mutating physical evidence contract exists and is separated from build, attach, patch and VM execution.",
+  "F_gap": "Physical Android/Termux execution has not been observed by this configuration artifact.",
+  "F_next": "Execute scripts/runtime_doctor_physical_readonly_gate.sh on physical Termux and preserve the exact receipt; close only states directly evidenced by that run."
+}
