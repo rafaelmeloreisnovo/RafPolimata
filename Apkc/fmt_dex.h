@@ -52,7 +52,7 @@ static inline void sha1_update(SHA1Ctx *c, const u8 *data, sz len) {
     }
 }
 static inline void sha1_final(SHA1Ctx *c, u8 out[20]) {
-    u64 orig_bits = c->bits; /* save before padding increments c->bits */
+    u64 orig_bits = c->bits;
     u8 b80=0x80u;
     sha1_update(c,&b80,1u);
     while(c->blen!=56u){u8 z=0;sha1_update(c,&z,1u);}
@@ -64,10 +64,12 @@ static inline void sha1_final(SHA1Ctx *c, u8 out[20]) {
 }
 
 /* ── DEX format constants ────────────────────────────────────────────── */
-#define DEX_HEADER_SZ   0x70u        /* 112 bytes */
+#define DEX_HEADER_SZ   0x70u
 #define DEX_ENDIAN_TAG  0x12345678u
+#define DEX_MAP_OFF_FIELD 0x34u      /* header field offset 52 */
+#define DEX_DATA_SIZE_FIELD 0x68u    /* header field offset 104 */
+#define DEX_DATA_OFF_FIELD  0x6Cu    /* header field offset 108 */
 
-/* TYPE_* values used in map list */
 #define DEX_TYPE_HEADER   0x0000u
 #define DEX_TYPE_MAPLIST  0x1000u
 
@@ -77,48 +79,45 @@ static inline void sha1_final(SHA1Ctx *c, u8 out[20]) {
  *   [0x000..0x06F]  header   (112 bytes)
  *   [0x070..0x08B]  map list (28 bytes: 4 + 2*12)
  * Total: 140 bytes.
- * Caller must supply a buffer of at least 140 bytes.
- * Returns actual size written.
+ *
+ * DEX header layout around the map field is:
+ *   0x2C link_size
+ *   0x30 link_off
+ *   0x34 map_off
+ * Writing MAP_OFF at 0x30 corrupts link_off and leaves map_off zero, which a
+ * strict parser must reject. Keep the named field offsets below as the contract.
  */
 static inline u32 dex_build(u8 *out, sz cap) {
-    const u32 TOTAL    = DEX_HEADER_SZ + 28u; /* 140 = 0x8C */
-    const u32 MAP_OFF  = DEX_HEADER_SZ;       /* 0x70 */
+    const u32 TOTAL    = DEX_HEADER_SZ + 28u;
+    const u32 MAP_OFF  = DEX_HEADER_SZ;
 
-    if (cap < (sz)TOTAL) return 0; /* OVERFLOW */
+    if (cap < (sz)TOTAL) return 0;
     m_set(out, 0, (sz)TOTAL);
 
-    /* magic: "dex\n035\0" */
     out[0]='d'; out[1]='e'; out[2]='x'; out[3]='\n';
     out[4]='0'; out[5]='3'; out[6]='5'; out[7]='\0';
 
-    /* [8..11]  checksum — filled in below */
-    /* [12..31] SHA-1 signature — filled in below */
     w32(out+32, TOTAL);           /* file_size */
-    w32(out+36, DEX_HEADER_SZ);  /* header_size */
-    w32(out+40, DEX_ENDIAN_TAG); /* endian_tag */
-    /* link_size, link_off = 0 (already zeroed) */
-    w32(out+48, MAP_OFF);        /* map_off */
+    w32(out+36, DEX_HEADER_SZ);   /* header_size */
+    w32(out+40, DEX_ENDIAN_TAG);  /* endian_tag */
+    /* link_size @ 44 and link_off @ 48 remain zero */
+    w32(out+DEX_MAP_OFF_FIELD, MAP_OFF);
     /* string/type/proto/field/method/class counts+offs = 0 */
-    w32(out+104, 28u);           /* data_size = map list size */
-    w32(out+108, MAP_OFF);       /* data_off  = start of data section */
+    w32(out+DEX_DATA_SIZE_FIELD, 28u);
+    w32(out+DEX_DATA_OFF_FIELD, MAP_OFF);
 
-    /* Map list at offset MAP_OFF */
     u8 *mp = out + MAP_OFF;
-    w32(mp, 2u);                  /* 2 map entries */
-    /* Entry 0: TYPE_HEADER_ITEM, count=1, offset=0 */
-    w16(mp+4,  DEX_TYPE_HEADER); w16(mp+6,  0u);
+    w32(mp, 2u);
+    w16(mp+4,  DEX_TYPE_HEADER);  w16(mp+6,  0u);
     w32(mp+8,  1u);               w32(mp+12, 0u);
-    /* Entry 1: TYPE_MAP_LIST, count=1, offset=MAP_OFF */
-    w16(mp+16, DEX_TYPE_MAPLIST);w16(mp+18, 0u);
+    w16(mp+16, DEX_TYPE_MAPLIST); w16(mp+18, 0u);
     w32(mp+20, 1u);               w32(mp+24, MAP_OFF);
 
-    /* SHA-1 signature (bytes [32..TOTAL-1]) */
     SHA1Ctx sc;
     sha1_init(&sc);
     sha1_update(&sc, out+32, (sz)(TOTAL-32u));
     sha1_final(&sc, out+12);
 
-    /* Adler-32 checksum (bytes [12..TOTAL-1]) */
     u32 ck = adler32(out+12, (sz)(TOTAL-12u));
     w32(out+8, ck);
 

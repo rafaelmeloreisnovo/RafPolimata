@@ -102,25 +102,15 @@ jobs:
           {
             echo '=== memfd runtime capability contract ==='
             bash tests/test_apkc_probe_memfd_runtime.sh
-
             echo '=== sealed memfd -> stdin helper ==='
-            clang -std=c11 -O2 -Wall -Wextra -Werror \
-              scripts/apkc_install_sealed_stdin.c \
-              -o /tmp/apkc-custody-hardening/apkc_install_sealed_stdin
-            bash tests/test_apkc_install_sealed_stdin.sh \
-              /tmp/apkc-custody-hardening/apkc_install_sealed_stdin
-
+            clang -std=c11 -O2 -Wall -Wextra -Werror scripts/apkc_install_sealed_stdin.c -o /tmp/apkc-custody-hardening/apkc_install_sealed_stdin
+            bash tests/test_apkc_install_sealed_stdin.sh /tmp/apkc-custody-hardening/apkc_install_sealed_stdin
             echo '=== stdin receipt finalizer ==='
-            bash tests/test_apkc_finalize_stdin_install_receipt.sh \
-              scripts/apkc_finalize_stdin_install_receipt.sh
-
+            bash tests/test_apkc_finalize_stdin_install_receipt.sh scripts/apkc_finalize_stdin_install_receipt.sh
             echo '=== sealed stdin launcher ==='
-            bash tests/test_apkc_install_sealed_stdin_launcher.sh \
-              scripts/apkc_install_sealed_stdin.sh
-
+            bash tests/test_apkc_install_sealed_stdin_launcher.sh scripts/apkc_install_sealed_stdin.sh
             echo '=== Termux/Android preflight logic (controlled fixtures only) ==='
-            bash tests/test_apkc_termux_sealed_stdin_gate.sh \
-              scripts/apkc_termux_sealed_stdin_gate.sh
+            bash tests/test_apkc_termux_sealed_stdin_gate.sh scripts/apkc_termux_sealed_stdin_gate.sh
           } 2>&1 | tee results/apkc-custody-hardening-shell-tests.log
           grep -q '^RESULT pass=8 fail=0 claim_allowed=false$' results/apkc-custody-hardening-shell-tests.log
           grep -q '^RESULT pass=6 fail=0 claim_allowed=false$' results/apkc-custody-hardening-shell-tests.log
@@ -163,7 +153,7 @@ jobs:
 
           python3 scripts/apkc_verified_build.py \
             --apkc "$runner" \
-            --input Apkc/hello.s.txt \
+            --input Apkc/hello.dualabi.structural.s.txt \
             --output Apkc/proofs/out/hello.apk \
             --report results/apkc-verified-build.json \
             --log results/apkc-verified-build.log \
@@ -195,10 +185,8 @@ jobs:
         id: contracts
         continue-on-error: true
         run: |
-          python3 scripts/audit_browser_tls_capability.py \
-            --write results/browser-tls-capability.json
-          python3 scripts/apkc_runtime_preflight.py \
-            --write results/apkc-runtime-preflight.json
+          python3 scripts/audit_browser_tls_capability.py --write results/browser-tls-capability.json
+          python3 scripts/apkc_runtime_preflight.py --write results/apkc-runtime-preflight.json
 
       - name: Create scoped C04 structural closure receipt
         id: structural_receipt
@@ -262,22 +250,15 @@ jobs:
         run: |
           set -eu
           for item in \
-            "$TOOLING_OUTCOME" \
-            "$SYNTAX_OUTCOME" \
-            "$TESTS_OUTCOME" \
-            "$CUSTODY_HARDENING_OUTCOME" \
-            "$SOURCE_PROOF_OUTCOME" \
-            "$GENERATE_APK_OUTCOME" \
-            "$HARDENING_OUTCOME" \
-            "$FIRST_PART_OUTCOME" \
-            "$CONTRACTS_OUTCOME" \
-            "$STRUCTURAL_RECEIPT_OUTCOME"; do
+            "$TOOLING_OUTCOME" "$SYNTAX_OUTCOME" "$TESTS_OUTCOME" \
+            "$CUSTODY_HARDENING_OUTCOME" "$SOURCE_PROOF_OUTCOME" \
+            "$GENERATE_APK_OUTCOME" "$HARDENING_OUTCOME" \
+            "$FIRST_PART_OUTCOME" "$CONTRACTS_OUTCOME" "$STRUCTURAL_RECEIPT_OUTCOME"; do
             test "$item" = success
           done
           python3 - <<'PY'
           import json
           from pathlib import Path
-
           path = Path('results/apkc-structural-closure.json')
           if not path.is_file():
               raise SystemExit('missing C04 structural receipt')
