@@ -39,7 +39,7 @@ resolve_tool(){
   [ -f "$p" ] || return 1
   printf '%s' "$p"
 }
-one_line(){ "$@" 2>&1 | sed -n '1{s/[[:cntrl:]]/ /g;p;q;}'; }
+one_line(){ "$@" 2>&1 | sed -n '1{s/[[:cntrl:]]/ /g;p;}'; }
 
 BASH_PATH=$(resolve_tool bash) || fail BASH_BINARY_UNRESOLVED 207
 SHA_PATH=$(resolve_tool sha256sum) || fail SHA256SUM_BINARY_UNRESOLVED 208
