@@ -11,15 +11,25 @@ RDA = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = RDA
 SPEC.loader.exec_module(RDA)
 
+FRIDA_MODULE_PATH = ROOT / "scripts" / "frida_runtime_probe.py"
+FRIDA_SPEC = importlib.util.spec_from_file_location("frida_runtime_probe", FRIDA_MODULE_PATH)
+assert FRIDA_SPEC and FRIDA_SPEC.loader
+FRIDA = importlib.util.module_from_spec(FRIDA_SPEC)
+sys.modules[FRIDA_SPEC.name] = FRIDA
+FRIDA_SPEC.loader.exec_module(FRIDA)
+
 
 def test_skill_registry_loads():
     raw, skills = RDA.load_skills(ROOT / "configs" / "runtime-doctor-skills.v1.json")
     assert raw["schema"] == "raf.runtime-doctor-skills.v1"
     ids = {skill.id for skill in skills}
     assert "termux_host_diagnostic" in ids
+    assert "frida_runtime_observer" in ids
     assert "llama_backend_doctor" in ids
     assert "rafpolimata_evidence_doctor" in ids
     assert "rafaeliaprivate_context" in ids
+    assert ["termux_host_diagnostic", "frida_runtime_observer"] in raw["route_graph"]
+    assert ["frida_runtime_observer", "rafpolimata_evidence_doctor"] in raw["route_graph"]
 
 
 def test_parse_last_json_line():
@@ -90,5 +100,48 @@ def test_laplace_learning_never_claims_without_history():
 
 def test_safe_probe_rejects_install_and_delete():
     assert RDA.safe_probe_command(("sh", "Arme/Add/diagnose.sh", "--json"))
+    assert RDA.safe_probe_command(("python3", "scripts/frida_runtime_probe.py", "--json"))
     assert not RDA.safe_probe_command(("sh", "-c", "pkg install x"))
     assert not RDA.safe_probe_command(("sh", "-c", "rm -rf x"))
+
+
+def test_frida_device_parser_is_read_only_and_structured():
+    text = "Id  Type   Name\n----------------------\nlocal local  Local System\nusb1 usb    Android Device\n"
+    devices = FRIDA.parse_device_lines(text)
+    assert devices == [
+        {"id": "local", "type": "local", "name": "Local System"},
+        {"id": "usb1", "type": "usb", "name": "Android Device"},
+    ]
+
+
+def test_frida_device_identifiers_are_pseudonymized():
+    raw = [{"id": "DEVICE-ID-123", "type": "usb", "name": "Test Phone"}]
+    safe = FRIDA.pseudonymize_devices(raw)
+    serialized = str(safe)
+    assert "DEVICE-ID-123" not in serialized
+    assert "Test Phone" not in serialized
+    assert safe[0]["type"] == "usb"
+    assert safe[0]["name_present"] is True
+    assert len(safe[0]["id_sha256_16"]) == 16
+    assert len(safe[0]["name_sha256_16"]) == 16
+
+
+def test_frida_probe_output_is_minimized():
+    raw = {"command": ["frida-ls-devices"], "exit_code": 0, "stdout": "device-output", "stderr": ""}
+    safe = FRIDA.redact_probe_output(raw, "device-enumeration")
+    assert safe["stdout"] == "<redacted:device-enumeration>"
+    assert safe["stdout_sha256"] == FRIDA.sha256_text("device-output")
+    assert safe["stdout_bytes"] == len(b"device-output")
+
+
+def test_frida_report_never_claims_dynamic_actions(monkeypatch):
+    monkeypatch.setattr(FRIDA, "command_info", lambda name: {"name": name, "available": False, "path": None})
+    monkeypatch.setattr(FRIDA, "getprop", lambda key: None)
+    report = FRIDA.build_report(None)
+    assert report["state"] == "TOKEN_VAZIO_FRIDA_TOOLS_NOT_FOUND"
+    assert report["capabilities"]["attach_tested"] is False
+    assert report["capabilities"]["hook_tested"] is False
+    assert report["policy"]["automatic_patch"] is False
+    assert report["policy"]["claim_allowed"] is False
+    assert report["privacy"]["raw_device_ids_stored"] is False
+    assert report["privacy"]["raw_device_enumeration_stdout_stored"] is False

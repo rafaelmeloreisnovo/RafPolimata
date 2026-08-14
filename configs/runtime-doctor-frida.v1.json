@@ -1,0 +1,83 @@
+{
+  "schema": "raf.runtime-doctor-frida.v1",
+  "state": "IMPLEMENTED_CONFIGURATION_NOT_DEVICE_EXECUTED",
+  "claim_allowed": false,
+  "scope": "USER_CONTROLLED_APP_OR_EXPLICIT_TEST_TARGET_ONLY",
+  "modes": [
+    {
+      "id": "OBSERVE",
+      "mutates_target": false,
+      "requires": ["frida_tooling_readiness_receipt"],
+      "produces": ["event_trace", "runtime_receipt"]
+    },
+    {
+      "id": "DIAGNOSE",
+      "mutates_target": false,
+      "requires": ["OBSERVE", "symptom", "target_identity"],
+      "produces": ["hypothesis", "evidence_links", "F_ok", "F_gap", "F_next"]
+    },
+    {
+      "id": "PATCH_EPHEMERAL",
+      "mutates_target": true,
+      "persistent": false,
+      "automatic": false,
+      "requires": ["explicit_target", "explicit_patch", "rollback_condition", "pre_patch_receipt"],
+      "produces": ["post_patch_receipt", "delta", "rollback_result"]
+    },
+    {
+      "id": "PROMOTE",
+      "mutates_target": false,
+      "automatic": false,
+      "requires": ["PATCH_EPHEMERAL evidence or independent root-cause proof", "source_patch", "tests", "build_receipt", "runtime_receipt"],
+      "produces": ["source_change_candidate", "promotion_gate_decision"]
+    }
+  ],
+  "invariants": [
+    "memory != proof",
+    "tool presence != attach capability",
+    "device enumeration != successful attach",
+    "attach != valid diagnosis",
+    "hook != permanent correction",
+    "ephemeral patch != source fix",
+    "source fix != deployed build",
+    "deployed build != verified runtime behavior",
+    "Frida/Gadget observation never overrides RafPolimata evidence gates",
+    "GAIA context routing never overrides hardware/runtime evidence",
+    "TOKEN_VAZIO is preserved until direct evidence closes it",
+    "every target must be user-controlled or an explicit authorized test target"
+  ],
+  "nonroot_route": {
+    "preferred": "GADGET_OR_DEBUGGABLE_APP",
+    "server_claim": "TOKEN_VAZIO_UNLESS_EXPLICITLY_OBSERVED",
+    "background_persistence": "TOKEN_VAZIO_DEVICE_TEST_REQUIRED"
+  },
+  "root_route": {
+    "preferred": "SERVER_ROUTE_CANDIDATE",
+    "server_claim": "TOKEN_VAZIO_UNLESS_EXPLICITLY_OBSERVED",
+    "automatic_privilege_escalation": false
+  },
+  "relations": [
+    ["termux_host_diagnostic", "frida_runtime_observer"],
+    ["frida_runtime_observer", "DIAGNOSE"],
+    ["DIAGNOSE", "PATCH_EPHEMERAL"],
+    ["PATCH_EPHEMERAL", "rafpolimata_evidence_doctor"],
+    ["rafpolimata_evidence_doctor", "PROMOTE"],
+    ["frida_runtime_observer", "gaia_context_router"],
+    ["frida_runtime_observer", "termux_packages_build_surface"],
+    ["frida_runtime_observer", "vectras_vm_runtime"],
+    ["frida_runtime_observer", "llama_backend_doctor"]
+  ],
+  "open_tokens": [
+    "TOKEN_VAZIO_FRIDA_TOOLS_ON_TARGET_DEVICE",
+    "TOKEN_VAZIO_GADGET_EXACT_ARTIFACT_SHA256",
+    "TOKEN_VAZIO_DEVELOPER_APP_GADGET_LOAD_RECEIPT",
+    "TOKEN_VAZIO_ATTACH_RECEIPT",
+    "TOKEN_VAZIO_JAVA_ART_JNI_HOOK_RECEIPT",
+    "TOKEN_VAZIO_BACKGROUND_PERSISTENCE_RECEIPT",
+    "TOKEN_VAZIO_EPHEMERAL_PATCH_ROLLBACK_RECEIPT",
+    "TOKEN_VAZIO_PHYSICAL_DEVICE_REGRESSION_TEST"
+  ],
+  "F_ok": "Frida has a governed L2.5 observability role with read-only readiness probing and explicit promotion boundaries.",
+  "F_gap": "No target-device attach, Gadget load, hook, background persistence or ephemeral patch execution is claimed by this configuration.",
+  "F_next": "Run the readiness probe on the physical Termux workspace, bind an exact Gadget/developer-app artifact by SHA-256, then execute the smallest authorized OBSERVE test and preserve its receipt."
+}
