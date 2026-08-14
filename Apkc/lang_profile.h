@@ -62,72 +62,74 @@ typedef struct {
 #define LP_TFLITE  22
 #define LP_COUNT   23
 
+/* All nine post-cc_args fields are explicit. This keeps -Wmissing-field-initializers
+ * useful as a schema-evolution gate when LangProfile gains new capabilities. */
 static const LangProfile _lang_table[LP_COUNT] = {
     [LP_ASM] = { "asm", ".s", 1, 0, 0, NULL,
-                 NULL, {NULL}, 0, 0, 0, 0 },
+                 NULL, {NULL}, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_C] = { "c", ".c", 0, 0, 1, "clang",
                NULL,
                {"--target","aarch64-linux-android","-shared","-fPIC","-Os","-o",NULL},
-               0, 1, 0, 0 },
+               0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_CPP] = { "cpp", ".cpp", 0, 0, 1, "clang++",
                  NULL,
                  {"--target","aarch64-linux-android","-shared","-fPIC","-Os","-o",NULL},
-                 0, 1, 0, 0 },
+                 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_RS] = { "rs", ".rs", 0, 0, 1, "rustc",
                 NULL,
                 {"--target","aarch64-linux-android","--crate-type","cdylib","-o",NULL},
-                0, 1, 0, 0 },
+                0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_KT] = { "kt", ".kt", 0, 0, 1, "kotlinc",
                 NULL,
                 {"-include-runtime","-d",NULL},
-                1, 0, 1, 0 },
+                1, 0, 1, 0, 0, 0, 0, 0, 0 },
 
     [LP_JAVA] = { "java", ".java", 0, 0, 1, "sh",
                   NULL,
                   {"scripts/apkc_java_to_jar.sh",NULL},
-                  1, 0, 1, 0 },
+                  1, 0, 1, 0, 0, 0, 0, 0, 0 },
 
     [LP_PY] = { "py", ".py", 0, 1, 0, "/usr/bin/python3",
-                "-c", {NULL}, 0, 1, 0, 0 },
+                "-c", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_SH] = { "sh", ".sh", 0, 1, 0, "/bin/sh",
-                "-c", {NULL}, 0, 1, 0, 0 },
+                "-c", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_PL] = { "pl", ".pl", 0, 1, 0, "/usr/bin/perl",
-                "-e", {NULL}, 0, 1, 0, 0 },
+                "-e", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_JS] = { "js", ".js", 0, 1, 0, "/usr/bin/node",
-                "-e", {NULL}, 0, 1, 0, 0 },
+                "-e", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_PHP] = { "php", ".php", 0, 1, 0, "/usr/bin/php",
-                 "-r", {NULL}, 0, 1, 0, 0 },
+                 "-r", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_JSX] = { "jsx", ".jsx", 0, 0, 1, "npx",
                  NULL,
                  {"babel","--presets","@babel/preset-react","--out-file",NULL},
-                 0, 1, 0, 1 },
+                 0, 1, 0, 1, 0, 0, 0, 0, 0 },
 
     [LP_GO] = { "go", ".go", 0, 0, 1, "go",
                 NULL,
                 {"build","-buildmode=c-shared","-o",NULL},
-                0, 1, 0, 0 },
+                0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_RB] = { "rb", ".rb", 0, 1, 0, "/usr/bin/ruby",
-                "-e", {NULL}, 0, 1, 0, 0 },
+                "-e", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_SWIFT] = { "swift", ".swift", 0, 0, 1, "swiftc",
                    NULL,
                    {"-emit-library","-o",NULL},
-                   0, 1, 0, 0 },
+                   0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
     [LP_GROOVY] = { "groovy", ".groovy", 0, 0, 1, "sh",
                     NULL,
                     {"scripts/apkc_groovy_to_jar.sh",NULL},
-                    1, 0, 1, 0 },
+                    1, 0, 1, 0, 0, 0, 0, 0, 0 },
 
     [LP_CLJ] = { "clj", ".clj", 0, 1, 0, "/usr/bin/clojure",
                  "-e", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
