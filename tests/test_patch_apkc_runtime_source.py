@@ -30,6 +30,8 @@ class ApkCRuntimeSourceHardeningTests(unittest.TestCase):
             "compiler output exceeds bounded buffer",
             "source exceeds 1MiB bounded input",
             "_apkc_is_dex",
+            "if (dexout && _apkc_is_dex(_fork_out,dexout))",
+            "d8 failed; refusing to package JAR bytes as classes.dex",
             "_apkc_is_elf64_aarch64",
             "so64_buf_ptr = _fork_out",
             "dex_output profile requires D8",
@@ -71,6 +73,21 @@ class ApkCRuntimeSourceHardeningTests(unittest.TestCase):
             1,
         )
         with self.assertRaisesRegex(ValueError, "APKC-RH-001"):
+            PATCHER.transform(drifted)
+
+    def test_rh007_minimal_anchor_drift_is_fail_closed(self) -> None:
+        anchor = (
+            "            if (dexout) {\n"
+            "                /* d8 succeeded: use _fork_out directly (avoids 200B _dex_buf limit) */\n"
+        )
+        self.assertEqual(self.source.count(anchor), 1)
+        drifted = self.source.replace(
+            anchor,
+            "            if (dexout) {\n"
+            "                /* changed outside RH-007 hardening contract */\n",
+            1,
+        )
+        with self.assertRaisesRegex(ValueError, "APKC-RH-007"):
             PATCHER.transform(drifted)
 
     def test_every_change_id_is_unique(self) -> None:
