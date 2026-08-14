@@ -27,81 +27,31 @@ SOURCE_SUFFIXES = {
 TEXT_LIMIT = 2_000_000
 
 PATTERNS: dict[str, tuple[re.Pattern[str], ...]] = {
-    "terminal_rendering": (
-        re.compile(r"VT100|tty_goto|terminal UI|TUI", re.I),
-    ),
-    "local_directory_listing": (
-        re.compile(r"dirbrowse|directory listing|file browser", re.I),
-    ),
-    "keyboard_navigation": (
-        re.compile(r"TAB=Panel|keyboard|KEY_UP|KEY_DOWN|ENTER=Run", re.I),
-    ),
-    "url_parser": (
-        re.compile(r"urlsplit|parse_url|URL parser|https?://", re.I),
-    ),
-    "dns_resolution": (
-        re.compile(r"getaddrinfo|res_query|DNS resolution|remote_ip", re.I),
-    ),
-    "tcp_transport": (
-        re.compile(r"socket\s*\(|connect\s*\(|TCP transport|curl", re.I),
-    ),
-    "http_response_parser": (
-        re.compile(r"HTTP/[123]|status[-_ ]line|response headers?|chunked", re.I),
-    ),
-    "https_transport": (
-        re.compile(r"HTTPS_TRANSPORT_ADAPTER|--proto '=https'|TLS handshake", re.I),
-    ),
-    "tls_1_2_handshake": (
-        re.compile(r"TLS1[_ .-]?2|TLSv1\.2|--tlsv1\.2", re.I),
-    ),
-    "tls_1_3_handshake": (
-        re.compile(r"TLS1[_ .-]?3|TLSv1\.3|--tlsv1\.3", re.I),
-    ),
-    "x509_chain_validation": (
-        re.compile(r"X509_verify_cert|x509 chain|certificate chain|ssl_verify_result", re.I),
-    ),
-    "hostname_verification": (
-        re.compile(r"hostname verification|X509_check_host|certificate_and_hostname_validation", re.I),
-    ),
-    "certificate_time_validation": (
-        re.compile(r"notBefore|notAfter|certificate time|expiry validation", re.I),
-    ),
-    "trusted_root_store": (
-        re.compile(r"CA bundle|root store|--cacert|system CA", re.I),
-    ),
-    "redirect_policy": (
-        re.compile(r"max-redirs|redirect policy|--proto-redir", re.I),
-    ),
-    "content_renderer": (
-        re.compile(r"HTML renderer|layout engine|DOM tree|render_html|WebView", re.I),
-    ),
-    "navigation_history": (
-        re.compile(r"navigation history|history stack|back_forward|goBack\s*\(", re.I),
-    ),
-    "runtime_integration_test": (
-        re.compile(r"browser.*integration.*PASS|tls.*transcript.*PASS|https.*runtime.*PASS", re.I),
-    ),
-    "assembly_source_core": (
-        re.compile(r"\.global|\.globl|section \.text|__asm__|asm volatile", re.I),
-    ),
-    "abi_contract": (
-        re.compile(r"AAPCS|ABI contract|callee-saved|caller-saved", re.I),
-    ),
-    "memory_bounds_evidence": (
-        re.compile(r"bounds test|buffer bounds|ASAN|memory safety.*PASS", re.I),
-    ),
-    "crypto_known_answer_tests": (
-        re.compile(r"known answer test|KAT.*PASS|RFC.*test vector", re.I),
-    ),
-    "tls_transcript_tests": (
-        re.compile(r"TLS transcript|handshake transcript", re.I),
-    ),
-    "certificate_chain_fixtures": (
-        re.compile(r"certificate fixture|test root CA|intermediate CA fixture", re.I),
-    ),
-    "independent_security_review": (
-        re.compile(r"independent security review|external security audit", re.I),
-    ),
+    "terminal_rendering": (re.compile(r"VT100|tty_goto|terminal UI|TUI", re.I),),
+    "local_directory_listing": (re.compile(r"dirbrowse|directory listing|file browser", re.I),),
+    "keyboard_navigation": (re.compile(r"TAB=Panel|keyboard|KEY_UP|KEY_DOWN|ENTER=Run", re.I),),
+    "url_parser": (re.compile(r"urlsplit|parse_url|URL parser|https?://", re.I),),
+    "dns_resolution": (re.compile(r"getaddrinfo|res_query|DNS resolution|remote_ip", re.I),),
+    "tcp_transport": (re.compile(r"socket\s*\(|connect\s*\(|TCP transport|curl", re.I),),
+    "http_response_parser": (re.compile(r"HTTP/[123]|status[-_ ]line|response headers?|chunked", re.I),),
+    "https_transport": (re.compile(r"HTTPS_TRANSPORT_ADAPTER|--proto '=https'|TLS handshake", re.I),),
+    "tls_1_2_handshake": (re.compile(r"TLS1[_ .-]?2|TLSv1\.2|--tlsv1\.2", re.I),),
+    "tls_1_3_handshake": (re.compile(r"TLS1[_ .-]?3|TLSv1\.3|--tlsv1\.3", re.I),),
+    "x509_chain_validation": (re.compile(r"X509_verify_cert|x509 chain|certificate chain|ssl_verify_result", re.I),),
+    "hostname_verification": (re.compile(r"hostname verification|X509_check_host|certificate_and_hostname_validation", re.I),),
+    "certificate_time_validation": (re.compile(r"notBefore|notAfter|certificate time|expiry validation", re.I),),
+    "trusted_root_store": (re.compile(r"CA bundle|root store|--cacert|system CA", re.I),),
+    "redirect_policy": (re.compile(r"max-redirs|redirect policy|--proto-redir", re.I),),
+    "content_renderer": (re.compile(r"HTML renderer|layout engine|DOM tree|render_html|WebView", re.I),),
+    "navigation_history": (re.compile(r"navigation history|history stack|back_forward|goBack\s*\(", re.I),),
+    "runtime_integration_test": (re.compile(r"browser.*integration.*PASS|tls.*transcript.*PASS|https.*runtime.*PASS", re.I),),
+    "assembly_source_core": (re.compile(r"\.global|\.globl|section \.text|__asm__|asm volatile", re.I),),
+    "abi_contract": (re.compile(r"AAPCS|ABI contract|callee-saved|caller-saved", re.I),),
+    "memory_bounds_evidence": (re.compile(r"bounds test|buffer bounds|ASAN|memory safety.*PASS", re.I),),
+    "crypto_known_answer_tests": (re.compile(r"known answer test|KAT.*PASS|RFC.*test vector", re.I),),
+    "tls_transcript_tests": (re.compile(r"TLS transcript|handshake transcript", re.I),),
+    "certificate_chain_fixtures": (re.compile(r"certificate fixture|test root CA|intermediate CA fixture", re.I),),
+    "independent_security_review": (re.compile(r"independent security review|external security audit", re.I),),
 }
 
 
@@ -171,6 +121,22 @@ def evaluate_level(name: str, requirements: list[str], evidence: dict[str, list[
     }
 
 
+def active_shell_option(text: str, option_pattern: str) -> bool:
+    """Detect an option in executable shell lines, excluding comments/documentation.
+
+    This intentionally avoids global substring scans: a safety comment such as
+    `No -k/--insecure` is evidence *about* policy and must not be mistaken for an
+    executed unsafe option. The match is restricted to option-shaped shell lines.
+    """
+    regex = re.compile(rf"(?m)^\s*(?:{option_pattern})(?:\s|\\|$)")
+    for line in text.splitlines():
+        if line.lstrip().startswith("#"):
+            continue
+        if regex.search(line):
+            return True
+    return False
+
+
 def audit(root: Path, config_path: Path) -> dict[str, object]:
     config = json.loads(config_path.read_text(encoding="utf-8"))
     evidence = collect_evidence(root, tracked_files(root))
@@ -178,15 +144,18 @@ def audit(root: Path, config_path: Path) -> dict[str, object]:
     for level, requirements in config["capability_levels"].items():
         levels[level] = evaluate_level(level, list(requirements), evidence)
 
-    # An HTTPS adapter is considered source-complete only when the audited script
-    # itself contains all policy markers. This still does not prove a handshake.
+    # An HTTPS adapter is source-complete only when the audited script itself
+    # contains the policy markers. A static contract still does not prove a TLS
+    # handshake. Unsafe flags are searched only as executable shell options, not
+    # as ambiguous global substrings in comments or help text.
     adapter_path = root / "scripts/raf_https_fetch.sh"
     adapter_text = read_text(adapter_path) if adapter_path.is_file() else ""
+    insecure_option_active = active_shell_option(adapter_text, r"-k|--insecure")
     adapter_markers = {
         "https_only_policy": "--proto '=https'" in adapter_text and "--proto-redir '=https'" in adapter_text,
         "tls_1_2_request": "--tlsv1.2" in adapter_text,
         "tls_1_3_request": "--tlsv1.3" in adapter_text,
-        "system_ca_validation": "--insecure" not in adapter_text and "No -k/--insecure" in adapter_text,
+        "system_ca_validation": not insecure_option_active and "No -k/--insecure" in adapter_text,
         "hostname_verification": "certificate_and_hostname_validation_enabled" in adapter_text,
         "redirect_limit": "--max-redirs" in adapter_text,
         "timeout": "--connect-timeout" in adapter_text and "--max-time" in adapter_text,
@@ -195,6 +164,7 @@ def audit(root: Path, config_path: Path) -> dict[str, object]:
     }
     adapter_missing = sorted(key for key, value in adapter_markers.items() if not value)
     levels["HTTPS_TRANSPORT_ADAPTER"]["static_contract"] = adapter_markers
+    levels["HTTPS_TRANSPORT_ADAPTER"]["unsafe_option_active"] = insecure_option_active
     levels["HTTPS_TRANSPORT_ADAPTER"]["state"] = (
         "STATIC_EVIDENCE" if adapter_path.is_file() and not adapter_missing else
         "SOURCE_PRESENT" if adapter_path.is_file() else "ABSENT"
