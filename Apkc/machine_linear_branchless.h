@@ -8,10 +8,10 @@
 #ifndef MACHINE_LINEAR_BRANCHLESS_H
 #define MACHINE_LINEAR_BRANCHLESS_H 1
 
-typedef unsigned long u64;
+typedef unsigned long long u64;
 typedef unsigned int u32;
 typedef unsigned char u8;
-typedef signed long i64;
+typedef signed long long i64;
 
 /* === MACHINE STATE: 16 registers + linear memory + PC === */
 struct Machine {

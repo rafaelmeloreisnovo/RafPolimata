@@ -10,7 +10,7 @@
 
 #include "machine_linear_branchless.h"
 
-typedef unsigned long u64;
+typedef unsigned long long u64;
 typedef unsigned int u32;
 typedef unsigned char u8;
 

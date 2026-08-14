@@ -14,6 +14,7 @@
 #include "fmt_dex.h"
 #include "fmt_axml.h"
 #include "fmt_elf.h"
+#include "apkc_branchless_handler.h"
 
 /* language modes */
 typedef enum { LANG_ASM=0, LANG_SH=1, LANG_PY=2, LANG_RS=3 } LangMode;
@@ -1654,6 +1655,25 @@ static i32 build_apk(
             };
             so32sz = elf32_build_so(_so32_buf, txt, (u32)r32_.size, _es32, 2);
         }
+
+    } else if (prof->use_branchless) {
+        /* Branchless machine compiler: source → machine instructions → ARM64 */
+        static struct BranchlessHandler bh;
+        u8 lang_idx = (u8)(prof - _lang_table);  /* language index from profile */
+
+        if (apkc_branchless_compile(&bh, src, src_len, lang_idx)) {
+            pr_err("apkc: branchless compilation failed\n");
+            return 1;
+        }
+
+        if (do64) {
+            ElfSym _bs64[2] = {
+                {"ANativeActivity_onCreate", 0u},
+                {"android_main", 4u}
+            };
+            so64sz = elf64_build_so(_so64_buf, bh.arm64_asm, bh.arm64_len, _bs64, 2, NULL, 0u);
+        }
+        do32 = 0;  /* branchless output is ARM64 only */
 
     } else if (prof->use_script) {
         /* inline execve bootstrap: interpreter runs source at app start */

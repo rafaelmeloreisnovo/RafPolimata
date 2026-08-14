@@ -23,6 +23,7 @@ typedef struct {
     int         use_asm;
     int         use_script;
     int         use_fork;
+    int         use_branchless;
     const char *compiler;
     const char *arg1;
     const char *cc_args[10];
@@ -65,101 +66,101 @@ typedef struct {
 /* All nine post-cc_args fields are explicit. This keeps -Wmissing-field-initializers
  * useful as a schema-evolution gate when LangProfile gains new capabilities. */
 static const LangProfile _lang_table[LP_COUNT] = {
-    [LP_ASM] = { "asm", ".s", 1, 0, 0, NULL,
+    [LP_ASM] = { "asm", ".s", 1, 0, 0, 0, NULL,
                  NULL, {NULL}, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_C] = { "c", ".c", 0, 0, 1, "clang",
+    [LP_C] = { "c", ".c", 0, 0, 1, 1, "clang",
                NULL,
                {"--target","aarch64-linux-android","-shared","-fPIC","-Os","-o",NULL},
                0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_CPP] = { "cpp", ".cpp", 0, 0, 1, "clang++",
+    [LP_CPP] = { "cpp", ".cpp", 0, 0, 1, 0, "clang++",
                  NULL,
                  {"--target","aarch64-linux-android","-shared","-fPIC","-Os","-o",NULL},
                  0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_RS] = { "rs", ".rs", 0, 0, 1, "rustc",
+    [LP_RS] = { "rs", ".rs", 0, 0, 1, 1, "rustc",
                 NULL,
                 {"--target","aarch64-linux-android","--crate-type","cdylib","-o",NULL},
                 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_KT] = { "kt", ".kt", 0, 0, 1, "kotlinc",
+    [LP_KT] = { "kt", ".kt", 0, 0, 1, 0, "kotlinc",
                 NULL,
                 {"-include-runtime","-d",NULL},
                 1, 0, 1, 0, 0, 0, 0, 0, 0 },
 
-    [LP_JAVA] = { "java", ".java", 0, 0, 1, "sh",
+    [LP_JAVA] = { "java", ".java", 0, 0, 1, 1, "sh",
                   NULL,
                   {"scripts/apkc_java_to_jar.sh",NULL},
                   1, 0, 1, 0, 0, 0, 0, 0, 0 },
 
-    [LP_PY] = { "py", ".py", 0, 1, 0, "/usr/bin/python3",
+    [LP_PY] = { "py", ".py", 0, 1, 0, 1, "/usr/bin/python3",
                 "-c", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_SH] = { "sh", ".sh", 0, 1, 0, "/bin/sh",
+    [LP_SH] = { "sh", ".sh", 0, 1, 0, 0, "/bin/sh",
                 "-c", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_PL] = { "pl", ".pl", 0, 1, 0, "/usr/bin/perl",
+    [LP_PL] = { "pl", ".pl", 0, 1, 0, 0, "/usr/bin/perl",
                 "-e", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_JS] = { "js", ".js", 0, 1, 0, "/usr/bin/node",
+    [LP_JS] = { "js", ".js", 0, 1, 0, 1, "/usr/bin/node",
                 "-e", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_PHP] = { "php", ".php", 0, 1, 0, "/usr/bin/php",
+    [LP_PHP] = { "php", ".php", 0, 1, 0, 0, "/usr/bin/php",
                  "-r", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_JSX] = { "jsx", ".jsx", 0, 0, 1, "npx",
+    [LP_JSX] = { "jsx", ".jsx", 0, 0, 1, 0, "npx",
                  NULL,
                  {"babel","--presets","@babel/preset-react","--out-file",NULL},
                  0, 1, 0, 1, 0, 0, 0, 0, 0 },
 
-    [LP_GO] = { "go", ".go", 0, 0, 1, "go",
+    [LP_GO] = { "go", ".go", 0, 0, 1, 1, "go",
                 NULL,
                 {"build","-buildmode=c-shared","-o",NULL},
                 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_RB] = { "rb", ".rb", 0, 1, 0, "/usr/bin/ruby",
+    [LP_RB] = { "rb", ".rb", 0, 1, 0, 0, "/usr/bin/ruby",
                 "-e", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_SWIFT] = { "swift", ".swift", 0, 0, 1, "swiftc",
+    [LP_SWIFT] = { "swift", ".swift", 0, 0, 1, 1, "swiftc",
                    NULL,
                    {"-emit-library","-o",NULL},
                    0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_GROOVY] = { "groovy", ".groovy", 0, 0, 1, "sh",
+    [LP_GROOVY] = { "groovy", ".groovy", 0, 0, 1, 0, "sh",
                     NULL,
                     {"scripts/apkc_groovy_to_jar.sh",NULL},
                     1, 0, 1, 0, 0, 0, 0, 0, 0 },
 
-    [LP_CLJ] = { "clj", ".clj", 0, 1, 0, "/usr/bin/clojure",
+    [LP_CLJ] = { "clj", ".clj", 0, 1, 0, 0, "/usr/bin/clojure",
                  "-e", {NULL}, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
 
-    [LP_GLSL] = { "glsl", ".comp", 0, 0, 0, "glslc",
+    [LP_GLSL] = { "glsl", ".comp", 0, 0, 0, 0, "glslc",
                   NULL, {"-fshader-stage=compute", "-o", NULL},
                   0, 1, 0, 0,
                   1, 0, 0, 0, 0 },
 
-    [LP_CL] = { "cl", ".cl", 0, 0, 0, NULL, /* TOKEN_VAZIO: OpenCL runtime não disponível */
+    [LP_CL] = { "cl", ".cl", 0, 0, 0, 0, NULL, /* TOKEN_VAZIO: OpenCL runtime não disponível */
                 NULL, {NULL},
                 0, 1, 0, 0,
                 0, 1, 0, 0, 0 },
 
-    [LP_HLSL] = { "hlsl", ".hlsl", 0, 0, 0, "glslc",
+    [LP_HLSL] = { "hlsl", ".hlsl", 0, 0, 0, 0, "glslc",
                   NULL, {"-fshader-stage=compute", "-x", "hlsl", "-o", NULL},
                   0, 1, 0, 0,
                   1, 0, 0, 0, 0 },
 
-    [LP_WGSL] = { "wgsl", ".wgsl", 0, 0, 0, NULL, /* TOKEN_VAZIO: WebGPU shaders não disponível */
+    [LP_WGSL] = { "wgsl", ".wgsl", 0, 0, 0, 0, NULL, /* TOKEN_VAZIO: WebGPU shaders não disponível */
                   NULL, {NULL},
                   0, 1, 0, 0,
                   0, 0, 1, 0, 0 },
 
-    [LP_DSP] = { "dsp", ".dsp", 0, 0, 0, "hexagon-clang",
+    [LP_DSP] = { "dsp", ".dsp", 0, 0, 0, 0, "hexagon-clang",
                  NULL, {"-mv65", "-shared", "-o", NULL},
                  0, 1, 0, 0,
                  0, 0, 0, 1, 0 },
 
-    [LP_TFLITE] = { "tflite", ".tflite", 0, 0, 0, NULL, /* TOKEN_VAZIO: TFLite runtime não disponível */
+    [LP_TFLITE] = { "tflite", ".tflite", 0, 0, 0, 0, NULL, /* TOKEN_VAZIO: TFLite runtime não disponível */
                     NULL, {NULL},
                     0, 1, 0, 0,
                     0, 0, 0, 0, 1 },

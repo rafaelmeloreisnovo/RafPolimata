@@ -19,6 +19,7 @@ __pycache__/
 # Test run artifacts (compiled binaries and logs)
 tests/results/
 tests/test_machine_branchless
+tests/test_apkc_branchless_integration
 
 # raf_shell orchestrator build artifacts
 raf_orchestrator
