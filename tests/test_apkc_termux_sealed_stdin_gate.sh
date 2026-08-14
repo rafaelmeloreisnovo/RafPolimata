@@ -31,14 +31,14 @@ SH
 chmod +x "$T/adb"
 P=0; N=0
 run(){ name=$1 exp=$2; shift 2; set +e; "$@" >/dev/null 2>&1; rc=$?; set -e; if [ "$exp" = 0 ]; then ok=$([ "$rc" -eq 0 ] && echo 1 || echo 0); else ok=$([ "$rc" -ne 0 ] && echo 1 || echo 0); fi; if [ "$ok" = 1 ]; then echo "PASS $name rc=$rc"; P=$((P+1)); else echo "FAIL $name rc=$rc"; N=$((N+1)); fi; }
-run probe_only 0 env APKC_MEMFD_PROBE_SRC="$T/probe.c" "$GATE" "$T/x.apk" "$SHA" "$T/o1" probe-only
-run digest_mismatch 1 env APKC_MEMFD_PROBE_SRC="$T/probe.c" "$GATE" "$T/x.apk" "$(printf '0%.0s' {1..64})" "$T/o2" probe-only
-run probe_claim_missing 1 env APKC_MEMFD_PROBE_SRC="$T/probe_badclaim.c" "$GATE" "$T/x.apk" "$SHA" "$T/o3" probe-only
-run probe_runtime_fail 1 env APKC_MEMFD_PROBE_SRC="$T/probe_fail.c" "$GATE" "$T/x.apk" "$SHA" "$T/o4" probe-only
-run unknown_mode 1 env APKC_MEMFD_PROBE_SRC="$T/probe.c" "$GATE" "$T/x.apk" "$SHA" "$T/o5" nonsense
-run adb_not_ready 1 env APKC_MEMFD_PROBE_SRC="$T/probe.c" APKC_SEALED_STDIN_LAUNCHER="$T/launcher.sh" APKC_ADB_BIN="$T/adb" MOCK_ADB_STATE=offline "$GATE" "$T/x.apk" "$SHA" "$T/o6" adb-shell-pm
-run adb_install_mock_pass 0 env APKC_MEMFD_PROBE_SRC="$T/probe.c" APKC_SEALED_STDIN_LAUNCHER="$T/launcher.sh" APKC_ADB_BIN="$T/adb" "$GATE" "$T/x.apk" "$SHA" "$T/o7" adb-shell-pm
-run install_mock_fail 1 env APKC_MEMFD_PROBE_SRC="$T/probe.c" APKC_SEALED_STDIN_LAUNCHER="$T/launcher.sh" APKC_ADB_BIN="$T/adb" MOCK_INSTALL_RC=23 "$GATE" "$T/x.apk" "$SHA" "$T/o8" adb-shell-pm
+run probe_only 0 env APKC_MEMFD_PROBE_SRC="$T/probe.c" bash "$GATE" "$T/x.apk" "$SHA" "$T/o1" probe-only
+run digest_mismatch 1 env APKC_MEMFD_PROBE_SRC="$T/probe.c" bash "$GATE" "$T/x.apk" "$(printf '0%.0s' {1..64})" "$T/o2" probe-only
+run probe_claim_missing 1 env APKC_MEMFD_PROBE_SRC="$T/probe_badclaim.c" bash "$GATE" "$T/x.apk" "$SHA" "$T/o3" probe-only
+run probe_runtime_fail 1 env APKC_MEMFD_PROBE_SRC="$T/probe_fail.c" bash "$GATE" "$T/x.apk" "$SHA" "$T/o4" probe-only
+run unknown_mode 1 env APKC_MEMFD_PROBE_SRC="$T/probe.c" bash "$GATE" "$T/x.apk" "$SHA" "$T/o5" nonsense
+run adb_not_ready 1 env APKC_MEMFD_PROBE_SRC="$T/probe.c" APKC_SEALED_STDIN_LAUNCHER="$T/launcher.sh" APKC_ADB_BIN="$T/adb" MOCK_ADB_STATE=offline bash "$GATE" "$T/x.apk" "$SHA" "$T/o6" adb-shell-pm
+run adb_install_mock_pass 0 env APKC_MEMFD_PROBE_SRC="$T/probe.c" APKC_SEALED_STDIN_LAUNCHER="$T/launcher.sh" APKC_ADB_BIN="$T/adb" bash "$GATE" "$T/x.apk" "$SHA" "$T/o7" adb-shell-pm
+run install_mock_fail 1 env APKC_MEMFD_PROBE_SRC="$T/probe.c" APKC_SEALED_STDIN_LAUNCHER="$T/launcher.sh" APKC_ADB_BIN="$T/adb" MOCK_INSTALL_RC=23 bash "$GATE" "$T/x.apk" "$SHA" "$T/o8" adb-shell-pm
 grep -q '^final_result=PASS$' "$T/o7/receipt-verify.txt" || { echo 'FAIL receipt_positive'; N=$((N+1)); }
 ! grep -R -Fq 'SERIAL-TEST' "$T/o7" || { echo 'FAIL raw_serial_leak'; N=$((N+1)); }
 if grep -q '^final_result=PASS$' "$T/o7/receipt-verify.txt" && ! grep -R -Fq 'SERIAL-TEST' "$T/o7"; then echo 'PASS receipt_and_serial_pseudonymization'; P=$((P+1)); fi
