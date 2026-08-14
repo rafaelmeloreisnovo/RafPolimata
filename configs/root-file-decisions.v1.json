@@ -38,7 +38,7 @@
     },
     {
       "path": "README_RAFAELIA_ROOT_OPTIMIZER.md",
-      "git_blob_sha": "ac4a8ab47962963271d5171a50b47b8918957c9e",
+      "git_blob_sha": "f95912a2d66dadb8c4112047351a636385cc41c3",
       "kind": "component-documentation",
       "content_state": "ACTIVE_REFERENCE",
       "evidence_state": "IMPLEMENTATION_LINKED_RUNTIME_PENDING",
@@ -50,7 +50,8 @@
       "findings": [
         "documento corresponde a raf_c_to_asm_root_optimizer.py",
         "escopo declara corretamente que não é compilador C completo",
-        "exemplo raiz_example.c está versionado"
+        "exemplo raiz_example.c está versionado",
+        "blob atual acrescenta apenas cabeçalho governado de Estado Proprietário lógico e Repositório ao conteúdo técnico previamente decidido"
       ],
       "required_gates": [
         "unit tests do parser AST IR e backends",
@@ -239,6 +240,32 @@
         "confirmar exit 2 para pré-condição required ausente",
         "confirmar REVIEW_REQUIRED sem promoção a PASS",
         "mover somente após atualização de chamadas e documentação"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    },
+    {
+      "path": "runtime-lock.json",
+      "git_blob_sha": "fbc1bab9ed280f385baa435b0dc6e19e38f64a11",
+      "kind": "runtime-integration-lock-manifest",
+      "content_state": "PARTIAL_PLACEHOLDER_LOCK",
+      "evidence_state": "TOKEN_VAZIO_EXTERNAL_PINS_AND_TOOLCHAIN",
+      "route": "KEEP_AT_ROOT",
+      "target": "runtime-lock.json",
+      "area": "root-runtime",
+      "owner_role": "integration-maintainer",
+      "risk": "MEDIUM",
+      "findings": [
+        "schema rafaelia.runtime_lock.v1 registra integração entre RafGitTools RafPolimata termux-app-rafacodephi CONVERSATIONS_CHUNKS_PRIVATE e llamaRafaelia",
+        "generated_at branches commits externos toolchain e expected_hashes permanecem TOKEN_VAZIO por contrato explícito",
+        "RafPolimata possui pin histórico b5552195242f4b3cbe949509f45d86177e647e8b marcado workspace_local_commit",
+        "placeholder_policy declara que preenchimento real pertence à etapa de geração e integração em RafGitTools"
+      ],
+      "required_gates": [
+        "materializar gerador em RafGitTools que substitua somente TOKEN_VAZIO por valores observados",
+        "validar schema e rejeitar lock promovido com pins obrigatórios ainda TOKEN_VAZIO",
+        "verificar existência e identidade exata de cada commit pinado antes de uso runtime",
+        "provar geração determinística do lock e registrar receipt com hashes e ambiente"
       ],
       "delete_allowed": false,
       "human_approval_required": true
