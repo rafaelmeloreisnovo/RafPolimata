@@ -51,17 +51,17 @@ if [ "$rc" -eq 23 ] && [ -f "$OUT2/provider-physical-tree.sha256" ] \
 OUT3="$TMP/out3"; mkdir -p "$OUT3"; printf stale > "$OUT3/stale.txt"; set +e
 APKC_PROVIDER_TRANSFER_GATE="$TRANSFER_OK" APKC_PHYSICAL_RECEIPTED_GATE="$PHYS" APKC_RECEIPT_TREE_SEALER="$SEAL" bash "$WRAP" "$ART" "$OUT3" probe-only >/dev/null 2>&1
 rc=$?; set -e
-if [ "$rc" -eq 293 ]; then ok dirty_output_rejected; else bad dirty_output_rejected; fi
+if [ "$rc" -eq 233 ]; then ok dirty_output_rejected; else bad dirty_output_rejected; fi
 
 OUT4="$TMP/out4"; set +e
 APKC_PROVIDER_TRANSFER_GATE="$TMP/missing-transfer.sh" APKC_PHYSICAL_RECEIPTED_GATE="$PHYS" APKC_RECEIPT_TREE_SEALER="$SEAL" bash "$WRAP" "$ART" "$OUT4" probe-only >/dev/null 2>&1
 rc=$?; set -e
-if [ "$rc" -eq 294 ] && grep -q 'claim_allowed=false' "$OUT4/provider-physical-chain.status"; then ok missing_transfer_fail_closed; else bad missing_transfer_fail_closed; fi
+if [ "$rc" -eq 234 ] && grep -q 'claim_allowed=false' "$OUT4/provider-physical-chain.status"; then ok missing_transfer_fail_closed; else bad missing_transfer_fail_closed; fi
 
 OUT5="$TMP/out5"; set +e
 APKC_PROVIDER_TRANSFER_GATE="$TRANSFER_OK" APKC_PHYSICAL_RECEIPTED_GATE="$PHYS" APKC_RECEIPT_TREE_SEALER="$SEAL" bash "$WRAP" "$ART" "$OUT5" invalid-mode >/dev/null 2>&1
 rc=$?; set -e
-if [ "$rc" -eq 292 ]; then ok unknown_mode_rejected; else bad unknown_mode_rejected; fi
+if [ "$rc" -eq 232 ]; then ok unknown_mode_rejected; else bad unknown_mode_rejected; fi
 
 if grep -Rqs 'claim_allowed=true' "$OUT2"; then bad claim_gate_preserved; else ok claim_gate_preserved; fi
 printf 'RESULT pass=%s fail=%s claim_allowed=false\n' "$PASS" "$FAIL"
