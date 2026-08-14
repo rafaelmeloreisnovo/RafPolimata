@@ -163,7 +163,7 @@ jobs:
 
           python3 scripts/apkc_verified_build.py \
             --apkc "$runner" \
-            --input Apkc/hello.s.txt \
+            --input Apkc/hello.dualabi.structural.s.txt \
             --output Apkc/proofs/out/hello.apk \
             --report results/apkc-verified-build.json \
             --log results/apkc-verified-build.log \
