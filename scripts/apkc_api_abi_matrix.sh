@@ -33,21 +33,22 @@ row(){ printf '| %s | %s | %s | %s | %s | %s |\n' "$1" "$2" "$3" "$4" "$5" "$6";
 command -v python3 >/dev/null 2>&1 || { echo 'FAIL: python3 ausente; source-cap hardening obrigatório.' >> "$SUMMARY"; exit 1; }
 [ -f "$ROOT/scripts/patch_apkc_source_cap.py" ] || { echo 'FAIL: transformer source-cap ausente.' >> "$SUMMARY"; exit 1; }
 [ -f "$ROOT/tests/test_apkc_source_cap_patch.py" ] || { echo 'FAIL: falsificador source-cap ausente.' >> "$SUMMARY"; exit 1; }
+[ -f "$ROOT/scripts/verify_apkc_source_cap_output.py" ] || { echo 'FAIL: verificador estrutural exato source-cap ausente.' >> "$SUMMARY"; exit 1; }
 
 : > "$HARD_LOG"
 if python3 "$ROOT/tests/test_apkc_source_cap_patch.py" > "$HARD_LOG" 2>&1 \
    && python3 "$ROOT/scripts/patch_apkc_source_cap.py" "$APKC/apkc.c" "$HARD_SRC" >> "$HARD_LOG" 2>&1 \
-   && grep -q 'source exceeds SRC_CAP' "$HARD_SRC" \
-   && ! grep -Fq 'if (n<=0) break;' "$HARD_SRC"; then
+   && python3 "$ROOT/scripts/verify_apkc_source_cap_output.py" "$HARD_SRC" >> "$HARD_LOG" 2>&1; then
   RAW_SHA=$(sha256sum "$APKC/apkc.c" 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
   HARD_SHA=$(sha256sum "$HARD_SRC" 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
   {
     echo "raw_source_sha256: $RAW_SHA"
     echo "hardened_source_sha256: $HARD_SHA"
+    echo 'legacy_source_read_anchor_present: no'
   } >> "$HARD_LOG"
-  echo "- source_cap_hardening: PASS ($HARD_SHA)" >> "$SUMMARY"
+  echo "- source_cap_hardening: PASS_EXACT ($HARD_SHA)" >> "$SUMMARY"
 else
-  echo 'FAIL: source-cap hardening/falsifier/anchor gate falhou; matriz não executada.' >> "$SUMMARY"
+  echo 'FAIL: source-cap hardening/exact verifier gate falhou; matriz não executada.' >> "$SUMMARY"
   exit 1
 fi
 
