@@ -54,6 +54,17 @@ class ApkCFirstPartGateTests(unittest.TestCase):
         failed = [check.check_id for check in GATE.check_code_markers(ROOT) if check.state == "FAIL"]
         self.assertEqual(failed, [])
 
+    def test_current_proof_contract_is_v3_fail_closed(self) -> None:
+        proof = (ROOT / "tools/raf_source_to_binary_proof.sh").read_text(encoding="utf-8")
+        self.assertIn('"schema": "raf.apkc.source-to-binary-proof.v3"', proof)
+        self.assertIn('"claim_allowed": false', proof)
+        self.assertIn("canonical PASS was not promoted", proof)
+        self.assertIn("exit 1", proof)
+        self.assertIn("supersedes source-to-binary-proof.v2", proof)
+        self.assertNotIn("grep -Fq 'if (n<=0) break;' \"$SRC\"", proof)
+        self.assertIn("tests/test_apkc_source_cap_patch.py", proof)
+        self.assertIn("scripts/patch_apkc_source_cap.py", proof)
+
     def test_current_gap_document_does_not_promote_token_artifacts(self) -> None:
         _, contradictions = GATE.reconcile_proofs(ROOT)
         self.assertEqual(contradictions, [])
