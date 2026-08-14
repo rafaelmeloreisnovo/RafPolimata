@@ -44,9 +44,21 @@ jobs:
             tests.test_audit_zip_artifact
 
       - name: Validate every loose root-file decision
+        id: root_decisions
+        continue-on-error: true
         run: |
+          set +e
           python3 scripts/validate_root_file_decisions.py \
             --write results/root-file-decisions-validation.json
+          rc=$?
+          set -e
+          if [ -f results/root-file-decisions-validation.json ]; then
+            echo "--- root-file-decisions-validation.json ---"
+            cat results/root-file-decisions-validation.json
+          else
+            echo "root-file-decisions: report missing"
+          fi
+          exit "$rc"
 
       - name: Audit versioned ZIP without filesystem extraction
         run: |
@@ -62,9 +74,11 @@ jobs:
           python3 scripts/document_governance.py --check --print-summary
 
       - name: Preserve governance evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: document-governance-evidence
+          if-no-files-found: warn
           path: |
             results/root-file-decisions-validation.json
             results/document-governance/summary.json
@@ -75,3 +89,8 @@ jobs:
             results/document-governance/rafaelia-complete-v4-zip.json
             docs/generated/DOCUMENT_GOVERNANCE_INDEX.md
             docs/generated/DOCUMENT_REVIEW_QUEUE.md
+
+      - name: Enforce root-file decision gate
+        if: always()
+        run: |
+          test "${{ steps.root_decisions.outcome }}" = "success"
