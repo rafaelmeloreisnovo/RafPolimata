@@ -114,6 +114,26 @@ def test_frida_device_parser_is_read_only_and_structured():
     ]
 
 
+def test_frida_device_identifiers_are_pseudonymized():
+    raw = [{"id": "DEVICE-ID-123", "type": "usb", "name": "Test Phone"}]
+    safe = FRIDA.pseudonymize_devices(raw)
+    serialized = str(safe)
+    assert "DEVICE-ID-123" not in serialized
+    assert "Test Phone" not in serialized
+    assert safe[0]["type"] == "usb"
+    assert safe[0]["name_present"] is True
+    assert len(safe[0]["id_sha256_16"]) == 16
+    assert len(safe[0]["name_sha256_16"]) == 16
+
+
+def test_frida_probe_output_is_minimized():
+    raw = {"command": ["frida-ls-devices"], "exit_code": 0, "stdout": "device-output", "stderr": ""}
+    safe = FRIDA.redact_probe_output(raw, "device-enumeration")
+    assert safe["stdout"] == "<redacted:device-enumeration>"
+    assert safe["stdout_sha256"] == FRIDA.sha256_text("device-output")
+    assert safe["stdout_bytes"] == len(b"device-output")
+
+
 def test_frida_report_never_claims_dynamic_actions(monkeypatch):
     monkeypatch.setattr(FRIDA, "command_info", lambda name: {"name": name, "available": False, "path": None})
     monkeypatch.setattr(FRIDA, "getprop", lambda key: None)
@@ -123,3 +143,5 @@ def test_frida_report_never_claims_dynamic_actions(monkeypatch):
     assert report["capabilities"]["hook_tested"] is False
     assert report["policy"]["automatic_patch"] is False
     assert report["policy"]["claim_allowed"] is False
+    assert report["privacy"]["raw_device_ids_stored"] is False
+    assert report["privacy"]["raw_device_enumeration_stdout_stored"] is False
