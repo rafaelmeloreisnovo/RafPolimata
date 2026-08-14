@@ -5,6 +5,7 @@
 # identified by an ELF reader and reproduced byte-for-byte. Failed or partial
 # runs are preserved under Apkc/proofs/runs/ and never become a false PASS.
 # Anti-retraction: raw Apkc/apkc.c is never compiled directly.
+# Contract genealogy: raf.apkc.source-to-binary-proof.v3 supersedes source-to-binary-proof.v2.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
