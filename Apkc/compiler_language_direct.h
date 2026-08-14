@@ -268,6 +268,7 @@ struct UniversalCompiler {
 static inline u8 compile_universal(struct UniversalCompiler *uc, const u8 *src, u32 len, u8 lang) {
 	/* Simple strategy: detect common patterns in source and emit appropriate instructions
 	 * Fall back to hardcoded pattern if no patterns match */
+	(void)lang;  /* lang parameter reserved for Stage 4.4 language-specific compilation */
 
 	if (src == NULL || len == 0) {
 		/* Empty source: return 0 */

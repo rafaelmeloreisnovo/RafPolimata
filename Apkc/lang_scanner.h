@@ -482,7 +482,6 @@ static inline struct Token scanner_next_token(struct Scanner *s) {
     if (c == '"' || c == '\'') {
         u8 quote = c;
         scanner_advance(s);
-        u32 start = s->pos;
 
         while (s->pos < s->src_len && scanner_peek(s) != quote) {
             if (scanner_peek(s) == '\\') {
