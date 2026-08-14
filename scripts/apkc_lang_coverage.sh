@@ -34,21 +34,22 @@ row(){ printf '| %s | %s | %s | %s |\n' "$1" "$2" "$3" "$4"; printf '| %s | %s |
 command -v python3 >/dev/null 2>&1 || { log 'FAIL: python3 ausente; hardening source-cap obrigatório não executado.'; exit 1; }
 [ -f "$ROOT/scripts/patch_apkc_source_cap.py" ] || { log 'FAIL: transformer source-cap ausente.'; exit 1; }
 [ -f "$ROOT/tests/test_apkc_source_cap_patch.py" ] || { log 'FAIL: falsificador source-cap ausente.'; exit 1; }
+[ -f "$ROOT/scripts/verify_apkc_source_cap_output.py" ] || { log 'FAIL: verificador estrutural exato source-cap ausente.'; exit 1; }
 
 : > "$HARD_LOG"
 if python3 "$ROOT/tests/test_apkc_source_cap_patch.py" > "$HARD_LOG" 2>&1 \
    && python3 "$ROOT/scripts/patch_apkc_source_cap.py" "$APKC/apkc.c" "$HARD_SRC" >> "$HARD_LOG" 2>&1 \
-   && grep -q 'source exceeds SRC_CAP' "$HARD_SRC" \
-   && ! grep -Fq 'if (n<=0) break;' "$HARD_SRC"; then
+   && python3 "$ROOT/scripts/verify_apkc_source_cap_output.py" "$HARD_SRC" >> "$HARD_LOG" 2>&1; then
   RAW_SHA=$(sha256sum "$APKC/apkc.c" 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
   HARD_SHA=$(sha256sum "$HARD_SRC" 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
   {
     echo "raw_source_sha256: $RAW_SHA"
     echo "hardened_source_sha256: $HARD_SHA"
+    echo 'legacy_source_read_anchor_present: no'
   } >> "$HARD_LOG"
-  log "- source_cap_hardening: PASS ($HARD_SHA)"
+  log "- source_cap_hardening: PASS_EXACT ($HARD_SHA)"
 else
-  log 'FAIL: source-cap hardening/falsifier/anchor gate falhou; nenhum build executado.'
+  log 'FAIL: source-cap hardening/exact verifier gate falhou; nenhum build executado.'
   exit 1
 fi
 

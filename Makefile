@@ -36,11 +36,11 @@ apkc-hardened-source:
 	@command -v python3 >/dev/null 2>&1 || { echo 'apkc-hardened-source: FAIL — python3 required' >&2; exit 127; }
 	@test -f scripts/patch_apkc_source_cap.py || { echo 'apkc-hardened-source: FAIL — transformer missing' >&2; exit 1; }
 	@test -f tests/test_apkc_source_cap_patch.py || { echo 'apkc-hardened-source: FAIL — falsifier missing' >&2; exit 1; }
+	@test -f scripts/verify_apkc_source_cap_output.py || { echo 'apkc-hardened-source: FAIL — exact verifier missing' >&2; exit 1; }
 	@mkdir -p "$(dir $(APKC_HARDENED_SRC))"
 	python3 tests/test_apkc_source_cap_patch.py
 	python3 scripts/patch_apkc_source_cap.py Apkc/apkc.c "$(APKC_HARDENED_SRC)"
-	@grep -q 'source exceeds SRC_CAP' "$(APKC_HARDENED_SRC)" || { echo 'apkc-hardened-source: FAIL — overflow guard absent' >&2; exit 1; }
-	@! grep -Fq 'if (n<=0) break;' "$(APKC_HARDENED_SRC)" || { echo 'apkc-hardened-source: FAIL — vulnerable anchor survived' >&2; exit 1; }
+	python3 scripts/verify_apkc_source_cap_output.py "$(APKC_HARDENED_SRC)"
 	@printf 'apkc-hardened-source: PASS sha256='; sha256sum "$(APKC_HARDENED_SRC)" | cut -d' ' -f1
 
 syntax: apkc-hardened-source

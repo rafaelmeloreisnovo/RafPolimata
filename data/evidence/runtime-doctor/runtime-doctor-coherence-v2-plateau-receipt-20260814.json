@@ -1,0 +1,118 @@
+{
+  "schema": "raf.runtime-doctor-coherence-plateau-receipt.v1",
+  "date": "2026-08-14",
+  "state": "PROVIDER_GREEN_PLATEAU_LIMITED",
+  "claim_allowed": false,
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "pr": 241,
+  "tested_head": "20778e4fd3acbfe72ae5e7078ae65345d617a30a",
+  "branch": "feature/runtime-doctor-coherence-v2-20260814",
+  "runtime_doctor_delta": {
+    "core_fix_commit": "777424dc980953fcaf386a26d625de9966365394",
+    "tests_commit": "f94e7e8a33a898cc3a7c7244ff10440b68f9d035",
+    "contract_commit": "06b4db1466f902bf0d6464e6c3065c964d4f3027",
+    "stdlib_provider_gate_commit": "fde02a1e929da6dabf66b94699f781d13665a3a4",
+    "features": [
+      "Python boolean NameError corrected",
+      "identical read-only probes deduplicated with source-skill provenance",
+      "reachable route_graph_used emitted",
+      "Build Doctor reports ingested by schema gate plus exact SHA-256",
+      "gap ledger exposes urgency, provenance, state and F_next"
+    ]
+  },
+  "apkc_coherence_delta": {
+    "make_exact_source_cap_verifier_commit": "f948bca272be3014ca48e51ee002866beffcc1f4",
+    "validate_exact_source_cap_verifier_commit": "27d23cb0c01d5c2b52905e64b436893ff9dec5d5",
+    "ci_pipefail_exact_verifier_commit": "700f5fb37a62346f698e17c363ab390e3767044e",
+    "lang_profile_explicit_initializer_commit": "ccbf32d23b0cdc9418dcd5bce3f941f06de0355c",
+    "language_coverage_exact_verifier_commit": "123591f83338c7b54f3d01b44c57984e34650853",
+    "api_abi_exact_verifier_commit": "20778e4fd3acbfe72ae5e7078ae65345d617a30a",
+    "root_cause_sequence": [
+      "global generic grep falsely treated an unrelated if(n<=0) break loop as source-read vulnerability",
+      "exact structural verifier replaced the ambiguous global falsifier",
+      "strict compile then exposed 16 incomplete LangProfile initializers instead of hiding them",
+      "all post-cc_args capability fields were made explicit without disabling -Werror",
+      "the same exact-verifier contract was propagated to active language-coverage and API/ABI gates"
+    ]
+  },
+  "provider_evidence": {
+    "ci": {
+      "run_id": 31809130085,
+      "job_id": 94795201784,
+      "runner_id": 1000131412,
+      "conclusion": "success",
+      "critical_steps": {
+        "21_apkc_F1_chain": "success",
+        "22_runtime_doctor_coherence": "success",
+        "23_apkc_proof_protocol": "success",
+        "24_apkc_language_coverage": "success",
+        "25_apkc_api_abi_matrix": "success",
+        "26_verbovivo": "success",
+        "27_coherence_phi": "success",
+        "28_verbovivo_unit": "success",
+        "29_runtime_router": "success",
+        "30_codegen_equivalence": "success",
+        "31_bus_throughput": "success",
+        "32_science_learning_engine_dry_run": "success",
+        "33_watt_proxy": "success",
+        "35_pk_falsifiability": "success",
+        "36_apkc_debug_signing_proof": "success"
+      }
+    },
+    "runtime_truth_receipt": {"run_id": 31809130061, "conclusion": "success"},
+    "formal_science_orchestrator": {"run_id": 31809130007, "conclusion": "success"},
+    "m063_language_contract": {"run_id": 31809129890, "conclusion": "success"},
+    "apkc_first_part_closure": {"run_id": 31809129945, "state_at_receipt": "IN_PROGRESS_TOKEN_VAZIO_FINAL_CONCLUSION"}
+  },
+  "artifacts": {
+    "apkc_proofs_and_hotfix": {
+      "artifact_id": 9222390711,
+      "size_bytes": 74698,
+      "sha256": "2f065134c01cf36efd9dfd0ae1337dada2079cd9cf96c3e15f200af063465cb7"
+    },
+    "apkc_proof_runs": {
+      "artifact_id": 9222391052,
+      "size_bytes": 6560,
+      "sha256": "1bde1b494a35d45a3e8270db26df29d742649ceeb8067e9e992bfacfc67eab52"
+    },
+    "watt_proxy": {
+      "artifact_id": 9222390214,
+      "size_bytes": 376,
+      "sha256": "106de068a19f85587fd213477084ef551beca749054f9ca88bb276c9c5b70e2d"
+    }
+  },
+  "resolved_scope": [
+    "RD-GAP-001_RUNTIME_DOCTOR_BOOLEAN_NAMEERROR_REFERENCE_AND_PROVIDER_GATE",
+    "RD-GAP-002_IDENTICAL_PROBE_DUPLICATION_REFERENCE",
+    "RD-GAP-003_ROUTE_GRAPH_EXPOSURE_REFERENCE",
+    "RD-GAP-004_BUILD_DOCTOR_HASH_BOUND_INGESTION_REFERENCE",
+    "RD-GAP-005A_RUNTIME_DOCTOR_PROVIDER_COHERENCE_GATE",
+    "APKC_ACTIVE_GATE_GLOBAL_FALSE_POSITIVE_SOURCE_CAP",
+    "APKC_LANGPROFILE_MISSING_FIELD_INITIALIZERS",
+    "APKC_LANGUAGE_COVERAGE_ACTIVE_GATE",
+    "APKC_API_ABI_ACTIVE_GATE"
+  ],
+  "open_scope": [
+    "RD-GAP-005B_FULL_PYTEST_SUITE",
+    "RD-GAP-006_PHYSICAL_TERMUX_RUNTIME",
+    "RD-GAP-007_PHYSICAL_FRIDA_READINESS",
+    "RD-GAP-008_LLAMA_CPU_VULKAN_BENCHMARK",
+    "RD-GAP-009_QEMU_GUEST_BOOT",
+    "RD-GAP-010_RAFAELIAPRIVATE_IDENTITY",
+    "RD-GAP-011_PROVIDER_GOVERNANCE_AUDIT",
+    "RD-GAP-012_DRIVE_POSTMERGE_APPEND",
+    "TOKEN_VAZIO_ADDITIONAL_SOURCE_CAP_CALLSITE_CONSISTENCY_AUDIT",
+    "TOKEN_VAZIO_APKC_FIRST_PART_CLOSURE_FINAL_CONCLUSION"
+  ],
+  "invariants": [
+    "GLOBAL_STRING_PATTERN != STRUCTURAL_VULNERABILITY",
+    "EXACT_STRUCTURAL_VERIFIER > AMBIGUOUS_GLOBAL_GREP",
+    "STRICT_WARNING_FAILURES_ARE_PRESERVED_AND_FIXED_NOT_DISABLED",
+    "CI_GREEN_PROVIDER != PHYSICAL_ANDROID_TERMUX_VERIFIED",
+    "RUNTIME_DOCTOR_PROVIDER_GATE != FULL_PYTEST_SUITE",
+    "TOKEN_VAZIO remains explicit for unexecuted layers"
+  ],
+  "F_ok": "The tested head reached a full green primary CI plateau while Runtime Truth, Formal Science and M063 also passed. Runtime Doctor coherence has direct provider execution evidence and active APKc source-cap gates were made structurally precise without weakening strict compilation.",
+  "F_gap": "Physical Termux/Frida, full pytest, downstream LLaMA/QEMU evidence, additional non-active source-cap callsite consistency and final ApkC First Part Closure conclusion remain open.",
+  "F_next": "Keep PR 241 draft; finish observing the independent ApkC First Part Closure run, audit remaining source-cap callsites for the obsolete global falsifier, then prioritize physical Termux Runtime Doctor and Frida read-only receipts."
+}

@@ -50,6 +50,23 @@ class BrowserTLSCapabilityTests(unittest.TestCase):
         path.write_text(json.dumps(config), encoding="utf-8")
         return path
 
+    def write_adapter(self, root: Path, unsafe: bool = False) -> None:
+        insecure = "  --insecure \\\n" if unsafe else ""
+        (root / "scripts/raf_https_fetch.sh").write_text(
+            """#!/bin/sh
+curl --proto '=https' --proto-redir '=https' --tlsv1.2 --tlsv1.3 \\
+  --tls-max 1.3 --max-redirs 5 --connect-timeout 10 --max-time 60
+"""
+            + insecure
+            + """# No -k/--insecure
+certificate_and_hostname_validation_enabled
+remote_ip ssl_verify_result
+mv -f candidate output
+raf.https-fetch-evidence.v1
+""",
+            encoding="utf-8",
+        )
+
     def test_tui_and_https_adapter_do_not_become_web_browser(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -59,26 +76,35 @@ class BrowserTLSCapabilityTests(unittest.TestCase):
                 "VT100 terminal UI TUI file browser dirbrowse TAB=Panel ENTER=Run",
                 encoding="utf-8",
             )
-            (root / "scripts/raf_https_fetch.sh").write_text(
-                """#!/bin/sh
-curl --proto '=https' --proto-redir '=https' --tlsv1.2 --tlsv1.3 \\
-  --tls-max 1.3 --max-redirs 5 --connect-timeout 10 --max-time 60
-# No -k/--insecure
-certificate_and_hostname_validation_enabled
-remote_ip ssl_verify_result
-mv -f candidate output
-raf.https-fetch-evidence.v1
-""",
-                encoding="utf-8",
-            )
+            self.write_adapter(root)
             report = MOD.audit(root, self.make_config(root))
             self.assertTrue(report["facts"]["tui_file_browser_static_evidence"])
             self.assertTrue(report["facts"]["https_transport_adapter_static_evidence"])
             self.assertFalse(report["facts"]["web_browser_tls_static_evidence"])
             self.assertFalse(report["facts"]["asm_web_browser_tls_static_evidence"])
+            self.assertFalse(report["levels"]["HTTPS_TRANSPORT_ADAPTER"]["unsafe_option_active"])
             self.assertEqual(report["truth"]["raf_shell_classification"], "TUI_FILE_BROWSER")
             self.assertEqual(report["truth"]["web_browser_tls"], "TOKEN_VAZIO")
             self.assertFalse(report["claim_allowed"])
+
+    def test_actual_insecure_option_fails_https_adapter_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "scripts").mkdir()
+            self.write_adapter(root, unsafe=True)
+            report = MOD.audit(root, self.make_config(root))
+            adapter = report["levels"]["HTTPS_TRANSPORT_ADAPTER"]
+            self.assertTrue(adapter["unsafe_option_active"])
+            self.assertFalse(adapter["static_contract"]["system_ca_validation"])
+            self.assertIn("system_ca_validation", adapter["missing"])
+            self.assertFalse(report["facts"]["https_transport_adapter_static_evidence"])
+            self.assertFalse(report["claim_allowed"])
+
+    def test_comment_alone_never_counts_as_active_insecure_option(self) -> None:
+        text = "# No -k/--insecure\ncurl --proto '=https' https://example.invalid\n"
+        self.assertFalse(MOD.active_shell_option(text, r"-k|--insecure"))
+        self.assertTrue(MOD.active_shell_option("  --insecure \\\n", r"-k|--insecure"))
+        self.assertTrue(MOD.active_shell_option("  -k \\\n", r"-k|--insecure"))
 
     def test_empty_tree_is_token_vazio(self) -> None:
         with tempfile.TemporaryDirectory() as td:

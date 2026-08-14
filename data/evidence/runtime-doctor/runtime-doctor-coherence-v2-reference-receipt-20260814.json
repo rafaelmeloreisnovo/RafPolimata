@@ -1,0 +1,93 @@
+{
+  "schema": "raf.runtime-doctor-coherence-reference-receipt.v1",
+  "date": "2026-08-14",
+  "state": "VERIFIED_LIMITED_REFERENCE",
+  "claim_allowed": false,
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "branch": "feature/runtime-doctor-coherence-v2-20260814",
+  "source": {
+    "path": "scripts/runtime_doctor_agent.py",
+    "implementation_commit": "777424dc980953fcaf386a26d625de9966365394",
+    "github_git_blob_sha1": "b04c6d478c0e39127a84ff0ada7292695a2e75d0",
+    "reference_runtime_git_blob_sha1": "b04c6d478c0e39127a84ff0ada7292695a2e75d0",
+    "reference_runtime_sha256": "3c47efe81d710b3e8e355bf1ee276d40d654d6c16f30cbe5b967630fac017dbc",
+    "byte_identity_gate": "PASS_GIT_BLOB_MATCH"
+  },
+  "test_extension": {
+    "commit": "f94e7e8a33a898cc3a7c7244ff10440b68f9d035",
+    "path": "tests/test_runtime_doctor_agent.py",
+    "provider_execution": "TOKEN_VAZIO_NOT_YET_OBSERVED"
+  },
+  "contract_extension": {
+    "commit": "06b4db1466f902bf0d6464e6c3065c964d4f3027",
+    "path": "contracts/runtime-doctor-agent-report.schema.json"
+  },
+  "reference_environment": {
+    "class": "CONTAINER_REFERENCE",
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "Linux 6.18.35 x86_64",
+    "python": "3.13.5",
+    "physical_android": false,
+    "termux": false
+  },
+  "execution": {
+    "kind": "INDEPENDENT_SYNTHETIC_HARNESS_ON_BYTE_IDENTICAL_RUNTIME_DOCTOR_SOURCE",
+    "result": "PASS",
+    "checks": {
+      "build_report_claim_booleans_no_NameError": "PASS",
+      "unique_probe_execution": "PASS_1_EXECUTION",
+      "probe_cache_reuse": "PASS_1_CACHE_HIT",
+      "probe_result_fanout": "PASS_5_RESULT_RECORDS",
+      "build_doctor_hash_bound_ingestion": "PASS",
+      "reachable_route_host_to_gpu": "PASS",
+      "reachable_route_host_to_frida": "PASS",
+      "frida_physical_gap_priority": "PASS_P0",
+      "llama_benchmark_gap_preserved": "PASS",
+      "vm_guest_boot_gap_preserved": "PASS",
+      "conservative_summary_state": "PASS_LIMITED"
+    },
+    "summary": {
+      "selected_skills": 5,
+      "probe_results": 5,
+      "probes_executed": 1,
+      "probe_cache_hits": 1,
+      "failed_probes": 0,
+      "incomplete_probes": 3,
+      "runtime_routes": 4,
+      "unresolved_repositories": 0,
+      "build_doctor_reports": 1,
+      "open_gaps": 6,
+      "state": "PASS_LIMITED"
+    },
+    "harness_receipt_sha256": "91ffaef9a3aefb1c83d4163eeb6239a0ca2d383b5c42679cc7104ca3e268c97b",
+    "generated_report_sha256": "2c0037dc381059fcf009f003e1f5768dbda93e3c3c914df98c2e0973a0042ea6"
+  },
+  "negative_evidence": {
+    "fresh_clone_attempt": "FAIL_DNS",
+    "error_class": "Could not resolve host: github.com",
+    "full_repository_pytest": "TOKEN_VAZIO_NOT_EXECUTED_DUE_TO_DNS_CHECKOUT_BLOCK"
+  },
+  "resolved": [
+    "GAP-RD-PYTHON-BOOLEAN-NAMEERROR_REFERENCE",
+    "GAP-RD-DUPLICATE-PROBE-REFERENCE",
+    "GAP-RD-ROUTE-GRAPH-EXPOSURE-REFERENCE",
+    "GAP-RD-BUILD-DOCTOR-HASH-INGESTION-REFERENCE"
+  ],
+  "open": [
+    "TOKEN_VAZIO_FULL_REPOSITORY_PYTEST_PROVIDER_OR_CLEAN_CHECKOUT",
+    "TOKEN_VAZIO_PHYSICAL_TERMUX_RUNTIME",
+    "TOKEN_VAZIO_FRIDA_PHYSICAL_DEVICE_RECEIPT",
+    "TOKEN_VAZIO_LLAMA_CPU_VULKAN_BENCHMARK",
+    "TOKEN_VAZIO_QEMU_GUEST_BOOT_RECEIPT"
+  ],
+  "invariants": [
+    "MERGED != TESTED",
+    "REFERENCE_HARNESS != FULL_REPOSITORY_TEST_SUITE",
+    "STATIC_EVIDENCE_INPUT != CURRENT_BUILD_EXECUTION",
+    "CACHE_REUSE != SECOND_EXECUTION",
+    "TOKEN_VAZIO is preserved until direct evidence closes it"
+  ],
+  "F_ok": "The runtime-doctor core defect was repaired and the new coherence mechanisms passed an independent synthetic harness against byte-identical source bytes.",
+  "F_gap": "Full repository pytest, physical Termux/Android runtime and dynamic Frida execution remain unverified.",
+  "F_next": "Run repository tests in a Git-capable runtime/provider, then run the read-only Runtime Doctor and Frida readiness probes on physical Termux and bind receipts to exact commits."
+}

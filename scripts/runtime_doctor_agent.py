@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
-import shlex
 import subprocess
 import sys
 from collections import Counter, defaultdict
@@ -15,6 +15,7 @@ from typing import Any, Iterable
 
 REPORT_SCHEMA = "raf.runtime-doctor-agent-report.v1"
 SKILL_SCHEMA = "raf.runtime-doctor-skills.v1"
+BUILD_DOCTOR_SCHEMA = "raf.ecosystem-build-doctor-report.v1"
 ALLOWED_PROBE_EXECUTABLES = {"sh", "bash", "python3", "python"}
 PASS_STATES = {"PASS", "OK", "VERIFIED_BY_EXECUTION"}
 FAIL_STATES = {"FAIL", "ERROR", "BLOCKED"}
@@ -47,6 +48,14 @@ class Trace:
 def load_json(path: Path) -> Any:
     with path.open("r", encoding="utf-8") as fh:
         return json.load(fh)
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def load_skills(path: Path) -> tuple[dict[str, Any], list[Skill]]:
@@ -169,6 +178,63 @@ def run_probe(skill: Skill, repo_root: Path, timeout_s: int, trace: Trace) -> di
         "stdout_tail": proc.stdout[-4000:],
         "stderr_tail": proc.stderr[-4000:],
     }
+
+
+def execute_selected_probes(
+    selected: list[Skill],
+    repos: dict[str, Path],
+    timeout_s: int,
+    trace: Trace,
+) -> list[dict[str, Any]]:
+    probes: list[dict[str, Any]] = []
+    cache: dict[tuple[str, tuple[str, ...]], dict[str, Any]] = {}
+
+    for skill in selected:
+        repo_root = repos.get(skill.repo)
+        if repo_root is None:
+            probes.append(
+                {
+                    "skill_id": skill.id,
+                    "state": "TOKEN_VAZIO_REPOSITORY_NOT_AVAILABLE",
+                    "repo": skill.repo,
+                    "probe_cache": {"reused": False, "source_skill_id": None},
+                }
+            )
+            continue
+
+        if not skill.probe:
+            record = run_probe(skill, repo_root, timeout_s, trace)
+            record["probe_cache"] = {"reused": False, "source_skill_id": skill.id}
+            probes.append(record)
+            continue
+
+        key = (str(repo_root), skill.probe)
+        if key in cache:
+            source = cache[key]
+            record = dict(source)
+            record["skill_id"] = skill.id
+            record["repo"] = skill.repo
+            record["probe_cache"] = {
+                "reused": True,
+                "source_skill_id": str(source.get("skill_id", "")),
+            }
+            trace.add(
+                "probe-cache",
+                "reused identical read-only probe result",
+                skill=skill.id,
+                source_skill_id=record["probe_cache"]["source_skill_id"],
+                repo=skill.repo,
+                command=list(skill.probe),
+            )
+            probes.append(record)
+            continue
+
+        record = run_probe(skill, repo_root, timeout_s, trace)
+        record["probe_cache"] = {"reused": False, "source_skill_id": skill.id}
+        cache[key] = dict(record)
+        probes.append(record)
+
+    return probes
 
 
 def load_outcome_history(path: Path | None, trace: Trace) -> dict[str, Counter[str]]:
@@ -366,7 +432,12 @@ def route_from_runtime(probes: list[dict[str, Any]], trace: Trace) -> list[dict[
     return routes
 
 
-def symptom_routes(skills: list[Skill], symptoms: list[str], repos: dict[str, Path], history: dict[str, Counter[str]]) -> list[dict[str, Any]]:
+def symptom_routes(
+    skills: list[Skill],
+    symptoms: list[str],
+    repos: dict[str, Path],
+    history: dict[str, Counter[str]],
+) -> list[dict[str, Any]]:
     routes = []
     for skill in selected_skills(skills, symptoms):
         repo_state = "TOKEN_VAZIO_REPOSITORY_NOT_FOUND"
@@ -386,6 +457,196 @@ def symptom_routes(skills: list[Skill], symptoms: list[str], repos: dict[str, Pa
             }
         )
     return routes
+
+
+def reachable_route_graph(registry: dict[str, Any], seed_ids: set[str]) -> list[list[str]]:
+    raw_edges = registry.get("route_graph", [])
+    edges: list[tuple[str, str]] = []
+    for item in raw_edges:
+        if isinstance(item, list) and len(item) == 2:
+            edges.append((str(item[0]), str(item[1])))
+
+    reachable = set(seed_ids)
+    used: list[list[str]] = []
+    changed = True
+    while changed:
+        changed = False
+        for src, dst in edges:
+            if src in reachable and [src, dst] not in used:
+                used.append([src, dst])
+                if dst != "L7" and dst not in reachable:
+                    reachable.add(dst)
+                    changed = True
+    return used
+
+
+def load_build_doctor_reports(paths: Iterable[str], trace: Trace) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for raw_path in paths:
+        path = Path(raw_path).expanduser().resolve()
+        base = {
+            "source_name": path.name,
+            "source_sha256": None,
+            "state": "TOKEN_VAZIO_NOT_READ",
+        }
+        try:
+            base["source_sha256"] = sha256_file(path)
+            payload = load_json(path)
+        except (OSError, json.JSONDecodeError) as exc:
+            base["state"] = "BLOCKED_UNREADABLE_REPORT"
+            base["error"] = str(exc)
+            records.append(base)
+            trace.add("evidence", "Build Doctor report unreadable", source_name=path.name)
+            continue
+
+        if not isinstance(payload, dict) or payload.get("schema") != BUILD_DOCTOR_SCHEMA:
+            base["state"] = "BLOCKED_SCHEMA_MISMATCH"
+            base["observed_schema"] = payload.get("schema") if isinstance(payload, dict) else None
+            records.append(base)
+            trace.add(
+                "evidence",
+                "Build Doctor report schema mismatch",
+                source_name=path.name,
+                observed_schema=base.get("observed_schema"),
+            )
+            continue
+
+        summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
+        claim_boundary = payload.get("claim_boundary") if isinstance(payload.get("claim_boundary"), dict) else {}
+        base.update(
+            {
+                "state": "INGESTED_HASH_BOUND_REPORT",
+                "summary": {
+                    "state": summary.get("state", "TOKEN_VAZIO_SUMMARY_STATE"),
+                    "highest_severity": summary.get("highest_severity", "TOKEN_VAZIO"),
+                    "findings": summary.get("findings", 0),
+                    "by_code": summary.get("by_code", {}),
+                    "by_repo": summary.get("by_repo", {}),
+                },
+                "claim_boundary": claim_boundary,
+            }
+        )
+        records.append(base)
+        trace.add(
+            "evidence",
+            "Build Doctor report ingested",
+            source_name=path.name,
+            source_sha256=base["source_sha256"],
+            state=base["summary"]["state"],
+        )
+    return records
+
+
+def build_gap_ledger(
+    args: argparse.Namespace,
+    skill_routes: list[dict[str, Any]],
+    probes: list[dict[str, Any]],
+    build_doctor_evidence: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    gaps: list[dict[str, Any]] = []
+
+    def add(gap_id: str, urgency: str, state: str, provenance: str, f_next: str) -> None:
+        gaps.append(
+            {
+                "id": gap_id,
+                "urgency": urgency,
+                "state": state,
+                "provenance": provenance,
+                "F_next": f_next,
+            }
+        )
+
+    selected_ids = {str(item.get("skill_id", "")) for item in skill_routes}
+
+    if not args.execute_probes:
+        add(
+            "GAP-RD-RUNTIME-EXECUTION",
+            "P0",
+            "TOKEN_VAZIO_NOT_EXECUTED",
+            "runtime-doctor invocation lacks --execute-probes",
+            "Run allowlisted read-only probes on the target runtime and preserve the JSON receipt.",
+        )
+
+    for item in skill_routes:
+        repo_state = str(item.get("repo_state", ""))
+        if repo_state.startswith("TOKEN_VAZIO"):
+            add(
+                f"GAP-RD-REPO-{item.get('skill_id', 'UNKNOWN')}",
+                "P1",
+                repo_state,
+                f"skill registry route for {item.get('skill_id')}",
+                "Resolve the exact repository/provider identity before promoting this route.",
+            )
+
+    for probe in probes:
+        probe_state = str(probe.get("state", ""))
+        if probe_state.startswith(("FAIL", "BLOCKED", "INCOMPLETE", "TOKEN_VAZIO")):
+            urgency = "P0" if probe_state.startswith(("FAIL", "BLOCKED")) else "P1"
+            add(
+                f"GAP-RD-PROBE-{probe.get('skill_id', 'UNKNOWN')}",
+                urgency,
+                probe_state,
+                f"probe:{probe.get('skill_id', 'unknown')}",
+                "Preserve stdout/stderr and resolve the probe-specific blocker without converting absence into PASS.",
+            )
+
+    if not args.build_doctor_report:
+        add(
+            "GAP-RD-BUILD-DOCTOR-EVIDENCE",
+            "P1",
+            "TOKEN_VAZIO_BUILD_DOCTOR_REPORT_NOT_INGESTED",
+            "no --build-doctor-report input",
+            "Run Ecosystem Build Doctor separately, preserve its JSON report, then ingest it by exact file hash.",
+        )
+    else:
+        for record in build_doctor_evidence:
+            state = str(record.get("state", ""))
+            if state.startswith("BLOCKED"):
+                add(
+                    "GAP-RD-BUILD-DOCTOR-INPUT",
+                    "P0",
+                    state,
+                    str(record.get("source_name", "build-doctor-report")),
+                    "Repair the evidence input/schema and re-ingest; do not infer static health from an unreadable report.",
+                )
+            summary = record.get("summary")
+            if isinstance(summary, dict) and summary.get("state") == "REVIEW_REQUIRED":
+                add(
+                    "GAP-RD-BUILD-DOCTOR-FINDINGS",
+                    "P1",
+                    "OPEN_STATIC_FINDINGS",
+                    f"{record.get('source_name')}@{record.get('source_sha256')}",
+                    "Route high/critical static findings to source-specific fixes and independent build/runtime gates.",
+                )
+
+    if "llama_backend_doctor" in selected_ids:
+        add(
+            "GAP-RD-LLAMA-BENCHMARK",
+            "P1",
+            "TOKEN_VAZIO_BENCHMARK_REQUIRED",
+            "llama_backend_doctor claim boundary",
+            "Run matched CPU/Vulkan benchmarks with model/config/artifact hashes.",
+        )
+
+    if "qemu_runtime" in selected_ids or "vectras_vm_runtime" in selected_ids:
+        add(
+            "GAP-RD-VM-GUEST-BOOT",
+            "P1",
+            "TOKEN_VAZIO_DEDICATED_RECEIPT_REQUIRED",
+            "VM/QEMU runtime claim boundary",
+            "Produce a dedicated guest-boot receipt with command, image hash, exit state and boot marker.",
+        )
+
+    if "frida_runtime_observer" in selected_ids:
+        add(
+            "GAP-RD-FRIDA-PHYSICAL",
+            "P0",
+            "TOKEN_VAZIO_PHYSICAL_DEVICE_RECEIPT_REQUIRED",
+            "L2.5 dynamic observability boundary",
+            "Execute the read-only readiness probe on the user-controlled physical device before any dynamic capability promotion.",
+        )
+
+    return gaps
 
 
 def append_outcomes(path: Path, outcomes: list[str], trace: Trace) -> None:
@@ -413,7 +674,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- state: `{report['summary']['state']}`",
         f"- selected skills: `{report['summary']['selected_skills']}`",
         f"- probes executed: `{report['summary']['probes_executed']}`",
+        f"- probe cache hits: `{report['summary']['probe_cache_hits']}`",
         f"- runtime routes: `{report['summary']['runtime_routes']}`",
+        f"- open gaps: `{report['summary']['open_gaps']}`",
         "",
         "## Skill map",
         "",
@@ -422,12 +685,35 @@ def markdown_report(report: dict[str, Any]) -> str:
         lines.append(
             f"- **{item['level']} / {item['skill_id']}** — {item['repo_state']} — {item['role']}"
         )
+
+    lines += ["", "## Route graph used", ""]
+    if not report["route_graph_used"]:
+        lines.append("- `TOKEN_VAZIO_NO_ROUTE_EDGE_SELECTED`")
+    for src, dst in report["route_graph_used"]:
+        lines.append(f"- `{src}` → `{dst}`")
+
     lines += ["", "## Runtime prescriptions", ""]
     if not report["runtime_routes"]:
         lines.append("- `TOKEN_VAZIO_RUNTIME_NOT_EXECUTED`: run with `--execute-probes` on the target host/device.")
     for route in report["runtime_routes"]:
         lines.append(f"- **{route['code']}** `{route['state']}` — {route['reason']} Next: {route['next_action']}")
-    lines += ["", "## Claim boundary", "", "```json", json.dumps(report["claim_boundary"], indent=2, ensure_ascii=False), "```", ""]
+
+    lines += ["", "## Gap ledger", ""]
+    for gap in report["gap_ledger"]:
+        lines.append(
+            f"- **{gap['id']}** `{gap['urgency']}` / `{gap['state']}` — provenance: {gap['provenance']}. "
+            f"Next: {gap['F_next']}"
+        )
+
+    lines += [
+        "",
+        "## Claim boundary",
+        "",
+        "```json",
+        json.dumps(report["claim_boundary"], indent=2, ensure_ascii=False),
+        "```",
+        "",
+    ]
     return "\n".join(lines)
 
 
@@ -447,28 +733,43 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
 
     probes: list[dict[str, Any]] = []
     if args.execute_probes:
-        for skill in selected:
-            repo_root = repos.get(skill.repo)
-            if repo_root is None:
-                probes.append(
-                    {
-                        "skill_id": skill.id,
-                        "state": "TOKEN_VAZIO_REPOSITORY_NOT_AVAILABLE",
-                        "repo": skill.repo,
-                    }
-                )
-                continue
-            probes.append(run_probe(skill, repo_root, args.timeout, trace))
+        probes = execute_selected_probes(selected, repos, args.timeout, trace)
     else:
         trace.add("probe", "runtime probes not executed; explicit --execute-probes required")
 
     runtime_routes = route_from_runtime(probes, trace)
+    route_graph_used = reachable_route_graph(registry, selected_ids)
+    build_doctor_evidence = load_build_doctor_reports(args.build_doctor_report, trace)
+    gap_ledger = build_gap_ledger(args, skill_routes, probes, build_doctor_evidence)
+
     append_outcomes(Path(args.append_outcome).expanduser().resolve(), args.outcome, trace) if args.append_outcome else None
 
-    failed_probes = sum(1 for probe in probes if str(probe.get("state", "")).startswith("FAIL"))
-    unresolved_repos = sum(1 for route in skill_routes if str(route["repo_state"]).startswith("TOKEN_VAZIO"))
-    state = "REVIEW_REQUIRED" if failed_probes else "PASS_LIMITED"
-    if args.execute_probes and probes and not failed_probes and runtime_routes:
+    failed_probes = sum(
+        1
+        for probe in probes
+        if str(probe.get("state", "")).startswith(("FAIL", "BLOCKED"))
+    )
+    incomplete_probes = sum(
+        1
+        for probe in probes
+        if str(probe.get("state", "")).startswith(("INCOMPLETE", "TOKEN_VAZIO"))
+    )
+    unresolved_repos = sum(
+        1 for route in skill_routes if str(route["repo_state"]).startswith("TOKEN_VAZIO")
+    )
+    evidence_blocks = sum(
+        1 for record in build_doctor_evidence if str(record.get("state", "")).startswith("BLOCKED")
+    )
+    static_review_required = any(
+        isinstance(record.get("summary"), dict)
+        and record["summary"].get("state") == "REVIEW_REQUIRED"
+        for record in build_doctor_evidence
+    )
+
+    state = "PASS_LIMITED"
+    if failed_probes or evidence_blocks or static_review_required:
+        state = "REVIEW_REQUIRED"
+    elif args.execute_probes and probes and not incomplete_probes and runtime_routes:
         state = "RUNTIME_OBSERVED_LIMITED"
 
     report = {
@@ -479,31 +780,63 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "summary": {
             "state": state,
             "selected_skills": len(skill_routes),
-            "probes_executed": sum(1 for p in probes if "exit_code" in p),
+            "probe_results": len(probes),
+            "probes_executed": sum(
+                1
+                for p in probes
+                if "exit_code" in p
+                and not (isinstance(p.get("probe_cache"), dict) and p["probe_cache"].get("reused") is True)
+            ),
+            "probe_cache_hits": sum(
+                1
+                for p in probes
+                if isinstance(p.get("probe_cache"), dict) and p["probe_cache"].get("reused") is True
+            ),
             "failed_probes": failed_probes,
+            "incomplete_probes": incomplete_probes,
             "runtime_routes": len(runtime_routes),
             "unresolved_repositories": unresolved_repos,
+            "build_doctor_reports": len(build_doctor_evidence),
+            "open_gaps": len(gap_ledger),
         },
         "repos": {name: str(path) for name, path in sorted(repos.items())},
         "symptoms": list(args.symptom),
         "skill_routes": skill_routes,
+        "route_graph_used": route_graph_used,
         "probes": probes,
         "runtime_routes": runtime_routes,
+        "evidence_inputs": {
+            "build_doctor": build_doctor_evidence,
+        },
+        "gap_ledger": gap_ledger,
         "trace": trace.events,
         "claim_boundary": {
             "static_mapping": "VERIFIED_BY_CONFIGURATION",
-            "runtime_execution": "VERIFIED_BY_EXECUTION" if any("exit_code" in p for p in probes) else "TOKEN_VAZIO_NOT_EXECUTED",
+            "runtime_execution": "VERIFIED_BY_EXECUTION"
+            if any("exit_code" in p for p in probes)
+            else "TOKEN_VAZIO_NOT_EXECUTED",
+            "build_doctor_evidence": "HASH_BOUND_INPUT_REPORT_ONLY"
+            if build_doctor_evidence
+            else "TOKEN_VAZIO_NOT_INGESTED",
             "gpu_library_presence": "CAPABILITY_CANDIDATE_ONLY",
             "llm_performance": "TOKEN_VAZIO_BENCHMARK_REQUIRED",
             "vm_guest_boot": "TOKEN_VAZIO_DEDICATED_RECEIPT_REQUIRED",
-            "automatic_repair": false,
-            "automatic_install": false,
-            "automatic_delete": false,
-            "claim_allowed": false,
+            "automatic_repair": False,
+            "automatic_install": False,
+            "automatic_delete": False,
+            "claim_allowed": False,
         },
-        "F_ok": "skills and routes are explicit; read-only probes can emit evidence",
-        "F_gap": "device execution, benchmarks, VM guest boot and unresolved repositories remain evidence-gated",
-        "F_next": "run on the real workspace/device with --execute-probes and preserve the generated receipt",
+        "F_ok": (
+            "skills, reachable route graph, read-only probes, probe deduplication and hash-bound static evidence "
+            "ingestion are explicit"
+        ),
+        "F_gap": (
+            "gap_ledger is authoritative for unresolved runtime, repository, benchmark, VM and physical-device evidence"
+        ),
+        "F_next": (
+            "resolve P0 gaps first; then execute physical read-only receipts and ingest exact Build Doctor evidence "
+            "without promoting configuration into runtime proof"
+        ),
     }
     return report
 
@@ -516,6 +849,12 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--repo", action="append", default=[], help="explicit repository mapping name=path")
     p.add_argument("--symptom", action="append", default=[], help="symptom/intent term used to select skills")
     p.add_argument("--history", help="JSON/JSONL file or directory of prior skill outcomes")
+    p.add_argument(
+        "--build-doctor-report",
+        action="append",
+        default=[],
+        help="exact Ecosystem Build Doctor JSON report to ingest by SHA-256; may be repeated",
+    )
     p.add_argument("--execute-probes", action="store_true", help="execute only allowlisted read-only probes")
     p.add_argument("--timeout", type=int, default=30)
     p.add_argument("--verbose", action="store_true")

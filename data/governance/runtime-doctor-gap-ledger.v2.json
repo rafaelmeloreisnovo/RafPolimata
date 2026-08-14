@@ -1,0 +1,166 @@
+{
+  "schema": "raf.runtime-doctor-gap-ledger.v2",
+  "date": "2026-08-14",
+  "mode": "APPEND_ONLY_CURRENT_FRONTIER",
+  "claim_allowed": false,
+  "taxonomy": {
+    "URGENT": "Blocks a direct next execution/evidence gate.",
+    "NECESSARY": "Required for structural correctness or reproducibility.",
+    "IMPORTANT": "Materially improves coherence, provenance or coverage.",
+    "PREVIOUSLY_UNCOVERED": "A relevant path existed but prior tests did not exercise it.",
+    "ABORTED_EXTERNAL_BLOCK": "An execution was attempted and stopped by an external/infrastructure blocker.",
+    "SUGGESTED": "Useful next mechanism not yet required by the current proof path.",
+    "CENSORED": "Never infer this classification without direct evidence; default TOKEN_VAZIO_NO_EVIDENCE."
+  },
+  "closure_contract": {
+    "minimum": ["state", "provenance", "method", "execution_or_provider_evidence", "F_next_or_closed_reason"],
+    "rule": "No gap becomes CLOSED solely from configuration, merge, memory or narrative.",
+    "reopen": "A falsifier, contradictory provider state or regression may reopen a closed gap append-only."
+  },
+  "items": [
+    {
+      "id": "RD-GAP-001",
+      "title": "Runtime Doctor Python boolean NameError",
+      "state": "CLOSED_REFERENCE",
+      "priority": "P0",
+      "classes": ["URGENT", "NECESSARY", "PREVIOUSLY_UNCOVERED"],
+      "provenance": "main scripts/runtime_doctor_agent.py used lowercase false inside Python build_report claim_boundary; provider CI had not executed steps.",
+      "resolution": "Changed to Python False and added build_report execution regression.",
+      "evidence": "data/evidence/runtime-doctor/runtime-doctor-coherence-v2-reference-receipt-20260814.json",
+      "F_next": "Require full repository/provider pytest before promoting from CLOSED_REFERENCE to CLOSED_REPOSITORY_TESTED."
+    },
+    {
+      "id": "RD-GAP-002",
+      "title": "Duplicate identical host/GPU probe execution",
+      "state": "CLOSED_REFERENCE",
+      "priority": "P1",
+      "classes": ["NECESSARY", "IMPORTANT"],
+      "provenance": "termux_host_diagnostic and termux_gpu_orchestrator share the same repository and diagnose.sh --json command.",
+      "resolution": "Cache keyed by repository root plus exact command; one execution fans out to multiple skills with source_skill_id provenance.",
+      "evidence": "reference harness: probes_executed=1, probe_cache_hits=1",
+      "F_next": "Verify the same behavior under repository pytest and physical workspace execution."
+    },
+    {
+      "id": "RD-GAP-003",
+      "title": "Route graph not exposed as used/reachable path",
+      "state": "CLOSED_REFERENCE",
+      "priority": "P1",
+      "classes": ["IMPORTANT", "NECESSARY"],
+      "provenance": "Registry had route_graph but runtime report did not expose the reachable path selected from active skills.",
+      "resolution": "Added route_graph_used via downstream reachability from selected skill seeds.",
+      "evidence": "reference harness route host->gpu and host->frida PASS",
+      "F_next": "Validate graph output against the canonical registry in repository tests."
+    },
+    {
+      "id": "RD-GAP-004",
+      "title": "Build Doctor evidence not ingested by Runtime Doctor",
+      "state": "CLOSED_REFERENCE",
+      "priority": "P1",
+      "classes": ["IMPORTANT", "NECESSARY"],
+      "provenance": "Ecosystem Build Doctor produced a separate JSON evidence surface with no formal Runtime Doctor ingestion path.",
+      "resolution": "Added --build-doctor-report with schema gate, SHA-256 binding and summary/claim-boundary ingestion.",
+      "evidence": "reference harness INGESTED_HASH_BOUND_REPORT PASS",
+      "F_next": "Run Build Doctor on real repository set and ingest exact generated report."
+    },
+    {
+      "id": "RD-GAP-005",
+      "title": "Full repository pytest for coherence V2",
+      "state": "OPEN",
+      "priority": "P0",
+      "classes": ["URGENT", "NECESSARY", "ABORTED_EXTERNAL_BLOCK"],
+      "provenance": "Fresh clone attempt from reference runtime failed DNS: Could not resolve host github.com.",
+      "evidence": "TOKEN_VAZIO_FULL_REPOSITORY_PYTEST_PROVIDER_OR_CLEAN_CHECKOUT",
+      "F_next": "Execute tests/test_runtime_doctor_agent.py from exact branch bytes in a Git-capable runtime/provider and bind command/exit/stdout/stderr/commit."
+    },
+    {
+      "id": "RD-GAP-006",
+      "title": "Physical Termux Runtime Doctor receipt",
+      "state": "OPEN",
+      "priority": "P0",
+      "classes": ["URGENT", "NECESSARY"],
+      "provenance": "No physical Android/Termux execution is present in this cycle.",
+      "evidence": "TOKEN_VAZIO_PHYSICAL_TERMUX_RUNTIME",
+      "F_next": "Run Runtime Doctor read-only on physical Termux, preserving JSON/Markdown receipt and exact commit."
+    },
+    {
+      "id": "RD-GAP-007",
+      "title": "Physical Frida readiness receipt",
+      "state": "OPEN",
+      "priority": "P0",
+      "classes": ["URGENT", "NECESSARY"],
+      "provenance": "Frida L2.5 is implemented, but no physical target-device readiness receipt exists.",
+      "evidence": "TOKEN_VAZIO_FRIDA_PHYSICAL_DEVICE_RECEIPT",
+      "F_next": "Execute scripts/frida_runtime_probe.py --json on the user-controlled physical device; no attach or patch promotion before this receipt."
+    },
+    {
+      "id": "RD-GAP-008",
+      "title": "LLaMA CPU versus Vulkan benchmark",
+      "state": "OPEN",
+      "priority": "P1",
+      "classes": ["IMPORTANT", "SUGGESTED"],
+      "provenance": "Backend/source candidates exist; comparable physical benchmark receipt is absent.",
+      "evidence": "TOKEN_VAZIO_LLAMA_CPU_VULKAN_BENCHMARK",
+      "F_next": "Run matched model/config CPU and Vulkan benchmarks only after host Vulkan runtime is evidenced."
+    },
+    {
+      "id": "RD-GAP-009",
+      "title": "QEMU guest boot receipt",
+      "state": "OPEN",
+      "priority": "P1",
+      "classes": ["IMPORTANT", "NECESSARY"],
+      "provenance": "QEMU route is configured without current guest-boot execution evidence.",
+      "evidence": "TOKEN_VAZIO_QEMU_GUEST_BOOT_RECEIPT",
+      "F_next": "Record exact command, QEMU version, image SHA-256, exit state and deterministic boot marker."
+    },
+    {
+      "id": "RD-GAP-010",
+      "title": "rafaeliaprivate exact repository identity",
+      "state": "OPEN",
+      "priority": "P2",
+      "classes": ["IMPORTANT"],
+      "provenance": "User-named repository route exists but exact accessible repository identity was not resolved.",
+      "evidence": "TOKEN_VAZIO_REPOSITORY_NOT_FOUND",
+      "F_next": "Resolve exact provider/repository identity before adding evidence or runtime authority."
+    },
+    {
+      "id": "RD-GAP-011",
+      "title": "Provider merge/test governance separation",
+      "state": "OPEN",
+      "priority": "P1",
+      "classes": ["IMPORTANT", "NECESSARY"],
+      "provenance": "PR #227 reached main while prior provider jobs had runner_id=0 and steps=[].",
+      "evidence": "MERGED_TO_MAIN != TESTS_EXECUTED",
+      "F_next": "Audit branch/ruleset/required-check behavior separately; do not attribute cause until provider policy evidence is fetched."
+    },
+    {
+      "id": "RD-GAP-012",
+      "title": "Drive post-merge append",
+      "state": "OPEN_EXTERNAL_BLOCK",
+      "priority": "P2",
+      "classes": ["ABORTED_EXTERNAL_BLOCK", "IMPORTANT"],
+      "provenance": "Post-merge Drive append attempts were blocked by connector control; earlier records remain preserved.",
+      "evidence": "TOKEN_VAZIO_DRIVE_POSTMERGE_APPEND_BLOCKED_BY_CONNECTOR_CONTROL",
+      "F_next": "Append a compact post-merge pointer when a permitted Drive write surface is available; never rewrite prior events."
+    },
+    {
+      "id": "RD-GAP-013",
+      "title": "Censored/suppressed-state classification",
+      "state": "TOKEN_VAZIO_NO_EVIDENCE",
+      "priority": "P2",
+      "classes": ["CENSORED"],
+      "provenance": "No evidence in this cycle supports labeling a technical item as censored or intentionally suppressed.",
+      "evidence": "TOKEN_VAZIO_NO_EVIDENCE",
+      "F_next": "Only assign this class if direct provenance establishes intentional suppression; otherwise preserve TOKEN_VAZIO."
+    }
+  ],
+  "frontier": {
+    "closed_reference": 4,
+    "open_or_external_block": 9,
+    "P0_open": 3,
+    "P1_open": 4,
+    "P2_open_or_unknown": 2
+  },
+  "F_ok": "Four structural microgaps have reference evidence without erasing open physical/provider gaps.",
+  "F_gap": "Full repository tests, physical Termux/Frida, LLaMA benchmark, QEMU boot, governance and unresolved provider identities remain open at their explicit priorities.",
+  "F_next": "Close P0 in order: full repository pytest -> physical Termux Runtime Doctor receipt -> physical Frida readiness receipt; then process P1 evidence routes."
+}

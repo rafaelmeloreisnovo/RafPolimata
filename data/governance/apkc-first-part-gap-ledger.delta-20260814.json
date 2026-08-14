@@ -1,0 +1,196 @@
+{
+  "schema": "raf.apkc-first-part-gap-ledger.delta.v1",
+  "date": "2026-08-14",
+  "mode": "APPEND_ONLY_ORTHOGONAL_FRONTIER",
+  "claim_allowed": false,
+  "source_provider_run": {
+    "workflow": "ApkC First Part Closure",
+    "run_id": 31809129945,
+    "tested_head": "20778e4fd3acbfe72ae5e7078ae65345d617a30a",
+    "artifact_id": 9222437829,
+    "artifact_sha256": "2f47ba26e7ee667dbd3773aa7b34632cbd27c177fd17c54641ae3742f0df89d3",
+    "historical_observation_requires_current_head_revalidation": true
+  },
+  "classification_rule": "Detector defects, stale contracts, fixture incompatibility and source-runtime blockers are separate gap families and never inherit one another's state.",
+  "contract_gaps": [
+    {
+      "id": "APKC-FP-GAP-CONTRACT-001",
+      "title": "source proof v3 supersession marker",
+      "historical_state": "FAIL_DETECTOR_CONTRACT",
+      "current_material_state": "FIX_MATERIALIZED_PENDING_CURRENT_PROVIDER_REVALIDATION",
+      "priority": "P1",
+      "provenance": "First Part test required canonical proof schema v3 plus explicit supersedes source-to-binary-proof.v2 marker; proof script emitted v3 but lacked the explicit lineage marker.",
+      "fix_commit": "6709e84ec37c92fc50cdfd54035af7e64596419a",
+      "F_next": "Require current First Part unit test and gate to PASS; do not infer from comment presence alone."
+    },
+    {
+      "id": "APKC-FP-GAP-CONTRACT-002",
+      "title": "HTTPS adapter insecure-option detector contradiction",
+      "historical_state": "FAIL_DETECTOR_LOGIC",
+      "current_material_state": "FIX_MATERIALIZED_PENDING_CURRENT_PROVIDER_REVALIDATION",
+      "priority": "P1",
+      "provenance": "Auditor required '--insecure' absent globally while simultaneously requiring the policy comment 'No -k/--insecure', making the condition self-contradictory.",
+      "fix_commits": [
+        "263b09d87587459c5f72d5a3d23f0e02cf4135f6",
+        "9877fc5b8d5daa79701ebab7e41402700d22cfb1"
+      ],
+      "resolution_contract": "Only executable option-shaped shell lines count as active -k/--insecure; comments do not. A negative test injects a real --insecure line and must be rejected.",
+      "F_next": "Require current browser/TLS tests and First Part unit suite to PASS; runtime TLS remains TOKEN_VAZIO."
+    },
+    {
+      "id": "APKC-FP-GAP-CONTRACT-003",
+      "title": "structural closure expected obsolete source proof v2",
+      "historical_state": "FAIL_STALE_SCHEMA_CONTRACT",
+      "current_material_state": "FIX_MATERIALIZED_PENDING_CURRENT_PROVIDER_REVALIDATION",
+      "priority": "P1",
+      "provenance": "Structural closure rejected the current source proof schema raf.apkc.source-to-binary-proof.v3 because its constant and fixtures still expected v2.",
+      "fix_commits": [
+        "122b562be375e76bbd22ce9992c41300ab142ce0",
+        "a63f109dc93dcdcb53dd1ae218cdac536ad76679"
+      ],
+      "resolution_contract": "Current structural closure requires v3 and a dedicated negative test rejects historical v2 fail-closed.",
+      "F_next": "Require current structural closure unit suite to PASS and preserve v2 only as historical evidence, not current input."
+    }
+  ],
+  "real_fixture_gap": {
+    "id": "APKC-FP-GAP-DUAL-ABI-001",
+    "title": "single ASM fixture is ARM64-specific but verified build requests -both",
+    "state": "OPEN_REAL_INCOMPATIBILITY",
+    "priority": "P0",
+    "provenance": "Apkc/hello.s.txt declares Architecture: arm64 and contains AArch64 registers/instructions; verified build requests -lang asm -both. ARM32 assembler emitted UNDEF placeholders and strict mode refused APK generation.",
+    "forbidden_shortcut": "Do not use --allow-undef to force green evidence.",
+    "F_next": "Define a dual-ABI fixture contract using either paired ARM64/ARM32 sources or a proven common mnemonic subset; bind both source hashes and require strict zero-UNDEF generation before structural closure."
+  },
+  "raw_source_runtime_preflight": {
+    "state": "BLOCKED_HISTORICAL_PROVIDER_OBSERVATION",
+    "tested_head": "20778e4fd3acbfe72ae5e7078ae65345d617a30a",
+    "summary": {
+      "source_blocker_count": 10,
+      "critical": 3,
+      "high": 6,
+      "medium": 1
+    },
+    "generated_runtime_hardening_reference": {
+      "schema": "raf.apkc.runtime-source-hardening.v1",
+      "changes": 13,
+      "generated_sha256": "13844d70544e1734910ebf387d9a604ae186483ffbe8498eceeeef5f6d142654",
+      "aarch64_build_identity_reproducibility": "PASS",
+      "arm32_build_identity_reproducibility": "PASS",
+      "runtime_execution": "TOKEN_VAZIO",
+      "interpretation": "These transformations are candidate/reference mitigations for several raw-source blockers; they do not close raw-source or runtime gaps until integrated/revalidated on the current path."
+    },
+    "items": [
+      {
+        "id": "APKC-RUN-001",
+        "severity": "HIGH",
+        "state": "OPEN_REVALIDATION_REQUIRED",
+        "issue": "hard-coded /tmp conflicts with Termux environment",
+        "candidate_mitigation_relations": ["APKC-RH-004", "APKC-RH-005", "APKC-RH-006", "APKC-RH-010", "APKC-RH-011"],
+        "F_next": "Re-run preflight against the current canonical execution source and prove TMPDIR/Termux-compatible paths."
+      },
+      {
+        "id": "APKC-RUN-002",
+        "severity": "HIGH",
+        "state": "OPEN_ARCHITECTURE_CONTRACT",
+        "issue": "external compiler fork/exec explicitly unavailable in ARM32 binary",
+        "candidate_mitigation_relations": [],
+        "F_next": "Define supported ARM32 language/profile boundary explicitly; unsupported external-compiler profiles must fail closed rather than appear matrix-ready."
+      },
+      {
+        "id": "APKC-RUN-003",
+        "severity": "CRITICAL",
+        "state": "OPEN_REVALIDATION_REQUIRED",
+        "issue": "bounded external-artifact read can hit limit without proving EOF, allowing silent truncation",
+        "candidate_mitigation_relations": ["APKC-RH-002", "APKC-RH-013"],
+        "F_next": "Adversarially test exact-cap, cap+1 and short-read cases on current execution source; require explicit overflow/truncation rejection."
+      },
+      {
+        "id": "APKC-RUN-004",
+        "severity": "CRITICAL",
+        "state": "OPEN_REVALIDATION_REQUIRED",
+        "issue": "external native .so may be truncated before packaging",
+        "candidate_mitigation_relations": ["APKC-RH-009", "APKC-RH-012"],
+        "F_next": "Package an external ELF larger than the former buffer and prove byte-identical payload or fail-closed rejection."
+      },
+      {
+        "id": "APKC-RUN-005",
+        "severity": "CRITICAL",
+        "state": "OPEN_REVALIDATION_REQUIRED",
+        "issue": "direct DEX path may truncate content to internal 200-byte buffer",
+        "candidate_mitigation_relations": ["APKC-RH-007", "APKC-RH-008"],
+        "F_next": "Adversarial DEX >200-byte fixture: require valid full payload path or explicit rejection; verify magic, SHA-1 and Adler-32 after packaging."
+      },
+      {
+        "id": "APKC-RUN-006",
+        "severity": "HIGH",
+        "state": "OPEN_REVALIDATION_REQUIRED",
+        "issue": "external artifact magic/structure/ABI not validated before ZIP",
+        "candidate_mitigation_relations": ["APKC-RH-007", "APKC-RH-009"],
+        "F_next": "Feed wrong-magic, wrong-ABI and malformed ELF/DEX fixtures; require rejection before ZIP emission."
+      },
+      {
+        "id": "APKC-RUN-007",
+        "severity": "HIGH",
+        "state": "OPEN_REVALIDATION_REQUIRED",
+        "issue": "stale compiler output may be accepted if prior temp file is not removed",
+        "candidate_mitigation_relations": ["APKC-RH-002"],
+        "F_next": "Pre-seed stale output, force compiler failure, and require no stale artifact promotion."
+      },
+      {
+        "id": "APKC-RUN-008",
+        "severity": "MEDIUM",
+        "state": "OPEN_REVALIDATION_REQUIRED",
+        "issue": "waitpid result not explicitly checked",
+        "candidate_mitigation_relations": ["APKC-RH-002"],
+        "F_next": "Inject child failure/signal and verify wait/exit semantics reject output deterministically."
+      },
+      {
+        "id": "APKC-RUN-009",
+        "severity": "HIGH",
+        "state": "OPEN",
+        "issue": "C/C++ Android target profile lacks explicit API level and NDK sysroot contract",
+        "candidate_mitigation_relations": [],
+        "F_next": "Bind API level, target triple and sysroot/NDK identity to profile and receipt before Android native-build claim."
+      },
+      {
+        "id": "APKC-RUN-010",
+        "severity": "HIGH",
+        "state": "OPEN",
+        "issue": "Go Android profile lacks GOOS/GOARCH/CGO_ENABLED/CC environment contract",
+        "candidate_mitigation_relations": [],
+        "F_next": "Define deterministic Android Go environment or mark Go/Android profile unsupported fail-closed."
+      }
+    ]
+  },
+  "priority_frontier": {
+    "P0": [
+      "APKC-FP-GAP-DUAL-ABI-001",
+      "APKC-RUN-003",
+      "APKC-RUN-004",
+      "APKC-RUN-005"
+    ],
+    "P1": [
+      "APKC-FP-GAP-CONTRACT-001",
+      "APKC-FP-GAP-CONTRACT-002",
+      "APKC-FP-GAP-CONTRACT-003",
+      "APKC-RUN-001",
+      "APKC-RUN-002",
+      "APKC-RUN-006",
+      "APKC-RUN-007",
+      "APKC-RUN-009",
+      "APKC-RUN-010"
+    ],
+    "P2": ["APKC-RUN-008"]
+  },
+  "invariants": [
+    "FIX_MATERIALIZED != PROVIDER_REVALIDATED",
+    "GENERATED_HARDENING_REFERENCE != CANONICAL_RUNTIME_INTEGRATION",
+    "COMPILE_REPRODUCIBILITY != RUNTIME_EXECUTION",
+    "DUAL_ABI_CLAIM_REQUIRES_ABI-CORRECT_INPUTS",
+    "UNDEF_PLACEHOLDERS_FORBID_STRICT_STRUCTURAL_PROMOTION",
+    "TOKEN_VAZIO is preserved when current-head evidence is absent"
+  ],
+  "F_ok": "Historical First Part failure is decomposed into detector defects, stale schema, a real dual-ABI fixture incompatibility and ten source-runtime blockers with candidate mitigation relations.",
+  "F_gap": "Current-head provider revalidation is pending; critical runtime truncation/overflow paths and dual-ABI fixture remain open; physical runtime remains TOKEN_VAZIO.",
+  "F_next": "Observe current First Part rerun, close only detector/schema gaps that execute PASS, then attack P0 real gaps: dual-ABI strict fixture plus RUN-003/004/005 adversarial truncation tests."
+}
