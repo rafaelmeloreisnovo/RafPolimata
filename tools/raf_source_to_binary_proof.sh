@@ -42,8 +42,9 @@ RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
 RUN_DIR="$RUNS/$RUN_ID/source-to-binary"
 mkdir -p "$OUT" "$RUN_DIR" "$ARCHIVE"
 
-COMMIT="$(git rev-parse HEAD 2>/dev/null)" || COMMIT="TOKEN_VAZIO"
-SHORT="$(git rev-parse --short HEAD 2>/dev/null)" || SHORT="TOKEN_VAZIO"
+CHECKOUT_COMMIT="$(git rev-parse HEAD 2>/dev/null)" || CHECKOUT_COMMIT="TOKEN_VAZIO"
+COMMIT="${SOURCE_COMMIT:-$CHECKOUT_COMMIT}"
+SHORT="${COMMIT:0:12}"
 DATE_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 HOST_ARCH="$(uname -m)"
 CLANGV="$(clang --version 2>/dev/null | head -1)" || CLANGV="clang: TOKEN_VAZIO"
@@ -124,7 +125,7 @@ print_cmd() { printf '  '; printf '%q ' "$@"; printf '\n'; }
 
 if "${A64_CMD[@]}" 2>"$A64_ERR"; then
     A64_BUILD="PASS"
-    "$ELF_READER" -h "$A64_1" > "$A64_HDR"
+    "$E6LF_READER" -h "$A64_1" > "$A64_HDR"
     "$ELF_READER" -l "$A64_1" > "$RUN_DIR/readelf-aarch64-program.txt"
     if grep -Eq 'Class:[[:space:]]+ELF64' "$A64_HDR" && grep -Eq 'Machine:[[:space:]]+AArch64' "$A64_HDR"; then A64_IDENTITY="PASS"; else A64_IDENTITY="FAIL"; fi
     if ! grep -Eq 'INTERP|Requesting program interpreter' "$RUN_DIR/readelf-aarch64-program.txt"; then A64_STATIC="PASS"; else A64_STATIC="FAIL"; fi
@@ -164,6 +165,7 @@ cat > "$STATUS_JSON" <<JSON
   "run_id": "$RUN_ID",
   "date_utc": "$DATE_UTC",
   "commit": "$COMMIT",
+  "checkout_commit": "$CHECKOUT_COMMIT",
   "host_arch": "$HOST_ARCH",
   "elf_reader": "$ELF_READER",
   "raw_source_sha256": "$RAW_SHA",
