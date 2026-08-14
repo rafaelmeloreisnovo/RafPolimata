@@ -12,7 +12,7 @@ import sys
 from typing import Any
 
 SCHEMA = "raf.apkc-structural-closure.v1"
-SOURCE_PROOF_SCHEMA = "raf.apkc.source-to-binary-proof.v2"
+SOURCE_PROOF_SCHEMA = "raf.apkc.source-to-binary-proof.v3"
 FIRST_PART_SCHEMA = "raf.apkc-first-part-gate.v1"
 PREFLIGHT_SCHEMA = "raf.apkc-runtime-preflight.v1"
 FORMAT_MODULE_PATH = Path(__file__).with_name("validate_apkc_formats.py")
@@ -215,6 +215,7 @@ def main() -> int:
         "source_commit": args.source_commit,
         "source_to_binary": {
             "state": source_state,
+            "expected_schema": SOURCE_PROOF_SCHEMA,
             "document": source_proof if source_proof is not None else "TOKEN_VAZIO",
         },
         "first_part_gate": {
@@ -255,6 +256,7 @@ def main() -> int:
             "performance_claim": "FORBIDDEN_OUT_OF_SCOPE",
         },
         "falsifiers": [
+            "source_proof_schema_not_current_v3",
             "source_proof_commit_mismatch",
             "source_build_or_reproducibility_not_pass",
             "first_part_gate_not_pass_or_contains_contradiction",
