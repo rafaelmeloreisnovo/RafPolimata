@@ -38,6 +38,10 @@ def command_info(name: str) -> dict[str, Any]:
     return {"name": name, "available": path is not None, "path": path}
 
 
+def sha256_text(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8", errors="replace")).hexdigest()
+
+
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as fh:
@@ -74,6 +78,37 @@ def parse_device_lines(text: str) -> list[dict[str, str]]:
     return devices
 
 
+def pseudonymize_devices(devices: list[dict[str, str]]) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for item in devices:
+        raw_id = item.get("id", "")
+        raw_name = item.get("name", "")
+        out.append(
+            {
+                "id_sha256_16": sha256_text(raw_id)[:16] if raw_id else None,
+                "type": item.get("type", "unknown"),
+                "name_present": bool(raw_name),
+                "name_sha256_16": sha256_text(raw_name)[:16] if raw_name else None,
+            }
+        )
+    return out
+
+
+def redact_probe_output(result: dict[str, Any], label: str) -> dict[str, Any]:
+    redacted = dict(result)
+    if "stdout" in redacted:
+        raw = str(redacted.get("stdout", ""))
+        redacted["stdout_sha256"] = sha256_text(raw)
+        redacted["stdout_bytes"] = len(raw.encode("utf-8", errors="replace"))
+        redacted["stdout"] = f"<redacted:{label}>"
+    if "stderr" in redacted and redacted.get("stderr"):
+        raw_err = str(redacted.get("stderr", ""))
+        redacted["stderr_sha256"] = sha256_text(raw_err)
+        redacted["stderr_bytes"] = len(raw_err.encode("utf-8", errors="replace"))
+        redacted["stderr"] = f"<redacted:{label}:stderr>"
+    return redacted
+
+
 def build_report(gadget_path: str | None) -> dict[str, Any]:
     commands = {name: command_info(name) for name in ("frida", "frida-ps", "frida-ls-devices", "adb")}
 
@@ -81,35 +116,43 @@ def build_report(gadget_path: str | None) -> dict[str, Any]:
     root_observed = uid == 0 if uid is not None else None
     android_root = os.environ.get("ANDROID_ROOT")
     prefix = os.environ.get("PREFIX")
-    android_observed = bool(android_root or getprop("ro.build.version.release"))
+    android_release = getprop("ro.build.version.release")
+    android_observed = bool(android_root or android_release)
 
     probes: list[dict[str, Any]] = []
     version: str | None = None
     if commands["frida"]["available"]:
         result = run_readonly([commands["frida"]["path"], "--version"])
-        probes.append(result)
         if result.get("exit_code") == 0:
             version = str(result.get("stdout", "")).strip() or None
+        probes.append(redact_probe_output(result, "frida-version"))
 
-    devices: list[dict[str, str]] = []
+    raw_devices: list[dict[str, str]] = []
     if commands["frida-ls-devices"]["available"]:
         result = run_readonly([commands["frida-ls-devices"]["path"])
-        probes.append(result)
         if result.get("exit_code") == 0:
-            devices = parse_device_lines(str(result.get("stdout", "")))
+            raw_devices = parse_device_lines(str(result.get("stdout", "")))
+        probes.append(redact_probe_output(result, "device-enumeration"))
+    devices = pseudonymize_devices(raw_devices)
 
     gadget: dict[str, Any]
     if gadget_path:
         path = Path(gadget_path).expanduser().resolve()
+        path_fingerprint = sha256_text(str(path))
         if path.is_file():
             gadget = {
                 "state": "PRESENT_HASHED",
-                "path": str(path),
+                "basename": path.name,
+                "path_sha256": path_fingerprint,
                 "size": path.stat().st_size,
                 "sha256": sha256_file(path),
             }
         else:
-            gadget = {"state": "TOKEN_VAZIO_GADGET_PATH_NOT_FOUND", "path": str(path)}
+            gadget = {
+                "state": "TOKEN_VAZIO_GADGET_PATH_NOT_FOUND",
+                "basename": path.name,
+                "path_sha256": path_fingerprint,
+            }
     else:
         gadget = {"state": "TOKEN_VAZIO_GADGET_PATH_NOT_SUPPLIED"}
 
@@ -132,14 +175,22 @@ def build_report(gadget_path: str | None) -> dict[str, Any]:
         "schema": SCHEMA,
         "mode": "READ_ONLY_READINESS_PROBE",
         "state": readiness,
+        "privacy": {
+            "default": "MINIMIZE_AND_PSEUDONYMIZE",
+            "raw_device_ids_stored": False,
+            "raw_device_names_stored": False,
+            "raw_device_enumeration_stdout_stored": False,
+            "gadget_absolute_path_stored": False,
+            "hashes_are_provenance_pseudonyms_not_identity_proof": True,
+        },
         "host": {
             "android_observed": android_observed,
-            "android_release": getprop("ro.build.version.release"),
+            "android_release": android_release,
             "abi": getprop("ro.product.cpu.abi"),
             "uid": uid,
             "root_observed": root_observed,
-            "ANDROID_ROOT": android_root,
-            "PREFIX": prefix,
+            "ANDROID_ROOT_present": android_root is not None,
+            "PREFIX_present": prefix is not None,
         },
         "commands": commands,
         "frida_version": version,
@@ -164,9 +215,9 @@ def build_report(gadget_path: str | None) -> dict[str, Any]:
             "target_scope": "USER_CONTROLLED_APP_OR_EXPLICIT_TEST_TARGET_ONLY",
             "claim_allowed": False,
         },
-        "F_ok": "Frida host tooling/readiness can be observed without modifying a process.",
+        "F_ok": "Frida host tooling/readiness can be observed without modifying a process; sensitive device identifiers are minimized/pseudonymized by default.",
         "F_gap": "Actual app attach, Gadget load, hooks, background persistence and dynamic correction remain unproven until target-device receipts exist.",
-        "F_next": "Provide or build the developer app/Gadget artifact, hash it, run an explicit user-controlled attach/hook test, then preserve the receipt before enabling any ephemeral patch workflow.",
+        "F_next": "Provide or build the developer app/Gadget artifact, hash it, run an explicit user-controlled OBSERVE test, then preserve the minimized receipt before enabling any ephemeral patch workflow.",
         "probes": probes,
     }
 
