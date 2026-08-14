@@ -315,20 +315,9 @@ TRANSFORMS: list[tuple[Change, str, str]] = [
         Change("APKC-RH-007", "validate DEX magic before packaging"),
         """            if (dexout) {
                 /* d8 succeeded: use _fork_out directly (avoids 200B _dex_buf limit) */
-                dex_buf_ptr = _fork_out;
-                dexsz = dexout;
-            } else {
-                pr_err("d8 failed; refusing to package JAR bytes as classes.dex\n");
-                return -1;
-            }
 """,
         """            if (dexout && _apkc_is_dex(_fork_out,dexout)) {
-                dex_buf_ptr = _fork_out;
-                dexsz = dexout;
-            } else {
-                pr_err("d8 failed or produced a non-DEX artifact\n");
-                return -1;
-            }
+                /* d8 succeeded and emitted a structurally recognizable DEX. */
 """,
     ),
     (
