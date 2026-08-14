@@ -61,7 +61,7 @@ class ApkCFirstPartGateTests(unittest.TestCase):
     def test_manifest_is_valid_and_frozen(self) -> None:
         manifest = json.loads((ROOT / "manifests/apkc-first-part.v1.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["schema"], "raf.apkc-first-part.v1")
-        self.assertEqual(manifest["version"], "1.5.0")
+        self.assertEqual(manifest["version"], "1.6.0")
         self.assertEqual(manifest["scope"]["new_features_before_runtime_evidence"], "BLOCKED")
         self.assertFalse(manifest["claim_allowed"])
 

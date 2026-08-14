@@ -43,11 +43,14 @@ jobs:
         id: tooling
         continue-on-error: true
         run: |
-          set -eu
-          if ! command -v qemu-aarch64 >/dev/null 2>&1; then
+          set -euo pipefail
+          if ! command -v qemu-aarch64 >/dev/null 2>&1 || ! command -v ld.lld >/dev/null 2>&1; then
             sudo apt-get update
-            sudo apt-get install --yes qemu-user
+            sudo apt-get install --yes qemu-user lld
           fi
+          command -v qemu-aarch64 >/dev/null
+          command -v clang >/dev/null
+          command -v ld.lld >/dev/null
           qemu-aarch64 --version
           clang --version | head -1
           ld.lld --version | head -1
@@ -67,14 +70,14 @@ jobs:
           sh -n scripts/raf_https_fetch.sh
           sh -n scripts/apkc_install_sealed_stdin.sh
           sh -n scripts/apkc_finalize_stdin_install_receipt.sh
-          sh -n scripts/apkc_termux_sealed_stdin_gate.sh
-          sh -n tests/test_apkc_probe_memfd_runtime.sh
-          sh -n tests/test_apkc_install_sealed_stdin.sh
-          sh -n tests/test_apkc_finalize_stdin_install_receipt.sh
-          sh -n tests/test_apkc_install_sealed_stdin_launcher.sh
-          sh -n tests/test_apkc_termux_sealed_stdin_gate.sh
-          sh -n tools/raf_source_to_binary_proof.sh
-          sh -n tools/raf_apkc_runtime_hardening_proof.sh
+          bash -n scripts/apkc_termux_sealed_stdin_gate.sh
+          bash -n tests/test_apkc_probe_memfd_runtime.sh
+          bash -n tests/test_apkc_install_sealed_stdin.sh
+          bash -n tests/test_apkc_finalize_stdin_install_receipt.sh
+          bash -n tests/test_apkc_install_sealed_stdin_launcher.sh
+          bash -n tests/test_apkc_termux_sealed_stdin_gate.sh
+          bash -n tools/raf_source_to_binary_proof.sh
+          bash -n tools/raf_apkc_runtime_hardening_proof.sh
           python3 -m json.tool configs/browser-tls-capability.v1.json >/dev/null
 
       - name: Test truth browser TLS verified APK DEX ELF ABI source hardening and C04 receipt
