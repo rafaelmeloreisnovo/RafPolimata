@@ -115,6 +115,9 @@ jobs:
           ! grep -Fq 'if (n<=0) break;' build/generated/Apkc/apkc.source-cap-hardened.c
           echo "F1: hardened apkc-compile.txt generated ($(wc -l < Apkc/proofs/out/apkc-compile.txt) lines)"
 
+      - name: Runtime Doctor coherence gate
+        run: python3 scripts/runtime_doctor_coherence_gate.py
+
       - name: Validate APKc proof protocol
         run: bash scripts/apkc_validate.sh
 
