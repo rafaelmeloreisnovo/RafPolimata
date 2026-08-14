@@ -41,8 +41,9 @@ RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
 RUN_DIR="$RUNS/$RUN_ID/source-to-binary"
 mkdir -p "$OUT" "$RUN_DIR" "$ARCHIVE"
 
-COMMIT="$(git rev-parse HEAD 2>/dev/null)" || COMMIT="TOKEN_VAZIO"
-SHORT="$(git rev-parse --short HEAD 2>/dev/null)" || SHORT="TOKEN_VAZIO"
+CHECKOUT_COMMIT="$(git rev-parse HEAD 2>/dev/null)" || CHECKOUT_COMMIT="TOKEN_VAZIO"
+COMMIT="${SOURCE_COMMIT:-$CHECKOUT_COMMIT}"
+SHORT="${COMMIT:0:12}"
 DATE_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 HOST_ARCH="$(uname -m)"
 CLANGV="$(clang --version 2>/dev/null | head -1)" || CLANGV="clang: TOKEN_VAZIO"
@@ -85,9 +86,9 @@ HARD_SHA="$(sha256sum "$SRC" | awk '{print $1}')"
 } >>"$HARD_LOG"
 
 COMMON=(clang -ffreestanding -fno-builtin -nostdlib -nostdinc -I Apkc)
-A64_CMD=("${COMMON[@]}" --target=aarch64-linux-gnu -fuse-ld=lld \
+A64_CMD=("${COMMON[@]}" --target=aarch64-linux-gnu -fuse-ld=lld -static \
          -Wl,-e,_start -Wl,--build-id=none "$SRC" -o "$A64_1")
-A64_CMD_2=("${COMMON[@]}" --target=aarch64-linux-gnu -fuse-ld=lld \
+A64_CMD_2=("${COMMON[@]}" --target=aarch64-linux-gnu -fuse-ld=lld -static \
            -Wl,-e,_start -Wl,--build-id=none "$SRC" -o "$A64_2")
 A32_CMD=("${COMMON[@]}" --target=arm-linux-gnueabihf -c "$SRC" -o "$A32_1")
 A32_CMD_2=("${COMMON[@]}" --target=arm-linux-gnueabihf -c "$SRC" -o "$A32_2")
@@ -111,16 +112,17 @@ print_cmd() {
     printf '==================================================================\n'
     printf 'REPRODUCIBLE SOURCE->BINARY TRANSCRIPT  %s\n' "$DATE_UTC"
     printf '==================================================================\n'
-    printf 'run_id:      %s\n' "$RUN_ID"
-    printf 'commit:      %s\n' "$COMMIT"
-    printf 'host_arch:   %s\n' "$HOST_ARCH"
-    printf 'toolchain:   %s\n' "$CLANGV"
-    printf 'lld:         %s\n' "$LLDV"
-    printf 'elf_reader:  %s\n' "$ELFV"
-    printf 'raw_source:  %s\n' "$RAW_SRC"
-    printf 'raw_sha256:  %s\n' "$RAW_SHA"
-    printf 'source:      %s\n' "$SRC"
-    printf 'source_sha:  %s\n\n' "$HARD_SHA"
+    printf 'run_id:         %s\n' "$RUN_ID"
+    printf 'source_commit:  %s\n' "$COMMIT"
+    printf 'checkout_commit:%s\n' "$CHECKOUT_COMMIT"
+    printf 'host_arch:      %s\n' "$HOST_ARCH"
+    printf 'toolchain:      %s\n' "$CLANGV"
+    printf 'lld:            %s\n' "$LLDV"
+    printf 'elf_reader:     %s\n' "$ELFV"
+    printf 'raw_source:     %s\n' "$RAW_SRC"
+    printf 'raw_sha256:     %s\n' "$RAW_SHA"
+    printf 'source:         %s\n' "$SRC"
+    printf 'source_sha:     %s\n\n' "$HARD_SHA"
     printf '[A64] command:\n'
     print_cmd "${A64_CMD[@]}"
 } > "$TRANSCRIPT"
@@ -129,7 +131,8 @@ if "${A64_CMD[@]}" 2>"$A64_ERR"; then
     A64_BUILD="PASS"
     "$ELF_READER" -h "$A64_1" > "$A64_HDR"
     if grep -Eq 'Class:[[:space:]]+ELF64' "$A64_HDR" &&
-       grep -Eq 'Machine:[[:space:]]+AArch64' "$A64_HDR"; then
+       grep -Eq 'Machine:[[:space:]]+AArch64' "$A64_HDR" &&
+       ! "$ELF_READER" -l "$A64_1" | grep -Fq 'Requesting program interpreter'; then
         A64_IDENTITY="PASS"
     else
         A64_IDENTITY="FAIL"
@@ -211,6 +214,7 @@ cat > "$STATUS_JSON" <<JSON
   "run_id": "$RUN_ID",
   "date_utc": "$DATE_UTC",
   "commit": "$COMMIT",
+  "checkout_commit": "$CHECKOUT_COMMIT",
   "host_arch": "$HOST_ARCH",
   "elf_reader": "$ELF_READER",
   "raw_source_sha256": "$RAW_SHA",
@@ -220,7 +224,8 @@ cat > "$STATUS_JSON" <<JSON
     "build": "$A64_BUILD",
     "identity": "$A64_IDENTITY",
     "reproducibility": "$A64_REPRO",
-    "sha256": "$A64_SHA"
+    "sha256": "$A64_SHA",
+    "host_loader_dependency": false
   },
   "arm32": {
     "build": "$A32_BUILD",
