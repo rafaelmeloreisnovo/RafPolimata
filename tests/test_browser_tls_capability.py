@@ -50,16 +50,20 @@ class BrowserTLSCapabilityTests(unittest.TestCase):
         path.write_text(json.dumps(config), encoding="utf-8")
         return path
 
-    def write_adapter(self, root: Path, unsafe: bool = False) -> None:
-        insecure = "  --insecure \\\n" if unsafe else ""
+    def write_fixture(self, root: Path, insecure_line: str | None = None) -> None:
+        (root / "raf_shell").mkdir(exist_ok=True)
+        (root / "scripts").mkdir(exist_ok=True)
+        (root / "raf_shell/raf_shell.c").write_text(
+            "VT100 terminal UI TUI file browser dirbrowse TAB=Panel ENTER=Run",
+            encoding="utf-8",
+        )
+        active_insecure = f"{insecure_line}\n" if insecure_line else ""
         (root / "scripts/raf_https_fetch.sh").write_text(
             """#!/bin/sh
 curl --proto '=https' --proto-redir '=https' --tlsv1.2 --tlsv1.3 \\
   --tls-max 1.3 --max-redirs 5 --connect-timeout 10 --max-time 60
-"""
-            + insecure
-            + """# No -k/--insecure
-certificate_and_hostname_validation_enabled
+# No -k/--insecure: this comment is documentation, not an executable option.
+""" + active_insecure + """certificate_and_hostname_validation_enabled
 remote_ip ssl_verify_result
 mv -f candidate output
 raf.https-fetch-evidence.v1
@@ -70,38 +74,43 @@ raf.https-fetch-evidence.v1
     def test_tui_and_https_adapter_do_not_become_web_browser(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            (root / "raf_shell").mkdir()
-            (root / "scripts").mkdir()
-            (root / "raf_shell/raf_shell.c").write_text(
-                "VT100 terminal UI TUI file browser dirbrowse TAB=Panel ENTER=Run",
-                encoding="utf-8",
-            )
-            self.write_adapter(root)
+            self.write_fixture(root)
             report = MOD.audit(root, self.make_config(root))
+            adapter = report["levels"]["HTTPS_TRANSPORT_ADAPTER"]
             self.assertTrue(report["facts"]["tui_file_browser_static_evidence"])
             self.assertTrue(report["facts"]["https_transport_adapter_static_evidence"])
             self.assertFalse(report["facts"]["web_browser_tls_static_evidence"])
             self.assertFalse(report["facts"]["asm_web_browser_tls_static_evidence"])
-            self.assertFalse(report["levels"]["HTTPS_TRANSPORT_ADAPTER"]["unsafe_option_active"])
+            self.assertFalse(adapter["unsafe_option_active"])
+            self.assertTrue(adapter["static_contract"]["system_ca_validation"])
             self.assertEqual(report["truth"]["raf_shell_classification"], "TUI_FILE_BROWSER")
             self.assertEqual(report["truth"]["web_browser_tls"], "TOKEN_VAZIO")
+            self.assertEqual(report["truth"]["certified_tls"], "TOKEN_VAZIO")
             self.assertFalse(report["claim_allowed"])
 
-    def test_actual_insecure_option_fails_https_adapter_contract(self) -> None:
+    def assert_active_insecure_fails(self, line: str) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            (root / "scripts").mkdir()
-            self.write_adapter(root, unsafe=True)
+            self.write_fixture(root, line)
             report = MOD.audit(root, self.make_config(root))
             adapter = report["levels"]["HTTPS_TRANSPORT_ADAPTER"]
             self.assertTrue(adapter["unsafe_option_active"])
             self.assertFalse(adapter["static_contract"]["system_ca_validation"])
             self.assertIn("system_ca_validation", adapter["missing"])
             self.assertFalse(report["facts"]["https_transport_adapter_static_evidence"])
+            self.assertEqual(report["truth"]["https_adapter_classification"], "TOKEN_VAZIO")
+            self.assertEqual(report["truth"]["certified_tls"], "TOKEN_VAZIO")
             self.assertFalse(report["claim_allowed"])
+
+    def test_active_short_insecure_flag_fails_closed(self) -> None:
+        self.assert_active_insecure_fails("curl -k https://example.invalid")
+
+    def test_active_long_insecure_flag_fails_closed(self) -> None:
+        self.assert_active_insecure_fails("curl --insecure https://example.invalid")
 
     def test_comment_alone_never_counts_as_active_insecure_option(self) -> None:
         text = "# No -k/--insecure\ncurl --proto '=https' https://example.invalid\n"
+        self.assertFalse(MOD.has_insecure_curl_flag(MOD.executable_shell_text(text)))
         self.assertFalse(MOD.active_shell_option(text, r"-k|--insecure"))
         self.assertTrue(MOD.active_shell_option("  --insecure \\\n", r"-k|--insecure"))
         self.assertTrue(MOD.active_shell_option("  -k \\\n", r"-k|--insecure"))
