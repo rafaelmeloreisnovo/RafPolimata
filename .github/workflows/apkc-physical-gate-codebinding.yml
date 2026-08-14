@@ -1,0 +1,37 @@
+name: ApkC Physical Gate Code Binding
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/apkc_provider_to_physical_codebound.sh'
+      - 'tests/test_apkc_provider_to_physical_codebound.sh'
+      - '.github/workflows/apkc-physical-gate-codebinding.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  codebound-custody:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/apkc_provider_to_physical_codebound.sh
+          bash -n tests/test_apkc_provider_to_physical_codebound.sh
+      - name: Gate-code custody falsifiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash tests/test_apkc_provider_to_physical_codebound.sh | tee apkc-codebound-test.txt
+          grep -Fxq 'RESULT pass=7 fail=0 claim_allowed=false' apkc-codebound-test.txt
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkc-physical-gate-codebinding-evidence
+          path: apkc-codebound-test.txt
+          if-no-files-found: warn
