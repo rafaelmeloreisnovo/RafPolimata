@@ -10,6 +10,7 @@
 
 #include "machine_linear_branchless.h"
 #include "lang_scanner.h"
+#include "lang_profile.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -134,115 +135,112 @@ static inline void codegen_emit_ret(struct CodeGen *cg) {
 	codegen_emit(cg, OP_RET, 0, 0, 0, 0);
 }
 
-/* === PYTHON COMPILER: x = y + z → 3 instructions === */
+/* Include language parsers after codegen functions are defined */
+#include "lang_expr.h"
+#include "lang_stmt.h"
+
+/* === PYTHON COMPILER: real parsing of Python source === */
 struct PythonCompiler {
 	struct CodeGen cg;
 	struct Scanner sc;
 };
 
 static inline u8 compile_python_assign(struct PythonCompiler *py) {
-	/* Pattern: identifier = expr */
-	/* Simplified: x = 5 + 3 */
-
-	u8 rd = codegen_alloc_reg(&py->cg);
-	if (rd == 255) return 1;
-
-	/* MOVI r_temp, 5 */
-	codegen_emit(&py->cg, OP_MOVI, rd, 0, 0, 5);
-
-	u8 rd2 = codegen_alloc_reg(&py->cg);
-	if (rd2 == 255) return 1;
-
-	/* MOVI r_temp2, 3 */
-	codegen_emit(&py->cg, OP_MOVI, rd2, 0, 0, 3);
-
-	/* ADD r_result, r_temp, r_temp2 */
-	u8 rr = codegen_alloc_reg(&py->cg);
-	if (rr == 255) return 1;
-	codegen_emit(&py->cg, OP_ADD, rr, rd, rd2, 0);
-
+	struct StmtCtx ctx;
+	stmt_init(&ctx, &py->sc, &py->cg, LP_PY);
+	stmt_parse_block(&ctx);
+	codegen_emit_movi(&py->cg, 0, 0);
+	codegen_emit_ret(&py->cg);
 	return 0;
 }
 
-/* === GO COMPILER: func sum(a, b) int { return a + b } === */
+/* === GO COMPILER: real parsing of Go source === */
 struct GoCompiler {
 	struct CodeGen cg;
 	struct Scanner sc;
 };
 
 static inline u8 compile_go_func(struct GoCompiler *go) {
-	/* Parameters in r0, r1 */
-	/* Return value in r2 */
-	/* Pattern: ADD r2, r0, r1; RET */
-
-	codegen_emit(&go->cg, OP_ADD, 2, 0, 1, 0);
-	codegen_emit(&go->cg, OP_RET, 0, 0, 0, 0);
-
+	struct StmtCtx ctx;
+	stmt_init(&ctx, &go->sc, &go->cg, LP_GO);
+	stmt_parse_block(&ctx);
+	codegen_emit_movi(&go->cg, 0, 0);
+	codegen_emit_ret(&go->cg);
 	return 0;
 }
 
-/* === RUST COMPILER: fn add(x: u64, y: u64) → u64 { x + y } === */
+/* === RUST COMPILER: real parsing of Rust source === */
 struct RustCompiler {
 	struct CodeGen cg;
 	struct Scanner sc;
 };
 
 static inline u8 compile_rust_fn(struct RustCompiler *rs) {
-	/* Same as Go: ADD r2, r0, r1; RET */
-	codegen_emit(&rs->cg, OP_ADD, 2, 0, 1, 0);
-	codegen_emit(&rs->cg, OP_RET, 0, 0, 0, 0);
+	struct StmtCtx ctx;
+	stmt_init(&ctx, &rs->sc, &rs->cg, LP_RS);
+	stmt_parse_block(&ctx);
+	codegen_emit_movi(&rs->cg, 0, 0);
+	codegen_emit_ret(&rs->cg);
 	return 0;
 }
 
-/* === C COMPILER: int f(int a, int b) { return a + b; } === */
+/* === C COMPILER: real parsing of C source === */
 struct CCompiler {
 	struct CodeGen cg;
 	struct Scanner sc;
 };
 
 static inline u8 compile_c_fn(struct CCompiler *c) {
-	/* Same: ADD r2, r0, r1; RET */
-	codegen_emit(&c->cg, OP_ADD, 2, 0, 1, 0);
-	codegen_emit(&c->cg, OP_RET, 0, 0, 0, 0);
+	struct StmtCtx ctx;
+	stmt_init(&ctx, &c->sc, &c->cg, LP_C);
+	stmt_parse_block(&ctx);
+	codegen_emit_movi(&c->cg, 0, 0);
+	codegen_emit_ret(&c->cg);
 	return 0;
 }
 
-/* === JAVASCRIPT COMPILER: const sum = (a, b) => a + b === */
+/* === JAVASCRIPT COMPILER: real parsing of JavaScript source === */
 struct JsCompiler {
 	struct CodeGen cg;
 	struct Scanner sc;
 };
 
 static inline u8 compile_js_arrow(struct JsCompiler *js) {
-	/* Arrow function: same binary operation */
-	codegen_emit(&js->cg, OP_ADD, 2, 0, 1, 0);
-	codegen_emit(&js->cg, OP_RET, 0, 0, 0, 0);
+	struct StmtCtx ctx;
+	stmt_init(&ctx, &js->sc, &js->cg, LP_JS);
+	stmt_parse_block(&ctx);
+	codegen_emit_movi(&js->cg, 0, 0);
+	codegen_emit_ret(&js->cg);
 	return 0;
 }
 
-/* === JAVA COMPILER: public static int add(int a, int b) { return a + b; } === */
+/* === JAVA COMPILER: real parsing of Java source === */
 struct JavaCompiler {
 	struct CodeGen cg;
 	struct Scanner sc;
 };
 
 static inline u8 compile_java_method(struct JavaCompiler *jc) {
-	/* Static method: same */
-	codegen_emit(&jc->cg, OP_ADD, 2, 0, 1, 0);
-	codegen_emit(&jc->cg, OP_RET, 0, 0, 0, 0);
+	struct StmtCtx ctx;
+	stmt_init(&ctx, &jc->sc, &jc->cg, LP_JAVA);
+	stmt_parse_block(&ctx);
+	codegen_emit_movi(&jc->cg, 0, 0);
+	codegen_emit_ret(&jc->cg);
 	return 0;
 }
 
-/* === SWIFT COMPILER: func add(_ a: Int, _ b: Int) -> Int { a + b } === */
+/* === SWIFT COMPILER: real parsing of Swift source === */
 struct SwiftCompiler {
 	struct CodeGen cg;
 	struct Scanner sc;
 };
 
 static inline u8 compile_swift_fn(struct SwiftCompiler *sw) {
-	/* Function: same */
-	codegen_emit(&sw->cg, OP_ADD, 2, 0, 1, 0);
-	codegen_emit(&sw->cg, OP_RET, 0, 0, 0, 0);
+	struct StmtCtx ctx;
+	stmt_init(&ctx, &sw->sc, &sw->cg, LP_SWIFT);
+	stmt_parse_block(&ctx);
+	codegen_emit_movi(&sw->cg, 0, 0);
+	codegen_emit_ret(&sw->cg);
 	return 0;
 }
 
