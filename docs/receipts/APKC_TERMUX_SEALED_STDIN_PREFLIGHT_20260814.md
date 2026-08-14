@@ -57,7 +57,7 @@ RESULT pass=9 fail=0 claim_allowed=false
 
 Transcript SHA-256: `a9165185b2277c9e856fb44f2f535f3c7e140071dde5e2ebd4b1f60a727f21c3`.
 
-The adb and installer paths in this local battery are mocks. Therefore this execution proves control flow, fail-closed semantics, receipt verification and serial pseudonymization, not Android installation compatibility.
+The probe, adb and installer paths in this local battery are controlled fixtures/mocks. Therefore this execution proves gate control flow, fail-closed semantics, receipt verification and serial pseudonymization; it does **not** prove current-device memfd capability or Android installation compatibility.
 
 ## Privacy/provenance boundary
 
@@ -88,7 +88,7 @@ A bounded post-build preflight gate now joins digest identity, memfd capability,
 
 ## F_gap
 
-No current Termux ARM32/Android physical execution is claimed in this receipt. Mock adb/installer success is not physical evidence. Installation, launch, runtime semantics, cross-device determinism and provider CI remain unproven.
+No current Termux ARM32/Android physical execution is claimed in this receipt. Controlled-fixture success is not physical evidence. Current-device memfd capability, installation, launch, runtime semantics, cross-device determinism and provider CI remain unproven.
 
 ## F_next
 
