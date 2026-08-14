@@ -1,0 +1,41 @@
+{
+  "schema": "raf.apkc.provider-c04-transfer.v1",
+  "claim_allowed": false,
+  "authority": {
+    "repository": "rafaelmeloreisnovo/RafPolimata",
+    "provider_workflow_run": 31812435821,
+    "provider_artifact_id": 9223681724,
+    "verified_head": "8b46572c2fe3ad8610ca543ebdc2fd7b2b06ffea",
+    "merge_commit": "3980c48a759dcd4ad469a7237df74e257e2a06e3",
+    "main_receipt_commit": "e842820374f7eaa9c061536a1bdcb20581b74709"
+  },
+  "artifact": {
+    "sha256": "5b1666efbb9f7be69b6db900287e10aab4caea476ee95462c5797ca6d336aa94",
+    "bytes": 567582,
+    "apk_member": "Apkc/proofs/out/hello.apk",
+    "apk_sha256": "7957e4421921da85924cb278fce38db8d6ba747c99ecb9eb7e04edfbe42e9ff3"
+  },
+  "proven_structure": {
+    "state": "PASS_STRUCTURAL",
+    "dual_abi": ["arm64-v8a", "armeabi-v7a"],
+    "zip_integrity": true,
+    "provider_executed": true
+  },
+  "runtime_boundary": {
+    "termux_arm32_current_run": "TOKEN_VAZIO",
+    "android_memfd_create_and_seals_current_device": "TOKEN_VAZIO",
+    "adb_shell_pm_stdin_physical_compatibility": "TOKEN_VAZIO",
+    "physical_install": "TOKEN_VAZIO",
+    "physical_launch": "TOKEN_VAZIO",
+    "runtime_semantic_pass": "TOKEN_VAZIO"
+  },
+  "allowed_transfer_modes": ["extract-only", "probe-only", "adb-shell-pm", "pm-local"],
+  "invariants": [
+    "artifact_sha256_must_match_before_extraction",
+    "apk_member_cardinality_must_equal_one",
+    "apk_sha256_must_match_before_physical_gate",
+    "no_silent_pathname_fallback",
+    "runtime_claims_remain_token_vazio_until_physical_evidence"
+  ],
+  "f_next": "Run extract-only or probe-only on the actual Termux device using the exact provider artifact; only after physical probe PASS attempt sealed-stdin installation."
+}
