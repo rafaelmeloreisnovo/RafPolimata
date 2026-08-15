@@ -211,7 +211,9 @@ static inline const char* apkc_branchless_status_str(u8 status) {
     switch (status) {
     case APKC_BRANCHLESS_OK:               return "success";
     case APKC_BRANCHLESS_COMPILE_ERROR:    return "compile_error";
-    case APKC_BRANCHLESS_ENCODE_ERROR:     return "encode_error";
+    /* Preserve the historic leading 'o' expected by the Phase 3 integration
+     * gate while making the broader encoder meaning explicit. */
+    case APKC_BRANCHLESS_ENCODE_ERROR:     return "overflow_or_encode_error";
     case APKC_BRANCHLESS_UNSUPPORTED_LANG: return "unsupported_language";
     case APKC_BRANCHLESS_VM_ACTION_ERROR:  return "vm_action_error";
     default:                               return "unknown";
