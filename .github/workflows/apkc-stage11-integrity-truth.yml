@@ -28,9 +28,13 @@ jobs:
       - name: Hash evidence
         run: |
           set -euo pipefail
-          sha256sum ApkC/sec_hardening_gates.h tests/test_stage11_integrity_truth.c stage11-integrity-truth.txt > stage11-integrity-truth.sha256
-          cat stage11-integrity-truth.sha256
+          for f in ApkC/sec_hardening_gates.h tests/test_stage11_integrity_truth.c stage11-integrity-truth.txt; do
+            test -f "$f"
+            command sha256sum "$f"
+          done | tee stage11-integrity-truth.sha256
+          test "$(wc -l < stage11-integrity-truth.sha256)" -eq 3
       - name: Upload evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: apkc-stage11-integrity-truth
