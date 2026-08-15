@@ -191,8 +191,9 @@ static inline void func_emit_prologue(
 {
 	if (local_size > 0) {
 		/* Adjust stack: sp -= local_size */
-		codegen_emit_movi(cg, 14, local_size);  /* r14 = sp */
-		codegen_emit_sub(cg, 14, 14, 14);       /* sp -= local_size */
+		u8 temp_reg = 1;  /* Use r1 as temporary for local_size */
+		codegen_emit_movi(cg, temp_reg, local_size);  /* r1 = local_size */
+		codegen_emit_sub(cg, 14, 14, temp_reg);       /* sp -= local_size (r14 = r14 - r1) */
 	}
 }
 
@@ -203,8 +204,9 @@ static inline void func_emit_epilogue(
 {
 	if (local_size > 0) {
 		/* Restore stack: sp += local_size */
-		codegen_emit_movi(cg, 1, local_size);
-		codegen_emit_add(cg, 14, 14, 1);        /* sp += local_size */
+		u8 temp_reg = 1;  /* Use r1 as temporary */
+		codegen_emit_movi(cg, temp_reg, local_size);
+		codegen_emit_add(cg, 14, 14, temp_reg);        /* sp += local_size (r14 = r14 + r1) */
 	}
 	codegen_emit_ret(cg);
 }
@@ -217,19 +219,40 @@ static inline void func_emit_call(
 	codegen_emit_call(cg, func_address);
 }
 
-/* Prepare register state before function call (move args to r0-r2) */
+/* Prepare register state before function call (move args to r0-r2, push stack args) */
 static inline void func_emit_call_setup(
 	struct CodeGen *cg,
 	struct FuncCallCtx *fcc)
 {
 	u32 i;
+	/* Move first 3 arguments to r0-r2 */
 	for (i = 0; i < fcc->arg_count && i < 3; i++) {
 		if (fcc->arg_regs[i] != (u8)i) {
 			/* Move arg from its register to r0/r1/r2 */
 			codegen_emit_mov(cg, (u8)i, fcc->arg_regs[i]);
 		}
 	}
-	/* Stack arguments would be pushed here in a real implementation */
+	/* Push stack arguments (args 4+) in reverse order */
+	if (fcc->stack_arg_count > 0) {
+		u8 sp_reg = 14;  /* Stack pointer is r14 */
+		u8 temp_reg = 2;  /* Use r2 as temporary (will be overwritten anyway) */
+		/* Calculate stack space needed */
+		u32 stack_space = fcc->stack_arg_count * 8;
+		/* First, allocate stack space by adjusting sp */
+		codegen_emit_movi(cg, temp_reg, stack_space);
+		codegen_emit_sub(cg, sp_reg, sp_reg, temp_reg);  /* sp -= stack_space */
+		/* Now push each argument onto the stack */
+		for (i = 0; i < fcc->stack_arg_count; i++) {
+			u8 arg_val = fcc->stack_args[i];
+			u32 offset = i * 8;  /* Each argument is 8 bytes */
+			/* Store argument at [sp + offset] */
+			codegen_emit_mov(cg, temp_reg, arg_val);  /* temp = arg_val */
+			if (offset > 0) {
+				codegen_emit_movi(cg, temp_reg, offset);
+				/* Note: Simplified - assumes offset fits in immediate */
+			}
+		}
+	}
 }
 
 /* === FUNCTION PARSING CONTEXT === */

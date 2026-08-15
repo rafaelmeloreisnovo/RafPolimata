@@ -229,7 +229,7 @@ static inline u32 expr_parse_unary(struct ExprCtx *ctx) {
         return rd;
     }
 
-    /* Bitwise not */
+    /* Bitwise not - load mask and XOR */
     if (expr_match(ctx, TOK_TILDE)) {
         expr_advance(ctx);
         u32 val = expr_parse_unary(ctx);
