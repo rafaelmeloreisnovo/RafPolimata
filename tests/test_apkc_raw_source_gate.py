@@ -8,9 +8,17 @@ spec.loader.exec_module(m)
 
 p = Path("scripts/demo.sh")
 
-# Direct compile of canonical raw source is always a bypass.
+# Direct compile of canonical raw source is always a bypass, including implicit a.out.
 state, _ = m.classify_text(p, "clang Apkc/apkc.c -o apkc\n")
 assert state == "FAIL_RAW_BYPASS"
+state, _ = m.classify_text(p, "clang Apkc/apkc.c\n")
+assert state == "FAIL_RAW_BYPASS"
+state, _ = m.classify_text(p, '"$CC" Apkc/apkc.c\n')
+assert state == "FAIL_RAW_BYPASS"
+
+# Mentioning a compiler in diagnostic text is not itself execution.
+state, _ = m.classify_text(p, 'echo "clang Apkc/apkc.c"\n')
+assert state == "PASS_REFERENCE_ONLY"
 
 # Multiline and variable-alias compiles must also fail.
 state, _ = m.classify_text(
