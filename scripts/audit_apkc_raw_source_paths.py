@@ -14,7 +14,10 @@ HARDENING_MARKERS = (
 )
 EXEC_SUFFIXES = {".sh", ".py", ".bash", ".yml", ".yaml"}
 EXEC_NAMES = {"Makefile"}
-COMPILER_TOKEN_RE = re.compile(r"(?:^|[\s:'\"/])(?:clang(?:\+\+)?|gcc|g\+\+|cc)(?:\s|$)|\$\{?CC\}?\b")
+COMPILER_TOKEN_RE = re.compile(
+    r"(?:^|[\s:'\"/])(?:clang(?:\+\+)?|gcc|g\+\+|cc)(?=\s|$)"
+    r"|\$(?:CC|\{CC\})(?=\s|$|[\"'])"
+)
 BUILD_FLAG_RE = re.compile(r"(?:^|\s)(?:-o|-c|-fsyntax-only|-nostdlib|-ffreestanding)(?:\s|$)")
 RAW_ALIAS_RE = re.compile(
     r"(?m)^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*(?::=|\?=|\+=|=)\s*['\"]?Apkc/apkc\.c['\"]?\s*$"
@@ -77,13 +80,15 @@ def classify_text(path: Path, text: str) -> tuple[str, str]:
         return ("IGNORED_NON_EXEC", "documentation/data/non-control-plane file")
     if not any(m in text for m in RAW_MARKERS):
         return ("NO_RAW_REF", "no canonical raw ApkC source reference")
-    if any(m in text for m in HARDENING_MARKERS):
-        return ("PASS_HARDENED", "raw source reference is paired with mandatory hardening entrypoint")
+    # A hardening marker elsewhere in the same file must never mask a separate
+    # direct compilation of the canonical raw source.
     if _active_raw_build(text):
         return (
             "FAIL_RAW_BYPASS",
-            "active compiler command consumes raw ApkC source without a recognized hardening entrypoint",
+            "active compiler command consumes raw ApkC source; hardening marker elsewhere cannot authorize it",
         )
+    if any(m in text for m in HARDENING_MARKERS):
+        return ("PASS_HARDENED", "raw source reference is transformer input to a recognized hardening entrypoint")
     return (
         "PASS_REFERENCE_ONLY",
         "raw ApkC source is referenced for inspection, fixture text, commentary, or non-build control logic",
