@@ -1,0 +1,47 @@
+name: ApkC Stage9 Signing Truth Gate
+
+on:
+  pull_request:
+    paths:
+      - 'Apkc/deploy_apk_signing.h'
+      - 'tests/test_deploy_apk_signing_truth.c'
+      - '.github/workflows/apkc-stage9-signing-truth.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  signing-truth:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile freestanding truth-boundary test
+        shell: bash
+        run: |
+          set -euo pipefail
+          clang -std=c99 -Wall -Wextra -Werror -ffreestanding \
+            tests/test_deploy_apk_signing_truth.c \
+            -o /tmp/test_deploy_apk_signing_truth
+      - name: Execute falsifiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          /tmp/test_deploy_apk_signing_truth
+          printf '%s\n' 'RESULT stage9_signing_truth=PASS claim_allowed=false'
+      - name: Static claim boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F 'DOES NOT implement RSA, ECDSA' Apkc/deploy_apk_signing.h
+          grep -F 'NOT SHA-256 and NOT cryptographic' Apkc/deploy_apk_signing.h
+          if grep -F 'out_report->signature_valid = 1' Apkc/deploy_apk_signing.h; then
+            echo 'forbidden signature promotion found' >&2
+            exit 1
+          fi
+          printf '%s\n' 'claim_allowed=false' > stage9-signing-truth.status
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: apkc-stage9-signing-truth
+          path: stage9-signing-truth.status
