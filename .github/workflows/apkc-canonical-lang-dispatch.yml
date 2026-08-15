@@ -5,12 +5,14 @@ on:
     paths:
       - 'Apkc/apkc_branchless_handler.h'
       - 'Apkc/apkc_language_dispatch.h'
+      - 'Apkc/apkc_semantic_return_subset.h'
       - 'Apkc/compiler_language_direct.h'
       - 'Apkc/lang_profile.h'
       - 'Apkc/lang_scanner.h'
       - 'Apkc/lang_stmt.h'
       - 'Apkc/lang_expr.h'
       - 'tests/test_apkc_canonical_lang_dispatch.c'
+      - 'tests/test_apkc_branchless_integration.c'
       - '.github/workflows/apkc-canonical-lang-dispatch.yml'
   workflow_dispatch:
 
@@ -25,28 +27,52 @@ jobs:
       - name: Checkout exact PR head
         uses: actions/checkout@v4
 
-      - name: Compile strict host gate
+      - name: Compile strict canonical gate
         shell: bash
         run: |
           set -euo pipefail
           cc -std=c11 -O2 -Wall -Wextra -Werror \
             tests/test_apkc_canonical_lang_dispatch.c \
-            -o /tmp/test_apkc_canonical_lang_dispatch
+            -o /tmp/test_apkc_canonical_lang_dispatch \
+            2>&1 | tee /tmp/apkc-canonical-lang-dispatch.log
 
       - name: Run canonical identity and fail-closed gate
         shell: bash
         run: |
           set -euo pipefail
-          /tmp/test_apkc_canonical_lang_dispatch | tee /tmp/apkc-canonical-lang-dispatch.log
+          /tmp/test_apkc_canonical_lang_dispatch \
+            2>&1 | tee -a /tmp/apkc-canonical-lang-dispatch.log
           grep -q 'SUMMARY pass=' /tmp/apkc-canonical-lang-dispatch.log
           grep -q 'fail=0' /tmp/apkc-canonical-lang-dispatch.log
+
+      - name: Compile pre-existing branchless integration regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The historical test source contains intentional unsigned>=0 and
+          # unused-local assertions; suppress only those pre-existing harness
+          # warnings while keeping every other warning fatal.
+          cc -std=c11 -O2 -Wall -Wextra -Werror \
+            -Wno-type-limits -Wno-unused-variable \
+            tests/test_apkc_branchless_integration.c \
+            -o /tmp/test_apkc_branchless_integration \
+            2>&1 | tee -a /tmp/apkc-canonical-lang-dispatch.log
+
+      - name: Run pre-existing branchless integration regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          /tmp/test_apkc_branchless_integration \
+            2>&1 | tee -a /tmp/apkc-canonical-lang-dispatch.log
+          grep -q 'FAIL: 0' /tmp/apkc-canonical-lang-dispatch.log
 
       - name: Freestanding syntax audit
         shell: bash
         run: |
           set -euo pipefail
           cc -std=c11 -Wall -Wextra -Werror -ffreestanding -fsyntax-only \
-            tests/test_apkc_canonical_lang_dispatch.c
+            tests/test_apkc_canonical_lang_dispatch.c \
+            2>&1 | tee -a /tmp/apkc-canonical-lang-dispatch.log
 
       - name: Preserve gate receipt
         if: always()
