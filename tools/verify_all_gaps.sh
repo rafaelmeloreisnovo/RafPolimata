@@ -126,25 +126,49 @@ check_l3_elf_validation() {
         return 0
     fi
 
-    # Create test ELF to verify readelf works
-    local test_elf="/tmp/test_arm64.so"
-
-    # Minimal ARM64 ELF header (64 bytes)
-    printf '\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00' > "$test_elf"
-    printf '\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x40\x00\x00\x00' >> "$test_elf"
-    printf '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' >> "$test_elf"
-
-    if readelf -h "$test_elf" 2>/dev/null | grep -q "ARM" || readelf -h "$test_elf" 2>/dev/null | grep -q "AArch64"; then
-        log_pass "L3: ARM64 ELF validation works"
-        PASSED_CHECKS=$((PASSED_CHECKS + 1))
-        rm -f "$test_elf"
-        return 0
-    else
-        log_warn "L3: readelf available but ELF validation needs work"
+    # Check if apkc binary exists
+    if [ ! -x "$APKC_BIN" ]; then
+        log_warn "L3: Apkc binary not available, skipping APK validation"
         SKIPPED_CHECKS=$((SKIPPED_CHECKS + 1))
-        rm -f "$test_elf"
         return 0
     fi
+
+    # Create a test C file to compile
+    local test_c="/tmp/l3_test_$$.c"
+    local test_apk="/tmp/l3_test_$$.apk"
+
+    cat > "$test_c" << 'EOF'
+#include <stdio.h>
+int main() {
+    printf("L3 validation test\n");
+    return 0;
+}
+EOF
+
+    # Compile with Apkc to generate an APK with ARM64 .so
+    if ! "$APKC_BIN" -o "$test_apk" "$test_c" >/dev/null 2>&1; then
+        log_warn "L3: Failed to compile test APK"
+        rm -f "$test_c" "$test_apk"
+        SKIPPED_CHECKS=$((SKIPPED_CHECKS + 1))
+        return 0
+    fi
+
+    # Run the validate_apk_elf_structure.sh script
+    if [ -x "$SCRIPT_DIR/validate_apk_elf_structure.sh" ]; then
+        if "$SCRIPT_DIR/validate_apk_elf_structure.sh" "$test_apk" >/dev/null 2>&1; then
+            log_pass "L3: ARM64 ELF validation passed"
+            PASSED_CHECKS=$((PASSED_CHECKS + 1))
+        else
+            log_warn "L3: ARM64 ELF validation failed"
+            SKIPPED_CHECKS=$((SKIPPED_CHECKS + 1))
+        fi
+    else
+        log_warn "L3: validate_apk_elf_structure.sh not found"
+        SKIPPED_CHECKS=$((SKIPPED_CHECKS + 1))
+    fi
+
+    rm -f "$test_c" "$test_apk"
+    return 0
 }
 
 # ─────────────────────────────────────────────────────────────────────────
