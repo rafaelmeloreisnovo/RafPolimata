@@ -116,13 +116,68 @@ PHYSICAL_LOOSE  = arquivo no lugar físico inadequado ou excepcional
 SEMANTIC_LOOSE  = arquivo sem aresta suficiente no índice/grafo documental
 ```
 
-A fonte de verdade para a fila completa de `LINK_REQUIRED`, `ROOT_REVIEW` e `SENSITIVITY_REVIEW` é o catálogo gerado por `scripts/document_governance.py`. Como snapshots gerados podem ficar atrás do `main`, suas contagens são históricas até regeneração sobre o commit corrente.
+A fonte de verdade para a fila completa de `LINK_REQUIRED`, `ROOT_REVIEW` e `SENSITIVITY_REVIEW` é o catálogo gerado por `scripts/document_governance.py`. Como snapshots gerados podem ficar atrás do `main`, suas contagens são históricas até regeneração sobre o commit correspondente.
 
-## 5. Observação de governança pós-criação do índice
+## 5. Reconciliação observada — PR #269
 
-O primeiro gate remoto de Document Governance disparado pela criação deste índice passou e regenerou o catálogo sem drift, mantendo `claim_allowed=false` e estado `REVIEW_REQUIRED`. Naquele run foram observados 1.089 arquivos catalogados, 1.023 relações e 676 itens na fila; como o repositório continuou recebendo merges em seguida, essas contagens permanecem um **snapshot temporal**, não uma contagem canônica eterna.
+O primeiro gate remoto após a criação deste índice havia encontrado dois links quebrados por percent-encoding, sete métodos físicos M057–M063 ainda fora do `RAF_INDEX.md` e um `REFERENCE_REPAIR` espúrio causado por uma expressão regular de shell interpretada como link Markdown.
 
-A auditoria estrutural do mesmo corte encontrou duas referências Markdown quebradas por percent-encoding e sete métodos físicos M057–M063 ainda ausentes do índice RAF. Este documento e `RAF_INDEX.md` corrigem exatamente esses dois deltas; o resultado final depende do rerun sobre o novo head.
+A tranche corretiva do PR #269 reconciliou esses três deltas e preservou a semântica dos gates. No head validado `2d733058234a38574e6c1539ca182b687353fb35`, os quatro workflows de pull request concluíram `success`:
+
+```text
+CI                                      run 31857725586  PASS
+Document Governance                     run 31857725525  PASS
+Formal Science Orchestrator              run 31857725555  PASS
+M063 language completion freestanding    run 31857725580  PASS
+```
+
+### Auditoria estrutural observada
+
+```text
+root_raf_method_files = 63
+broken_markdown_links = 0
+raf_existing_not_indexed = 0
+raf_indexed_not_existing = 0
+```
+
+### Document Governance observada
+
+A regeneração determinística no merge-ref testado `5ed48fb68eae066cff23972533eec4c3e3430918` registrou:
+
+```text
+state = REVIEW_REQUIRED
+blockers = 0
+broken_reference_sources = 0
+missing_canonical_indexes = []
+files = 1099
+relations = 1037
+review_queue = 678
+CANONICAL = 6
+INDEXED = 415
+LINK_REQUIRED = 654
+REVIEW_STALE = 12
+ROOT_REVIEW = 10
+SENSITIVITY_REVIEW = 2
+REFERENCE_REPAIR = 0
+```
+
+O estado `REVIEW_REQUIRED` permanece intencional: existem 10 arquivos soltos de raiz com decisões explícitas, mas `unmapped=0`, `stale_hashes=0`, `critical=0` e `claim_allowed=false`.
+
+O artefato `document-governance-evidence` do run 31857725525 foi materializado com artifact id `9239555059`, 273038 bytes e SHA-256 do ZIP `60b5b2c10b4bdb66a144578b8fe2ccede3b4a5851c4a97a355f838b51905ff3b`.
+
+### Preservação do gate M063
+
+A correção do falso `REFERENCE_REPAIR` apenas dividiu textualmente a construção de uma regex de headers hospedados; o contrato M063 continuou PASS, incluindo:
+
+- headers hosted proibidos: PASS;
+- objeto M063 sem símbolos indefinidos: PASS;
+- matriz de arquitetura e linguagem: PASS;
+- auditoria de biblioteca estrangeira: PASS;
+- rewrite fail-closed: PASS;
+- ARM64 + ARM32 + C++ export + hosted kernel: PASS;
+- reprodutibilidade byte a byte: PASS.
+
+Isso não promove `APK_SIGNATURE`, `APK_INSTALL`, `ANDROID_RUNTIME` nem `DEVICE_ACCELERATOR_RUNTIME`.
 
 ## 6. Critério para promoção ou movimentação
 
@@ -141,19 +196,30 @@ hash/identidade atual confere
 
 ## 7. Gates de reconciliação
 
-Antes de reorganizar fisicamente a documentação:
+A tranche atual executou e fechou os três primeiros gates abaixo sobre o head reconciliado:
 
 ```sh
 python3 scripts/audit_repository_structure.py --depth 5
 python3 scripts/document_governance.py --write --print-summary
 python3 scripts/document_governance.py --check --print-summary
 python3 scripts/validate_root_file_decisions.py
+```
+
+O mapa abaixo é produzido pelo workflow `ApkC First Part Closure`:
+
+```sh
 python3 scripts/apkc_first_part_gate.py \
   --write results/apkc-first-part-gate.json \
   --write-map docs/generated/REPOSITORY_LOOSE_FILES_MAP.md
 ```
 
-A promoção só ocorre depois da observação desses gates no commit correspondente.
+Esse workflow aceita `workflow_dispatch`, mas o conector GitHub usado nesta operação não expõe ação de dispatch e o PR #269 não altera paths que o disparem automaticamente. Assim, neste corte:
+
+```text
+REPOSITORY_LOOSE_FILES_MAP_current_head = TOKEN_VAZIO_NOT_EXECUTED
+```
+
+Nenhum arquivo ApkC foi alterado artificialmente apenas para forçar o workflow.
 
 ## 8. Leitura rápida
 
@@ -167,6 +233,6 @@ Para entender o problema dos arquivos soltos sem percorrer todo o repositório:
 
 ---
 
-**F_ok:** existe governança documental, decisões explícitas e preservação de proveniência; o índice RAF agora distingue inventário atual de custódia histórica.  
-**F_gap:** snapshots gerados continuam temporais; M057–M063 ainda precisam de gates próprios para qualquer claim de build/runtime/hardware/benchmark.  
-**F_next:** executar os gates no novo head, regenerar mapa/catálogo e só então promover ou mover arquivos.
+**F_ok:** links quebrados = 0; RAF físico não indexado = 0; RAF indexado inexistente = 0; `REFERENCE_REPAIR` = 0; governança e M063 passaram no mesmo head de evidência.  
+**F_gap:** `REPOSITORY_LOOSE_FILES_MAP` do head corrente permanece `TOKEN_VAZIO_NOT_EXECUTED`; M057–M063 não recebem claim global de build/runtime/hardware/benchmark apenas por estarem indexados.  
+**F_next:** materializar o mapa pelo workflow ApkC quando houver dispatch observável e, depois, iniciar migrações físicas em PRs dedicados seguindo as decisões já registradas.
