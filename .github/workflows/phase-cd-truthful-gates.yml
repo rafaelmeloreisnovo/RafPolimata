@@ -6,6 +6,7 @@ on:
       - 'tools/verify_all_gaps.sh'
       - 'tools/validate_dex_pipeline.sh'
       - 'tools/validate_android_runtime_evidence.sh'
+      - 'tools/validate_ffi.sh'
       - 'tools/phase2_android_preflight.sh'
       - 'docs/receipts/PHASE_CD_TRUTHFUL_DEVICE_GATES_20260815.md'
       - '.github/workflows/phase-cd-truthful-gates.yml'
@@ -28,6 +29,7 @@ jobs:
           bash -n tools/verify_all_gaps.sh
           bash -n tools/validate_dex_pipeline.sh
           bash -n tools/validate_android_runtime_evidence.sh
+          bash -n tools/validate_ffi.sh
 
       - name: Phase 2 Android preflight
         run: |
@@ -44,6 +46,23 @@ jobs:
           set -e
           test "$rc" -eq 2
           grep -q 'TOKEN_VAZIO' ci/reports/l2-runtime-static-check.txt
+
+      - name: L5 bounded real FFI proof — C ABI to CPython ctypes
+        run: |
+          set -o pipefail
+          bash tools/validate_ffi.sh | tee ci/reports/l5-ffi-c-python.txt
+          grep -q 'PASS_C_PYTHON_FFI' ci/reports/l5-ffi-c-python.txt
+          ls docs/proofs/L5_FFI_C_PYTHON_*.json >/dev/null
+          python3 - <<'PY'
+          import glob,json
+          p=sorted(glob.glob('docs/proofs/L5_FFI_C_PYTHON_*.json'))[-1]
+          d=json.load(open(p,encoding='utf-8'))
+          assert d['state']=='PASS_C_PYTHON_FFI'
+          assert d['observations']['add_20_22']==42
+          assert d['observations']['bounds_rejection']=='PASS'
+          assert d['twelve_language_coverage']=='TOKEN_VAZIO_OUT_OF_SCOPE'
+          print('L5 receipt:',p)
+          PY
 
       - name: Verify L1-L10 without false-green
         run: |
@@ -69,6 +88,7 @@ jobs:
           grep -q 'apksigner.*verify' tools/verify_all_gaps.sh
           grep -q 'TOKEN_VAZIO_FORMAL_PROOF' tools/verify_all_gaps.sh
           grep -q 'exit 2' tools/validate_dex_pipeline.sh
+          grep -q 'twelve_language_coverage.*TOKEN_VAZIO_OUT_OF_SCOPE' tools/validate_ffi.sh
 
       - name: Upload Phase C-D receipts
         if: always()
@@ -78,9 +98,11 @@ jobs:
           path: |
             ci/reports/phase2-android-preflight.json
             ci/reports/l2-runtime-static-check.txt
+            ci/reports/l5-ffi-c-python.txt
             ci/reports/phase-cd-gap-verification.txt
             docs/proofs/L1_PROVENANCE_CURRENT.json
             docs/proofs/L4_DEX_VALIDATION_*.json
+            docs/proofs/L5_FFI_C_PYTHON_*.json
             results/apkc-runtime-hardening-proof.json
             Apkc/proofs/runs/
           if-no-files-found: warn
