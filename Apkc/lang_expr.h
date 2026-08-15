@@ -233,11 +233,13 @@ static inline u32 expr_parse_unary(struct ExprCtx *ctx) {
         return rd;
     }
 
-    /* Bitwise not */
+    /* Bitwise not - load mask and XOR */
     if (expr_match(ctx, TOK_TILDE)) {
         expr_advance(ctx);
-        u32 val = expr_parse_unary(ctx);
-        codegen_emit_xor(ctx->codegen, rd, val, 0xffffffff);  /* Simplified: XOR with -1 */
+        u32 val_reg = expr_parse_unary(ctx);
+        u8 mask_reg = (rd == 0) ? 1 : 0;  /* Use different register for mask */
+        codegen_emit_movi(ctx->codegen, mask_reg, 0xff);  /* Load mask into temp register */
+        codegen_emit_xor(ctx->codegen, rd, val_reg, mask_reg);  /* XOR with mask register */
         return rd;
     }
 
