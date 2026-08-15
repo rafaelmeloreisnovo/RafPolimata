@@ -47,7 +47,13 @@ done
 if grep -En '\b(malloc|calloc|realloc|free)[[:space:]]*\(' "${STRICT_FILES[@]}"; then
   fail 'heap explícito encontrado no núcleo M063 estrito'
 fi
-if grep -En '^#[[:space:]]*include[[:space:]]*[<"](stdio|stdlib|string|unistd|pthread|dlfcn|execinfo|setjmp)\.h[>"]' "${STRICT_FILES[@]}"; then
+# Keep the hosted-header regex semantically identical while avoiding a literal
+# Markdown-like `](` sequence in this shell source. The documentation governance
+# scanner treats Markdown links as relations; this split prevents the shell regex
+# itself from being misclassified as a broken local document reference.
+HOSTED_HEADER_RE='^#[[:space:]]*include[[:space:]]*[<"]'
+HOSTED_HEADER_RE+='(stdio|stdlib|string|unistd|pthread|dlfcn|execinfo|setjmp)\.h[>"]'
+if grep -En "$HOSTED_HEADER_RE" "${STRICT_FILES[@]}"; then
   fail 'header hosted proibido encontrado no núcleo M063 estrito'
 fi
 if grep -En '\b(new|delete|throw|catch|dynamic_cast|typeid)[[:space:]]*(\(|\[|[A-Za-z_])' "${STRICT_FILES[@]}"; then
