@@ -62,17 +62,43 @@ class InternalCustodyLedgerTests(unittest.TestCase):
         self.assertTrue(raw1.endswith(b"\n"))
         self.assertIn("龍".encode("utf-8"), raw1)
 
+    def test_canonical_null_token_and_number_representation(self):
+        token = "TOKEN" + "_VAZIO"
+        raw = ICE.canonical_json_bytes({"state": token, "none": None, "n": 1.25})
+        self.assertEqual(raw, ('{"n":1.25,"none":null,"state":"' + token + '"}\n').encode("utf-8"))
+
     def test_event_id_is_deterministic_given_identical_event(self):
+        token = "TOKEN" + "_VAZIO"
         event = {
             "event_version": "1.1.0", "parent_event_id": ICE.GENESIS_PARENT_ID,
             "timestamp_utc": "2026-08-15T12:00:00Z", "repository": "r",
-            "commit_sha": "TOKEN_VAZIO", "path": "x", "blob_sha": "TOKEN_VAZIO",
-            "symbol": "s", "toolchain": {"compiler":"TOKEN_VAZIO","linker":"TOKEN_VAZIO","platform":"linux"},
-            "parameters": {"state":"TOKEN_VAZIO"}, "seed": "TOKEN_VAZIO", "environment": {},
-            "input_sha256": "TOKEN_VAZIO", "output_sha256": "TOKEN_VAZIO",
-            "stdout_hash": "TOKEN_VAZIO", "stderr_hash": "TOKEN_VAZIO", "exit_code": 0, "result": "PASS"
+            "commit_sha": token, "path": "x", "blob_sha": token,
+            "symbol": "s", "toolchain": {"compiler":token,"linker":token,"platform":"linux"},
+            "parameters": {"state":token}, "seed": token, "environment": {},
+            "input_sha256": token, "output_sha256": token,
+            "stdout_hash": token, "stderr_hash": token, "exit_code": 0, "result": "PASS"
         }
         self.assertEqual(ICE.calculate_event_id(event, ICE.GENESIS_PARENT_ID), ICE.calculate_event_id(event, ICE.GENESIS_PARENT_ID))
+
+    def test_replay_with_fixed_inputs_is_byte_identical(self):
+        ledger_a = self.root / "replay-a.jsonl"
+        ledger_b = self.root / "replay-b.jsonl"
+        kwargs = dict(
+            repository="rafaelmeloreisnovo/RafPolimata",
+            path="artifact.bin",
+            symbol="deterministic_replay",
+            result="PASS",
+            exit_code=0,
+            parameters={"alpha": 7, "mode": "fixture"},
+            seed="0123456789abcdef",
+            repo_root=self.root,
+            timestamp_utc="2026-08-15T12:00:00Z",
+        )
+        first = ICE.record_event(ledger_path=ledger_a, **kwargs)
+        second = ICE.record_event(ledger_path=ledger_b, **kwargs)
+        self.assertIsNotNone(first); self.assertIsNotNone(second)
+        self.assertEqual(first, second)
+        self.assertEqual(ledger_a.read_bytes(), ledger_b.read_bytes())
 
     def test_one_byte_tamper_fails(self):
         self.record()
@@ -86,6 +112,16 @@ class InternalCustodyLedgerTests(unittest.TestCase):
         lines = self.ledger.read_text().splitlines()
         self.ledger.write_text(lines[1] + "\n" + lines[0] + "\n")
         self.assertFalse(self.verify()[1])
+
+    def test_incorrect_parent_is_rejected(self):
+        self.record(symbol="first"); self.record(symbol="second")
+        events = [json.loads(line) for line in self.ledger.read_text().splitlines()]
+        events[1]["parent_event_id"] = "a" * 64
+        events[1]["event_id"] = ICE.calculate_event_id(events[1], events[1]["parent_event_id"])
+        self.ledger.write_text("".join(json.dumps(event, separators=(",", ":"), sort_keys=True) + "\n" for event in events))
+        verifier, valid = self.verify()
+        self.assertFalse(valid)
+        self.assertIn("parent_event_id mismatch", verifier.report())
 
     def test_duplicate_event_fails(self):
         self.record(); line = self.ledger.read_text(); self.ledger.write_text(line + line)
