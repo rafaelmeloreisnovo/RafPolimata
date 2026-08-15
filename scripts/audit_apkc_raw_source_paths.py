@@ -18,6 +18,11 @@ COMPILER_TOKEN_RE = re.compile(
     r"(?:^|[\s:'\"/])(?:clang(?:\+\+)?|gcc|g\+\+|cc)(?=\s|$)"
     r"|\$(?:CC|\{CC\})(?=\s|$|[\"'])"
 )
+COMMAND_COMPILER_RE = re.compile(
+    r"(?:^|[;&|]\s*|\brun:\s*(?:\|\s*)?)"
+    r"(?:['\"]?(?:clang(?:\+\+)?|gcc|g\+\+|cc)['\"]?|['\"]?\$(?:CC|\{CC\})['\"]?)"
+    r"(?=\s|$)"
+)
 BUILD_FLAG_RE = re.compile(r"(?:^|\s)(?:-o|-c|-fsyntax-only|-nostdlib|-ffreestanding)(?:\s|$)")
 RAW_ALIAS_RE = re.compile(
     r"(?m)^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*(?::=|\?=|\+=|=)\s*['\"]?Apkc/apkc\.c['\"]?\s*$"
@@ -70,6 +75,10 @@ def _active_raw_build(text: str) -> bool:
         alias_on_line = any((f"${name}" in line or f"${{{name}}}" in line) for name in aliases)
         if not (raw_on_line or alias_on_line):
             continue
+        # Compiler invocation is a build even without -o (default a.out behavior).
+        # The flag-aware fallback catches common wrapped commands such as env/sudo.
+        if COMMAND_COMPILER_RE.search(stripped):
+            return True
         if COMPILER_TOKEN_RE.search(line) and BUILD_FLAG_RE.search(line):
             return True
     return False
