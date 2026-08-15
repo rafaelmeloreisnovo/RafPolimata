@@ -1,0 +1,60 @@
+name: ApkC Scoped Semantic Return Oracle
+
+on:
+  pull_request:
+    paths:
+      - 'Apkc/apkc_branchless_handler.h'
+      - 'Apkc/apkc_language_dispatch.h'
+      - 'Apkc/apkc_semantic_return_subset.h'
+      - 'Apkc/compiler_language_direct.h'
+      - 'Apkc/machine_linear_branchless.h'
+      - 'Apkc/executor_zero_overhead.h'
+      - 'Apkc/apkc_machine_to_arm64.h'
+      - 'tests/test_apkc_semantic_return_oracle.c'
+      - '.github/workflows/apkc-semantic-return-oracle.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  return-oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      - name: Compile strict gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror \
+            tests/test_apkc_semantic_return_oracle.c \
+            -o /tmp/test_apkc_semantic_return_oracle \
+            2>&1 | tee /tmp/apkc-semantic-return-oracle.log
+
+      - name: Execute expected-value falsifiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          /tmp/test_apkc_semantic_return_oracle \
+            2>&1 | tee -a /tmp/apkc-semantic-return-oracle.log
+          grep -q 'SUMMARY pass=' /tmp/apkc-semantic-return-oracle.log
+          grep -q 'fail=0' /tmp/apkc-semantic-return-oracle.log
+
+      - name: Freestanding syntax audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -Wall -Wextra -Werror -ffreestanding -fsyntax-only \
+            tests/test_apkc_semantic_return_oracle.c \
+            2>&1 | tee -a /tmp/apkc-semantic-return-oracle.log
+
+      - name: Preserve receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkc-semantic-return-oracle-receipt
+          path: /tmp/apkc-semantic-return-oracle.log
+          if-no-files-found: warn
