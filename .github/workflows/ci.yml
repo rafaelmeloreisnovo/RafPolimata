@@ -100,6 +100,7 @@ jobs:
 
       - name: APKc raw-source anti-bypass gate
         run: |
+          set -o pipefail
           python3 tests/test_apkc_raw_source_gate.py
           python3 scripts/audit_apkc_raw_source_paths.py | tee Apkc/proofs/out/raw-source-gate.json
 

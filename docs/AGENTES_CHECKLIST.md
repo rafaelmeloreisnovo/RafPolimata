@@ -1,144 +1,158 @@
 # Checklist operacional por sessão de agente
 
-> **Entrada canônica:** docs/AGENTES.md §3 (ciclo de sessão — startup e shutdown) e §4 (regras de não-colisão). Checklist executável por sessão de agente — 5 passos de startup, verificações pré-código por tipo de mudança e critérios de shutdown.
+> Entrada curta: `AGENTS.md`. Protocolo detalhado: `docs/AGENTES.md`.
 
-Este checklist é executável — marque cada item antes de prosseguir.
-Para contexto completo de cada item, consulte `docs/AGENTES.md`.
+Use este checklist de forma proporcional à tarefa. Nem todo gate pertence a todo PR.
 
----
+## Startup
 
-## Startup — antes de qualquer mudança de código
-
-```
-[ ] 1. Ler CLAUDE.md (invariantes, buffer limits, extensão protocol)
-
-[ ] 2. Confirmar branch destino:
-       git branch --show-current
-       → para feature/fix: branch dedicado (ex: feat/scope-YYYYMMDD)
-       → para canonização: main (apenas via PR aprovado)
-       → ver AGENTES.md §3.3 para política de branches
-
-[ ] 3. Rodar syntax check freestanding:
-       clang -target aarch64-linux-gnu -fsyntax-only -nostdlib -nostdinc \
-         -ffreestanding -I Apkc Apkc/apkc.c
-       → deve retornar sem erros antes e depois de qualquer edição em Apkc/
-
-[ ] 4. Grep de invariante freestanding em Apkc/:
-       grep -rn "malloc\|calloc\|free(\|#include <stdlib" Apkc/*.c Apkc/*.h
-       → deve retornar vazio
-
-[ ] 5. Identificar e classificar a tarefa:
-       [ ] documentação
-       [ ] implementação de feature
-       [ ] refatoração / limpeza
-       [ ] conformidade / auditoria
-       [ ] pesquisa / investigação
+```text
+[ ] 1. Ler AGENTS.md e docs/AGENTES.md.
+[ ] 2. Ler README/índice e instruções específicas do caminho alterado.
+[ ] 3. Registrar branch, HEAD e working tree.
+[ ] 4. Confirmar branch dedicada; não trabalhar em main por padrão.
+[ ] 5. Classificar tarefa: code | docs | data | compliance | research.
+[ ] 6. Identificar fonte canônica, derivados, invariantes e gates aplicáveis.
+[ ] 7. Registrar tool/device/dataset ausente como TOKEN_VAZIO.
 ```
 
----
+Comandos de identidade:
 
-## Pré-código — por tipo de mudança
-
-### Se for adicionar uma linguagem à tabela
-
-```
-[ ] Adicionar exatamente 1 linha em Apkc/lang_profile.h → _lang_table[]
-[ ] Definir flags: use_asm | use_script | use_fork
-[ ] Se DEX: use_d8=1
-[ ] Se JSX: jsx_node=1
-[ ] Rodar syntax check freestanding após a adição
-[ ] Nenhuma outra mudança necessária para o pipeline
+```sh
+git branch --show-current
+git rev-parse HEAD
+git status --short
 ```
 
-### Se for adicionar encoder ARM64
+## Antes de editar
 
-```
-[ ] Escrever static inline u32 em Apkc/arch_arm64.h
-[ ] Adicionar case correspondente em asm_insn64() em Apkc/apkc.c
-[ ] Se for família de equivalência: verificar semântica idêntica para TODOS os encodings
-[ ] Adicionar golden test em tests/test_arm64_encoders.py
-[ ] Rodar: python3 tests/test_arm64_encoders.py
-```
-
-### Se for adicionar seção ELF
-
-```
-[ ] Estender Apkc/fmt_elf.h com nova seção
-[ ] Atualizar sh_link de .hash, .dynsym, .dynamic (todos apontam para .dynstr)
-[ ] Atualizar e_shstrndx se .shstrtab mudou de índice
-[ ] Conferir contagem de seções em todos os cross-refs
-[ ] Rodar syntax check freestanding
+```text
+[ ] Existe AGENTS.md mais próximo do arquivo?
+[ ] Existe .github/instructions/*.instructions.md aplicável?
+[ ] O texto que vou usar é atual ou histórico?
+[ ] Há receipt/closure mais recente que contradiz onboarding antigo?
+[ ] O baseline mínimo pode ser executado neste ambiente?
 ```
 
-### Se for documentação apenas
+## Se tocar ApkC
 
-```
-[ ] Linkar o documento a um arquivo de código, gate ou script executável
-[ ] Não remover TOKEN_VAZIO sem implementar o que ele sinaliza
-[ ] Atualizar MAPA_ESTRUTURAL_REPOSITORIO.md se novo arquivo muda a estrutura
+```text
+[ ] Classificar caminho: hosted | freestanding | shared.
+[ ] Não aplicar “no libc em todo ApkC” indiscriminadamente.
+[ ] Preservar no-libc/no-heap apenas onde o target/gate freestanding exige.
+[ ] Validar capacidade/offset/alinhamento antes de alterar buffers/formats.
+[ ] Guardar NULL/erro de lookup conforme a API atual.
+[ ] Rodar o menor gate atual aplicável.
 ```
 
----
+Entrada recomendada para syntax hardened atual:
+
+```sh
+make syntax
+```
+
+Quando aplicável:
+
+```sh
+make compiler-contract
+make compiler-selftest
+make hotfix-audit
+```
+
+Não copie comandos históricos se o Makefile atual já representa o caminho canônico.
+
+## Se tocar linguagem ou encoder
+
+```text
+[ ] Verificar tabela/dispatch/artefato/ABI exigidos pelo contrato atual.
+[ ] Encoder novo tem implementação + dispatch + golden/roundtrip aplicável.
+[ ] Família de equivalência preserva semântica e efeitos colaterais relevantes.
+[ ] Nenhum caminho desconhecido virou sucesso silencioso.
+```
+
+## Se tocar ELF / DEX / AXML / ZIP / segment / schema
+
+```text
+[ ] Avaliar versão e compatibilidade.
+[ ] Atualizar todos os cross-references, offsets, contagens e alinhamentos.
+[ ] Preservar endianness/tamanho explícito.
+[ ] Rodar leitor/validador independente aplicável.
+[ ] Corrupção/truncamento continuam rejeitados onde o contrato exige.
+```
+
+## Se tocar T^7 / Verbovivo
+
+```text
+[ ] Ler docs/closures/CLOSURE_L9_T7_CONVERGENCE.md.
+[ ] Não restaurar “42 fixed-point attractors” como claim provado.
+[ ] Distinguir índice/range de propriedade dinâmica.
+[ ] Se houver claim novo: definição + falsificador + execução + receipt.
+```
+
+## Se tocar Android/runtime
+
+```text
+[ ] Não colapsar source/ELF/APK/signature/install/launch/runtime.
+[ ] Current-commit/current-artifact evidence está explicitamente ligada ao claim?
+[ ] Device ausente = TOKEN_VAZIO, não PASS.
+```
+
+## Se for documentação
+
+```text
+[ ] Distinguir REFERENCE / IMPLEMENTED / PASS / FAIL / TOKEN_VAZIO.
+[ ] Não transformar receipt histórico em estado atual.
+[ ] Novo documento tem área, lifecycle, responsável lógico e rota de descoberta.
+[ ] Não editar docs/generated/ ou results/document-governance/ manualmente.
+[ ] Se a mudança for canônica, executar governance check quando disponível.
+```
+
+Comandos típicos:
+
+```sh
+python3 -m unittest tests.test_document_governance
+python3 scripts/document_governance.py --check --print-summary
+```
 
 ## Durante a execução
 
-```
-[ ] Syntax check freestanding após CADA edição em Apkc/*.h ou Apkc/*.c
-[ ] Estados VOID/PENDING/AUDIT/RUNTIME/REFERENCE explícitos em tudo incompleto
-[ ] TOKEN_VAZIO quando falta evidência — nunca fabricar PASS
-[ ] Nenhuma alocação dinâmica em hot paths (nem mesmo alloca)
-[ ] Commits atômicos: código + documentação correspondente no mesmo commit
-```
-
----
-
-## Shutdown — antes do push
-
-```
-[ ] Syntax check freestanding passa limpo
-
-[ ] Grep de malloc/calloc/free em Apkc/ retorna vazio:
-    grep -rn "malloc\|calloc\|free(\|#include <stdlib" Apkc/*.c Apkc/*.h
-
-[ ] Commit message no formato:
-    type(scope): o que foi feito + por quê
-    ✓  feat(Apkc): add PHP to _lang_table — completes OS coverage
-    ✓  fix(arch_arm64): guard NULL return in lang_profile_find callers
-    ✗  update lang_profile.h
-
-[ ] Todo trabalho incompleto tem VOID ou PENDING explícito com descrição
-
-[ ] Riscos e pendências listados no body do PR
-
-[ ] PR aberto como DRAFT se CI não está completamente verde
-
-[ ] Se houve conflito com outro agente: entrada criada em docs/AGENTES_DECISAO_LOG.md
+```text
+[ ] Commits/diffs permanecem no escopo.
+[ ] Falha não foi escondida por || true, skip silencioso ou retorno sempre sucesso.
+[ ] Resultados negativos/falsificadores foram preservados.
+[ ] Segredos não foram reproduzidos em logs/docs.
+[ ] Estado desconhecido continua TOKEN_VAZIO.
+[ ] Otimização não substituiu referência/golden sem equivalência.
 ```
 
----
+## Shutdown
 
-## Critério de encerramento de sessão
+```text
+[ ] Código/docs/estado permanecem coerentes.
+[ ] Listei apenas comandos realmente executados como execução.
+[ ] Cada gate observado tem PASS / FAIL / TOKEN_VAZIO explícito.
+[ ] Riscos e rollback estão no handoff/PR.
+[ ] PR permanece draft se um gate material para o claim ainda está aberto.
+[ ] Conflito entre agentes foi registrado em docs/AGENTES_DECISAO_LOG.md.
+[ ] Merge não foi feito sem autorização humana explícita.
+```
 
-A sessão só é encerrada com PR pronto quando:
+## Critério de prontidão
 
-1. Gates bloqueantes do CI passam
-2. Relatório P(k) em PASS (`results/first_test_report.json` → `"verdict": "PASS"`)
-3. Nenhum arquivo crítico (listado em `CLAUDE.md → Key files`) foi alterado sem documentação correspondente
-4. Todas as pendências estão declaradas como PENDING no PR ou em código
+Não existe gate universal como P(k), Android físico ou CI completo para todo tipo de mudança.
 
-Se qualquer item acima estiver incompleto, deixar PR como DRAFT com comentário
-explicativo — não fingir que está pronto.
+Um PR está pronto para revisão quando:
 
----
+1. os gates **aplicáveis ao escopo declarado** foram executados ou marcados `TOKEN_VAZIO` com razão;
+2. nenhum claim excede a evidência observada;
+3. não há regressão conhecida escondida;
+4. documentação/rollback/provenance necessários estão presentes;
+5. o humano pode entender claramente o que falta antes de merge.
 
-## Referência rápida — buffer limits (nunca ultrapassar)
+## Fechamento R3
 
-| Buffer | Tamanho | Uso |
-|---|---|---|
-| `_code64` | 64 KB | Código ARM64 montado |
-| `_so64_buf` | 32 KB | Saída ELF64 .so |
-| `_fork_out` | 1 MB | Saída de compilador externo (fork+exec) |
-| `_dex_buf` | 200 B | Stub classes.dex mínimo |
-| dynstr (stack) | 512 B | Nomes de símbolos ELF dinâmicos |
-| elfhash (stack) | 64 B | Hash table ELF (nbucket=1) |
-| AXML sv[] | 50 entradas | Pool de strings do AXML builder |
+```text
+F_ok   = alterado/executado/demonstrado
+F_gap  = não executado, indisponível, contraditório ou pendente
+F_next = menor ação reproduzível seguinte
+```

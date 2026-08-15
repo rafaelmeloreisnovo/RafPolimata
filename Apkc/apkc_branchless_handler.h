@@ -1,8 +1,11 @@
 /* apkc_branchless_handler.h — Branchless machine compilation coordinator
  *
- * Pipeline: Source → compiler_language_direct → executor_zero_overhead → ARM64
+ * Pipeline: Source -> canonical LangProfile -> scoped semantic subset or
+ *          language-specific frontend -> linear machine -> scoped VM oracle
+ *          (when eligible) -> ARM64
+ *
  * Zero-overhead: no malloc, no libc, no function calls in hot path.
- * Deterministic: identical input → identical output, every build.
+ * Deterministic: identical input -> identical output, every build.
  *
  * FREESTANDING: No malloc, no libc, all stack allocation.
  */
@@ -12,12 +15,24 @@
 
 #include "machine_linear_branchless.h"
 #include "compiler_language_direct.h"
+#include "apkc_language_dispatch.h"
 #include "executor_zero_overhead.h"
 #include "apkc_machine_to_arm64.h"
 
 typedef unsigned long long u64;
 typedef unsigned int u32;
 typedef unsigned char u8;
+
+/* Branchless handler status codes. */
+#define APKC_BRANCHLESS_OK                  0u
+#define APKC_BRANCHLESS_COMPILE_ERROR       1u
+#define APKC_BRANCHLESS_ENCODE_ERROR        2u
+#define APKC_BRANCHLESS_UNSUPPORTED_LANG    3u
+#define APKC_BRANCHLESS_VM_ACTION_ERROR     4u
+
+/* VM action observation is not, by itself, semantic equivalence proof. */
+#define APKC_VM_ACTION_NOT_RUN 0u
+#define APKC_VM_ACTION_OBSERVED 1u
 
 /* === BRANCHLESS COMPILER STATE === */
 struct BranchlessHandler {
@@ -31,8 +46,16 @@ struct BranchlessHandler {
     struct Arm64Encoder arm64_enc;
     u8 arm64_asm[0x10000];               /* 64K ARM64 buffer */
 
-    /* Status and metrics */
-    u8 status;                           /* 0=success, 1=error, 2=overflow */
+    /* Status and evidence metrics */
+    u8 status;                           /* APKC_BRANCHLESS_* */
+    u8 lang_profile_id;                  /* canonical LP_* value from lang_profile.h */
+    u8 frontend_kind;                    /* APKC_FRONTEND_* */
+    u8 semantic_scope;                   /* APKC_SEMANTIC_SCOPE_* */
+    u8 semantic_proof;                   /* APKC_SEMANTIC_*; external expected-value gate required */
+    u8 vm_action_observed;               /* APKC_VM_ACTION_* */
+    u8 vm_status;                        /* ExecutionContext status */
+    u8 _reserved0;
+    u64 vm_result;                       /* observed r0 after scoped VM action */
     u64 steps_executed;                  /* Instruction count from executor */
     u32 code_len;                        /* Actual instruction count */
     u32 arm64_len;                       /* Actual ARM64 assembly size */
@@ -40,20 +63,12 @@ struct BranchlessHandler {
 
 /* === ENTRY POINT === */
 
-/* apkc_branchless_compile: Source → Machine instructions → ARM64
+/* apkc_branchless_compile: Source -> canonical route -> Machine -> ARM64
  *
- * INPUT:
- *   handler    — uninitialized BranchlessHandler struct (stack-allocated)
- *   src        — source code buffer
- *   src_len    — source length in bytes
- *   lang_type  — language type (0=Python, 1=Go, 2=Rust, 3=C, 4=JS, 5=Java, 6=Swift, 7=Kotlin)
- *
- * OUTPUT:
- *   handler->arm64_asm   — compiled ARM64 assembly (if status=0)
- *   handler->arm64_len   — assembly size in bytes
- *   handler->status      — 0=success, 1=compile_error, 2=overflow
- *
- * RETURNS: u8 status code (0=success, 1=error)
+ * A bounded semantic subset may additionally execute the exact VM instruction
+ * stream.  The handler records that observation but cannot know the caller's
+ * expected value, so semantic_proof remains UNPROVEN here.  CI/test code must
+ * compare vm_result against an independently declared expected result.
  */
 static inline u8 apkc_branchless_compile(
     struct BranchlessHandler *h,
@@ -62,6 +77,8 @@ static inline u8 apkc_branchless_compile(
 {
     u32 i;
 
+    if (!h) return 1;
+
     /* === PHASE 1: INITIALIZATION === */
 
     /* Zero out handler (critical for determinism) */
@@ -69,11 +86,29 @@ static inline u8 apkc_branchless_compile(
         ((u8*)h)[i] = 0;
     }
 
+    if (!src || src_len == 0) {
+        h->status = APKC_BRANCHLESS_COMPILE_ERROR;
+        return 1;
+    }
+
+    /* G-S1: there is one language identity contract: LP_* from lang_profile.h. */
+    if (!apkc_branchless_lang_supported(lang_type)) {
+        h->status = APKC_BRANCHLESS_UNSUPPORTED_LANG;
+        return 1;
+    }
+
+    h->lang_profile_id = lang_type;
+    h->frontend_kind = APKC_FRONTEND_NONE;
+    h->semantic_scope = APKC_SEMANTIC_SCOPE_NONE;
+    h->semantic_proof = APKC_SEMANTIC_UNPROVEN;
+    h->vm_action_observed = APKC_VM_ACTION_NOT_RUN;
+
     /* Initialize execution context with embedded machine state and code array */
     h->ctx.code_len = 0;
     h->ctx.max_steps = 0x10000;  /* 64K step limit */
     h->ctx.status = 0;
     h->ctx.steps_executed = 0;
+    h->ctx.result = 0;
 
     /* Initialize machine state within execution context */
     for (i = 0; i < 16; i++) {
@@ -96,69 +131,92 @@ static inline u8 apkc_branchless_compile(
 
     /* === PHASE 2: COMPILATION === */
 
-    /* Route to language-specific compiler via compile_universal() */
-    if (compile_universal(&uc, src, src_len, lang_type)) {
-        h->status = 1;  /* Compile error */
+    if (apkc_compile_language_direct_scoped(
+            &uc, src, src_len, lang_type,
+            &h->frontend_kind, &h->semantic_scope)) {
+        h->status = APKC_BRANCHLESS_COMPILE_ERROR;
         return 1;
     }
 
     /* Snapshot instruction count */
     h->code_len = uc.cg.pos;
+    if (h->code_len == 0 || h->code_len > 0x10000) {
+        h->status = APKC_BRANCHLESS_COMPILE_ERROR;
+        return 1;
+    }
 
-    /* Copy code length to execution context */
+    /* Copy generated code into the execution context.  The future or current
+     * oracle must consume exactly the same VM instruction stream that proceeds
+     * to ARM64 encoding.
+     */
     h->ctx.code_len = h->code_len;
+    for (i = 0; i < h->code_len; i++) {
+        h->ctx.code[i] = h->code[i];
+    }
 
-    /* === PHASE 3: VALIDATION (OPTIONAL) === */
+    /* === PHASE 3: SCOPED VM ACTION ORACLE === */
 
-    /* Execute compiled program to validate:
-     * - No invalid operations
-     * - No out-of-bounds memory access
-     * - Deterministic execution
-     *
-     * NOTE: For Phase 3a, we skip execution and proceed directly to ARM64 encoding.
-     * Phase 3b will add execution validation with hardening gates.
+    if (h->semantic_scope == APKC_SEMANTIC_SCOPE_RETURN_ARITHMETIC_FRAGMENT) {
+        /* The bounded subset ends in VM RET.  For this synthetic caller-only
+         * oracle, r14 points one instruction past the fragment so RET exits the
+         * VM cleanly.  This convention does not claim general CALL/RET closure.
+         */
+        h->ctx.m.r[14] = (u64)h->code_len;
+        h->vm_status = execute(&h->ctx);
+        h->vm_result = h->ctx.result;
+        h->steps_executed = h->ctx.steps_executed;
+
+        if (h->vm_status != 1u) {
+            h->status = APKC_BRANCHLESS_VM_ACTION_ERROR;
+            return 1;
+        }
+        h->vm_action_observed = APKC_VM_ACTION_OBSERVED;
+    }
+
+    /* `semantic_proof` deliberately remains UNPROVEN: the handler can observe
+     * r0 but cannot decide whether r0 equals the independently expected value.
      */
 
     /* === PHASE 4: ARM64 ASSEMBLY GENERATION === */
 
-    /* Encode machine instructions to ARM64 binary format */
     if (arm64_encode_program(&h->arm64_enc, h->code, h->code_len)) {
-        h->status = 2;  /* Overflow or encoding error */
+        h->status = APKC_BRANCHLESS_ENCODE_ERROR;
         return 1;
     }
 
-    /* Snapshot ARM64 assembly size */
     h->arm64_len = h->arm64_enc.pos;
 
-    /* === PHASE 5: SUCCESS === */
+    /* === PHASE 5: STRUCTURAL SUCCESS === */
 
-    h->status = 0;
+    h->status = APKC_BRANCHLESS_OK;
     h->steps_executed = h->ctx.steps_executed;
-
     return 0;
 }
 
-/* === OPTIONAL: VALIDATION WITH HARDENING GATES (Phase 3b) === */
+/* === OPTIONAL: VALIDATION WITH HARDENING GATES === */
 
-/* apkc_branchless_validate_with_gates: Add hardening gate checks
- *
- * This is a placeholder for Phase 3b integration with:
+/* apkc_branchless_validate_with_gates remains a future integration point for:
  * - hardening_boundary_gates.h (capacity validation)
  * - hardening_receipt_chain.h (chain-of-custody)
  * - hardening_fail_closed.h (TOKEN_VAZIO barrier)
  *
- * TODO: Implement after Phase 3a baseline.
+ * Only bounded scopes with explicit expected-result falsifiers may promote
+ * semantic evidence.  Control flow, calls, variables and comparison semantics
+ * remain independent open gates.
  */
 
 /* === INTROSPECTION === */
 
-/* Get status string for debugging (freestanding-safe) */
 static inline const char* apkc_branchless_status_str(u8 status) {
     switch (status) {
-    case 0: return "success";
-    case 1: return "compile_error";
-    case 2: return "overflow";
-    default: return "unknown";
+    case APKC_BRANCHLESS_OK:               return "success";
+    case APKC_BRANCHLESS_COMPILE_ERROR:    return "compile_error";
+    /* Preserve the historic leading 'o' expected by the Phase 3 integration
+     * gate while making the broader encoder meaning explicit. */
+    case APKC_BRANCHLESS_ENCODE_ERROR:     return "overflow_or_encode_error";
+    case APKC_BRANCHLESS_UNSUPPORTED_LANG: return "unsupported_language";
+    case APKC_BRANCHLESS_VM_ACTION_ERROR:  return "vm_action_error";
+    default:                               return "unknown";
     }
 }
 

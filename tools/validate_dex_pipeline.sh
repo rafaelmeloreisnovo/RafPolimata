@@ -1,352 +1,126 @@
-#!/bin/bash
-# tools/validate_dex_pipeline.sh
-#
-# Phase C Component 4 (Gap L4): Java/DEX Pipeline Validation
-# Verifies that Kotlin/Java sources compile to valid DEX bytecode
-#
-# Checks:
-# 1. Java compiler (javac) available
-# 2. DEX compiler (d8) or alternative (dx, dex) available
-# 3. .class file generation from .kt/.java
-# 4. DEX bytecode generation (64-bit DEX format)
-# 5. DEX structure validation (magic + version)
-# 6. Method count and class references
-#
-# Usage:
-#   ./tools/validate_dex_pipeline.sh <java_or_kt_file>
+#!/usr/bin/env bash
+# L4 Java/Kotlin -> JVM class -> DEX validation.
+# Exit 0=observed PASS, 1=falsified with available toolchain, 2=TOKEN_VAZIO external capability.
+set -u -o pipefail
 
-set -e
+SOURCE_FILE="${1:-}"
+[ -n "$SOURCE_FILE" ] || { echo "Usage: $0 <java_or_kt_file>" >&2; exit 64; }
+[ -f "$SOURCE_FILE" ] || { echo "L4 FAIL source_missing=$SOURCE_FILE" >&2; exit 1; }
 
-SOURCE_FILE="${1:?Usage: $0 <java_or_kt_file>}"
-TIMESTAMP=$(date -u +"%Y%m%d_%H%M%S")
-TMPDIR="/tmp/dex_validation_$$"
-RESULT_DIR="./docs/proofs"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+OUT_DIR="$TMP/dex"
+CLASS_DIR="$TMP/classes"
+mkdir -p "$OUT_DIR" "$CLASS_DIR" docs/proofs
+RECEIPT="docs/proofs/L4_DEX_VALIDATION_${TIMESTAMP}.json"
 
-mkdir -p "$TMPDIR" "$RESULT_DIR"
-
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-log_info() { echo -e "${BLUE}[INFO]${NC} $*"; }
-log_pass() { echo -e "${GREEN}[PASS]${NC} $*"; }
-log_fail() { echo -e "${RED}[FAIL]${NC} $*"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $*"; }
-
-# Verification flags
-PASS=1
-JAVAC_AVAILABLE=0
-DEX_COMPILER_AVAILABLE=0
-CLASS_GENERATED=0
-DEX_GENERATED=0
-DEX_STRUCTURE_VALID=0
-DEX_64BIT=0
-
-# ─────────────────────────────────────────────────────────────────────────
-# Check 1: Detect source type and required tools
-# ─────────────────────────────────────────────────────────────────────────
-
-detect_source_type() {
-    log_info "Check 1: Detecting source file type..."
-
-    if [ ! -f "$SOURCE_FILE" ]; then
-        log_fail "Source file not found: $SOURCE_FILE"
-        PASS=0
-        return 1
-    fi
-
-    local ext="${SOURCE_FILE##*.}"
-    case "$ext" in
-        java)
-            log_info "  ✓ Java source detected (.java)"
-            return 0
-            ;;
-        kt)
-            log_info "  ✓ Kotlin source detected (.kt)"
-            return 0
-            ;;
-        *)
-            log_fail "  ✗ Unsupported source type: .$ext"
-            PASS=0
-            return 1
-            ;;
-    esac
+has() { command -v "$1" >/dev/null 2>&1; }
+find_sdk_tool() {
+  local name="$1"
+  if has "$name"; then command -v "$name"; return 0; fi
+  local sdk="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+  [ -n "$sdk" ] || return 1
+  [ -d "$sdk/build-tools" ] || return 1
+  find "$sdk/build-tools" -type f -name "$name" -perm -u+x 2>/dev/null | sort -V | tail -n 1
 }
 
-# ─────────────────────────────────────────────────────────────────────────
-# Check 2: Verify Java compiler availability
-# ─────────────────────────────────────────────────────────────────────────
-
-check_javac_availability() {
-    log_info "Check 2: Verifying Java compiler availability..."
-
-    if command -v javac &>/dev/null; then
-        local version=$(javac -version 2>&1 | head -1)
-        log_pass "  ✓ javac found: $version"
-        JAVAC_AVAILABLE=1
-        return 0
-    else
-        log_warn "  ⊘ javac not found (can skip .class generation if DEX available)"
-        return 0
+EXT="${SOURCE_FILE##*.}"
+COMPILER=""
+case "$EXT" in
+  java)
+    if ! has javac; then
+      cat >"$RECEIPT" <<JSON
+{"schema":"rafpolimata.l4.dex.v2","state":"TOKEN_VAZIO_TOOLCHAIN","missing":"javac","source":"$(basename "$SOURCE_FILE")","claim_allowed":false}
+JSON
+      echo "L4 TOKEN_VAZIO_TOOLCHAIN missing=javac receipt=$RECEIPT"
+      exit 2
     fi
-}
-
-# ─────────────────────────────────────────────────────────────────────────
-# Check 3: Verify DEX compiler availability
-# ─────────────────────────────────────────────────────────────────────────
-
-check_dex_compiler_availability() {
-    log_info "Check 3: Verifying DEX compiler availability..."
-
-    # Check for d8 (preferred, modern Android Gradle plugin)
-    if command -v d8 &>/dev/null; then
-        log_pass "  ✓ d8 found (modern DEX compiler)"
-        DEX_COMPILER_AVAILABLE=1
-        return 0
+    COMPILER="javac"
+    ;;
+  kt)
+    if ! has kotlinc; then
+      cat >"$RECEIPT" <<JSON
+{"schema":"rafpolimata.l4.dex.v2","state":"TOKEN_VAZIO_TOOLCHAIN","missing":"kotlinc","source":"$(basename "$SOURCE_FILE")","claim_allowed":false}
+JSON
+      echo "L4 TOKEN_VAZIO_TOOLCHAIN missing=kotlinc receipt=$RECEIPT"
+      exit 2
     fi
+    COMPILER="kotlinc"
+    ;;
+  *)
+    echo "L4 FAIL unsupported_source_extension=$EXT" >&2
+    exit 1
+    ;;
+esac
 
-    # Fallback: dx (legacy Android SDK)
-    if command -v dx &>/dev/null; then
-        log_pass "  ✓ dx found (legacy DEX compiler)"
-        DEX_COMPILER_AVAILABLE=1
-        return 0
-    fi
+DEX="$(find_sdk_tool d8 2>/dev/null || find_sdk_tool dx 2>/dev/null || true)"
+if [ -z "$DEX" ]; then
+  cat >"$RECEIPT" <<JSON
+{"schema":"rafpolimata.l4.dex.v2","state":"TOKEN_VAZIO_TOOLCHAIN","missing":"d8_or_dx","source":"$(basename "$SOURCE_FILE")","claim_allowed":false}
+JSON
+  echo "L4 TOKEN_VAZIO_TOOLCHAIN missing=d8_or_dx receipt=$RECEIPT"
+  exit 2
+fi
 
-    # Fallback: dex (in some SDK setups)
-    if command -v dex &>/dev/null; then
-        log_pass "  ✓ dex found"
-        DEX_COMPILER_AVAILABLE=1
-        return 0
-    fi
+if [ "$COMPILER" = javac ]; then
+  if ! javac -d "$CLASS_DIR" "$SOURCE_FILE"; then
+    echo "L4 FAIL javac_compile" >&2; exit 1
+  fi
+else
+  if ! kotlinc "$SOURCE_FILE" -d "$CLASS_DIR"; then
+    echo "L4 FAIL kotlinc_compile" >&2; exit 1
+  fi
+fi
 
-    log_warn "  ⊘ No DEX compiler found (d8/dx/dex)"
-    log_warn "    Phase 2: Install Android Gradle plugin or SDK tools"
-    return 0
-}
+mapfile -t CLASSES < <(find "$CLASS_DIR" -type f -name '*.class' -print | sort)
+if [ ${#CLASSES[@]} -eq 0 ]; then
+  echo "L4 FAIL no_class_files_generated" >&2
+  exit 1
+fi
 
-# ─────────────────────────────────────────────────────────────────────────
-# Check 4: Compile .java/.kt to .class
-# ─────────────────────────────────────────────────────────────────────────
+DEX_FILE="$OUT_DIR/classes.dex"
+case "$(basename "$DEX")" in
+  d8*)
+    if ! "$DEX" --output "$OUT_DIR" "${CLASSES[@]}"; then echo "L4 FAIL d8_compile" >&2; exit 1; fi
+    ;;
+  dx*)
+    if ! "$DEX" --dex --output="$DEX_FILE" "${CLASSES[@]}"; then echo "L4 FAIL dx_compile" >&2; exit 1; fi
+    ;;
+  *) echo "L4 FAIL unknown_dex_compiler=$DEX" >&2; exit 1;;
+esac
 
-check_class_generation() {
-    log_info "Check 4: Generating .class from source..."
+[ -f "$DEX_FILE" ] || { echo "L4 FAIL dex_not_generated" >&2; exit 1; }
+# DEX header is: 'dex\n' + three ASCII version bytes + NUL.
+MAGIC_HEX="$(od -An -tx1 -N8 "$DEX_FILE" | tr -d ' \n')"
+case "$MAGIC_HEX" in
+  6465780a3033[0-9a-f][0-9a-f]00|6465780a3034[0-9a-f][0-9a-f]00)
+    ;;
+  *) echo "L4 FAIL invalid_dex_magic=$MAGIC_HEX" >&2; exit 1;;
+esac
 
-    if [ $JAVAC_AVAILABLE -eq 0 ]; then
-        log_warn "  ⊘ javac not available (skipping .class generation)"
-        return 0
-    fi
-
-    local class_file="$TMPDIR/Main.class"
-
-    # For .kt files, we'd need kotlinc, so skip if not Java
-    local ext="${SOURCE_FILE##*.}"
-    if [ "$ext" != "java" ]; then
-        log_warn "  ⊘ Kotlin source detected (requires kotlinc, skipping)"
-        return 0
-    fi
-
-    # Compile .java to .class
-    if javac -d "$TMPDIR" "$SOURCE_FILE" 2>/dev/null; then
-        if [ -f "$class_file" ] || ls "$TMPDIR"/*.class >/dev/null 2>&1; then
-            log_pass "  ✓ .class file generated successfully"
-            CLASS_GENERATED=1
-            return 0
-        else
-            log_warn "  ⊘ .class file not found after compilation"
-            return 0
-        fi
-    else
-        log_warn "  ⊘ Java compilation failed (syntax error or missing deps)"
-        return 0
-    fi
-}
-
-# ─────────────────────────────────────────────────────────────────────────
-# Check 5: Compile .class to DEX
-# ─────────────────────────────────────────────────────────────────────────
-
-check_dex_generation() {
-    log_info "Check 5: Generating DEX bytecode..."
-
-    if [ $DEX_COMPILER_AVAILABLE -eq 0 ]; then
-        log_warn "  ⊘ DEX compiler not available (phase 2 requirement)"
-        return 0
-    fi
-
-    local dex_output="$TMPDIR/classes.dex"
-
-    # If .class files exist, compile them to DEX
-    if ls "$TMPDIR"/*.class >/dev/null 2>&1; then
-        if command -v d8 &>/dev/null; then
-            # Modern d8 compiler
-            if d8 --output="$TMPDIR" "$TMPDIR"/*.class 2>/dev/null; then
-                if [ -f "$dex_output" ]; then
-                    log_pass "  ✓ DEX generated via d8"
-                    DEX_GENERATED=1
-                    return 0
-                fi
-            fi
-        elif command -v dx &>/dev/null; then
-            # Legacy dx compiler
-            if dx --dex --output="$TMPDIR" "$TMPDIR"/*.class 2>/dev/null; then
-                if [ -f "$dex_output" ]; then
-                    log_pass "  ✓ DEX generated via dx"
-                    DEX_GENERATED=1
-                    return 0
-                fi
-            fi
-        fi
-    fi
-
-    log_warn "  ⊘ DEX generation skipped (no .class or compiler failure)"
-    return 0
-}
-
-# ─────────────────────────────────────────────────────────────────────────
-# Check 6: Validate DEX structure
-# ─────────────────────────────────────────────────────────────────────────
-
-check_dex_structure() {
-    log_info "Check 6: Validating DEX bytecode structure..."
-
-    local dex_file="$TMPDIR/classes.dex"
-
-    if [ ! -f "$dex_file" ]; then
-        log_warn "  ⊘ No DEX file to validate"
-        return 0
-    fi
-
-    # Check DEX magic bytes (64 65 78 0A = "dex\n")
-    local magic=$(od -An -tx1 -N3 "$dex_file" 2>/dev/null | tr -d ' ')
-    if [ "$magic" = "646578" ]; then
-        log_pass "  ✓ DEX magic bytes valid (64 65 78 0A)"
-        DEX_STRUCTURE_VALID=1
-
-        # Check version (bytes 4-6)
-        local version=$(od -An -tx1 -j4 -N2 "$dex_file" 2>/dev/null | tr -d ' ')
-        case "$version" in
-            3900) log_info "    ✓ DEX version 039 (API 13+)" ;;
-            3400) log_info "    ✓ DEX version 034 (API 9+)" ;;
-            3500) log_info "    ✓ DEX version 035 (API 11+)" ;;
-            *)    log_warn "    ⊘ DEX version: $version (check Android API level)" ;;
-        esac
-
-        # Check if 64-bit DEX (uleb128 encoded file size at offset 32)
-        DEX_64BIT=1
-        log_info "    ✓ 64-bit DEX format supported"
-
-        return 0
-    else
-        log_fail "  ✗ Invalid DEX magic bytes: $magic"
-        PASS=0
-        return 1
-    fi
-}
-
-# ─────────────────────────────────────────────────────────────────────────
-# Check 7: Verify DEX class count
-# ─────────────────────────────────────────────────────────────────────────
-
-check_dex_class_count() {
-    log_info "Check 7: Analyzing DEX class and method counts..."
-
-    local dex_file="$TMPDIR/classes.dex"
-
-    if [ ! -f "$dex_file" ]; then
-        log_warn "  ⊘ No DEX file for analysis"
-        return 0
-    fi
-
-    # File size check
-    local file_size=$(stat -c%s "$dex_file" 2>/dev/null || stat -f%z "$dex_file")
-    if [ "$file_size" -gt 0 ]; then
-        log_info "  ✓ DEX file size: $file_size bytes"
-    fi
-
-    # Note: Full DEX parsing requires understanding uleb128 encoding
-    # For now, basic size check suffices
-    if [ "$file_size" -gt 64 ]; then
-        log_pass "  ✓ DEX contains class definitions ($file_size bytes)"
-        return 0
-    else
-        log_warn "  ⊘ DEX file appears empty or minimal"
-        return 0
-    fi
-}
-
-# ─────────────────────────────────────────────────────────────────────────
-# Generate Results Receipt
-# ─────────────────────────────────────────────────────────────────────────
-
-generate_receipt() {
-    local receipt_file="$RESULT_DIR/L4_DEX_VALIDATION_${TIMESTAMP}.json"
-
-    cat > "$receipt_file" << EOF
+SIZE="$(wc -c <"$DEX_FILE" | tr -d ' ')"
+SHA="$(sha256sum "$DEX_FILE" | awk '{print $1}')"
+CLASS_COUNT="${#CLASSES[@]}"
+cat >"$RECEIPT" <<JSON
 {
-  "metadata": {
-    "timestamp": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
-    "source_file": "$(basename $SOURCE_FILE)",
-    "source_type": "${SOURCE_FILE##*.}"
-  },
-  "tools": {
-    "javac_available": $JAVAC_AVAILABLE,
-    "dex_compiler_available": $DEX_COMPILER_AVAILABLE
-  },
-  "compilation": {
-    "class_generated": $CLASS_GENERATED,
-    "dex_generated": $DEX_GENERATED,
-    "dex_structure_valid": $DEX_STRUCTURE_VALID,
-    "dex_64bit": $DEX_64BIT
-  },
-  "verdict": $([ $PASS -eq 1 ] && echo "\"PASS\"" || echo "\"FAIL\""),
-  "summary": "$([ $PASS -eq 1 ] && echo "✓ DEX pipeline framework validated (ready for phase 2 testing)" || echo "✗ DEX validation failed")"
+  "schema":"rafpolimata.l4.dex.v2",
+  "timestamp_utc":"$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "source":"$(basename "$SOURCE_FILE")",
+  "source_language":"$EXT",
+  "class_compiler":"$COMPILER",
+  "dex_compiler":"$(basename "$DEX")",
+  "class_files":$CLASS_COUNT,
+  "dex_bytes":$SIZE,
+  "dex_sha256":"$SHA",
+  "dex_magic_hex":"$MAGIC_HEX",
+  "state":"PASS_GENERATED_DEX",
+  "device_execution":"TOKEN_VAZIO_NOT_PART_OF_L4_STATIC_PIPELINE",
+  "claim_allowed":false
 }
-EOF
+JSON
 
-    log_info "Receipt saved: $receipt_file"
-    echo ""
-    cat "$receipt_file"
-}
-
-# ─────────────────────────────────────────────────────────────────────────
-# Main Execution
-# ─────────────────────────────────────────────────────────────────────────
-
-main() {
-    log_info "Starting Java/DEX pipeline validation: $SOURCE_FILE"
-    echo ""
-
-    detect_source_type || true
-    check_javac_availability || true
-    check_dex_compiler_availability || true
-    check_class_generation || true
-    check_dex_generation || true
-    check_dex_structure || true
-    check_dex_class_count || true
-
-    echo ""
-    echo "╔═══════════════════════════════════════════════════════════╗"
-    echo "║  L4: Java/DEX Pipeline Validation Results                  ║"
-    echo "╠═══════════════════════════════════════════════════════════╣"
-    echo "║  javac Available:        $([ $JAVAC_AVAILABLE -eq 1 ] && echo "✓" || echo "✗")                                         ║"
-    echo "║  DEX Compiler Available: $([ $DEX_COMPILER_AVAILABLE -eq 1 ] && echo "✓" || echo "✗")                                         ║"
-    echo "║  Class Generated:        $([ $CLASS_GENERATED -eq 1 ] && echo "✓" || echo "✗")                                         ║"
-    echo "║  DEX Generated:          $([ $DEX_GENERATED -eq 1 ] && echo "✓" || echo "✗")                                         ║"
-    echo "║  DEX Structure Valid:    $([ $DEX_STRUCTURE_VALID -eq 1 ] && echo "✓" || echo "✗")                                         ║"
-    echo "║  DEX 64-bit:             $([ $DEX_64BIT -eq 1 ] && echo "✓" || echo "✗")                                         ║"
-    echo "║  Overall Status:         $([ $PASS -eq 1 ] && echo "✓ PASS" || echo "✗ FAIL")                                       ║"
-    echo "╚═══════════════════════════════════════════════════════════╝"
-    echo ""
-
-    generate_receipt
-
-    # Cleanup
-    rm -rf "$TMPDIR"
-
-    exit $([ $PASS -eq 1 ] && echo 0 || echo 1)
-}
-
-main
+echo "L4 PASS generated_dex bytes=$SIZE sha256=$SHA receipt=$RECEIPT"
+exit 0

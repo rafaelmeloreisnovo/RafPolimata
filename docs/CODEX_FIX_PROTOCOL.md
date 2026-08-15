@@ -1,125 +1,182 @@
-# Protocolo Codex/IA para Correção de Compilação (S38)
+# Codex / AI Compilation-Fix Protocol — RafPolimata
 
-> **Entrada canônica:** docs/AGENTES.md §4 (regras de não-colisão — freestanding, sem NULL-deref, sintaxe obrigatória antes do commit) e §7 (CI gates — o que cada gate valida e o que significa falhar). Este protocolo é o guia cirúrgico específico para diagnóstico e correção de erros de compilação sem quebrar invariantes de arquitetura.
+> Subordinate to `AGENTS.md` and `docs/AGENTES.md`.
 
-## Objetivo
+This is a **surgical compilation-diagnosis protocol**, not a second repository-wide instruction source. OpenAI Codex should start at `AGENTS.md`; other agents may use this file when the task is specifically a compiler/build failure.
 
-Definir como um agente de IA (Codex, Claude Code, ou similar) deve diagnosticar
-e corrigir erros de compilação neste projeto sem quebrar invariantes de arquitetura.
+## Objective
 
-## Invariantes que nunca podem ser quebradas
+Diagnose and repair compilation/build defects without weakening architecture, evidence, error semantics, ABI/layout contracts, or tests merely to obtain a green result.
 
-Antes de qualquer correção, o agente deve verificar que sua alteração não viola
-(lista completa em `docs/AGENTES.md` §1 e §4):
+## Non-negotiable rules
 
-1. **Sem malloc/calloc/free em `Apkc/` e hot paths** — freestanding constraint
-2. **Sem `#include <stdio.h>` / `<stdlib.h>` em `Apkc/`** — usa `sys.h` com `svc`/`swi`
-3. **`lang_profile_find()` deve guardar NULL para nomes desconhecidos** — callers devem checar
-4. **Registradores AVR acessados apenas via `RAFA_MMIO8(addr)`** — sem cast direto de ponteiro
-5. **TOKEN_VAZIO = return 0 quando hardware ausente** — nunca inventar sucesso
+1. Distinguish hosted and freestanding paths before changing includes, allocation, entrypoints or syscalls.
+2. Do not use the obsolete blanket rule “no libc anywhere in `Apkc/`”. Freestanding targets keep their no-libc/no-heap contract; explicitly hosted development paths may use libc inside that boundary.
+3. Do not change a public API, persisted format, status code, error meaning or claim boundary as a side effect of a compile fix.
+4. NULL/unknown lookup paths must be handled according to the current API contract.
+5. `TOKEN_VAZIO` is an evidence state, **not a universal C integer value**. Never assume `TOKEN_VAZIO == 0` unless a concrete schema/API explicitly defines that encoding.
+6. Missing hardware/tool/device is not automatically PASS. Represent it using the contract's explicit unavailable/skip/TOKEN_VAZIO state.
+7. Never weaken warnings, tests or assertions only to hide a causal defect.
+8. Never merge without explicit human authorization.
 
-## Fluxo de diagnóstico
+## Diagnostic flow
 
-### Passo 1: Isolar o erro
+### Step 1 — Identify the exact failing contract
 
-```bash
-# Compilar arquivo com saída estruturada
-gcc -std=c11 -O2 -Wall -Wextra -I. -c RAF_XXX_*.c 2>&1 | \
-  grep -E "^.+:[0-9]+:[0-9]+: (error|warning):" | \
-  head -20
+Record:
+
+```sh
+git branch --show-current
+git rev-parse HEAD
+git status --short
 ```
 
-### Passo 2: Categorizar o erro
+Then identify:
 
-| Categoria | Padrão de erro | Ação recomendada |
-|-----------|---------------|------------------|
-| Tipo incompatível | `error: incompatible type` | Verificar se precisa de cast explícito ou typedef |
-| Símbolo não definido | `error: implicit declaration` | Adicionar `#include` correto ou declaração forward |
-| Atributo desconhecido | `warning: unknown attribute` | Usar `__attribute__((X))` em vez de C23 `[[X]]` |
-| Unused result | `warning: ignoring return value` | `ssize_t n = f(); (void)n;` |
-| Signed/unsigned mismatch | `warning: comparison` | Cast explícito ou mudar tipo da variável |
-| Unused variable | `warning: unused variable` | `(void)var;` após uso legítimo |
-| Missing return | `warning: control reaches end` | Adicionar `return 0;` ou `return TOKEN_VAZIO;` |
-
-### Passo 3: Script de diagnóstico automatizado
-
-```bash
-bash scripts/raf_codex_diagnose.sh [arquivo_ou_padrão]
+```text
+source path
+target architecture
+hosted | freestanding | shared
+compiler/toolchain
+exact command/target
+first causal error
+related test/gate
 ```
 
-Produz saída estruturada adequada para input de IA:
-- Lista de erros com categoria
-- Contexto de 3 linhas ao redor de cada erro
-- Invariantes violadas (se detectadas)
+Prefer current repository entrypoints over commands copied from historical documents.
 
-### Passo 4: Verificar que a correção não introduz regressão
+Examples:
 
-```bash
-# Freestanding audit (Apkc/ não pode ter libc)
-bash scripts/ci_freestanding_audit.sh
-
-# Size regression (cada arquivo < 4096B .text)
-bash scripts/raf_binary_size_test.sh
-
-# Baseline comparison
-bash scripts/raf_baseline_measure.sh <arquivo_corrigido>
+```sh
+make syntax
+make compiler-contract
+make compiler-selftest
 ```
 
-## Script de diagnóstico
+Run only the gate applicable to the failing path.
 
-```bash
-#!/usr/bin/env bash
-# Uso: bash scripts/raf_codex_diagnose.sh [arquivo.c]
-# Se nenhum arquivo for passado, diagnostica todos os RAF_0xx_*.c
+### Step 2 — Minimize the failure without changing semantics
 
-FILES=${1:-$(ls RAF_0[0-9][0-9]_*.c 2>/dev/null)}
-for f in ${FILES}; do
-    echo "=== ${f} ==="
-    gcc -std=c11 -O2 -Wall -Wextra -I. -c "${f}" -o /dev/null 2>&1 | \
-      grep -E "(error|warning):" | sed 's/^/  /'
-done
+Use the project's current command when possible. If a direct compiler invocation is required for diagnosis, preserve the target flags and include paths from the canonical script/Makefile rather than inventing a new build profile.
+
+Capture the **first causal error**, not only the last cascade.
+
+Useful diagnostic classes:
+
+| Class | Typical symptom | Required check |
+|---|---|---|
+| declaration/type | incompatible/implicit declaration | header/API contract |
+| target boundary | hosted symbol in freestanding build | target-specific guard |
+| layout/ABI | size/offset/link failure | schema/format + validator |
+| capacity | overflow/truncation diagnostic | explicit bounds |
+| toolchain | command/path unavailable | provenance + TOKEN_VAZIO if unavailable |
+| architecture | unsupported asm/instruction | target/compiler flags |
+| warning-as-error | unused/sign/format | fix cause, do not globally silence |
+
+### Step 3 — Choose the smallest semantic fix
+
+A compile fix may be larger than five lines when the causal defect genuinely spans several files. The correct limit is **scope**, not line count.
+
+Escalate when the repair requires any of:
+
+- public API/ABI change;
+- persisted format/schema change;
+- deletion/migration;
+- security/license change;
+- altered error/status semantics;
+- weakened freestanding boundary;
+- new architecture/language backend;
+- contradiction with a current closure or receipt.
+
+### Step 4 — Re-run the failing gate and nearest regression tests
+
+Do not claim repository-wide PASS from one compiler invocation.
+
+For ApkC-related work, applicable gates may include:
+
+```sh
+make syntax
+make compiler-contract
+make compiler-selftest
+make hotfix-audit
 ```
 
-## Padrões de correção aprovados
+Select the minimum sufficient matrix for the changed paths and state exactly what was not run.
 
-### AVR register access (M001-M020)
+## Approved repair patterns
+
+### Guard optional/unknown lookup
+
 ```c
-/* CORRETO: via macro RAFA_MMIO8 */
-RAFA_MMIO8(AVR_DDRB_ADDR)  |= (uint8_t)(1u << 5);
-
-/* ERRADO: cast de ponteiro direto */
-*((volatile uint8_t *)0x24) |= (1 << 5);  /* não faça isso */
+if (!prof) {
+    pr_err("unknown language\n");
+    return 1;
+}
 ```
 
-### Unused result de syscall (M036-M038)
-```c
-/* CORRETO */
-ssize_t n = read(fd, buf, sizeof(buf));
-(void)n;
+Use the actual function/API's error convention; do not copy this return value into unrelated APIs.
 
-/* ERRADO — dispara -Wunused-result */
-(void)read(fd, buf, sizeof(buf));
+### Hosted/freestanding split
+
+```c
+#if defined(__x86_64__) || defined(__i386__)
+/* explicitly hosted development support */
+#include <unistd.h>
+#else
+/* target-specific freestanding path */
+#endif
 ```
 
-### Return TOKEN_VAZIO (todos)
-```c
-/* CORRETO — hardware ausente = return 0, nunca -1 para "ausente" */
-if (fd < 0) return 0;   /* TOKEN_VAZIO */
+This is acceptable only when the current architecture intentionally defines that boundary. Do not use it to smuggle hosted dependencies into the freestanding object.
 
-/* ERRADO — -1 significa "erro de implementação", não "hardware ausente" */
-if (fd < 0) return -1;
-```
+### Ignored result
 
-### GNU SOURCE redefine (M036)
+Prefer checking a result when failure matters. If the API contract intentionally ignores it, make that choice explicit and warning-clean without changing behavior.
+
+### Feature macro guard
+
 ```c
-/* CORRETO — guard contra redef */
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#include <sched.h>
 ```
 
-## Regra de ouro
+Use only where the hosted target requires it and where it does not change a freestanding translation unit unexpectedly.
 
-> Se a correção adiciona mais de 5 linhas ou muda a interface de uma função,
-> pare e consulte o humano. Correções de compilação devem ser cirúrgicas.
+## Forbidden “fixes”
+
+- `|| true` around a blocking gate;
+- unconditional `return 0` to make CI green;
+- disabling `-Werror` globally instead of fixing a new warning;
+- deleting a falsifier because it exposes a regression;
+- changing `FAIL`/unavailable into `PASS`;
+- replacing a real current-artifact gate with file-existence checks;
+- editing generated results manually;
+- introducing unbounded copy/allocation into bounded/freestanding code;
+- claiming current runtime from historical receipts.
+
+## Evidence package
+
+A useful compilation-fix receipt/handoff records:
+
+```text
+base commit
+changed paths
+failing command and first causal error
+repair rationale
+post-fix command(s)
+exit code(s)
+compiler/tool version when available
+PASS / FAIL / TOKEN_VAZIO by gate
+risks and rollback
+```
+
+## Close
+
+```text
+F_ok   = compile defect actually repaired and gates actually observed
+F_gap  = architectures/tools/tests/runtime not observed or contradictions remaining
+F_next = smallest reproducible next validation
+```
+
+A green local compiler command proves only the scope of that command.

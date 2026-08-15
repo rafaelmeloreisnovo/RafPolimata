@@ -1,24 +1,14 @@
-# Índice dos 56 arquivos C
+# Índice dos 63 arquivos C
 
-> **Layout em disco (flat / repo root).** Todos os 56 arquivos de método
-> (`RAF_NNN_<slug>.c`) e o cabeçalho comum `RAF_rafaelia_common.h` ficam na
-> **raiz do repositório**, lado a lado — não há diretório `methods/` nem
-> `include/`. Cada método faz `#include "RAF_rafaelia_common.h"` e compila com:
+> **Layout em disco (flat / repo root).** No corte atual existem 63 arquivos físicos de método numerados M001–M063 e o cabeçalho comum `RAF_rafaelia_common.h` na raiz do repositório. Este índice registra somente nomes físicos exatos; padrões genéricos ficam fora de inline-code para não serem confundidos pelo auditor estrutural com arquivos reais.
 >
-> ```bash
-> gcc -c -I. RAF_NNN_<slug>.c
-> ```
->
-> **Correção (lacuna L12).** As versões anteriores deste índice listavam caminhos
-> prefixados com `methods/001_...` — esses caminhos eram **aspiracionais e não
-> correspondiam ao layout em disco**. Abaixo, cada entrada usa o nome de arquivo
-> real (`RAF_NNN_<slug>.c`) verificado contra o conteúdo da raiz do repositório.
+> A prova histórica de 17/06/2026 permanece preservada separadamente: naquele corte eram 56 métodos e o build registrado foi 56/56 PASS. A presença atual de M057–M063 não retroage essa evidência nem autoriza afirmar 63/63 PASS sem novo gate.
 
 ## Cabeçalho comum
 
-- `RAF_rafaelia_common.h` — cabeçalho compartilhado, incluído por todos os 56 métodos
+- `RAF_rafaelia_common.h` — cabeçalho compartilhado pela família original de métodos e infraestrutura low-level.
 
-## Métodos
+## Métodos físicos atuais
 
 - `RAF_001_acesso_direto_a_ddrx_portx_pinx.c` — Acesso direto a DDRx PORTx PINx
 - `RAF_002_toggle_por_escrita_em_pinx.c` — Toggle por escrita em PINx
@@ -76,24 +66,50 @@
 - `RAF_054_batching_de_operacoes_repetidas.c` — Batching de operações repetidas
 - `RAF_055_cache_local_de_resultado_tecnico.c` — Cache local de resultado técnico
 - `RAF_056_comparacao_automatica_contra_implementacao_padrao.c` — Comparação automática contra implementação padrão
+- `RAF_057_eeprom_wear_leveling.c` — EEPROM wear-leveling por endereço circular; escrita real AVR-gated e selftest host simulado
+- `RAF_058_can_bus_mcp2515_spi.c` — CAN bus via SPI + MCP2515; caminho de hardware condicionado e TOKEN_VAZIO sem SPI
+- `RAF_059_rtos_minimal_no_heap.c` — RTOS mínimo cooperativo sem heap, com scheduler estático e selftest
+- `RAF_060_bootloader_ota_uart.c` — Bootloader OTA via UART polling; hardware AVR-gated e parser/CRC selftest
+- `RAF_061_vectra_neon_arm32.c` — kernel Vectra NEON ARM32 VMLA/VMLS; execução real condicionada a ARM32+NEON
+- `RAF_062_quaternary_anchor_eight_gate.c` — âncora quaternária com 4 órgãos, 8 gates e quinto estado derivado
+- `RAF_063_language_completion_freestanding.c` — contrato freestanding de language completion/library assimilation; valida política e lowering, não executa runtimes estrangeiros
 
-## Build / verificação
+## Build / verificação atual
 
-Compilar todos os 56 métodos para objetos em `/tmp` (prova de build):
+O inventário físico atual é M001–M063. Para uma nova prova de build, o gate deve enumerar os arquivos físicos e registrar ambiente, compilador, flags, hashes e resultado por método.
 
 ```bash
-for f in RAF_*.c; do
+for f in RAF_[0-9][0-9][0-9]_*.c; do
   gcc -c -I. "$f" -o /tmp/$(basename "$f" .c).o || echo "FAIL $f"
 done
 ```
 
-## Cadeia de custódia (lacuna L12)
+Estado antes do novo gate completo:
+
+```text
+physical_methods = 63
+indexed_methods = 63
+full_current_build = TOKEN_VAZIO
+physical_target_validation = TOKEN_VAZIO
+claim_allowed_63_of_63 = false
+```
+
+## Cadeia de custódia histórica — 2026-06-17
+
+Preservação do receipt anterior, sem reinterpretação retroativa:
 
 - **Data:** 2026-06-17
-- **Arquivos `RAF_*.c` em disco (raiz):** 56
-- **Entradas neste índice:** 56 (1:1 — cada entrada corresponde a um arquivo real)
-- **Cabeçalho comum `RAF_rafaelia_common.h`:** presente na raiz
-- **Resultado do loop de build acima (`gcc -c -I.`):** PASS=56 FAIL=0
-- **Divergências de nome/arquivo encontradas:** nenhuma (todos os 56 nomes
-  do índice existem em disco; os antigos prefixos `methods/` foram corrigidos)
-- **Status L12:** RESOLVIDO — índice realinhado ao layout flat em disco
+- **Métodos físicos naquele corte:** 56
+- **Entradas indexadas naquele corte:** 56
+- **Resultado registrado do loop de build:** PASS=56 FAIL=0
+- **Divergências de nome/arquivo naquele corte:** nenhuma
+- **Status histórico L12:** RESOLVIDO para o conjunto M001–M056 daquele snapshot
+
+## Delta posterior ao snapshot histórico
+
+M057–M063 foram adicionados depois do corte de 17/06/2026. A atualização deste índice prova somente **identidade/rota documental observada**, não prova compilação, execução em alvo, benchmark ou hardware físico dos sete métodos adicionais.
+
+```text
+M057..M063 artifact_presence = OBSERVED
+M057..M063 current_full_gate = TOKEN_VAZIO até execução observável
+```

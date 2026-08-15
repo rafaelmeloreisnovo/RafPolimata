@@ -6,6 +6,10 @@
  * Bare compiler names and conventional Unix paths are resolved by sys.h through
  * deterministic Android/Termux prefixes; execve itself does not search PATH.
  *
+ * This header is intentionally pure data/lookup logic.  It does not include
+ * sys.h, so language identity can be validated on a host without selecting an
+ * ARM syscall ABI merely by including this table.
+ *
  * use_asm    : internal ARM assembler (lang=asm/.s)
  * use_script : inline execve bootstrap via gen_script_code64()
  * use_fork   : fork+exec external compiler, read output artefact
@@ -15,7 +19,10 @@
  *
  * RAFCODE-Φ-∆RafaelVerboΩ */
 #pragma once
-#include "sys.h"
+
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
 
 typedef struct {
     const char *name;
@@ -172,7 +179,7 @@ static inline char _lp_lower(char c) {
 
 static inline int _lp_eq_ci(const char *a, const char *b) {
     if (!a || !b) return 0;
-    sz i = 0;
+    __SIZE_TYPE__ i = 0;
     while (a[i] && b[i]) {
         if (_lp_lower(a[i]) != _lp_lower(b[i])) return 0;
         i++;
@@ -220,9 +227,9 @@ static inline const LangProfile *lang_profile_from_path(const char *path) {
     if (!path || !path[0] || !lang_profile_table_validate())
         return (const LangProfile *)0;
 
-    sz last_dot = (sz)-1;
-    for (sz i = 0; path[i]; i++) if (path[i] == '.') last_dot = i;
-    if (last_dot == (sz)-1 || !path[last_dot + 1]) return (const LangProfile *)0;
+    __SIZE_TYPE__ last_dot = (__SIZE_TYPE__)-1;
+    for (__SIZE_TYPE__ i = 0; path[i]; i++) if (path[i] == '.') last_dot = i;
+    if (last_dot == (__SIZE_TYPE__)-1 || !path[last_dot + 1]) return (const LangProfile *)0;
 
     const char *ext = path + last_dot;
     for (int i = 0; i < LP_COUNT; i++) {

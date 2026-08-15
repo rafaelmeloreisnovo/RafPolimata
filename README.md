@@ -25,9 +25,10 @@ A ordem de leitura é:
 
 1. [`docs/AGENTES.md`](docs/AGENTES.md) — regras operacionais e invariantes;
 2. [`docs/INDEX.md`](docs/INDEX.md) — índice curado da documentação;
-3. [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md`](docs/MAPA_ESTRUTURAL_REPOSITORIO.md) — disposição física;
-4. [`docs/DOCUMENT_GOVERNANCE.md`](docs/DOCUMENT_GOVERNANCE.md) — catálogo, grafo, temporalidade, risco e promoção;
-5. documento técnico do subsistema em alteração.
+3. [`docs/LOOSE_DOCUMENTATION_INDEX.md`](docs/LOOSE_DOCUMENTATION_INDEX.md) — índice dos documentos soltos, históricos, experimentais e com rota de reconciliação pendente;
+4. [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md`](docs/MAPA_ESTRUTURAL_REPOSITORIO.md) — disposição física;
+5. [`docs/DOCUMENT_GOVERNANCE.md`](docs/DOCUMENT_GOVERNANCE.md) — catálogo, grafo, temporalidade, risco e promoção;
+6. documento técnico do subsistema em alteração.
 
 ## Fontes de verdade executáveis
 

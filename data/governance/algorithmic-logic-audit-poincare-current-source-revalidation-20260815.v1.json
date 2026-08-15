@@ -1,0 +1,41 @@
+{
+  "schema": "rafaelia.algorithmic-logic-audit-revalidation/v1",
+  "generated_at": "2026-08-15T01:35:00-03:00",
+  "finding_ids": ["ALA-20260815-002", "ALA-20260815-003"],
+  "source": {
+    "repository": "rafaelmeloreisnovo/ChipQuantum",
+    "path": "src/geometry/sqrt3_geometry_matrix/poincare_7d_aarch64.c",
+    "latest_path_commit": "8f7198fc4afd66f0e6e8e792d261401a23e884af",
+    "blob_sha": "1fd6fe8b765d35e71d82f0ba579a277baea3476e"
+  },
+  "reference_execution": {
+    "runtime": "Python/numpy float32 reference of source semantics",
+    "aarch64_binary_executed": false,
+    "C00": 140.0,
+    "C77": 3472.0,
+    "global_scale": 3472.0,
+    "deltas": [-995680.0, -3119872.0, -6425440.0, -10912384.0, -16580704.0, -23430400.0, -31461472.0, -40673920.0],
+    "modes": ["L", "L", "L", "L", "L", "L", "L", "L"],
+    "radii": [0.14217227697372437, 0.24145469069480896, 0.3281325101852417, 0.4042430520057678, 0.46775132417678833, 0.5194360017776489, 0.5616153478622437, 0.5960178971290588],
+    "all_radii_lt_1": true
+  },
+  "current_source_assessment": {
+    "strict_timelike_gate_present": true,
+    "canonical_lift_explicit": true,
+    "historical_plus_sign_projection_not_present_in_current_path": true,
+    "finding_002": "RESOLVED_IN_CURRENT_SOURCE_REFERENCE_REPRODUCED",
+    "finding_003": "RESOLVED_IN_CURRENT_SOURCE_STATIC_AND_REFERENCE_REPRODUCED",
+    "remaining": "TOKEN_VAZIO_AARCH64_NATIVE_EXECUTION_THIS_RUN",
+    "claim_allowed": false
+  },
+  "F_ok": [
+    "current source explicitly separates strict timelike projection and canonical lift",
+    "float32 reference reproduces all eight negative deltas",
+    "all eight outputs use lift mode and radii remain inside B7"
+  ],
+  "F_gap": [
+    "native AArch64 execution of exact source/blob in this run",
+    "binary disassembly/ELF receipt tied to exact commit"
+  ],
+  "F_next": "Compile exact commit for AArch64, record ELF hash/disassembly, execute on AArch64/Termux, compare emitted P7 lines against reference hex/radii."
+}
