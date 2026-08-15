@@ -1,0 +1,81 @@
+{
+  "schema": "rafaelia.algorithmic-logic-audit/v1",
+  "audit_id": "ALG-AUDIT-TOKEN_VAZIO",
+  "created_at": "TOKEN_VAZIO_TIMESTAMP",
+  "scope": {
+    "repository": "TOKEN_VAZIO_REPOSITORY",
+    "ref": "TOKEN_VAZIO_REF",
+    "paths": [],
+    "language_runtime_isa": [],
+    "declared_protocol_or_version": "TOKEN_VAZIO",
+    "out_of_scope": []
+  },
+  "identity": {
+    "source_hashes": [],
+    "commit_sha": "TOKEN_VAZIO",
+    "provenance_state": "TOKEN_VAZIO"
+  },
+  "algorithm_map": {
+    "inputs": [],
+    "preconditions": [],
+    "state_variables": [],
+    "transformation_steps": [],
+    "branches_or_transitions": [],
+    "outputs": [],
+    "failure_states": [],
+    "side_effects": [],
+    "inverse_or_consumer": []
+  },
+  "invariants": {
+    "declared": [],
+    "inferred": [],
+    "forbidden_collapses": [
+      "INTENTION_TO_IMPLEMENTATION",
+      "IMPLEMENTATION_TO_EXECUTION",
+      "EXECUTION_TO_GENERAL_CLAIM",
+      "INTEGRITY_TO_AUTHENTICITY",
+      "TOKEN_VAZIO_TO_ZERO"
+    ]
+  },
+  "axes": {
+    "A1_semantic_fidelity": "TOKEN_VAZIO",
+    "A2_domain_totality_boundaries": "TOKEN_VAZIO",
+    "A3_state_control_flow": "TOKEN_VAZIO",
+    "A4_inverse_roundtrip_conservation": "TOKEN_VAZIO",
+    "A5_numerical_algebraic_resources": "TOKEN_VAZIO",
+    "A6_determinism_concurrency_safety": "TOKEN_VAZIO",
+    "A7_evidence_stubs_claims": "TOKEN_VAZIO"
+  },
+  "findings": [
+    {
+      "finding_id": "ALG-TOKEN_VAZIO",
+      "severity": "S2",
+      "class": "TOKEN_VAZIO",
+      "artifact": {
+        "repo": "TOKEN_VAZIO",
+        "path": "TOKEN_VAZIO",
+        "ref": "TOKEN_VAZIO"
+      },
+      "claim_or_invariant": "TOKEN_VAZIO",
+      "observed_logic": "TOKEN_VAZIO",
+      "counterexample_or_trigger": "TOKEN_VAZIO",
+      "evidence": [],
+      "uncertainty": [],
+      "token_vazio": [],
+      "claim_allowed": false,
+      "smallest_fix_or_test": "TOKEN_VAZIO"
+    }
+  ],
+  "stubs_and_token_vazio": [],
+  "tests": {
+    "executed": [],
+    "proposed": [],
+    "negative_controls": [],
+    "differential_references": []
+  },
+  "claim_matrix": [],
+  "F_ok": [],
+  "F_gap": [],
+  "F_next": "TOKEN_VAZIO",
+  "claim_allowed": false
+}
