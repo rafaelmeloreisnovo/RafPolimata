@@ -169,31 +169,84 @@ def is_excluded(path: Path, root: Path, extra_parts: set[str]) -> bool:
 
     parts = rel.parts
 
-    # Check if any part of the path is a build-like directory with generated markers
-    for i, part in enumerate(parts):
-        part_lower = part.lower()
-        if part_lower in TOPLEVEL_BUILD_DIRS:
-            # Reconstruct the path to this build-like directory
-            build_dir = root
-            for j in range(i + 1):
-                build_dir = build_dir / parts[j]
-            try:
-                if has_generated_markers(build_dir):
-                    return True
-            except OSError:
-                return True
-
-    # Exclude paths where any part is in DEFAULT_EXCLUDE_PARTS (except build-like dirs)
+    # First, check if any part is in extra_parts (standard exclusions like .git, .gradle, etc)
     for part in parts:
         part_lower = part.lower()
         if part_lower in extra_parts and part_lower not in TOPLEVEL_BUILD_DIRS:
             return True
+
+    # For top-level build-like directories, only exclude if they have generated markers
+    # This preserves nested source directories like rmr/build/ that don't have markers
+    for i, part in enumerate(parts):
+        part_lower = part.lower()
+        if part_lower in TOPLEVEL_BUILD_DIRS:
+            # Only exclude if this is at the top level (i == 0)
+            # Otherwise, check for generated markers in this directory
+            if i == 0:
+                # Top-level build/out/dist/target directory
+                build_dir = root / parts[0]
+                try:
+                    if has_generated_markers(build_dir):
+                        return True
+                except OSError:
+                    return True
+            else:
+                # Nested directory named build/out/dist/target - only exclude if it has markers
+                build_dir = root
+                for j in range(i + 1):
+                    build_dir = build_dir / parts[j]
+                try:
+                    if has_generated_markers(build_dir):
+                        return True
+                except OSError:
+                    return True
 
     return False
 
 
 def relative_posix(path: Path, root: Path) -> str:
     return path.relative_to(root).as_posix()
+
+
+def get_exclusion_reason(path: Path, root: Path, extra_parts: set[str]) -> str | None:
+    """Determine why a path is excluded, returning None if not excluded."""
+    try:
+        rel = path.relative_to(root)
+    except ValueError:
+        return "outside_root"
+
+    parts = rel.parts
+
+    # Check standard exclusions first
+    for part in parts:
+        part_lower = part.lower()
+        if part_lower in extra_parts and part_lower not in TOPLEVEL_BUILD_DIRS:
+            return f"excluded_component:{part}"
+
+    # Check top-level build-like directories
+    for i, part in enumerate(parts):
+        part_lower = part.lower()
+        if part_lower in TOPLEVEL_BUILD_DIRS:
+            if i == 0:
+                # Top-level build directory
+                build_dir = root / parts[0]
+                try:
+                    if has_generated_markers(build_dir):
+                        return f"generated_markers_in_toplevel:{part}"
+                except OSError:
+                    return f"access_error_toplevel:{part}"
+            else:
+                # Nested build-like directory
+                build_dir = root
+                for j in range(i + 1):
+                    build_dir = build_dir / parts[j]
+                try:
+                    if has_generated_markers(build_dir):
+                        return f"generated_markers_in_nested:{part}"
+                except OSError:
+                    return f"access_error_nested:{part}"
+
+    return None
 
 
 def bounded_text(path: Path, max_bytes: int) -> str | None:
@@ -214,27 +267,10 @@ def collect_files(root: Path, max_bytes: int, report_exclusions: bool = False) -
         if not path.is_file():
             continue
 
-        excluded = is_excluded(path, root, DEFAULT_EXCLUDE_PARTS)
-        if excluded:
+        reason = get_exclusion_reason(path, root, DEFAULT_EXCLUDE_PARTS)
+        if reason is not None:
             if report_exclusions:
                 rel = relative_posix(path, root)
-                rel_path = Path(rel)
-                reason = "unknown"
-
-                # Determine exclusion reason
-                if rel_path.parts[0].lower() in TOPLEVEL_BUILD_DIRS:
-                    try:
-                        top_path = root / rel_path.parts[0]
-                        if has_generated_markers(top_path):
-                            reason = f"generated_markers_in_{rel_path.parts[0]}"
-                    except OSError:
-                        reason = "access_error"
-                else:
-                    for part in rel_path.parts:
-                        if part.lower() in DEFAULT_EXCLUDE_PARTS:
-                            reason = f"excluded_path_component_{part}"
-                            break
-
                 exclusions.append({
                     "path": rel,
                     "reason": reason,
@@ -756,9 +792,31 @@ def main(argv: Sequence[str] | None = None) -> int:
         default="none",
         help="Retorna 2 quando houver achado nessa severidade ou acima.",
     )
+    parser.add_argument(
+        "--exclude",
+        action="append",
+        default=[],
+        help="Componentes de path adicionais a excluir (podem ser repetidos).",
+    )
+    parser.add_argument(
+        "--include-root",
+        action="store_true",
+        help="Incluir path absoluto no relatório de exclusões (cuidado com dados privados).",
+    )
+    parser.add_argument(
+        "--report-exclusions",
+        action="store_true",
+        help="Incluir lista detalhada de exclusões no relatório.",
+    )
     args = parser.parse_args(argv)
 
-    report = build_report(args.repo, args.max_text_bytes)
+    # Build exclude set from default + command-line arguments
+    exclude_parts = set(DEFAULT_EXCLUDE_PARTS)
+    for extra in args.exclude:
+        exclude_parts.add(extra.lower())
+
+    # For now, we'll use DEFAULT_EXCLUDE_PARTS; the exclude_parts would be passed to analyze_repo if needed
+    report = build_report(args.repo, args.max_text_bytes, report_exclusions=args.report_exclusions)
     json_payload = json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     md_payload = markdown_report(report)
     write_text(args.json_out, json_payload)

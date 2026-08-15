@@ -21,6 +21,14 @@ typedef int                 iptr;
 #endif
 typedef __SIZE_TYPE__       sz;
 
+/* For x86_64 development builds, include libc headers */
+#if defined(__x86_64__) || defined(__i386__)
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/wait.h>
+#endif
+
 #define NULL ((void*)0)
 
 /* O_* flags only needed for ARM syscalls; x86_64 gets them from libc */
@@ -31,14 +39,6 @@ typedef __SIZE_TYPE__       sz;
 #define O_CREAT   0x40
 #define O_TRUNC   0x200
 #define O_CLOEXEC 0x80000
-#endif
-
-/* For x86_64 development builds, include libc headers */
-#if defined(__x86_64__) || defined(__i386__)
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/wait.h>
 #endif
 
 #ifdef __aarch64__
