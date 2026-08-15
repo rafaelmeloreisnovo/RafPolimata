@@ -45,5 +45,7 @@ javac.*.args
 # Repository commit tracker generated state and snapshots
 build/repository-tracker/
 .tracker-state/
-# Test executables (compiled binaries)
-tests/test_*
+# Test executables (compiled binaries, no extension)
+tests/test_phase*_type_checker
+tests/test_phase*_symbol_resolution
+tests/test_phase*_cfg_builder
