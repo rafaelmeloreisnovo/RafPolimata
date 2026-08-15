@@ -24,6 +24,13 @@ jobs:
       - name: Validate canonical coherence protocol
         run: python3 scripts/validate_coherence_protocol.py
 
+      - name: Validate TOKEN_VAZIO gates (Hotfix H1)
+        run: |
+          python3 tools/validate_token_vazio_gates.py \
+            --repo . \
+            --output ci/reports/token-vazio-validation.json \
+            --summary --strict
+
       - name: Validate two-cycle omega protocol
         run: python3 scripts/validate_two_cycle_omega.py
 
@@ -208,6 +215,14 @@ jobs:
 
       - name: Try APKc debug signing proof
         run: bash scripts/apkc_sign_debug.sh
+
+      - name: Upload TOKEN_VAZIO validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: token-vazio-validation-${{ github.run_id }}
+          path: ci/reports/token-vazio-validation.json
+          if-no-files-found: warn
 
       - name: Upload APKc proof and HOTFIX artifacts
         if: always()
