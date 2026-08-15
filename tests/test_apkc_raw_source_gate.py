@@ -47,6 +47,14 @@ state, _ = m.classify_text(
 )
 assert state == "PASS_HARDENED"
 
+# A hardening marker elsewhere in the file must never authorize a separate raw compile.
+state, _ = m.classify_text(
+    Path("tools/mixed.sh"),
+    "python3 scripts/patch_apkc_runtime_source_c_escape.py --input Apkc/apkc.c --output '$GEN'\n"
+    "clang Apkc/apkc.c -o raw-apkc\n",
+)
+assert state == "FAIL_RAW_BYPASS"
+
 # Workflow compile remains fail-closed.
 state, _ = m.classify_text(
     Path(".github/workflows/ci.yml"),
