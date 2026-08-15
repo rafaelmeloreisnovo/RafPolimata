@@ -197,6 +197,7 @@ static inline u8 apkc_compile_return_arithmetic_subset(
     struct ApkCReturnParser p;
     u8 result;
     u32 start_pos;
+    u8 start_r_free;
 
     if (!cg || !src || src_len == 0u) return APKC_RETURN_SUBSET_NOT_MATCH;
 
@@ -207,6 +208,7 @@ static inline u8 apkc_compile_return_arithmetic_subset(
     p.error = 0u;
     p.depth = 0u;
     start_pos = cg->pos;
+    start_r_free = cg->r_free;
 
     if (!apkc_ret_keyword(&p)) return APKC_RETURN_SUBSET_NOT_MATCH;
     apkc_ret_skip_ws(&p);
@@ -215,7 +217,7 @@ static inline u8 apkc_compile_return_arithmetic_subset(
     result = apkc_ret_parse_expr(&p);
     if (p.error || result == 255u) {
         cg->pos = start_pos;
-        cg->r_free = 0u;
+        cg->r_free = start_r_free;
         return APKC_RETURN_SUBSET_INVALID;
     }
 
@@ -226,12 +228,18 @@ static inline u8 apkc_compile_return_arithmetic_subset(
     }
     if (p.pos != p.len) {
         cg->pos = start_pos;
-        cg->r_free = 0u;
+        cg->r_free = start_r_free;
         return APKC_RETURN_SUBSET_INVALID;
     }
 
     if (result != 0u) codegen_emit_mov(cg, 0u, result);
-    codegen_emit(cg, OP_HALT, 0u, 0u, 0u, 0u);
+
+    /* Emit ordinary VM RET so the same instruction has a native ARM64 RET
+     * mapping.  The scoped VM oracle sets r14 to code_len before execution,
+     * making this fragment return to the synthetic caller boundary.  This
+     * convention is local to the semantic gate and does not close G-A2.
+     */
+    codegen_emit_ret(cg);
     return APKC_RETURN_SUBSET_OK;
 }
 
