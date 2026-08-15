@@ -57,22 +57,43 @@ JSON
 }
 
 check_l2() {
-  begin 'L2 runtime evidence: require an actual Android execution target'
-  if has adb; then
-    local state
-    state="$(adb get-state 2>/dev/null || true)"
-    case "$state" in
-      device) pass "L2 adb device connected serial=$(adb get-serialno 2>/dev/null || echo TOKEN_VAZIO)"; return ;;
-      unauthorized) tv 'L2 TOKEN_VAZIO_DEVICE_UNAUTHORIZED: authorize USB debugging on device'; return ;;
-      offline) tv 'L2 TOKEN_VAZIO_DEVICE_OFFLINE'; return ;;
-      *) ;;
-    esac
+  begin 'L2 runtime evidence: canonical install→launch→logcat chain on current commit'
+  local validator='tools/validate_android_runtime_evidence.sh'
+  local capture='scripts/capture_android_proof_chain.sh'
+  local out="${RAF_ANDROID_PROOF_OUT:-proofs/run-arm64-full-chain/out}"
+
+  if [ ! -f "$capture" ]; then fail 'L2 canonical Android proof-chain capture script missing'; return; fi
+  if [ ! -f "$validator" ]; then fail 'L2 Android runtime receipt validator missing'; return; fi
+
+  # Explicit opt-in performs the physical chain. CI never fabricates a device run.
+  if [ "${RAF_RUN_DEVICE_CHAIN:-0}" = '1' ]; then
+    local target_ready=0
+    if has adb && [ "$(adb get-state 2>/dev/null || true)" = 'device' ]; then target_ready=1; fi
+    if [ -x /system/bin/getprop ] || [ -f /system/build.prop ]; then target_ready=1; fi
+    if [ $target_ready -ne 1 ]; then
+      tv 'L2 TOKEN_VAZIO_DEVICE: RAF_RUN_DEVICE_CHAIN=1 but no authorized adb/local Android target exists'; return
+    fi
+    if ! OUT_DIR="$out" bash "$capture"; then
+      fail 'L2 canonical Android proof-chain execution returned non-zero'; return
+    fi
   fi
-  if [ -x /system/bin/getprop ] || [ -f /system/build.prop ]; then
-    pass 'L2 local Android/Termux runtime target detected'
-    return
+
+  bash "$validator" "$out" >/tmp/rafpolimata-l2-$$.log 2>&1
+  local rc=$?
+  if [ $rc -eq 0 ]; then
+    cat /tmp/rafpolimata-l2-$$.log
+    rm -f /tmp/rafpolimata-l2-$$.log
+    pass 'L2 current-commit Android install+launch+logcat evidence validated'
+  elif [ $rc -eq 2 ]; then
+    local reason
+    reason="$(tail -n 1 /tmp/rafpolimata-l2-$$.log 2>/dev/null || echo incomplete_runtime_evidence)"
+    rm -f /tmp/rafpolimata-l2-$$.log
+    tv "L2 $reason; run RAF_RUN_DEVICE_CHAIN=1 bash tools/verify_all_gaps.sh L2 on Android/device host"
+  else
+    tail -n 20 /tmp/rafpolimata-l2-$$.log >&2 || true
+    rm -f /tmp/rafpolimata-l2-$$.log
+    fail 'L2 Android runtime receipt falsified'
   fi
-  tv 'L2 TOKEN_VAZIO_DEVICE: no connected adb device and host is not Android'
 }
 
 check_l3() {
@@ -196,7 +217,7 @@ check_l10() {
 check_framework() {
   begin 'Framework: required Phase C falsifiable harnesses'
   local missing=()
-  for f in tests/test_e3_functional_phases_21_45.c tests/test_e2e_apk_pipeline.c tools/verify_translation_validity.c tools/phase2_android_preflight.sh; do
+  for f in tests/test_e3_functional_phases_21_45.c tests/test_e2e_apk_pipeline.c tools/verify_translation_validity.c tools/phase2_android_preflight.sh tools/validate_android_runtime_evidence.sh scripts/capture_android_proof_chain.sh; do
     [ -f "$f" ] || missing+=("$f")
   done
   if [ ${#missing[@]} -gt 0 ]; then fail "Framework missing: ${missing[*]}"; else pass 'Framework anchors present'; fi
