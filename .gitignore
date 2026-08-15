@@ -49,5 +49,7 @@ build/repository-tracker/
 tests/test_phase*_type_checker
 tests/test_phase*_symbol_resolution
 tests/test_phase*_cfg_builder
-tests/test_phases_*
+tests/test_phases_23_to_35
+tests/test_phases_36_to_45
+tests/test_phases_46_to_48
 tests/test_cfg_quick
