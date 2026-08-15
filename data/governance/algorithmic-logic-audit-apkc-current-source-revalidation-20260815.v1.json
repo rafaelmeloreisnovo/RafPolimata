@@ -1,0 +1,50 @@
+{
+  "schema": "rafaelia.algorithmic-logic-audit-revalidation/v1",
+  "generated_at": "2026-08-15T01:35:00-03:00",
+  "finding_ids": ["ALA-20260815-004", "ALA-20260815-005", "ALA-20260815-006"],
+  "sources": [
+    {"repository":"rafaelmeloreisnovo/RafGitTools","path":"scripts/termux/build_apkc_hermetic.sh","latest_path_commit":"9d85679026b8fd80985345542bd2846ae3cb0be1","blob_sha":"a047c59a033c67f68b9fe90070d083da28ab4470"},
+    {"repository":"rafaelmeloreisnovo/RafGitTools","path":"tools/termuxforge/rafgittools_bootstrap.s","blob_sha":"a2f3d05b61d2aa653db02ac2ba43977daceb8294"},
+    {"repository":"rafaelmeloreisnovo/RafPolimata","path":"scripts/apkc_termux_hermetic_build.sh","blob_sha":"4d90f0092c8a30307026316a8762970d6210415d"}
+  ],
+  "current_source_assessment": {
+    "finding_004": {
+      "state": "PARTIALLY_RESOLVED_SCOPE_EXPLICIT",
+      "evidence": [
+        "RafGitTools script explicitly says NativeActivity bootstrap and not full Kotlin/Compose/JGit application",
+        "receipt scope says native bootstrap only and full_compose_application remains TOKEN_VAZIO_NOT_BUILT_BY_THIS_MODE",
+        "bootstrap assembly contains only ANativeActivity_onCreate: ret and android_main: ret"
+      ],
+      "remaining": "the top file comment still uses the word fallback, so product naming can still be read too broadly"
+    },
+    "finding_005": {
+      "state": "OPEN_CONFIRMED_CURRENT_SOURCE",
+      "evidence": [
+        "RafGitTools accepts RAFPOLIMATA_ROOT override and APKC_HERMETIC_BUILDER override",
+        "orchestrator receipt records builder path but not builder SHA-256/commit",
+        "RafPolimata builder hashes raw/hardened ApkC, input source, host binary and APK but that does not lock the wrapper to the builder source identity"
+      ]
+    },
+    "finding_006": {
+      "state": "OPEN_CONFIRMED_CURRENT_SOURCE",
+      "evidence": [
+        "RafGitTools wrapper only requires a non-empty unsigned APK before writing its receipt",
+        "RafPolimata builder receipt leaves structural_validation=TOKEN_VAZIO and install_and_runtime=TOKEN_VAZIO",
+        "this revalidation did not prove dual-ABI ELF identity or current 16KiB ELF/ZIP alignment"
+      ]
+    },
+    "claim_allowed": false
+  },
+  "F_ok": [
+    "scope honesty is now explicit in current source",
+    "bootstrap minimality is confirmed by exact assembly source",
+    "builder hardening and artifact hashes are present in current RafPolimata path"
+  ],
+  "F_gap": [
+    "builder source identity lock at RafGitTools wrapper layer",
+    "dual-ABI extraction and ELF identity validation",
+    "16KiB ELF/ZIP alignment validation on current generated APK",
+    "install/launch/runtime receipt"
+  ],
+  "F_next": "Add builder_sha256/commit to the RafGitTools orchestration contract, then extract generated APK native libraries and run structural/page-alignment validators before install/runtime promotion."
+}
