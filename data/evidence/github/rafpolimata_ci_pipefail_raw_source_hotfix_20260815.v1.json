@@ -1,0 +1,32 @@
+{
+  "schema": "RAFPOLIMATA_CI_PIPEFAIL_HOTFIX_EVIDENCE/V1",
+  "date": "2026-08-15",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "base_sha": "3fc0cc0b2928878aa834240dd6c1ed3b343dac74",
+  "observed_green_run": 31877652032,
+  "observed_job": 94995643445,
+  "workflow_path": ".github/workflows/ci.yml",
+  "failure_class": "FALSE_GREEN_PIPELINE_EXIT_MASKING",
+  "evidence": {
+    "step": "APKc raw-source anti-bypass gate",
+    "observed_audit_state": "FAIL",
+    "observed_failures": 7,
+    "workflow_job_conclusion": "success",
+    "cause": "python audit piped to tee without pipefail; tee exit status masked upstream non-zero exit"
+  },
+  "hotfix": {
+    "branch": "hotfix/ci-pipefail-raw-source-gate-20260815",
+    "workflow_commit": "20948769dc9cf9154873ece5557911a8ba4735c5",
+    "change": "add set -o pipefail before the raw-source audit pipeline"
+  },
+  "boundaries": {
+    "yml_source_fixed": true,
+    "underlying_raw_source_violations_fixed": false,
+    "ci_pass": false,
+    "claim_allowed": false
+  },
+  "pending": [
+    "TOKEN_VAZIO_PENDING_HOTFIX_BRANCH_CI",
+    "TOKEN_VAZIO_RAW_SOURCE_7_FINDINGS_REMAIN"
+  ]
+}
