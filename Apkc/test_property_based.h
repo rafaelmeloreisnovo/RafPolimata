@@ -1,10 +1,10 @@
-/* test_property_based.h — Property-Based Testing Framework (Stage 14.2)
+/* test_property_based.h — Property-Based Testing Framework (Stage 17.2)
  *
- * Property-based testing: generate random inputs and check properties.
- * Shrinking: reduce failing inputs to minimal counterexamples.
- * Property specification: express expected behavior as predicates.
- * Test generation strategies: custom input generation per type.
- * Deterministic replay: reproduce failures from seed values.
+ * Property definition: specify invariants that must hold for all inputs.
+ * Random test generation: create diverse test cases from generator functions.
+ * Shrinking: minimize failing test case to simplest reproduction.
+ * Property validator: run property checks across input domain.
+ * Statistics tracking: count successes/failures/edge cases.
  *
  * FREESTANDING: No malloc, no libc, stack-only allocation.
  */
@@ -17,289 +17,212 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
-/* Property test status */
-enum PropertyStatus {
-	PROP_OK = 0,                /* Property holds for all tests */
-	PROP_FALSIFIED = 1,         /* Counterexample found */
-	PROP_INCONCLUSIVE = 2,      /* Cannot determine (insufficient data) */
-	PROP_ERROR = 3,             /* Error during test execution */
-	PROP_EXHAUSTED = 4          /* Ran out of test cases */
-};
+/* Property validator function type */
+typedef u8 (*PropertyValidator)(u64 input, u64 expected);
 
-/* Test generation strategy */
-enum GenerationStrategy {
-	STRAT_UNIFORM = 1,          /* Uniform random over range */
-	STRAT_SHRINK = 2,           /* Binary search for minimal counterexample */
-	STRAT_BIASED = 3,           /* Biased toward edge cases (0, max, -1, etc.) */
-	STRAT_RECURSIVE = 4         /* Recursive structure generation */
-};
-
-/* Property specification */
+/* Property definition */
 struct Property {
 	const char *property_name;  /* Property identifier */
-	u32 min_tests;              /* Minimum tests before passing */
-	u32 max_tests;              /* Maximum tests to run */
-	u8 generation_strategy;     /* GenerationStrategy */
-	u64 random_seed;            /* PRNG seed for reproducibility */
-	u32 shrink_depth;           /* Max shrinking attempts */
+	PropertyValidator validator; /* Validation function */
+	u32 property_id;            /* Unique property ID */
+	u8 is_enabled;              /* 1 if property is active */
+	u32 success_count;          /* Successful validations */
+	u32 failure_count;          /* Failed validations */
+	u64 failing_input;          /* Input that caused failure (if any) */
 };
 
-/* Test counterexample */
-struct Counterexample {
-	u64 inputs[8];              /* Input values */
-	u32 input_count;
-	u64 output;                 /* Actual output */
-	u64 expected;               /* Expected output */
-	const char *failure_reason; /* Why property failed */
-	u64 seed;                   /* Random seed that produced counterexample */
-};
+/* Test generator (produces random test inputs) */
+typedef u64 (*TestGenerator)(u32 seed, u32 iteration);
 
-/* Property test result */
-struct PropertyResult {
-	const char *property_name;
-	u8 status;                  /* PropertyStatus */
-	u32 tests_run;
-	u32 tests_passed;
-	struct Counterexample counterexample;
-	u64 execution_time_ms;
-};
-
-/* PRNG state for deterministic testing */
-struct TestRandom {
-	u64 state;                  /* PRNG state */
-	u64 seed;                   /* Original seed */
+/* Property-based test configuration */
+struct PropertyTest {
+	struct Property properties[32];     /* Up to 32 properties */
+	u32 property_count;
+	TestGenerator input_generator;     /* Input generation function */
+	u32 iterations;                    /* Number of test iterations per property */
+	u32 seed;                          /* Random seed for reproducibility */
+	u32 shrink_count;                  /* Number of shrink iterations on failure */
+	u32 total_tests_run;               /* Total tests executed */
+	u32 total_properties_failed;       /* Properties that failed */
 };
 
 /* ============================================================ */
-/* PRNG IMPLEMENTATION (Simple Linear Congruential) */
+/* PROPERTY TEST INITIALIZATION */
 /* ============================================================ */
 
-/* Initialize PRNG */
-static inline void test_random_init(struct TestRandom *rng, u64 seed) {
-	if (!rng) return;
-	rng->seed = seed;
-	rng->state = seed;
-}
+/* Initialize property test */
+static inline void proptest_init(
+	struct PropertyTest *pt,
+	TestGenerator gen,
+	u32 iterations,
+	u32 seed) {
 
-/* Get next random value */
-static inline u64 test_random_next(struct TestRandom *rng) {
-	if (!rng) return 0;
-
-	/* Linear congruential generator: x = (a*x + c) mod m */
-	/* Using parameters: a=6364136223846793005, c=1442695040888963407 */
-	rng->state = rng->state * 6364136223846793005ULL + 1442695040888963407ULL;
-	return rng->state;
-}
-
-/* Get random value in range [min, max) */
-static inline u64 test_random_range(
-	struct TestRandom *rng,
-	u64 min,
-	u64 max) {
-
-	if (!rng || min >= max) return min;
-
-	u64 range = max - min;
-	u64 rand = test_random_next(rng);
-	return min + (rand % range);
+	if (!pt) return;
+	pt->property_count = 0;
+	pt->input_generator = gen;
+	pt->iterations = iterations;
+	pt->seed = seed;
+	pt->shrink_count = 0;
+	pt->total_tests_run = 0;
+	pt->total_properties_failed = 0;
 }
 
 /* ============================================================ */
-/* PROPERTY SPECIFICATION */
+/* PROPERTY REGISTRATION */
 /* ============================================================ */
 
-/* Initialize property */
-static inline void prop_init(
-	struct Property *prop,
+/* Register property */
+static inline u8 proptest_register_property(
+	struct PropertyTest *pt,
 	const char *name,
-	u64 seed) {
+	PropertyValidator validator) {
 
-	if (!prop) return;
+	if (!pt || !name || !validator) return 0;
+	if (pt->property_count >= 32) return 0;
+
+	struct Property *prop = &pt->properties[pt->property_count];
 	prop->property_name = name;
-	prop->min_tests = 100;
-	prop->max_tests = 1000;
-	prop->generation_strategy = STRAT_UNIFORM;
-	prop->random_seed = seed;
-	prop->shrink_depth = 5;
-}
+	prop->validator = validator;
+	prop->property_id = pt->property_count;
+	prop->is_enabled = 1;
+	prop->success_count = 0;
+	prop->failure_count = 0;
+	prop->failing_input = 0;
 
-/* Set generation strategy */
-static inline void prop_set_strategy(
-	struct Property *prop,
-	u8 strategy) {
-
-	if (!prop) return;
-	prop->generation_strategy = strategy;
+	pt->property_count++;
+	return 1;
 }
 
 /* ============================================================ */
-/* BIAS TOWARD EDGE CASES */
+/* PROPERTY VALIDATION */
 /* ============================================================ */
 
-/* Generate biased value (prefer edge cases) */
-static inline u64 prop_generate_biased(
-	struct TestRandom *rng,
-	u64 min,
-	u64 max) {
+/* Run property test (single iteration) */
+static inline u8 proptest_validate_property(
+	struct PropertyTest *pt,
+	u32 property_id,
+	u64 input,
+	u64 expected) {
 
-	if (!rng || min >= max) return min;
+	if (!pt || property_id >= pt->property_count) return 0;
 
-	u64 rand = test_random_next(rng) % 100;
+	struct Property *prop = &pt->properties[property_id];
+	if (!prop->is_enabled || !prop->validator) return 0;
 
-	/* 20% chance: return min */
-	if (rand < 20) return min;
+	u8 result = prop->validator(input, expected);
 
-	/* 20% chance: return max-1 */
-	if (rand < 40) return max - 1;
+	pt->total_tests_run++;
 
-	/* 20% chance: return 0 */
-	if (rand < 60) return 0;
-
-	/* 20% chance: return -1 (as u64) */
-	if (rand < 80) return (u64)(-1);
-
-	/* 20% chance: uniform random */
-	return test_random_range(rng, min, max);
-}
-
-/* ============================================================ */
-/* SHRINKING (REDUCE COUNTEREXAMPLE) */
-/* ============================================================ */
-
-/* Attempt to shrink counterexample by modifying one input */
-static inline u8 prop_shrink_step(
-	struct Counterexample *ceex,
-	u32 depth) {
-
-	if (!ceex || depth == 0 || ceex->input_count == 0) return 0;
-
-	/* Try reducing first input by half */
-	u64 original = ceex->inputs[0];
-	u64 shrunk = original / 2;
-
-	if (shrunk != original) {
-		ceex->inputs[0] = shrunk;
-		return 1;  /* Shrinking modified the counterexample */
-	}
-
-	return 0;  /* Cannot shrink further */
-}
-
-/* ============================================================ */
-/* PROPERTY TEST EXECUTION */
-/* ============================================================ */
-
-/* Run property test with generated inputs */
-static inline struct PropertyResult prop_run_test(
-	struct Property *prop,
-	u8 (*property_check)(const u64 *inputs, u32 input_count, u64 *output)) {
-
-	struct PropertyResult result = {0};
-	if (!prop || !property_check) {
-		result.status = PROP_ERROR;
-		return result;
-	}
-
-	result.property_name = prop->property_name;
-	result.tests_run = 0;
-	result.tests_passed = 0;
-
-	struct TestRandom rng = {0};
-	test_random_init(&rng, prop->random_seed);
-
-	u32 test_count;
-	for (test_count = 0; test_count < prop->max_tests; test_count++) {
-		u64 inputs[8] = {0};
-		u32 input_count = 3;  /* Default: test with 3 inputs */
-
-		/* Generate inputs based on strategy */
-		u32 i;
-		for (i = 0; i < input_count; i++) {
-			if (prop->generation_strategy == STRAT_BIASED) {
-				inputs[i] = prop_generate_biased(&rng, 0, 1000);
-			} else {
-				inputs[i] = test_random_next(&rng) % 1000;
-			}
-		}
-
-		u64 output = 0;
-		u8 check_result = property_check(inputs, input_count, &output);
-
-		result.tests_run++;
-
-		if (check_result == 0) {
-			/* Property failed */
-			result.status = PROP_FALSIFIED;
-			result.counterexample.output = output;
-			result.counterexample.seed = prop->random_seed;
-			result.counterexample.input_count = input_count;
-
-			u32 j;
-			for (j = 0; j < input_count; j++) {
-				result.counterexample.inputs[j] = inputs[j];
-			}
-
-			/* Try shrinking */
-			u32 shrink_attempt;
-			for (shrink_attempt = 0; shrink_attempt < prop->shrink_depth; shrink_attempt++) {
-				if (!prop_shrink_step(&result.counterexample, shrink_attempt)) {
-					break;
-				}
-
-				u64 shrunk_output = 0;
-				u8 shrunk_check = property_check(
-					result.counterexample.inputs,
-					result.counterexample.input_count,
-					&shrunk_output);
-
-				if (shrunk_check != 0) {
-					/* Shrinking broke the counterexample, revert */
-					u32 k;
-					for (k = 0; k < input_count; k++) {
-						result.counterexample.inputs[k] = inputs[k];
-					}
-					break;
-				}
-			}
-
-			return result;
-		}
-
-		result.tests_passed++;
-
-		if (test_count >= prop->min_tests) {
-			/* Enough tests passed, property holds */
-			result.status = PROP_OK;
-		}
-	}
-
-	if (result.status != PROP_OK && result.tests_run >= prop->min_tests) {
-		result.status = PROP_OK;
+	if (result) {
+		prop->success_count++;
+	} else {
+		prop->failure_count++;
+		prop->failing_input = input;
+		pt->total_properties_failed++;
 	}
 
 	return result;
 }
 
-/* ============================================================ */
-/* RESULT REPORTING */
-/* ============================================================ */
+/* Run all properties with generated inputs */
+static inline u32 proptest_run_all(struct PropertyTest *pt) {
+	if (!pt || !pt->input_generator) return 0;
 
-/* Check if property passed */
-static inline u8 prop_passed(struct PropertyResult *result) {
-	if (!result) return 0;
-	return (result->status == PROP_OK) ? 1 : 0;
+	u32 failed_count = 0;
+	u32 i;
+	for (i = 0; i < pt->property_count; i++) {
+		if (!pt->properties[i].is_enabled) continue;
+
+		u32 j;
+		for (j = 0; j < pt->iterations; j++) {
+			u64 input = pt->input_generator(pt->seed + j, j);
+			u8 result = proptest_validate_property(pt, i, input, 0);
+			if (!result) {
+				failed_count++;
+			}
+		}
+	}
+
+	return failed_count;
 }
 
-/* Get test count */
-static inline u32 prop_get_test_count(struct PropertyResult *result) {
-	if (!result) return 0;
-	return result->tests_run;
+/* ============================================================ */
+/* SHRINKING & MINIMIZATION */
+/* ============================================================ */
+
+/* Shrink failing input (find minimal reproduction) */
+static inline u64 proptest_shrink_input(
+	struct PropertyTest *pt,
+	u32 property_id,
+	u64 failing_input) {
+
+	if (!pt || property_id >= pt->property_count) return failing_input;
+
+	struct Property *prop = &pt->properties[property_id];
+	u64 current = failing_input;
+	u64 best_shrink = current;
+
+	u32 i;
+	for (i = 0; i < pt->shrink_count; i++) {
+		/* Try halving the input */
+		u64 candidate = current / 2;
+		if (candidate == current) break;
+
+		u8 still_fails = prop->validator(candidate, 0);
+		if (still_fails) {
+			best_shrink = candidate;
+			current = candidate;
+		}
+	}
+
+	return best_shrink;
 }
 
-/* Get pass count */
-static inline u32 prop_get_pass_count(struct PropertyResult *result) {
-	if (!result) return 0;
-	return result->tests_passed;
+/* ============================================================ */
+/* STATISTICS & ANALYSIS */
+/* ============================================================ */
+
+/* Get property success rate */
+static inline u32 proptest_get_success_rate(
+	struct PropertyTest *pt,
+	u32 property_id) {
+
+	if (!pt || property_id >= pt->property_count) return 0;
+
+	struct Property *prop = &pt->properties[property_id];
+	u32 total = prop->success_count + prop->failure_count;
+	if (total == 0) return 0;
+	return (prop->success_count * 100) / total;
+}
+
+/* Count failing properties */
+static inline u32 proptest_count_failures(struct PropertyTest *pt) {
+	if (!pt) return 0;
+
+	u32 count = 0;
+	u32 i;
+	for (i = 0; i < pt->property_count; i++) {
+		if (pt->properties[i].failure_count > 0) {
+			count++;
+		}
+	}
+
+	return count;
+}
+
+/* Get property with most failures */
+static inline struct Property *proptest_find_flakiest_property(struct PropertyTest *pt) {
+	if (!pt || pt->property_count == 0) return 0;
+
+	struct Property *flakiest = &pt->properties[0];
+	u32 i;
+	for (i = 1; i < pt->property_count; i++) {
+		if (pt->properties[i].failure_count > flakiest->failure_count) {
+			flakiest = &pt->properties[i];
+		}
+	}
+
+	return flakiest;
 }
 
 #endif /* APKC_TEST_PROPERTY_BASED_H */
