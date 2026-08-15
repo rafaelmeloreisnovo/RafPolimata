@@ -1,13 +1,11 @@
 #!/usr/bin/env sh
 # Roundtrip smoke test for the APKc internal assembler.
 #
-# This test is intentionally honest:
-# - it always runs the pure Python ARM64 encoder golden tests;
-# - on ARM hosts it also compiles/runs the C encoder reference test;
-# - it only executes the APK generation roundtrip on ARM hosts where apkc.c
-#   can produce a native freestanding executable with its _start entry.
-# - on non-ARM hosts it exits 0 after the Python encoder tests with a SKIP note,
-#   because x86_64 syntax checks are not Android runtime proof.
+# Honest boundary:
+# - Python encoder golden tests always run;
+# - ARM hosts additionally compile/run the C encoder reference test;
+# - the APKc executable is built only from the canonical runtime-hardened source;
+# - non-ARM hosts keep the APK/C roundtrip as TOKEN_VAZIO.
 
 set -eu
 
@@ -33,10 +31,12 @@ case "$ARCH" in
 esac
 
 CC=${CC:-cc}
-if ! command -v "$CC" >/dev/null 2>&1; then
-  echo "FAIL: C compiler not found: $CC" >&2
-  exit 1
-fi
+for cmd in "$CC" python3 sha256sum; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "FAIL: required command not found: $cmd" >&2
+    exit 1
+  fi
+done
 
 if [ ! -f Apkc/apkc.c ]; then
   echo "FAIL: Apkc/apkc.c missing" >&2
@@ -48,12 +48,20 @@ if [ ! -f Apkc/hello.s.txt ]; then
   exit 1
 fi
 
+PATCHER=scripts/patch_apkc_runtime_source_c_escape.py
+if [ ! -f "$PATCHER" ]; then
+  echo "FAIL: canonical runtime hardening patcher missing: $PATCHER" >&2
+  exit 1
+fi
+
 TMPDIR_ROOT=${TMPDIR:-/tmp}
 WORK="$TMPDIR_ROOT/rafpolimata_asm_roundtrip_$$"
 mkdir -p "$WORK"
 trap 'rm -rf "$WORK"' EXIT HUP INT TERM
 
 ENC_C="$WORK/test_arm64_encoders"
+HARDENED_SRC="$WORK/apkc.runtime-hardened.c"
+HARDENING_MANIFEST="$WORK/apkc-runtime-source-hardening.json"
 APKC="$WORK/apkc"
 APK="$WORK/hello-arm64.apk"
 LOG="$WORK/apkc-generate.txt"
@@ -67,8 +75,14 @@ else
   echo "TOKEN_VAZIO: tests/test_arm64_encoders.c missing; C encoder test skipped"
 fi
 
-echo "BUILD: $CC -std=c11 -Wall -Wextra -Wno-unused-function -nostdlib -Wl,-e,_start Apkc/apkc.c -o $APKC"
-"$CC" -std=c11 -Wall -Wextra -Wno-unused-function -nostdlib -Wl,-e,_start Apkc/apkc.c -o "$APKC"
+python3 "$PATCHER" --input Apkc/apkc.c --output "$HARDENED_SRC" --write-manifest "$HARDENING_MANIFEST"
+python3 "$PATCHER" --input Apkc/apkc.c --output "$HARDENED_SRC" --write-manifest "$HARDENING_MANIFEST" --check
+RAW_SHA=$(sha256sum Apkc/apkc.c | awk '{print $1}')
+HARDENED_SHA=$(sha256sum "$HARDENED_SRC" | awk '{print $1}')
+printf 'SOURCE raw_sha256=%s hardened_sha256=%s manifest=%s\n' "$RAW_SHA" "$HARDENED_SHA" "$HARDENING_MANIFEST"
+
+echo "BUILD: $CC -std=c11 -Wall -Wextra -Wno-unused-function -nostdlib -Wl,-e,_start $HARDENED_SRC -o $APKC"
+"$CC" -std=c11 -Wall -Wextra -Wno-unused-function -nostdlib -Wl,-e,_start "$HARDENED_SRC" -o "$APKC"
 
 echo "RUN: $APKC Apkc/hello.s.txt -o $APK -p com.rafael.roundtrip -l RoundTrip -n hello -64"
 "$APKC" Apkc/hello.s.txt -o "$APK" -p com.rafael.roundtrip -l RoundTrip -n hello -64 >"$LOG" 2>&1
@@ -103,5 +117,5 @@ else
   echo "TOKEN_VAZIO: readelf/unzip missing; ARM64 ELF header not inspected"
 fi
 
-echo "PASS: ARM64 assembler roundtrip generated $APK"
+echo "PASS: ARM64 hardened-source assembler roundtrip generated $APK"
 echo "LOG: $LOG"

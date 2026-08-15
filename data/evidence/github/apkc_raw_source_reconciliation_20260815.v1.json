@@ -1,0 +1,55 @@
+{
+  "schema": "RAFPOLIMATA_APKC_RAW_SOURCE_RECONCILIATION/V1",
+  "date": "2026-08-15",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "base_main_sha": "3605ef80939dd45233b47a4727a63ab7dc16ff89",
+  "source_failure": {
+    "pr": 279,
+    "head_sha": "369f4957fcb4cb78c1671c517a44efda1aaf0674",
+    "workflow_run": 31878158598,
+    "job": 94996813231,
+    "state": "FAIL",
+    "failures": 7,
+    "artifact": {
+      "id": 9245303457,
+      "sha256": "318329569b8221915f98f8170e612f983ea91d969e7381966afe779a0f1b2657"
+    }
+  },
+  "classification": {
+    "reference_only": [
+      "docs/CONVERGENCIA_UNICA_CHECKLIST.yml",
+      "scripts/apkc_runtime_preflight.py",
+      "scripts/java_dex_pipeline_probe.sh",
+      "tests/test_apkc_runtime_preflight.py",
+      "tests/test_arm32_encoders.py"
+    ],
+    "already_hardened_but_unrecognized": [
+      "tools/raf_apkc_runtime_hardening_proof.sh"
+    ],
+    "true_raw_build_bypass": [
+      "tests/test_asm_roundtrip.sh"
+    ]
+  },
+  "before_after": {
+    "before": "all executable-suffix textual references to Apkc/apkc.c without three historical marker strings were rejected, while a hardening marker anywhere in a file could authorize the whole file",
+    "after": "docs are non-executable; inspection/fixture/commentary references are PASS_REFERENCE_ONLY; canonical runtime-C-escape transformer is recognized; active direct raw compile via literal, variable alias, or multiline command is rejected even when a hardening marker exists elsewhere; ARM roundtrip compiles only generated hardened source"
+  },
+  "branch": "hardening/apkc-raw-source-bypass-reconciliation-20260815",
+  "pr": 280,
+  "tested_policy_head_sha": "7c08a5837fff01e050afefde8b38dd3d83b4ce21",
+  "git_blob_ids": {
+    "scripts/audit_apkc_raw_source_paths.py": "8741411676380f22beaca0e2439c8b5f33a08f52",
+    "tests/test_apkc_raw_source_gate.py": "6210980b65fe57211b502343190b4cbbaaec1c2f",
+    "tests/test_asm_roundtrip.sh": "fa4d16bd896719cf8d738da00f825b5683da1413"
+  },
+  "local_probe": {
+    "attempt": "git clone exact branch + execute classifier + audit + sh -n",
+    "result": "TOKEN_VAZIO_ENVIRONMENT_NETWORK_DNS",
+    "error": "Could not resolve host: github.com",
+    "promotion": false
+  },
+  "provider_execution": "TOKEN_VAZIO_NO_RUN_OBSERVED_AT_RECEIPT_TIME",
+  "physical_android_execution": "TOKEN_VAZIO",
+  "claim_allowed": false,
+  "rollback": "close PR #280 or revert its branch commits; default branch was not written by this operation"
+}
