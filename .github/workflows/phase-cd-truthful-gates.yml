@@ -5,6 +5,7 @@ on:
     paths:
       - 'tools/verify_all_gaps.sh'
       - 'tools/validate_dex_pipeline.sh'
+      - 'tools/validate_android_runtime_evidence.sh'
       - 'tools/phase2_android_preflight.sh'
       - 'docs/receipts/PHASE_CD_TRUTHFUL_DEVICE_GATES_20260815.md'
       - '.github/workflows/phase-cd-truthful-gates.yml'
@@ -26,6 +27,7 @@ jobs:
           bash -n tools/phase2_android_preflight.sh
           bash -n tools/verify_all_gaps.sh
           bash -n tools/validate_dex_pipeline.sh
+          bash -n tools/validate_android_runtime_evidence.sh
 
       - name: Phase 2 Android preflight
         run: |
@@ -34,12 +36,22 @@ jobs:
           python3 -m json.tool ci/reports/phase2-android-preflight.json >/dev/null
           cat ci/reports/phase2-android-preflight.json
 
+      - name: L2 must remain TOKEN_VAZIO without physical current-commit receipt
+        run: |
+          set +e
+          bash tools/validate_android_runtime_evidence.sh proofs/run-arm64-full-chain/out > ci/reports/l2-runtime-static-check.txt 2>&1
+          rc=$?
+          set -e
+          test "$rc" -eq 2
+          grep -q 'TOKEN_VAZIO' ci/reports/l2-runtime-static-check.txt
+
       - name: Verify L1-L10 without false-green
         run: |
           set -o pipefail
           bash tools/verify_all_gaps.sh | tee ci/reports/phase-cd-gap-verification.txt
           grep -Eq 'state=(PASS|PARTIAL_TOKEN_VAZIO)' ci/reports/phase-cd-gap-verification.txt
           grep -q 'claim_allowed=false' ci/reports/phase-cd-gap-verification.txt
+          grep -q 'L2 TOKEN_VAZIO' ci/reports/phase-cd-gap-verification.txt
 
       - name: Guard canonical ApkC path
         run: |
@@ -49,7 +61,11 @@ jobs:
 
       - name: Guard evidence semantics
         run: |
-          grep -q 'adb get-state' tools/verify_all_gaps.sh
+          grep -q 'capture_android_proof_chain.sh' tools/verify_all_gaps.sh
+          grep -q 'validate_android_runtime_evidence.sh' tools/verify_all_gaps.sh
+          grep -q 'android_install' tools/validate_android_runtime_evidence.sh
+          grep -q 'android_launch' tools/validate_android_runtime_evidence.sh
+          grep -q 'fatal_runtime_marker_in_logcat' tools/validate_android_runtime_evidence.sh
           grep -q 'apksigner.*verify' tools/verify_all_gaps.sh
           grep -q 'TOKEN_VAZIO_FORMAL_PROOF' tools/verify_all_gaps.sh
           grep -q 'exit 2' tools/validate_dex_pipeline.sh
@@ -61,6 +77,7 @@ jobs:
           name: phase-cd-truthful-gates-${{ github.run_id }}
           path: |
             ci/reports/phase2-android-preflight.json
+            ci/reports/l2-runtime-static-check.txt
             ci/reports/phase-cd-gap-verification.txt
             docs/proofs/L1_PROVENANCE_CURRENT.json
             docs/proofs/L4_DEX_VALIDATION_*.json
