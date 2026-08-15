@@ -1,5 +1,7 @@
 /* sys.h — freestanding syscall layer: arm64 / arm32 Android/Linux
- * svc #0 (arm64) / swi #0 (arm32). No libc. No crt. Pure inline ASM. */
+ * svc #0 (arm64) / swi #0 (arm32). No libc. No crt. Pure inline ASM.
+ * NOTE: x86_64 host uses libc wrappers for development (output still freestanding ARM64).
+ */
 #pragma once
 
 typedef unsigned char       u8;
@@ -21,12 +23,23 @@ typedef __SIZE_TYPE__       sz;
 
 #define NULL ((void*)0)
 
+/* O_* flags only needed for ARM syscalls; x86_64 gets them from libc */
+#if !defined(__x86_64__) && !defined(__i386__)
 #define O_RDONLY  0x00
 #define O_WRONLY  0x01
 #define O_RDWR    0x02
 #define O_CREAT   0x40
 #define O_TRUNC   0x200
 #define O_CLOEXEC 0x80000
+#endif
+
+/* For x86_64 development builds, include libc headers */
+#if defined(__x86_64__) || defined(__i386__)
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/wait.h>
+#endif
 
 #ifdef __aarch64__
 
@@ -163,8 +176,9 @@ static inline i32 os_waitpid(i32 pid, i32 *st, i32 opts) {
     return (i32)_sc4(_NR_wait4, (i64)pid, (i64)(uptr)st, (i64)opts, 0LL);
 }
 
-#else
+#elif defined(__arm__)
 
+/* ARM32 (32-bit ARM) syscalls */
 #define _NR_exit   1
 #define _NR_read   3
 #define _NR_write  4
@@ -196,4 +210,89 @@ static inline i32  os_close(i32 fd)                      { return _sc1_32(_NR_cl
 static inline __attribute__((noreturn)) void os_exit(i32 c) {
     _sc1_32(_NR_exit,c); __builtin_unreachable();
 }
+
+#else
+
+/* x86_64 / x86 host (development only, uses libc) */
+static inline i64  os_read (i32 fd, void *b, sz n)       { return (i64)read(fd, b, n); }
+static inline i64  os_write(i32 fd, const void *b, sz n) { return (i64)write(fd, b, n); }
+static inline i32  os_open (const char *p, i32 f, i32 m) { return open(p, f, m); }
+static inline i32  os_close(i32 fd)                      { return close(fd); }
+static inline __attribute__((noreturn)) void os_exit(i32 c) {
+    exit(c); __builtin_unreachable();
+}
+
+static inline i32 os_fork(void) {
+    return fork();
+}
+
+static inline i32 _os_execve_raw(const char *p, char *const argv[], char *const envp[]) {
+    return execve(p, argv, envp);
+}
+
+static inline int _os_has_slash(const char *p) {
+    if (!p) return 0;
+    for (sz i = 0; p[i]; i++) if (p[i] == '/') return 1;
+    return 0;
+}
+
+static inline const char *_os_basename(const char *p) {
+    const char *name = p;
+    if (!p) return p;
+    for (sz i = 0; p[i]; i++) if (p[i] == '/' && p[i + 1]) name = p + i + 1;
+    return name;
+}
+
+static inline int _os_join_exec(char out[256], const char *prefix, const char *name) {
+    sz p = 0;
+    if (!out || !prefix || !name || !name[0]) return 0;
+    while (prefix[p]) {
+        if (p >= 255u) return 0;
+        out[p] = prefix[p];
+        p++;
+    }
+    for (sz i = 0; name[i]; i++) {
+        if (p >= 255u) return 0;
+        out[p++] = name[i];
+    }
+    out[p] = 0;
+    return 1;
+}
+
+/* execve does not search PATH. Try an explicit path first. If a conventional
+ * Linux path such as /usr/bin/python3 is absent on x86_64, retry its basename. */
+static inline i32 os_execve(const char *p, char *const argv[], char *const envp[]) {
+    static char env_path[] = "PATH=/usr/local/bin:/usr/bin:/bin";
+    static char env_home[] = "HOME=/root";
+    static char env_tmp[]  = "TMPDIR=/tmp";
+    static char env_lang[] = "LANG=C";
+    static char *fallback_env[] = { env_path, env_home, env_tmp, env_lang, NULL };
+    char *const *effective_env = (envp && envp[0]) ? envp : fallback_env;
+
+    if (!p || !p[0]) return -2;
+
+    i32 last = -2;
+    const char *name = p;
+    if (_os_has_slash(p)) {
+        last = _os_execve_raw(p, argv, effective_env);
+        name = _os_basename(p);
+    }
+
+    static const char *prefixes[] = {
+        "/usr/local/bin/",
+        "/usr/bin/",
+        "/bin/"
+    };
+    char candidate[256];
+    for (sz i = 0; i < sizeof(prefixes)/sizeof(prefixes[0]); i++) {
+        if (!_os_join_exec(candidate, prefixes[i], name)) return -36;
+        last = _os_execve_raw(candidate, argv, effective_env);
+    }
+    return last;
+}
+
+static inline i32 os_waitpid(i32 pid, i32 *st, i32 opts) {
+    return (i32)waitpid(pid, (int *)st, opts);
+}
+
 #endif
