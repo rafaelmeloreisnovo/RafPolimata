@@ -7,7 +7,9 @@ on:
       - 'tools/validate_dex_pipeline.sh'
       - 'tools/validate_android_runtime_evidence.sh'
       - 'tools/validate_ffi.sh'
+      - 'tools/t7_convergence_falsifier.c'
       - 'tools/phase2_android_preflight.sh'
+      - 'docs/closures/CLOSURE_L9_T7_CONVERGENCE.md'
       - 'docs/receipts/PHASE_CD_TRUTHFUL_DEVICE_GATES_20260815.md'
       - '.github/workflows/phase-cd-truthful-gates.yml'
   workflow_dispatch:
@@ -64,6 +66,16 @@ jobs:
           print('L5 receipt:',p)
           PY
 
+      - name: L9 falsify fixed-point convergence before formal proof
+        run: |
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -Wno-unused-function -I. \
+            tools/t7_convergence_falsifier.c -o /tmp/t7_convergence_falsifier
+          /tmp/t7_convergence_falsifier | tee ci/reports/l9-t7-convergence.txt
+          grep -q 'L9_RANGE_INVARIANT_PASS' ci/reports/l9-t7-convergence.txt
+          grep -q 'L9_INTEGER_IIR_LIMIT_PASS H=3 C=65536 phi=65533 omega=5' ci/reports/l9-t7-convergence.txt
+          grep -q 'L9_STRONG_FIXED_POINT_CONVERGENCE_FALSIFIED' ci/reports/l9-t7-convergence.txt
+          grep -q 'OLD_L9_FIXED_POINT_CONVERGENCE = FALSIFIED_AS_STATED' docs/closures/CLOSURE_L9_T7_CONVERGENCE.md
+
       - name: Verify L1-L10 without false-green
         run: |
           set -o pipefail
@@ -99,6 +111,7 @@ jobs:
             ci/reports/phase2-android-preflight.json
             ci/reports/l2-runtime-static-check.txt
             ci/reports/l5-ffi-c-python.txt
+            ci/reports/l9-t7-convergence.txt
             ci/reports/phase-cd-gap-verification.txt
             docs/proofs/L1_PROVENANCE_CURRENT.json
             docs/proofs/L4_DEX_VALIDATION_*.json
