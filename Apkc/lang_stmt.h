@@ -75,8 +75,6 @@ static inline u32 stmt_alloc_label(struct StmtCtx *ctx) {
 
 /* Parse variable declaration with language-specific syntax */
 static inline void stmt_parse_var_decl(struct StmtCtx *ctx) {
-    enum TokenType type_keyword = TOK_IDENT;
-
     /* Consume type keyword or identifier */
     if (stmt_match_keyword(ctx, (const u8*)"var", 3) ||
         stmt_match_keyword(ctx, (const u8*)"let", 3) ||
@@ -149,11 +147,12 @@ static inline void stmt_parse_assignment(struct StmtCtx *ctx) {
     }
 }
 
-/* Parse if statement */
+/* Parse if statement.
+ * Stage 4a currently performs structural token consumption only; no jump
+ * labels are emitted here, so allocating dead labels would create false
+ * implementation evidence and fail strict warning gates.
+ */
 static inline void stmt_parse_if(struct StmtCtx *ctx) {
-    u32 else_label = stmt_alloc_label(ctx);
-    u32 end_label = stmt_alloc_label(ctx);
-
     /* Skip 'if' keyword */
     stmt_advance(ctx);
 
@@ -200,11 +199,8 @@ static inline void stmt_parse_if(struct StmtCtx *ctx) {
     }
 }
 
-/* Parse while loop */
+/* Parse while loop. Structural parsing only until control labels are wired. */
 static inline void stmt_parse_while(struct StmtCtx *ctx) {
-    u32 loop_label = stmt_alloc_label(ctx);
-    u32 end_label = stmt_alloc_label(ctx);
-
     /* Skip 'while' keyword */
     stmt_advance(ctx);
 
@@ -233,11 +229,8 @@ static inline void stmt_parse_while(struct StmtCtx *ctx) {
     }
 }
 
-/* Parse for loop */
+/* Parse for loop. Structural parsing only until control labels are wired. */
 static inline void stmt_parse_for(struct StmtCtx *ctx) {
-    u32 loop_label = stmt_alloc_label(ctx);
-    u32 end_label = stmt_alloc_label(ctx);
-
     /* Skip 'for' keyword */
     stmt_advance(ctx);
 
