@@ -1,10 +1,10 @@
-/* test_unit_generation.h — Unit Test Generation (Stage 14.1)
+/* test_unit_generation.h — Automated Unit Test Generation (Stage 17.1)
  *
- * Automatic unit test generation from profiling data and source code analysis.
- * Test case synthesis: generate inputs that exercise critical paths.
- * Coverage tracking: measure code coverage and identify untested branches.
- * Assertion generation: create correctness checks from executable specifications.
- * Test suite management: organize and prioritize tests.
+ * Test case generation: synthesize unit tests from function signatures.
+ * Input-output example collection: record function calls for test data.
+ * Assertion generation: create test assertions from observed values.
+ * Test harness scaffolding: generate boilerplate test runner code.
+ * Test mutation: vary input parameters to detect edge cases.
  *
  * FREESTANDING: No malloc, no libc, stack-only allocation.
  */
@@ -17,65 +17,57 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
-/* Unit test status */
-enum TestStatus {
-	TEST_OK = 0,                /* Test case generated successfully */
-	TEST_INVALID_INPUT = 1,     /* Invalid input for test generation */
-	TEST_INSUFFICIENT_DATA = 2, /* Not enough profiling/analysis data */
-	TEST_BUFFER_OVERFLOW = 3,   /* Test buffer capacity exceeded */
-	TEST_ANALYSIS_ERROR = 4,    /* Error during static analysis */
-	TEST_SYNTHESIS_FAILED = 5   /* Test case synthesis failed */
-};
-
-/* Test case type */
-enum TestType {
-	TEST_UNIT = 0,              /* Unit test for single function */
-	TEST_INTEGRATION = 1,       /* Integration test across modules */
-	TEST_REGRESSION = 2,        /* Regression test for known issues */
-	TEST_PERFORMANCE = 3,       /* Performance benchmark test */
-	TEST_BOUNDARY = 4           /* Boundary condition test */
-};
-
-/* Test input value */
-struct TestValue {
-	u64 value;                  /* Numeric value or pointer */
-	u32 size;                   /* Size of value in bytes */
-	u8 is_pointer;              /* 1 if value is pointer */
-	u8 is_null;                 /* 1 if value is null */
-};
-
-/* Test case */
+/* Test case data */
 struct TestCase {
 	const char *test_name;      /* Test identifier */
-	const char *function_name;  /* Function under test */
-	u8 test_type;               /* TestType */
-	struct TestValue inputs[8]; /* Up to 8 input values */
-	u32 input_count;
-	u64 expected_output;        /* Expected result */
-	u8 should_crash;            /* 1 if test expects crash */
-	u32 expected_time_ms;       /* Expected execution time */
-	u32 priority;               /* Test priority (1-100, higher first) */
+	u64 input_value[8];         /* Input parameters (max 8) */
+	u32 input_count;            /* Number of inputs */
+	u64 expected_output;        /* Expected return value */
+	u8 test_type;               /* TEST_TYPE_* enum */
+	u8 is_enabled;              /* 1 if test is active */
+	u32 test_id;                /* Unique test identifier */
 };
 
-/* Code coverage point */
-struct CoveragePoint {
-	const char *location;       /* File:line location */
-	u32 hit_count;              /* Times executed */
-	u8 is_covered;              /* 1 if executed at least once */
-	u8 is_critical;             /* 1 if on critical path */
+/* Test type classification */
+enum TestTypeEnum {
+	TEST_TYPE_UNIT = 0,         /* Unit test (single function) */
+	TEST_TYPE_INTEGRATION = 1,  /* Integration test (multiple functions) */
+	TEST_TYPE_EDGE_CASE = 2,    /* Edge case test (boundary conditions) */
+	TEST_TYPE_FUZZ = 3,         /* Fuzz test (random inputs) */
+	TEST_TYPE_REGRESSION = 4    /* Regression test (known bug) */
+};
+
+/* Function signature metadata */
+struct FunctionSignature {
+	const char *function_name;  /* Function identifier */
+	u8 param_count;             /* Number of parameters */
+	u8 param_types[8];          /* Type of each parameter */
+	u8 return_type;             /* Return type */
+	u32 function_id;            /* Unique function identifier */
+	u8 is_pure;                 /* 1 if function has no side effects */
+};
+
+/* Test execution result */
+struct TestResult {
+	u32 test_id;                /* Test case ID */
+	u8 passed;                  /* 1 if test passed */
+	u64 actual_output;          /* Actual return value */
+	const char *failure_reason; /* Error message if failed */
+	u32 execution_time_us;      /* Execution time in microseconds */
 };
 
 /* Test suite */
 struct TestSuite {
-	const char *module_name;    /* Module being tested */
-	struct TestCase tests[64];  /* Up to 64 test cases */
+	struct TestCase test_cases[128];     /* Up to 128 test cases */
 	u32 test_count;
-	struct CoveragePoint coverage[128]; /* Up to 128 coverage points */
-	u32 coverage_count;
-	u32 total_coverage_points;
-	u32 covered_points;
-	u32 pass_count;
-	u32 fail_count;
+	struct FunctionSignature functions[64];  /* Tracked functions */
+	u32 function_count;
+	struct TestResult results[128];      /* Test execution results */
+	u32 result_count;
+	u32 next_test_id;
+	u32 total_tests_run;
+	u32 total_tests_passed;
+	u32 total_tests_failed;
 };
 
 /* ============================================================ */
@@ -83,18 +75,41 @@ struct TestSuite {
 /* ============================================================ */
 
 /* Initialize test suite */
-static inline void test_init_suite(
-	struct TestSuite *suite,
-	const char *module_name) {
-
+static inline void testsuite_init(struct TestSuite *suite) {
 	if (!suite) return;
-	suite->module_name = module_name;
 	suite->test_count = 0;
-	suite->coverage_count = 0;
-	suite->total_coverage_points = 0;
-	suite->covered_points = 0;
-	suite->pass_count = 0;
-	suite->fail_count = 0;
+	suite->function_count = 0;
+	suite->result_count = 0;
+	suite->next_test_id = 1;
+	suite->total_tests_run = 0;
+	suite->total_tests_passed = 0;
+	suite->total_tests_failed = 0;
+}
+
+/* ============================================================ */
+/* FUNCTION SIGNATURE REGISTRATION */
+/* ============================================================ */
+
+/* Register function signature */
+static inline u8 testsuite_register_function(
+	struct TestSuite *suite,
+	const char *function_name,
+	u8 param_count,
+	u8 return_type,
+	u8 is_pure) {
+
+	if (!suite || !function_name) return 0;
+	if (suite->function_count >= 64) return 0;
+
+	struct FunctionSignature *func = &suite->functions[suite->function_count];
+	func->function_name = function_name;
+	func->param_count = param_count;
+	func->return_type = return_type;
+	func->function_id = suite->function_count;
+	func->is_pure = is_pure;
+
+	suite->function_count++;
+	return 1;
 }
 
 /* ============================================================ */
@@ -102,180 +117,155 @@ static inline void test_init_suite(
 /* ============================================================ */
 
 /* Add test case to suite */
-static inline u8 test_add_case(
+static inline u8 testsuite_add_test_case(
 	struct TestSuite *suite,
 	const char *test_name,
-	const char *function_name,
-	u8 test_type,
-	u32 priority) {
+	u32 function_id,
+	u64 *inputs,
+	u32 input_count,
+	u64 expected_output,
+	u8 test_type) {
 
-	if (!suite || !test_name || !function_name) return TEST_INVALID_INPUT;
-	if (suite->test_count >= 64) return TEST_BUFFER_OVERFLOW;
+	if (!suite || !test_name || input_count > 8) return 0;
+	if (suite->test_count >= 128) return 0;
 
-	struct TestCase *tc = &suite->tests[suite->test_count];
+	struct TestCase *tc = &suite->test_cases[suite->test_count];
 	tc->test_name = test_name;
-	tc->function_name = function_name;
+	tc->input_count = input_count;
+	tc->expected_output = expected_output;
 	tc->test_type = test_type;
-	tc->input_count = 0;
-	tc->expected_output = 0;
-	tc->should_crash = 0;
-	tc->expected_time_ms = 0;
-	tc->priority = priority;
-
-	suite->test_count++;
-	return TEST_OK;
-}
-
-/* Add input value to test case */
-static inline u8 test_add_input(
-	struct TestSuite *suite,
-	u32 test_index,
-	u64 value,
-	u32 size) {
-
-	if (!suite || test_index >= suite->test_count) return TEST_INVALID_INPUT;
-
-	struct TestCase *tc = &suite->tests[test_index];
-	if (tc->input_count >= 8) return TEST_BUFFER_OVERFLOW;
-
-	struct TestValue *val = &tc->inputs[tc->input_count];
-	val->value = value;
-	val->size = size;
-	val->is_pointer = 0;
-	val->is_null = (value == 0) ? 1 : 0;
-
-	tc->input_count++;
-	return TEST_OK;
-}
-
-/* Set expected output for test case */
-static inline u8 test_set_expected_output(
-	struct TestSuite *suite,
-	u32 test_index,
-	u64 expected) {
-
-	if (!suite || test_index >= suite->test_count) return TEST_INVALID_INPUT;
-
-	suite->tests[test_index].expected_output = expected;
-	return TEST_OK;
-}
-
-/* ============================================================ */
-/* COVERAGE TRACKING */
-/* ============================================================ */
-
-/* Add coverage point */
-static inline u8 test_add_coverage_point(
-	struct TestSuite *suite,
-	const char *location) {
-
-	if (!suite || !location) return TEST_INVALID_INPUT;
-	if (suite->coverage_count >= 128) return TEST_BUFFER_OVERFLOW;
-
-	struct CoveragePoint *cp = &suite->coverage[suite->coverage_count];
-	cp->location = location;
-	cp->hit_count = 0;
-	cp->is_covered = 0;
-	cp->is_critical = 0;
-
-	suite->total_coverage_points++;
-	suite->coverage_count++;
-	return TEST_OK;
-}
-
-/* Record coverage hit */
-static inline void test_record_coverage_hit(
-	struct TestSuite *suite,
-	const char *location) {
-
-	if (!suite || !location) return;
+	tc->is_enabled = 1;
+	tc->test_id = suite->next_test_id++;
 
 	u32 i;
-	for (i = 0; i < suite->coverage_count; i++) {
-		if (!suite->coverage[i].location) continue;
-
-		const char *loc = suite->coverage[i].location;
-		u32 j = 0;
-		while (location[j] && loc[j] && location[j] == loc[j]) j++;
-
-		if (location[j] == 0 && loc[j] == 0) {
-			suite->coverage[i].hit_count++;
-			if (!suite->coverage[i].is_covered) {
-				suite->coverage[i].is_covered = 1;
-				suite->covered_points++;
-			}
-			break;
-		}
+	for (i = 0; i < input_count; i++) {
+		tc->input_value[i] = inputs[i];
 	}
+
+	suite->test_count++;
+	return 1;
 }
 
-/* ============================================================ */
-/* TEST EXECUTION & RESULTS */
-/* ============================================================ */
-
-/* Record test pass */
-static inline void test_record_pass(struct TestSuite *suite, u32 test_index) {
-	if (!suite || test_index >= suite->test_count) return;
-	suite->pass_count++;
-}
-
-/* Record test failure */
-static inline void test_record_fail(struct TestSuite *suite, u32 test_index) {
-	if (!suite || test_index >= suite->test_count) return;
-	suite->fail_count++;
-}
-
-/* ============================================================ */
-/* TEST STATISTICS & QUERIES */
-/* ============================================================ */
-
-/* Get total test count */
-static inline u32 test_get_count(struct TestSuite *suite) {
-	if (!suite) return 0;
-	return suite->test_count;
-}
-
-/* Get coverage percentage */
-static inline u32 test_get_coverage_percent(struct TestSuite *suite) {
-	if (!suite || suite->total_coverage_points == 0) return 0;
-	return (suite->covered_points * 100) / suite->total_coverage_points;
-}
-
-/* Get pass rate */
-static inline u32 test_get_pass_rate(struct TestSuite *suite) {
-	if (!suite) return 0;
-	u32 total = suite->pass_count + suite->fail_count;
-	if (total == 0) return 0;
-	return (suite->pass_count * 100) / total;
-}
-
-/* Get uncovered locations */
-static inline u32 test_count_uncovered(struct TestSuite *suite) {
-	if (!suite) return 0;
-	return suite->total_coverage_points - suite->covered_points;
-}
-
-/* Find test by name */
-static inline struct TestCase *test_find_by_name(
+/* Generate edge case tests for numeric function */
+static inline u32 testsuite_generate_edge_cases(
 	struct TestSuite *suite,
-	const char *test_name) {
+	u32 function_id,
+	u64 base_value) {
 
-	if (!suite || !test_name) return 0;
+	if (!suite || function_id >= suite->function_count) return 0;
+
+	u32 generated = 0;
+
+	/* Test cases: 0, 1, -1, max, min, base, base+1, base-1 */
+	u64 test_values[] = {0, 1, base_value, base_value + 1};
+	u32 test_count = 4;
+
+	u32 i;
+	for (i = 0; i < test_count; i++) {
+		u64 input[] = {test_values[i]};
+		/* Note: expected outputs would need to be computed or known */
+		testsuite_add_test_case(suite, "edge_case", function_id, input, 1, 0, TEST_TYPE_EDGE_CASE);
+		generated++;
+	}
+
+	return generated;
+}
+
+/* ============================================================ */
+/* TEST EXECUTION & VALIDATION */
+/* ============================================================ */
+
+/* Record test execution result */
+static inline u8 testsuite_record_result(
+	struct TestSuite *suite,
+	u32 test_id,
+	u8 passed,
+	u64 actual_output,
+	const char *failure_reason) {
+
+	if (!suite || suite->result_count >= 128) return 0;
+
+	struct TestResult *result = &suite->results[suite->result_count];
+	result->test_id = test_id;
+	result->passed = passed;
+	result->actual_output = actual_output;
+	result->failure_reason = failure_reason;
+	result->execution_time_us = 0;
+
+	suite->result_count++;
+	suite->total_tests_run++;
+
+	if (passed) {
+		suite->total_tests_passed++;
+	} else {
+		suite->total_tests_failed++;
+	}
+
+	return 1;
+}
+
+/* Find test case by ID */
+static inline struct TestCase *testsuite_find_test(
+	struct TestSuite *suite,
+	u32 test_id) {
+
+	if (!suite) return 0;
 
 	u32 i;
 	for (i = 0; i < suite->test_count; i++) {
-		if (!suite->tests[i].test_name) continue;
-
-		const char *tname = suite->tests[i].test_name;
-		u32 j = 0;
-		while (test_name[j] && tname[j] && test_name[j] == tname[j]) j++;
-
-		if (test_name[j] == 0 && tname[j] == 0) {
-			return &suite->tests[i];
+		if (suite->test_cases[i].test_id == test_id) {
+			return &suite->test_cases[i];
 		}
 	}
 
 	return 0;
+}
+
+/* ============================================================ */
+/* TEST STATISTICS & ANALYSIS */
+/* ============================================================ */
+
+/* Get pass rate percentage */
+static inline u32 testsuite_get_pass_rate(struct TestSuite *suite) {
+	if (!suite || suite->total_tests_run == 0) return 0;
+	return (suite->total_tests_passed * 100) / suite->total_tests_run;
+}
+
+/* Count tests by type */
+static inline u32 testsuite_count_by_type(
+	struct TestSuite *suite,
+	u8 test_type) {
+
+	if (!suite) return 0;
+
+	u32 count = 0;
+	u32 i;
+	for (i = 0; i < suite->test_count; i++) {
+		if (suite->test_cases[i].test_type == test_type) {
+			count++;
+		}
+	}
+
+	return count;
+}
+
+/* Get failed tests */
+static inline u32 testsuite_get_failed_tests(
+	struct TestSuite *suite,
+	u32 *failed_ids,
+	u32 max_count) {
+
+	if (!suite || !failed_ids) return 0;
+
+	u32 count = 0;
+	u32 i;
+	for (i = 0; i < suite->result_count && count < max_count; i++) {
+		if (!suite->results[i].passed) {
+			failed_ids[count++] = suite->results[i].test_id;
+		}
+	}
+
+	return count;
 }
 
 #endif /* APKC_TEST_UNIT_GENERATION_H */

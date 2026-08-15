@@ -1,10 +1,10 @@
-/* test_regression_tracking.h — Regression Test Tracking (Stage 14.3)
+/* test_regression_tracking.h — Regression Test Tracking (Stage 17.4)
  *
- * Regression test database: store and track known issues and fixes.
- * Issue linking: connect tests to bug reports and commits.
- * Regression detection: identify when fixed issues resurface.
- * Test metadata: timestamp, author, affected versions.
- * Bisect support: identify commit that introduced regression.
+ * Regression database: store known failing test cases and expected results.
+ * Test history: track test results across builds for trend analysis.
+ * Failure analysis: categorize regressions (new failure vs reappearance).
+ * Quarantine system: mark flaky tests for investigation.
+ * Trend reporting: generate historical analysis of test health.
  *
  * FREESTANDING: No malloc, no libc, stack-only allocation.
  */
@@ -17,295 +17,285 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
-/* Regression test status */
-enum RegressionStatus {
-	REG_OK = 0,                 /* Test passing (issue fixed) */
-	REG_RESURFACED = 1,         /* Issue has resurfaced */
-	REG_NOT_REPRODUCIBLE = 2,   /* Issue cannot be reproduced */
-	REG_UNKNOWN_STATUS = 3,     /* Status unknown */
-	REG_BLOCKED = 4             /* Test blocked/skipped */
-};
-
-/* Test severity level */
-enum RegressionSeverity {
-	SEV_TRIVIAL = 0,            /* Cosmetic issue */
-	SEV_MINOR = 1,              /* Minor functionality broken */
-	SEV_MAJOR = 2,              /* Major functionality broken */
-	SEV_BLOCKER = 3             /* Release blocker */
-};
-
-/* Regression test case */
+/* Regression test entry */
 struct RegressionTest {
-	const char *test_name;      /* Test identifier */
-	const char *issue_id;       /* Bug report ID (e.g., "BUG-123") */
-	const char *description;    /* Issue description */
-	u8 severity;                /* RegressionSeverity */
-	const char *introduced_in;  /* First affected version */
-	const char *fixed_in;       /* Version where fix landed */
-	const char *fix_commit;     /* Git commit SHA that fixed it */
-	u8 status;                  /* RegressionStatus */
-	u32 test_count;             /* Times this test has run */
-	u32 pass_count;             /* Times test passed */
-	u32 fail_count;             /* Times test failed (resurfaced) */
-	u64 last_run_time;          /* Unix timestamp of last run */
+	u32 test_id;                /* Test identifier */
+	const char *test_name;      /* Test name */
+	const char *commit_hash;    /* Git commit where test was added */
+	u8 was_failing;             /* 1 if test was originally failing */
+	u8 is_quarantined;          /* 1 if test is flaky/under investigation */
+	u32 consecutive_failures;   /* Times failed in a row */
+	u32 consecutive_passes;     /* Times passed in a row */
 };
 
-/* Test failure record */
-struct FailureRecord {
-	const char *test_name;      /* Which test failed */
-	u64 timestamp;              /* When it failed */
-	const char *git_sha;        /* Which commit was being tested */
-	const char *error_message;  /* What went wrong */
-	u32 fail_count;             /* Number of failures at this commit */
+/* Test result history entry */
+struct TestHistory {
+	u32 test_id;                /* Test identifier */
+	u64 timestamp;              /* When test was run (unix seconds) */
+	u8 passed;                  /* 1 if test passed */
+	const char *commit_hash;    /* Commit being tested */
+	u32 build_number;           /* CI build number */
+	const char *failure_message;/* Error message if failed */
 };
 
-/* Regression test suite */
-struct RegressionSuite {
-	const char *suite_name;     /* Suite identifier */
-	struct RegressionTest tests[64]; /* Up to 64 regression tests */
+/* Regression analysis report */
+struct RegressionReport {
+	u32 total_tests;            /* Total tracked tests */
+	u32 currently_failing;      /* Tests failing in current build */
+	u32 newly_failing;          /* Tests that just started failing */
+	u32 reappeared_failures;    /* Tests that fail again after passing */
+	u32 quarantined_count;      /* Flaky tests under investigation */
+	u32 trend_improving;        /* Tests improving (more passes lately) */
+	u32 trend_worsening;        /* Tests worsening (more failures lately) */
+	u32 build_number;           /* Current build number */
+};
+
+/* Regression tracking database */
+struct RegressionDb {
+	struct RegressionTest tests[256];       /* Up to 256 tracked tests */
 	u32 test_count;
-	struct FailureRecord failures[32]; /* Up to 32 recent failures */
-	u32 failure_count;
-	u32 active_count;           /* Tests currently failing */
-	u32 fixed_count;            /* Issues fixed in this suite */
-	u64 last_scan_time;         /* When suite was last scanned */
+	struct TestHistory history[1024];       /* Up to 1024 history entries */
+	u32 history_count;
+	struct RegressionReport latest_report;
+	u32 next_build_number;
 };
 
 /* ============================================================ */
-/* REGRESSION SUITE MANAGEMENT */
+/* REGRESSION DATABASE INITIALIZATION */
 /* ============================================================ */
 
-/* Initialize regression suite */
-static inline void reg_init_suite(
-	struct RegressionSuite *suite,
-	const char *suite_name) {
-
-	if (!suite) return;
-	suite->suite_name = suite_name;
-	suite->test_count = 0;
-	suite->failure_count = 0;
-	suite->active_count = 0;
-	suite->fixed_count = 0;
-	suite->last_scan_time = 0;
+/* Initialize regression database */
+static inline void regdb_init(struct RegressionDb *db) {
+	if (!db) return;
+	db->test_count = 0;
+	db->history_count = 0;
+	db->next_build_number = 1;
+	db->latest_report.total_tests = 0;
+	db->latest_report.currently_failing = 0;
+	db->latest_report.newly_failing = 0;
+	db->latest_report.reappeared_failures = 0;
+	db->latest_report.quarantined_count = 0;
+	db->latest_report.trend_improving = 0;
+	db->latest_report.trend_worsening = 0;
+	db->latest_report.build_number = 0;
 }
 
 /* ============================================================ */
 /* REGRESSION TEST REGISTRATION */
 /* ============================================================ */
 
-/* Add regression test */
-static inline u8 reg_add_test(
-	struct RegressionSuite *suite,
+/* Register regression test */
+static inline u8 regdb_register_test(
+	struct RegressionDb *db,
+	u32 test_id,
 	const char *test_name,
-	const char *issue_id,
-	const char *description,
-	u8 severity,
-	const char *introduced_in,
-	const char *fixed_in,
-	const char *fix_commit) {
+	const char *commit_hash) {
 
-	if (!suite || !test_name || !issue_id) return REG_UNKNOWN_STATUS;
-	if (suite->test_count >= 64) return REG_UNKNOWN_STATUS;
+	if (!db || !test_name || !commit_hash) return 0;
+	if (db->test_count >= 256) return 0;
 
-	struct RegressionTest *test = &suite->tests[suite->test_count];
+	struct RegressionTest *test = &db->tests[db->test_count];
+	test->test_id = test_id;
 	test->test_name = test_name;
-	test->issue_id = issue_id;
-	test->description = description;
-	test->severity = severity;
-	test->introduced_in = introduced_in;
-	test->fixed_in = fixed_in;
-	test->fix_commit = fix_commit;
-	test->status = REG_OK;
-	test->test_count = 0;
-	test->pass_count = 0;
-	test->fail_count = 0;
-	test->last_run_time = 0;
+	test->commit_hash = commit_hash;
+	test->was_failing = 0;
+	test->is_quarantined = 0;
+	test->consecutive_failures = 0;
+	test->consecutive_passes = 0;
 
-	suite->test_count++;
-	return REG_OK;
+	db->test_count++;
+	db->latest_report.total_tests++;
+
+	return 1;
 }
 
-/* ============================================================ */
-/* TEST EXECUTION & TRACKING */
-/* ============================================================ */
+/* Mark test as originally failing (known bug) */
+static inline u8 regdb_mark_known_failure(
+	struct RegressionDb *db,
+	u32 test_id) {
 
-/* Record test run result */
-static inline u8 reg_record_run(
-	struct RegressionSuite *suite,
-	const char *test_name,
-	u8 passed) {
+	if (!db) return 0;
 
-	if (!suite || !test_name) return REG_UNKNOWN_STATUS;
-
-	/* Find test */
 	u32 i;
-	for (i = 0; i < suite->test_count; i++) {
-		if (!suite->tests[i].test_name) continue;
-
-		const char *tname = suite->tests[i].test_name;
-		u32 j = 0;
-		while (test_name[j] && tname[j] && test_name[j] == tname[j]) j++;
-
-		if (test_name[j] == 0 && tname[j] == 0) {
-			/* Found test */
-			struct RegressionTest *test = &suite->tests[i];
-			test->test_count++;
-			test->last_run_time = 0;  /* Would be current timestamp */
-
-			if (passed) {
-				test->pass_count++;
-				test->status = REG_OK;
-			} else {
-				test->fail_count++;
-				test->status = REG_RESURFACED;
-				suite->active_count++;
-			}
-
-			return test->status;
+	for (i = 0; i < db->test_count; i++) {
+		if (db->tests[i].test_id == test_id) {
+			db->tests[i].was_failing = 1;
+			return 1;
 		}
 	}
 
-	return REG_UNKNOWN_STATUS;
+	return 0;
 }
 
-/* Record failure with commit info */
-static inline u8 reg_record_failure(
-	struct RegressionSuite *suite,
-	const char *test_name,
-	u64 timestamp,
-	const char *git_sha,
-	const char *error_message) {
+/* Quarantine flaky test */
+static inline u8 regdb_quarantine_test(
+	struct RegressionDb *db,
+	u32 test_id) {
 
-	if (!suite || !test_name || !git_sha) return REG_UNKNOWN_STATUS;
-	if (suite->failure_count >= 32) return REG_UNKNOWN_STATUS;
+	if (!db) return 0;
 
-	struct FailureRecord *record = &suite->failures[suite->failure_count];
-	record->test_name = test_name;
-	record->timestamp = timestamp;
-	record->git_sha = git_sha;
-	record->error_message = error_message;
-	record->fail_count = 1;
+	u32 i;
+	for (i = 0; i < db->test_count; i++) {
+		if (db->tests[i].test_id == test_id) {
+			db->tests[i].is_quarantined = 1;
+			db->latest_report.quarantined_count++;
+			return 1;
+		}
+	}
 
-	suite->failure_count++;
-	return REG_OK;
+	return 0;
+}
+
+/* ============================================================ */
+/* TEST RESULT RECORDING */
+/* ============================================================ */
+
+/* Record test result in history */
+static inline u8 regdb_record_result(
+	struct RegressionDb *db,
+	u32 test_id,
+	u8 passed,
+	const char *commit_hash,
+	const char *failure_msg) {
+
+	if (!db || !commit_hash) return 0;
+	if (db->history_count >= 1024) return 0;
+
+	struct TestHistory *entry = &db->history[db->history_count];
+	entry->test_id = test_id;
+	entry->timestamp = 0;  /* Would be current time */
+	entry->passed = passed;
+	entry->commit_hash = commit_hash;
+	entry->build_number = db->next_build_number;
+	entry->failure_message = failure_msg;
+
+	db->history_count++;
+
+	/* Update consecutive counters */
+	u32 i;
+	for (i = 0; i < db->test_count; i++) {
+		if (db->tests[i].test_id == test_id) {
+			if (passed) {
+				db->tests[i].consecutive_passes++;
+				db->tests[i].consecutive_failures = 0;
+			} else {
+				db->tests[i].consecutive_failures++;
+				db->tests[i].consecutive_passes = 0;
+				db->latest_report.currently_failing++;
+			}
+			break;
+		}
+	}
+
+	return 1;
 }
 
 /* ============================================================ */
 /* REGRESSION ANALYSIS */
 /* ============================================================ */
 
-/* Check if issue has resurfaced */
-static inline u8 reg_is_resurfaced(
-	struct RegressionSuite *suite,
-	const char *test_name) {
+/* Detect newly failing test */
+static inline u8 regdb_is_newly_failing(
+	struct RegressionDb *db,
+	u32 test_id) {
 
-	if (!suite || !test_name) return 0;
+	if (!db) return 0;
 
 	u32 i;
-	for (i = 0; i < suite->test_count; i++) {
-		if (!suite->tests[i].test_name) continue;
-
-		const char *tname = suite->tests[i].test_name;
-		u32 j = 0;
-		while (test_name[j] && tname[j] && test_name[j] == tname[j]) j++;
-
-		if (test_name[j] == 0 && tname[j] == 0) {
-			return (suite->tests[i].status == REG_RESURFACED) ? 1 : 0;
+	for (i = 0; i < db->test_count; i++) {
+		if (db->tests[i].test_id == test_id) {
+			/* New failure if: not originally failing, and just started failing */
+			return !db->tests[i].was_failing && db->tests[i].consecutive_failures == 1;
 		}
 	}
 
 	return 0;
 }
 
-/* Count failing tests by severity */
-static inline u32 reg_count_by_severity(
-	struct RegressionSuite *suite,
-	u8 severity) {
+/* Count consecutive failures for test */
+static inline u32 regdb_get_consecutive_failures(
+	struct RegressionDb *db,
+	u32 test_id) {
 
-	if (!suite) return 0;
+	if (!db) return 0;
 
-	u32 count = 0;
 	u32 i;
-	for (i = 0; i < suite->test_count; i++) {
-		if (suite->tests[i].severity == severity &&
-			suite->tests[i].status == REG_RESURFACED) {
-			count++;
-		}
-	}
-
-	return count;
-}
-
-/* ============================================================ */
-/* BISECT SUPPORT */
-/* ============================================================ */
-
-/* Find failure in commit history (would use binary search) */
-static inline const char *reg_bisect_find_culprit(
-	struct RegressionSuite *suite,
-	const char *test_name) {
-
-	if (!suite || !test_name) return 0;
-
-	/* Find first failure in failure record */
-	u32 i;
-	for (i = 0; i < suite->failure_count; i++) {
-		const char *fname = suite->failures[i].test_name;
-		u32 j = 0;
-		while (test_name[j] && fname[j] && test_name[j] == fname[j]) j++;
-
-		if (test_name[j] == 0 && fname[j] == 0) {
-			return suite->failures[i].git_sha;
+	for (i = 0; i < db->test_count; i++) {
+		if (db->tests[i].test_id == test_id) {
+			return db->tests[i].consecutive_failures;
 		}
 	}
 
 	return 0;
 }
 
-/* ============================================================ */
-/* STATISTICS & REPORTING */
-/* ============================================================ */
+/* Get test history for trend analysis */
+static inline u32 regdb_get_test_history(
+	struct RegressionDb *db,
+	u32 test_id,
+	struct TestHistory *out_history,
+	u32 max_entries) {
 
-/* Get total active (resurfaced) issues */
-static inline u32 reg_get_active_count(struct RegressionSuite *suite) {
-	if (!suite) return 0;
-	return suite->active_count;
-}
-
-/* Get number of fixed issues */
-static inline u32 reg_get_fixed_count(struct RegressionSuite *suite) {
-	if (!suite) return 0;
+	if (!db || !out_history) return 0;
 
 	u32 count = 0;
 	u32 i;
-	for (i = 0; i < suite->test_count; i++) {
-		if (suite->tests[i].status == REG_OK &&
-			suite->tests[i].fixed_in != 0) {
-			count++;
+	for (i = 0; i < db->history_count && count < max_entries; i++) {
+		if (db->history[i].test_id == test_id) {
+			out_history[count++] = db->history[i];
 		}
 	}
 
 	return count;
 }
 
-/* Get total test count */
-static inline u32 reg_get_test_count(struct RegressionSuite *suite) {
-	if (!suite) return 0;
-	return suite->test_count;
-}
+/* Identify improving tests (more recent passes) */
+static inline u32 regdb_find_improving_tests(
+	struct RegressionDb *db,
+	u32 *test_ids,
+	u32 max_count) {
 
-/* Check if suite is healthy (no active regressions) */
-static inline u8 reg_is_healthy(struct RegressionSuite *suite) {
-	if (!suite) return 1;
+	if (!db || !test_ids) return 0;
 
+	u32 count = 0;
 	u32 i;
-	for (i = 0; i < suite->test_count; i++) {
-		if (suite->tests[i].status == REG_RESURFACED) {
-			return 0;
+	for (i = 0; i < db->test_count && count < max_count; i++) {
+		/* Improving if: was failing, consecutive_passes > 0 */
+		if (db->tests[i].was_failing && db->tests[i].consecutive_passes > 0) {
+			test_ids[count++] = db->tests[i].test_id;
+			db->latest_report.trend_improving++;
 		}
 	}
 
-	return 1;
+	return count;
+}
+
+/* Identify worsening tests (recently started failing) */
+static inline u32 regdb_find_worsening_tests(
+	struct RegressionDb *db,
+	u32 *test_ids,
+	u32 max_count) {
+
+	if (!db || !test_ids) return 0;
+
+	u32 count = 0;
+	u32 i;
+	for (i = 0; i < db->test_count && count < max_count; i++) {
+		/* Worsening if: was passing, recent failures > threshold */
+		if (!db->tests[i].was_failing && db->tests[i].consecutive_failures >= 2) {
+			test_ids[count++] = db->tests[i].test_id;
+			db->latest_report.trend_worsening++;
+		}
+	}
+
+	return count;
+}
+
+/* Get regression report */
+static inline struct RegressionReport *regdb_get_report(struct RegressionDb *db) {
+	if (!db) return 0;
+	db->latest_report.build_number = db->next_build_number;
+	return &db->latest_report;
 }
 
 #endif /* APKC_TEST_REGRESSION_TRACKING_H */
