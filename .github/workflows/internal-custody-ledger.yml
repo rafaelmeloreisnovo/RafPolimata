@@ -1,0 +1,82 @@
+name: Internal Custody Ledger
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-internal-custody-ledger:
+    name: validate-internal-custody-ledger
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Syntax and adversarial unit tests
+        run: |
+          python3 -m py_compile tools/internal_custody_event.py tools/verify_internal_custody.py
+          python3 -m unittest -v tests.test_internal_custody_ledger
+
+      - name: Generate intact fixture chain
+        run: |
+          set -euo pipefail
+          mkdir -p ci/custody
+          printf 'rafaelia-custody-fixture\n' > ci/custody/input.txt
+          cp ci/custody/input.txt ci/custody/output.txt
+          python3 tools/internal_custody_event.py \
+            --ledger ci/custody/internal-custody.jsonl \
+            --repository rafaelmeloreisnovo/RafPolimata \
+            --path ci/custody/output.txt \
+            --symbol ci_fixture_transform \
+            --result PASS \
+            --input ci/custody/input.txt \
+            --output ci/custody/output.txt \
+            --parameters-json '{"network":"disabled","fixture":"deterministic"}' \
+            --repo-root . \
+            > ci/custody/writer-event.json
+          python3 tools/verify_internal_custody.py \
+            ci/custody/internal-custody.jsonl \
+            --artifact-root . \
+            --strict \
+            --report ci/custody/verification-report.txt
+
+      - name: Falsifier — one-byte semantic tamper must fail
+        run: |
+          set -euo pipefail
+          cp ci/custody/internal-custody.jsonl ci/custody/tampered.jsonl
+          cp ci/custody/internal-custody.jsonl.manifest.json ci/custody/tampered.jsonl.manifest.json
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('ci/custody/tampered.jsonl')
+          raw = path.read_bytes()
+          needle = b'"result":"PASS"'
+          replacement = b'"result":"FAIL"'
+          if needle not in raw:
+              raise SystemExit('fixture does not contain expected PASS token')
+          path.write_bytes(raw.replace(needle, replacement, 1))
+          PY
+          if python3 tools/verify_internal_custody.py ci/custody/tampered.jsonl --strict > ci/custody/tamper-report.txt 2>&1; then
+            echo 'FAIL: tampered ledger was accepted'
+            exit 1
+          fi
+          echo 'PASS: tampered ledger rejected as required'
+
+      - name: Upload custody evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: internal-custody-ledger-${{ github.run_id }}
+          path: |
+            ci/custody/internal-custody.jsonl
+            ci/custody/internal-custody.jsonl.manifest.json
+            ci/custody/writer-event.json
+            ci/custody/verification-report.txt
+            ci/custody/tampered.jsonl
+            ci/custody/tampered.jsonl.manifest.json
+            ci/custody/tamper-report.txt
+          if-no-files-found: error
