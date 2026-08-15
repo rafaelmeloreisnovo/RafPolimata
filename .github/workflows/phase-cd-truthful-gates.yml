@@ -1,0 +1,121 @@
+name: Phase C-D Truthful Gates
+
+on:
+  pull_request:
+    paths:
+      - 'tools/verify_all_gaps.sh'
+      - 'tools/validate_dex_pipeline.sh'
+      - 'tools/validate_android_runtime_evidence.sh'
+      - 'tools/validate_ffi.sh'
+      - 'tools/t7_convergence_falsifier.c'
+      - 'tools/phase2_android_preflight.sh'
+      - 'docs/closures/CLOSURE_L9_T7_CONVERGENCE.md'
+      - 'docs/receipts/PHASE_CD_TRUTHFUL_DEVICE_GATES_20260815.md'
+      - '.github/workflows/phase-cd-truthful-gates.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  provider-static-truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Shell syntax
+        run: |
+          bash -n tools/phase2_android_preflight.sh
+          bash -n tools/verify_all_gaps.sh
+          bash -n tools/validate_dex_pipeline.sh
+          bash -n tools/validate_android_runtime_evidence.sh
+          bash -n tools/validate_ffi.sh
+
+      - name: Phase 2 Android preflight
+        run: |
+          mkdir -p ci/reports
+          bash tools/phase2_android_preflight.sh ci/reports/phase2-android-preflight.json
+          python3 -m json.tool ci/reports/phase2-android-preflight.json >/dev/null
+          cat ci/reports/phase2-android-preflight.json
+
+      - name: L2 must remain TOKEN_VAZIO without physical current-commit receipt
+        run: |
+          set +e
+          bash tools/validate_android_runtime_evidence.sh proofs/run-arm64-full-chain/out > ci/reports/l2-runtime-static-check.txt 2>&1
+          rc=$?
+          set -e
+          test "$rc" -eq 2
+          grep -q 'TOKEN_VAZIO' ci/reports/l2-runtime-static-check.txt
+
+      - name: L5 bounded real FFI proof — C ABI to CPython ctypes
+        run: |
+          set -o pipefail
+          bash tools/validate_ffi.sh | tee ci/reports/l5-ffi-c-python.txt
+          grep -q 'PASS_C_PYTHON_FFI' ci/reports/l5-ffi-c-python.txt
+          ls docs/proofs/L5_FFI_C_PYTHON_*.json >/dev/null
+          python3 - <<'PY'
+          import glob,json
+          p=sorted(glob.glob('docs/proofs/L5_FFI_C_PYTHON_*.json'))[-1]
+          d=json.load(open(p,encoding='utf-8'))
+          assert d['state']=='PASS_C_PYTHON_FFI'
+          assert d['observations']['add_20_22']==42
+          assert d['observations']['bounds_rejection']=='PASS'
+          assert d['twelve_language_coverage']=='TOKEN_VAZIO_OUT_OF_SCOPE'
+          print('L5 receipt:',p)
+          PY
+
+      - name: L9 falsify fixed-point convergence before formal proof
+        run: |
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -Wno-unused-function -I. \
+            tools/t7_convergence_falsifier.c -o /tmp/t7_convergence_falsifier
+          /tmp/t7_convergence_falsifier | tee ci/reports/l9-t7-convergence.txt
+          grep -q 'L9_RANGE_INVARIANT_PASS' ci/reports/l9-t7-convergence.txt
+          grep -q 'L9_INTEGER_IIR_LIMIT_PASS H=3 C=65536 phi=65533 omega=5' ci/reports/l9-t7-convergence.txt
+          grep -q 'L9_STRONG_FIXED_POINT_CONVERGENCE_FALSIFIED' ci/reports/l9-t7-convergence.txt
+          grep -q 'OLD_L9_FIXED_POINT_CONVERGENCE = FALSIFIED_AS_STATED' docs/closures/CLOSURE_L9_T7_CONVERGENCE.md
+
+      - name: Verify L1-L10 without false-green
+        run: |
+          set -o pipefail
+          bash tools/verify_all_gaps.sh | tee ci/reports/phase-cd-gap-verification.txt
+          grep -Eq 'state=(PASS|PARTIAL_TOKEN_VAZIO)' ci/reports/phase-cd-gap-verification.txt
+          grep -q 'claim_allowed=false' ci/reports/phase-cd-gap-verification.txt
+          grep -q 'L2 TOKEN_VAZIO' ci/reports/phase-cd-gap-verification.txt
+
+      - name: Guard canonical ApkC path
+        run: |
+          ! grep -nE 'APKC_BIN=.*Apkc/apkc([" ]|$)' tools/verify_all_gaps.sh
+          grep -q 'patch_apkc_source_cap.py' tools/verify_all_gaps.sh
+          grep -q 'raf_apkc_runtime_hardening_proof.sh' tools/verify_all_gaps.sh
+
+      - name: Guard evidence semantics
+        run: |
+          grep -q 'capture_android_proof_chain.sh' tools/verify_all_gaps.sh
+          grep -q 'validate_android_runtime_evidence.sh' tools/verify_all_gaps.sh
+          grep -q 'android_install' tools/validate_android_runtime_evidence.sh
+          grep -q 'android_launch' tools/validate_android_runtime_evidence.sh
+          grep -q 'fatal_runtime_marker_in_logcat' tools/validate_android_runtime_evidence.sh
+          grep -q 'apksigner.*verify' tools/verify_all_gaps.sh
+          grep -q 'TOKEN_VAZIO_FORMAL_PROOF' tools/verify_all_gaps.sh
+          grep -q 'exit 2' tools/validate_dex_pipeline.sh
+          grep -q 'twelve_language_coverage.*TOKEN_VAZIO_OUT_OF_SCOPE' tools/validate_ffi.sh
+
+      - name: Upload Phase C-D receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-cd-truthful-gates-${{ github.run_id }}
+          path: |
+            ci/reports/phase2-android-preflight.json
+            ci/reports/l2-runtime-static-check.txt
+            ci/reports/l5-ffi-c-python.txt
+            ci/reports/l9-t7-convergence.txt
+            ci/reports/phase-cd-gap-verification.txt
+            docs/proofs/L1_PROVENANCE_CURRENT.json
+            docs/proofs/L4_DEX_VALIDATION_*.json
+            docs/proofs/L5_FFI_C_PYTHON_*.json
+            results/apkc-runtime-hardening-proof.json
+            Apkc/proofs/runs/
+          if-no-files-found: warn
