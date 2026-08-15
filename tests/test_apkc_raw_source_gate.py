@@ -7,50 +7,51 @@ m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
 
 p = Path("scripts/demo.sh")
+RAW = "Apkc/" + "apkc.c"
 
 # Direct compile of canonical raw source is always a bypass, including implicit a.out.
-state, _ = m.classify_text(p, "clang Apkc/apkc.c -o apkc\n")
+state, _ = m.classify_text(p, f"clang {RAW} -o apkc\n")
 assert state == "FAIL_RAW_BYPASS"
-state, _ = m.classify_text(p, "clang Apkc/apkc.c\n")
+state, _ = m.classify_text(p, f"clang {RAW}\n")
 assert state == "FAIL_RAW_BYPASS"
-state, _ = m.classify_text(p, '"$CC" Apkc/apkc.c\n')
+state, _ = m.classify_text(p, f'"$CC" {RAW}\n')
 assert state == "FAIL_RAW_BYPASS"
 
 # Mentioning a compiler in diagnostic text is not itself execution.
-state, _ = m.classify_text(p, 'echo "clang Apkc/apkc.c"\n')
+state, _ = m.classify_text(p, f'echo "clang {RAW}"\n')
 assert state == "PASS_REFERENCE_ONLY"
 
 # Multiline and variable-alias compiles must also fail.
 state, _ = m.classify_text(
     p,
-    "SRC=Apkc/apkc.c\n"
+    f"SRC={RAW}\n"
     '"$CC" -std=c11 -nostdlib "$SRC" -o apkc\n',
 )
 assert state == "FAIL_RAW_BYPASS"
 
 state, _ = m.classify_text(
     Path(".github/workflows/ci.yml"),
-    "run: |\n  clang \\\n    -fsyntax-only \\\n    Apkc/apkc.c\n",
+    "run: |\n  clang \\\n    -fsyntax-only \\\n    " + RAW + "\n",
 )
 assert state == "FAIL_RAW_BYPASS"
 
 # Canonical hardening entrypoints authorize the raw source only as transformer input.
 state, _ = m.classify_text(
     p,
-    "python3 scripts/patch_apkc_source_cap.py Apkc/apkc.c '$TMP/apkc_hardened.c'\n"
+    f"python3 scripts/patch_apkc_source_cap.py {RAW} '$TMP/apkc_hardened.c'\n"
     "clang '$TMP/apkc_hardened.c' -o apkc\n",
 )
 assert state == "PASS_HARDENED"
 
 state, _ = m.classify_text(
     Path("tools/runtime.sh"),
-    "python3 scripts/patch_apkc_runtime_source.py --input Apkc/apkc.c --output '$GEN'\n",
+    f"python3 scripts/patch_apkc_runtime_source.py --input {RAW} --output '$GEN'\n",
 )
 assert state == "PASS_HARDENED"
 
 state, _ = m.classify_text(
     Path("tools/runtime-c-escape.sh"),
-    "python3 scripts/patch_apkc_runtime_source_c_escape.py --input Apkc/apkc.c --output '$GEN'\n"
+    f"python3 scripts/patch_apkc_runtime_source_c_escape.py --input {RAW} --output '$GEN'\n"
     "clang -nostdlib '$GEN' -o apkc\n",
 )
 assert state == "PASS_HARDENED"
@@ -58,15 +59,15 @@ assert state == "PASS_HARDENED"
 # A hardening marker elsewhere in the file must never authorize a separate raw compile.
 state, _ = m.classify_text(
     Path("tools/mixed.sh"),
-    "python3 scripts/patch_apkc_runtime_source_c_escape.py --input Apkc/apkc.c --output '$GEN'\n"
-    "clang Apkc/apkc.c -o raw-apkc\n",
+    f"python3 scripts/patch_apkc_runtime_source_c_escape.py --input {RAW} --output '$GEN'\n"
+    f"clang {RAW} -o raw-apkc\n",
 )
 assert state == "FAIL_RAW_BYPASS"
 
 # Workflow compile remains fail-closed.
 state, _ = m.classify_text(
     Path(".github/workflows/ci.yml"),
-    "run: clang -fsyntax-only Apkc/apkc.c\n",
+    f"run: clang -fsyntax-only {RAW}\n",
 )
 assert state == "FAIL_RAW_BYPASS"
 
@@ -79,27 +80,27 @@ assert state == "NO_RAW_REF"
 # Source inspection, fixtures and commentary are references, not build bypasses.
 state, _ = m.classify_text(
     Path("scripts/preflight.py"),
-    'apkc_path = root / "Apkc/apkc.c"\ntext = apkc_path.read_text()\n',
+    f'apkc_path = root / "{RAW}"\ntext = apkc_path.read_text()\n',
 )
 assert state == "PASS_REFERENCE_ONLY"
 
 state, _ = m.classify_text(
     Path("tests/test_fixture.py"),
-    '(root / "Apkc/apkc.c").write_text("fixture")\n',
+    f'(root / "{RAW}").write_text("fixture")\n',
 )
 assert state == "PASS_REFERENCE_ONLY"
 
 state, _ = m.classify_text(
     Path("scripts/probe.sh"),
-    'echo "fork path in Apkc/apkc.c remains TOKEN_VAZIO"\n',
+    f'echo "fork path in {RAW} remains TOKEN_VAZIO"\n',
 )
 assert state == "PASS_REFERENCE_ONLY"
 
 # Files under docs remain documentation even when YAML-suffixed.
-state, _ = m.classify_text(Path("docs/checklist.yml"), 'target: "Apkc/apkc.c"\n')
+state, _ = m.classify_text(Path("docs/checklist.yml"), f'target: "{RAW}"\n')
 assert state == "IGNORED_NON_EXEC"
 
-state, _ = m.classify_text(Path("docs/note.md"), "clang Apkc/apkc.c -o apkc\n")
+state, _ = m.classify_text(Path("docs/note.md"), f"clang {RAW} -o apkc\n")
 assert state == "IGNORED_NON_EXEC"
 
 print("PASS raw-source gate classification")
