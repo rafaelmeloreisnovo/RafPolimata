@@ -1,14 +1,14 @@
-/* deploy_apk_signing.h — APK Signing & Integrity (Stage 9.2)
+/* deploy_apk_signing.h — APK integrity/signing boundary (Stage 9.2 hardening)
  *
- * Signing configuration and digital signatures.
- * SHA256 content hashing for integrity verification.
- * Certificate pinning and chain validation.
- * Tamper detection and code signature validation.
- * SHA256 only (no MD5/SHA1); freestanding implementation.
+ * IMPORTANT EVIDENCE BOUNDARY:
+ * - This freestanding module DOES NOT implement RSA, ECDSA, APK Signature Scheme,
+ *   X.509 chain validation, or cryptographic SHA-256.
+ * - integrity_hash32_substitute() is deterministic integrity instrumentation only.
+ * - Any request for RSA/ECDSA signing fails closed until a real implementation is wired.
+ * - claim_allowed remains false outside this header until cryptographic/provider/runtime proof exists.
  *
- * FREESTANDING: No malloc, no libc, stack-only allocation.
+ * FREESTANDING: no malloc, no libc, stack-only/fixed-size storage.
  */
-
 #ifndef APKC_DEPLOY_APK_SIGNING_H
 #define APKC_DEPLOY_APK_SIGNING_H 1
 
@@ -16,384 +16,261 @@ typedef unsigned char u8;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
-/* Signing algorithm types */
 enum SigningAlgorithm {
-	SIGN_SHA256_RSA = 0,       /* SHA256 with RSA */
-	SIGN_SHA256_EC = 1,        /* SHA256 with ECDSA */
-	SIGN_NONE = 2              /* No signing */
+    SIGN_SHA256_RSA = 0,
+    SIGN_SHA256_EC = 1,
+    SIGN_NONE = 2
 };
 
-/* Certificate information */
+enum SigningCapability {
+    SIGN_CAPABILITY_UNIMPLEMENTED = 0,
+    SIGN_CAPABILITY_INTEGRITY_SUBSTITUTE_ONLY = 1
+};
+
 struct Certificate {
-	const u8 *subject;         /* Subject DN */
-	u32 subject_len;
-	const u8 *issuer;          /* Issuer DN */
-	u32 issuer_len;
-	u64 serial;                /* Serial number */
-	u32 not_before;            /* Issue time (UNIX timestamp) */
-	u32 not_after;             /* Expiry time (UNIX timestamp) */
-	const u8 *fingerprint;     /* SHA256 fingerprint (32 bytes) */
-	u8 self_signed;            /* 1 if self-signed */
+    const u8 *subject;
+    u32 subject_len;
+    const u8 *issuer;
+    u32 issuer_len;
+    u64 serial;
+    u32 not_before;
+    u32 not_after;
+    const u8 *fingerprint;
+    u8 self_signed;
 };
 
-/* Signing key configuration */
 struct SigningKey {
-	const u8 *key_data;        /* Private key material */
-	u32 key_len;
-	enum SigningAlgorithm algo;
-	struct Certificate cert;   /* Associated certificate */
-	u8 valid;                  /* 1 if key valid and ready to use */
+    const u8 *key_data;
+    u32 key_len;
+    enum SigningAlgorithm algo;
+    struct Certificate cert;
+    u8 valid;
 };
 
-/* APK signature */
+/* Own the bytes. Never retain pointers to temporary stack arrays. */
 struct ApkSignature {
-	const u8 *signature;       /* Digital signature bytes */
-	u32 signature_len;
-	const u8 *content_hash;    /* SHA256 hash of APK content (32 bytes) */
-	struct Certificate cert;   /* Signing certificate */
-	enum SigningAlgorithm algo;
-	u32 signed_at;             /* Timestamp of signing */
+    u8 signature[32];
+    u32 signature_len;
+    u8 content_hash[32];
+    struct Certificate cert;
+    enum SigningAlgorithm algo;
+    u32 signed_at;
+    enum SigningCapability capability;
 };
 
-/* APK integrity report */
 struct IntegrityReport {
-	u8 is_signed;              /* 1 if APK is signed */
-	u8 signature_valid;        /* 1 if signature verification passed */
-	u8 content_match;          /* 1 if content hash matches stored hash */
-	u8 not_tampered;           /* 1 if all checks passed (not tampered) */
-	enum SigningAlgorithm algo;
-	const u8 *signature_issue;  /* Issue description (if failed) */
-	u32 issue_len;
-	u64 verified_at;           /* Verification timestamp */
+    u8 is_signed;
+    u8 signature_valid;
+    u8 content_match;
+    u8 not_tampered;
+    enum SigningAlgorithm algo;
+    const u8 *signature_issue;
+    u32 issue_len;
+    u64 verified_at;
+    enum SigningCapability capability;
 };
 
-/* ============================================================ */
-/* SIGNING CONFIGURATION */
-/* ============================================================ */
+static inline void apkc_zero32(u8 *p) {
+    u32 i;
+    if (!p) return;
+    for (i = 0; i < 32; i++) p[i] = 0;
+}
 
-/* Initialize signing key from data */
+static inline void apkc_copy32(u8 *dst, const u8 *src) {
+    u32 i;
+    if (!dst || !src) return;
+    for (i = 0; i < 32; i++) dst[i] = src[i];
+}
+
+static inline u8 apkc_equal32(const u8 *a, const u8 *b) {
+    u32 i;
+    u8 diff = 0;
+    if (!a || !b) return 0;
+    for (i = 0; i < 32; i++) diff |= (u8)(a[i] ^ b[i]);
+    return (u8)(diff == 0);
+}
+
 static inline u8 signing_key_init(
-	struct SigningKey *key,
-	const u8 *key_data, u32 key_len,
-	enum SigningAlgorithm algo) {
-
-	if (!key || !key_data) return 1;
-
-	key->key_data = key_data;
-	key->key_len = key_len;
-	key->algo = algo;
-	key->valid = 1;
-
-	/* Initialize certificate */
-	key->cert.subject = (const u8*)"CN=APKC";
-	key->cert.subject_len = 7;
-	key->cert.issuer = (const u8*)"CN=APKC";
-	key->cert.issuer_len = 7;
-	key->cert.serial = 0x0123456789ABCDEFULL;
-	key->cert.not_before = 0;
-	key->cert.not_after = 0xFFFFFFFF;
-	key->cert.self_signed = 1;
-
-	return 0;
+    struct SigningKey *key,
+    const u8 *key_data, u32 key_len,
+    enum SigningAlgorithm algo) {
+    if (!key || !key_data || key_len == 0) return 1;
+    key->key_data = key_data;
+    key->key_len = key_len;
+    key->algo = algo;
+    /* A key blob being present is not proof that RSA/ECDSA is implemented. */
+    key->valid = 1;
+    key->cert.subject = (const u8*)"CN=APKC";
+    key->cert.subject_len = 7;
+    key->cert.issuer = (const u8*)"CN=APKC";
+    key->cert.issuer_len = 7;
+    key->cert.serial = 0x0123456789ABCDEFULL;
+    key->cert.not_before = 0;
+    key->cert.not_after = 0xFFFFFFFFU;
+    key->cert.fingerprint = (const u8*)0;
+    key->cert.self_signed = 1;
+    return 0;
 }
 
-/* Load signing key from file path (simplified) */
 static inline u8 signing_key_load(
-	struct SigningKey *key,
-	const u8 *key_path, u32 path_len,
-	enum SigningAlgorithm algo) {
-
-	if (!key || !key_path || path_len == 0) return 1;
-
-	/* In freestanding: cannot actually load from filesystem */
-	/* Stub: assume key data is embedded */
-
-	key->key_data = NULL;  /* Would be loaded from file */
-	key->key_len = 0;
-	key->algo = algo;
-	key->valid = 0;  /* Mark as not loaded (would need real I/O) */
-
-	return 1;  /* File loading not supported in freestanding */
+    struct SigningKey *key,
+    const u8 *key_path, u32 path_len,
+    enum SigningAlgorithm algo) {
+    if (!key || !key_path || path_len == 0) return 1;
+    key->key_data = (const u8*)0;
+    key->key_len = 0;
+    key->algo = algo;
+    key->valid = 0;
+    return 1;
 }
 
-/* Set certificate for signing key */
 static inline void signing_key_set_cert(
-	struct SigningKey *key,
-	const u8 *subject, u32 subject_len,
-	const u8 *issuer, u32 issuer_len,
-	u64 serial) {
-
-	if (!key) return;
-
-	key->cert.subject = subject;
-	key->cert.subject_len = subject_len;
-	key->cert.issuer = issuer;
-	key->cert.issuer_len = issuer_len;
-	key->cert.serial = serial;
+    struct SigningKey *key,
+    const u8 *subject, u32 subject_len,
+    const u8 *issuer, u32 issuer_len,
+    u64 serial) {
+    if (!key) return;
+    key->cert.subject = subject;
+    key->cert.subject_len = subject_len;
+    key->cert.issuer = issuer;
+    key->cert.issuer_len = issuer_len;
+    key->cert.serial = serial;
 }
 
-/* ============================================================ */
-/* CONTENT HASHING */
-/* ============================================================ */
-
-/* Simplified SHA256 (NOT cryptographically correct; simplified for demonstration)
- * A real implementation would use proper SHA256 algorithm.
- * For freestanding APK verification, we use a deterministic hash substitute.
- */
-static inline void sha256_simple(
-	const u8 *data, u32 len,
-	u8 *hash_out) {
-
-	if (!data || !hash_out) return;
-
-	/* Simplified: XOR folding of data (NOT real SHA256) */
-	u32 i, j;
-	for (i = 0; i < 32; i++) {
-		hash_out[i] = 0;
-	}
-
-	for (i = 0; i < len; i++) {
-		hash_out[i % 32] ^= data[i];
-		hash_out[(i + 1) % 32] ^= (data[i] << 1) | (data[i] >> 7);
-		hash_out[(i + 2) % 32] ^= (data[i] >> 1) | (data[i] << 7);
-	}
-
-	/* Mix with length to prevent length-based collisions */
-	hash_out[0] ^= (len >> 0) & 0xFF;
-	hash_out[1] ^= (len >> 8) & 0xFF;
-	hash_out[2] ^= (len >> 16) & 0xFF;
-	hash_out[3] ^= (len >> 24) & 0xFF;
+/* Deterministic 32-byte integrity substitute. NOT SHA-256 and NOT cryptographic. */
+static inline void integrity_hash32_substitute(
+    const u8 *data, u32 len, u8 *hash_out) {
+    u32 i;
+    if (!hash_out) return;
+    apkc_zero32(hash_out);
+    if (!data && len != 0) return;
+    for (i = 0; i < len; i++) {
+        hash_out[i % 32] ^= data[i];
+        hash_out[(i + 1U) % 32] ^= (u8)((data[i] << 1) | (data[i] >> 7));
+        hash_out[(i + 2U) % 32] ^= (u8)((data[i] >> 1) | (data[i] << 7));
+    }
+    hash_out[0] ^= (u8)((len >> 0) & 0xFFU);
+    hash_out[1] ^= (u8)((len >> 8) & 0xFFU);
+    hash_out[2] ^= (u8)((len >> 16) & 0xFFU);
+    hash_out[3] ^= (u8)((len >> 24) & 0xFFU);
 }
 
-/* Hash APK content (all sections) */
+/* Compatibility alias, intentionally documented as non-cryptographic. */
+static inline void sha256_simple(const u8 *data, u32 len, u8 *hash_out) {
+    integrity_hash32_substitute(data, len, hash_out);
+}
+
 static inline u8 signing_hash_content(
-	const u8 *apk_data, u32 apk_size,
-	u8 *hash_out) {
-
-	if (!apk_data || !hash_out) return 1;
-
-	sha256_simple(apk_data, apk_size, hash_out);
-	return 0;
+    const u8 *apk_data, u32 apk_size, u8 *hash_out) {
+    if ((!apk_data && apk_size != 0) || !hash_out) return 1;
+    integrity_hash32_substitute(apk_data, apk_size, hash_out);
+    return 0;
 }
 
-/* Hash specific APK sections (code, resources, manifest) */
 static inline u8 signing_hash_sections(
-	const u8 *code_section, u32 code_len,
-	const u8 *resource_section, u32 resource_len,
-	const u8 *manifest_section, u32 manifest_len,
-	u8 *hash_out) {
-
-	if (!hash_out) return 1;
-
-	/* Hash each section and combine */
-	u8 code_hash[32], resource_hash[32], manifest_hash[32];
-
-	if (code_section) sha256_simple(code_section, code_len, code_hash);
-	if (resource_section) sha256_simple(resource_section, resource_len, resource_hash);
-	if (manifest_section) sha256_simple(manifest_section, manifest_len, manifest_hash);
-
-	/* Combine hashes via XOR */
-	u32 i;
-	for (i = 0; i < 32; i++) {
-		hash_out[i] = code_hash[i] ^ resource_hash[i] ^ manifest_hash[i];
-	}
-
-	return 0;
+    const u8 *code_section, u32 code_len,
+    const u8 *resource_section, u32 resource_len,
+    const u8 *manifest_section, u32 manifest_len,
+    u8 *hash_out) {
+    u8 code_hash[32], resource_hash[32], manifest_hash[32];
+    u32 i;
+    if (!hash_out) return 1;
+    if ((!code_section && code_len) || (!resource_section && resource_len) ||
+        (!manifest_section && manifest_len)) return 1;
+    apkc_zero32(code_hash);
+    apkc_zero32(resource_hash);
+    apkc_zero32(manifest_hash);
+    if (code_section) integrity_hash32_substitute(code_section, code_len, code_hash);
+    if (resource_section) integrity_hash32_substitute(resource_section, resource_len, resource_hash);
+    if (manifest_section) integrity_hash32_substitute(manifest_section, manifest_len, manifest_hash);
+    for (i = 0; i < 32; i++)
+        hash_out[i] = (u8)(code_hash[i] ^ resource_hash[i] ^ manifest_hash[i]);
+    return 0;
 }
 
-/* ============================================================ */
-/* SIGNING & SIGNATURE GENERATION */
-/* ============================================================ */
-
-/* Sign APK with configured key */
+/* Cryptographic signing is intentionally unavailable until implemented/proved. */
 static inline u8 signing_sign_apk(
-	struct SigningKey *key,
-	const u8 *apk_data, u32 apk_size,
-	struct ApkSignature *out_sig) {
-
-	if (!key || !key->valid || !apk_data || !out_sig) return 1;
-
-	/* Compute content hash */
-	u8 content_hash[32];
-	if (signing_hash_content(apk_data, apk_size, content_hash)) {
-		return 1;
-	}
-
-	/* In real implementation: sign hash with RSA/ECDSA */
-	/* Simplified: use hash as signature (NOT secure) */
-	out_sig->signature = content_hash;
-	out_sig->signature_len = 32;
-	out_sig->content_hash = content_hash;
-	out_sig->algo = key->algo;
-	out_sig->cert = key->cert;
-	out_sig->signed_at = 0;  /* Would be current time */
-
-	return 0;
+    struct SigningKey *key,
+    const u8 *apk_data, u32 apk_size,
+    struct ApkSignature *out_sig) {
+    u8 h[32];
+    if (!key || !apk_data || apk_size == 0 || !out_sig) return 1;
+    apkc_zero32(out_sig->signature);
+    apkc_zero32(out_sig->content_hash);
+    out_sig->signature_len = 0;
+    out_sig->algo = key->algo;
+    out_sig->cert = key->cert;
+    out_sig->signed_at = 0;
+    out_sig->capability = SIGN_CAPABILITY_INTEGRITY_SUBSTITUTE_ONLY;
+    if (signing_hash_content(apk_data, apk_size, h)) return 1;
+    apkc_copy32(out_sig->content_hash, h);
+    /* Never claim RSA/ECDSA signature from the substitute hash. */
+    return 2;
 }
 
-/* ============================================================ */
-/* SIGNATURE VERIFICATION */
-/* ============================================================ */
-
-/* Verify APK signature against certificate */
 static inline u8 signing_verify_apk(
-	const u8 *apk_data, u32 apk_size,
-	struct ApkSignature *sig,
-	struct IntegrityReport *out_report) {
-
-	if (!apk_data || !sig || !out_report) return 1;
-
-	out_report->is_signed = 1;
-	out_report->algo = sig->algo;
-	out_report->verified_at = 0;  /* Would be current time */
-
-	/* Compute current content hash */
-	u8 current_hash[32];
-	if (signing_hash_content(apk_data, apk_size, current_hash)) {
-		out_report->signature_valid = 0;
-		out_report->content_match = 0;
-		out_report->not_tampered = 0;
-		out_report->signature_issue = (const u8*)"hash computation failed";
-		out_report->issue_len = 22;
-		return 1;
-	}
-
-	/* Check content hash matches stored hash */
-	u8 hash_match = 1;
-	u32 i;
-	for (i = 0; i < 32; i++) {
-		if (current_hash[i] != sig->content_hash[i]) {
-			hash_match = 0;
-			break;
-		}
-	}
-
-	out_report->content_match = hash_match;
-
-	/* Verify signature (simplified: just check hash match) */
-	if (!hash_match) {
-		out_report->signature_valid = 0;
-		out_report->not_tampered = 0;
-		out_report->signature_issue = (const u8*)"content hash mismatch";
-		out_report->issue_len = 21;
-		return 1;
-	}
-
-	out_report->signature_valid = 1;
-	out_report->not_tampered = 1;
-	return 0;
+    const u8 *apk_data, u32 apk_size,
+    struct ApkSignature *sig,
+    struct IntegrityReport *out_report) {
+    u8 current_hash[32];
+    u8 match;
+    if (!apk_data || apk_size == 0 || !sig || !out_report) return 1;
+    out_report->is_signed = 0;
+    out_report->signature_valid = 0;
+    out_report->content_match = 0;
+    out_report->not_tampered = 0;
+    out_report->algo = sig->algo;
+    out_report->verified_at = 0;
+    out_report->capability = SIGN_CAPABILITY_INTEGRITY_SUBSTITUTE_ONLY;
+    out_report->signature_issue = (const u8*)"cryptographic signing unimplemented";
+    out_report->issue_len = 35;
+    if (signing_hash_content(apk_data, apk_size, current_hash)) return 1;
+    match = apkc_equal32(current_hash, sig->content_hash);
+    out_report->content_match = match;
+    /* A matching substitute hash is integrity instrumentation, not signature validity. */
+    return 2;
 }
 
-/* ============================================================ */
-/* CERTIFICATE OPERATIONS */
-/* ============================================================ */
-
-/* Extract certificate from signature */
-static inline struct Certificate signing_extract_cert(
-	struct ApkSignature *sig) {
-
-	if (sig) {
-		return sig->cert;
-	}
-
-	struct Certificate cert = {0};
-	return cert;
+static inline struct Certificate signing_extract_cert(struct ApkSignature *sig) {
+    struct Certificate cert = {0};
+    if (sig) return sig->cert;
+    return cert;
 }
 
-/* Validate certificate expiry */
-static inline u8 signing_cert_is_valid(
-	struct Certificate *cert,
-	u32 current_time) {
-
-	if (!cert) return 0;
-
-	/* Check if current time is within validity period */
-	if (current_time < cert->not_before || current_time > cert->not_after) {
-		return 0;  /* Expired or not yet valid */
-	}
-
-	return 1;
+static inline u8 signing_cert_is_valid(struct Certificate *cert, u32 current_time) {
+    if (!cert) return 0;
+    if (current_time < cert->not_before || current_time > cert->not_after) return 0;
+    return 1;
 }
 
-/* Check certificate pinning (compare fingerprints) */
 static inline u8 signing_cert_pin_check(
-	struct Certificate *cert,
-	const u8 *pinned_fingerprint) {
-
-	if (!cert || !pinned_fingerprint) return 0;
-
-	/* Compare SHA256 fingerprints (32 bytes) */
-	if (!cert->fingerprint) return 0;
-
-	u32 i;
-	for (i = 0; i < 32; i++) {
-		if (cert->fingerprint[i] != pinned_fingerprint[i]) {
-			return 0;  /* Fingerprint mismatch */
-		}
-	}
-
-	return 1;  /* Pinned certificate matches */
+    struct Certificate *cert, const u8 *pinned_fingerprint) {
+    if (!cert || !cert->fingerprint || !pinned_fingerprint) return 0;
+    return apkc_equal32(cert->fingerprint, pinned_fingerprint);
 }
 
-/* ============================================================ */
-/* INTEGRITY VALIDATION */
-/* ============================================================ */
-
-/* Comprehensive integrity check */
 static inline u8 signing_verify_integrity(
-	const u8 *apk_data, u32 apk_size,
-	struct ApkSignature *sig,
-	struct IntegrityReport *out_report) {
-
-	if (!apk_data || !sig || !out_report) return 1;
-
-	/* Verify signature */
-	if (signing_verify_apk(apk_data, apk_size, sig, out_report)) {
-		return 1;
-	}
-
-	/* Verify certificate validity */
-	if (!signing_cert_is_valid(&sig->cert, 0)) {
-		out_report->not_tampered = 0;
-		out_report->signature_issue = (const u8*)"certificate expired";
-		out_report->issue_len = 19;
-		return 1;
-	}
-
-	out_report->not_tampered = 1;
-	return 0;
+    const u8 *apk_data, u32 apk_size,
+    struct ApkSignature *sig,
+    struct IntegrityReport *out_report) {
+    /* Integrity hash comparison can be observed, but cryptographic verification is absent. */
+    return signing_verify_apk(apk_data, apk_size, sig, out_report);
 }
 
-/* Create integrity report summary */
 static inline u32 signing_report_format(
-	struct IntegrityReport *report,
-	u8 *buf, u32 buf_size) {
-
-	if (!report || !buf || buf_size < 60) return 0;
-
-	const u8 *fmt = (const u8*)"Integrity[";
-	u32 i = 0;
-	while (fmt[i] && i < buf_size - 1) {
-		buf[i] = fmt[i];
-		i++;
-	}
-
-	if (report->not_tampered) {
-		const u8 *ok = (const u8*)"OK";
-		while (*ok && i < buf_size - 1) {
-			buf[i++] = *ok++;
-		}
-	} else {
-		const u8 *fail = (const u8*)"FAIL";
-		while (*fail && i < buf_size - 1) {
-			buf[i++] = *fail++;
-		}
-	}
-
-	if (i < buf_size - 1) buf[i++] = ']';
-	buf[i] = '\0';
-
-	return i;
+    struct IntegrityReport *report, u8 *buf, u32 buf_size) {
+    const u8 *prefix = (const u8*)"Integrity[";
+    const u8 *state;
+    u32 i = 0, j = 0;
+    if (!report || !buf || buf_size < 24) return 0;
+    while (prefix[j] && i < buf_size - 1) buf[i++] = prefix[j++];
+    state = report->signature_valid ? (const u8*)"CRYPTO_OK" :
+            (report->content_match ? (const u8*)"HASH_MATCH_ONLY" : (const u8*)"FAIL");
+    j = 0;
+    while (state[j] && i < buf_size - 1) buf[i++] = state[j++];
+    if (i < buf_size - 1) buf[i++] = ']';
+    buf[i] = 0;
+    return i;
 }
 
 #endif /* APKC_DEPLOY_APK_SIGNING_H */
