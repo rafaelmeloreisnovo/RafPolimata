@@ -79,8 +79,7 @@ static inline u8 exec_one(struct Machine *m, struct Insn *code, u32 code_size) {
 	if (m->pc >= code_size) return 1;  /* halt */
 
 	struct Insn *i = &code[m->pc];
-	u64 a, b, res;
-	u8 cond;
+	u64 res;
 
 	switch (i->op) {
 	/* ALU: no branches, compute always */

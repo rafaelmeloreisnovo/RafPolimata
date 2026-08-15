@@ -9,9 +9,9 @@
 #define TMP_CAP  0x080000u   /* 512 KiB — scratch / temp                 */
 
 static u8 _apk_buf[APK_CAP];
-static u8 _src_buf[SRC_CAP];
+/* static u8 _src_buf[SRC_CAP]; */    /* unused in Apkc, reserved for raf_shell */
 static u8 _tmp_buf[TMP_CAP];
-static sz _apk_pos, _src_pos, _tmp_pos;
+static sz _apk_pos, /* _src_pos, */ _tmp_pos;  /* _src_pos unused in Apkc */
 static u8 _apk_oom, _tmp_oom;
 
 static inline u8  *apk_ptr(void)  { return _apk_buf; }
