@@ -1,0 +1,40 @@
+name: ApkC Stage11 Integrity Truth
+
+on:
+  pull_request:
+    paths:
+      - 'Apkc/sec_hardening_gates.h'
+      - 'tests/test_stage11_integrity_truth.c'
+      - '.github/workflows/apkc-stage11-integrity-truth.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integrity-truth:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile strict
+        run: |
+          set -euo pipefail
+          clang -std=c99 -Wall -Wextra -Werror -I. tests/test_stage11_integrity_truth.c -o /tmp/test_stage11_integrity_truth
+      - name: Run falsifiers
+        run: |
+          set -euo pipefail
+          /tmp/test_stage11_integrity_truth | tee stage11-integrity-truth.txt
+          grep -F 'RESULT pass=8 fail=0 claim_allowed=false' stage11-integrity-truth.txt
+      - name: Hash evidence
+        run: |
+          set -euo pipefail
+          sha256sum ApkC/sec_hardening_gates.h tests/test_stage11_integrity_truth.c stage11-integrity-truth.txt > stage11-integrity-truth.sha256
+          cat stage11-integrity-truth.sha256
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkc-stage11-integrity-truth
+          path: |
+            stage11-integrity-truth.txt
+            stage11-integrity-truth.sha256
+          if-no-files-found: error
