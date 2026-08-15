@@ -136,10 +136,6 @@ static inline u32 expr_parse_primary(struct ExprCtx *ctx) {
 
     /* Identifier (variable or function call) */
     if (expr_match(ctx, TOK_IDENT)) {
-        u32 ident_reg = 0;
-        u32 ident_len = ctx->current.len;
-        const u8 *ident_text = ctx->current.text;
-
         expr_advance(ctx);
 
         /* Function call */
@@ -233,11 +229,13 @@ static inline u32 expr_parse_unary(struct ExprCtx *ctx) {
         return rd;
     }
 
-    /* Bitwise not */
+    /* Bitwise not - load mask and XOR */
     if (expr_match(ctx, TOK_TILDE)) {
         expr_advance(ctx);
         u32 val = expr_parse_unary(ctx);
-        codegen_emit_xor(ctx->codegen, rd, val, 0xffffffff);  /* Simplified: XOR with -1 */
+        /* XOR consumes registers, so materialize the all-ones mask first. */
+        codegen_emit_movi(ctx->codegen, (u8)rd, 0xffffffffu);
+        codegen_emit_xor(ctx->codegen, (u8)rd, (u8)val, (u8)rd);
         return rd;
     }
 
