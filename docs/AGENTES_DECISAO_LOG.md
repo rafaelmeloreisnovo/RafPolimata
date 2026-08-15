@@ -113,7 +113,7 @@ A campanha registrou 68 arquivos `.md` em `docs/` e `docs/arch/`, distribuídos 
 - `docs/closures/CLOSURE_L9_T7_CONVERGENCE.md` registra o claim forte de fixed-point convergence como falsificado na formulação anterior;
 - GitHub Copilot possui mecanismo repo-wide e path-specific, permitindo retirar regras do conversation indexer do arquivo global;
 - Codex usa `AGENTS.md` como instrução de repositório;
-- `CLAUDE.md` pode funcionar como adaptador do Claude Code, sem duplicar o protocolo completo.
+- `CLAUDE.md` funciona como adaptador do Claude Code, sem duplicar o protocolo completo.
 
 #### Resolução
 
@@ -144,7 +144,7 @@ Regras derivadas:
 
 - **Data de resolução**: TOKEN_VAZIO até revisão/merge
 - **Decidido por**: TOKEN_VAZIO
-- **Branch / PR**: `docs/unify-ai-agent-instructions-20260815` → PR a ser associado
+- **Branch / PR**: `docs/unify-ai-agent-instructions-20260815` → PR #285
 
 ---
 
