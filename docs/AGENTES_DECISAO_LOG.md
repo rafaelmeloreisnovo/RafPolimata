@@ -1,78 +1,66 @@
 # Log de Decisões entre Agentes
 
-Este arquivo registra conflitos e decisões arquiteturais que envolvem mais
-de um agente ou que precisam de rastreabilidade explícita. Foi criado para
-preencher a lacuna referenciada em `docs/MULTI_AI_METHODOLOGY.md`:
+Este arquivo registra conflitos e decisões arquiteturais que envolvem mais de um agente ou precisam de rastreabilidade explícita.
 
-> "Create `docs/DECISION_LOG.md` with both proposals, pros/cons,
-> and a recommended resolution."
+> **Política atual:** `AGENTS.md` é o roteador comum; `docs/AGENTES.md` é o protocolo detalhado. Referências históricas a `CLAUDE.md` como autoridade primária, a `Main` com M maiúsculo ou a números antigos de seção permanecem apenas como histórico quando aparecem em decisões antigas.
 
 ---
 
 ## Como usar
 
-1. Quando dois agentes propõem mudanças incompatíveis, abrir uma entrada aqui.
-2. Não mergear nenhuma das propostas até a resolução estar marcada como `RESOLVED`.
-3. Se humano indisponível: criar branch `decision/<topic>` + PR + entrada aqui.
-4. Após resolução, marcar a entrada como `RESOLVED` com data e decisão final.
+1. Quando agentes/humanos propõem mudanças incompatíveis, abrir uma entrada aqui.
+2. Não promover a proposta conflitante até existir resolução reproduzível ou decisão humana quando exigida.
+3. Preservar evidência de ambos os lados; não apagar o caso negativo.
+4. Registrar branch/PR/commit quando existirem.
+5. Uma decisão histórica pode ser `SUPERSEDED` por nova entrada sem apagar a anterior.
 
 ---
 
 ## Template de entrada
 
 ```markdown
-### DECISAO-NNN — <título curto descritivo>
+### DECISAO-NNN — <título>
 
 - **Data de abertura**: YYYY-MM-DD
-- **Agente A** (sessão/tipo): <Claude / Codex / ChatGPT / Humano + identificação da sessão>
-- **Agente B** (sessão/tipo): <idem>
-- **Contexto**: breve descrição do que motivou o conflito
+- **Participantes/superfícies**: <humano/agentes>
+- **Base**: <repo/branch/commit>
+- **Contexto**: <conflito>
 
-#### Proposta A
+#### Propostas / evidências
 
-<descrição técnica da proposta A>
+<proposta A, B, ... + evidência>
 
-**Prós:**
-- ...
+#### Critério de decisão
 
-**Contras:**
-- ...
+<teste, spec, receipt ou autoridade humana>
 
-#### Proposta B
+#### Resolução
 
-<descrição técnica da proposta B>
-
-**Prós:**
-- ...
-
-**Contras:**
-- ...
-
-#### Resolução recomendada
-
-<qual proposta adotar e por quê — ou proposta híbrida>
+<decisão e limites>
 
 #### Estado
 
-`PENDING` | `RESOLVED` | `ESCALATED`
+`PENDING` | `RESOLVED` | `ESCALATED` | `SUPERSEDED`
 
-- **Data de resolução**: YYYY-MM-DD (quando RESOLVED)
-- **Decidido por**: <agente ou humano que fechou>
-- **Branch / PR**: `decision/<topic>` → PR #NNN (quando aplicável)
+- **Data de resolução**: YYYY-MM-DD
+- **Decidido por**: <humano/teste/spec>
+- **Branch / PR / commit**: <referência>
 ```
 
 ---
 
 ## Critérios de escalação obrigatória para humano
 
-Qualquer decisão que envolva um dos itens abaixo **não pode ser resolvida por
-agentes** — deve ser `ESCALATED` e aguardar revisão humana:
+Escalar quando a mudança envolver:
 
-1. Mudança que viola um invariante de `CLAUDE.md`
-2. Nova dependência externa (ferramenta, biblioteca, serviço)
-3. Mudança de licença ou termos de redistribuição
-4. Qualquer aspecto de segurança criptográfica
-5. Mudança na estrutura de PR/merge (ex: remover proteção de branch Main)
+1. quebra ou alteração de invariante canônico em `AGENTS.md` / `docs/AGENTES.md`;
+2. API/ABI/formato persistido público com migração incompatível;
+3. nova dependência externa de risco material;
+4. licença, privacidade, segredo ou segurança criptográfica;
+5. exclusão/movimentação/quarentena com perda potencial de provenance;
+6. alteração de política de branch/merge;
+7. promoção de claim científico/externo que exceda a evidência disponível;
+8. merge com gate material aberto.
 
 ---
 
@@ -83,62 +71,86 @@ agentes** — deve ser `ESCALATED` e aguardar revisão humana:
 - **Data de abertura**: 2026-07-09
 - **Agente A** (sessão/tipo): Claude — branch `claude/operational-excellence-agents-mabjye`
 - **Agente B** (sessão/tipo): N/A — decisão unilateral do agente, validada pelo humano
-- **Contexto**: Após criar a trilogia AGENTES (docs/AGENTES.md, docs/AGENTES_CHECKLIST.md,
-  docs/AGENTES_DECISAO_LOG.md) nos PRs #108 e #109, identificou-se que todos os `.md`
-  anteriores em `docs/` e `docs/arch/` referenciavam documentos de profundidade mas não
-  tinham um ponteiro canônico para AGENTES.md. Sem esse ponteiro, um agente que abre um
-  documento específico não descobre o ponto de entrada unificado.
+- **Contexto**: Após criar a trilogia AGENTES (`docs/AGENTES.md`, `docs/AGENTES_CHECKLIST.md`, `docs/AGENTES_DECISAO_LOG.md`) nos PRs #108 e #109, identificou-se que documentos anteriores não tinham um ponteiro operacional unificado.
 
 #### Proposta adotada
 
-Adicionar em cada arquivo `.md` preexistente (que não seja da trilogia AGENTES) um
-blockquote de entrada imediatamente após o `# Título`:
+Adicionar callout de entrada canônica nos documentos aplicáveis para permitir navegação até a governança de agentes.
 
-```markdown
-> **Entrada canônica:** docs/AGENTES.md §N (desc) e §N (desc). <frase contextualizando o doc>.
-```
+Regras históricas da campanha:
 
-Regras de inserção:
-- 1 linha, imediatamente após `# Título`, antes do primeiro parágrafo
-- Seções referenciadas = as seções de AGENTES.md mais relevantes para o doc em questão
-- Callouts não-padrão pré-existentes (`> **Agente novo?**`, `> Para o ciclo completo...`,
-  `> **Ponto de entrada unificado:**`, `> **Resumo executivo em**`) convertidos para o
-  formato uniforme `> **Entrada canônica:**`
-- Zero alterações em código C/H
-
-**Prós:**
-- Qualquer agente que abra qualquer doc chega a AGENTES.md em ≤ 2 cliques
-- Formato uniforme é parseável por automação futura
-- Não remove nem substitui nenhum documento de profundidade
-
-**Contras:**
-- Adiciona 3–5 linhas por arquivo (visível no diff)
-- Exige manutenção caso AGENTES.md mude as numerações de seção
+- callout imediatamente após o título;
+- apontar para a seção então relevante de `docs/AGENTES.md`;
+- não alterar código C/H;
+- preservar documentos de profundidade.
 
 #### Escopo executado
 
-68 arquivos `.md` em `docs/` e `docs/arch/` cobertos em batches 1–11:
-
-| Batch | PR | Arquivos |
-|---|---|---|
-| 1–9 | #110–#135 | docs/ (55 arquivos) |
-| 10 | #139 | docs/arch/ (4 arquivos) |
-| 11a–11f | #139 | docs/ remanescentes (13 arquivos — callouts não-padrão + arquivos adicionados após início da campanha) |
+A campanha registrou 68 arquivos `.md` em `docs/` e `docs/arch/`, distribuídos em batches/PRs históricos.
 
 #### Estado
 
 `RESOLVED`
 
 - **Data de resolução**: 2026-07-19
-- **Decidido por**: rafaelmeloreisnovo (aprovação tácita via merge dos PRs #110–#138)
-- **Branch / PR**: `claude/operational-excellence-agents-mabjye` → PR #139
+- **Decidido por**: rafaelmeloreisnovo via merges da campanha
+- **Observação de 2026-08-15**: números de seção e a noção de uma única entrada `docs/AGENTES.md` foram posteriormente refinados por `DECISAO-002`; os callouts históricos continuam sendo rotas válidas, mas agentes novos devem iniciar em `AGENTS.md`.
 
 ---
 
-## Histórico de resolução (resumo executivo)
+### DECISAO-002 — Unificar Codex, Copilot, ChatGPT e Claude Code sem duplicar a verdade
 
-| ID | Título | Data | Estado | Decidido por |
+- **Data de abertura**: 2026-08-15
+- **Participantes/superfícies**: humano + ChatGPT/GitHub; afeta Codex, GitHub Copilot e Claude Code
+- **Base**: `rafaelmeloreisnovo/RafPolimata@265baae3f0c1d8b2763e2eac24286e3a25dd8ace`
+- **Branch**: `docs/unify-ai-agent-instructions-20260815`
+- **Contexto**: os arquivos de onboarding divergiram entre si. `.github/copilot-instructions.md` estava excessivamente especializado no conversation indexer; `CLAUDE.md` continha afirmações históricas sobre “42 attractors” e no-libc global; `CODEX_FIX_PROTOCOL.md` tratava `TOKEN_VAZIO` como se tivesse codificação C universal; `MULTI_AI_METHODOLOGY.md` atribuía autoridade por fornecedor e citava branch `Main` com capitalização incorreta.
+
+#### Evidências observadas
+
+- `main` usa `main` como default branch.
+- o caminho hosted x86/x86_64 do ApkC pode usar libc de desenvolvimento, enquanto targets freestanding preservam seus gates próprios;
+- `docs/closures/CLOSURE_L9_T7_CONVERGENCE.md` registra o claim forte de fixed-point convergence como falsificado na formulação anterior;
+- GitHub Copilot possui mecanismo repo-wide e path-specific, permitindo retirar regras do conversation indexer do arquivo global;
+- Codex usa `AGENTS.md` como instrução de repositório;
+- `CLAUDE.md` pode funcionar como adaptador do Claude Code, sem duplicar o protocolo completo.
+
+#### Resolução
+
+Adotar arquitetura:
+
+```text
+AGENTS.md                       = roteador comum curto
+  -> docs/AGENTES.md            = protocolo detalhado
+  -> .github/copilot-instructions.md = adaptador Copilot repo-wide
+  -> .github/instructions/*     = regras por caminho
+  -> CLAUDE.md                  = adaptador Claude Code
+  -> docs/CODEX_FIX_PROTOCOL.md = protocolo cirúrgico subordinado
+  -> docs/MULTI_AI_METHODOLOGY.md = handoff por papel/evidência
+```
+
+Regras derivadas:
+
+1. adaptadores não podem enfraquecer o protocolo canônico;
+2. autoridade é por escopo/evidência, não por marca/modelo;
+3. `TOKEN_VAZIO` é estado epistemológico e não possui codificação inteira universal;
+4. hosted != freestanding;
+5. `42` como range/index não implica 42 fixed-point attractors;
+6. merge continua decisão humana explícita.
+
+#### Estado
+
+`PENDING_HUMAN_REVIEW`
+
+- **Data de resolução**: TOKEN_VAZIO até revisão/merge
+- **Decidido por**: TOKEN_VAZIO
+- **Branch / PR**: `docs/unify-ai-agent-instructions-20260815` → PR a ser associado
+
+---
+
+## Histórico de resolução — resumo
+
+| ID | Título | Data | Estado | Autoridade |
 |---|---|---|---|---|
-| DECISAO-001 | Campanha callouts Entrada canônica AGENTES.md | 2026-07-19 | RESOLVED | rafaelmeloreisnovo |
-
-*Atualizar esta tabela sempre que uma entrada muda de estado.*
+| DECISAO-001 | Callouts de entrada canônica | 2026-07-19 | RESOLVED | humano/merges históricos |
+| DECISAO-002 | Unificação multiagente | 2026-08-15 | PENDING_HUMAN_REVIEW | TOKEN_VAZIO |
