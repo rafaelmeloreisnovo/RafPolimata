@@ -55,6 +55,11 @@ class TestTokenVazioValidation(unittest.TestCase):
         self._git("commit", "-m", "baseline")
         return self._git("rev-parse", "HEAD")
 
+    def _commit_candidate(self) -> str:
+        self._git("add", ".")
+        self._git("commit", "-m", "candidate")
+        return self._git("rev-parse", "HEAD")
+
     def test_valid_token_with_inline_closure_is_warning(self) -> None:
         test_file = self.repo_root / "valid.md"
         test_file.write_text(f"gap={TOKEN}; see CLOSURE_L1\n", encoding="utf-8")
@@ -145,6 +150,7 @@ class TestTokenVazioValidation(unittest.TestCase):
         (self.repo_root / "changed.md").write_text("baseline\n", encoding="utf-8")
         base = self._commit_baseline()
         (self.repo_root / "changed.md").write_text("baseline\nordinary change\n", encoding="utf-8")
+        self._commit_candidate()
 
         validator = TokenVazioValidator(self.repo_root)
         scope = validator.changed_lines_since(base)
@@ -156,6 +162,7 @@ class TestTokenVazioValidation(unittest.TestCase):
         (self.repo_root / "new-gap.md").write_text("baseline\n", encoding="utf-8")
         base = self._commit_baseline()
         (self.repo_root / "new-gap.md").write_text(f"baseline\nnew={TOKEN}\n", encoding="utf-8")
+        self._commit_candidate()
 
         validator = TokenVazioValidator(self.repo_root)
         scope = validator.changed_lines_since(base)
@@ -170,6 +177,7 @@ class TestTokenVazioValidation(unittest.TestCase):
         test_file.write_text("# Governance: CLOSURE_L1\nbaseline\n", encoding="utf-8")
         base = self._commit_baseline()
         test_file.write_text(f"# Governance: CLOSURE_L1\nbaseline\nstate={TOKEN}\n", encoding="utf-8")
+        self._commit_candidate()
 
         validator = TokenVazioValidator(self.repo_root)
         scope = validator.changed_lines_since(base)
@@ -182,6 +190,7 @@ class TestTokenVazioValidation(unittest.TestCase):
         test_file.write_text("CLOSURE_L1\n", encoding="utf-8")
         base = self._commit_baseline()
         test_file.write_text(f"CLOSURE_L1\n{TOKEN}\n", encoding="utf-8")
+        self._commit_candidate()
 
         validator = TokenVazioValidator(self.repo_root)
         validator.scope = "changed_lines"
