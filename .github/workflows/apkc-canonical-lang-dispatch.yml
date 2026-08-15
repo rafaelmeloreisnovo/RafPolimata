@@ -1,0 +1,57 @@
+name: ApkC Canonical Language Dispatch
+
+on:
+  pull_request:
+    paths:
+      - 'Apkc/apkc_branchless_handler.h'
+      - 'Apkc/apkc_language_dispatch.h'
+      - 'Apkc/compiler_language_direct.h'
+      - 'Apkc/lang_profile.h'
+      - 'Apkc/lang_scanner.h'
+      - 'Apkc/lang_stmt.h'
+      - 'Apkc/lang_expr.h'
+      - 'tests/test_apkc_canonical_lang_dispatch.c'
+      - '.github/workflows/apkc-canonical-lang-dispatch.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canonical-lang-dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+
+      - name: Compile strict host gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror \
+            tests/test_apkc_canonical_lang_dispatch.c \
+            -o /tmp/test_apkc_canonical_lang_dispatch
+
+      - name: Run canonical identity and fail-closed gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          /tmp/test_apkc_canonical_lang_dispatch | tee /tmp/apkc-canonical-lang-dispatch.log
+          grep -q 'SUMMARY pass=' /tmp/apkc-canonical-lang-dispatch.log
+          grep -q 'fail=0' /tmp/apkc-canonical-lang-dispatch.log
+
+      - name: Freestanding syntax audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -Wall -Wextra -Werror -ffreestanding -fsyntax-only \
+            tests/test_apkc_canonical_lang_dispatch.c
+
+      - name: Preserve gate receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkc-canonical-lang-dispatch-receipt
+          path: /tmp/apkc-canonical-lang-dispatch.log
+          if-no-files-found: warn
