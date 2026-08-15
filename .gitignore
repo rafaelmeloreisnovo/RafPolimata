@@ -62,3 +62,7 @@ tests/test_phases_46_to_48
 tests/test_phase49_validation
 tests/test_phase50_deployment
 tests/test_cfg_quick
+
+# Internal custody ledger (generated event logs)
+data/ledgers/*.jsonl
+*.custody.jsonl

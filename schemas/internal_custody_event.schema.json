@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Internal Custody Event",
+  "description": "Deterministic, tamper-evident event representing a transformation in RafPolimata",
+  "type": "object",
+  "properties": {
+    "event_version": {
+      "type": "string",
+      "description": "Schema version for this event",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "event_id": {
+      "type": "string",
+      "description": "SHA256 hash of canonical event bytes (excluding event_id itself)",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "parent_event_id": {
+      "type": "string",
+      "description": "SHA256 of previous event's event_id; genesis uses explicit value",
+      "pattern": "^[a-f0-9]{64}|^GENESIS_[A-Z0-9_]+$"
+    },
+    "repository": {
+      "type": "string",
+      "description": "Repository name (owner/repo or internal path)"
+    },
+    "commit_sha": {
+      "type": "string",
+      "description": "Git commit SHA at time of event",
+      "pattern": "^[a-f0-9]{40}$|^TOKEN_VAZIO$"
+    },
+    "path": {
+      "type": "string",
+      "description": "Path of artifact being transformed (relative to repo root)"
+    },
+    "blob_sha": {
+      "type": "string",
+      "description": "Git blob SHA if artifact is versioned in repository",
+      "pattern": "^[a-f0-9]{40}$|^TOKEN_VAZIO$"
+    },
+    "symbol": {
+      "type": "string",
+      "description": "Identifier for the operation/symbol producing this event"
+    },
+    "toolchain": {
+      "type": "object",
+      "description": "Toolchain versions and identifiers",
+      "properties": {
+        "compiler": {
+          "type": "string",
+          "description": "Compiler name and version"
+        },
+        "linker": {
+          "type": "string",
+          "description": "Linker name and version"
+        },
+        "platform": {
+          "type": "string",
+          "description": "Build platform (e.g., Linux, Darwin, Windows)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Build/execution parameters",
+      "additionalProperties": true
+    },
+    "seed": {
+      "type": "string",
+      "description": "Random seed for reproducibility",
+      "pattern": "^[a-f0-9]*$|^TOKEN_VAZIO$"
+    },
+    "environment": {
+      "type": "object",
+      "description": "Environment variables relevant to execution",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "input_sha256": {
+      "type": "string",
+      "description": "SHA256 hash of input data",
+      "pattern": "^[a-f0-9]{64}$|^TOKEN_VAZIO$"
+    },
+    "output_sha256": {
+      "type": "string",
+      "description": "SHA256 hash of output data",
+      "pattern": "^[a-f0-9]{64}$|^TOKEN_VAZIO$"
+    },
+    "stdout_hash": {
+      "type": "string",
+      "description": "SHA256 hash of standard output",
+      "pattern": "^[a-f0-9]{64}$|^TOKEN_VAZIO$"
+    },
+    "stderr_hash": {
+      "type": "string",
+      "description": "SHA256 hash of standard error",
+      "pattern": "^[a-f0-9]{64}$|^TOKEN_VAZIO$"
+    },
+    "exit_code": {
+      "type": "integer",
+      "description": "Exit/result code of operation"
+    },
+    "timestamp_utc": {
+      "type": "string",
+      "description": "ISO 8601 UTC timestamp",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$"
+    },
+    "result": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "TOKEN_VAZIO"],
+      "description": "Outcome of the operation"
+    }
+  },
+  "required": [
+    "event_version",
+    "event_id",
+    "parent_event_id",
+    "repository",
+    "commit_sha",
+    "path",
+    "symbol",
+    "exit_code",
+    "timestamp_utc",
+    "result"
+  ],
+  "additionalProperties": false
+}
