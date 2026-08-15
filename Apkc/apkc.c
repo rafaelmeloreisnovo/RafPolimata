@@ -2036,4 +2036,9 @@ void _start(void) {
         ::: "r0","r7","memory"
     );
 }
+#elif defined(__x86_64__) || defined(__i386__)
+/* x86_64/x86 main() entry point for development builds */
+i32 main(i32 argc, char **argv) {
+    return apkc_main(argc, argv);
+}
 #endif
