@@ -148,6 +148,25 @@ check_l3_elf_validation() {
 }
 
 # ─────────────────────────────────────────────────────────────────────────
+# L4: Java/DEX Pipeline Verification
+# ─────────────────────────────────────────────────────────────────────────
+
+check_l4_java_dex() {
+    TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
+    log_info "L4: Verifying Java/DEX pipeline tool..."
+
+    if [ ! -x "$REPO_ROOT/tools/validate_dex_pipeline.sh" ]; then
+        log_fail "L4: validate_dex_pipeline.sh not found"
+        FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        return 1
+    fi
+
+    log_pass "L4: DEX pipeline validation tool exists"
+    PASSED_CHECKS=$((PASSED_CHECKS + 1))
+    return 0
+}
+
+# ─────────────────────────────────────────────────────────────────────────
 # L6: Determinism Verification
 # ─────────────────────────────────────────────────────────────────────────
 
@@ -276,6 +295,7 @@ run_all_checks() {
         check_l1_compiler_provenance
         check_l2_runtime_evidence
         check_l3_elf_validation
+        check_l4_java_dex
         check_l6_determinism
         check_l7_performance_baseline
         check_l8_type_system_formal
@@ -288,6 +308,7 @@ run_all_checks() {
                 L1) check_l1_compiler_provenance ;;
                 L2) check_l2_runtime_evidence ;;
                 L3) check_l3_elf_validation ;;
+                L4) check_l4_java_dex ;;
                 L6) check_l6_determinism ;;
                 L7) check_l7_performance_baseline ;;
                 L8) check_l8_type_system_formal ;;
