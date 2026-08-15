@@ -12,6 +12,8 @@
 #ifndef APKC_ADV_ERROR_RECOVERY_H
 #define APKC_ADV_ERROR_RECOVERY_H 1
 
+#include "sem_type_system.h"
+#include "sem_symbol_table.h"
 #include "sem_verifier.h"
 
 typedef unsigned char u8;

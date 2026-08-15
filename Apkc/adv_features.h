@@ -14,6 +14,7 @@
 #ifndef APKC_ADV_FEATURES_H
 #define APKC_ADV_FEATURES_H 1
 
+#include "sem_type_system.h"
 #include "adv_error_recovery.h"
 
 typedef unsigned char u8;

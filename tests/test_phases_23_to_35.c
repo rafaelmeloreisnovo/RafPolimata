@@ -224,6 +224,8 @@ static void test_dead_code_analysis(void) {
 
 	struct CFGNode *entry = cfg_create_node(&cfg, CFG_ENTRY, "e");
 	struct CFGNode *dead = cfg_create_node(&cfg, CFG_BASIC_BLOCK, "d");
+
+	entry->is_reachable = 1;
 	dead->is_reachable = 0;
 
 	analyzer.cfg = &cfg;
