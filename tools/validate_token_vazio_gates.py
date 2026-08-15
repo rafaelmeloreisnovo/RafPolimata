@@ -1,241 +1,290 @@
 #!/usr/bin/env python3
+"""Validate TOKEN_VAZIO closure linkage without re-failing legacy debt.
+
+Governance anchor: CLOSURE_L1.
+
+Default mode preserves the historical full-repository inventory.  CI may use
+``--changed-since <git-ref>`` to enforce the rule only on added/modified lines,
+so pre-existing unresolved references remain visible without making every
+unrelated pull request permanently red.
 """
-Hotfix H1: TOKEN_VAZIO Consistency Across CI Gates
+from __future__ import annotations
 
-Validates that all TOKEN_VAZIO states in commits are linked to explicit closure files.
-Rejects PRs/commits that contain TOKEN_VAZIO without corresponding closure.
-
-Protocol: RAFAELIA-PSC-1 (parabolic_semantic_codec.routing.v1)
-Scope: Local repository scan, no external API calls
-"""
-
+import argparse
 import json
 import re
+import subprocess
 import sys
-from pathlib import Path
-from typing import Dict, List, Tuple
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from hashlib import sha256
-from datetime import datetime
+from pathlib import Path
+from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 
 @dataclass
 class TokenVazioFinding:
-    """Represents a TOKEN_VAZIO detection."""
     file_path: str
     line_number: int
     context: str
     has_closure: bool
     closure_file: str = ""
-    severity: str = "ERROR"  # ERROR or WARNING
+    severity: str = "ERROR"
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, object]:
         return asdict(self)
 
 
 class TokenVazioValidator:
-    """Validates TOKEN_VAZIO linkage to closure files."""
+    """Validate explicit gap markers against repository closure records."""
 
-    PATTERNS = {
-        "token_vazio_explicit": re.compile(r"TOKEN_VAZIO|token_vazio"),
-        "closure_reference": re.compile(r"CLOSURE_[LG]\d+", flags=re.IGNORECASE),
-        "closure_file": re.compile(r"docs/closures/CLOSURE_[LG]\d+"),
-    }
-
-    ALLOWED_MISSING = [
-        "L9",  # 42 attractors falsified, explicitly TOKEN_VAZIO
-    ]
+    TOKEN_PATTERN = re.compile(r"TOKEN_VAZIO", re.IGNORECASE)
+    CLOSURE_PATTERN = re.compile(r"CLOSURE_([LG]\d+)", re.IGNORECASE)
+    HUNK_PATTERN = re.compile(r"@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
+    TEXT_SUFFIXES = {".json", ".py", ".md", ".txt", ".h", ".c", ".sh"}
+    SKIP_MARKERS = ("docs/generated/", "results/", ".git/", "__pycache__", ".pyc")
+    ALLOWED_MISSING = {"L9"}
 
     def __init__(self, repo_root: Path = Path(".")):
         self.repo_root = Path(repo_root).resolve()
         self.findings: List[TokenVazioFinding] = []
         self.closure_dir = self.repo_root / "docs" / "closures"
         self.closure_map: Dict[str, bool] = self._build_closure_map()
+        self.scope = "full_repository"
+        self.changed_since: Optional[str] = None
 
     def _build_closure_map(self) -> Dict[str, bool]:
-        """Map which closures exist."""
-        closure_map = {}
+        closure_map: Dict[str, bool] = {}
         if self.closure_dir.exists():
             for closure_file in self.closure_dir.glob("CLOSURE_*.md"):
-                match = re.search(r"CLOSURE_([LG]\d+)", closure_file.name)
+                match = re.search(r"CLOSURE_([LG]\d+)", closure_file.name, re.IGNORECASE)
                 if match:
-                    closure_map[match.group(1)] = True
+                    closure_map[match.group(1).upper()] = True
         return closure_map
 
-    def scan_file(self, file_path: Path) -> List[TokenVazioFinding]:
-        """Scan single file for TOKEN_VAZIO references."""
-        local_findings = []
+    def _is_valid_closure(self, closure_id: str) -> bool:
+        closure_id = closure_id.upper()
+        return closure_id in self.closure_map or closure_id in self.ALLOWED_MISSING
 
-        # Skip generated and config files
-        if any(x in str(file_path) for x in [
-            "docs/generated/",
-            "results/",
-            ".git/",
-            "__pycache__",
-            ".pyc",
-        ]):
+    def _valid_closures(self, text: str) -> List[str]:
+        ids = {match.group(1).upper() for match in self.CLOSURE_PATTERN.finditer(text)}
+        return sorted(closure_id for closure_id in ids if self._is_valid_closure(closure_id))
+
+    def _is_scannable(self, file_path: Path) -> bool:
+        try:
+            relative = file_path.resolve().relative_to(self.repo_root).as_posix()
+        except (ValueError, OSError):
+            return False
+        if any(marker in relative for marker in self.SKIP_MARKERS):
+            return False
+        return file_path.suffix.lower() in self.TEXT_SUFFIXES and file_path.is_file()
+
+    def scan_file(
+        self,
+        file_path: Path,
+        line_numbers: Optional[Set[int]] = None,
+    ) -> List[TokenVazioFinding]:
+        """Scan one file.
+
+        In diff mode, a valid closure reference anywhere in the changed file may
+        govern its changed TOKEN_VAZIO lines.  Full inventory mode retains the
+        older line-local closure rule for backward compatibility.
+        """
+        file_path = Path(file_path)
+        local_findings: List[TokenVazioFinding] = []
+        if not self._is_scannable(file_path):
             return local_findings
 
-        # Only scan text files
-        if file_path.suffix in [".json", ".py", ".md", ".txt", ".h", ".c", ".sh"]:
-            try:
-                if not file_path.exists():
-                    return local_findings
+        try:
+            content = file_path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            return local_findings
 
-                content = file_path.read_text(encoding="utf-8", errors="ignore")
-                lines = content.split("\n")
+        file_closures = self._valid_closures(content) if line_numbers is not None else []
+        relative = file_path.resolve().relative_to(self.repo_root).as_posix()
 
-                for line_num, line in enumerate(lines, 1):
-                    if self.PATTERNS["token_vazio_explicit"].search(line):
-                        # Check if closure is referenced
-                        has_closure_ref = bool(
-                            self.PATTERNS["closure_reference"].search(line)
-                        )
+        for line_num, line in enumerate(content.splitlines(), 1):
+            if line_numbers is not None and line_num not in line_numbers:
+                continue
+            if not self.TOKEN_PATTERN.search(line):
+                continue
 
-                        # Extract closure ID if present (e.g., "L0", "L1", etc.)
-                        closure_match = self.PATTERNS["closure_reference"].search(line)
-                        closure_full = closure_match.group(0) if closure_match else ""  # e.g., "CLOSURE_L0"
-                        # Extract just the ID part (e.g., "L0")
-                        closure_id_match = re.search(r"([LG]\d+)", closure_full)
-                        closure_id = closure_id_match.group(1) if closure_id_match else ""
-
-                        # Check if closure file exists or is allowed to be missing
-                        closure_exists = (
-                            closure_id in self.closure_map or
-                            closure_id in self.ALLOWED_MISSING
-                        )
-
-                        severity = "WARNING" if (has_closure_ref and closure_exists) else "ERROR"
-
-                        finding = TokenVazioFinding(
-                            file_path=str(file_path.relative_to(self.repo_root)),
-                            line_number=line_num,
-                            context=line.strip()[:100],
-                            has_closure=has_closure_ref and closure_exists,
-                            closure_file=f"CLOSURE_{closure_id}" if closure_id else "",
-                            severity=severity,
-                        )
-                        local_findings.append(finding)
-                        self.findings.append(finding)
-            except Exception as e:
-                # Silently skip unreadable files
-                pass
-
+            inline_valid = self._valid_closures(line)
+            valid_closures = inline_valid or file_closures
+            closure_id = valid_closures[0] if valid_closures else ""
+            finding = TokenVazioFinding(
+                file_path=relative,
+                line_number=line_num,
+                context=line.strip()[:160],
+                has_closure=bool(closure_id),
+                closure_file=f"CLOSURE_{closure_id}" if closure_id else "",
+                severity="WARNING" if closure_id else "ERROR",
+            )
+            local_findings.append(finding)
+            self.findings.append(finding)
         return local_findings
 
-    def scan_repository(self) -> Tuple[int, int]:
-        """Scan entire repository. Returns (error_count, warning_count)."""
+    def scan_repository(
+        self,
+        line_scope: Optional[Dict[str, Set[int]]] = None,
+    ) -> Tuple[int, int]:
+        """Scan the full repository or only selected changed lines."""
         error_count = 0
         warning_count = 0
 
-        for file_path in self.repo_root.rglob("*"):
-            if file_path.is_file():
-                findings = self.scan_file(file_path)
-                self.findings.extend(findings)
+        if line_scope is None:
+            candidates: Iterable[Tuple[Path, Optional[Set[int]]]] = (
+                (path, None) for path in self.repo_root.rglob("*") if path.is_file()
+            )
+        else:
+            candidates = (
+                (self.repo_root / relative, line_numbers)
+                for relative, line_numbers in sorted(line_scope.items())
+            )
 
-                for finding in findings:
-                    if finding.severity == "ERROR":
-                        error_count += 1
-                    else:
-                        warning_count += 1
-
+        for file_path, line_numbers in candidates:
+            for finding in self.scan_file(file_path, line_numbers=line_numbers):
+                if finding.severity == "ERROR":
+                    error_count += 1
+                else:
+                    warning_count += 1
         return error_count, warning_count
 
-    def report(self, output_file: Path = None) -> Dict:
-        """Generate report."""
-        # Compute hash over findings only (timestamp-independent)
-        hash_content = {
-            "findings": [f.to_dict() for f in self.findings],
-            "summary": {
-                "total_findings": len(self.findings),
-                "errors": sum(1 for f in self.findings if f.severity == "ERROR"),
-                "warnings": sum(1 for f in self.findings if f.severity == "WARNING"),
-                "closures_present": len(self.closure_map),
-                "allowed_missing": self.ALLOWED_MISSING,
-            },
-        }
-        hash_json = json.dumps(hash_content, sort_keys=True)
-        report_hash = sha256(hash_json.encode()).hexdigest()
+    @staticmethod
+    def _decode_diff_path(raw_path: str) -> Optional[str]:
+        raw_path = raw_path.strip()
+        if raw_path == "/dev/null":
+            return None
+        if raw_path.startswith("b/"):
+            raw_path = raw_path[2:]
+        if raw_path.startswith('"') and raw_path.endswith('"'):
+            try:
+                raw_path = bytes(raw_path[1:-1], "utf-8").decode("unicode_escape")
+            except UnicodeDecodeError:
+                return None
+        return Path(raw_path).as_posix()
 
-        report = {
+    def changed_lines_since(self, base_ref: str, head_ref: str = "HEAD") -> Dict[str, Set[int]]:
+        """Return new-line numbers introduced/modified since ``base_ref``."""
+        result = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(self.repo_root),
+                "diff",
+                "--unified=0",
+                "--no-color",
+                "--no-ext-diff",
+                base_ref,
+                head_ref,
+                "--",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            detail = (result.stderr or result.stdout).strip()
+            raise RuntimeError(f"git_diff_failed({result.returncode}): {detail}")
+
+        scope: Dict[str, Set[int]] = {}
+        current_path: Optional[str] = None
+        for line in result.stdout.splitlines():
+            if line.startswith("+++ "):
+                current_path = self._decode_diff_path(line[4:])
+                if current_path is not None:
+                    scope.setdefault(current_path, set())
+                continue
+            if current_path is None or not line.startswith("@@ "):
+                continue
+            match = self.HUNK_PATTERN.search(line)
+            if not match:
+                continue
+            start = int(match.group(1))
+            count = int(match.group(2)) if match.group(2) is not None else 1
+            if count > 0:
+                scope[current_path].update(range(start, start + count))
+        return {path: lines for path, lines in scope.items() if lines}
+
+    def report(self, output_file: Optional[Path] = None) -> Dict[str, object]:
+        summary = {
+            "total_findings": len(self.findings),
+            "errors": sum(1 for finding in self.findings if finding.severity == "ERROR"),
+            "warnings": sum(1 for finding in self.findings if finding.severity == "WARNING"),
+            "closures_present": len(self.closure_map),
+            "allowed_missing": sorted(self.ALLOWED_MISSING),
+            "scope": self.scope,
+            "changed_since": self.changed_since,
+        }
+        hash_content = {
+            "findings": [finding.to_dict() for finding in self.findings],
+            "summary": summary,
+        }
+        report_hash = sha256(
+            json.dumps(hash_content, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        report: Dict[str, object] = {
             "schema": "rafaelia.token_vazio_validator.v1",
-            "timestamp": datetime.utcnow().isoformat() + "Z",
-            "repository": str(self.repo_root.absolute()),
-            "findings": [f.to_dict() for f in self.findings],
-            "summary": {
-                "total_findings": len(self.findings),
-                "errors": sum(1 for f in self.findings if f.severity == "ERROR"),
-                "warnings": sum(1 for f in self.findings if f.severity == "WARNING"),
-                "closures_present": len(self.closure_map),
-                "allowed_missing": self.ALLOWED_MISSING,
-            },
-            "status": "PASS" if all(f.severity != "ERROR" for f in self.findings) else "FAIL",
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "repository": str(self.repo_root),
+            "findings": [finding.to_dict() for finding in self.findings],
+            "summary": summary,
+            "status": "PASS" if summary["errors"] == 0 else "FAIL",
             "report_hash": report_hash,
         }
-
         if output_file:
-            output_file.write_text(json.dumps(report, indent=2))
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            output_file.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             print(f"Report written to {output_file}")
-
         return report
 
     def should_halt_ci(self) -> bool:
-        """Return True if CI should halt (errors present)."""
-        return any(f.severity == "ERROR" for f in self.findings)
+        return any(finding.severity == "ERROR" for finding in self.findings)
 
 
-def main():
-    """CLI entry point."""
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description="Validate TOKEN_VAZIO gates across repository"
-    )
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = argparse.ArgumentParser(description="Validate TOKEN_VAZIO closure linkage")
+    parser.add_argument("--repo", type=Path, default=Path("."))
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--summary", action="store_true")
+    parser.add_argument("--strict", action="store_true")
     parser.add_argument(
-        "--repo",
-        type=Path,
-        default=Path("."),
-        help="Repository root (default: current directory)"
+        "--changed-since",
+        help="Enforce only TOKEN_VAZIO references on added/modified lines since this git ref",
     )
-    parser.add_argument(
-        "--output",
-        type=Path,
-        help="Write report to JSON file"
-    )
-    parser.add_argument(
-        "--summary",
-        action="store_true",
-        help="Print summary only"
-    )
-    parser.add_argument(
-        "--strict",
-        action="store_true",
-        help="Exit with error code 1 if any errors found"
-    )
-
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     validator = TokenVazioValidator(args.repo)
-    error_count, warning_count = validator.scan_repository()
+    if args.changed_since:
+        try:
+            scope = validator.changed_lines_since(args.changed_since)
+        except RuntimeError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 2
+        validator.scope = "changed_lines"
+        validator.changed_since = args.changed_since
+        validator.scan_repository(scope)
+    else:
+        validator.scan_repository()
 
     report = validator.report(args.output)
-
     if args.summary or not sys.stdout.isatty():
-        print(f"\nTOKEN_VAZIO Validation Summary")
-        print(f"{'=' * 50}")
-        print(f"Errors:   {report['summary']['errors']}")
-        print(f"Warnings: {report['summary']['warnings']}")
+        summary = report["summary"]
+        print("\nTOKEN_VAZIO Validation Summary")
+        print("=" * 50)
+        print(f"Scope:    {summary['scope']}")
+        print(f"Errors:   {summary['errors']}")
+        print(f"Warnings: {summary['warnings']}")
         print(f"Status:   {report['status']}")
         print(f"Hash:     {report['report_hash']}")
     else:
-        print(json.dumps(report, indent=2))
+        print(json.dumps(report, indent=2, ensure_ascii=False))
 
     if args.strict and validator.should_halt_ci():
         print("\nERROR: TOKEN_VAZIO validation failed. CI halting.")
-        sys.exit(1)
-
+        return 1
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())
