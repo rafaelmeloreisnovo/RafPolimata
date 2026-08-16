@@ -1,4 +1,66 @@
 {
-  "exact": {},
-  "normalized_candidates": {}
+  "exact": {
+    "013d08d4fa523c2d952869afc8560207559389e523a1f5ede57f9c78675bc218": [
+      "Apkc/proofs/runs/20260617T064636Z/g4_arm32_encoders.txt",
+      "Apkc/proofs/runs/20260816T034940Z/g4_arm32_encoders.txt",
+      "Apkc/proofs/runs/20260816T034943Z/g4_arm32_encoders.txt",
+      "Apkc/proofs/runs/20260816T035020Z/g4_arm32_encoders.txt"
+    ],
+    "02f72ecd2491a9ece5b475f028fc0fbeb7f317c6071d96f3780a8d5f451bb6b4": [
+      "Apkc/proofs/runs/20260816T034940Z/g6_apk_generation.txt",
+      "Apkc/proofs/runs/20260816T034943Z/g6_apk_generation.txt",
+      "Apkc/proofs/runs/20260816T035020Z/g6_apk_generation.txt"
+    ],
+    "341b091efbb7a8eae586ff653a74a81c1d044488b39d3c562d02bafc15f1efa0": [
+      "Apkc/proofs/runs/20260816T034940Z/g0_source_cap.txt",
+      "Apkc/proofs/runs/20260816T034943Z/g0_source_cap.txt"
+    ],
+    "64230f0e7083cadf3389ff9909af25c740c6a46107360c07536d4e05645be060": [
+      "Apkc/proofs/runs/20260816T034940Z/g3_verbovivo.txt",
+      "Apkc/proofs/runs/20260816T034943Z/g3_verbovivo.txt",
+      "Apkc/proofs/runs/20260816T035020Z/g3_verbovivo.txt"
+    ],
+    "9329d13feaad75f49a371d72258a07d079a92b556ee49b9507139d6385875762": [
+      "Apkc/proofs/runs/20260816T034940Z/gates.txt",
+      "Apkc/proofs/runs/20260816T034943Z/gates.txt"
+    ],
+    "bc940f5a9ce47f26fde600713e90ac83b07215089238af02339fcc26cc540025": [
+      "Apkc/proofs/runs/20260816T034940Z/apkc_hardened.c",
+      "Apkc/proofs/runs/20260816T034943Z/apkc_hardened.c",
+      "Apkc/proofs/runs/20260816T035020Z/apkc_hardened.c"
+    ],
+    "c37256ae6f1c540d7fe1f53e9635745dc2fdc9578d954a2e24bc2c69e6546b66": [
+      "Apkc/proofs/runs/20260816T034940Z/g1_syntax.txt",
+      "Apkc/proofs/runs/20260816T034943Z/g1_syntax.txt"
+    ],
+    "cafee8dd3231e0289f23b34d5f4115360ce06ac6e1c4d85fdd41236b72a85dab": [
+      "Apkc/proofs/runs/20260617T064636Z/g5_arm64_encoders.txt",
+      "Apkc/proofs/runs/20260816T034940Z/g5_arm64_encoders.txt",
+      "Apkc/proofs/runs/20260816T034943Z/g5_arm64_encoders.txt",
+      "Apkc/proofs/runs/20260816T035020Z/g5_arm64_encoders.txt"
+    ]
+  },
+  "normalized_candidates": {
+    "27a8b2f9983957092505898097bd9daf34a639205c4bf18531af2f76c6f8d1b5": [
+      "Apkc/proofs/runs/20260816T034940Z/apkc_hardened.c",
+      "Apkc/proofs/runs/20260816T034943Z/apkc_hardened.c",
+      "Apkc/proofs/runs/20260816T035020Z/apkc_hardened.c"
+    ],
+    "bd2f153b9c0f84f0184803cff4dcaeccb2cd1c389df9f666e9df3319208ede96": [
+      "Apkc/proofs/runs/20260617T064636Z/g4_arm32_encoders.txt",
+      "Apkc/proofs/runs/20260816T034940Z/g4_arm32_encoders.txt",
+      "Apkc/proofs/runs/20260816T034943Z/g4_arm32_encoders.txt",
+      "Apkc/proofs/runs/20260816T035020Z/g4_arm32_encoders.txt"
+    ],
+    "c1c4fba48242fcc3b98bbd34acfe9245d2108b1f7d7b2b7a4479d10ad9ef22fc": [
+      "Apkc/proofs/runs/20260816T034940Z/gates.txt",
+      "Apkc/proofs/runs/20260816T034943Z/gates.txt"
+    ],
+    "d4d335667febc2f4150d8185e4b147b19cd62e112823d72222340682631da78e": [
+      "Apkc/proofs/runs/20260617T064636Z/g5_arm64_encoders.txt",
+      "Apkc/proofs/runs/20260816T034940Z/g5_arm64_encoders.txt",
+      "Apkc/proofs/runs/20260816T034943Z/g5_arm64_encoders.txt",
+      "Apkc/proofs/runs/20260816T035020Z/g5_arm64_encoders.txt"
+    ]
+  }
 }
