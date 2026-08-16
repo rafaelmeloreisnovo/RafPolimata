@@ -1,0 +1,1 @@
+TOKEN_VAZIO: hardened apkc is freestanding ARM64, not runnable on x86 host; needs ARM/Termux/qemu.

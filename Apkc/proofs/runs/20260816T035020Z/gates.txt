@@ -1,0 +1,7 @@
+source-cap-hardening   PASS         transform+falsifier+real-source consumption; sha256=bc940f5a9ce47f26fde600713e90ac83b07215089238af02339fcc26cc540025
+freestanding-syntax    PASS         clang aarch64 hardened source -fsyntax-only clean -> g1_syntax.txt
+cross-object-a64       PASS         hardened source Class=ELF64 Machine=AArch64 sha256=0de33829be3137f0f4c61366d9c8a9ceacda0e8060e62adbce27c2548e8275e2
+verbovivo-build-smoke  PASS         build+smoke; phi line -> g3_verbovivo.txt
+arm32-encoders         PASS         PASS: 16 ARM32 encoder golden cases.
+arm64-encoders         PASS         PASS: 9 ARM64 encoder golden cases.
+apk-generation         TOKEN_VAZIO  requires ARM/Termux/qemu/device -> g6_apk_generation.txt

@@ -1,0 +1,4 @@
+commit_sha : 761cea4
+date_utc   : 2026-08-16T03:49:40Z
+host_arch  : x86_64
+clean-proof-run: 3 PASS, 3 FAIL, 1 TOKEN_VAZIO

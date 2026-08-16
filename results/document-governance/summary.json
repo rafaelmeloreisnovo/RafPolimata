@@ -1,43 +1,45 @@
 {
   "claim_allowed": false,
-  "commit": "08b71841a7832195ee9e6cf0c7f190ab3933baba",
-  "generated_at": "2026-07-27T18:36:57Z",
+  "commit": "9f39e0489439482bc9462769b339846968970f54",
+  "generated_at": "2026-08-16T03:51:09Z",
   "policy_version": "1.0.0",
   "schema": "raf.document-governance.v1",
   "state": "REVIEW_REQUIRED",
   "summary": {
     "areas": {
-      "apkc": 71,
+      "apkc": 214,
       "assets": 1,
-      "automation": 98,
+      "automation": 206,
       "canonical": 3,
-      "configs": 29,
-      "documentation": 107,
-      "evidence": 13,
-      "root-methods": 73,
-      "root-other": 97,
+      "configs": 43,
+      "documentation": 224,
+      "evidence": 32,
+      "root-methods": 75,
+      "root-other": 245,
       "root-runtime": 21,
-      "runtime": 49,
-      "tests": 36,
-      "workflows": 7
+      "runtime": 57,
+      "tests": 148,
+      "workflows": 34
     },
     "blockers": 0,
-    "broken_reference_sources": 0,
+    "broken_reference_sources": 1,
     "classifications": {
-      "INTERNAL": 494,
-      "PUBLIC": 111
+      "INTERNAL": 1075,
+      "PUBLIC": 228
     },
-    "exact_duplicate_groups": 0,
-    "files": 605,
+    "exact_duplicate_groups": 8,
+    "files": 1303,
     "missing_canonical_indexes": [],
-    "normalized_duplicate_groups": 0,
-    "relations": 792,
-    "review_queue": 302,
+    "normalized_duplicate_groups": 4,
+    "relations": 1206,
+    "review_queue": 812,
     "routes": {
       "CANONICAL": 6,
-      "INDEXED": 297,
-      "LINK_REQUIRED": 290,
-      "ROOT_REVIEW": 10,
+      "DUPLICATE_REVIEW": 23,
+      "INDEXED": 485,
+      "LINK_REQUIRED": 774,
+      "REFERENCE_REPAIR": 1,
+      "ROOT_REVIEW": 12,
       "SENSITIVITY_REVIEW": 2
     }
   }

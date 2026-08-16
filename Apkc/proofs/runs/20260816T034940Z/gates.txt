@@ -1,0 +1,7 @@
+source-cap-hardening   FAIL         transform/falsifier/anchor gate failed -> g0_source_cap.txt
+freestanding-syntax    FAIL         blocked by source-cap-hardening
+cross-object-a64       FAIL         hardened cross-compile to AArch64 object failed/blocked -> g2_object.txt
+verbovivo-build-smoke  PASS         build+smoke; phi line -> g3_verbovivo.txt
+arm32-encoders         PASS         PASS: 16 ARM32 encoder golden cases.
+arm64-encoders         PASS         PASS: 9 ARM64 encoder golden cases.
+apk-generation         TOKEN_VAZIO  requires ARM/Termux/qemu/device -> g6_apk_generation.txt
