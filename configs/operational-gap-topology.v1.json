@@ -1,0 +1,401 @@
+{
+  "schema": "raf.operational-gap-topology.v1",
+  "version": "1.0.0",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "observed_commit": "37adbf091f57dbd83460336010e877c3b42382df",
+  "state_model": {
+    "unknown_state": "TOKEN_VAZIO",
+    "claim_rule": "TOKEN_VAZIO, PENDING and FAIL never authorize an external claim.",
+    "evidence_rule": "A claim may only be promoted inside the scope demonstrated by same-commit or explicitly historical evidence."
+  },
+  "standards_snapshot": [
+    {"id": "NIST-CSF", "version": "2.0", "status": "CURRENT_FINAL", "use": "REFERENCE_ONLY_NO_CERTIFICATION_CLAIM"},
+    {"id": "NIST-SSDF", "version": "1.1", "status": "CURRENT_FINAL", "use": "REFERENCE_ONLY_NO_CERTIFICATION_CLAIM"},
+    {"id": "NIST-SSDF", "version": "1.2-draft", "status": "DRAFT_MONITOR_ONLY", "use": "REFERENCE_ONLY_NO_CERTIFICATION_CLAIM"},
+    {"id": "SLSA", "version": "1.2", "status": "CURRENT_FINAL", "use": "REFERENCE_ONLY_NO_CERTIFICATION_CLAIM"},
+    {"id": "ISO-IEC-27001", "version": "2022", "status": "CURRENT_FINAL", "use": "REFERENCE_ONLY_NO_CERTIFICATION_CLAIM"},
+    {"id": "ISO-37301", "version": "2021", "status": "CURRENT_FINAL", "use": "REFERENCE_ONLY_NO_CERTIFICATION_CLAIM"},
+    {"id": "ISO-31000", "version": "2018", "status": "CURRENT_FINAL", "use": "REFERENCE_ONLY_NO_CERTIFICATION_CLAIM"},
+    {"id": "ISO-9001", "version": "2015+Amd1:2024", "status": "CURRENT_PENDING_REPLACEMENT", "use": "REFERENCE_ONLY_NO_CERTIFICATION_CLAIM"}
+  ],
+  "gaps": [
+    {
+      "id": "GAP-TECH-ARM64-APK-L4",
+      "title": "ARM64 ELF identity inside the current APK",
+      "domain": "technical",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P0",
+      "impact": "CRITICAL",
+      "uncertainty_class": "OBSERVATION_MISSING",
+      "claim_allowed": false,
+      "owner_role": "apkc-maintainer",
+      "required_roles": ["apkc-maintainer", "evidence-custodian", "quality-assurance"],
+      "provenance": ["docs/APKC_VALUE_AND_GAPS.md", "docs/LACUNAS_PROFUNDAS_MVP_PRODUTO.md", "pull/299"],
+      "evidence": ["CI validates structural ARM64 routes but does not prove current ELF identity inside an installed APK"],
+      "next_action": "Generate one current-commit APK containing the ARM64 ELF, extract it independently and compare cryptographic identity.",
+      "reference_controls": ["NIST-SSDF-PS", "SLSA-1.2-Build"],
+      "closure": {
+        "condition": "The ARM64 ELF embedded in the current APK is independently extracted and hash-identical to the current build artifact.",
+        "required_artifacts": ["current APK", "current ARM64 ELF", "embedded ELF extraction", "SHA-256 receipt"],
+        "required_gates": ["readelf on embedded ELF", "hash equality", "same-commit provenance"]
+      }
+    },
+    {
+      "id": "GAP-TECH-ANDROID-RUNTIME-L2",
+      "title": "Physical Android install, launch and runtime receipt for the current artifact",
+      "domain": "technical",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P0",
+      "impact": "CRITICAL",
+      "uncertainty_class": "OBSERVATION_MISSING",
+      "claim_allowed": false,
+      "owner_role": "runtime-maintainer",
+      "required_roles": ["runtime-maintainer", "apkc-maintainer", "evidence-custodian", "quality-assurance"],
+      "provenance": ["AGENTS.md", "docs/AGENTES.md", "docs/APKC_VALUE_AND_GAPS.md", "pull/299"],
+      "evidence": ["PR and main CI are green; device runtime remains outside those gates"],
+      "next_action": "Install the same current APK on an authorized Android device, launch/dlopen it and record logcat/exit with artifact hashes.",
+      "reference_controls": ["NIST-SSDF-PW", "NIST-CSF-2.0-DE", "NIST-CSF-2.0-RS"],
+      "closure": {
+        "condition": "Same-commit APK is installed and launched on an authorized device with a bounded runtime receipt and no unaccounted crash.",
+        "required_artifacts": ["device identity without secrets", "APK SHA-256", "install receipt", "launch receipt", "logcat or exit receipt"],
+        "required_gates": ["adb install or equivalent authorized install", "launch/dlopen", "runtime observation", "receipt hash binding"]
+      }
+    },
+    {
+      "id": "GAP-LEGAL-LICENSE-DECISION",
+      "title": "Repository licensing and third-party redistribution decision",
+      "domain": "legal",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P0",
+      "impact": "CRITICAL",
+      "uncertainty_class": "OWNER_DECISION",
+      "claim_allowed": false,
+      "owner_role": "human-authorizer",
+      "required_roles": ["human-authorizer", "security-license", "documentation-governance"],
+      "provenance": ["repository metadata: license=null observed 2026-08-16", "docs/LICENCAS_COMPARADAS.md", "docs/LICENSE_DECISION_RECORD.md"],
+      "evidence": [],
+      "next_action": "Human owner selects the intended licensing model after authorship and third-party compatibility review; then add the corresponding root license and notices.",
+      "owner_decision_required": true,
+      "reference_controls": ["ISO-37301", "ISO-31000"],
+      "closure": {
+        "condition": "A human-authorized license decision is recorded and repository/third-party terms are made internally consistent.",
+        "required_artifacts": ["license decision record", "root license text or explicit proprietary terms", "third-party license inventory"],
+        "required_gates": ["owner approval", "third-party compatibility review", "GitHub license detection or explicit documented exception"]
+      }
+    },
+    {
+      "id": "GAP-SEC-PRIVATE-REPORTING",
+      "title": "Verified private vulnerability reporting channel",
+      "domain": "security",
+      "state": "PENDING",
+      "urgency": "P1",
+      "impact": "HIGH",
+      "uncertainty_class": "EXTERNAL_VERIFICATION",
+      "claim_allowed": false,
+      "owner_role": "security-license",
+      "required_roles": ["security-license", "repository-maintainer"],
+      "provenance": [".github/SECURITY.md", "GitHub private vulnerability reporting setting is not readable by the current integration"],
+      "evidence": ["Security policy is versioned; private reporting enablement remains unverified"],
+      "next_action": "Enable or verify GitHub private vulnerability reporting and record a non-sensitive administrative receipt.",
+      "reference_controls": ["NIST-SSDF-RV", "NIST-CSF-2.0-RS", "ISO-IEC-27001-2022"],
+      "closure": {
+        "condition": "A private vulnerability intake path is demonstrably available and its handling workflow is documented.",
+        "required_artifacts": ["SECURITY.md", "private reporting setting receipt or approved private contact mechanism"],
+        "required_gates": ["private intake availability", "responsible disclosure workflow review"]
+      }
+    },
+    {
+      "id": "GAP-SEC-SBOM-PROVENANCE",
+      "title": "Release-grade SBOM and third-party license inventory",
+      "domain": "security",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P1",
+      "impact": "HIGH",
+      "uncertainty_class": "IMPLEMENTATION_GAP",
+      "claim_allowed": false,
+      "owner_role": "security-license",
+      "required_roles": ["security-license", "evidence-custodian", "release-manager"],
+      "provenance": ["docs/LICENCAS_COMPARADAS.md", "release V1.0.0 has no attached assets"],
+      "evidence": [],
+      "next_action": "Generate a deterministic machine-readable SBOM plus third-party notices for a named release artifact and bind both to its commit/hash.",
+      "reference_controls": ["NIST-SSDF-PS", "SLSA-1.2", "ISO-37301"],
+      "closure": {
+        "condition": "Named release artifact has reproducible SBOM, third-party inventory and provenance bound to the same commit.",
+        "required_artifacts": ["SBOM", "third-party notices", "artifact manifest", "hash receipt"],
+        "required_gates": ["deterministic regeneration", "license inventory review", "artifact-to-SBOM binding"]
+      }
+    },
+    {
+      "id": "GAP-GOV-CUSTODY-ISSUE121",
+      "title": "Internal custody ledger cross-environment closure and issue reconciliation",
+      "domain": "governance",
+      "state": "PENDING",
+      "urgency": "P1",
+      "impact": "HIGH",
+      "uncertainty_class": "EXTERNAL_VERIFICATION",
+      "claim_allowed": false,
+      "owner_role": "evidence-custodian",
+      "required_roles": ["evidence-custodian", "ci-governance", "quality-assurance"],
+      "provenance": ["issue/121", "schemas/internal_custody_event.schema.json", ".github/workflows/internal-custody-ledger.yml"],
+      "evidence": ["Schema and CI ledger checks exist; issue remains open and Termux execution is still a named acceptance item"],
+      "next_action": "Run the current ledger writer/verifier on Termux, preserve the receipt, reconcile each issue #121 checkbox and close only if all acceptance conditions are evidenced.",
+      "reference_controls": ["NIST-SSDF-PO", "SLSA-1.2-Provenance", "ISO-31000"],
+      "closure": {
+        "condition": "Current writer/verifier passes both Linux CI and Termux with tamper-negative tests, and issue #121 is reconciled against receipts.",
+        "required_artifacts": ["Linux CI receipt", "Termux receipt", "tamper-negative receipt", "issue reconciliation record"],
+        "required_gates": ["chain verification", "tamper rejection", "cross-environment replay", "human issue reconciliation"]
+      }
+    },
+    {
+      "id": "GAP-FED-REAL-SIGNATURES-134",
+      "title": "Real cryptographic authority signatures for federated receipts",
+      "domain": "federation",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P1",
+      "impact": "HIGH",
+      "uncertainty_class": "IMPLEMENTATION_GAP",
+      "claim_allowed": false,
+      "owner_role": "federation-maintainer",
+      "required_roles": ["federation-maintainer", "security-license", "evidence-custodian"],
+      "provenance": ["issue/134", "RafPolimata #293 referenced by issue/134"],
+      "evidence": ["Issue #134 explicitly records ED25519 as TOKEN_VAZIO_PLACEHOLDER"],
+      "next_action": "Replace the placeholder with a verifiable signing contract or explicitly remove signature claims from the federated protocol.",
+      "reference_controls": ["SLSA-1.2-Provenance", "NIST-CSF-2.0-GV"],
+      "closure": {
+        "condition": "Federated receipt signatures are cryptographically verifiable with documented key lifecycle, or signature claims are removed from the contract.",
+        "required_artifacts": ["signature contract", "public verification material", "key lifecycle policy", "positive and negative verification receipts"],
+        "required_gates": ["signature verify", "tamper reject", "wrong-key reject", "key provenance review"]
+      }
+    },
+    {
+      "id": "GAP-FED-CROSS-REPO-RECEIPTS-134",
+      "title": "Cross-repository physical receipts and federated reconciliation",
+      "domain": "federation",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P1",
+      "impact": "HIGH",
+      "uncertainty_class": "CROSS_REPO_EVIDENCE",
+      "claim_allowed": false,
+      "owner_role": "federation-maintainer",
+      "required_roles": ["federation-maintainer", "evidence-custodian", "quality-assurance"],
+      "provenance": ["issue/134"],
+      "evidence": ["11/11 local authority artifacts are reconciled, but federated runtime/receipts remain unverified"],
+      "next_action": "Produce at least one real authority submission -> review -> receipt -> aggregate chain across repositories with immutable identities.",
+      "reference_controls": ["SLSA-1.2-Provenance", "NIST-SSDF-PS"],
+      "closure": {
+        "condition": "A cross-repo receipt chain binds repository, commit, artifact, authority and aggregate, and an independent verifier accepts it while rejecting tampering.",
+        "required_artifacts": ["authority submission", "review receipt", "aggregate receipt", "cross-repo identity manifest"],
+        "required_gates": ["identity resolution", "signature/provenance verification where applicable", "tamper rejection", "aggregate reconstruction"]
+      }
+    },
+    {
+      "id": "GAP-INTEG-CROSS-REPO-BRIDGE-298",
+      "title": "Deterministic cross_repo_bridge_v1 for RafGitTools and FlorisBoard",
+      "domain": "integration",
+      "state": "PENDING",
+      "urgency": "P1",
+      "impact": "HIGH",
+      "uncertainty_class": "IMPLEMENTATION_GAP",
+      "claim_allowed": false,
+      "owner_role": "integration-maintainer",
+      "required_roles": ["integration-maintainer", "schema-governance", "privacy-review", "quality-assurance"],
+      "provenance": ["issue/298", "RafGitTools#357 referenced by issue/298"],
+      "evidence": ["Issue #298 defines node/edge contract but adapter/schema/view are not yet closed"],
+      "next_action": "Implement artifact_ref ingestion, typed nodes/edges, deterministic view and tests while excluding typed IME content by default.",
+      "reference_controls": ["NIST-CSF-2.0-GV", "NIST-SSDF-PO", "ISO-IEC-27001-2022"],
+      "closure": {
+        "condition": "Schema + adapter + deterministic cross_repo_bridge_v1 reconstruct only from source manifests/receipts and preserve claim boundaries.",
+        "required_artifacts": ["artifact_ref schema", "adapter", "deterministic view", "fixture receipt"],
+        "required_gates": ["deterministic replay", "unknown artifact rejection", "claim_allowed fail-closed", "privacy boundary test"]
+      }
+    },
+    {
+      "id": "GAP-PRIV-IME-DATA-BOUNDARY",
+      "title": "Executable privacy boundary for FlorisBoard/IME integration",
+      "domain": "privacy",
+      "state": "PENDING",
+      "urgency": "P1",
+      "impact": "HIGH",
+      "uncertainty_class": "POLICY_GAP",
+      "claim_allowed": false,
+      "owner_role": "privacy-review",
+      "required_roles": ["privacy-review", "integration-maintainer", "security-license"],
+      "provenance": ["issue/298"],
+      "evidence": ["Issue #298 states typed content is out of scope by default; executable enforcement is not yet evidenced"],
+      "next_action": "Encode and test an allowlist of metadata fields for the bridge so typed text/content cannot enter the derived graph by default.",
+      "reference_controls": ["NIST-CSF-2.0-GV", "ISO-IEC-27001-2022", "ISO-37301"],
+      "closure": {
+        "condition": "Bridge fixtures prove typed content is rejected or excluded by default and only approved metadata is ingested.",
+        "required_artifacts": ["data-boundary contract", "allowlist schema", "negative privacy fixtures"],
+        "required_gates": ["typed-content rejection", "metadata allowlist", "no-secret logging"]
+      }
+    },
+    {
+      "id": "GAP-REL-CURRENT-RELEASE-ASSETS",
+      "title": "Current reproducible release with attached artifacts and checksums",
+      "domain": "release",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P1",
+      "impact": "HIGH",
+      "uncertainty_class": "STALE_STATE",
+      "claim_allowed": false,
+      "owner_role": "release-manager",
+      "required_roles": ["release-manager", "evidence-custodian", "security-license"],
+      "provenance": ["GitHub release V1.0.0 observed as prerelease dated 2026-06-14 with zero attached assets", "docs/RELEASE_NOTES_PENDING.md"],
+      "evidence": [],
+      "next_action": "Create a release candidate from a current green commit with immutable artifact manifest, checksums, provenance and explicit limitations.",
+      "reference_controls": ["SLSA-1.2-Build", "NIST-SSDF-PS", "ISO-9001"],
+      "closure": {
+        "condition": "A current release candidate contains named downloadable artifacts, checksums, provenance and reproducible build instructions.",
+        "required_artifacts": ["release artifact", "checksum manifest", "provenance receipt", "release notes"],
+        "required_gates": ["clean rebuild", "checksum verify", "release artifact smoke test", "license gate"]
+      }
+    },
+    {
+      "id": "GAP-COM-SUPPORT-LIFECYCLE",
+      "title": "Commercial support, maintenance and lifecycle decision",
+      "domain": "commercial",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P2",
+      "impact": "MEDIUM",
+      "uncertainty_class": "OWNER_DECISION",
+      "claim_allowed": false,
+      "owner_role": "human-authorizer",
+      "required_roles": ["human-authorizer", "release-manager", "security-license", "commercial-owner"],
+      "provenance": ["docs/RAFAELIA_PAPER_MARKET_7_VECTORS.md", ".github/SECURITY.md"],
+      "evidence": [],
+      "next_action": "Choose supported release channels, maintenance window, security response expectations and whether any SLA is offered; do not imply one before approval.",
+      "owner_decision_required": true,
+      "reference_controls": ["ISO-9001", "ISO-37301", "ISO-31000"],
+      "closure": {
+        "condition": "Human-approved support/lifecycle policy defines supported channels, maintenance semantics and non-promissory or contractual response terms.",
+        "required_artifacts": ["support policy", "release lifecycle", "security response policy"],
+        "required_gates": ["owner approval", "commercial/legal review", "documentation consistency"]
+      }
+    },
+    {
+      "id": "GAP-COM-EXTERNAL-VALIDATION",
+      "title": "Independent user, buyer or research validation",
+      "domain": "commercial",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P2",
+      "impact": "HIGH",
+      "uncertainty_class": "ADOPTION_GAP",
+      "claim_allowed": false,
+      "owner_role": "commercial-owner",
+      "required_roles": ["commercial-owner", "quality-assurance", "research-review", "evidence-custodian"],
+      "provenance": ["repository metadata observed 2026-08-16: 0 stars, 0 forks", "docs/APKC_VALUE_AND_GAPS.md"],
+      "evidence": [],
+      "next_action": "Obtain independent install/reproduction or a bounded pilot and preserve the external receipt without converting interest into efficacy claims.",
+      "reference_controls": ["ISO-9001", "ISO-31000"],
+      "closure": {
+        "condition": "At least one independent party reproduces a declared workflow or pilot under documented conditions and limitations.",
+        "required_artifacts": ["external reproduction receipt", "environment manifest", "feedback or acceptance record"],
+        "required_gates": ["independent reproduction", "scope agreement", "claim boundary review"]
+      }
+    },
+    {
+      "id": "GAP-COMP-EXTERNAL-ASSESSMENT",
+      "title": "External compliance/security assessment when certification is claimed",
+      "domain": "compliance",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P3",
+      "impact": "HIGH",
+      "uncertainty_class": "EXTERNAL_VERIFICATION",
+      "claim_allowed": false,
+      "owner_role": "compliance-owner",
+      "required_roles": ["compliance-owner", "security-license", "human-authorizer"],
+      "provenance": ["docs/BASES_SUPRALEGAIS_E_PADROES.md", "docs/MATRIZ_JURIDICO_TECNOLOGICA.md", "docs/OPERATIONAL_GAP_TOPOLOGY_V1.md"],
+      "evidence": [],
+      "next_action": "Only if a certification/conformity claim becomes a business requirement, define scope and engage a competent independent assessor; until then use alignment language only.",
+      "reference_controls": ["ISO-IEC-27001-2022", "ISO-37301", "ISO-9001", "NIST-CSF-2.0"],
+      "closure": {
+        "condition": "Any external conformity claim is supported by scope-specific independent assessment or certification evidence.",
+        "required_artifacts": ["assessment scope", "independent report or certificate", "exceptions register"],
+        "required_gates": ["scope verification", "independent assessment", "claim wording review"]
+      }
+    },
+    {
+      "id": "GAP-QUAL-INDEPENDENT-REPRODUCTION",
+      "title": "Independent technical reproduction of core claims",
+      "domain": "quality",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P2",
+      "impact": "HIGH",
+      "uncertainty_class": "EXTERNAL_VERIFICATION",
+      "claim_allowed": false,
+      "owner_role": "quality-assurance",
+      "required_roles": ["quality-assurance", "research-review", "evidence-custodian"],
+      "provenance": ["AGENTS.md", "docs/AGENTES.md", "issue/134"],
+      "evidence": ["Internal CI proves named gates; independent reproduction is not implied"],
+      "next_action": "Publish a bounded reproduction protocol and have an independent environment rerun core compiler/provenance/runtime gates.",
+      "reference_controls": ["NIST-SSDF-PO", "ISO-9001", "ISO-31000"],
+      "closure": {
+        "condition": "Independent execution reproduces the selected claim set from documented inputs and records both positive and negative results.",
+        "required_artifacts": ["reproduction protocol", "independent receipt", "comparison report"],
+        "required_gates": ["clean-room or independent environment run", "hash comparison", "deviation accounting"]
+      }
+    },
+    {
+      "id": "GAP-DOC-HISTORICAL-CLAIMS",
+      "title": "Reconcile high-risk historical completion claims with current evidence",
+      "domain": "documentation",
+      "state": "PENDING",
+      "urgency": "P1",
+      "impact": "HIGH",
+      "uncertainty_class": "STALE_STATE",
+      "claim_allowed": false,
+      "owner_role": "documentation-governance",
+      "required_roles": ["documentation-governance", "evidence-custodian", "quality-assurance"],
+      "provenance": ["PHASES_49_50_COMPLETION_SUMMARY.md", "configs/root-file-decisions.d/2026-08-16.json", "pull/299"],
+      "evidence": ["The root decision supplement classifies the document HIGH/review-required rather than current evidence"],
+      "next_action": "Map each quantitative/production claim to current receipt, historical receipt or TOKEN_VAZIO and move/archive only through a dedicated review PR.",
+      "reference_controls": ["ISO-9001", "ISO-31000", "NIST-CSF-2.0-GV"],
+      "closure": {
+        "condition": "Every strong historical claim has an evidence state and the document is clearly separated from current operational truth.",
+        "required_artifacts": ["claim-to-evidence matrix", "archive or current-state decision", "updated references"],
+        "required_gates": ["claim traceability", "document governance", "broken-reference check"]
+      }
+    },
+    {
+      "id": "GAP-SEC-BRANCH-PROTECTION-EVIDENCE",
+      "title": "Observable branch protection and merge-control policy",
+      "domain": "security",
+      "state": "TOKEN_VAZIO",
+      "urgency": "P1",
+      "impact": "HIGH",
+      "uncertainty_class": "EXTERNAL_VERIFICATION",
+      "claim_allowed": false,
+      "owner_role": "repository-maintainer",
+      "required_roles": ["repository-maintainer", "security-license", "ci-governance"],
+      "provenance": ["AGENTS.md requires non-protected branch work by policy", "GitHub branch protection endpoint returned inaccessible to current integration"],
+      "evidence": [],
+      "next_action": "Verify repository rulesets/branch protection in GitHub settings and record only non-sensitive policy facts such as required checks and review rules.",
+      "reference_controls": ["NIST-SSDF-PS", "SLSA-1.2-Source", "NIST-CSF-2.0-PR"],
+      "closure": {
+        "condition": "Main branch merge controls are observable and consistent with the repository's human-authorization and required-check policy.",
+        "required_artifacts": ["ruleset or branch-protection receipt", "required-check list", "exception policy"],
+        "required_gates": ["merge-control review", "required-check verification", "exception audit"]
+      }
+    }
+  ],
+  "edges": [
+    {"id": "EDGE-RUNTIME-REQUIRES-ARM64APK", "from": "GAP-TECH-ANDROID-RUNTIME-L2", "to": "GAP-TECH-ARM64-APK-L4", "relation": "requires", "strength": "HARD", "rationale": "Runtime claim for the ARM64 path requires identity of the ARM64 artifact inside the tested APK."},
+    {"id": "EDGE-RELEASE-REQUIRES-LICENSE", "from": "GAP-REL-CURRENT-RELEASE-ASSETS", "to": "GAP-LEGAL-LICENSE-DECISION", "relation": "requires", "strength": "HARD", "rationale": "Third-party release must not silently invent redistribution rights."},
+    {"id": "EDGE-RELEASE-REQUIRES-SBOM", "from": "GAP-REL-CURRENT-RELEASE-ASSETS", "to": "GAP-SEC-SBOM-PROVENANCE", "relation": "requires", "strength": "HARD", "rationale": "Release-grade distribution requires component and third-party provenance."},
+    {"id": "EDGE-SUPPORT-REQUIRES-SECURITY", "from": "GAP-COM-SUPPORT-LIFECYCLE", "to": "GAP-SEC-PRIVATE-REPORTING", "relation": "requires", "strength": "HARD", "rationale": "A support lifecycle needs an explicit vulnerability intake path before security expectations are offered."},
+    {"id": "EDGE-SUPPORT-REQUIRES-LICENSE", "from": "GAP-COM-SUPPORT-LIFECYCLE", "to": "GAP-LEGAL-LICENSE-DECISION", "relation": "requires", "strength": "HARD", "rationale": "Commercial support packaging depends on the owner's licensing/distribution model."},
+    {"id": "EDGE-FED-RECEIPTS-REQUIRE-CUSTODY", "from": "GAP-FED-CROSS-REPO-RECEIPTS-134", "to": "GAP-GOV-CUSTODY-ISSUE121", "relation": "requires", "strength": "HARD", "rationale": "Federated receipts need the local custody event model to be closed across execution environments."},
+    {"id": "EDGE-FED-RECEIPTS-REQUIRE-SIGNATURE", "from": "GAP-FED-CROSS-REPO-RECEIPTS-134", "to": "GAP-FED-REAL-SIGNATURES-134", "relation": "requires", "strength": "HARD", "rationale": "The current federated contract references signatures; real aggregate claims require a verifiable signature path or removal of that claim."},
+    {"id": "EDGE-BRIDGE-REQUIRES-PRIVACY", "from": "GAP-INTEG-CROSS-REPO-BRIDGE-298", "to": "GAP-PRIV-IME-DATA-BOUNDARY", "relation": "requires", "strength": "HARD", "rationale": "FlorisBoard integration must enforce the stated default exclusion of typed content."},
+    {"id": "EDGE-BRIDGE-SUPPORTED-BY-FED-RECEIPTS", "from": "GAP-FED-CROSS-REPO-RECEIPTS-134", "to": "GAP-INTEG-CROSS-REPO-BRIDGE-298", "relation": "supports", "strength": "SOFT", "rationale": "A deterministic bridge provides a consumption surface for real cross-repo receipts without replacing source authority."},
+    {"id": "EDGE-EXTERNAL-VALIDATION-REQUIRES-RELEASE", "from": "GAP-COM-EXTERNAL-VALIDATION", "to": "GAP-REL-CURRENT-RELEASE-ASSETS", "relation": "requires", "strength": "HARD", "rationale": "External evaluators need a bounded, downloadable, identified artifact."},
+    {"id": "EDGE-EXTERNAL-VALIDATION-REQUIRES-RUNTIME", "from": "GAP-COM-EXTERNAL-VALIDATION", "to": "GAP-TECH-ANDROID-RUNTIME-L2", "relation": "requires", "strength": "HARD", "rationale": "Claims about Android utility require at least one current physical runtime path before commercial validation is meaningful."},
+    {"id": "EDGE-INDEPENDENT-REPRO-REQUIRES-RELEASE", "from": "GAP-QUAL-INDEPENDENT-REPRODUCTION", "to": "GAP-REL-CURRENT-RELEASE-ASSETS", "relation": "requires", "strength": "HARD", "rationale": "Independent reproduction needs immutable inputs and build instructions."},
+    {"id": "EDGE-COMPLIANCE-REQUIRES-LICENSE", "from": "GAP-COMP-EXTERNAL-ASSESSMENT", "to": "GAP-LEGAL-LICENSE-DECISION", "relation": "requires", "strength": "SOFT", "rationale": "A formal external assessment scope should include legal/IP obligations if commercial distribution is in scope."},
+    {"id": "EDGE-COMPLIANCE-REQUIRES-SECURITY", "from": "GAP-COMP-EXTERNAL-ASSESSMENT", "to": "GAP-SEC-PRIVATE-REPORTING", "relation": "requires", "strength": "SOFT", "rationale": "Security/compliance assessment benefits from an operational vulnerability intake process."},
+    {"id": "EDGE-DOC-SUPPORTS-REPRO", "from": "GAP-DOC-HISTORICAL-CLAIMS", "to": "GAP-QUAL-INDEPENDENT-REPRODUCTION", "relation": "supports", "strength": "SOFT", "rationale": "Removing ambiguity between historical and current claims reduces reproduction drift."},
+    {"id": "EDGE-BRANCH-MITIGATES-RELEASE", "from": "GAP-SEC-BRANCH-PROTECTION-EVIDENCE", "to": "GAP-REL-CURRENT-RELEASE-ASSETS", "relation": "mitigates", "strength": "SOFT", "rationale": "Observable merge controls reduce release provenance risk."},
+    {"id": "EDGE-LICENSE-BLOCKS-COMMERCIAL", "from": "GAP-LEGAL-LICENSE-DECISION", "to": "GAP-COM-EXTERNAL-VALIDATION", "relation": "blocks", "strength": "HARD", "rationale": "Commercial reuse terms remain ambiguous until the owner makes the licensing decision."}
+  ]
+}

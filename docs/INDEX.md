@@ -21,6 +21,7 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 
 | Documento | Função | Estado de uso |
 |---|---|---|
+| [README.md](README.md) | router curto da árvore `docs/` | `CANONICAL_ROUTER` |
 | [AGENTES.md](AGENTES.md) | guia operacional para agentes humanos e IA | `CANONICAL` |
 | [AGENTES_CHECKLIST.md](AGENTES_CHECKLIST.md) | checklist de início, execução e encerramento | `REFERENCE` |
 | [AGENTES_DECISAO_LOG.md](AGENTES_DECISAO_LOG.md) | decisões, conflitos e escalações | `AUDIT` |
@@ -49,6 +50,8 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 
 | Documento | Função |
 |---|---|
+| [OPERATIONAL_GAP_TOPOLOGY_V1.md](OPERATIONAL_GAP_TOPOLOGY_V1.md) | grafo canônico de gaps, urgências, incertezas, owners, proveniência, closures e relações técnico-comerciais |
+| [closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md](closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md) | liga `TOKEN_VAZIO` estruturado ao grafo sem promover gaps materiais a PASS |
 | [REPOSITORY_COMMIT_TRACKER_OMEGA.md](REPOSITORY_COMMIT_TRACKER_OMEGA.md) | rastreamento bounded de repositórios, forks, commits, shards e snapshots |
 | [REPOSITORY_PR_CONTEXT_SIDECAR.md](REPOSITORY_PR_CONTEXT_SIDECAR.md) | sidecar de contexto temporal e semântico dos pull requests |
 | [EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md](EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md) | governança de otimização, fallback e rollback |
@@ -79,17 +82,19 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 | [RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md](RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md) | validação local registrada |
 | [MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md](MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md) | contrato de segmentação e evidência |
 
-## 6. Jurídico, licenças e padrões
+## 6. Jurídico, licenças, segurança e padrões
 
 | Documento | Função |
 |---|---|
 | [MATRIZ_JURIDICO_TECNOLOGICA.md](MATRIZ_JURIDICO_TECNOLOGICA.md) | matriz jurídico-tecnológica |
 | [LICENCAS_COMPARADAS.md](LICENCAS_COMPARADAS.md) | comparação de licenças e termos |
+| [LICENSE_DECISION_RECORD.md](LICENSE_DECISION_RECORD.md) | decisão P0 fail-closed sobre licença, terceiros e redistribuição |
+| [SECURITY.md](../.github/SECURITY.md) | política de disclosure e fronteira explícita do canal privado |
 | [ATRATORES_42_JURIDICOS.md](ATRATORES_42_JURIDICOS.md) | framework de atratores jurídicos |
 | [BASES_SUPRALEGAIS_E_PADROES.md](BASES_SUPRALEGAIS_E_PADROES.md) | bases supralegais e padrões técnicos |
 | [IA_AGENTE_HUMANOS_TECNICO_FORMALIDADE.md](IA_AGENTE_HUMANOS_TECNICO_FORMALIDADE.md) | protocolo IA↔humanos |
 
-> Estes documentos não substituem parecer jurídico profissional.
+> Estes documentos não substituem parecer jurídico profissional, auditoria independente ou certificação normativa.
 
 ## 7. Comunicação, mercado e publicação
 
@@ -130,9 +135,11 @@ python3 -m unittest \
   tests.test_language_matrix \
   tests.test_language_commit_evidence \
   tests.test_repo_commit_tracker \
-  tests.test_repo_pr_context_tracker
+  tests.test_repo_pr_context_tracker \
+  tests.test_operational_gap_topology
 
 python3 scripts/validate_root_file_decisions.py
+python3 scripts/validate_operational_gap_topology.py
 python3 scripts/language_matrix.py --state data/language/language-matrix-state.v1.json
 python3 scripts/language_commit_evidence.py
 python3 scripts/repo_commit_tracker.py --validate-only

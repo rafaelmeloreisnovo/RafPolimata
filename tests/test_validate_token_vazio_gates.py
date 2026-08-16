@@ -34,6 +34,10 @@ class TestTokenVazioValidation(unittest.TestCase):
             "# L2: runtime evidence\nStatus: governed\n",
             encoding="utf-8",
         )
+        (closure_dir / "CLOSURE_L11.md").write_text(
+            "# L11: operational gap topology\nStatus: governed\n",
+            encoding="utf-8",
+        )
 
     def tearDown(self) -> None:
         self.temp_dir.cleanup()
@@ -151,7 +155,6 @@ class TestTokenVazioValidation(unittest.TestCase):
         base = self._commit_baseline()
         (self.repo_root / "changed.md").write_text("baseline\nordinary change\n", encoding="utf-8")
         self._commit_candidate()
-
         validator = TokenVazioValidator(self.repo_root)
         scope = validator.changed_lines_since(base)
         validator.scan_repository(scope)
@@ -163,7 +166,6 @@ class TestTokenVazioValidation(unittest.TestCase):
         base = self._commit_baseline()
         (self.repo_root / "new-gap.md").write_text(f"baseline\nnew={TOKEN}\n", encoding="utf-8")
         self._commit_candidate()
-
         validator = TokenVazioValidator(self.repo_root)
         scope = validator.changed_lines_since(base)
         validator.scope = "changed_lines"
@@ -178,12 +180,30 @@ class TestTokenVazioValidation(unittest.TestCase):
         base = self._commit_baseline()
         test_file.write_text(f"# Governance: CLOSURE_L1\nbaseline\nstate={TOKEN}\n", encoding="utf-8")
         self._commit_candidate()
-
         validator = TokenVazioValidator(self.repo_root)
         scope = validator.changed_lines_since(base)
         errors, warnings = validator.scan_repository(scope)
         self.assertEqual((errors, warnings), (0, 1))
         self.assertEqual(validator.findings[0].closure_file, "CLOSURE_L1")
+
+    def test_structured_topology_path_is_bound_to_l11(self) -> None:
+        topology = self.repo_root / "configs" / "operational-gap-topology.v1.json"
+        topology.parent.mkdir(parents=True)
+        topology.write_text(f'{{"state":"{TOKEN}"}}\n', encoding="utf-8")
+        validator = TokenVazioValidator(self.repo_root)
+        errors, warnings = validator.scan_repository()
+        self.assertEqual((errors, warnings), (0, 1))
+        self.assertEqual(validator.findings[0].closure_file, "CLOSURE_L11")
+
+    def test_structured_topology_binding_fails_if_l11_missing(self) -> None:
+        (self.repo_root / "docs" / "closures" / "CLOSURE_L11.md").unlink()
+        topology = self.repo_root / "configs" / "operational-gap-topology.v1.json"
+        topology.parent.mkdir(parents=True)
+        topology.write_text(f'{{"state":"{TOKEN}"}}\n', encoding="utf-8")
+        validator = TokenVazioValidator(self.repo_root)
+        errors, warnings = validator.scan_repository()
+        self.assertEqual((errors, warnings), (1, 0))
+        self.assertEqual(validator.findings[0].severity, "ERROR")
 
     def test_changed_scope_reports_scope_and_base(self) -> None:
         test_file = self.repo_root / "governed.txt"
@@ -191,7 +211,6 @@ class TestTokenVazioValidation(unittest.TestCase):
         base = self._commit_baseline()
         test_file.write_text(f"CLOSURE_L1\n{TOKEN}\n", encoding="utf-8")
         self._commit_candidate()
-
         validator = TokenVazioValidator(self.repo_root)
         validator.scope = "changed_lines"
         validator.changed_since = base
@@ -211,6 +230,7 @@ class TestTokenVazioValidation(unittest.TestCase):
         validator = TokenVazioValidator(self.repo_root)
         self.assertIn("L1", validator.closure_map)
         self.assertIn("L2", validator.closure_map)
+        self.assertIn("L11", validator.closure_map)
         self.assertNotIn("L0", validator.closure_map)
 
 
