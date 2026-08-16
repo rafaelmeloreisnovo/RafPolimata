@@ -13,10 +13,17 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$ROOT"
 
-COMMIT=$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || echo TOKEN_VAZIO)
+# Closure anchors used by generated evidence receipts. They bind missing
+# provenance/toolchain observations to L1, device/runtime gaps to L2, and
+# ARM64 artifact validation gaps to L3 without promoting them to PASS.
+CLOSURE_PROVENANCE=CLOSURE_L1
+CLOSURE_RUNTIME=CLOSURE_L2
+CLOSURE_ARM64=CLOSURE_L3
+
+COMMIT=$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || echo "TOKEN_VAZIO $CLOSURE_PROVENANCE")
 DATE_UTC=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
 STAMP=$(date -u '+%Y%m%dT%H%M%SZ')
-HOST_ARCH=$(uname -m 2>/dev/null || echo TOKEN_VAZIO)
+HOST_ARCH=$(uname -m 2>/dev/null || echo "TOKEN_VAZIO $CLOSURE_PROVENANCE")
 
 RUNDIR="$ROOT/Apkc/proofs/runs/$STAMP"
 mkdir -p "$RUNDIR"
@@ -25,7 +32,7 @@ HEADER="$RUNDIR/header.txt"
 SUMMARY="$RUNDIR/summary.txt"
 : > "$GATES"
 
-ver(){ command -v "$1" >/dev/null 2>&1 && "$@" 2>&1 | head -1 || echo "$1: TOKEN_VAZIO (ausente)"; }
+ver(){ command -v "$1" >/dev/null 2>&1 && "$@" 2>&1 | head -1 || echo "$1: TOKEN_VAZIO (ausente); $CLOSURE_PROVENANCE"; }
 
 {
   echo '# RafPolimata clean proof run'
@@ -33,6 +40,7 @@ ver(){ command -v "$1" >/dev/null 2>&1 && "$@" 2>&1 | head -1 || echo "$1: TOKEN
   echo "date_utc   : $DATE_UTC"
   echo "host_arch  : $HOST_ARCH"
   echo "run_dir    : $RUNDIR"
+  echo "governance : $CLOSURE_PROVENANCE $CLOSURE_RUNTIME $CLOSURE_ARM64"
   echo '# toolchain versions'
   echo "clang      : $(ver clang --version)"
   echo "gcc        : $(ver gcc --version)"
@@ -64,8 +72,8 @@ if python3 tests/test_apkc_source_cap_patch.py > "$G0LOG" 2>&1 \
    && python3 scripts/patch_apkc_source_cap.py Apkc/apkc.c "$HARD_SRC" >> "$G0LOG" 2>&1 \
    && grep -q 'source exceeds SRC_CAP' "$HARD_SRC" \
    && grep -q 'if (n<0).*source read failed' "$HARD_SRC"; then
-  SRC_SHA=$(sha256sum Apkc/apkc.c 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
-  HARD_SHA=$(sha256sum "$HARD_SRC" 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
+  SRC_SHA=$(sha256sum Apkc/apkc.c 2>/dev/null | cut -d' ' -f1 || echo "TOKEN_VAZIO $CLOSURE_PROVENANCE")
+  HARD_SHA=$(sha256sum "$HARD_SRC" 2>/dev/null | cut -d' ' -f1 || echo "TOKEN_VAZIO $CLOSURE_PROVENANCE")
   {
     echo "source_sha256: $SRC_SHA"
     echo "hardened_sha256: $HARD_SHA"
@@ -103,9 +111,10 @@ if [ "$HARDENED_OK" -eq 1 ] && \
     CLASS=$(readelf -h "$G2OBJ" 2>/dev/null | sed -n 's/.*Class:[[:space:]]*//p' | head -1)
     MACH=$(readelf -h "$G2OBJ" 2>/dev/null | sed -n 's/.*Machine:[[:space:]]*//p' | head -1)
   else
-    CLASS=TOKEN_VAZIO; MACH=TOKEN_VAZIO
+    CLASS="TOKEN_VAZIO $CLOSURE_ARM64"
+    MACH="TOKEN_VAZIO $CLOSURE_ARM64"
   fi
-  SHA=$(sha256sum "$G2OBJ" 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
+  SHA=$(sha256sum "$G2OBJ" 2>/dev/null | cut -d' ' -f1 || echo "TOKEN_VAZIO $CLOSURE_PROVENANCE")
   echo "sha256: $SHA" >> "$G2LOG"
   gate cross-object-a64 PASS "hardened source Class=$CLASS Machine=$MACH sha256=$SHA"
 else
@@ -146,19 +155,19 @@ fi
 # --- Gate 6: actual APK generation by running apkc --------------------------
 # apkc is freestanding ARM64 code; it is not runnable on this x86 host.
 G6LOG="$RUNDIR/g6_apk_generation.txt"
-echo 'TOKEN_VAZIO: hardened apkc is freestanding ARM64, not runnable on x86 host; needs ARM/Termux/qemu.' > "$G6LOG"
-gate apk-generation TOKEN_VAZIO 'requires ARM/Termux/qemu/device -> g6_apk_generation.txt'
+echo "TOKEN_VAZIO: hardened apkc is freestanding ARM64, not runnable on x86 host; needs ARM/Termux/qemu. $CLOSURE_RUNTIME $CLOSURE_ARM64" > "$G6LOG"
+gate apk-generation TOKEN_VAZIO "requires ARM/Termux/qemu/device -> g6_apk_generation.txt; $CLOSURE_RUNTIME $CLOSURE_ARM64"
 
 # --- summary / global fail-closed -------------------------------------------
 {
   echo "commit_sha : $COMMIT"
   echo "date_utc   : $DATE_UTC"
   echo "host_arch  : $HOST_ARCH"
-  echo "clean-proof-run: $PASS PASS, $FAIL FAIL, $TOKV TOKEN_VAZIO"
+  echo "clean-proof-run: $PASS PASS, $FAIL FAIL, $TOKV TOKEN_VAZIO [$CLOSURE_RUNTIME $CLOSURE_ARM64]"
 } > "$SUMMARY"
 
 echo "run_dir: $RUNDIR"
-echo "clean-proof-run: $PASS PASS, $FAIL FAIL, $TOKV TOKEN_VAZIO"
+echo "clean-proof-run: $PASS PASS, $FAIL FAIL, $TOKV TOKEN_VAZIO [$CLOSURE_RUNTIME $CLOSURE_ARM64]"
 
 # A host-tractable FAIL is a failing proof run. TOKEN_VAZIO remains auditable
 # but does not masquerade as failure or PASS.

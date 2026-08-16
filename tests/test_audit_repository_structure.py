@@ -63,6 +63,31 @@ class RepositoryStructureAuditTests(unittest.TestCase):
         finally:
             td.cleanup()
 
+    def test_code_fence_markdown_like_syntax_is_not_a_link(self) -> None:
+        td, root, _ = self.make_repo()
+        try:
+            (root / "docs/guide.md").write_text(
+                "# Guide\n```text\nidentity[Int](42)\nidentity[String](\"hi\")\n```\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(AUDIT.broken_markdown_links(root), [])
+        finally:
+            td.cleanup()
+
+    def test_real_link_after_code_fence_is_still_validated(self) -> None:
+        td, root, _ = self.make_repo()
+        try:
+            (root / "docs/guide.md").write_text(
+                "```text\nidentity[Int](42)\n```\n[Missing](missing.md)\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                AUDIT.broken_markdown_links(root),
+                ["docs/guide.md -> missing.md"],
+            )
+        finally:
+            td.cleanup()
+
     def test_report_separates_blocker_from_review(self) -> None:
         td, root, policy = self.make_repo()
         try:

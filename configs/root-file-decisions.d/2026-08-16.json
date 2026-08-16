@@ -1,0 +1,60 @@
+{
+  "schema": "raf.root-file-decisions.v1",
+  "version": "1.0.0+2026-08-16",
+  "date": "2026-08-16",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "mode": "APPEND_ONLY_SUPPLEMENT",
+  "decisions": [
+    {
+      "path": "AGENTS.md",
+      "git_blob_sha": "38c13f6e6dc4fe4518cd098176201c2aa65ae194",
+      "kind": "repository-agent-router",
+      "content_state": "ACTIVE_CANONICAL_GOVERNANCE",
+      "evidence_state": "IMPLEMENTATION_LINKED",
+      "route": "KEEP_AT_ROOT",
+      "target": "AGENTS.md",
+      "area": "automation",
+      "owner_role": "repository-governance",
+      "risk": "LOW",
+      "findings": [
+        "é o ponto curto de entrada repository-wide para agentes de código",
+        "encaminha explicitamente para docs/AGENTES.md, README.md e docs/INDEX.md",
+        "preserva a separação conceito implementação execução evidência claim",
+        "a posição na raiz é funcional para descoberta automática por agentes"
+      ],
+      "required_gates": [
+        "manter referência válida para docs/AGENTES.md",
+        "manter coerência com adapters Copilot Claude Codex e ChatGPT",
+        "revisar qualquer mudança de política antes de atualizar este hash"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    },
+    {
+      "path": "PHASES_49_50_COMPLETION_SUMMARY.md",
+      "git_blob_sha": "d128a78a56aeabe9f6db2e1ce63fa5f5f7ddc89a",
+      "kind": "completion-claim-summary",
+      "content_state": "HISTORICAL_CLAIM_DOCUMENT_REVIEW_REQUIRED",
+      "evidence_state": "MIXED_CLAIMS_NEED_RECONCILIATION",
+      "route": "MOVE_PROPOSED",
+      "target": "docs/archive/PHASES_49_50_COMPLETION_SUMMARY.md",
+      "area": "documentation",
+      "owner_role": "documentation-governance",
+      "risk": "HIGH",
+      "findings": [
+        "declara production readiness e 50 fases completas sem ser por si só receipt de execução",
+        "declara arquitetura sem libc de forma ampla enquanto o repositório atual possui rota hosted x86 explicitamente guardada",
+        "contagens de linguagens testes linhas e passes são claims temporais que precisam ser reconciliados com artefatos atuais",
+        "deve permanecer como registro histórico até revisão claim-evidence em PR dedicado"
+      ],
+      "required_gates": [
+        "mapear cada claim quantitativo para teste receipt commit ou TOKEN_VAZIO sob CLOSURE_L1",
+        "separar resultado histórico de estado operacional atual",
+        "reconciliar linguagem freestanding com a distinção target ARM versus hosted x86",
+        "mover somente em PR documental dedicado preservando histórico e atualizando referências"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    }
+  ]
+}

@@ -18,6 +18,7 @@ DEFAULT_DEPTH = 5
 DEFAULT_POLICY = "configs/document-governance.v1.json"
 IGNORED_DIRS = {".git", "__pycache__", "build_host_check", "node_modules", ".gradle", ".idea"}
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)\s]+)(?:\s+['\"][^'\"]*['\"])?\)")
+FENCED_CODE = re.compile(r"(?ms)^[ \t]*(```+|~~~+)[^\n]*\n.*?^[ \t]*\1[ \t]*$")
 
 
 @dataclass(frozen=True)
@@ -144,6 +145,16 @@ def markdown_files(root: Path) -> list[Path]:
     return sorted(set(files), key=lambda path: rel(root, path).casefold())
 
 
+def markdown_link_text(text: str) -> str:
+    """Return Markdown prose eligible for link validation.
+
+    Fenced code is executable/example content, not Markdown navigation. Keeping
+    it in the link regex misclassifies expressions such as `identity[Int](42)`
+    as a local link to a file named `42`.
+    """
+    return FENCED_CODE.sub("", text)
+
+
 def broken_markdown_links(root: Path) -> list[str]:
     broken: list[str] = []
     for path in markdown_files(root):
@@ -151,7 +162,7 @@ def broken_markdown_links(root: Path) -> list[str]:
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        for target in MARKDOWN_LINK.findall(text):
+        for target in MARKDOWN_LINK.findall(markdown_link_text(text)):
             if local_target_status(root, path, target) == "missing":
                 broken.append(f"{rel(root, path)} -> {target}")
     return sorted(set(broken))
