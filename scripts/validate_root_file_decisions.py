@@ -3,6 +3,10 @@
 
 A regra é fechada: todo arquivo versionado na raiz que não pertence à política
 canônica/prefixos deve possuir decisão explícita. O validador não move nem apaga.
+
+O manifesto V1 principal permanece imutável quando possível. Decisões novas podem
+ser anexadas em ``configs/root-file-decisions.d/*.json``; o carregamento é
+lexicograficamente determinístico e rejeita paths duplicados no bundle final.
 """
 from __future__ import annotations
 
@@ -15,6 +19,7 @@ from typing import Any
 
 POLICY_SCHEMA = "raf.document-governance-policy.v1"
 DECISION_SCHEMA = "raf.root-file-decisions.v1"
+DEFAULT_SUPPLEMENT_DIR = "configs/root-file-decisions.d"
 ROUTES = {
     "MOVE_PROPOSED",
     "ARCHIVE_PROPOSED",
@@ -38,6 +43,34 @@ def load_json(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise SystemExit(f"root-decisions: objeto JSON esperado em {path}")
     return value
+
+
+def load_manifest_bundle(root: Path, primary: Path, supplement_dir: Path | None = None) -> dict[str, Any]:
+    """Load primary + append-only supplements in deterministic path order."""
+    base = load_json(primary)
+    if base.get("schema") != DECISION_SCHEMA:
+        raise SystemExit("root-decisions: schema do manifesto principal incompatível")
+    decisions = list(base.get("decisions", []))
+    sources = [primary.relative_to(root).as_posix() if primary.is_relative_to(root) else str(primary)]
+
+    directory = supplement_dir or (root / DEFAULT_SUPPLEMENT_DIR)
+    if not directory.is_absolute():
+        directory = root / directory
+    if directory.is_dir():
+        for path in sorted(directory.glob("*.json"), key=lambda item: item.name.casefold()):
+            supplement = load_json(path)
+            if supplement.get("schema") != DECISION_SCHEMA:
+                raise SystemExit(f"root-decisions: schema incompatível em suplemento {path}")
+            extra = supplement.get("decisions", [])
+            if not isinstance(extra, list):
+                raise SystemExit(f"root-decisions: decisions deve ser lista em suplemento {path}")
+            decisions.extend(extra)
+            sources.append(path.relative_to(root).as_posix())
+
+    merged = dict(base)
+    merged["decisions"] = decisions
+    merged["bundle_sources"] = sources
+    return merged
 
 
 def git_paths(root: Path) -> list[str]:
@@ -176,6 +209,7 @@ def validate(root: Path, policy: dict[str, Any], manifest: dict[str, Any]) -> di
         "schema": "raf.root-file-decisions-validation.v1",
         "state": state,
         "claim_allowed": state == "PASS",
+        "bundle_sources": manifest.get("bundle_sources", []),
         "summary": {
             "tracked_files": len(tracked),
             "loose_root_files": len(loose),
@@ -200,18 +234,23 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--policy", default="configs/document-governance.v1.json")
     parser.add_argument("--manifest", default="configs/root-file-decisions.v1.json")
+    parser.add_argument("--supplement-dir", default=DEFAULT_SUPPLEMENT_DIR)
     parser.add_argument("--write", type=Path)
     args = parser.parse_args(argv)
 
     root = args.root.resolve()
     policy_path = Path(args.policy)
     manifest_path = Path(args.manifest)
+    supplement_dir = Path(args.supplement_dir)
     if not policy_path.is_absolute():
         policy_path = root / policy_path
     if not manifest_path.is_absolute():
         manifest_path = root / manifest_path
+    if not supplement_dir.is_absolute():
+        supplement_dir = root / supplement_dir
 
-    report = validate(root, load_json(policy_path), load_json(manifest_path))
+    manifest = load_manifest_bundle(root, manifest_path, supplement_dir)
+    report = validate(root, load_json(policy_path), manifest)
     payload = json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
     if args.write:
         target = args.write if args.write.is_absolute() else root / args.write
