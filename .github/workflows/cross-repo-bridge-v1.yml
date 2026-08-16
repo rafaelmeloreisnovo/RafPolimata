@@ -1,0 +1,82 @@
+name: Cross Repo Bridge V1
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "schemas/cross_repo_artifact_ref.v1.json"
+      - "scripts/cross_repo_bridge_v1.py"
+      - "tests/test_cross_repo_bridge_v1.py"
+      - "docs/CROSS_REPO_BRIDGE_V1.md"
+      - ".github/workflows/cross-repo-bridge-v1.yml"
+  pull_request:
+    paths:
+      - "schemas/cross_repo_artifact_ref.v1.json"
+      - "scripts/cross_repo_bridge_v1.py"
+      - "tests/test_cross_repo_bridge_v1.py"
+      - "docs/CROSS_REPO_BRIDGE_V1.md"
+      - ".github/workflows/cross-repo-bridge-v1.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cross-repo-bridge-v1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-cross-repo-bridge-v1:
+    name: validate-cross-repo-bridge-v1
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate schema JSON
+        run: python3 -m json.tool schemas/cross_repo_artifact_ref.v1.json >/dev/null
+
+      - name: Run bridge regression tests
+        run: python3 -m unittest -v tests.test_cross_repo_bridge_v1
+
+      - name: Produce deterministic fixture receipt
+        run: |
+          mkdir -p ci/reports/cross-repo-bridge
+          cat > ci/reports/cross-repo-bridge/fixture.jsonl <<'EOF'
+          {"schema":"raf.cross_repo_artifact_ref.v1","repo":"rafaelmeloreisnovo/RafGitTools","path":"receipts/reference.json","commit_sha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","content_hash":"sha256:1111111111111111111111111111111111111111111111111111111111111111","media_type":"application/json","provenance_state":"REFERENCE","artifact_kind":"receipt","claim_allowed":false,"producer":"RafGitTools"}
+          {"schema":"raf.cross_repo_artifact_ref.v1","repo":"rafaelmeloreisnovo/florisboard","path":"app/build.gradle.kts","commit_sha":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","content_hash":"sha256:2222222222222222222222222222222222222222222222222222222222222222","media_type":"text/plain","provenance_state":"REFERENCE","artifact_kind":"build","claim_allowed":false,"producer":"florisboard","relation_hints":[{"relation":"observed_in","target_content_hash":"sha256:1111111111111111111111111111111111111111111111111111111111111111"}]}
+          EOF
+          python3 scripts/cross_repo_bridge_v1.py \
+            ci/reports/cross-repo-bridge/fixture.jsonl \
+            --output ci/reports/cross-repo-bridge/graph.json \
+            --receipt ci/reports/cross-repo-bridge/receipt.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          graph = json.loads(Path('ci/reports/cross-repo-bridge/graph.json').read_text())
+          receipt = json.loads(Path('ci/reports/cross-repo-bridge/receipt.json').read_text())
+          assert graph['schema'] == 'raf.cross_repo_bridge.v1'
+          assert graph['privacy_boundary'] == 'METADATA_ALLOWLIST_NO_TYPED_CONTENT'
+          assert len(graph['nodes']) == 2
+          assert len(graph['edges']) == 1
+          assert receipt['claim_allowed'] is False
+          print(receipt['graph_hash'])
+          PY
+
+      - name: Privacy negative fixture must fail
+        run: |
+          set +e
+          printf '%s\n' '{"schema":"raf.cross_repo_artifact_ref.v1","repo":"rafaelmeloreisnovo/florisboard","path":"ime","commit_sha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","content_hash":"sha256:1111111111111111111111111111111111111111111111111111111111111111","media_type":"application/json","provenance_state":"REFERENCE","artifact_kind":"runtime","claim_allowed":false,"typed_text":"must-not-cross"}' | \
+            python3 scripts/cross_repo_bridge_v1.py - >/tmp/bridge.out 2>/tmp/bridge.err
+          rc=$?
+          set -e
+          test "$rc" -ne 0
+          grep -q 'privacy allowlist' /tmp/bridge.err
+
+      - name: Upload bridge receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-repo-bridge-v1-${{ github.run_id }}
+          path: ci/reports/cross-repo-bridge/
+          if-no-files-found: error
