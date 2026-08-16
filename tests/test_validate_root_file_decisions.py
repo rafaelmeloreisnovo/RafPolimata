@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -25,15 +27,15 @@ class RootFileDecisionTests(unittest.TestCase):
             }
         }
 
-    def valid_decision(self) -> dict:
+    def valid_decision(self, path: str = "loose.txt") -> dict:
         return {
-            "path": "loose.txt",
+            "path": path,
             "git_blob_sha": "a" * 40,
             "kind": "documentation",
             "content_state": "REFERENCE",
             "evidence_state": "PENDING",
             "route": "MOVE_PROPOSED",
-            "target": "docs/archive/loose.txt",
+            "target": f"docs/archive/{path}",
             "area": "documentation",
             "owner_role": "documentation-governance",
             "risk": "MEDIUM",
@@ -76,6 +78,52 @@ class RootFileDecisionTests(unittest.TestCase):
         decision["route"] = "DELETE_NOW"
         errors = MOD.validate_decision(decision)
         self.assertTrue(any("route inválida" in item for item in errors))
+
+    def test_manifest_bundle_appends_supplements_deterministically(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            configs = root / "configs"
+            supplements = configs / "root-file-decisions.d"
+            supplements.mkdir(parents=True)
+            primary = configs / "root-file-decisions.v1.json"
+            primary.write_text(
+                json.dumps({"schema": MOD.DECISION_SCHEMA, "decisions": [self.valid_decision("a.txt")]}),
+                encoding="utf-8",
+            )
+            (supplements / "20.json").write_text(
+                json.dumps({"schema": MOD.DECISION_SCHEMA, "decisions": [self.valid_decision("c.txt")]}),
+                encoding="utf-8",
+            )
+            (supplements / "10.json").write_text(
+                json.dumps({"schema": MOD.DECISION_SCHEMA, "decisions": [self.valid_decision("b.txt")]}),
+                encoding="utf-8",
+            )
+            bundle = MOD.load_manifest_bundle(root, primary, supplements)
+            self.assertEqual([d["path"] for d in bundle["decisions"]], ["a.txt", "b.txt", "c.txt"])
+            self.assertEqual(
+                bundle["bundle_sources"],
+                [
+                    "configs/root-file-decisions.v1.json",
+                    "configs/root-file-decisions.d/10.json",
+                    "configs/root-file-decisions.d/20.json",
+                ],
+            )
+
+    def test_manifest_bundle_rejects_bad_supplement_schema(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            configs = root / "configs"
+            supplements = configs / "root-file-decisions.d"
+            supplements.mkdir(parents=True)
+            primary = configs / "root-file-decisions.v1.json"
+            primary.write_text(
+                json.dumps({"schema": MOD.DECISION_SCHEMA, "decisions": []}), encoding="utf-8"
+            )
+            (supplements / "bad.json").write_text(
+                json.dumps({"schema": "wrong", "decisions": []}), encoding="utf-8"
+            )
+            with self.assertRaises(SystemExit):
+                MOD.load_manifest_bundle(root, primary, supplements)
 
 
 if __name__ == "__main__":
