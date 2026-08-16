@@ -48,7 +48,7 @@
         "deve permanecer como registro histórico até revisão claim-evidence em PR dedicado"
       ],
       "required_gates": [
-        "mapear cada claim quantitativo para teste receipt commit ou TOKEN_VAZIO",
+        "mapear cada claim quantitativo para teste receipt commit ou TOKEN_VAZIO sob CLOSURE_L1",
         "separar resultado histórico de estado operacional atual",
         "reconciliar linguagem freestanding com a distinção target ARM versus hosted x86",
         "mover somente em PR documental dedicado preservando histórico e atualizando referências"
