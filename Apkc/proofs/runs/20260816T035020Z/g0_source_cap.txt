@@ -1,0 +1,5 @@
+PASS source-cap transformer: exact anchor + overflow probe + read-error guard
+source_sha256: 7493954e03fc3e6f42247f4f9f70bf945ddf9838e49b4cb39736408ea82c62a9
+hardened_sha256: bc940f5a9ce47f26fde600713e90ac83b07215089238af02339fcc26cc540025
+guard: source exceeds SRC_CAP
+legacy_anchor_present: no

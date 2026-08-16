@@ -63,7 +63,7 @@ HARDENED_OK=0
 if python3 tests/test_apkc_source_cap_patch.py > "$G0LOG" 2>&1 \
    && python3 scripts/patch_apkc_source_cap.py Apkc/apkc.c "$HARD_SRC" >> "$G0LOG" 2>&1 \
    && grep -q 'source exceeds SRC_CAP' "$HARD_SRC" \
-   && ! grep -Fq 'if (n<=0) break;' "$HARD_SRC"; then
+   && grep -q 'if (n<0).*source read failed' "$HARD_SRC"; then
   SRC_SHA=$(sha256sum Apkc/apkc.c 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
   HARD_SHA=$(sha256sum "$HARD_SRC" 2>/dev/null | cut -d' ' -f1 || echo TOKEN_VAZIO)
   {
