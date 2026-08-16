@@ -28,10 +28,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout
+      - name: Checkout exact subject commit
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Verify checkout identity
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          ACTUAL_SHA="$(git rev-parse HEAD)"
+          test "$ACTUAL_SHA" = "$EXPECTED_SHA"
+          printf 'subject_commit=%s\n' "$ACTUAL_SHA"
 
       - name: Run source SBOM regression tests
         run: python3 -m unittest -v tests.test_generate_source_sbom_v1
@@ -54,21 +64,26 @@ jobs:
           cmp ci/reports/source-sbom/license-evidence.json /tmp/source-sbom-second/license-evidence.json
           cmp ci/reports/source-sbom/receipt.json /tmp/source-sbom-second/receipt.json
 
-      - name: Enforce source-only claim boundary
+      - name: Enforce source-only claim boundary and subject identity
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           python3 - <<'PY'
           import json
+          import os
           from pathlib import Path
           bom = json.loads(Path('ci/reports/source-sbom/bom.cdx.json').read_text())
           lic = json.loads(Path('ci/reports/source-sbom/license-evidence.json').read_text())
           receipt = json.loads(Path('ci/reports/source-sbom/receipt.json').read_text())
           assert bom['bomFormat'] == 'CycloneDX'
           assert bom['specVersion'] == '1.7'
+          assert receipt['repository_commit'] == os.environ['EXPECTED_SHA']
           assert receipt['scope'] == 'SOURCE_INVENTORY_ONLY'
           assert receipt['claim_allowed'] is False
           assert lic['claim_allowed'] is False
           assert receipt['tracked_file_count'] == len(bom['components'])
           print(json.dumps({
+              'repository_commit': receipt['repository_commit'],
               'tracked_file_count': receipt['tracked_file_count'],
               'tracked_bytes': receipt['tracked_bytes'],
               'source_set_hash': receipt['source_set_hash'],
