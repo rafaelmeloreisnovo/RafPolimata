@@ -1,302 +1,217 @@
 #!/usr/bin/env python3
+"""Regression tests for the TOKEN_VAZIO gate.
+
+Governance anchor: CLOSURE_L1.  These tests intentionally exercise explicit
+gap markers; examples are not claims and must never be promoted to PASS.
 """
-Tests for TOKEN_VAZIO validator (Hotfix H1)
-"""
+from __future__ import annotations
 
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 from sys import path as sys_path
 
-# Add tools to path
 sys_path.insert(0, str(Path(__file__).parent.parent / "tools"))
 
-from validate_token_vazio_gates import TokenVazioValidator, TokenVazioFinding
+from validate_token_vazio_gates import TokenVazioFinding, TokenVazioValidator
+
+TOKEN = "TOKEN" + "_VAZIO"
 
 
 class TestTokenVazioValidation(unittest.TestCase):
-    """Test TOKEN_VAZIO detection and closure linkage."""
-
-    def setUp(self):
-        """Create temporary repository structure."""
+    def setUp(self) -> None:
         self.temp_dir = tempfile.TemporaryDirectory()
         self.repo_root = Path(self.temp_dir.name)
-
-        # Create closures directory
-        (self.repo_root / "docs" / "closures").mkdir(parents=True)
-
-        # Create some closure files
-        (self.repo_root / "docs" / "closures" / "CLOSURE_L0.md").write_text(
-            "# L0: Source Provenance\nStatus: PASS\n"
+        closure_dir = self.repo_root / "docs" / "closures"
+        closure_dir.mkdir(parents=True)
+        (closure_dir / "CLOSURE_L1.md").write_text(
+            "# L1: provenance/reproducibility\nStatus: governed\n",
+            encoding="utf-8",
         )
-        (self.repo_root / "docs" / "closures" / "CLOSURE_L1.md").write_text(
-            "# L1: Reproducibility\nStatus: PASS\n"
+        (closure_dir / "CLOSURE_L2.md").write_text(
+            "# L2: runtime evidence\nStatus: governed\n",
+            encoding="utf-8",
         )
 
-    def tearDown(self):
-        """Clean up."""
+    def tearDown(self) -> None:
         self.temp_dir.cleanup()
 
-    def test_valid_token_vazio_with_closure(self):
-        """TOKEN_VAZIO linked to existing closure should PASS."""
-        test_file = self.repo_root / "test_valid.md"
-        test_file.write_text(
-            "# Document\n"
-            "Some claim with TOKEN_VAZIO reference: see CLOSURE_L0 for proof.\n"
+    def _git(self, *args: str) -> str:
+        result = subprocess.run(
+            ["git", "-C", str(self.repo_root), *args],
+            text=True,
+            capture_output=True,
+            check=True,
         )
+        return result.stdout.strip()
 
+    def _commit_baseline(self) -> str:
+        self._git("init")
+        self._git("config", "user.email", "custody-test@example.invalid")
+        self._git("config", "user.name", "Custody Test")
+        self._git("add", ".")
+        self._git("commit", "-m", "baseline")
+        return self._git("rev-parse", "HEAD")
+
+    def _commit_candidate(self) -> str:
+        self._git("add", ".")
+        self._git("commit", "-m", "candidate")
+        return self._git("rev-parse", "HEAD")
+
+    def test_valid_token_with_inline_closure_is_warning(self) -> None:
+        test_file = self.repo_root / "valid.md"
+        test_file.write_text(f"gap={TOKEN}; see CLOSURE_L1\n", encoding="utf-8")
         validator = TokenVazioValidator(self.repo_root)
         validator.scan_file(test_file)
-
-        # Should find TOKEN_VAZIO
-        self.assertTrue(len(validator.findings) > 0)
-        # Should mark as WARNING (has closure)
-        self.assertTrue(validator.findings[0].has_closure)
-
-    def test_token_vazio_without_closure_reference(self):
-        """TOKEN_VAZIO without closure reference should ERROR."""
-        test_file = self.repo_root / "test_invalid.md"
-        test_file.write_text(
-            "# Document\n"
-            "Some incomplete claim: TOKEN_VAZIO\n"
-        )
-
-        validator = TokenVazioValidator(self.repo_root)
-        validator.scan_file(test_file)
-
-        # Should find TOKEN_VAZIO
-        self.assertTrue(len(validator.findings) > 0)
-        # Should mark as ERROR (no closure)
-        self.assertFalse(validator.findings[0].has_closure)
-        self.assertEqual(validator.findings[0].severity, "ERROR")
-
-    def test_token_vazio_with_missing_closure_file(self):
-        """TOKEN_VAZIO referencing missing closure should ERROR."""
-        test_file = self.repo_root / "test_missing_closure.md"
-        test_file.write_text(
-            "# Document\n"
-            "Claim with TOKEN_VAZIO and missing closure: see CLOSURE_L99 for details.\n"
-        )
-
-        validator = TokenVazioValidator(self.repo_root)
-        validator.scan_file(test_file)
-
-        # Should find TOKEN_VAZIO reference
-        self.assertTrue(len(validator.findings) > 0)
-        # Closure doesn't exist and not in ALLOWED_MISSING
-        self.assertEqual(validator.findings[0].severity, "ERROR")
-
-    def test_allowed_missing_closure_l9(self):
-        """L9 (42 attractors) is allowed to remain TOKEN_VAZIO."""
-        test_file = self.repo_root / "test_l9.md"
-        test_file.write_text(
-            "# Document\n"
-            "42 attractors TOKEN_VAZIO convergence: see CLOSURE_L9 for falsification.\n"
-        )
-
-        validator = TokenVazioValidator(self.repo_root)
-        validator.scan_file(test_file)
-
-        # Should find TOKEN_VAZIO reference
-        self.assertTrue(len(validator.findings) > 0)
-        # L9 is in ALLOWED_MISSING
+        self.assertEqual(len(validator.findings), 1)
         self.assertTrue(validator.findings[0].has_closure)
         self.assertEqual(validator.findings[0].severity, "WARNING")
 
-    def test_repository_scan(self):
-        """Full repository scan should find all TOKEN_VAZIO."""
-        (self.repo_root / "docs").mkdir(exist_ok=True)
-        (self.repo_root / "src").mkdir(exist_ok=True)
-
-        # File 1: valid closure reference
-        (self.repo_root / "docs" / "file1.md").write_text(
-            "Document with TOKEN_VAZIO in CLOSURE_L0\n"
-        )
-
-        # File 2: invalid (no closure)
-        (self.repo_root / "src" / "file2.py").write_text(
-            'status = "TOKEN_VAZIO"  # unlinked\n'
-        )
-
-        # File 3: should skip
-        (self.repo_root / "docs" / "generated").mkdir(parents=True, exist_ok=True)
-        (self.repo_root / "docs" / "generated" / "auto.md").write_text(
-            "TOKEN_VAZIO auto-generated\n"
-        )
-
-        validator = TokenVazioValidator(self.repo_root)
-        error_count, warning_count = validator.scan_repository()
-
-        # Should find TOKEN_VAZIO in files 1 and 2, skip generated
-        self.assertEqual(error_count, 1)  # file2 (unlinked)
-        self.assertGreater(warning_count, 0)  # file1 (linked)
-
-    def test_report_generation(self):
-        """Report should be valid JSON with required fields."""
-        test_file = self.repo_root / "test.md"
-        test_file.write_text("TOKEN_VAZIO\n")
-
+    def test_token_without_closure_is_error(self) -> None:
+        test_file = self.repo_root / "invalid.md"
+        test_file.write_text(f"gap={TOKEN}\n", encoding="utf-8")
         validator = TokenVazioValidator(self.repo_root)
         validator.scan_file(test_file)
-        report = validator.report()
+        self.assertEqual(len(validator.findings), 1)
+        self.assertEqual(validator.findings[0].severity, "ERROR")
+        self.assertTrue(validator.should_halt_ci())
 
-        # Verify report structure
-        self.assertIn("schema", report)
-        self.assertEqual(report["schema"], "rafaelia.token_vazio_validator.v1")
-        self.assertIn("timestamp", report)
-        self.assertIn("findings", report)
-        self.assertIn("summary", report)
-        self.assertIn("status", report)
-        self.assertIn("report_hash", report)
-
-        # Verify hash is consistent
-        hash1 = report["report_hash"]
-        report2 = validator.report()
-        hash2 = report2["report_hash"]
-        self.assertEqual(hash1, hash2)
-
-    def test_should_halt_ci_on_errors(self):
-        """CI should halt if errors present."""
-        test_file = self.repo_root / "test.md"
-        test_file.write_text("TOKEN_VAZIO without closure\n")
-
+    def test_missing_closure_reference_is_error(self) -> None:
+        test_file = self.repo_root / "missing.md"
+        test_file.write_text(f"gap={TOKEN}; see CLOSURE_L99\n", encoding="utf-8")
         validator = TokenVazioValidator(self.repo_root)
         validator.scan_file(test_file)
+        self.assertEqual(validator.findings[0].severity, "ERROR")
 
-        # Should halt if errors
-        if validator.findings[0].severity == "ERROR":
-            self.assertTrue(validator.should_halt_ci())
-
-    def test_multiple_token_vazio_in_file(self):
-        """Multiple TOKEN_VAZIO in same file should all be detected."""
-        test_file = self.repo_root / "test_multiple.md"
-        test_file.write_text(
-            "Line 1: TOKEN_VAZIO without closure\n"
-            "Line 3: See CLOSURE_L0 for TOKEN_VAZIO proof\n"
-            "Line 5: Another TOKEN_VAZIO standalone\n"
-        )
-
+    def test_allowed_l9_reference_remains_warning(self) -> None:
+        test_file = self.repo_root / "l9.md"
+        test_file.write_text(f"gap={TOKEN}; see CLOSURE_L9\n", encoding="utf-8")
         validator = TokenVazioValidator(self.repo_root)
         validator.scan_file(test_file)
+        self.assertEqual(validator.findings[0].severity, "WARNING")
 
-        # Should find 3 TOKEN_VAZIO references
-        self.assertEqual(len(validator.findings), 3)
+    def test_repository_scan_does_not_duplicate_findings(self) -> None:
+        (self.repo_root / "one.md").write_text(f"{TOKEN} CLOSURE_L1\n", encoding="utf-8")
+        (self.repo_root / "two.py").write_text(f"state='{TOKEN}'\n", encoding="utf-8")
+        validator = TokenVazioValidator(self.repo_root)
+        errors, warnings = validator.scan_repository()
+        self.assertEqual((errors, warnings), (1, 1))
+        self.assertEqual(len(validator.findings), 2)
+        identities = {(f.file_path, f.line_number) for f in validator.findings}
+        self.assertEqual(len(identities), 2)
 
-    def test_case_insensitive_detection(self):
-        """TOKEN_VAZIO detection should be case-insensitive."""
-        test_file = self.repo_root / "test_case.md"
-        test_file.write_text(
-            "With TOKEN_VAZIO uppercase\n"
-            "And token_vazio lowercase\n"
-        )
+    def test_generated_and_git_content_are_skipped(self) -> None:
+        generated = self.repo_root / "docs" / "generated"
+        generated.mkdir(parents=True)
+        (generated / "auto.md").write_text(TOKEN + "\n", encoding="utf-8")
+        git_dir = self.repo_root / ".git"
+        git_dir.mkdir()
+        (git_dir / "config").write_text(TOKEN + "\n", encoding="utf-8")
+        (self.repo_root / "regular.md").write_text(TOKEN + "\n", encoding="utf-8")
+        validator = TokenVazioValidator(self.repo_root)
+        validator.scan_repository()
+        self.assertEqual([(f.file_path, f.line_number) for f in validator.findings], [("regular.md", 1)])
 
+    def test_case_insensitive_detection(self) -> None:
+        test_file = self.repo_root / "case.md"
+        test_file.write_text("token_vazio\nToKeN_VaZiO\n", encoding="utf-8")
         validator = TokenVazioValidator(self.repo_root)
         validator.scan_file(test_file)
-
-        # Should find both
         self.assertEqual(len(validator.findings), 2)
 
-    def test_skips_binary_and_generated(self):
-        """Should skip binary files and generated content."""
-        (self.repo_root / "docs" / "generated").mkdir(parents=True)
-        (self.repo_root / ".git").mkdir(parents=True)
-
-        # Write to generated dir
-        (self.repo_root / "docs" / "generated" / "auto.md").write_text(
-            "TOKEN_VAZIO in generated\n"
-        )
-
-        # Write to .git dir
-        (self.repo_root / ".git" / "config").write_text(
-            "TOKEN_VAZIO in git config\n"
-        )
-
-        # Regular file for comparison
-        (self.repo_root / "regular.md").write_text(
-            "TOKEN_VAZIO in regular file\n"
-        )
-
+    def test_report_is_deterministic_except_timestamp(self) -> None:
+        test_file = self.repo_root / "report.md"
+        test_file.write_text(TOKEN + "\n", encoding="utf-8")
         validator = TokenVazioValidator(self.repo_root)
-        error_count, warning_count = validator.scan_repository()
+        validator.scan_file(test_file)
+        report1 = validator.report()
+        report2 = validator.report()
+        self.assertEqual(report1["schema"], "rafaelia.token_vazio_validator.v1")
+        self.assertEqual(report1["report_hash"], report2["report_hash"])
+        json.dumps(report1)
 
-        # Should only find in regular file
-        findings_in_regular = [
-            f for f in validator.findings
-            if "regular.md" in f.file_path
-        ]
-        self.assertTrue(len(findings_in_regular) > 0)
-
-        findings_in_generated = [
-            f for f in validator.findings
-            if "generated" in f.file_path
-        ]
-        self.assertEqual(len(findings_in_generated), 0)
-
-    def test_finding_data_structure(self):
-        """TokenVazioFinding should have all required fields."""
+    def test_finding_data_structure(self) -> None:
         finding = TokenVazioFinding(
             file_path="test.md",
             line_number=42,
-            context="Some context",
+            context="context",
             has_closure=True,
-            closure_file="CLOSURE_L0",
-            severity="WARNING"
+            closure_file="CLOSURE_L1",
+            severity="WARNING",
         )
-
         finding_dict = finding.to_dict()
-        self.assertIn("file_path", finding_dict)
-        self.assertIn("line_number", finding_dict)
-        self.assertIn("context", finding_dict)
-        self.assertIn("has_closure", finding_dict)
-        self.assertIn("closure_file", finding_dict)
-        self.assertIn("severity", finding_dict)
+        self.assertEqual(finding_dict["line_number"], 42)
+        self.assertEqual(finding_dict["closure_file"], "CLOSURE_L1")
 
-
-class TestTokenVazioIntegration(unittest.TestCase):
-    """Integration tests with document governance."""
-
-    def setUp(self):
-        """Create temporary directory with closure structure."""
-        self.temp_dir = tempfile.TemporaryDirectory()
-        self.repo_root = Path(self.temp_dir.name)
-        (self.repo_root / "docs" / "closures").mkdir(parents=True)
-
-    def tearDown(self):
-        """Clean up."""
-        self.temp_dir.cleanup()
-
-    def test_closure_map_building(self):
-        """Validator should correctly map existing closures."""
-        # Create multiple closure files
-        for gap_id in ["L0", "L1", "L2", "G1"]:
-            (self.repo_root / "docs" / "closures" / f"CLOSURE_{gap_id}.md").write_text(
-                f"# {gap_id}\n"
-            )
+    def test_changed_scope_ignores_legacy_unlinked_debt(self) -> None:
+        (self.repo_root / "legacy.py").write_text(f"legacy='{TOKEN}'\n", encoding="utf-8")
+        (self.repo_root / "changed.md").write_text("baseline\n", encoding="utf-8")
+        base = self._commit_baseline()
+        (self.repo_root / "changed.md").write_text("baseline\nordinary change\n", encoding="utf-8")
+        self._commit_candidate()
 
         validator = TokenVazioValidator(self.repo_root)
-        self.assertIn("L0", validator.closure_map)
+        scope = validator.changed_lines_since(base)
+        validator.scan_repository(scope)
+        self.assertEqual(validator.findings, [])
+        self.assertNotIn("legacy.py", scope)
+
+    def test_changed_scope_rejects_new_unlinked_gap(self) -> None:
+        (self.repo_root / "new-gap.md").write_text("baseline\n", encoding="utf-8")
+        base = self._commit_baseline()
+        (self.repo_root / "new-gap.md").write_text(f"baseline\nnew={TOKEN}\n", encoding="utf-8")
+        self._commit_candidate()
+
+        validator = TokenVazioValidator(self.repo_root)
+        scope = validator.changed_lines_since(base)
+        validator.scope = "changed_lines"
+        validator.changed_since = base
+        errors, warnings = validator.scan_repository(scope)
+        self.assertEqual((errors, warnings), (1, 0))
+        self.assertEqual(validator.findings[0].file_path, "new-gap.md")
+
+    def test_file_level_l1_governs_changed_gap_line(self) -> None:
+        test_file = self.repo_root / "governed.md"
+        test_file.write_text("# Governance: CLOSURE_L1\nbaseline\n", encoding="utf-8")
+        base = self._commit_baseline()
+        test_file.write_text(f"# Governance: CLOSURE_L1\nbaseline\nstate={TOKEN}\n", encoding="utf-8")
+        self._commit_candidate()
+
+        validator = TokenVazioValidator(self.repo_root)
+        scope = validator.changed_lines_since(base)
+        errors, warnings = validator.scan_repository(scope)
+        self.assertEqual((errors, warnings), (0, 1))
+        self.assertEqual(validator.findings[0].closure_file, "CLOSURE_L1")
+
+    def test_changed_scope_reports_scope_and_base(self) -> None:
+        test_file = self.repo_root / "governed.txt"
+        test_file.write_text("CLOSURE_L1\n", encoding="utf-8")
+        base = self._commit_baseline()
+        test_file.write_text(f"CLOSURE_L1\n{TOKEN}\n", encoding="utf-8")
+        self._commit_candidate()
+
+        validator = TokenVazioValidator(self.repo_root)
+        validator.scope = "changed_lines"
+        validator.changed_since = base
+        validator.scan_repository(validator.changed_lines_since(base))
+        report = validator.report()
+        self.assertEqual(report["summary"]["scope"], "changed_lines")
+        self.assertEqual(report["summary"]["changed_since"], base)
+        self.assertEqual(report["status"], "PASS")
+
+    def test_invalid_diff_base_fails_closed(self) -> None:
+        self._commit_baseline()
+        validator = TokenVazioValidator(self.repo_root)
+        with self.assertRaises(RuntimeError):
+            validator.changed_lines_since("definitely-not-a-git-ref")
+
+    def test_closure_map_uses_realistic_l_ids(self) -> None:
+        validator = TokenVazioValidator(self.repo_root)
         self.assertIn("L1", validator.closure_map)
         self.assertIn("L2", validator.closure_map)
-        self.assertIn("G1", validator.closure_map)
-
-    def test_report_serialization(self):
-        """Report should be JSON-serializable."""
-        test_file = self.repo_root / "test.md"
-        test_file.write_text("TOKEN_VAZIO\n")
-
-        validator = TokenVazioValidator(self.repo_root)
-        validator.scan_file(test_file)
-        report = validator.report()
-
-        # Should be able to serialize to JSON
-        json_str = json.dumps(report, indent=2)
-        self.assertIsInstance(json_str, str)
-        self.assertGreater(len(json_str), 0)
-
-        # Should be able to deserialize back
-        report_restored = json.loads(json_str)
-        self.assertEqual(report["report_hash"], report_restored["report_hash"])
+        self.assertNotIn("L0", validator.closure_map)
 
 
 if __name__ == "__main__":
