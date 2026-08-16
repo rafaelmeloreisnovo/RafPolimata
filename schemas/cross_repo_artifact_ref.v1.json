@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/rafpolimata/cross_repo_artifact_ref.v1.json",
+  "title": "Cross Repository Artifact Reference V1",
+  "description": "Read-only artifact reference for cross-repository provenance. Governance anchor: CLOSURE_L11.",
+  "type": "object",
+  "required": ["schema", "repo", "path", "commit_sha", "content_hash", "media_type", "provenance_state", "artifact_kind", "claim_allowed"],
+  "properties": {
+    "schema": {"const": "raf.cross_repo_artifact_ref.v1"},
+    "repo": {"type": "string", "minLength": 1},
+    "path": {"type": "string", "minLength": 1},
+    "commit_sha": {"type": "string", "pattern": "^(?:[a-f0-9]{40}|TOKEN_VAZIO)$"},
+    "content_hash": {"type": "string", "pattern": "^(?:sha256:[a-f0-9]{64}|TOKEN_VAZIO)$"},
+    "media_type": {"type": "string", "minLength": 1},
+    "provenance_state": {"enum": ["VERIFIED", "OBSERVED", "REFERENCE", "TOKEN_VAZIO"]},
+    "artifact_kind": {"enum": ["source", "code", "build", "runtime", "receipt", "claim", "TOKEN_VAZIO"]},
+    "claim_allowed": {"type": "boolean"},
+    "producer": {"type": "string", "minLength": 1},
+    "relation_hints": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "required": ["relation", "target_content_hash"],
+        "properties": {
+          "relation": {"enum": ["derived_from", "supports", "contradicts", "supersedes", "requires", "observed_in"]},
+          "target_content_hash": {"type": "string", "pattern": "^(?:sha256:[a-f0-9]{64}|TOKEN_VAZIO)$"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
