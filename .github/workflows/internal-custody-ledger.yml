@@ -1,0 +1,201 @@
+name: Internal Custody Ledger
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-internal-custody-ledger:
+    name: validate-internal-custody-ledger
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Syntax and adversarial unit tests
+        run: |
+          python3 -m py_compile \
+            tools/internal_custody_event.py \
+            tools/verify_internal_custody.py \
+            tools/run_with_internal_custody.py
+          python3 -m unittest -v \
+            tests.test_internal_custody_ledger \
+            tests.test_internal_custody_runner
+
+      - name: Generate intact fixture chain
+        run: |
+          set -euo pipefail
+          mkdir -p ci/custody
+          printf 'rafaelia-custody-fixture\n' > ci/custody/input.txt
+          cp ci/custody/input.txt ci/custody/output.txt
+          python3 tools/internal_custody_event.py \
+            --ledger ci/custody/internal-custody.jsonl \
+            --repository rafaelmeloreisnovo/RafPolimata \
+            --path ci/custody/output.txt \
+            --symbol ci_fixture_transform \
+            --result PASS \
+            --input ci/custody/input.txt \
+            --output ci/custody/output.txt \
+            --parameters-json '{"network":"disabled","fixture":"deterministic"}' \
+            --repo-root . \
+            > ci/custody/writer-event.json
+          python3 tools/verify_internal_custody.py \
+            ci/custody/internal-custody.jsonl \
+            --artifact-root . \
+            --strict \
+            --report ci/custody/verification-report.txt
+
+      - name: Falsifier — one-byte semantic tamper must fail
+        run: |
+          set -euo pipefail
+          cp ci/custody/internal-custody.jsonl ci/custody/tampered.jsonl
+          cp ci/custody/internal-custody.jsonl.manifest.json ci/custody/tampered.jsonl.manifest.json
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('ci/custody/tampered.jsonl')
+          raw = path.read_bytes()
+          needle = b'"result":"PASS"'
+          replacement = b'"result":"FAIL"'
+          if needle not in raw:
+              raise SystemExit('fixture does not contain expected PASS token')
+          path.write_bytes(raw.replace(needle, replacement, 1))
+          PY
+          if python3 tools/verify_internal_custody.py ci/custody/tampered.jsonl --strict > ci/custody/tamper-report.txt 2>&1; then
+            echo 'FAIL: tampered ledger was accepted'
+            exit 1
+          fi
+          echo 'PASS: tampered ledger rejected as required'
+
+      - name: Custody integration — canonical coherence gate
+        run: |
+          set -euo pipefail
+          python3 tools/run_with_internal_custody.py \
+            --ledger ci/custody/gates.jsonl \
+            --repository rafaelmeloreisnovo/RafPolimata \
+            --path configs/semantic_coherence.yml \
+            --symbol validate_coherence_protocol \
+            --input configs/semantic_coherence.yml \
+            --parameters-json '{"gate":"coherence_protocol","network":"disabled"}' \
+            --repo-root . \
+            -- python3 scripts/validate_coherence_protocol.py
+
+      - name: Custody integration — ApkC F0-F6 gate
+        run: |
+          set -euo pipefail
+          python3 tools/run_with_internal_custody.py \
+            --ledger ci/custody/gates.jsonl \
+            --repository rafaelmeloreisnovo/RafPolimata \
+            --path Apkc/proofs/out/validation-summary.md \
+            --symbol apkc_validate_F0_F6 \
+            --input scripts/apkc_validate.sh \
+            --output Apkc/proofs/out/validation-summary.md \
+            --token-vazio-marker TOKEN_VAZIO \
+            --parameters-json '{"gate":"F0-F6","network":"disabled"}' \
+            --repo-root . \
+            -- sh scripts/apkc_validate.sh
+
+      - name: Custody integration — compiled codegen selector
+        run: |
+          set -euo pipefail
+          python3 tools/run_with_internal_custody.py \
+            --ledger ci/custody/gates.jsonl \
+            --repository rafaelmeloreisnovo/RafPolimata \
+            --path ci/custody/build_codegen_select_test \
+            --symbol raf_codegen_select_build \
+            --input tools/raf_codegen_select_test.c \
+            --output ci/custody/build_codegen_select_test \
+            --parameters-json '{"gate":"codegen_build","network":"disabled"}' \
+            --repo-root . \
+            -- gcc -std=c11 -Wall -Wextra -Werror tools/raf_codegen_select_test.c -o ci/custody/build_codegen_select_test
+          python3 tools/run_with_internal_custody.py \
+            --ledger ci/custody/gates.jsonl \
+            --repository rafaelmeloreisnovo/RafPolimata \
+            --path ci/custody/build_codegen_select_test \
+            --symbol raf_codegen_select_test \
+            --input ci/custody/build_codegen_select_test \
+            --parameters-json '{"gate":"codegen_runtime","network":"disabled"}' \
+            --repo-root . \
+            -- ./ci/custody/build_codegen_select_test
+
+      - name: Custody integration — Verbovivo build and recall
+        run: |
+          set -euo pipefail
+          python3 tools/run_with_internal_custody.py \
+            --ledger ci/custody/gates.jsonl \
+            --repository rafaelmeloreisnovo/RafPolimata \
+            --path ci/custody/verbovivo_ci \
+            --symbol verbovivo_build \
+            --input rafaelia/verbovivo.c \
+            --output ci/custody/verbovivo_ci \
+            --parameters-json '{"gate":"verbovivo_build","network":"disabled"}' \
+            --repo-root . \
+            -- gcc -std=c11 -O2 -I. -IBenchmark -DVERBOVIVO_MAIN \
+              rafaelia/verbovivo.c rafaelia/fiber_relmat.c -lm -o ci/custody/verbovivo_ci
+          printf 'RAFAELIA recall custody vector\nsecond engram line\n' > ci/custody/verbovivo-input.txt
+          python3 tools/run_with_internal_custody.py \
+            --ledger ci/custody/gates.jsonl \
+            --repository rafaelmeloreisnovo/RafPolimata \
+            --path ci/custody/verbovivo-input.txt \
+            --symbol verbovivo_recall \
+            --input ci/custody/verbovivo-input.txt \
+            --stdin-file ci/custody/verbovivo-input.txt \
+            --parameters-json '{"gate":"verbovivo_recall","recall_n":3,"network":"disabled"}' \
+            --repo-root . \
+            -- ./ci/custody/verbovivo_ci -r 3
+
+      - name: Verify integrated gate chain and result domain
+        run: |
+          set -euo pipefail
+          python3 tools/verify_internal_custody.py \
+            ci/custody/gates.jsonl \
+            --artifact-root . \
+            --strict \
+            --report ci/custody/gates-verification-report.txt
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          events = [json.loads(line) for line in Path('ci/custody/gates.jsonl').read_text().splitlines()]
+          expected = {
+              'validate_coherence_protocol',
+              'apkc_validate_F0_F6',
+              'raf_codegen_select_build',
+              'raf_codegen_select_test',
+              'verbovivo_build',
+              'verbovivo_recall',
+          }
+          observed = {event['symbol'] for event in events}
+          missing = expected - observed
+          if missing:
+              raise SystemExit(f'missing custody gate events: {sorted(missing)}')
+          allowed = {'PASS', 'FAIL', 'TOKEN_VAZIO'}
+          invalid = [(event['symbol'], event['result']) for event in events if event['result'] not in allowed]
+          if invalid:
+              raise SystemExit(f'invalid result states: {invalid}')
+          print('integrated custody events:', len(events))
+          for event in events:
+              print(event['symbol'], event['result'], event['exit_code'])
+          PY
+
+      - name: Upload custody evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: internal-custody-ledger-${{ github.run_id }}
+          path: |
+            ci/custody/internal-custody.jsonl
+            ci/custody/internal-custody.jsonl.manifest.json
+            ci/custody/writer-event.json
+            ci/custody/verification-report.txt
+            ci/custody/tampered.jsonl
+            ci/custody/tampered.jsonl.manifest.json
+            ci/custody/tamper-report.txt
+            ci/custody/gates.jsonl
+            ci/custody/gates.jsonl.manifest.json
+            ci/custody/gates-verification-report.txt
+            ci/custody/captures/
+          if-no-files-found: warn
