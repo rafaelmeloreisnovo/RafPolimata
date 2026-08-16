@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""Cross-repo bridge V1 regression tests.
+
+Governance anchor: CLOSURE_L11. Explicit TOKEN_VAZIO spellings in test names are
+part of the fail-closed contract and do not promote the underlying external gap.
+"""
 from __future__ import annotations
 
 import copy
