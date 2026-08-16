@@ -21,6 +21,7 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 
 | Documento | Função | Estado de uso |
 |---|---|---|
+| [README.md](README.md) | router curto da árvore `docs/` | `CANONICAL_ROUTER` |
 | [AGENTES.md](AGENTES.md) | guia operacional para agentes humanos e IA | `CANONICAL` |
 | [AGENTES_CHECKLIST.md](AGENTES_CHECKLIST.md) | checklist de início, execução e encerramento | `REFERENCE` |
 | [AGENTES_DECISAO_LOG.md](AGENTES_DECISAO_LOG.md) | decisões, conflitos e escalações | `AUDIT` |
@@ -49,7 +50,8 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 
 | Documento | Função |
 |---|---|
-| [OPERATIONAL_GAP_TOPOLOGY_V1.md](OPERATIONAL_GAP_TOPOLOGY_V1.md) | grafo canônico de gaps, urgências, incertezas, owners, proveniência, closures e relações técnico-comerciais | 
+| [OPERATIONAL_GAP_TOPOLOGY_V1.md](OPERATIONAL_GAP_TOPOLOGY_V1.md) | grafo canônico de gaps, urgências, incertezas, owners, proveniência, closures e relações técnico-comerciais |
+| [closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md](closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md) | liga `TOKEN_VAZIO` estruturado ao grafo sem promover gaps materiais a PASS |
 | [REPOSITORY_COMMIT_TRACKER_OMEGA.md](REPOSITORY_COMMIT_TRACKER_OMEGA.md) | rastreamento bounded de repositórios, forks, commits, shards e snapshots |
 | [REPOSITORY_PR_CONTEXT_SIDECAR.md](REPOSITORY_PR_CONTEXT_SIDECAR.md) | sidecar de contexto temporal e semântico dos pull requests |
 | [EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md](EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md) | governança de otimização, fallback e rollback |
