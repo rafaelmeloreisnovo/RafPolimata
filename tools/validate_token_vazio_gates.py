@@ -45,6 +45,21 @@ class TokenVazioValidator:
     SKIP_MARKERS = ("docs/generated/", "results/", ".git/", "__pycache__", ".pyc")
     ALLOWED_MISSING = {"L9"}
 
+    # These paths form one structured closure domain.  CLOSURE_L11 closes the
+    # governance linkage of their explicit unknowns; it never promotes the
+    # underlying technical/legal/external gap to PASS.  The topology's own
+    # fail-closed validator enforces owner/provenance/closure semantics.
+    STRUCTURED_CLOSURE_PATHS = {
+        "configs/operational-gap-topology.v1.json": "L11",
+        "schemas/operational-gap-topology.v1.schema.json": "L11",
+        "scripts/validate_operational_gap_topology.py": "L11",
+        "tests/test_operational_gap_topology.py": "L11",
+        "docs/OPERATIONAL_GAP_TOPOLOGY_V1.md": "L11",
+        "docs/LICENSE_DECISION_RECORD.md": "L11",
+        ".github/SECURITY.md": "L11",
+        ".github/workflows/operational-gap-topology.yml": "L11",
+    }
+
     def __init__(self, repo_root: Path = Path(".")):
         self.repo_root = Path(repo_root).resolve()
         self.findings: List[TokenVazioFinding] = []
@@ -70,6 +85,10 @@ class TokenVazioValidator:
         ids = {match.group(1).upper() for match in self.CLOSURE_PATTERN.finditer(text)}
         return sorted(closure_id for closure_id in ids if self._is_valid_closure(closure_id))
 
+    def _structured_closure(self, relative_path: str) -> str:
+        closure_id = self.STRUCTURED_CLOSURE_PATHS.get(relative_path, "")
+        return closure_id if closure_id and self._is_valid_closure(closure_id) else ""
+
     def _is_scannable(self, file_path: Path) -> bool:
         try:
             relative = file_path.resolve().relative_to(self.repo_root).as_posix()
@@ -87,8 +106,10 @@ class TokenVazioValidator:
         """Scan one file.
 
         In diff mode, a valid closure reference anywhere in the changed file may
-        govern its changed TOKEN_VAZIO lines.  Full inventory mode retains the
-        older line-local closure rule for backward compatibility.
+        govern its changed TOKEN_VAZIO lines.  Canonical structured-governance
+        paths may additionally bind to a dedicated closure by exact path.  Full
+        inventory mode retains line-local behavior for ordinary files while
+        honoring those explicit structured bindings.
         """
         file_path = Path(file_path)
         local_findings: List[TokenVazioFinding] = []
@@ -100,8 +121,11 @@ class TokenVazioValidator:
         except OSError:
             return local_findings
 
-        file_closures = self._valid_closures(content) if line_numbers is not None else []
         relative = file_path.resolve().relative_to(self.repo_root).as_posix()
+        file_closures = self._valid_closures(content) if line_numbers is not None else []
+        structured = self._structured_closure(relative)
+        if structured:
+            file_closures = sorted(set(file_closures + [structured]))
 
         for line_num, line in enumerate(content.splitlines(), 1):
             if line_numbers is not None and line_num not in line_numbers:
