@@ -1,0 +1,80 @@
+name: Operational Gap Topology
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "configs/operational-gap-topology.v1.json"
+      - "schemas/operational-gap-topology.v1.schema.json"
+      - "scripts/validate_operational_gap_topology.py"
+      - "tests/test_operational_gap_topology.py"
+      - "docs/OPERATIONAL_GAP_TOPOLOGY_V1.md"
+      - "docs/LICENSE_DECISION_RECORD.md"
+      - ".github/SECURITY.md"
+      - ".github/workflows/operational-gap-topology.yml"
+  pull_request:
+    paths:
+      - "configs/operational-gap-topology.v1.json"
+      - "schemas/operational-gap-topology.v1.schema.json"
+      - "scripts/validate_operational_gap_topology.py"
+      - "tests/test_operational_gap_topology.py"
+      - "docs/OPERATIONAL_GAP_TOPOLOGY_V1.md"
+      - "docs/LICENSE_DECISION_RECORD.md"
+      - ".github/SECURITY.md"
+      - ".github/workflows/operational-gap-topology.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: operational-gap-topology-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-operational-gap-topology:
+    name: validate-operational-gap-topology
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate JSON syntax
+        run: |
+          python3 -m json.tool schemas/operational-gap-topology.v1.schema.json >/dev/null
+          python3 -m json.tool configs/operational-gap-topology.v1.json >/dev/null
+
+      - name: Run topology regression tests
+        run: python3 -m unittest -v tests.test_operational_gap_topology
+
+      - name: Validate topology fail-closed
+        run: |
+          python3 scripts/validate_operational_gap_topology.py \
+            --write-report ci/reports/operational-gap-topology.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('ci/reports/operational-gap-topology.json').read_text(encoding='utf-8'))
+          assert report['state'] == 'PASS', report
+          assert report['claim_allowed'] is False
+          assert report['summary']['gaps'] >= 1
+          assert report['summary']['blocking_p0_p1'] >= 1
+          print(json.dumps(report['summary'], sort_keys=True))
+          PY
+
+      - name: Verify human-readable contract routes
+        run: |
+          test -s docs/OPERATIONAL_GAP_TOPOLOGY_V1.md
+          test -s docs/LICENSE_DECISION_RECORD.md
+          test -s .github/SECURITY.md
+          grep -q 'TOKEN_VAZIO != PASS' docs/OPERATIONAL_GAP_TOPOLOGY_V1.md
+          grep -q 'TOKEN_VAZIO_OWNER_DECISION' docs/LICENSE_DECISION_RECORD.md
+          grep -q 'PRIVATE_CHANNEL_TOKEN_VAZIO' .github/SECURITY.md
+
+      - name: Upload topology validation receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: operational-gap-topology-${{ github.run_id }}
+          path: ci/reports/operational-gap-topology.json
+          if-no-files-found: error
