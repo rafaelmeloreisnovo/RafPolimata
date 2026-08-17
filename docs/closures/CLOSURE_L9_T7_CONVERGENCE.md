@@ -203,14 +203,14 @@ This is **not** inconsistent with T9.2 (finite-state eventual periodicity). The 
 ## 7. Closure verdict
 
 ```text
-OLD_L9_FIXED_POINT_CONVERGENCE    = FALSIFIED_AS_STATED
-T7_ATTRACTOR_RANGE_0_41           = SUPPORTED_BY_IMPLEMENTATION [PASS: test_t7_attractor_extended]
-ATTRACTOR_EVOLUTION_PERIODICITY   = EMPIRICALLY_DETERMINED_~7000_STEPS [PASS: test_t7_attractor_extended]
-ALL_42_ATTRACTORS_VISITED         = CONFIRMED_IN_100K_TRAJECTORY [PASS: test_t7_attractor_extended]
-EVENTUAL_PERIODICITY              = MATHEMATICALLY_SUPPORTED_FOR_CONSTANT_INPUT_FINITE_STATE_MODEL
-EXACTLY_42_STABLE_ATTRACTORS      = UNPROVEN (42 is cardinality, not Lyapunov stability)
-KAM_STABILITY                     = UNPROVEN_HYPOTHESES
-MACHINE_CHECKED_PROOF             = NOT_YET_FORMALIZED
+OLD_L9_FIXED_POINT_CONVERGENCE = FALSIFIED_AS_STATED
+T7_ATTRACTOR_RANGE_0_41 = SUPPORTED_BY_IMPLEMENTATION [PASS: test_t7_attractor_extended]
+ATTRACTOR_EVOLUTION_PERIODICITY = EMPIRICALLY_DETERMINED_~7000_STEPS [PASS: test_t7_attractor_extended]
+ALL_42_ATTRACTORS_VISITED = CONFIRMED_IN_100K_TRAJECTORY [PASS: test_t7_attractor_extended]
+EVENTUAL_PERIODICITY = MATHEMATICALLY_SUPPORTED_FOR_CONSTANT_INPUT_FINITE_STATE_MODEL
+EXACTLY_42_STABLE_ATTRACTORS = UNPROVEN (42 is cardinality, not Lyapunov stability)
+KAM_STABILITY = UNPROVEN_HYPOTHESES
+MACHINE_CHECKED_PROOF = NOT_YET_FORMALIZED
 ```
 
 The scientifically correct Phase D action is therefore **claim correction + weaker formal theorems + empirical periodicity characterization**, not attempting to force a proof of a false or underspecified proposition.
