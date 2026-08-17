@@ -66,6 +66,29 @@ jobs:
           print(json.dumps(report, ensure_ascii=False, sort_keys=True))
           PY
 
+      - name: Validate formula registry 01-20
+        run: |
+          python3 scripts/validate_formula_registry_01_20.py
+          python3 -m unittest tests/test_formula_registry_01_20.py -v
+          test -s results/formula_registry_01_20_report.json
+
+      - name: Verify formula registry boundary
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(
+              Path('results/formula_registry_01_20_report.json').read_text(encoding='utf-8')
+          )
+          assert report['verdict'] == 'PASS'
+          assert report['record_count'] == 20
+          assert report['claim_allowed'] is False
+          assert report['critical_blocked_or_contradicted'] == ['F06', 'F09', 'F11']
+          assert report['priorities'] == {'P0': 7, 'P1': 8, 'P2': 5}
+          print(json.dumps(report, ensure_ascii=False, sort_keys=True))
+          PY
+
       - name: Upload formal-science reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -74,4 +97,5 @@ jobs:
           path: |
             results/formal_science_orchestrator_report.json
             results/toroidal_research_router_report.json
+            results/formula_registry_01_20_report.json
           if-no-files-found: error
