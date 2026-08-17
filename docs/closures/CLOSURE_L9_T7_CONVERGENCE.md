@@ -208,9 +208,9 @@ T7_ATTRACTOR_RANGE_0_41           = SUPPORTED_BY_IMPLEMENTATION [PASS: test_t7_a
 ATTRACTOR_EVOLUTION_PERIODICITY   = EMPIRICALLY_DETERMINED_~7000_STEPS [PASS: test_t7_attractor_extended]
 ALL_42_ATTRACTORS_VISITED         = CONFIRMED_IN_100K_TRAJECTORY [PASS: test_t7_attractor_extended]
 EVENTUAL_PERIODICITY              = MATHEMATICALLY_SUPPORTED_FOR_CONSTANT_INPUT_FINITE_STATE_MODEL
-EXACTLY_42_STABLE_ATTRACTORS      = TOKEN_VAZIO (42 is cardinality, not Lyapunov stability)
-KAM_STABILITY                     = TOKEN_VAZIO_HYPOTHESES
-MACHINE_CHECKED_PROOF             = TOKEN_VAZIO
+EXACTLY_42_STABLE_ATTRACTORS      = UNPROVEN (42 is cardinality, not Lyapunov stability)
+KAM_STABILITY                     = UNPROVEN_HYPOTHESES
+MACHINE_CHECKED_PROOF             = NOT_YET_FORMALIZED
 ```
 
 The scientifically correct Phase D action is therefore **claim correction + weaker formal theorems + empirical periodicity characterization**, not attempting to force a proof of a false or underspecified proposition.

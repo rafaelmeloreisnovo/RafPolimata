@@ -6,7 +6,8 @@
 # Generates or uses 1.2GB JSON dataset and measures LZ4 compression
 # performance against the 16 GB/s estimate from Phase 2A benchmarks.
 #
-# STATUS: TOKEN_VAZIO (extrapolated from 100MB) → PASS/FAIL
+# STATUS: PENDING (extrapolated from 100MB) — Phase 2B Iteration 2
+# REFERENCE: docs/closures/CLOSURE_L9_T7_CONVERGENCE.md (Section 6 for attractor context)
 # Date: 2026-08-17
 
 set -e

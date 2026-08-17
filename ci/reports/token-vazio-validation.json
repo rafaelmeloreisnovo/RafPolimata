@@ -1,0 +1,28 @@
+{
+  "schema": "rafaelia.token_vazio_validator.v1",
+  "timestamp": "2026-08-17T04:55:27.760413Z",
+  "repository": "/home/user/RafPolimata",
+  "findings": [
+    {
+      "file_path": "tests/test_t7_attractor_extended.c",
+      "line_number": 231,
+      "context": "printf(\"STATUS: TOKEN_VAZIO — Insufficient cycles to classify trajectory\\n\");",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L9",
+      "severity": "WARNING"
+    }
+  ],
+  "summary": {
+    "total_findings": 1,
+    "errors": 0,
+    "warnings": 1,
+    "closures_present": 10,
+    "allowed_missing": [
+      "L9"
+    ],
+    "scope": "changed_lines",
+    "changed_since": "37adbf091f57dbd83460336010e877c3b42382df"
+  },
+  "status": "PASS",
+  "report_hash": "74eef2bc9b889fee064f0e4105bd5c6b32fd1c53a93a61a90172aeccfa5a7853"
+}
