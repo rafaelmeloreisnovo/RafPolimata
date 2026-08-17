@@ -33,7 +33,7 @@ def validate(path: Path) -> dict[str, object]:
         raise SystemExit("invalid_schema")
     if doc.get("claim_allowed") is not False:
         raise SystemExit("registry_claim_must_be_false")
-    if "TOKEN_VAZIO" not in doc.get("token_vazio_rule", ""):
+    if "token_vazio" not in str(doc.get("token_vazio_rule", "")).lower():
         raise SystemExit("missing_token_vazio_rule")
     records = doc.get("records")
     if not isinstance(records, list) or len(records) != 20:
