@@ -395,14 +395,13 @@ $ make test-phase3-advanced
 
 ## Gate Criteria for Phase 3 Completion
 
-| Gate | Criterion | Status |
-|------|-----------|--------|
-| **Functional** | All 8 tests PASS | PENDING |
-| **Performance** | P95 latency <20s | PENDING |
-| **Reproducibility** | Hash-identical across runs | PENDING |
-| **Safety** | 5/5 safe, ≥4/5 unsafe classified | PENDING |
-| **Code Quality** | No compiler warnings (-Wall -Wextra) | PENDING |
-| **TOKEN_VAZIO Closure** | All gates have closure or documented deferral | TOKEN_VAZIO (Phase 3A: Tests 1-3 implemented, Tests 4-8 deferred to Phase 3B) |
+| Gate | Criterion | Phase 3A Status | Phase 3B Status |
+|------|-----------|-----------------|-----------------|
+| **Functional** | All 8 tests PASS | TOKEN_VAZIO: Tests 1-3 IMPLEMENTED; CI execution pending | TOKEN_VAZIO: Tests 4-8 not yet implemented |
+| **Performance** | P95 latency <20s | TOKEN_VAZIO: Requires CI test execution | TOKEN_VAZIO: Requires Tests 4-8 implementation & execution |
+| **Reproducibility** | Hash-identical across runs | TOKEN_VAZIO: Requires CI test execution | TOKEN_VAZIO: Deferred to Phase 3B validation |
+| **Safety** | 5/5 safe, ≥4/5 unsafe classified | TOKEN_VAZIO: Test 8 not yet implemented | TOKEN_VAZIO: Test 8 deferred to Phase 3B |
+| **Code Quality** | No compiler warnings (-Wall -Wextra) | IMPLEMENTED: Source compiles without warnings | TOKEN_VAZIO: Phase 3B test implementation pending |
 
 ---
 
@@ -451,27 +450,27 @@ The following items are documented as TOKEN_VAZIO (unexecuted) for the stated sc
 
 ## Implementation Status & Next Steps
 
-### Phase 3A: IMPLEMENTED
+### Phase 3A: Test Code IMPLEMENTED
 
-- ✅ Test 1: E2E Text-to-Image (4 subtests: basic, determinism, multiple prompts, safety)
-- ✅ Test 2: E2E Image-to-Image (4 subtests: basic, determinism, strength variation, pattern variations)
-- ✅ Test 3: Latency Distribution (P50/P95/P99 percentile collection over 100 samples)
-- ✅ Integration test framework compiled and all tests PASS locally
+- IMPLEMENTED: Test 1: E2E Text-to-Image (4 subtests: basic, determinism, multiple prompts, safety) — source exists at tests/test_phase3_e2e_text_to_image.c
+- IMPLEMENTED: Test 2: E2E Image-to-Image (4 subtests: basic, determinism, strength variation, pattern variations) — source exists at tests/test_phase3_e2e_image_to_image.c
+- IMPLEMENTED: Test 3: Latency Distribution (P50/P95/P99 percentile collection over 100 samples) — source exists at tests/test_phase3_latency_distribution.c
+- TOKEN_VAZIO: Execution in CI environment (local execution completed; CI gate execution pending)
 
 ### Phase 3B & Phase 3+: TOKEN_VAZIO (Deferred)
 
-- Tests 4-8: Throughput, cache efficiency, distributed protocol, safety classification (8 tests total planned)
-- Real model weight integration
-- Production performance optimization
-- Multi-node distributed deployment
+- Tests 4-8: Throughput, cache efficiency, distributed protocol, safety classification (planned, not yet implemented)
+- Real model weight integration (deferred to Phase 3B)
+- Production performance optimization (deferred to Phase 3B)
+- Multi-node distributed deployment (deferred to Phase 3+)
 
 ### Execution Plan
 
-1. **Phase 3A Current:** Tests 1-3 implemented and passing ✅
-2. **Phase 3B Short-term:** Complete Tests 4-8 (throughput, cache, safety validation)
+1. **Phase 3A Current:** Tests 1-3 source IMPLEMENTED; CI execution TOKEN_VAZIO
+2. **Phase 3B Short-term:** Implement Tests 4-8; execute full Phase 3A-3B integration suite
 3. **Phase 3B Follow-up:** Real model weight integration and performance profiling
 4. **Phase 3+:** Distributed multi-node deployment and hardware benchmarking
 
 ---
 
-**Status (2026-08-17):** Phase 3A: Core integration tests 1-3 IMPLEMENTED and PASS. Tests 4-8 TOKEN_VAZIO, deferred to Phase 3B.
+**Status (2026-08-17):** Phase 3A: Core integration test source code (1-3) IMPLEMENTED. CI execution TOKEN_VAZIO. Tests 4-8 TOKEN_VAZIO (planned, not implemented).
