@@ -38,6 +38,10 @@ class TestTokenVazioValidation(unittest.TestCase):
             "# L11: operational gap topology\nStatus: governed\n",
             encoding="utf-8",
         )
+        (closure_dir / "CLOSURE_G1.md").write_text(
+            "# G1: formula registry governance\nStatus: governed\n",
+            encoding="utf-8",
+        )
 
     def tearDown(self) -> None:
         self.temp_dir.cleanup()
@@ -205,6 +209,25 @@ class TestTokenVazioValidation(unittest.TestCase):
         self.assertEqual((errors, warnings), (1, 0))
         self.assertEqual(validator.findings[0].severity, "ERROR")
 
+    def test_formula_registry_path_is_bound_to_g1(self) -> None:
+        registry = self.repo_root / "research" / "formula_registry_01_20" / "registry.v1.json"
+        registry.parent.mkdir(parents=True)
+        registry.write_text(f'{{"dimensional_gate":"{TOKEN}"}}\n', encoding="utf-8")
+        validator = TokenVazioValidator(self.repo_root)
+        errors, warnings = validator.scan_repository()
+        self.assertEqual((errors, warnings), (0, 1))
+        self.assertEqual(validator.findings[0].closure_file, "CLOSURE_G1")
+
+    def test_formula_registry_binding_fails_if_g1_missing(self) -> None:
+        (self.repo_root / "docs" / "closures" / "CLOSURE_G1.md").unlink()
+        registry = self.repo_root / "research" / "formula_registry_01_20" / "registry.v1.json"
+        registry.parent.mkdir(parents=True)
+        registry.write_text(f'{{"dimensional_gate":"{TOKEN}"}}\n', encoding="utf-8")
+        validator = TokenVazioValidator(self.repo_root)
+        errors, warnings = validator.scan_repository()
+        self.assertEqual((errors, warnings), (1, 0))
+        self.assertEqual(validator.findings[0].severity, "ERROR")
+
     def test_changed_scope_reports_scope_and_base(self) -> None:
         test_file = self.repo_root / "governed.txt"
         test_file.write_text("CLOSURE_L1\n", encoding="utf-8")
@@ -226,11 +249,12 @@ class TestTokenVazioValidation(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             validator.changed_lines_since("definitely-not-a-git-ref")
 
-    def test_closure_map_uses_realistic_l_ids(self) -> None:
+    def test_closure_map_uses_realistic_l_and_g_ids(self) -> None:
         validator = TokenVazioValidator(self.repo_root)
         self.assertIn("L1", validator.closure_map)
         self.assertIn("L2", validator.closure_map)
         self.assertIn("L11", validator.closure_map)
+        self.assertIn("G1", validator.closure_map)
         self.assertNotIn("L0", validator.closure_map)
 
 
