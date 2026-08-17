@@ -63,6 +63,9 @@ tests/test_phase49_validation
 tests/test_phase50_deployment
 tests/test_cfg_quick
 
+# Test data (generated during benchmarks, not source artifacts)
+tests/data/
+
 # Internal custody ledger (generated event logs)
 data/ledgers/*.jsonl
 *.custody.jsonl
