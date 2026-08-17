@@ -397,40 +397,46 @@ $ make test-phase3-advanced
 
 | Gate | Criterion | Status |
 |------|-----------|--------|
-| **Functional** | All 8 tests PASS | 🟡 PENDING |
-| **Performance** | P95 latency <20s | 🟡 PENDING |
-| **Reproducibility** | Hash-identical across runs | 🟡 PENDING |
-| **Safety** | 5/5 safe, ≥4/5 unsafe classified | 🟡 PENDING |
-| **Code Quality** | No compiler warnings (-Wall -Wextra) | 🟡 PENDING |
-| **TOKEN_VAZIO** | All gates have closure or documented deferral | 🟡 PENDING |
+| **Functional** | All 8 tests PASS | PENDING |
+| **Performance** | P95 latency <20s | PENDING |
+| **Reproducibility** | Hash-identical across runs | PENDING |
+| **Safety** | 5/5 safe, ≥4/5 unsafe classified | PENDING |
+| **Code Quality** | No compiler warnings (-Wall -Wextra) | PENDING |
+| **TOKEN_VAZIO Closure** | All gates have closure or documented deferral | TOKEN_VAZIO (Phase 3A: Tests 1-3 implemented, Tests 4-8 deferred to Phase 3B) |
 
 ---
 
-## Risk Assessment
+## Deferred Work (TOKEN_VAZIO — Phase 3B & Production)
 
-### Known Risks
+The following items are documented as TOKEN_VAZIO (unexecuted) for the stated scope and are deferred to later phases:
 
-1. **Real Model Weights Missing**
-   - Current diffusion uses synthetic 42-step kernel
-   - Risk: Performance numbers may not reflect production
-   - Mitigation: Use real model weights in Phase 3B
+### TOKEN_VAZIO: Real Model Weights (Deferred to Phase 3B)
 
-2. **Single-Machine Testing**
-   - Distributed test is stub only
-   - Risk: Multi-node protocol unvalidated
-   - Mitigation: Implement real network in Phase 3B or Phase 3+
+| Item | Scope | Timeline | Reason |
+|------|-------|----------|--------|
+| Production diffusion kernel | Tests currently use synthetic 42-step kernel | Phase 3B (after integration test framework validated) | Real weights enable production latency/quality validation |
+| Model weight integration | Placeholder weights in core/diffusion.c | Phase 3B integration | Current stubs suffice for API/interface testing |
 
-3. **Safety Classifier Incomplete**
-   - Current classifier is risk-score heuristic
-   - Risk: May have high false positive/negative rate
-   - Mitigation: Collect diverse test data, refine scoring
+### TOKEN_VAZIO: Distributed Multi-Node Protocol (Deferred to Phase 3+)
 
-### Regression Prevention
+| Item | Scope | Timeline | Reason |
+|------|-------|----------|--------|
+| Network transmission | Test 7 is stub/reference only; no actual multi-node setup | Phase 3+ (production deployment) | Requires infrastructure beyond single-machine testing |
+| Protocol validation across nodes | LZ4 round-trip verified locally; network latency/ordering untested | Phase 3+ | Deferred to physical multi-node environment |
+
+### TOKEN_VAZIO: Safety Classifier Refinement (Deferred to Phase 3B)
+
+| Item | Scope | Timeline | Reason |
+|------|-------|----------|--------|
+| Diverse prompt testing | Test 8 uses 15 synthetic prompts; no production annotation data | Phase 3B | Requires human labeling of edge cases |
+| False positive/negative rates | Current heuristic may have high variance | Phase 3B | Needs statistical evaluation on real data |
+
+### Regression Prevention (Phase 3A Status)
 
 - ✅ All Phase 2B bridge code remains unchanged
-- ✅ Phase 3 tests are additive only
+- ✅ Phase 3 tests (1-3) are additive only; no subsystem modifications
 - ✅ Core imgcreative.h API remains stable
-- ✅ Full test suite runs on each commit
+- ✅ Phase 3 tests compile and run successfully on current branch
 
 ---
 
@@ -443,13 +449,29 @@ $ make test-phase3-advanced
 
 ---
 
-## Next Steps
+## Implementation Status & Next Steps
 
-1. **Immediate:** Implement test framework and Test 1-4 (E2E, latency, throughput)
-2. **Short-term:** Implement Tests 5-8 (cache, distributed, safety)
-3. **Follow-up:** Real model weight integration and Phase 3B refinement
-4. **Production:** Distributed multi-node deployment and hardware benchmarking (Phase 3+)
+### Phase 3A: IMPLEMENTED
+
+- ✅ Test 1: E2E Text-to-Image (4 subtests: basic, determinism, multiple prompts, safety)
+- ✅ Test 2: E2E Image-to-Image (4 subtests: basic, determinism, strength variation, pattern variations)
+- ✅ Test 3: Latency Distribution (P50/P95/P99 percentile collection over 100 samples)
+- ✅ Integration test framework compiled and all tests PASS locally
+
+### Phase 3B & Phase 3+: TOKEN_VAZIO (Deferred)
+
+- Tests 4-8: Throughput, cache efficiency, distributed protocol, safety classification (8 tests total planned)
+- Real model weight integration
+- Production performance optimization
+- Multi-node distributed deployment
+
+### Execution Plan
+
+1. **Phase 3A Current:** Tests 1-3 implemented and passing ✅
+2. **Phase 3B Short-term:** Complete Tests 4-8 (throughput, cache, safety validation)
+3. **Phase 3B Follow-up:** Real model weight integration and performance profiling
+4. **Phase 3+:** Distributed multi-node deployment and hardware benchmarking
 
 ---
 
-**Status:** 🟡 Phase 3A beginning with test framework implementation
+**Status (2026-08-17):** Phase 3A: Core integration tests 1-3 IMPLEMENTED and PASS. Tests 4-8 TOKEN_VAZIO, deferred to Phase 3B.
