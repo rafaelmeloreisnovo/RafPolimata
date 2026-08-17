@@ -45,10 +45,8 @@ class TokenVazioValidator:
     SKIP_MARKERS = ("docs/generated/", "results/", ".git/", "__pycache__", ".pyc")
     ALLOWED_MISSING = {"L9"}
 
-    # These paths form one structured closure domain.  CLOSURE_L11 closes the
-    # governance linkage of their explicit unknowns; it never promotes the
-    # underlying technical/legal/external gap to PASS.  The topology's own
-    # fail-closed validator enforces owner/provenance/closure semantics.
+    # These paths form structured closure domains.  A closure binds explicit
+    # unknowns to governance; it never promotes the underlying material gap.
     STRUCTURED_CLOSURE_PATHS = {
         "configs/operational-gap-topology.v1.json": "L11",
         "schemas/operational-gap-topology.v1.schema.json": "L11",
@@ -58,6 +56,11 @@ class TokenVazioValidator:
         "docs/LICENSE_DECISION_RECORD.md": "L11",
         ".github/SECURITY.md": "L11",
         ".github/workflows/operational-gap-topology.yml": "L11",
+        "research/formula_registry_01_20/registry.v1.json": "G1",
+        "research/formula_registry_01_20/README.md": "G1",
+        "research/formula_registry_01_20/reference.py": "G1",
+        "scripts/validate_formula_registry_01_20.py": "G1",
+        "tests/test_formula_registry_01_20.py": "G1",
     }
 
     def __init__(self, repo_root: Path = Path(".")):
