@@ -116,7 +116,7 @@ EOF
     fi
 
     rm -f "$test_c" "$test_apk"
-    return 0
+  fi
 }
 
 check_l3() {
