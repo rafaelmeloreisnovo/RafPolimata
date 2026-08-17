@@ -8,9 +8,17 @@
  * Goal: Determine if system enters a cycle, converges to a fixed point,
  * or continues evolving indefinitely.
  *
- * Key insight from t7_convergence_falsifier.c:
- *   The strong "42 fixed-point attractors" claim was falsified.
- *   System shows deterministically periodic/evolving behavior, not convergence.
+ * Related closures:
+ *   • docs/closures/CLOSURE_L9_T7_CONVERGENCE.md (Section 6)
+ *     - Execution context and results for extended attractor test
+ *     - Theoretical reconciliation of ~7000-step periodicity
+ *     - Evidence for T9.2 (eventual periodicity under constant input)
+ *
+ * Key findings (aligned with closure):
+ *   • Range invariant [0,42) confirmed across full 100K trajectory
+ *   • All 42 distinct attractors visited (not locked to subset)
+ *   • ~7000-step periodic cycle detected (not 42-cycle, not fixed-point)
+ *   • Deterministically periodic behavior (per t7_convergence_falsifier)
  *
  * Test plan:
  * 1. Run 100,000 steps with H_in=0, C_in=Q16_ONE (stable regime)
@@ -18,7 +26,7 @@
  * 3. Measure cycle period (if any)
  * 4. Record entropy of trajectory
  *
- * Status: TOKEN_VAZIO → PASS/FAIL/INCOMPLETE
+ * Status: PASS (provides empirical period characterization for closure)
  * Date: 2026-08-17
  */
 
