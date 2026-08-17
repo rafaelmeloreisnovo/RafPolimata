@@ -75,6 +75,8 @@ check_l2() {
     fi
     # Actual device chain capture would run here (TOKEN_VAZIO in CI environment)
     tv 'L2 TOKEN_VAZIO_DEVICE: Device chain execution not available in CI; requires physical device and explicit approval'
+  else
+    tv 'L2 TOKEN_VAZIO_DEVICE_NOT_ENABLED: Device chain validation requires RAF_RUN_DEVICE_CHAIN=1 and connected physical Android device'
   fi
 }
 
