@@ -1,0 +1,42 @@
+name: Neurobio Claim Contract
+
+on:
+  pull_request:
+    paths:
+      - 'tools/neurobio_claim_validator.py'
+      - 'tests/test_neurobio_claim_validator.py'
+      - 'tests/fixtures/neurobio_claim_contract_sample.jsonl'
+      - '.github/workflows/neurobio-claim-contract.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/neurobio_claim_validator.py'
+      - 'tests/test_neurobio_claim_validator.py'
+      - 'tests/fixtures/neurobio_claim_contract_sample.jsonl'
+      - '.github/workflows/neurobio-claim-contract.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  neurobio-static-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Unit tests — neurobio claim validator
+        run: python3 -m unittest -v tests.test_neurobio_claim_validator
+      - name: Validate deterministic neurobio fixture
+        run: python3 tools/neurobio_claim_validator.py tests/fixtures/neurobio_claim_contract_sample.jsonl --json
+      - name: Assert no scientific promotion
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          rows = [json.loads(x) for x in Path('tests/fixtures/neurobio_claim_contract_sample.jsonl').read_text().splitlines() if x.strip()]
+          assert rows
+          assert all(row.get('claim_allowed') is False for row in rows)
+          assert all(row.get('status') != 'PASS' for row in rows)
+          print('NEUROBIO_STATIC_CONTRACT_ONLY=PASS')
+          print('SCIENTIFIC_CLAIM_ALLOWED=false')
+          PY
