@@ -1,0 +1,23 @@
+{
+  "receipt_id":"NEUROBIO-STATIC-LOCAL-20260820",
+  "scope":"exact validator/test content authored for this branch",
+  "runtime":"Python unittest in current execution environment",
+  "tests":5,
+  "passed":5,
+  "failed":0,
+  "result":"PASS_STATIC_CONTRACT_TESTS_LOCAL",
+  "scientific_claim_allowed":false,
+  "limitations":[
+    "This is not GitHub Actions/remote CI evidence.",
+    "This is not wet-lab, human-subject or biological replication evidence.",
+    "The validator checks bookkeeping/anti-conflation rules only."
+  ],
+  "covered":[
+    "claim_allowed=false enforcement",
+    "EMF dosimetry gate requirement",
+    "UPE source-attribution promotion guard",
+    "PASS cannot be authorized by static validator",
+    "JSONL deterministic read path"
+  ],
+  "F_next":"Run repository CI if configured and attach remote workflow receipt without changing scientific status."
+}
