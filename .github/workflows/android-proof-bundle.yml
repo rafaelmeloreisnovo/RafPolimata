@@ -1,0 +1,41 @@
+name: Android Proof Bundle Gate
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/validate_android_proof_bundle.py'
+      - 'tests/test_android_proof_bundle.py'
+      - 'proofs/run-arm64-full-chain/**'
+  push:
+    paths:
+      - 'scripts/validate_android_proof_bundle.py'
+      - 'tests/test_android_proof_bundle.py'
+      - 'proofs/run-arm64-full-chain/**'
+
+permissions:
+  contents: read
+
+jobs:
+  proof-bundle-validator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run promotion-boundary tests
+        run: python3 -m unittest -v tests.test_android_proof_bundle
+      - name: Validate template remains non-promotable
+        run: |
+          python3 scripts/validate_android_proof_bundle.py \
+            --manifest proofs/run-arm64-full-chain/manifest.template.json \
+            --out-dir proofs/run-arm64-full-chain \
+            --write-report build/android-proof-bundle/template-report.json
+          python3 - <<'PY'
+          import json
+          report=json.load(open('build/android-proof-bundle/template-report.json'))
+          assert report['status'] == 'TOKEN_VAZIO', report
+          assert report['claim_allowed'] is False, report
+          PY
