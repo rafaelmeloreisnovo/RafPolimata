@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Validate Android proof bundles under runtime-evidence closure CLOSURE_L2."""
 from __future__ import annotations
 
 import argparse
