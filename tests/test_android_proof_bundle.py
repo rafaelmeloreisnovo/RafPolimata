@@ -1,3 +1,4 @@
+"""Tests for Android proof-bundle runtime evidence closure CLOSURE_L2."""
 from __future__ import annotations
 
 import json
