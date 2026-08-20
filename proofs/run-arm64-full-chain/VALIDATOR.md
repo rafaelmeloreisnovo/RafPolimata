@@ -1,6 +1,7 @@
 # Android Proof-Bundle Validator
 
-Estado: `ACTIVE / EVIDENCE-GATED`
+Estado: `ACTIVE / EVIDENCE-GATED`  
+Governança da lacuna runtime: `CLOSURE_L2`.
 
 This validator consumes the existing `rafpolimata.android_proof_chain.v1` manifest plus same-run transcript files. It does **not** trust the manifest's `promotion` fields by themselves.
 
