@@ -1,0 +1,139 @@
+{
+  "timestamp": "2026-08-21T07:43:22.375828Z",
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "token_vazio": 3,
+    "total": 8
+  },
+  "results": [
+    {
+      "timestamp": "2026-08-21T07:43:21.150724Z",
+      "commit": "9da4c835ef473d2a6fe5903f92cf8ff0b29e0dc4",
+      "branch": "claude/governance-ethics-layers-2aon2n",
+      "gate_id": "G0_legality",
+      "gate_type": "prevention",
+      "subsystem": "entire",
+      "result": "PASS",
+      "evidence": {
+        "check": "Security policy file exists",
+        "security_file_exists": true
+      },
+      "scope": "Repository-wide",
+      "limitations": "Requires manual review of laws; script does syntactic check only"
+    },
+    {
+      "timestamp": "2026-08-21T07:43:21.155372Z",
+      "commit": "9da4c835ef473d2a6fe5903f92cf8ff0b29e0dc4",
+      "branch": "claude/governance-ethics-layers-2aon2n",
+      "gate_id": "G2_claims_supported",
+      "gate_type": "prevention",
+      "subsystem": "entire",
+      "result": "PASS",
+      "evidence": {
+        "framework_exists": true,
+        "framework_path": "docs/RISCO_GESTAO_FRAMEWORK_CANONICAL.md",
+        "claims_section_present": true
+      },
+      "scope": "Documentation framework",
+      "limitations": "Checks documentation structure only; does not validate claim content"
+    },
+    {
+      "timestamp": "2026-08-21T07:43:21.169562Z",
+      "commit": "9da4c835ef473d2a6fe5903f92cf8ff0b29e0dc4",
+      "branch": "claude/governance-ethics-layers-2aon2n",
+      "gate_id": "G3_determinism_verifiable",
+      "gate_type": "prevention",
+      "subsystem": "ApkC",
+      "result": "PASS",
+      "evidence": {
+        "golden_test_count": 1,
+        "subsystem": "ApkC",
+        "files_found": [
+          "tools/witness_compiler_determinism.sh"
+        ]
+      },
+      "scope": "ApkC subsystem",
+      "limitations": "Only detects golden test files; does not run them"
+    },
+    {
+      "timestamp": "2026-08-21T07:43:21.173515Z",
+      "commit": "9da4c835ef473d2a6fe5903f92cf8ff0b29e0dc4",
+      "branch": "claude/governance-ethics-layers-2aon2n",
+      "gate_id": "G5_universalization",
+      "gate_type": "prevention",
+      "subsystem": "entire",
+      "result": "TOKEN_VAZIO",
+      "evidence": {
+        "gate_documented": true,
+        "note": "G5 is a qualitative gate requiring human judgment"
+      },
+      "scope": "Governance framework",
+      "limitations": "Gate is qualitative; automation only confirms documentation exists"
+    },
+    {
+      "timestamp": "2026-08-21T07:43:21.177554Z",
+      "commit": "9da4c835ef473d2a6fe5903f92cf8ff0b29e0dc4",
+      "branch": "claude/governance-ethics-layers-2aon2n",
+      "gate_id": "D1_test_failure",
+      "gate_type": "detection",
+      "subsystem": "ApkC",
+      "result": "PASS",
+      "evidence": {
+        "tests_dir_exists": true,
+        "subsystem": "ApkC",
+        "test_file_count": 109,
+        "note": "Found 109 test files"
+      },
+      "scope": "ApkC subsystem",
+      "limitations": "Only checks test file existence; does not execute tests"
+    },
+    {
+      "timestamp": "2026-08-21T07:43:21.181027Z",
+      "commit": "9da4c835ef473d2a6fe5903f92cf8ff0b29e0dc4",
+      "branch": "claude/governance-ethics-layers-2aon2n",
+      "gate_id": "D3_integrity_hash",
+      "gate_type": "detection",
+      "subsystem": "conversation_indexer",
+      "result": "TOKEN_VAZIO",
+      "evidence": {
+        "indexer_exists": true,
+        "subsystem": "conversation_indexer",
+        "hash_patterns_found": []
+      },
+      "scope": "conversation_indexer subsystem",
+      "limitations": "Only searches for hash-related keywords; does not validate implementation"
+    },
+    {
+      "timestamp": "2026-08-21T07:43:22.368154Z",
+      "commit": "9da4c835ef473d2a6fe5903f92cf8ff0b29e0dc4",
+      "branch": "claude/governance-ethics-layers-2aon2n",
+      "gate_id": "D4_semantic_coherence",
+      "gate_type": "detection",
+      "subsystem": "entire",
+      "result": "FAIL",
+      "evidence": {
+        "governance_script_exists": true,
+        "governance_check_output": "{\n  \"commit\": \"9da4c835ef473d2a6fe5903f92cf8ff0b29e0dc4\",\n  \"drift\": [\n    \"results/document-governance/summary.json\",\n    \"results/document-governance/catalog.jsonl\",\n    \"results/document-governance/relations.jsonl\",\n    \"results/document-governance/review-queue.json\",\n    \"docs/generated/DOCUMENT_GOVERNANCE_INDEX.md\",\n    \"docs/generated/DOCUMENT_REVIEW_QUEUE.md\"\n  ],\n  \"schema\": \"raf.document-governance.v1\",\n  \"state\": \"REVIEW_REQUIRED\",\n  \"summary\": {\n    \"areas\": {\n      \"apkc\": 214,\n     ",
+        "error": "document-governance: generated output drift: results/document-governance/summary.json, results/document-governance/catalog.jsonl, results/document-governance/relations.jsonl, results/document-governance/review-queue.json, docs/generated/DOCUMENT_GOVERNANCE_INDEX.md, docs/generated/DOCUMENT_REVIEW_QUEUE.md\n"
+      },
+      "scope": "Repository-wide",
+      "limitations": "Requires document_governance.py to be functional"
+    },
+    {
+      "timestamp": "2026-08-21T07:43:22.372156Z",
+      "commit": "9da4c835ef473d2a6fe5903f92cf8ff0b29e0dc4",
+      "branch": "claude/governance-ethics-layers-2aon2n",
+      "gate_id": "D5_traceability",
+      "gate_type": "detection",
+      "subsystem": "entire",
+      "result": "TOKEN_VAZIO",
+      "evidence": {
+        "results_dir_exists": true,
+        "receipt_count": 0
+      },
+      "scope": "Repository-wide",
+      "limitations": "Only checks directory structure; does not validate receipt content"
+    }
+  ]
+}
