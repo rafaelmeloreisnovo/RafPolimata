@@ -1,0 +1,319 @@
+{
+  "schema": "raf.termux-integration-receipt.v1",
+  "receipt_id": "termux-integration-20260821",
+  "generated_at": "2026-08-21T03:15:00Z",
+  "description": "Comprehensive integration receipt linking termux-app-rafacodephi and termux-packages",
+
+  "phase": "3B_MULTIDIMENSIONAL_OBSERVATION",
+
+  "dimension_1_visual_semantic_modeling": {
+    "status": "IN_PROGRESS",
+    "artifact": "federation-diagram-termux-integration.svg",
+    "scope": "Control plane integration, package dependency graph, evidence chain",
+    "token_vazio": "Diagram generation pending"
+  },
+
+  "dimension_2_execution_evidence": {
+    "status": "SOURCE_AND_ARTIFACT_LEVEL",
+    "scope": "ELO 1-3: Source, Compilation, Artifact",
+    "blocked_at": "ELO 4-5: Device execution (requires physical Android device)",
+
+    "elo_1_entrada": {
+      "layer": "SOURCE_CODE",
+      "repositories": [
+        {
+          "name": "termux-app-rafacodephi",
+          "url": "https://github.com/rafaelmeloreisnovo/termux-app-rafacodephi",
+          "commit_observed": "TBD",
+          "branch": "claude/proximo-passo-natural-c15mg3",
+          "files_key": [
+            "app/build.gradle",
+            "app/src/main/java/com/termux/app/TermuxApplication.java",
+            "app/src/main/java/com/termux/app/BootstrapGateActivity.java",
+            "app/src/main/java/com/termux/app/orchestration/BetaEvidenceOrchestrator.java",
+            "app/src/main/AndroidManifest.xml"
+          ],
+          "declared_capabilities": [
+            "Android runtime (SDK 21-35)",
+            "Native code execution (ARM/ARM64/x86/x86_64)",
+            "Logcat logging and event capture",
+            "Sensor API integration (accelerometer, gyroscope, magnetometer, light, proximity)",
+            "Evidence orchestration (5-stage pipeline)",
+            "Health gate execution (bootstrap readiness, integrity verification, bare-metal validation)"
+          ],
+          "declared_gaps": [
+            "Device runtime execution unavailable (no physical device or emulator)",
+            "APK signing capability unavailable (no signing keys in session)",
+            "ANativeActivity runtime observation unavailable",
+            "Logcat real-time capture unavailable"
+          ]
+        },
+        {
+          "name": "termux-packages",
+          "url": "https://github.com/rafaelmeloreisnovo/termux-packages",
+          "commit_observed": "TBD",
+          "branch": "main or development",
+          "packages_observed": "2059+ packages across 3 repos (main, root, x11)",
+          "key_packages_for_app": [
+            "bash (5.2.26-2)",
+            "libssl (openssl >= 3.2.1-1)",
+            "libz (zlib)",
+            "libcurl",
+            "libapt-pkg",
+            "apt (package manager)",
+            "dpkg (package database)"
+          ],
+          "build_system": "build-package.sh (32KB orchestrator)",
+          "dependency_resolver": "scripts/buildorder.py (topological sort)"
+        }
+      ],
+      "manifest_version": "AndroidManifest.xml observed (versionCode/versionName TBD at build time)",
+      "bootstrap_configuration": {
+        "base_url": "https://github.com/termux/termux-packages/releases/download",
+        "package_variant": "apt-android-7 (default, overridable)",
+        "supported_abis": ["arm64-v8a", "armeabi-v7a", "x86", "x86_64"],
+        "integrity_mechanism": "BLAKE3-256 checksums (fail-closed validation)"
+      }
+    },
+
+    "elo_2_compilador": {
+      "layer": "BUILD_ARTIFACTS",
+      "status": "TOKEN_VAZIO (build environment not configured in this session)",
+      "expected_command": "gradle build --variant release",
+      "expected_compiler": "Android Gradle Plugin (AGP), NDK C compiler",
+      "expected_artifacts": [
+        {
+          "name": "app-release.apk",
+          "type": "Android Package",
+          "target_arch": ["arm64-v8a", "armeabi-v7a"],
+          "size_estimate": "20-40 MB (with bootstrap)"
+        },
+        {
+          "name": "libraf_pa_core.so",
+          "type": "Native library (ELF)",
+          "arch": "ARM64/ARM32"
+        }
+      ],
+      "exit_code_expected": 0,
+      "notes": "Build requires Android SDK 35 (API 35), NDK r26+, and gradle setup"
+    },
+
+    "elo_3_artefato": {
+      "layer": "ARTIFACT_IDENTITY",
+      "status": "TOKEN_VAZIO (APK inspection requires local file)",
+      "expected_contents": {
+        "apk_structure": [
+          "META-INF/ (signature and manifest)",
+          "classes.dex (DEX bytecode)",
+          "lib/arm64-v8a/ (ARM64 native binaries)",
+          "resources.arsc (compiled resources)",
+          "AndroidManifest.xml (compiled app manifest)"
+        ],
+        "dex_analysis": "To extract class definitions and method signatures from DEX bytecode",
+        "elf_inspection": "To verify native binary (libraf_pa_core.so) structure and dependencies",
+        "signature_status": "Unsigned (dev build) or custom-signed (if keys available)"
+      },
+      "identity_hash": "SHA256(app-release.apk) = TBD",
+      "versioncode": "TBD (from build.gradle dynamicVersion)",
+      "versionname": "TBD (from build.gradle versionName)"
+    },
+
+    "elo_4_assinatura_instalacao": {
+      "layer": "DEVICE_INSTALLATION",
+      "status": "TOKEN_VAZIO (requires physical Android device or emulator)",
+      "blocked_reason": "No Android device or emulator configured in remote session",
+      "expected_gates": [
+        "APK signing verification (jarsigner -verify)",
+        "Installation via adb install (or package manager)",
+        "Permission grant (if required)",
+        "First-run bootstrap extraction"
+      ]
+    },
+
+    "elo_5_runtime_observation": {
+      "layer": "DEVICE_RUNTIME",
+      "status": "TOKEN_VAZIO (requires device access)",
+      "blocked_reason": "No Android device or emulator configured in remote session",
+      "expected_evidence": [
+        "ANativeActivity lifecycle (onCreate, onStart, onResume, onPause, onStop)",
+        "JNI initialization (ApiLowLevelBridge.nativeInit() call logs)",
+        "Logcat output (app lifecycle, error logs, native JNI calls)",
+        "Runtime health metrics (memory usage, CPU, battery)",
+        "Evidence orchestration output (BetaEvidenceOrchestrator receipt)",
+        "Package manager state (apt list, dpkg status)"
+      ]
+    }
+  },
+
+  "dimension_3_package_genealogy": {
+    "status": "IN_PROGRESS",
+    "matrix_file": "package-genealogy-matrix-20260821.json",
+    "scope": "Package dependency graph, build chain, satisfaction mapping",
+
+    "key_packages": [
+      {
+        "name": "bash",
+        "version": "5.2.26-2",
+        "provides": ["shell_interpreter"],
+        "requires": ["readline (>= 8.3)", "termux-tools"],
+        "depended_by": ["other-packages"],
+        "satisfied_by_app": "YES (in bootstrap)",
+        "evidence": "build.sh in termux-packages/packages/bash/"
+      },
+      {
+        "name": "libcurl",
+        "version": "8.20.0",
+        "provides": ["http_client_library", "url_transfer"],
+        "requires": ["libnghttp2", "libnghttp3", "libngtcp2", "libssh2", "openssl (>= 3.2.1-1)", "zlib"],
+        "depended_by": ["other-packages", "termux-app (optional)"],
+        "satisfied_by_app": "OPTIONAL (in bootstrap if curl command used)",
+        "evidence": "build.sh in termux-packages/packages/libcurl/"
+      },
+      {
+        "name": "openssl",
+        "version": ">= 3.2.1-1",
+        "provides": ["cryptography", "tls_support", "libssl.so"],
+        "requires": ["zlib"],
+        "depended_by": ["libcurl", "libssh2", "many-packages"],
+        "satisfied_by_app": "YES (essential, in bootstrap)",
+        "evidence": "build.sh in termux-packages/packages/openssl/"
+      },
+      {
+        "name": "apt",
+        "version": "current",
+        "provides": ["package_manager", "apt_command", "apt-get_command"],
+        "requires": ["libapt-pkg", "libgcc", "libc"],
+        "depended_by": ["termux-app (runtime)", "system-bootstrap"],
+        "satisfied_by_app": "YES (mandated in real-pkg mode)",
+        "evidence": "build.sh in termux-packages/packages/apt/",
+        "validation_gate": "BootstrapReadinessGate checks for ELF binary at PREFIX/bin/apt"
+      }
+    ],
+
+    "seven_directions_matrix": {
+      "1_provision": {
+        "description": "What capability does this package provide?",
+        "examples": [
+          "bash → shell_interpreter",
+          "libssl.so → cryptography_and_tls",
+          "apt → package_management"
+        ]
+      },
+      "2_dependency": {
+        "description": "What does this package require?",
+        "examples": [
+          "libcurl → requires openssl, libz, libnghttp2",
+          "apt → requires libapt-pkg, libgcc"
+        ]
+      },
+      "3_conflict": {
+        "description": "What does this package conflict with?",
+        "examples": [
+          "openssl-1.0 ↔ openssl-1.1 (incompatible ABI)",
+          "busybox ↔ coreutils (command name collisions)"
+        ]
+      },
+      "4_implementation": {
+        "description": "What interface does this package implement?",
+        "examples": [
+          "curl implements http_client interface",
+          "bash implements posix_shell interface"
+        ]
+      },
+      "5_evidence": {
+        "description": "What evidence proves this package works?",
+        "examples": [
+          "build.log proves compilation success",
+          "build-package.sh execution receipt",
+          "ELF header verification (magic bytes)"
+        ]
+      },
+      "6_falsification": {
+        "description": "What contradicts this package's claims?",
+        "examples": [
+          "static_binary flag ↔ dynamic_link requirement",
+          "architecture mismatch (arm64 binary on arm32 device)"
+        ]
+      },
+      "7_evolutionary": {
+        "description": "What other versions or packages replace this?",
+        "examples": [
+          "bash-4.x → bash-5.x",
+          "openssl-1.1 → openssl-3.0 (ABI breaking)"
+        ]
+      }
+    }
+  },
+
+  "cross_repository_relationships": {
+    "producer": {
+      "repository": "rafaelmeloreisnovo/termux-packages",
+      "role": "package_source",
+      "artifact": "packages/*/build.sh (2059+ recipes)",
+      "hash": "TBD (repo HEAD hash)",
+      "timestamp": "TBD"
+    },
+    "consumer": {
+      "repository": "rafaelmeloreisnovo/termux-app-rafacodephi",
+      "role": "runtime_platform",
+      "dependency_declaration": "app/build.gradle (TERMUX_BOOTSTRAP_BASE_URL)",
+      "consumption_method": "GitHub releases download → bootstrap acquisition"
+    },
+    "intermediary": {
+      "role": "evidence_orchestrator",
+      "function": "BetaEvidenceOrchestrator (5-stage pipeline)",
+      "scope": "Capture bootstrap state, health gates, package manager state"
+    }
+  },
+
+  "epistemological_state": {
+    "state_before": "HIPÓTESE",
+    "state_now": "PARCIAL_FATO",
+    "transformation": "Explored architecture, identified dependencies, marked TOKEN_VAZIO gates",
+    "observable_boundaries": [
+      "Source code analysis: FATO (code exists and is observable)",
+      "Build configuration: FATO (gradle/build system is observable)",
+      "Package genealogy: FATO (dependency declarations are parseable)",
+      "Build execution: TOKEN_VAZIO (requires build environment)",
+      "APK artifact identity: TOKEN_VAZIO (requires successful build)",
+      "Device installation: TOKEN_VAZIO (requires physical device)",
+      "Runtime observation: TOKEN_VAZIO (requires device access)"
+    ],
+    "claim_allowed": false,
+    "notes": "Comprehensive mapping complete at source/architecture level. Device-level proof blocked by unavailable hardware."
+  },
+
+  "f_ok": [
+    "✓ termux-app-rafacodephi architecture mapped (5 entry points identified)",
+    "✓ Evidence orchestration infrastructure confirmed (BetaEvidenceOrchestrator + 5-stage pipeline)",
+    "✓ Bootstrap configuration understood (BLAKE3 checksums, package variants)",
+    "✓ termux-packages build system analyzed (2059+ packages, REAL layer, PHASE 9 optimization)",
+    "✓ Integration points identified (bootstrap sourcing, runtime PREFIX, package validation)",
+    "✓ Dependencies mapped (apt, libcurl, openssl, libz, etc.)",
+    "✓ Cross-repository relationship established (producer/consumer/intermediary roles)",
+    "✓ Health gates documented (bootstrap readiness, integrity verification, bare-metal validation)"
+  ],
+
+  "f_gap": [
+    "⚠️ No Android build environment (gradle build command not executable in this session)",
+    "⚠️ No physical Android device or emulator (runtime observation blocked)",
+    "⚠️ No APK signing keys (signature verification limited to unsigned/custom builds)",
+    "⚠️ No package build execution (termux-packages compilation requires build toolchain)",
+    "⚠️ Device installation not testable (adb install unavailable)",
+    "⚠️ Runtime package manager state not observable (dpkg status, apt sources verification)",
+    "⚠️ Sensor data and performance metrics unavailable (Vectra integration not testable)",
+    "⚠️ Evidence orchestration output not observable (BetaEvidenceOrchestrator receipt generation requires device)"
+  ],
+
+  "f_next": [
+    "1. Generate federation diagram artifact (Mermaid/SVG) showing termux role in control plane",
+    "2. Create package genealogy matrix JSON with 7-direction relationships",
+    "3. Register termux-app and termux-packages observations in Mapa module_registry.v1.json",
+    "4. Update Mapa federation-policy.v1.json with validation lanes and evidence requirements",
+    "5. Execute federated_doctor_pass.py to aggregate cross-repository evidence",
+    "6. Close federated circuit with final F_ok/F_gap/F_next report",
+    "7. When device becomes available: Run termux-app on device, capture ANativeActivity logs, verify package manager state, generate runtime evidence artifacts"
+  ],
+
+  "status": "PARCIAL_FATO"
+}
