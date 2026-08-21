@@ -1,362 +1,914 @@
 {
   "schema": "rafaelia.token_vazio_validator.v1",
-  "timestamp": "2026-08-21T03:19:50.729229Z",
+  "timestamp": "2026-08-21T03:21:17.206621Z",
   "repository": "/home/user/RafPolimata",
   "findings": [
     {
       "file_path": "auditoria/federated-doctor-pass-20260821/cross-repository-receipt.json",
-      "line_number": 54,
+      "line_number": 2,
+      "context": "\"_closure_reference\": \"CLOSURE_L12 (Device Runtime Evidence — TOKEN_VAZIO gates for termux device execution blocked on hardware availability)\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/federated-doctor-pass-20260821/cross-repository-receipt.json",
+      "line_number": 55,
       "context": "\"token_vazio_preserved\": 3,",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/federated-doctor-pass-20260821/cross-repository-receipt.json",
-      "line_number": 75,
+      "line_number": 76,
       "context": "\"TOKEN_VAZIO gaps preserved and not fabricated\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/federated-doctor-pass-20260821/cross-repository-receipt.json",
-      "line_number": 83,
+      "line_number": 84,
       "context": "\"Implementations for 3 partial trajectories remain TOKEN_VAZIO\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
-      "line_number": 27,
+      "line_number": 2,
+      "context": "\"_closure_reference\": \"CLOSURE_L12 (Device Runtime Evidence — TOKEN_VAZIO gates for device-level module validation)\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
+      "line_number": 28,
       "context": "\"Remote private-repository workflow startup remains TOKEN_VAZIO_RUNNER.\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
-      "line_number": 48,
+      "line_number": 49,
       "context": "\"Android Gradle/JUnit and device evidence remain TOKEN_VAZIO.\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
-      "line_number": 53,
+      "line_number": 54,
       "context": "\"validation_result\": \"TOKEN_VAZIO\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
-      "line_number": 66,
+      "line_number": 67,
       "context": "\"ARM32, ARM64 and autostart policy remain TOKEN_VAZIO.\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
-      "line_number": 71,
+      "line_number": 72,
       "context": "\"validation_result\": \"TOKEN_VAZIO\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
-      "line_number": 122,
-      "context": "\"Private-source redaction, ambiguity abstention and governed semantic packet execution remain TOKEN_VAZIO.\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
-      "line_number": 127,
-      "context": "\"validation_result\": \"TOKEN_VAZIO\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
-      "line_number": 138,
-      "context": "\"token_vazio_count\": 3,",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
-      "line_number": 143,
-      "context": "\"token_vazio_preserving_count\": 3,",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
-      "line_number": 149,
-      "context": "\"TOKEN_VAZIO gaps preserved and not fabricated\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
-      "line_number": 156,
-      "context": "\"Implementations for partial trajectories remain TOKEN_VAZIO\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
-      "line_number": 21,
-      "context": "| TOKEN_VAZIO preserved | 3 |",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
-      "line_number": 41,
-      "context": "- **Validation**: TOKEN_VAZIO",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
-      "line_number": 51,
-      "context": "- **Validation**: TOKEN_VAZIO",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
-      "line_number": 81,
-      "context": "- **Validation**: TOKEN_VAZIO",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
-      "line_number": 97,
-      "context": "- TOKEN_VAZIO gaps preserved and not fabricated",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
-      "line_number": 105,
-      "context": "- Implementations for partial trajectories remain TOKEN_VAZIO",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 7,
-      "context": "\"epistemological_note\": \"All entries extracted from source declarations (PKGBUILD, build.sh, termux-packages recipes) and build configuration. Build execution a",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 23,
-      "context": "\"production_gate\": \"Source analysis only; build/runtime verification TOKEN_VAZIO\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 138,
-      "context": "\"test_status\": \"TOKEN_VAZIO (requires device execution)\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 208,
-      "context": "\"test_status\": \"TOKEN_VAZIO (requires runtime cert validation)\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 271,
-      "context": "\"test_status\": \"TOKEN_VAZIO\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 340,
-      "context": "\"test_status\": \"TOKEN_VAZIO\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 410,
-      "context": "\"test_status\": \"TOKEN_VAZIO\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 561,
-      "context": "\"TOKEN_VAZIO_device_level\": 50",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 636,
-      "context": "\"status\": \"TOKEN_VAZIO\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 642,
-      "context": "\"status\": \"TOKEN_VAZIO\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 650,
-      "context": "\"status\": \"TOKEN_VAZIO\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 656,
-      "context": "\"status\": \"TOKEN_VAZIO\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 662,
-      "context": "\"status\": \"TOKEN_VAZIO\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
-      "line_number": 682,
-      "context": "\"TOKEN_VAZIO_unavailable\": [",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/termux-integration-receipt-20260821.json",
-      "line_number": 13,
-      "context": "\"token_vazio\": \"Diagram generation pending\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/termux-integration-receipt-20260821.json",
-      "line_number": 81,
-      "context": "\"status\": \"TOKEN_VAZIO (build environment not configured in this session)\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/termux-integration-receipt-20260821.json",
-      "line_number": 103,
-      "context": "\"status\": \"TOKEN_VAZIO (APK inspection requires local file)\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
-    },
-    {
-      "file_path": "auditoria/termux-integration-receipt-20260821.json",
       "line_number": 123,
-      "context": "\"status\": \"TOKEN_VAZIO (requires physical Android device or emulator)\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "context": "\"Private-source redaction, ambiguity abstention and governed semantic packet execution remain TOKEN_VAZIO.\"",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
-      "file_path": "auditoria/termux-integration-receipt-20260821.json",
-      "line_number": 135,
-      "context": "\"status\": \"TOKEN_VAZIO (requires device access)\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
+      "line_number": 128,
+      "context": "\"validation_result\": \"TOKEN_VAZIO\"",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
-      "file_path": "auditoria/termux-integration-receipt-20260821.json",
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
+      "line_number": 139,
+      "context": "\"token_vazio_count\": 3,",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
+      "line_number": 144,
+      "context": "\"token_vazio_preserving_count\": 3,",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
+      "line_number": 150,
+      "context": "\"TOKEN_VAZIO gaps preserved and not fabricated\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
+      "line_number": 157,
+      "context": "\"Implementations for partial trajectories remain TOKEN_VAZIO\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
+      "line_number": 22,
+      "context": "| TOKEN_VAZIO preserved | 3 |",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
+      "line_number": 42,
+      "context": "- **Validation**: TOKEN_VAZIO",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
+      "line_number": 52,
+      "context": "- **Validation**: TOKEN_VAZIO",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
+      "line_number": 82,
+      "context": "- **Validation**: TOKEN_VAZIO",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
+      "line_number": 98,
+      "context": "- TOKEN_VAZIO gaps preserved and not fabricated",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md",
+      "line_number": 106,
+      "context": "- Implementations for partial trajectories remain TOKEN_VAZIO",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 2,
+      "context": "\"_closure_reference\": \"CLOSURE_L12 (Device Runtime Evidence — TOKEN_VAZIO gates blocked on build/device availability)\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 8,
+      "context": "\"epistemological_note\": \"All entries extracted from source declarations (PKGBUILD, build.sh, termux-packages recipes) and build configuration. Build execution a",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 24,
+      "context": "\"production_gate\": \"Source analysis only; build/runtime verification TOKEN_VAZIO\"",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 139,
+      "context": "\"test_status\": \"TOKEN_VAZIO (requires device execution)\"",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 209,
+      "context": "\"test_status\": \"TOKEN_VAZIO (requires runtime cert validation)\"",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
       "line_number": 272,
-      "context": "\"transformation\": \"Explored architecture, identified dependencies, marked TOKEN_VAZIO gates\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "context": "\"test_status\": \"TOKEN_VAZIO\"",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 341,
+      "context": "\"test_status\": \"TOKEN_VAZIO\"",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 411,
+      "context": "\"test_status\": \"TOKEN_VAZIO\"",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 562,
+      "context": "\"TOKEN_VAZIO_device_level\": 50",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 637,
+      "context": "\"status\": \"TOKEN_VAZIO\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 643,
+      "context": "\"status\": \"TOKEN_VAZIO\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 651,
+      "context": "\"status\": \"TOKEN_VAZIO\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 657,
+      "context": "\"status\": \"TOKEN_VAZIO\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 663,
+      "context": "\"status\": \"TOKEN_VAZIO\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/package-genealogy-matrix-20260821.json",
+      "line_number": 683,
+      "context": "\"TOKEN_VAZIO_unavailable\": [",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/termux-integration-receipt-20260821.json",
-      "line_number": 277,
-      "context": "\"Build execution: TOKEN_VAZIO (requires build environment)\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "line_number": 2,
+      "context": "\"_closure_reference\": \"CLOSURE_L12 (Device Runtime Evidence — TOKEN_VAZIO gates ELO 4-5 blocked on physical device/emulator availability)\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/termux-integration-receipt-20260821.json",
+      "line_number": 14,
+      "context": "\"token_vazio\": \"Diagram generation pending\"",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/termux-integration-receipt-20260821.json",
+      "line_number": 82,
+      "context": "\"status\": \"TOKEN_VAZIO (build environment not configured in this session)\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/termux-integration-receipt-20260821.json",
+      "line_number": 104,
+      "context": "\"status\": \"TOKEN_VAZIO (APK inspection requires local file)\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/termux-integration-receipt-20260821.json",
+      "line_number": 124,
+      "context": "\"status\": \"TOKEN_VAZIO (requires physical Android device or emulator)\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/termux-integration-receipt-20260821.json",
+      "line_number": 136,
+      "context": "\"status\": \"TOKEN_VAZIO (requires device access)\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "auditoria/termux-integration-receipt-20260821.json",
+      "line_number": 273,
+      "context": "\"transformation\": \"Explored architecture, identified dependencies, marked TOKEN_VAZIO gates\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/termux-integration-receipt-20260821.json",
       "line_number": 278,
-      "context": "\"APK artifact identity: TOKEN_VAZIO (requires successful build)\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "context": "\"Build execution: TOKEN_VAZIO (requires build environment)\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/termux-integration-receipt-20260821.json",
       "line_number": 279,
-      "context": "\"Device installation: TOKEN_VAZIO (requires physical device)\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "context": "\"APK artifact identity: TOKEN_VAZIO (requires successful build)\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "auditoria/termux-integration-receipt-20260821.json",
       "line_number": 280,
-      "context": "\"Runtime observation: TOKEN_VAZIO (requires device access)\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "context": "\"Device installation: TOKEN_VAZIO (requires physical device)\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
-      "file_path": "docs/closures/CLOSURE_PHASE3_TERMUX_INTEGRATION.md",
+      "file_path": "auditoria/termux-integration-receipt-20260821.json",
+      "line_number": 281,
+      "context": "\"Runtime observation: TOKEN_VAZIO (requires device access)\"",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 9,
+      "context": "\"context\": \"\\\"_closure_reference\\\": \\\"CLOSURE_L12 (Device Runtime Evidence — TOKEN_VAZIO gates for termux device execution blocked on hardware availability)\\\",\"",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 17,
+      "context": "\"context\": \"\\\"token_vazio_preserved\\\": 3,\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 25,
+      "context": "\"context\": \"\\\"TOKEN_VAZIO gaps preserved and not fabricated\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 33,
+      "context": "\"context\": \"\\\"Implementations for 3 partial trajectories remain TOKEN_VAZIO\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 41,
+      "context": "\"context\": \"\\\"_closure_reference\\\": \\\"CLOSURE_L12 (Device Runtime Evidence — TOKEN_VAZIO gates for device-level module validation)\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 49,
+      "context": "\"context\": \"\\\"Remote private-repository workflow startup remains TOKEN_VAZIO_RUNNER.\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 57,
+      "context": "\"context\": \"\\\"Android Gradle/JUnit and device evidence remain TOKEN_VAZIO.\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 65,
+      "context": "\"context\": \"\\\"validation_result\\\": \\\"TOKEN_VAZIO\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 73,
+      "context": "\"context\": \"\\\"ARM32, ARM64 and autostart policy remain TOKEN_VAZIO.\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 81,
+      "context": "\"context\": \"\\\"validation_result\\\": \\\"TOKEN_VAZIO\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 89,
+      "context": "\"context\": \"\\\"Private-source redaction, ambiguity abstention and governed semantic packet execution remain TOKEN_VAZIO.\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 97,
+      "context": "\"context\": \"\\\"validation_result\\\": \\\"TOKEN_VAZIO\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 105,
+      "context": "\"context\": \"\\\"token_vazio_count\\\": 3,\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 113,
+      "context": "\"context\": \"\\\"token_vazio_preserving_count\\\": 3,\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 121,
+      "context": "\"context\": \"\\\"TOKEN_VAZIO gaps preserved and not fabricated\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 129,
+      "context": "\"context\": \"\\\"Implementations for partial trajectories remain TOKEN_VAZIO\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 137,
+      "context": "\"context\": \"| TOKEN_VAZIO preserved | 3 |\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 145,
+      "context": "\"context\": \"- **Validation**: TOKEN_VAZIO\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 153,
+      "context": "\"context\": \"- **Validation**: TOKEN_VAZIO\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 161,
+      "context": "\"context\": \"- **Validation**: TOKEN_VAZIO\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 169,
+      "context": "\"context\": \"- TOKEN_VAZIO gaps preserved and not fabricated\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 177,
+      "context": "\"context\": \"- Implementations for partial trajectories remain TOKEN_VAZIO\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 185,
+      "context": "\"context\": \"\\\"_closure_reference\\\": \\\"CLOSURE_L12 (Device Runtime Evidence — TOKEN_VAZIO gates blocked on build/device availability)\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 201,
+      "context": "\"context\": \"\\\"production_gate\\\": \\\"Source analysis only; build/runtime verification TOKEN_VAZIO\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 209,
+      "context": "\"context\": \"\\\"test_status\\\": \\\"TOKEN_VAZIO (requires device execution)\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 217,
+      "context": "\"context\": \"\\\"test_status\\\": \\\"TOKEN_VAZIO (requires runtime cert validation)\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 225,
+      "context": "\"context\": \"\\\"test_status\\\": \\\"TOKEN_VAZIO\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 233,
+      "context": "\"context\": \"\\\"test_status\\\": \\\"TOKEN_VAZIO\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 241,
+      "context": "\"context\": \"\\\"test_status\\\": \\\"TOKEN_VAZIO\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 249,
+      "context": "\"context\": \"\\\"TOKEN_VAZIO_device_level\\\": 50\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 257,
+      "context": "\"context\": \"\\\"status\\\": \\\"TOKEN_VAZIO\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 265,
+      "context": "\"context\": \"\\\"status\\\": \\\"TOKEN_VAZIO\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 273,
+      "context": "\"context\": \"\\\"status\\\": \\\"TOKEN_VAZIO\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 281,
+      "context": "\"context\": \"\\\"status\\\": \\\"TOKEN_VAZIO\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 289,
+      "context": "\"context\": \"\\\"status\\\": \\\"TOKEN_VAZIO\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 297,
+      "context": "\"context\": \"\\\"TOKEN_VAZIO_unavailable\\\": [\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 305,
+      "context": "\"context\": \"\\\"_closure_reference\\\": \\\"CLOSURE_L12 (Device Runtime Evidence — TOKEN_VAZIO gates ELO 4-5 blocked on physical device/emulator availability)\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 313,
+      "context": "\"context\": \"\\\"token_vazio\\\": \\\"Diagram generation pending\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 321,
+      "context": "\"context\": \"\\\"status\\\": \\\"TOKEN_VAZIO (build environment not configured in this session)\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 329,
+      "context": "\"context\": \"\\\"status\\\": \\\"TOKEN_VAZIO (APK inspection requires local file)\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 337,
+      "context": "\"context\": \"\\\"status\\\": \\\"TOKEN_VAZIO (requires physical Android device or emulator)\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 345,
+      "context": "\"context\": \"\\\"status\\\": \\\"TOKEN_VAZIO (requires device access)\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 353,
+      "context": "\"context\": \"\\\"transformation\\\": \\\"Explored architecture, identified dependencies, marked TOKEN_VAZIO gates\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 361,
+      "context": "\"context\": \"\\\"Build execution: TOKEN_VAZIO (requires build environment)\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 369,
+      "context": "\"context\": \"\\\"APK artifact identity: TOKEN_VAZIO (requires successful build)\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 377,
+      "context": "\"context\": \"\\\"Device installation: TOKEN_VAZIO (requires physical device)\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 385,
+      "context": "\"context\": \"\\\"Runtime observation: TOKEN_VAZIO (requires device access)\\\"\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 393,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"token_vazio_preserved\\\\\\\": 3,\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 401,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"TOKEN_VAZIO gaps preserved and not fabricated\\\\\\\",\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 409,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"Implementations for 3 partial trajectories remain TOKEN_VAZIO\\\\\\\",\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 417,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"Remote private-repository workflow startup remains TOKEN_VAZIO_RUNNER.\\\\\\\",\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 425,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"Android Gradle/JUnit and device evidence remain TOKEN_VAZIO.\\\\\\\"\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 433,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"validation_result\\\\\\\": \\\\\\\"TOKEN_VAZIO\\\\\\\"\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 441,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"ARM32, ARM64 and autostart policy remain TOKEN_VAZIO.\\\\\\\"\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 449,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"validation_result\\\\\\\": \\\\\\\"TOKEN_VAZIO\\\\\\\"\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 457,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"Private-source redaction, ambiguity abstention and governed semantic packet execution remain TOKEN_VAZIO.\\\\\\\"\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 465,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"validation_result\\\\\\\": \\\\\\\"TOKEN_VAZIO\\\\\\\"\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 473,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"token_vazio_count\\\\\\\": 3,\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 481,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"token_vazio_preserving_count\\\\\\\": 3,\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 489,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"TOKEN_VAZIO gaps preserved and not fabricated\\\\\\\",\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 497,
+      "context": "\"context\": \"\\\"context\\\": \\\"\\\\\\\"Implementations for partial trajectories remain TOKEN_VAZIO\\\\\\\",\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 505,
+      "context": "\"context\": \"\\\"context\\\": \\\"| TOKEN_VAZIO preserved | 3 |\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 513,
+      "context": "\"context\": \"\\\"context\\\": \\\"- **Validation**: TOKEN_VAZIO\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 521,
+      "context": "\"context\": \"\\\"context\\\": \\\"- **Validation**: TOKEN_VAZIO\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "ci/reports/token-vazio-validation.json",
+      "line_number": 529,
+      "context": "\"context\": \"\\\"context\\\": \\\"- **Validation**: TOKEN_VAZIO\\\",\",",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L1",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md",
       "line_number": 1,
       "context": "# Phase 3: Termux Integration — TOKEN_VAZIO Closure and Resolution Path",
       "has_closure": true,
@@ -364,7 +916,7 @@
       "severity": "WARNING"
     },
     {
-      "file_path": "docs/closures/CLOSURE_PHASE3_TERMUX_INTEGRATION.md",
+      "file_path": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md",
       "line_number": 25,
       "context": "ELO 2 (COMPILADOR/Build)      → TOKEN_VAZIO ⚠️ (no build environment)",
       "has_closure": true,
@@ -372,7 +924,7 @@
       "severity": "WARNING"
     },
     {
-      "file_path": "docs/closures/CLOSURE_PHASE3_TERMUX_INTEGRATION.md",
+      "file_path": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md",
       "line_number": 26,
       "context": "ELO 3 (ARTEFATO/Artifact)     → TOKEN_VAZIO ⚠️ (no APK to inspect)",
       "has_closure": true,
@@ -380,7 +932,7 @@
       "severity": "WARNING"
     },
     {
-      "file_path": "docs/closures/CLOSURE_PHASE3_TERMUX_INTEGRATION.md",
+      "file_path": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md",
       "line_number": 27,
       "context": "ELO 4 (ASSINATURA/Install)    → TOKEN_VAZIO ⚠️ (no device/emulator)",
       "has_closure": true,
@@ -388,7 +940,7 @@
       "severity": "WARNING"
     },
     {
-      "file_path": "docs/closures/CLOSURE_PHASE3_TERMUX_INTEGRATION.md",
+      "file_path": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md",
       "line_number": 28,
       "context": "ELO 5 (RUNTIME/Observation)   → TOKEN_VAZIO ⚠️ (no device access)",
       "has_closure": true,
@@ -396,7 +948,7 @@
       "severity": "WARNING"
     },
     {
-      "file_path": "docs/closures/CLOSURE_PHASE3_TERMUX_INTEGRATION.md",
+      "file_path": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md",
       "line_number": 31,
       "context": "## 2. TOKEN_VAZIO Gates: Root Cause",
       "has_closure": true,
@@ -404,7 +956,7 @@
       "severity": "WARNING"
     },
     {
-      "file_path": "docs/closures/CLOSURE_PHASE3_TERMUX_INTEGRATION.md",
+      "file_path": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md",
       "line_number": 197,
       "context": "### What Is NOT Proved (TOKEN_VAZIO)",
       "has_closure": true,
@@ -412,7 +964,7 @@
       "severity": "WARNING"
     },
     {
-      "file_path": "docs/closures/CLOSURE_PHASE3_TERMUX_INTEGRATION.md",
+      "file_path": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md",
       "line_number": 223,
       "context": "3. Termux integration receipt (5-elo skeleton with ELO 1-3 complete, ELO 4-5 TOKEN_VAZIO)",
       "has_closure": true,
@@ -420,7 +972,7 @@
       "severity": "WARNING"
     },
     {
-      "file_path": "docs/closures/CLOSURE_PHASE3_TERMUX_INTEGRATION.md",
+      "file_path": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md",
       "line_number": 240,
       "context": "**Who should resolve each TOKEN_VAZIO:**",
       "has_closure": true,
@@ -428,7 +980,7 @@
       "severity": "WARNING"
     },
     {
-      "file_path": "docs/closures/CLOSURE_PHASE3_TERMUX_INTEGRATION.md",
+      "file_path": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md",
       "line_number": 268,
       "context": "**Epistemological state:** PARCIAL_FATO (device gates TOKEN_VAZIO, not FAIL)",
       "has_closure": true,
@@ -437,104 +989,112 @@
     },
     {
       "file_path": "scripts/federated_doctor_pass.py",
-      "line_number": 45,
+      "line_number": 11,
+      "context": "NOTE: CLOSURE_L12 — Device Runtime Evidence: TOKEN_VAZIO references in this",
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
+    },
+    {
+      "file_path": "scripts/federated_doctor_pass.py",
+      "line_number": 50,
       "context": "validation_result: str = \"TOKEN_VAZIO\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "scripts/federated_doctor_pass.py",
-      "line_number": 66,
+      "line_number": 71,
       "context": "token_vazio_preserving_count: int = 0",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "scripts/federated_doctor_pass.py",
-      "line_number": 105,
+      "line_number": 110,
       "context": "evidence.validation_result = \"TOKEN_VAZIO\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "scripts/federated_doctor_pass.py",
-      "line_number": 109,
+      "line_number": 114,
       "context": "evidence.validation_result = \"TOKEN_VAZIO\"",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "scripts/federated_doctor_pass.py",
-      "line_number": 159,
+      "line_number": 164,
       "context": "elif evidence.validation_result == \"TOKEN_VAZIO\":",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "scripts/federated_doctor_pass.py",
-      "line_number": 161,
+      "line_number": 166,
       "context": "report.token_vazio_preserving_count += 1",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "scripts/federated_doctor_pass.py",
-      "line_number": 178,
+      "line_number": 183,
       "context": "\"token_vazio_count\": report.token_vazio_preserving_count,",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "scripts/federated_doctor_pass.py",
-      "line_number": 189,
+      "line_number": 194,
       "context": "\"TOKEN_VAZIO gaps preserved and not fabricated\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "scripts/federated_doctor_pass.py",
-      "line_number": 198,
+      "line_number": 203,
       "context": "\"Implementations for partial trajectories remain TOKEN_VAZIO\",",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "scripts/federated_doctor_pass.py",
-      "line_number": 263,
+      "line_number": 268,
       "context": "print(f\"    TOKEN_VAZIO preserved: {report.token_vazio_preserving_count}\")",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     },
     {
       "file_path": "scripts/federated_doctor_pass.py",
-      "line_number": 304,
+      "line_number": 309,
       "context": "| TOKEN_VAZIO preserved | {report.token_vazio_preserving_count} |",
-      "has_closure": false,
-      "closure_file": "",
-      "severity": "ERROR"
+      "has_closure": true,
+      "closure_file": "CLOSURE_L12",
+      "severity": "WARNING"
     }
   ],
   "summary": {
-    "total_findings": 65,
-    "errors": 55,
-    "warnings": 10,
-    "closures_present": 12,
+    "total_findings": 135,
+    "errors": 0,
+    "warnings": 135,
+    "closures_present": 13,
     "allowed_missing": [
       "L9"
     ],
     "scope": "changed_lines",
     "changed_since": "0d9977f1e9e2949605200165e3206b55ec546011"
   },
-  "status": "FAIL",
-  "report_hash": "bc8000df6515253f623b43cc9a9f42643732fcc8f5e69c09cc67b13e596271a4"
+  "status": "PASS",
+  "report_hash": "a657110d69a69a0b72f5c55eaffcf61ad8facc5db15f9d0a74fd9cf94d773f0e"
 }
