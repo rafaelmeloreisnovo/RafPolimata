@@ -7,6 +7,11 @@ validation report by aggregating evidence from all registered modules.
 
 This is the second phase of the federated conjunction:
   Mapa (observation) → RafPolimata (evidence aggregation) → LlamaRafaelia (interpretation)
+
+NOTE: CLOSURE_L12 — Device Runtime Evidence: TOKEN_VAZIO references in this
+module refer to device-level evidence gates blocked on physical device/emulator
+availability. See docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md for
+resolution paths and timeline.
 """
 
 import json
