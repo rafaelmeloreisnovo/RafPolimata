@@ -13,7 +13,7 @@ exe="$exec_root/raf_compile"
 "$cc" -std=c11 -Wall -Wextra -Werror \
   raf_main.c raf_frontend.c raf_cpu.c raf_asm_emit.c raf_precomp.c \
   -o "$exe"
-chmod +x "$exe" 2>/dev/null || true
+chmod +x "$exe"
 
 "$exe" tests/fixtures/raf_return_42.c "$build_dir/a" O3 --native >/dev/null
 "$exe" tests/fixtures/raf_return_42.c "$build_dir/b" O3 --native >/dev/null
