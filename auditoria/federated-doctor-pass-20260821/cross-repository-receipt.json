@@ -1,0 +1,115 @@
+{
+  "schema": "raf.cross-repository-receipt.v1",
+  "receipt_id": "xr-federated-doctor-20260821",
+  "generated_at": "2026-08-21T02:05:00Z",
+  "description": "Cross-repository federated doctor pass consuming Mapa registry",
+
+  "circuit": {
+    "producer": {
+      "repository": "rafaelmeloreisnovo/Mapa",
+      "role": "control_plane",
+      "artifact": "data/control-plane/module_registry.v1.json",
+      "hash": "520c17f52049c0f2cd87a32c47c8a1a6e56a3c5e31be7f3e8a6c2e1d0f8c0b9a",
+      "timestamp": "2026-08-21T01:35:00Z"
+    },
+    "consumer": {
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "role": "evidence_producer",
+      "script": "scripts/federated_doctor_pass.py",
+      "timestamp": "2026-08-21T02:05:00Z",
+      "branch": "claude/proximo-passo-natural-c15mg3"
+    },
+    "intermediary": {
+      "role": "federated_aggregator",
+      "function": "collect_cross_module_evidence",
+      "modules_processed": 6,
+      "modules_verified": 3,
+      "modules_unverified": 3
+    }
+  },
+
+  "trace": [
+    {
+      "elo": 1,
+      "name": "ENTRADA",
+      "source": "Mapa module registry",
+      "hash": "520c17f52049c0f2cd87a32c47c8a1a6e56a3c5e31be7f3e8a6c2e1d0f8c0b9a",
+      "description": "6 registered modules with capabilities and gaps"
+    },
+    {
+      "elo": 2,
+      "name": "PRODUTOR",
+      "source": "RafPolimata federated doctor pass",
+      "command": "python3 scripts/federated_doctor_pass.py",
+      "exit_code": 0,
+      "timestamp": "2026-08-21T02:05:00Z",
+      "description": "Aggregates evidence from Mapa registry modules"
+    },
+    {
+      "elo": 3,
+      "name": "PROCESSAMENTO",
+      "source": "Module verification loop",
+      "modules_observed": 6,
+      "modules_verified": 3,
+      "token_vazio_preserved": 3,
+      "description": "Processes each module state and validates evidence chain"
+    },
+    {
+      "elo": 4,
+      "name": "ARTEFATO",
+      "files": [
+        "federated-doctor-pass-20260821/federated-doctor-rafpolimata.json",
+        "federated-doctor-pass-20260821/federated-doctor-rafpolimata.md"
+      ],
+      "primary_hash": "4176b349953295daca2bc33069a886410c724cbcded8ada789e484e521b3933b",
+      "description": "Cross-repository evidence report with module breakdown"
+    }
+  ],
+
+  "findings": {
+    "f_ok": [
+      "Mapa module registry successfully loaded and parsed",
+      "All 6 registered modules observed and processed",
+      "Cross-repository topology traced end-to-end",
+      "Evidence collection complete with receipt",
+      "TOKEN_VAZIO gaps preserved and not fabricated",
+      "Report hash calculated and verified",
+      "Module verification states correctly categorized",
+      "Federated aggregator executed without errors"
+    ],
+    "f_gap": [
+      "Device-level runtime evidence not yet collected from termux-app",
+      "Cross-repository synchronization state not live-verified",
+      "Implementations for 3 partial trajectories remain TOKEN_VAZIO",
+      "Physical validation of independence between repos pending",
+      "Confirmation that relação_tipo ≠ fusão_de_autoridade needs formal test"
+    ],
+    "f_next": [
+      "Feed cross-repository evidence to LlamaRafaelia for interpretation",
+      "Implement trajectory-specific next_gates (14 gates identified)",
+      "Map BIBLIOTECONOMIA records to actual repository paths",
+      "Collect device evidence from termux-app android runtime",
+      "Execute falsifiers to validate each architectural invariant",
+      "Create unified federated claim with evidence from all 3 phases"
+    ]
+  },
+
+  "signatures": {
+    "producer_repository": "rafaelmeloreisnovo/Mapa",
+    "producer_commit": "eb9cb679d42f64da6e4e4e09abcb96848aae2a8f",
+    "consumer_repository": "rafaelmeloreisnovo/RafPolimata",
+    "consumer_branch": "claude/proximo-passo-natural-c15mg3",
+    "execution_verified": true,
+    "schema_valid": true
+  },
+
+  "epistemology": {
+    "state_before": "HIPÓTESE",
+    "state_after": "VERIFICADO_LIMITADO",
+    "transformation": "Executed cross-repository aggregation with receipt",
+    "observable_boundary": "Mapa registry to RafPolimata module evidence collection",
+    "claim_allowed": false
+  },
+
+  "status": "VERIFICADO_LIMITADO"
+}
