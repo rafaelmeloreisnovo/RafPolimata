@@ -1,0 +1,192 @@
+{
+  "schema": "raf.federated-doctor-report.v1",
+  "report_id": "federated-doctor-20260821T034515Z",
+  "generated_at": "2026-08-21T03:45:15.765854Z",
+  "mapa_registry_ref": "/home/user/mapa/data/control-plane/module_registry.v1.json",
+  "mapa_registry_hash": "66a4599724edd7538691a6937d32eac0588f657fd0499462ad9fc6e028a80baa",
+  "modules_observed": 7,
+  "modules_verified": 3,
+  "modules_unverified": 4,
+  "modules_error": 0,
+  "module_evidence": [
+    {
+      "module_id": "MOD-MAPA-CONTROL",
+      "repository": "rafaelmeloreisnovo/Mapa",
+      "branch": "main",
+      "observed_ref": "eb9cb679d42f64da6e4e4e09abcb96848aae2a8f",
+      "state": "VERIFIED_LIMITED",
+      "capabilities": [
+        "inventory",
+        "ontology",
+        "workflow_gate",
+        "operational_triage",
+        "custody",
+        "next_action_routing"
+      ],
+      "gaps": [
+        "Remote private-repository workflow startup remains TOKEN_VAZIO_RUNNER.",
+        "Live registry drift detection is introduced by this package but not yet remotely executed."
+      ],
+      "evidence_collected": true,
+      "evidence_hash": "90008cb0347789d225949751614c9a90bedaa1b73e21dbb6b78b60c707542989",
+      "evidence_timestamp": "2026-08-21T03:45:15.765899Z",
+      "validation_result": "VERIFICADO_LIMITADO"
+    },
+    {
+      "module_id": "MOD-RAF-CONTROL",
+      "repository": "rafaelmeloreisnovo/RafGitTools",
+      "branch": "feat/termux-health-loopback-v1",
+      "observed_ref": "24c3bf6f0bb98dbc80fb35cd37dbff0b0ae9d4b5",
+      "state": "PARTIAL_DRAFT",
+      "capabilities": [
+        "git.status",
+        "git.diff",
+        "termux.health"
+      ],
+      "gaps": [
+        "PR 297 is open draft.",
+        "Android Gradle/JUnit and device evidence remain TOKEN_VAZIO."
+      ],
+      "evidence_collected": true,
+      "evidence_hash": "f4dd9fd59ccfc3dc5041ca4205beb7d1d755d823bb322c562b2053a63c52064c",
+      "evidence_timestamp": "2026-08-21T03:45:15.765989Z",
+      "validation_result": "TOKEN_VAZIO"
+    },
+    {
+      "module_id": "MOD-TERMUX-RUNTIME",
+      "repository": "rafaelmeloreisnovo/termux-app-rafacodephi",
+      "branch": "feat/readonly-health-server-v1",
+      "observed_ref": "d62153f377c9e6cb6d9ff4ab23efc66d1392de71",
+      "state": "PARTIAL_DRAFT",
+      "capabilities": [
+        "health.readonly"
+      ],
+      "gaps": [
+        "PR 308 is open draft.",
+        "ARM32, ARM64 and autostart policy remain TOKEN_VAZIO."
+      ],
+      "evidence_collected": true,
+      "evidence_hash": "2913dce56e4d3d16a830e98e8ba0c4dd6508f6b5435332dabb4e2e2b81e1ba88",
+      "evidence_timestamp": "2026-08-21T03:45:15.766025Z",
+      "validation_result": "TOKEN_VAZIO"
+    },
+    {
+      "module_id": "MOD-RAFPOLIMATA-EVIDENCE",
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "branch": "main",
+      "observed_ref": "5a0551eb73845cb0ea6e6882854ec03f01a2a3b3",
+      "state": "VERIFIED_LIMITED",
+      "capabilities": [
+        "bounded_conversation_index",
+        "ecosystem_build_doctor",
+        "report_contract"
+      ],
+      "gaps": [
+        "No complete federated doctor report across all registered modules is attached."
+      ],
+      "evidence_collected": true,
+      "evidence_hash": "8cb377b1790983d017271fe91d41e0d5629500b5ec89a311964a7dbf97307fe6",
+      "evidence_timestamp": "2026-08-21T03:45:15.766056Z",
+      "validation_result": "VERIFICADO_LIMITADO"
+    },
+    {
+      "module_id": "MOD-VECTRAS-RUNTIME",
+      "repository": "rafaelmeloreisnovo/Vectras-VM-Android",
+      "branch": "main",
+      "observed_ref": "4c461538e1e62faab4d4754101675f1340466a72",
+      "state": "VERIFIED_LIMITED",
+      "capabilities": [
+        "vm_runtime",
+        "cmake_language_contract",
+        "rmr_cache_selftest"
+      ],
+      "gaps": [
+        "QEMU TCG RMR shadow callsite and Android device evidence remain open."
+      ],
+      "evidence_collected": true,
+      "evidence_hash": "e1ecb43fe83d0963e620145c6c12218d104810163f446ad2a1bf87a051597f9c",
+      "evidence_timestamp": "2026-08-21T03:45:15.766089Z",
+      "validation_result": "VERIFICADO_LIMITADO"
+    },
+    {
+      "module_id": "MOD-LLAMA-INTERPRET",
+      "repository": "rafaelmeloreisnovo/llamaRafaelia",
+      "branch": "master",
+      "observed_ref": "4800636abb6b5cdc8e78da60c90dd0d8a25c5c46",
+      "state": "PARTIAL",
+      "capabilities": [
+        "context_retrieval",
+        "rmrcti_structural_features"
+      ],
+      "gaps": [
+        "Private-source redaction, ambiguity abstention and governed semantic packet execution remain TOKEN_VAZIO."
+      ],
+      "evidence_collected": true,
+      "evidence_hash": "8f45f9cbb827340730bb561395bfb02a8abf8168c3903c26e86feb4a4fa4f3b7",
+      "evidence_timestamp": "2026-08-21T03:45:15.766121Z",
+      "validation_result": "TOKEN_VAZIO"
+    },
+    {
+      "module_id": "MOD-TERMUX-INTEGRATION",
+      "repository": "rafaelmeloreisnovo/termux-app-rafacodephi",
+      "branch": "claude/proximo-passo-natural-c15mg3",
+      "observed_ref": "5e83eef9aea803bee127cd21eed6206ced193cb7",
+      "state": "PARTIAL_DRAFT",
+      "capabilities": [
+        "Android runtime execution environment",
+        "native code integration (JNI/NDK)",
+        "logcat evidence collection",
+        "package dependency resolution",
+        "health monitoring"
+      ],
+      "gaps": [
+        "No Android SDK/NDK available in this build environment (ELO 2-3 build gates TOKEN_VAZIO).",
+        "No physical Android device or emulator for runtime execution (ELO 4-5 installation/runtime gates TOKEN_VAZIO).",
+        "APK signing and device installation proof unavailable (requires device/keystore access).",
+        "Runtime ANativeActivity observation not executable (requires emulator or physical device).",
+        "Health metrics and device capability verification pending (blocked on device access)."
+      ],
+      "evidence_collected": true,
+      "evidence_hash": "9ba27c34cd391a572c63052c3d96606254d44989411662cada7b672a76eef6bb",
+      "evidence_timestamp": "2026-08-21T03:45:15.766150Z",
+      "validation_result": "TOKEN_VAZIO"
+    }
+  ],
+  "aggregated_findings": [
+    {
+      "finding": "module_inventory_complete",
+      "modules_tracked": 7,
+      "state": "VERIFICADO_LIMITADO"
+    },
+    {
+      "finding": "gap_preservation",
+      "token_vazio_count": 4,
+      "gaps_preserved_not_fabricated": true,
+      "state": "FATO"
+    }
+  ],
+  "token_vazio_preserving_count": 4,
+  "f_ok": [
+    "Mapa module registry loaded and parsed successfully",
+    "All 6 registered modules observed",
+    "Evidence collection completed for each module",
+    "State transitions validated (VERIFIED_LIMITED, PARTIAL_DRAFT, etc)",
+    "TOKEN_VAZIO gaps preserved and not fabricated",
+    "Cross-repository topology visible and traced"
+  ],
+  "f_gap": [
+    "Device evidence for termux-app not yet collected",
+    "Validation of independence between repositories pending",
+    "Live synchronization state not verified",
+    "Implementations for partial trajectories remain TOKEN_VAZIO",
+    "Physical runtime evidence on Android device absent"
+  ],
+  "f_next": [
+    "Execute next_gates for BIBLIOTECONOMIA trajectory",
+    "Map ONTOLOGY_CATALOG records to repository paths",
+    "Implement deterministic bootstrap fixture for STATISTICS",
+    "Create blinded benchmark for SCIENTIFIC_INFERENCE",
+    "Collect device evidence from termux-app runtime"
+  ],
+  "report_hash": "038f9a68f186e95138a2e6f8b531308f2b4bc5ed669b61e0fdefd5a8a7dde4e7"
+}
