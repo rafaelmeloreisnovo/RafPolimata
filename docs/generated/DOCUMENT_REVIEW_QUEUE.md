@@ -4,7 +4,6 @@
 
 | Risco | Rota | Arquivo | Área | Motivo |
 |---:|---|---|---|---|
-| 60 | `ROOT_REVIEW` | `PHASES_49_50_COMPLETION_SUMMARY.md` | root-other | arquivo de raiz fora da política declarada |
 | 60 | `ROOT_REVIEW` | `RAFAELIA_COMPLETE_v4.zip` | root-other | arquivo de raiz fora da política declarada |
 | 60 | `ROOT_REVIEW` | `safe-extended` | root-other | arquivo de raiz fora da política declarada |
 | 55 | `DUPLICATE_REVIEW` | `Apkc/proofs/runs/20260617T064636Z/g4_arm32_encoders.txt` | apkc | conteúdo byte-a-byte duplicado |
@@ -37,6 +36,7 @@
 | 40 | `LINK_REQUIRED` | `.github/ISSUE_TEMPLATE/copilot-internal-custody-ledger.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/ISSUE_TEMPLATE/copilot-phase-1-conversation-segments.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/pull_request_template.md` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `.github/workflows/android-proof-bundle.yml` | workflows | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/workflows/android-runtime-evidence-v1.yml` | workflows | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/workflows/apkc-canonical-lang-dispatch.yml` | workflows | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/workflows/apkc-physical-gate-codebinding.yml` | workflows | sem relação de entrada em índice ou documento |
@@ -50,9 +50,12 @@
 | 40 | `LINK_REQUIRED` | `.github/workflows/compiler-three-target-gate.yml` | workflows | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/workflows/contextual-relational-tensor-v1.yml` | workflows | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/workflows/forensic-deception-lab.yml` | workflows | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `.github/workflows/internal-custody-ledger.yml` | workflows | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/workflows/m062-anchor.yml` | workflows | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/workflows/m063-language-freestanding.yml` | workflows | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/workflows/multifilament-envelope-gate.yml` | workflows | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `.github/workflows/neurobio-claim-contract.yml` | workflows | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `.github/workflows/operational-gap-topology.yml` | workflows | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/workflows/rafaelia-handoff-gate.yml` | workflows | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/workflows/rafcodephi-bootstrap-evidence.yml` | workflows | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `.github/workflows/segment-v1-abi-contract.yml` | workflows | sem relação de entrada em índice ou documento |
@@ -183,6 +186,9 @@
 | 40 | `LINK_REQUIRED` | `Apkc/test_unit_generation.h` | apkc | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `auditoria/BITRAF_MATRIX_LOCAL_RECEIPT_2026-08-01.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `auditoria/COGNITIVE_OPERATORS_71_126_LOCAL_RECEIPT_20260806.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `auditoria/federated-doctor-pass-20260821/cross-repository-receipt.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `auditoria/HYFORM_PACKED_LOCAL_RECEIPT_20260728.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `auditoria/LIVING_BOOK_DOMAIN_IR_LOCAL_RECEIPT_20260801.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `auditoria/ORQUESTRADOR_OMEGA_LOCAL_RECEIPT_20260730.json` | root-other | sem relação de entrada em índice ou documento |
@@ -207,6 +213,7 @@
 | 40 | `LINK_REQUIRED` | `ci/reports/asm_opt/RAF_032_dma_control_block_chain_x86_64.s` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `ci/reports/claims_audit.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `ci/reports/pk_trend.txt` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `ci/reports/token-vazio-validation.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `ci/reports/watt-proxy.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `COMPILA/.gitignore` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `COMPILA/rafaelia-v4.1-hardened/INDEX.md` | root-other | sem relação de entrada em índice ou documento |
@@ -235,6 +242,7 @@
 | 40 | `LINK_REQUIRED` | `configs/operational_excellence.yml` | configs | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `configs/rll-session-avalanche-route-v1.json` | configs | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `configs/rll-session-avalanche-route-v2.json` | configs | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `configs/root-file-decisions.d/2026-08-16.json` | configs | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `configs/runtime-doctor-physical-readonly.v1.json` | configs | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `configs/safe-extended-policy.v2.json` | configs | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `configs/zipraf-ao42-governance.json` | configs | sem relação de entrada em índice ou documento |
@@ -285,6 +293,8 @@
 | 40 | `LINK_REQUIRED` | `docs/C04_APKC_STRUCTURAL_CLOSURE.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/CANON_COSMOS_7D_EVIDENCE_BRIDGE.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/CHAIN_OF_CUSTODY_2026-06-16_CHECKLIST_RECONCILE.md` | documentation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `docs/CI_RECOVERY_2026-08-16.md` | documentation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_G1_FORMULA_REGISTRY_01_20.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L10_APK_SECURITY.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L1_COMPILER_PROVENANCE.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L2_RUNTIME_EVIDENCE.md` | documentation | sem relação de entrada em índice ou documento |
@@ -292,6 +302,7 @@
 | 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L6_DETERMINISM.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L7_PERFORMANCE_BASELINE.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L8_TYPE_SYSTEM.md` | documentation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `docs/closures/PHASE_2B_ITERATION_3_RESULTS.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/COGNITIVE_OPERATOR_REFERENCE_V1.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/COMPILER_THREE_TARGET_GATE_V1.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/COMPOSICAO_UNIFICADA_SESSAO_PERMUTACOES_ESTRATEGICAS.md` | documentation | sem relação de entrada em índice ou documento |
@@ -320,12 +331,14 @@
 | 40 | `LINK_REQUIRED` | `docs/METHOD_M062_QUATERNARY_ANCHOR.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/OPERACAO_COMPILAR_PRECOMPILAR.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/PARABOLIC_SEMANTIC_CODEC_ORCHESTRATOR.md` | documentation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `docs/PHASE_3_INTEGRATION_TEST_PLAN.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/PHASE_A_COMPLETION_SUMMARY.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/PR178_SCIENCE_INTEGRITY_HOTFIX.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/RAF_SEMANTIC_IR_X3264_V1.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/RAF_SEMANTIC_LANGUAGE_SEVEN_ARCH_V2.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/RAFAELIA_B7_FEDERATED_RUNTIME.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/RAFAELIA_MORPHCORE_OPERATION_PROTOCOL.md` | documentation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `docs/README.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/receipts/APKC_AARCH64_FREESTANDING_PROVIDER_CLOSURE_20260814.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/receipts/APKC_ANDROID_PROOF_CHAIN_HARDENING_20260812.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/receipts/APKC_ANTI_RETRACTION_POSTMERGE_20260812.md` | documentation | sem relação de entrada em índice ou documento |
@@ -379,7 +392,6 @@
 | 40 | `LINK_REQUIRED` | `docs/TEMPLATE_SPEC.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/TEMPLATE_USAGE_GUIDE.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/TOROIDAL_RESEARCH_ROUTER.md` | documentation | sem relação de entrada em índice ou documento |
-| 40 | `LINK_REQUIRED` | `docs/TRABALHO_COMPLETADO_2026-08-16.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/TRACEBUF_FOLLOWUP_MARKER.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/TRACEBUF_FOLLOWUP_MARKER_2.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/ZIPRAF_AO42_GOVERNANCE.md` | documentation | sem relação de entrada em índice ou documento |
@@ -503,6 +515,7 @@
 | 40 | `LINK_REQUIRED` | `packages/industrial/android_ndk/PRODUCTION_CHECKLIST.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `packages/industrial/arm/PRODUCTION_CHECKLIST.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `proofs/run-arm64-full-chain/manifest.template.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `proofs/run-arm64-full-chain/VALIDATOR.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `raf_asm_emit.c` | root-runtime | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `RAF_avr_regs_generated.h` | root-methods | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `RAF_benchmark_matrix.csv` | root-methods | sem relação de entrada em índice ou documento |
@@ -530,6 +543,7 @@
 | 40 | `LINK_REQUIRED` | `reports/evidence_runs/advanced_cognitive_cell_v3/local_receipt.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `reports/evidence_runs/advanced_cognitive_cell_v3/README.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `reports/evidence_runs/cognitive_operator_reference_20260806.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `reports/evidence_runs/neurobio_contract_local_20260820.receipt.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `research/APKC_RMR_RESEARCH_CORE/contracts/coupling.v1.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `research/APKC_RMR_RESEARCH_CORE/core/apkc_rmr_research_core.c` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `research/APKC_RMR_RESEARCH_CORE/core/apkc_rmr_research_core.h` | root-other | sem relação de entrada em índice ou documento |
@@ -550,6 +564,7 @@
 | 40 | `LINK_REQUIRED` | `research/APKC_RMR_RESEARCH_CORE/tools/coupled_build.py` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `research/APKC_RMR_RESEARCH_CORE/tools/verify_coupled_artifacts.py` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `research/cognitive_operators_71_126/operators.index.v1.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `research/formula_registry_01_20/README.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/core/emulator.py` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/core_config.v1.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/fixtures/demo_units.v1.json` | root-other | sem relação de entrada em índice ou documento |
@@ -597,6 +612,7 @@
 | 40 | `LINK_REQUIRED` | `scripts/contextual_relational_tensor.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/emit_raf_methods_status.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/emit_repository_universe_matrix.py` | automation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `scripts/federated_doctor_pass.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/gen_avr_regs.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/language_commit_evidence.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/patch_apkc_runtime_source_c_escape.py` | automation | sem relação de entrada em índice ou documento |
@@ -625,6 +641,7 @@
 | 40 | `LINK_REQUIRED` | `scripts/test_m062_anchor.sh` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/test_ops_manifest.sh` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/toroidal_research_router.py` | automation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `scripts/validate_android_proof_bundle.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/validate_compiler_station_contract.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/validate_flow_port_axial_diagonal_governance.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/validate_formal_science_orchestrator.py` | automation | sem relação de entrada em índice ou documento |
@@ -645,6 +662,7 @@
 | 40 | `LINK_REQUIRED` | `tests/fixtures/bitraf_loss_observations.v1.jsonl` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/fixtures/bitraf_loss_query.v1.json` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/fixtures/kernel.py` | tests | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `tests/fixtures/neurobio_claim_contract_sample.jsonl` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/fixtures/raf_return_1337.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/fixtures/raf_return_42.c` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/fixtures/raf_return_ambiguous.c` | tests | sem relação de entrada em índice ou documento |
@@ -656,6 +674,7 @@
 | 40 | `LINK_REQUIRED` | `tests/fixtures/strict_kernel.cpp` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/fixtures/unsupported_header.c` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/raf_libc_emu_selftest.c` | tests | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `tests/test_android_proof_bundle.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_android_runtime_evidence.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_apkc_android_final_path_aliases.sh` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_apkc_android_final_receipt.sh` | tests | sem relação de entrada em índice ou documento |
@@ -706,8 +725,11 @@
 | 40 | `LINK_REQUIRED` | `tests/test_hardening_modules.c` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_hex_matrix_projection_governance.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_internal_custody_ledger.py` | tests | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `tests/test_internal_custody_runner.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_language_commit_evidence.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_language_matrix.py` | tests | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `tests/test_neurobio_claim_validator.py` | tests | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `tests/test_operational_gap_topology.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_parable_compiler.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_patch_apkc_runtime_source.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_peer_review_math_7d.py` | tests | sem relação de entrada em índice ou documento |
@@ -744,6 +766,7 @@
 | 40 | `LINK_REQUIRED` | `tests/test_seven_constructions_lint.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_signed_area_geometry.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_stage11_integrity_truth.c` | tests | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `tests/test_t7_attractor_extended.c` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_toroidal_research_router.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_triangle_geometry_atlas.py` | tests | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tests/test_validate_apkc_formats.py` | tests | sem relação de entrada em índice ou documento |
@@ -766,6 +789,7 @@
 | 40 | `LINK_REQUIRED` | `tools/living_book_domain_ir/compile_domain_cell_ir.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tools/living_book_domain_ir/README.md` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tools/living_book_domain_ir/test_compile_domain_cell_ir.py` | automation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `tools/neurobio_claim_validator.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tools/orchestrator_omega/orquestrador-omega-excellence-v1.json` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tools/orchestrator_omega/README.md` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tools/orchestrator_omega/test_orquestrador_omega.py` | automation | sem relação de entrada em índice ou documento |
@@ -794,6 +818,7 @@
 | 40 | `LINK_REQUIRED` | `tools/rafbbs/rafbbs_theme.h` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tools/rafbbs/rafbbs_tui.h` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tools/rollout_dashboard.py` | automation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `tools/run_with_internal_custody.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tools/signed_area_geometry.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tools/t7_convergence_falsifier.c` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `tools/validate_cognitive_operators_runtime_index.py` | automation | sem relação de entrada em índice ou documento |
@@ -812,10 +837,12 @@
 | 20 | `ROOT_REVIEW` | `Arm64 Mixer leve criptografia.md` | root-other | arquivo de raiz fora da política declarada |
 | 20 | `ROOT_REVIEW` | `big_test.sh` | root-other | arquivo de raiz fora da política declarada |
 | 20 | `ROOT_REVIEW` | `L1.md` | root-other | arquivo de raiz fora da política declarada |
+| 20 | `ROOT_REVIEW` | `PHASES_49_50_COMPLETION_SUMMARY.md` | root-other | arquivo de raiz fora da política declarada |
 | 20 | `ROOT_REVIEW` | `RAFAELIA_MASTER_DOC.txt` | root-other | arquivo de raiz fora da política declarada |
 | 20 | `ROOT_REVIEW` | `RASBERY.MD` | root-other | arquivo de raiz fora da política declarada |
 | 20 | `ROOT_REVIEW` | `README_RAFAELIA_ROOT_OPTIMIZER.md` | root-other | arquivo de raiz fora da política declarada |
 | 20 | `ROOT_REVIEW` | `runtime-lock.json` | root-other | arquivo de raiz fora da política declarada |
+| 5 | `REFERENCE_REPAIR` | `scripts/audit_repository_structure.py` | automation | referência local quebrada |
 
 ## Ordem de tratamento
 

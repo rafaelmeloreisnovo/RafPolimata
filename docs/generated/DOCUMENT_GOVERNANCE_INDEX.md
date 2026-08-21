@@ -3,11 +3,11 @@
 > Fonte: `scripts/document_governance.py`. Este arquivo descreve o catálogo
 > versionado; não promove implementação ou prova apenas pela existência.
 
-- Commit: `9f39e0489439482bc9462769b339846968970f54`
+- Commit: `6d0f84a7073723c2f13a137c1235565943779139`
 - Estado: `REVIEW_REQUIRED`
-- Arquivos: **1303**
-- Relações: **1206**
-- Fila de revisão: **812**
+- Arquivos: **1347**
+- Relações: **1257**
+- Fila de revisão: **839**
 - Bloqueadores: **0**
 
 ## Distribuição por rota
@@ -16,9 +16,9 @@
 |---|---:|
 | `CANONICAL` | 6 |
 | `DUPLICATE_REVIEW` | 23 |
-| `INDEXED` | 485 |
-| `LINK_REQUIRED` | 774 |
-| `REFERENCE_REPAIR` | 1 |
+| `INDEXED` | 502 |
+| `LINK_REQUIRED` | 800 |
+| `REFERENCE_REPAIR` | 2 |
 | `ROOT_REVIEW` | 12 |
 | `SENSITIVITY_REVIEW` | 2 |
 
