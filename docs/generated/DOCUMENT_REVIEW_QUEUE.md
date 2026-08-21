@@ -186,7 +186,8 @@
 | 40 | `LINK_REQUIRED` | `Apkc/test_unit_generation.h` | apkc | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `auditoria/BITRAF_MATRIX_LOCAL_RECEIPT_2026-08-01.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `auditoria/COGNITIVE_OPERATORS_71_126_LOCAL_RECEIPT_20260806.json` | root-other | sem relação de entrada em índice ou documento |
-| 40 | `LINK_REQUIRED` | `auditoria/federated-doctor-pass-20260821/cross-repository-receipt.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata-updated.json` | root-other | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata-updated.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.json` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `auditoria/federated-doctor-pass-20260821/federated-doctor-rafpolimata.md` | root-other | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `auditoria/HYFORM_PACKED_LOCAL_RECEIPT_20260728.json` | root-other | sem relação de entrada em índice ou documento |
@@ -295,8 +296,7 @@
 | 40 | `LINK_REQUIRED` | `docs/CHAIN_OF_CUSTODY_2026-06-16_CHECKLIST_RECONCILE.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/CI_RECOVERY_2026-08-16.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_G1_FORMULA_REGISTRY_01_20.md` | documentation | sem relação de entrada em índice ou documento |
-| 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L10_APK_SECURITY.md` | documentation | sem relação de entrada em índice ou documento |
-| 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L1_COMPILER_PROVENANCE.md` | documentation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L2_RUNTIME_EVIDENCE.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L5_FFI_VALIDATION.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/closures/CLOSURE_L6_DETERMINISM.md` | documentation | sem relação de entrada em índice ou documento |
@@ -376,6 +376,7 @@
 | 40 | `LINK_REQUIRED` | `docs/receipts/APKC_TLS_STATIC_POSTMERGE_REDUCTION_20260814.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/receipts/BRANCHLESS_MACHINE_COMPLETE_20260814.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/receipts/PHASE_CD_TRUTHFUL_DEVICE_GATES_20260815.md` | documentation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `docs/results/risk/risk_gates_2026-08-21T07-43-22.375752.json` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/RLL_SESSION_AVALANCHE_ORCHESTRATOR.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/RMRCTI_OMEGA_COMPILER_BRIDGE.md` | documentation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `docs/RUNTIME_DOCTOR_AGENT_V1.md` | documentation | sem relação de entrada em índice ou documento |
@@ -630,6 +631,7 @@
 | 40 | `LINK_REQUIRED` | `scripts/raf_strict_compile_plan.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/raf_watt_proxy_probe.sh` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/rafpolimata_foundation_compiler_gate.py` | automation | sem relação de entrada em índice ou documento |
+| 40 | `LINK_REQUIRED` | `scripts/risk_gates_validator.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/rll_session_avalanche_router.py` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/run_bitraf_termux_receipt.sh` | automation | sem relação de entrada em índice ou documento |
 | 40 | `LINK_REQUIRED` | `scripts/run_semantic_core_gate.sh` | automation | sem relação de entrada em índice ou documento |

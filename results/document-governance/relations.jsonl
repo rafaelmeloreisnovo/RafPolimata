@@ -577,6 +577,8 @@
 {"evidence": "markdown-link", "relation": "references", "source": "docs/INDEX.md", "target": "docs/RELEASE_NOTES_PENDING.md"}
 {"evidence": "markdown-link", "relation": "references", "source": "docs/INDEX.md", "target": "docs/REPOSITORY_COMMIT_TRACKER_OMEGA.md"}
 {"evidence": "markdown-link", "relation": "references", "source": "docs/INDEX.md", "target": "docs/REPOSITORY_PR_CONTEXT_SIDECAR.md"}
+{"evidence": "markdown-link", "relation": "references", "source": "docs/INDEX.md", "target": "docs/RISCO_GESTAO_FRAMEWORK_CANONICAL.md"}
+{"evidence": "markdown-link", "relation": "references", "source": "docs/INDEX.md", "target": "docs/RISCO_MATRIZ_SUBSISTEMAS.md"}
 {"evidence": "markdown-link", "relation": "references", "source": "docs/INDEX.md", "target": "docs/ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md"}
 {"evidence": "markdown-link", "relation": "references", "source": "docs/INDEX.md", "target": "docs/ROOT_LOOSE_FILES_REVIEW.md"}
 {"evidence": "markdown-link", "relation": "references", "source": "docs/INDEX.md", "target": "docs/ROTINA_OPERACIONAL_BENCHMARKS.md"}
@@ -958,6 +960,12 @@
 {"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L10_APK_SECURITY.md", "target": "scripts/capture_android_proof_chain.sh"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md", "target": "configs/operational-gap-topology.v1.json"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md", "target": "scripts/validate_operational_gap_topology.py"}
+{"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md", "target": "auditoria/federated-doctor-pass-20260821/cross-repository-receipt.json"}
+{"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md", "target": "auditoria/package-genealogy-matrix-20260821.json"}
+{"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md", "target": "auditoria/termux-integration-receipt-20260821.json"}
+{"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md", "target": "docs/closures/CLOSURE_L10_APK_SECURITY.md"}
+{"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md", "target": "docs/closures/CLOSURE_L1_COMPILER_PROVENANCE.md"}
+{"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.md", "target": "docs/closures/CLOSURE_L9_T7_CONVERGENCE.md"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L1_COMPILER_PROVENANCE.md", "target": "tools/verify_all_gaps.sh"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L2_RUNTIME_EVIDENCE.md", "target": "tests/test_e2e_source_to_device.sh"}
 {"evidence": "inline-path", "relation": "references", "source": "docs/closures/CLOSURE_L3_ARM64_ELF_VALIDATION.md", "target": "tools/validate_apk_elf_structure.sh"}
