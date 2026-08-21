@@ -1,0 +1,47 @@
+{
+  "F_gap": [
+    "ABI_validation_contracts_and_runtime_integration:TOKEN_VAZIO",
+    "device_runtime_execution:TOKEN_VAZIO"
+  ],
+  "F_next": [
+    "validate_abi_contracts_between_qemu_and_androidx",
+    "execute_android_ci_build_with_verified_sources"
+  ],
+  "F_ok": [
+    "all_external_sources_pinned_commits_verified",
+    "qemu_rafaelia_commit_2346c30c2ba77881c2930add83523ea903b173fe_resolved",
+    "androidx_RmR_commit_e3c10c6ac1acff50774d14417d93eaa6b5f8169a_resolved"
+  ],
+  "claim_allowed": false,
+  "evidence_state": "VERIFIED_LIMITED",
+  "external_sources": {
+    "androidx_RmR": {
+      "branch": "androidx-main",
+      "pinned_sha": "e3c10c6ac1acff50774d14417d93eaa6b5f8169a",
+      "receipt_timestamp": "2026-08-21T05:57:23Z",
+      "recovery_rank": "rank_0_original_pin",
+      "repository": "https://github.com/wojcikiewicz17/androidx_RmR",
+      "resolved_sha": "e3c10c6ac1acff50774d14417d93eaa6b5f8169a",
+      "status": "VERIFIED_ORIGINAL_PIN"
+    },
+    "qemu_rafaelia": {
+      "branch": "master",
+      "pinned_sha": "2346c30c2ba77881c2930add83523ea903b173fe",
+      "receipt_timestamp": "2026-08-21T05:57:25Z",
+      "recovery_rank": "rank_0_original_pin",
+      "repository": "https://github.com/rafaelmeloreisnovo/qemu_rafaelia",
+      "resolved_sha": "2346c30c2ba77881c2930add83523ea903b173fe",
+      "status": "VERIFIED_ORIGINAL_PIN"
+    }
+  },
+  "external_sources_validated": [
+    "androidx_RmR",
+    "qemu_rafaelia"
+  ],
+  "produced_at": "2026-08-21T05:57:28.264592+00:00",
+  "safe_state": "sources_validated_no_artifacts_modified",
+  "schema": "raf.external-source-evidence.v1",
+  "scope": "android-ci-external-source-validation",
+  "scope_description": "External source validation for qemu_rafaelia and androidx_RmR used by Vectras-VM-Android",
+  "source_receipts_hash": "1a66f6c0069995aaca869fa08bb964b65c79c2eae8dff5aecd60b1c70c959688"
+}
