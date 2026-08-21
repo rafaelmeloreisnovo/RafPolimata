@@ -48,20 +48,22 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 
 ## 3. Excelência operacional e evidência
 
-| Documento | Função |
-|---|---|
-| [OPERATIONAL_GAP_TOPOLOGY_V1.md](OPERATIONAL_GAP_TOPOLOGY_V1.md) | grafo canônico de gaps, urgências, incertezas, owners, proveniência, closures e relações técnico-comerciais |
-| [closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md](closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md) | liga `TOKEN_VAZIO` estruturado ao grafo sem promover gaps materiais a PASS |
-| [REPOSITORY_COMMIT_TRACKER_OMEGA.md](REPOSITORY_COMMIT_TRACKER_OMEGA.md) | rastreamento bounded de repositórios, forks, commits, shards e snapshots |
-| [REPOSITORY_PR_CONTEXT_SIDECAR.md](REPOSITORY_PR_CONTEXT_SIDECAR.md) | sidecar de contexto temporal e semântico dos pull requests |
-| [EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md](EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md) | governança de otimização, fallback e rollback |
-| [ROTINA_OPERACIONAL_BENCHMARKS.md](ROTINA_OPERACIONAL_BENCHMARKS.md) | rotina de benchmark e estatística operacional |
-| [PROTOCOLO_FALSIFICABILIDADE_PK.md](PROTOCOLO_FALSIFICABILIDADE_PK.md) | falsificabilidade mínima em P(k) |
-| [PROTOCOLO_CANONICO_COHERENCIA.md](PROTOCOLO_CANONICO_COHERENCIA.md) | coerência, invariantes e gates |
-| [PROTOCOLO_DOIS_CICLOS_OMEGA.md](PROTOCOLO_DOIS_CICLOS_OMEGA.md) | dois ciclos, fail-safe, failover e rollback |
-| [DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md](DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md) | claim, fonte, ensaio, incerteza e IP |
-| [CONCEPT_STRUCTURAL_AUDIT.md](CONCEPT_STRUCTURAL_AUDIT.md) | conceitos ligados a arquivos e lacunas |
-| [ORQUESTRADOR_FORMAL_CIENTIFICO.md](ORQUESTRADOR_FORMAL_CIENTIFICO.md) | orquestração científica e gates dimensionais |
+| Documento | Função | Estado |
+|---|---|---|
+| **[RISCO_GESTAO_FRAMEWORK_CANONICAL.md](RISCO_GESTAO_FRAMEWORK_CANONICAL.md)** | **Framework canônico de gestão de riscos em 4 camadas (acadêmica, normativa, autoral, claims), 7 gates de prevenção (G0-G7), 5 gates de detecção (D1-D5), 4 gates de remediação (R0-R3), 4 gates de melhoria (I0-I3)** | **`CANONICAL`** |
+| **[RISCO_MATRIZ_SUBSISTEMAS.md](RISCO_MATRIZ_SUBSISTEMAS.md)** | **Matriz de riscos específicos por subsistema (ApkC, Indexer, T^7, Router, Governança) com gates operacionalizáveis, remediação e priorização** | **`CANONICAL`** |
+| [OPERATIONAL_GAP_TOPOLOGY_V1.md](OPERATIONAL_GAP_TOPOLOGY_V1.md) | grafo canônico de gaps, urgências, incertezas, owners, proveniência, closures e relações técnico-comerciais | |
+| [closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md](closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md) | liga `TOKEN_VAZIO` estruturado ao grafo sem promover gaps materiais a PASS | |
+| [REPOSITORY_COMMIT_TRACKER_OMEGA.md](REPOSITORY_COMMIT_TRACKER_OMEGA.md) | rastreamento bounded de repositórios, forks, commits, shards e snapshots | |
+| [REPOSITORY_PR_CONTEXT_SIDECAR.md](REPOSITORY_PR_CONTEXT_SIDECAR.md) | sidecar de contexto temporal e semântico dos pull requests | |
+| [EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md](EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md) | governança de otimização, fallback e rollback | |
+| [ROTINA_OPERACIONAL_BENCHMARKS.md](ROTINA_OPERACIONAL_BENCHMARKS.md) | rotina de benchmark e estatística operacional | |
+| [PROTOCOLO_FALSIFICABILIDADE_PK.md](PROTOCOLO_FALSIFICABILIDADE_PK.md) | falsificabilidade mínima em P(k) | |
+| [PROTOCOLO_CANONICO_COHERENCIA.md](PROTOCOLO_CANONICO_COHERENCIA.md) | coerência, invariantes e gates | |
+| [PROTOCOLO_DOIS_CICLOS_OMEGA.md](PROTOCOLO_DOIS_CICLOS_OMEGA.md) | dois ciclos, fail-safe, failover e rollback | |
+| [DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md](DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md) | claim, fonte, ensaio, incerteza e IP | |
+| [CONCEPT_STRUCTURAL_AUDIT.md](CONCEPT_STRUCTURAL_AUDIT.md) | conceitos ligados a arquivos e lacunas | |
+| [ORQUESTRADOR_FORMAL_CIENTIFICO.md](ORQUESTRADOR_FORMAL_CIENTIFICO.md) | orquestração científica e gates dimensionais | |
 
 ## 4. ApkC e baixo nível Android
 
