@@ -1,4 +1,5 @@
 # Federated Doctor Pass Report
+<!-- CLOSURE_L12: Device Runtime Evidence -->
 
 **Report ID**: federated-doctor-20260821T020315Z
 **Generated**: 2026-08-21T02:03:15.684412Z
