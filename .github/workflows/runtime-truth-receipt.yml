@@ -13,6 +13,7 @@ on:
       - 'scripts/validate_compiler_station_contract.py'
       - 'scripts/test_compiler_station.sh'
       - 'scripts/test_ops_manifest.sh'
+      - 'scripts/android_build_matrix.sh'
       - 'scripts/raf_c_rewrite.py'
       - 'scripts/raf_kernel_lower.py'
       - 'scripts/apkc_strict_native_build.sh'

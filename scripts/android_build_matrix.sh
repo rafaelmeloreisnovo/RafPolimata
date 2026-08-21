@@ -52,6 +52,6 @@ for abi in armeabi-v7a arm64-v8a; do
   mkdir -p "$abi_dir"
   "$cc" -std=c11 -Wall -Wextra -Werror -Os -fPIE -pie \
     -ffreestanding -fno-builtin $srcs -o "$abi_dir/raf_compile"
-  "$abi_dir/raf_compile" --help >/dev/null || true
+  "$abi_dir/raf_compile" --help >/dev/null
   printf 'BUILT %s %s\n' "$abi" "$abi_dir/raf_compile"
 done
