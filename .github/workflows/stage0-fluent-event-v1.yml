@@ -4,7 +4,9 @@ on:
   pull_request:
     paths:
       - 'Apkc/raf_fluent_event.h'
+      - 'Apkc/raf_stage0_arm32.h'
       - 'tests/test_raf_fluent_event_v1.c'
+      - 'tests/test_stage0_arm32_elf_v1.c'
       - 'spec/RAFAELIA_STAGE0_FLUENT_EVENT_ABI_V1.md'
       - '.github/workflows/stage0-fluent-event-v1.yml'
   push:
@@ -17,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Host smoke test
+      - name: Host Fluent codec smoke test
         run: |
           set -eux
           cc -std=c11 -Wall -Wextra -Werror -I Apkc \
@@ -25,7 +27,7 @@ jobs:
           /tmp/raf_fluent_event_v1_test
           sha256sum /tmp/raf_fluent_event_v1_test
 
-      - name: ARM32 freestanding compile-only gate
+      - name: ARM32 Fluent codec freestanding compile-only gate
         run: |
           set -eux
           clang --target=armv7a-linux-androideabi21 \
@@ -35,3 +37,22 @@ jobs:
             -c tests/test_raf_fluent_event_v1.c -o /tmp/raf_fluent_event_v1_arm32.o
           readelf -h /tmp/raf_fluent_event_v1_arm32.o | grep -E 'Machine:.*ARM'
           sha256sum /tmp/raf_fluent_event_v1_arm32.o
+
+      - name: Host direct RAFIR to A32 to ELF32 smoke test
+        run: |
+          set -eux
+          clang -std=c11 -Wall -Wextra -Werror -Wno-error=macro-redefined -I Apkc \
+            tests/test_stage0_arm32_elf_v1.c -o /tmp/raf_stage0_arm32_elf_v1_test
+          /tmp/raf_stage0_arm32_elf_v1_test
+          sha256sum /tmp/raf_stage0_arm32_elf_v1_test
+
+      - name: ARM32 Stage0 core freestanding compile-only gate
+        run: |
+          set -eux
+          clang --target=armv7a-linux-androideabi21 \
+            -march=armv7-a -mfloat-abi=softfp -mfpu=neon-vfpv4 \
+            -std=c11 -Os -ffreestanding -fno-builtin -fno-stack-protector \
+            -nostdinc -Wall -Wextra -Werror -I Apkc \
+            -c tests/test_stage0_arm32_elf_v1.c -o /tmp/raf_stage0_arm32_elf_v1_arm32.o
+          readelf -h /tmp/raf_stage0_arm32_elf_v1_arm32.o | grep -E 'Machine:.*ARM'
+          sha256sum /tmp/raf_stage0_arm32_elf_v1_arm32.o
