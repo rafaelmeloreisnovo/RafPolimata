@@ -7,6 +7,7 @@ on:
       - 'Apkc/raf_stage0_arm32.h'
       - 'tests/test_raf_fluent_event_v1.c'
       - 'tests/test_stage0_arm32_elf_v1.c'
+      - 'tests/host_emit_stage0_arm32_elf_v1.c'
       - 'spec/RAFAELIA_STAGE0_FLUENT_EVENT_ABI_V1.md'
       - '.github/workflows/stage0-fluent-event-v1.yml'
   push:
@@ -56,3 +57,17 @@ jobs:
             -c tests/test_stage0_arm32_elf_v1.c -o /tmp/raf_stage0_arm32_elf_v1_arm32.o
           readelf -h /tmp/raf_stage0_arm32_elf_v1_arm32.o | grep -E 'Machine:.*ARM'
           sha256sum /tmp/raf_stage0_arm32_elf_v1_arm32.o
+
+      - name: Seal and audit concrete direct Stage0 ELF32 artifact
+        run: |
+          set -eux
+          clang -std=c11 -Wall -Wextra -Werror -Wno-error=macro-redefined -I Apkc \
+            tests/host_emit_stage0_arm32_elf_v1.c -o /tmp/raf_stage0_arm32_elf_v1_emitter
+          /tmp/raf_stage0_arm32_elf_v1_emitter /tmp/raf-stage0-arm32-v1.so
+          test -s /tmp/raf-stage0-arm32-v1.so
+          readelf -h /tmp/raf-stage0-arm32-v1.so | grep -E 'Class:.*ELF32'
+          readelf -h /tmp/raf-stage0-arm32-v1.so | grep -E 'Machine:.*ARM'
+          ! readelf -l /tmp/raf-stage0-arm32-v1.so | grep -q 'INTERP'
+          ! readelf -d /tmp/raf-stage0-arm32-v1.so | grep -q 'NEEDED'
+          readelf -s /tmp/raf-stage0-arm32-v1.so | grep -q 'raf_entry'
+          sha256sum /tmp/raf-stage0-arm32-v1.so
