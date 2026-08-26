@@ -1,5 +1,6 @@
 #include "../Apkc/raf_fluent_event.h"
 
+/* Fixture unknown hashes are governed by CLOSURE_L2 until runtime evidence is bound. */
 int main(void) {
     raf_u8 out[1024];
     RafFluentEventV1 e;
