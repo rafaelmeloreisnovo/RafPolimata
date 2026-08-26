@@ -1,0 +1,37 @@
+name: Stage0 Fluent Event V1
+
+on:
+  pull_request:
+    paths:
+      - 'Apkc/raf_fluent_event.h'
+      - 'tests/test_raf_fluent_event_v1.c'
+      - 'spec/RAFAELIA_STAGE0_FLUENT_EVENT_ABI_V1.md'
+      - '.github/workflows/stage0-fluent-event-v1.yml'
+  push:
+    branches:
+      - 'architecture/stage0-fluent-event-v1'
+
+jobs:
+  codec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Host smoke test
+        run: |
+          set -eux
+          cc -std=c11 -Wall -Wextra -Werror -I Apkc \
+            tests/test_raf_fluent_event_v1.c -o /tmp/raf_fluent_event_v1_test
+          /tmp/raf_fluent_event_v1_test
+          sha256sum /tmp/raf_fluent_event_v1_test
+
+      - name: ARM32 freestanding compile-only gate
+        run: |
+          set -eux
+          clang --target=armv7a-linux-androideabi21 \
+            -march=armv7-a -mfloat-abi=softfp -mfpu=neon-vfpv4 \
+            -std=c11 -Os -ffreestanding -fno-builtin -fno-stack-protector \
+            -nostdinc -Wall -Wextra -Werror -I Apkc \
+            -c tests/test_raf_fluent_event_v1.c -o /tmp/raf_fluent_event_v1_arm32.o
+          readelf -h /tmp/raf_fluent_event_v1_arm32.o | grep -E 'Machine:.*ARM'
+          sha256sum /tmp/raf_fluent_event_v1_arm32.o
