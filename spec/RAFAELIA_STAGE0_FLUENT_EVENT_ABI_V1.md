@@ -2,6 +2,8 @@
 
 Status: `MATERIALIZED_FOR_REVIEW / claim_allowed=false`
 
+Closure binding for unresolved execution/runtime evidence: `CLOSURE_L2`.
+
 ## Decision
 
 RAFAELIA separates the compile artifact plane from the event/receipt plane.
