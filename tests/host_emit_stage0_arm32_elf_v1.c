@@ -2,6 +2,7 @@
 #include "../Apkc/raf_stage0_arm32.h"
 
 int main(int argc, char **argv) {
+    (void)elf64_build_so;
     if (argc != 2 || !argv[1]) return 64;
 
     static const RafIr32InsnV1 ir[] = {
