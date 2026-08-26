@@ -13,6 +13,7 @@
  *   - deterministic field order
  *   - portable across ARM32/ARM64 and host validation builds
  *
+ * Unknown build/runtime evidence is governed by CLOSURE_L2.
  * This is a transport/event ABI, not a compiler IR and not an artifact format.
  */
 #pragma once
