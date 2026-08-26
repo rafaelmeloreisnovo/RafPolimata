@@ -5,7 +5,8 @@
  *     [tag, time, record]
  *
  * Properties:
- *   - no libc
+ *   - no libc headers
+ *   - no syscall-layer dependency
  *   - no heap
  *   - no external MessagePack library
  *   - caller-owned output buffer
@@ -15,7 +16,15 @@
  * This is a transport/event ABI, not a compiler IR and not an artifact format.
  */
 #pragma once
-#include "sys.h"
+
+/* Compiler-provided primitive types avoid libc/stdint/sys.h dependencies and
+ * keep this codec embeddable in the Stage0 core without namespace collisions. */
+typedef __UINT8_TYPE__  raf_u8;
+typedef __UINT16_TYPE__ raf_u16;
+typedef __UINT32_TYPE__ raf_u32;
+typedef __UINT64_TYPE__ raf_u64;
+typedef __INT32_TYPE__  raf_i32;
+typedef __SIZE_TYPE__   raf_sz;
 
 typedef struct {
     const char *tag;
@@ -26,87 +35,87 @@ typedef struct {
     const char *state;
     const char *source_sha256;
     const char *artifact_sha256;
-    u64 time_unix_s;
-    u64 seq;
-    u32 claim_allowed;
+    raf_u64 time_unix_s;
+    raf_u64 seq;
+    raf_u32 claim_allowed;
 } RafFluentEventV1;
 
 typedef struct {
-    u8 *p;
-    sz cap;
-    sz pos;
-    i32 err;
+    raf_u8 *p;
+    raf_sz cap;
+    raf_sz pos;
+    raf_i32 err;
 } RafMsgPackBuf;
 
-static inline void raf_mp_u8(RafMsgPackBuf *b, u8 v) {
+static inline void raf_mp_u8(RafMsgPackBuf *b, raf_u8 v) {
     if (!b || b->err) return;
     if (b->pos >= b->cap) { b->err = -1; return; }
     b->p[b->pos++] = v;
 }
 
-static inline void raf_mp_be16(RafMsgPackBuf *b, u16 v) {
-    raf_mp_u8(b, (u8)(v >> 8));
-    raf_mp_u8(b, (u8)v);
+static inline void raf_mp_be16(RafMsgPackBuf *b, raf_u16 v) {
+    raf_mp_u8(b, (raf_u8)(v >> 8));
+    raf_mp_u8(b, (raf_u8)v);
 }
 
-static inline void raf_mp_be32(RafMsgPackBuf *b, u32 v) {
-    raf_mp_u8(b, (u8)(v >> 24));
-    raf_mp_u8(b, (u8)(v >> 16));
-    raf_mp_u8(b, (u8)(v >> 8));
-    raf_mp_u8(b, (u8)v);
+static inline void raf_mp_be32(RafMsgPackBuf *b, raf_u32 v) {
+    raf_mp_u8(b, (raf_u8)(v >> 24));
+    raf_mp_u8(b, (raf_u8)(v >> 16));
+    raf_mp_u8(b, (raf_u8)(v >> 8));
+    raf_mp_u8(b, (raf_u8)v);
 }
 
-static inline void raf_mp_be64(RafMsgPackBuf *b, u64 v) {
-    raf_mp_u8(b, (u8)(v >> 56));
-    raf_mp_u8(b, (u8)(v >> 48));
-    raf_mp_u8(b, (u8)(v >> 40));
-    raf_mp_u8(b, (u8)(v >> 32));
-    raf_mp_u8(b, (u8)(v >> 24));
-    raf_mp_u8(b, (u8)(v >> 16));
-    raf_mp_u8(b, (u8)(v >> 8));
-    raf_mp_u8(b, (u8)v);
+static inline void raf_mp_be64(RafMsgPackBuf *b, raf_u64 v) {
+    raf_mp_u8(b, (raf_u8)(v >> 56));
+    raf_mp_u8(b, (raf_u8)(v >> 48));
+    raf_mp_u8(b, (raf_u8)(v >> 40));
+    raf_mp_u8(b, (raf_u8)(v >> 32));
+    raf_mp_u8(b, (raf_u8)(v >> 24));
+    raf_mp_u8(b, (raf_u8)(v >> 16));
+    raf_mp_u8(b, (raf_u8)(v >> 8));
+    raf_mp_u8(b, (raf_u8)v);
 }
 
-static inline sz raf_cstr_len_65535(const char *s) {
-    sz n = 0;
+static inline raf_sz raf_cstr_len_65535(const char *s) {
+    raf_sz n = 0;
     if (!s) return 0;
     while (s[n] && n < 65535u) n++;
     return n;
 }
 
 static inline void raf_mp_str(RafMsgPackBuf *b, const char *s) {
-    sz n = raf_cstr_len_65535(s);
+    raf_sz n = raf_cstr_len_65535(s);
     if (n <= 31u) {
-        raf_mp_u8(b, (u8)(0xA0u | (u8)n));
+        raf_mp_u8(b, (raf_u8)(0xA0u | (raf_u8)n));
     } else if (n <= 255u) {
         raf_mp_u8(b, 0xD9u);
-        raf_mp_u8(b, (u8)n);
+        raf_mp_u8(b, (raf_u8)n);
     } else {
         raf_mp_u8(b, 0xDAu);
-        raf_mp_be16(b, (u16)n);
+        raf_mp_be16(b, (raf_u16)n);
     }
-    for (sz i = 0; i < n; i++) raf_mp_u8(b, (u8)s[i]);
+    for (raf_sz i = 0; i < n; i++) raf_mp_u8(b, (raf_u8)s[i]);
 }
 
-static inline void raf_mp_u64(RafMsgPackBuf *b, u64 v) {
+static inline void raf_mp_u64(RafMsgPackBuf *b, raf_u64 v) {
     if (v <= 0x7Fu) {
-        raf_mp_u8(b, (u8)v);
+        raf_mp_u8(b, (raf_u8)v);
     } else if (v <= 0xFFu) {
         raf_mp_u8(b, 0xCCu);
-        raf_mp_u8(b, (u8)v);
+        raf_mp_u8(b, (raf_u8)v);
     } else if (v <= 0xFFFFu) {
         raf_mp_u8(b, 0xCDu);
-        raf_mp_be16(b, (u16)v);
+        raf_mp_be16(b, (raf_u16)v);
     } else if (v <= 0xFFFFFFFFULL) {
         raf_mp_u8(b, 0xCEu);
-        raf_mp_be32(b, (u32)v);
+        raf_mp_be32(b, (raf_u32)v);
     } else {
         raf_mp_u8(b, 0xCFu);
         raf_mp_be64(b, v);
     }
 }
 
-static inline void raf_mp_bool(RafMsgPackBuf *b, u32 v) {
+static inline void raf_mp_bool(RafMsgPackBuf *b, raf_u32 v) {
     raf_mp_u8(b, v ? 0xC3u : 0xC2u);
 }
 
@@ -115,12 +124,12 @@ static inline void raf_mp_kv_str(RafMsgPackBuf *b, const char *k, const char *v)
     raf_mp_str(b, v ? v : "TOKEN_VAZIO");
 }
 
-static inline void raf_mp_kv_u64(RafMsgPackBuf *b, const char *k, u64 v) {
+static inline void raf_mp_kv_u64(RafMsgPackBuf *b, const char *k, raf_u64 v) {
     raf_mp_str(b, k);
     raf_mp_u64(b, v);
 }
 
-static inline void raf_mp_kv_bool(RafMsgPackBuf *b, const char *k, u32 v) {
+static inline void raf_mp_kv_bool(RafMsgPackBuf *b, const char *k, raf_u32 v) {
     raf_mp_str(b, k);
     raf_mp_bool(b, v);
 }
@@ -134,8 +143,8 @@ static inline void raf_mp_kv_bool(RafMsgPackBuf *b, const char *k, u32 v) {
  *
  * Return: encoded byte count; 0 on invalid input or capacity failure.
  */
-static inline sz raf_fluent_encode_event_v1(
-    u8 *out, sz cap, const RafFluentEventV1 *e)
+static inline raf_sz raf_fluent_encode_event_v1(
+    raf_u8 *out, raf_sz cap, const RafFluentEventV1 *e)
 {
     if (!out || !cap || !e || !e->tag) return 0;
 
