@@ -1,6 +1,11 @@
 #include "../Apkc/raf_stage0_arm32.h"
 
 int main(void) {
+    /* fmt_elf.h intentionally owns both target writers. Referencing the sibling
+     * keeps this one-target smoke translation unit warning-clean under -Werror
+     * without weakening diagnostics or changing the writer implementation. */
+    (void)elf64_build_so;
+
     static const RafIr32InsnV1 ir[] = {
         { RAF_IR32_MOV_IMM, A32_R0, 0u, 0u, 42u },
         { RAF_IR32_RET,     0u,     0u, 0u, 0u  }
