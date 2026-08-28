@@ -1,0 +1,37 @@
+module_schema: rafpolimata-hash-module/v1
+module_id: blake3
+requested_alias: Black3
+algorithm_identity: BLAKE3
+status: PROVENANCE_PENDING
+
+implementation:
+  path_or_source: TOKEN_VAZIO
+  upstream_repository: TOKEN_VAZIO
+  upstream_version_or_commit: TOKEN_VAZIO
+  upstream_license: TOKEN_VAZIO
+  copyright_notice: TOKEN_VAZIO
+  modifications_by_rafaelia: TOKEN_VAZIO
+
+licensing:
+  algorithm_name_does_not_define_implementation_license: true
+  original_rafaelia_wrapper_license: LicenseRef-RAFAELIA-RCNC-1.0
+  upstream_material_rule: UPSTREAM_LICENSE_CONTROLS
+  commercial_restriction_applies_to_upstream: false
+  redistribution_gate: HOLD_UNTIL_IMPLEMENTATION_AND_LICENSE_RESOLVED
+
+security:
+  algorithm_claim: BLAKE3
+  implementation_verified: TOKEN_VAZIO
+  test_receipt: TOKEN_VAZIO
+
+provenance:
+  receipt: TOKEN_VAZIO
+  gaps:
+    - GAP-BLAKE3-IMPLEMENTATION
+    - GAP-BLAKE3-UPSTREAM-LICENSE
+
+claim_allowed:
+  algorithm_identity: true
+  bundled_implementation_origin: false
+  bundled_implementation_license: false
+  implementation_security_validation: false

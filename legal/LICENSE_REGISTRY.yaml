@@ -1,0 +1,114 @@
+schema: rafpolimata-license-registry/v1
+registry_status: DRAFT_FOR_REVIEW
+updated: 2026-08-28
+
+original_material:
+  license_id: LicenseRef-RAFAELIA-RCNC-1.0
+  scope_activation: EXPLICIT_MARKING_OR_REGISTRY_ENTRY_ONLY
+  commercial_use: FORMAL_COMMERCIAL_AUTHORIZATION_REQUIRED
+  commercial_default: NOT_GRANTED
+  ownership_unresolved_behavior: TOKEN_VAZIO_HOLD
+
+commercial_authorization:
+  required_instrument: legal/COMMERCIAL_AUTHORIZATION_CONTRACT_TEMPLATE.md
+  required_fields:
+    - parties_and_authority
+    - exact_material_version_or_commit
+    - dossier_of_origin
+    - dossier_of_finality
+    - granted_rights_and_exclusions
+    - territory_and_term
+    - consideration_if_any
+    - attribution_and_notices
+    - third_party_boundaries
+    - privacy_and_data_obligations
+    - assent_date_and_evidence
+  status_required_for_grant: EXECUTED
+  unresolved_status: TOKEN_VAZIO
+
+education:
+  noncommercial_fee: 0
+  institutional_registration_required_by_rafaelia_license: false
+  student_registration_required_by_rafaelia_license: false
+  preferred_contact: teacher_or_responsible_adult_or_institution_system_responsible
+  contact_data_rule: MINIMUM_NECESSARY_FOR_DOCUMENTED_PURPOSE
+  phone_only_if_sufficient: true
+  student_public_receipts: prohibited
+  independent_legal_duties_preserved: true
+
+community_access:
+  literacy_neutral: true
+  literacy_proof_required: false
+  socioeconomic_proof_required: false
+  noncommercial_fee: 0
+  examples:
+    - autonomous_recycling_collectors
+    - autonomous_scrap_material_collectors
+    - repair_and_reuse_workers
+    - community_makers
+  commercial_intermediary_capture: prohibited_without_commercial_authorization
+
+third_party:
+  governing_rule: UPSTREAM_LICENSE_CONTROLS
+  preserve_required_notices: true
+  rafaelia_noncommercial_override_of_upstream: prohibited_without_authority
+  unknown_license_state: TOKEN_VAZIO
+  unknown_license_claim_gate: HOLD
+
+modules:
+  blake3:
+    requested_alias: Black3
+    algorithm_identity: BLAKE3
+    implementation_in_scope: TOKEN_VAZIO
+    upstream_source: TOKEN_VAZIO
+    upstream_version_or_commit: TOKEN_VAZIO
+    upstream_license: TOKEN_VAZIO
+    rafaelia_original_wrapper_license: LicenseRef-RAFAELIA-RCNC-1.0
+    redistribution_gate: HOLD_UNTIL_IMPLEMENTATION_PROVENANCE_RESOLVED
+  chat32:
+    requested_name: Chat32
+    algorithm_identity: TOKEN_VAZIO
+    implementation_in_scope: TOKEN_VAZIO
+    upstream_source: TOKEN_VAZIO
+    upstream_license: TOKEN_VAZIO
+    security_claim_gate: HOLD
+    redistribution_gate: HOLD
+  md5:
+    algorithm_identity: MD5
+    implementation_in_scope: TOKEN_VAZIO
+    upstream_source: TOKEN_VAZIO
+    upstream_license: TOKEN_VAZIO
+    security_role: LEGACY_ONLY
+    sole_integrity_anchor: false
+    sole_authentication_anchor: false
+    sole_anteriority_anchor: false
+    modern_parallel_digest_required: true
+
+receipts:
+  policy: APPEND_ONLY
+  correction_method: SUPERSEDING_RECEIPT
+  self_hash_required: false
+  git_commit_and_tree_recording: required_when_available
+
+non_regression:
+  policy: legal/NON_REGRESSION_POLICY.md
+  token_vazio_not_permission: true
+  upstream_notices_not_removed: true
+  historical_license_versions_immutable: true
+
+open_gaps:
+  - id: GAP-BLAKE3-IMPLEMENTATION
+    state: TOKEN_VAZIO
+    blocks: [blake3_implementation_relicense_claim]
+  - id: GAP-BLAKE3-UPSTREAM-LICENSE
+    state: TOKEN_VAZIO
+    blocks: [blake3_upstream_license_claim]
+  - id: GAP-CHAT32-IDENTITY
+    state: TOKEN_VAZIO
+    blocks: [chat32_algorithm_claim, chat32_license_claim, chat32_security_claim]
+  - id: GAP-MD5-IMPLEMENTATION-LICENSE
+    state: TOKEN_VAZIO
+    blocks: [md5_implementation_relicense_claim]
+  - id: GAP-LEGAL-CASELAW-REVIEW
+    state: TOKEN_VAZIO
+    blocks: [absolute_enforceability_claim]

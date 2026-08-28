@@ -1,0 +1,38 @@
+module_schema: rafpolimata-hash-module/v1
+module_id: chat32
+requested_name: Chat32
+algorithm_identity: TOKEN_VAZIO
+status: IDENTIFICATION_REQUIRED
+
+implementation:
+  path_or_source: TOKEN_VAZIO
+  upstream_repository: TOKEN_VAZIO
+  upstream_version_or_commit: TOKEN_VAZIO
+  upstream_license: TOKEN_VAZIO
+  copyright_notice: TOKEN_VAZIO
+  modifications_by_rafaelia: TOKEN_VAZIO
+
+licensing:
+  original_rafaelia_wrapper_license: LicenseRef-RAFAELIA-RCNC-1.0
+  upstream_material_rule: UPSTREAM_LICENSE_CONTROLS
+  redistribution_gate: HOLD
+
+security:
+  primitive_class: TOKEN_VAZIO
+  digest_width: TOKEN_VAZIO
+  security_properties: TOKEN_VAZIO
+  implementation_verified: TOKEN_VAZIO
+  test_receipt: TOKEN_VAZIO
+
+provenance:
+  receipt: TOKEN_VAZIO
+  gaps:
+    - GAP-CHAT32-IDENTITY
+
+claim_allowed:
+  algorithm_identity: false
+  upstream_origin: false
+  upstream_license: false
+  security_properties: false
+
+next_verifiable_action: Resolve what exact primitive/code 'Chat32' names from repository evidence before assigning algorithm, license, security properties or commercial boundary.

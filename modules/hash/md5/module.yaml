@@ -1,0 +1,37 @@
+module_schema: rafpolimata-hash-module/v1
+module_id: md5
+algorithm_identity: MD5
+status: LEGACY_ONLY
+
+implementation:
+  path_or_source: TOKEN_VAZIO
+  upstream_repository: TOKEN_VAZIO
+  upstream_version_or_commit: TOKEN_VAZIO
+  upstream_license: TOKEN_VAZIO
+  copyright_notice: TOKEN_VAZIO
+  modifications_by_rafaelia: TOKEN_VAZIO
+
+licensing:
+  original_rafaelia_wrapper_license: LicenseRef-RAFAELIA-RCNC-1.0
+  upstream_material_rule: UPSTREAM_LICENSE_CONTROLS
+  redistribution_gate: HOLD_UNTIL_IMPLEMENTATION_LICENSE_RESOLVED
+
+security:
+  role: LEGACY_INTEROPERABILITY_AND_HISTORICAL_COMPARISON_ONLY
+  collision_resistance_for_security: NOT_ALLOWED_AS_RELIED_UPON_PROPERTY
+  sole_integrity_anchor: false
+  sole_authentication_anchor: false
+  sole_anteriority_or_priority_anchor: false
+  modern_parallel_digest_required: true
+  preferred_baseline: SHA-256_OR_STRONGER_CONTEXT_APPROPRIATE_DIGEST
+
+provenance:
+  receipt: TOKEN_VAZIO
+  gaps:
+    - GAP-MD5-IMPLEMENTATION-LICENSE
+
+claim_allowed:
+  algorithm_identity: true
+  bundled_implementation_origin: false
+  bundled_implementation_license: false
+  security_grade_integrity: false
