@@ -3,7 +3,7 @@
 
 Governance anchor: CLOSURE_L1.
 
-Default mode preserves the historical full-repository inventory.  CI may use
+Default mode preserves the historical full-repository inventory. CI may use
 ``--changed-since <git-ref>`` to enforce the rule only on added/modified lines,
 so pre-existing unresolved references remain visible without making every
 unrelated pull request permanently red.
@@ -45,7 +45,7 @@ class TokenVazioValidator:
     SKIP_MARKERS = ("docs/generated/", "results/", ".git/", "__pycache__", ".pyc")
     ALLOWED_MISSING = {"L9"}
 
-    # These paths form structured closure domains.  A closure binds explicit
+    # These paths form structured closure domains. A closure binds explicit
     # unknowns to governance; it never promotes the underlying material gap.
     # Date-stamped receipts remain append-only: bind them here instead of
     # rewriting historical evidence merely to satisfy the validator.
@@ -65,6 +65,24 @@ class TokenVazioValidator:
         "research/formula_registry_01_20/reference.py": "G1",
         "scripts/validate_formula_registry_01_20.py": "G1",
         "tests/test_formula_registry_01_20.py": "G1",
+        # CLOSURE_L12: Legal & Service Assurance Pack V1. Exact-path only;
+        # no directory-wide whitelist is permitted.
+        "docs/legal/DPA_LGPD_GDPR_V1.md": "L12",
+        "docs/legal/INTERNATIONAL_DATA_TRANSFER_SCHEDULE_V1.md": "L12",
+        "docs/legal/LEGAL_CONTROL_MATRIX_V1.json": "L12",
+        "docs/legal/MASTER_SERVICES_AGREEMENT_TEMPLATE_V1.md": "L12",
+        "docs/legal/PRIVACY_NOTICE_TEMPLATE_V1.md": "L12",
+        "docs/legal/RAFCODE_IP_LICENSE_POLICY_V1.md": "L12",
+        "docs/legal/README.md": "L12",
+        "docs/legal/SECURITY_ASSURANCE_SCHEDULE_V1.md": "L12",
+        "docs/legal/STATEMENT_OF_WORK_TEMPLATE_V1.md": "L12",
+        "docs/legal/SUBPROCESSOR_SUPPLY_CHAIN_REGISTER_V1.md": "L12",
+        "docs/legal/THIRD_PARTY_CRYPTO_LICENSE_REGISTER_V1.md": "L12",
+        "native/raf_hash_fabric_v1/LICENSE_SCOPE_V1.json": "L12",
+        "native/raf_hash_fabric_v1/README.md": "L12",
+        "native/raf_hash_fabric_v1/SPEC.md": "L12",
+        "native/raf_hash_fabric_v1/evidence/BLAKE3_PORTABLE_LOCAL_KAT_2026-08-28.md": "L12",
+        "native/raf_hash_fabric_v1/include/raf_hash_fabric.h": "L12",
     }
 
     def __init__(self, repo_root: Path = Path(".")):
@@ -113,8 +131,8 @@ class TokenVazioValidator:
         """Scan one file.
 
         In diff mode, a valid closure reference anywhere in the changed file may
-        govern its changed TOKEN_VAZIO lines.  Canonical structured-governance
-        paths may additionally bind to a dedicated closure by exact path.  Full
+        govern its changed TOKEN_VAZIO lines. Canonical structured-governance
+        paths may additionally bind to a dedicated closure by exact path. Full
         inventory mode retains line-local behavior for ordinary files while
         honoring those explicit structured bindings.
         """
