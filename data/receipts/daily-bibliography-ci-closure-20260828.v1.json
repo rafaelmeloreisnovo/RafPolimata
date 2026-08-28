@@ -1,0 +1,98 @@
+{
+  "schema": "RAFAELIA_DAILY_BIBLIOGRAPHY_CI_CLOSURE_V1",
+  "cycle_id": "OMEGA-20260828-0655-BIBLIO-CI-CLOSURE",
+  "observed_at": "2026-08-28T06:55:00-03:00",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "branch": "audit/daily-bibliography-evolution-20260828",
+  "predecessor": {
+    "head_sha": "32a73e0fed5c4478a1ef6fad0fbd73017539d582",
+    "base_sha": "8054f652b8528b5d9e2c1fab6c246e45554f0e1c",
+    "pr": 318
+  },
+  "contract": ["SOURCE", "TRANSFORM", "CLAIM", "TEST_EVIDENCE", "RECEIPT", "INDEX", "MEMORY"],
+  "claim_allowed": false,
+  "evidence": [
+    {
+      "workflow": "CI",
+      "run_id": 33154683979,
+      "run_number": 2276,
+      "head_sha": "32a73e0fed5c4478a1ef6fad0fbd73017539d582",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "workflow": "Formal Science Orchestrator",
+      "run_id": 33154684047,
+      "run_number": 2154,
+      "head_sha": "32a73e0fed5c4478a1ef6fad0fbd73017539d582",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "workflow": "Internal Custody Ledger",
+      "run_id": 33154683894,
+      "run_number": 226,
+      "head_sha": "32a73e0fed5c4478a1ef6fad0fbd73017539d582",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "gap_dispositions": [
+    {
+      "gap_id": "TV-BIBLIO-PR318-CI",
+      "state": "CLOSED_FOR_HEAD_32A73E0F",
+      "source_pointer": "GitHub Actions runs 33154683979,33154684047,33154683894",
+      "missing_field": null,
+      "blocking_dependency": null,
+      "evidence_needed": "three provider-bound workflows completed successfully on the exact predecessor head",
+      "falsifier": "a later head or rerun fails a required gate",
+      "next_probe": "first real daily acquisition execution after integration/dispatch",
+      "owner_authority": "GitHub provider evidence; scientific promotion remains separate",
+      "urgency": "P0_CLOSED_BOUNDED",
+      "closure_gate": "CI + Formal Science Orchestrator + Internal Custody Ledger SUCCESS on exact head",
+      "claim_allowed": false
+    },
+    {
+      "gap_id": "TV-BIBLIO-FIRST-REAL-DAILY-RUN",
+      "state": "TOKEN_VAZIO",
+      "source_pointer": ".github/workflows/daily-bibliography-evolution.yml",
+      "missing_field": "provider-bound acquisition artifact and receipt from a real daily/workflow_dispatch run",
+      "blocking_dependency": "workflow must execute from an integrated or explicitly dispatched ref; ORCID token optional and fail-closed",
+      "evidence_needed": "artifact containing records/occurrences/content identities/source receipts/hypothesis ledger/coverage/manifest/receipt",
+      "falsifier": "missing artifact, hash mismatch, nonzero acquisition failure without typed receipt, or claim_allowed=true",
+      "next_probe": "execute first real daily acquisition; inspect artifact cardinality, source coverage and hashes",
+      "owner_authority": "RafPolimata acquisition pipeline + source providers",
+      "urgency": "P0",
+      "closure_gate": "one provider-bound real acquisition run with immutable artifact and manifest validation",
+      "claim_allowed": false
+    },
+    {
+      "gap_id": "TV-BIBLIO-ORCID-CREDENTIAL",
+      "state": "TOKEN_VAZIO",
+      "source_pointer": "ORCID_ACCESS_TOKEN secret",
+      "missing_field": "valid ORCID Public API credential in execution environment",
+      "blocking_dependency": "credential provisioning outside repository content",
+      "evidence_needed": "provider-bound ORCID source receipt showing authenticated request success",
+      "falsifier": "missing/invalid token or ORCID request rejection",
+      "next_probe": "leave fail-closed until credential is available; Zenodo/arXiv remain independently executable",
+      "owner_authority": "repository owner + ORCID provider",
+      "urgency": "P1",
+      "closure_gate": "authenticated ORCID retrieval receipt",
+      "claim_allowed": false
+    }
+  ],
+  "boundaries": [
+    "CI success != scientific validation",
+    "metadata acquisition != thesis",
+    "hypothesis TESTABLE != VALIDATED",
+    "scheduled workflow materialized != real daily execution observed",
+    "ORCID TOKEN_VAZIO does not block independent Zenodo/arXiv acquisition"
+  ],
+  "atlas": {
+    "L": "initial implementation -> CI failure -> closure binding fix -> exact-head 3/3 workflow success -> this receipt",
+    "O": "CI, formal-science and custody are independent operational gates",
+    "T": "GitHub acquisition pipeline <-> Drive custody receipt <-> ORCID/Zenodo/arXiv <-> hypothesis ledger",
+    "C": "bounded metadata acquisition; claim_allowed=false; first real acquisition pending",
+    "P": "commit SHAs, workflow run IDs, PR number and append-only receipts"
+  }
+}
