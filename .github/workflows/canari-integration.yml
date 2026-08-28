@@ -1,0 +1,52 @@
+name: canari-integration
+
+on:
+  pull_request:
+    paths:
+      - 'configs/canari-integration.v1.json'
+      - 'scripts/validate_canari_integration.py'
+      - 'tests/test_canari_integration.py'
+      - 'docs/CANARI_MALTEGO_INTEGRATION.md'
+      - 'docs/LICENSE_DECISION_RECORD.md'
+      - '.github/workflows/canari-integration.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'configs/canari-integration.v1.json'
+      - 'scripts/validate_canari_integration.py'
+      - 'tests/test_canari_integration.py'
+      - 'docs/CANARI_MALTEGO_INTEGRATION.md'
+      - 'docs/LICENSE_DECISION_RECORD.md'
+      - '.github/workflows/canari-integration.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Unit tests
+        run: python3 -m unittest tests.test_canari_integration
+
+      - name: Validate Canari boundary
+        run: |
+          mkdir -p results/canari
+          python3 scripts/validate_canari_integration.py \
+            --output results/canari/integration-receipt.json
+
+      - name: Upload structural receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: canari-integration-receipt
+          path: results/canari/integration-receipt.json
+          if-no-files-found: warn
