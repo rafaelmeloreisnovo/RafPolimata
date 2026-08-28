@@ -23,6 +23,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: RAF Hash Fabric source-contract binding gate
+        run: make -C native/raf_hash_fabric_v1 source-contract-check
+
       - name: Validate canonical coherence protocol
         run: python3 scripts/validate_coherence_protocol.py
 
