@@ -1,0 +1,49 @@
+{
+  "schema": "raf.canari-integration.v1",
+  "integration_id": "CANARI-MALTEGO-001",
+  "name": "Canari",
+  "purpose": "Maltego rapid local/remote transform development framework integration boundary",
+  "mode": "external-isolated",
+  "upstream": {
+    "repository": "malleum-inc/canari3",
+    "default_branch": "master",
+    "observed_pushed_at": "2021-04-21T16:04:45Z",
+    "license": "GPL-3.0",
+    "python_classifiers": [
+      "2.7",
+      "3.6",
+      "3.7"
+    ],
+    "package_name": "canari",
+    "pypi_legacy_version_observed": "3.3.10",
+    "source_pin": "TOKEN_VAZIO"
+  },
+  "compatibility": {
+    "host_runtime": "Python 3.x",
+    "policy": "do-not-import-into-core",
+    "isolated_environment_required": true,
+    "network_execution_default": "disabled"
+  },
+  "legal": {
+    "rafpolimata_license_state": "TOKEN_VAZIO_OWNER_DECISION",
+    "compatibility_review": "TOKEN_VAZIO",
+    "vendoring_allowed": false
+  },
+  "evidence": {
+    "upstream_metadata_observed": true,
+    "runtime_verified": "TOKEN_VAZIO",
+    "maltego_profile_verified": "TOKEN_VAZIO",
+    "termux_verified": "TOKEN_VAZIO"
+  },
+  "claims": {
+    "claim_allowed": false,
+    "reason": "Runtime, source pin and license compatibility are not yet closed."
+  },
+  "next_step": [
+    "select and record an immutable upstream commit pin",
+    "complete third-party license compatibility review",
+    "reproduce Canari in an isolated environment",
+    "generate and validate a minimal local Maltego profile",
+    "record runtime receipt before promoting any claim"
+  ]
+}
