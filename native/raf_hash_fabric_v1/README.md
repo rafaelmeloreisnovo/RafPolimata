@@ -51,9 +51,75 @@ This is scheduling parallelism, not a change from (for example) a 512-bit messag
 
 Original files enumerated in `LICENSE_SCOPE_V1.json` are offered under **PolyForm Noncommercial License 1.0.0** through `LICENSE.md`. The scope is module-specific; it does not relicense unrelated RafPolimata material or any third-party content.
 
-Research/noncommercial use follows the standardized license. Commercial/production rights outside that grant require a separate written commercial agreement. Third-party components retain their own licenses and must be recorded before distribution.
+The authorization source for this module is deliberately limited to three repository surfaces:
 
-Contract/privacy/security templates are routed from `../../docs/legal/README.md`.
+1. `README.md` — human-readable orientation and response codes;
+2. `LICENSE.md` — license notice and required notice;
+3. `LICENSE_SCOPE_V1.json` — machine-readable scope and real file inventory.
+
+No school, teacher, student, laboratory or researcher registration is required for a use that is already permitted by the applicable license. No approval database, allow-list, application form or personal-data collection is created by this authorization model.
+
+The summary below does **not** expand, replace or override the PolyForm license. If the summary and the canonical license differ, the canonical license controls.
+
+## Simplified authorization — schools and researchers
+
+### School / educational institution
+
+**Response: `EDU-PERMITTED`** when the use is by an educational institution and concerns material listed as original/covered in `LICENSE_SCOPE_V1.json`, subject to the license terms.
+
+Typical examples include classroom teaching, coursework, educational laboratories, demonstrations, study, internal educational adaptation, and redistribution for the permitted purpose when the license's notice obligations are preserved.
+
+No prior email, individual registration or authorization number is required. If software is copied or redistributed, recipients must receive the PolyForm terms or its canonical URL and the `Required Notice` supplied in `LICENSE.md`.
+
+### Researcher / research organization
+
+**Response: `RESEARCH-PERMITTED`** when the use is permitted by the PolyForm license, including personal research/experiment/testing without anticipated commercial application and use by a public research organization under the license terms.
+
+Researchers may study, modify, test, benchmark, reproduce experiments and publish findings. If they distribute copies or modified software, the applicable license and notice obligations travel with the software.
+
+No researcher registry is required. For reproducibility, citing the repository, revision/commit and file path is recommended but is not a substitute for the license conditions.
+
+### When the answer is not automatically “permitted”
+
+**Response: `REVIEW-REQUIRED`** when the facts do not clearly fit a permitted purpose, for example:
+
+- research performed by or for a commercial business where commercial advantage/application is anticipated;
+- a paid product, SaaS, resale, managed production service or commercial deployment;
+- uncertainty about whether a file is original RAF material or separately licensed third-party material;
+- redistribution that removes or conflicts with required notices or upstream terms;
+- a request for rights not granted by the applicable copyright/patent license, or for trademark/brand rights.
+
+**Response: `SEPARATE-LICENSE`** when the intended commercial/production use is outside the PolyForm Noncommercial grant. A separate written commercial agreement is then required from the applicable rightsholder(s).
+
+### Canonical short answers
+
+```text
+EDU-PERMITTED
+Uso educacional coberto, quando realizado dentro dos termos da licença aplicável.
+Não exige cadastro individual. Preserve LICENSE/URL e Required Notice ao redistribuir.
+
+RESEARCH-PERMITTED
+Uso de pesquisa coberto, quando realizado dentro dos termos da licença aplicável.
+Não exige cadastro de pesquisador. Preserve os termos e avisos ao redistribuir.
+
+REVIEW-REQUIRED
+Os fatos informados não permitem classificar o uso com segurança apenas pelo README.
+Verifique LICENSE.md + LICENSE_SCOPE_V1.json e os termos próprios de qualquer terceiro.
+
+SEPARATE-LICENSE
+O uso pretendido está fora da concessão não comercial ou pede direitos adicionais.
+É necessário acordo escrito separado com o(s) titular(es) aplicável(is).
+```
+
+## Real inventory — no parallel registry
+
+`LICENSE_SCOPE_V1.json` is the inventory for this module. At the current PR scope it classifies **17 real files**:
+
+- **14 covered original paths**;
+- **2 license/authorization metadata files**: `LICENSE.md` and `LICENSE_SCOPE_V1.json`;
+- **1 evidence-only receipt**: `evidence/BLAKE3_PORTABLE_LOCAL_KAT_2026-08-28.md`.
+
+The evidence receipt is not a persisted BLAKE3 implementation and must not be interpreted as one. Third-party rights are determined from the third-party material's own license/SPDX/notice; an unclear third-party status yields `REVIEW-REQUIRED`, not an invented permission.
 
 ## Evidence boundary
 
