@@ -37,29 +37,73 @@ jobs:
             --output results/bibliography_daily \
             --max-per-query 20 | tee daily-bibliography-run.json
 
-      - name: Assert claim fence and receipt structure
+      - name: Verify custody, claim fence and receipt structure
         run: |
           python - <<'PY'
-          import json, pathlib
-          roots=sorted(pathlib.Path('results/bibliography_daily').glob('*'))
-          assert roots, 'no daily output directory'
-          p=roots[-1]
-          receipt=json.loads((p/'receipt.json').read_text())
-          coverage=json.loads((p/'coverage.json').read_text())
-          assert receipt['claim_allowed'] is False
-          assert coverage['claim_allowed'] is False
-          assert (p/'manifest.sha256').stat().st_size > 0
-          assert (p/'occurrences.jsonl').exists()
-          assert (p/'content_identities.jsonl').exists()
-          assert (p/'hypothesis_ledger.jsonl').exists()
+          import importlib.util
+          import json
+          import pathlib
+
+          script = pathlib.Path("scripts/daily_bibliography_evolution.py")
+          spec = importlib.util.spec_from_file_location("daily_biblio", script)
+          mod = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(mod)
+
+          roots = sorted(pathlib.Path("results/bibliography_daily").glob("*"))
+          if not roots:
+              raise SystemExit("no daily output directory")
+          p = roots[-1]
+
+          receipt = json.loads((p / "receipt.json").read_text())
+          coverage = json.loads((p / "coverage.json").read_text())
+
+          if receipt.get("claim_allowed") is not False:
+              raise SystemExit("receipt claim fence violated")
+          if coverage.get("claim_allowed") is not False:
+              raise SystemExit("coverage claim fence violated")
+          if receipt.get("manifest_verified") is not True:
+              raise SystemExit("receipt does not attest local manifest verification")
+
+          source_states = coverage.get("source_states", {})
+          for provider in ("zenodo", "arxiv"):
+              bad = [r for r in source_states.get(provider, []) if r.get("state") != "EXECUTED"]
+              if bad:
+                  raise SystemExit(f"{provider} public-provider gate failed: {bad}")
+          orcid_blocked = [r for r in source_states.get("orcid", []) if r.get("state") == "BLOCKED"]
+          if orcid_blocked:
+              raise SystemExit(f"ORCID configured/provider execution blocked: {orcid_blocked}")
+
+          manifest_ok, manifest_problems = mod.verify_manifest(p)
+          if not manifest_ok:
+              raise SystemExit("manifest verification failed: " + "; ".join(manifest_problems))
+          receipt_ok, receipt_problem = mod.verify_receipt_digest(p)
+          if not receipt_ok:
+              raise SystemExit("receipt digest verification failed: " + str(receipt_problem))
+
+          required = (
+              "occurrences.jsonl",
+              "content_identities.jsonl",
+              "field_comparison_receipts.jsonl",
+              "hypothesis_ledger.jsonl",
+              "source_receipts.jsonl",
+          )
+          missing = [name for name in required if not (p / name).is_file()]
+          if missing:
+              raise SystemExit("missing evidence files: " + ", ".join(missing))
+
           print(json.dumps({
-              'output': str(p),
-              'occurrences': coverage['occurrences'],
-              'content_identities': coverage['content_identities'],
-              'cross_source_identities': coverage['cross_source_identities'],
-              'hypothesis_candidates': coverage['hypothesis_candidates'],
-              'blocked_source_queries': coverage['blocked_source_queries'],
-              'claim_allowed': False,
+              "output": str(p),
+              "occurrences": coverage["occurrences"],
+              "content_identities": coverage["content_identities"],
+              "cross_source_identities": coverage["cross_source_identities"],
+              "field_comparisons": coverage["field_comparisons"],
+              "field_compatible": coverage["field_compatible"],
+              "field_contradicted": coverage["field_contradicted"],
+              "field_token_vazio": coverage["field_token_vazio"],
+              "hypothesis_candidates": coverage["hypothesis_candidates"],
+              "blocked_source_queries": coverage["blocked_source_queries"],
+              "non_executed_source_queries": coverage["non_executed_source_queries"],
+              "claim_allowed": False,
           }, indent=2))
           PY
 
@@ -69,9 +113,12 @@ jobs:
           echo '## RAFAELIA Daily Bibliography Evolution' >> "$GITHUB_STEP_SUMMARY"
           echo '- SOURCE: ORCID + Zenodo + arXiv' >> "$GITHUB_STEP_SUMMARY"
           echo '- Output is acquisition evidence, not scientific validation.' >> "$GITHUB_STEP_SUMMARY"
-          echo '- ORCID without configured token remains TOKEN_VAZIO; Zenodo/arXiv may still execute.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- ORCID without configured token remains TOKEN_VAZIO; ORCID BLOCKED fails verification.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Zenodo/arXiv must reach EXECUTED for every configured query or the job fails closed.' >> "$GITHUB_STEP_SUMMARY"
           echo '- Provider occurrences remain separate from reconciled content identities.' >> "$GITHUB_STEP_SUMMARY"
-          echo '- Hypotheses are TESTABLE candidates, never promoted theses.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Field comparison receipts can expose COMPATIBLE, CONTRADICTED or TOKEN_VAZIO metadata states.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Hypotheses remain TESTABLE candidates, never promoted theses.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- manifest.sha256 and receipt.sha256 are recomputed before upload.' >> "$GITHUB_STEP_SUMMARY"
           echo '- claim_allowed=false' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload immutable daily evidence bundle
