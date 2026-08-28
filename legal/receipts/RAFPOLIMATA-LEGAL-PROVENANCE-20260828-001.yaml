@@ -1,0 +1,89 @@
+receipt_version: 1
+receipt_id: RAFPOLIMATA-LEGAL-PROVENANCE-20260828-001
+observed_at: 2026-08-28T15:59:45-03:00
+repository: rafaelmeloreisnovo/RafPolimata
+branch: feat/raf-legal-provenance-v1
+
+base_state:
+  commit_sha: 4c9c039baef3434666c51c05d4a4f40e849316d2
+  tree_sha: 02f58d4005584b99fe8afb4f463455d65cb1dd46
+
+framework_state:
+  commit_sha: eeb1c6feb52196a4b51d03a31740d52c9706a867
+  tree_sha: 8ba83e276bd6087007703b0faee6e7cc93fe9182
+  commit_message: "feat(legal): add RCNC licensing provenance gaps and social access v1"
+
+added_paths:
+  - legal/README.md
+  - legal/RAFAELIA-RESEARCH-COMMUNITY-NONCOMMERCIAL-LICENSE-1.0.md
+  - legal/TOKEN_VAZIO_AND_GAPS.md
+  - legal/PROVENANCE_AND_RECEIPTS.md
+  - legal/NON_REGRESSION_POLICY.md
+  - legal/COMMERCIAL_AUTHORIZATION_CONTRACT_TEMPLATE.md
+  - legal/EDUCATION_AND_SOCIAL_ACCESS_POLICY.md
+  - legal/THIRD_PARTY_BOUNDARY.md
+  - legal/LICENSE_REGISTRY.yaml
+  - legal/LEGAL_BASIS_BR.md
+  - modules/hash/blake3/module.yaml
+  - modules/hash/chat32/module.yaml
+  - modules/hash/md5/module.yaml
+
+policy_assertions:
+  original_rafaelia_commercial_default: NOT_GRANTED
+  commercial_grant_requires_executed_formal_instrument: true
+  upstream_license_controls_third_party_material: true
+  upstream_notices_preserved_by_policy: true
+  education_noncommercial_fee: 0
+  rafaelia_student_registration_required: false
+  literacy_or_socioeconomic_proof_required: false
+  autonomous_recycling_scrap_community_noncommercial_access: PERMITTED
+  personal_data_rule: MINIMUM_NECESSARY_FOR_DOCUMENTED_PURPOSE
+  receipts_append_only: true
+  md5_sole_security_or_anteriority_anchor: false
+
+open_gaps:
+  - gap_id: GAP-BLAKE3-IMPLEMENTATION
+    state: TOKEN_VAZIO
+    next_verifiable_action: identify exact implementation/path and upstream source
+  - gap_id: GAP-BLAKE3-UPSTREAM-LICENSE
+    state: TOKEN_VAZIO
+    next_verifiable_action: verify license/notices for the exact implementation
+  - gap_id: GAP-CHAT32-IDENTITY
+    state: TOKEN_VAZIO
+    next_verifiable_action: resolve exact primitive/code named Chat32 from repository evidence
+  - gap_id: GAP-MD5-IMPLEMENTATION-LICENSE
+    state: TOKEN_VAZIO
+    next_verifiable_action: identify exact implementation and license/notices
+  - gap_id: GAP-LEGAL-CASELAW-REVIEW
+    state: TOKEN_VAZIO
+    next_verifiable_action: qualified counsel review if commercial enforcement or litigation reliance is intended
+  - gap_id: GAP-SIGNED-RECEIPT
+    state: TOKEN_VAZIO
+    next_verifiable_action: create signed tag or independently signed/timestamped receipt if stronger identity evidence is required
+
+normative_verification:
+  jurisdiction_reference: Brazil
+  verified_on: 2026-08-28
+  official_sources_reviewed:
+    - Constitution_1988_Art_5_XXVII
+    - Law_9609_1998_Arts_2_6_7_9_10_11
+    - Law_9610_1998_Arts_22_28_29_31
+    - LGPD_Law_13709_2018_Arts_6_7_8_14
+  legal_opinion: false
+
+content_digests:
+  git_tree: 8ba83e276bd6087007703b0faee6e7cc93fe9182
+  per_file_sha256: TOKEN_VAZIO
+  blake3: TOKEN_VAZIO
+  md5_legacy: TOKEN_VAZIO
+
+signature:
+  status: TOKEN_VAZIO
+  method: TOKEN_VAZIO
+  signer_identity: TOKEN_VAZIO
+
+self_reference_note: This receipt cannot include its own final Git commit SHA without recursion. Its containing commit is the external closure identifier and may be referenced by a later receipt.
+claim_allowed:
+  framework_exists_at_framework_commit: true
+  absolute_authorship_or_priority_guarantee: false
+  commercial_permission_for_any_specific_third_party: false
