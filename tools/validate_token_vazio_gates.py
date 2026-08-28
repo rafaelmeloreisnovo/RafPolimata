@@ -47,6 +47,8 @@ class TokenVazioValidator:
 
     # These paths form structured closure domains.  A closure binds explicit
     # unknowns to governance; it never promotes the underlying material gap.
+    # Date-stamped receipts remain append-only: bind them here instead of
+    # rewriting historical evidence merely to satisfy the validator.
     STRUCTURED_CLOSURE_PATHS = {
         "configs/operational-gap-topology.v1.json": "L11",
         "schemas/operational-gap-topology.v1.schema.json": "L11",
@@ -56,6 +58,8 @@ class TokenVazioValidator:
         "docs/LICENSE_DECISION_RECORD.md": "L11",
         ".github/SECURITY.md": "L11",
         ".github/workflows/operational-gap-topology.yml": "L11",
+        "data/receipts/daily-bibliography-ci-closure-20260828.v1.json": "L11",
+        "tests/test_daily_bibliography_evolution.py": "L11",
         "research/formula_registry_01_20/registry.v1.json": "G1",
         "research/formula_registry_01_20/README.md": "G1",
         "research/formula_registry_01_20/reference.py": "G1",

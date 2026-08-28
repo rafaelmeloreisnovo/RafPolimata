@@ -1,0 +1,97 @@
+{
+  "schema": "RAFAELIA_DAILY_BIBLIOGRAPHY_HARDENING_CI_CLOSURE_V1",
+  "cycle_id": "OMEGA-20260828-BIBLIO-HARDENING-CI-CLOSURE",
+  "recorded_date": "2026-08-28",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "branch": "audit/daily-bibliography-evolution-20260828",
+  "governance_anchor": "CLOSURE_L11",
+  "claim_allowed": false,
+  "subject_head": "24eb37ab9017b80ceb07cc4ba0355d7d8c6a5051",
+  "lineage": [
+    "29adcb25eeda6b9e93e07d95eac0a85b086161c0",
+    "a3849bd452ca443142d001de6f3ed4e629b8c58b",
+    "24eb37ab9017b80ceb07cc4ba0355d7d8c6a5051"
+  ],
+  "evidence": [
+    {
+      "workflow": "CI",
+      "run_id": 33162272848,
+      "run_number": 2282,
+      "head_sha": "24eb37ab9017b80ceb07cc4ba0355d7d8c6a5051",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "workflow": "Formal Science Orchestrator",
+      "run_id": 33162272838,
+      "run_number": 2160,
+      "head_sha": "24eb37ab9017b80ceb07cc4ba0355d7d8c6a5051",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "workflow": "Internal Custody Ledger",
+      "run_id": 33162272833,
+      "run_number": 232,
+      "head_sha": "24eb37ab9017b80ceb07cc4ba0355d7d8c6a5051",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "falsifier_history": {
+    "head_sha": "a3849bd452ca443142d001de6f3ed4e629b8c58b",
+    "ci_run_id": 33162087208,
+    "conclusion": "failure",
+    "failed_step": "Validate TOKEN_VAZIO gates (Hotfix H1)",
+    "validator_errors": 6,
+    "validator_warnings": 11,
+    "report_hash": "354a983472ef92feeb4bfdcee8ffd0dfc9ab91f38918d81a7658ae848d9ae17b",
+    "resolution": "bind immutable bibliography receipt and bibliography test to existing CLOSURE_L11 structured closure domain without rewriting historical receipt"
+  },
+  "hardening_verified": [
+    "stable arXiv identity across vN revisions while preserving provider version metadata",
+    "field comparison receipts for DOI/title/publication year/creator overlap",
+    "CONTRADICTED and TOKEN_VAZIO remain non-promotional epistemic states",
+    "ORCID profile-match scope does not imply work-level relevance",
+    "manifest.sha256 is recomputed and tamper-detecting",
+    "receipt.sha256 is recomputed",
+    "public-provider gates are fail-closed",
+    "claim_allowed remains false"
+  ],
+  "gap_dispositions": [
+    {
+      "gap_id": "TV-BIBLIO-HARDENING-EXACT-HEAD-CI",
+      "state": "CLOSED_FOR_HEAD_24EB37AB",
+      "closure_gate": "CI + Formal Science Orchestrator + Internal Custody Ledger SUCCESS on exact subject_head",
+      "claim_allowed": false
+    },
+    {
+      "gap_id": "TV-BIBLIO-FIRST-REAL-DAILY-RUN",
+      "state": "TOKEN_VAZIO",
+      "missing_field": "provider-bound acquisition artifact and receipt from a real Daily Bibliography Evolution workflow run",
+      "evidence_needed": "immutable Actions artifact with records, occurrences, identities, source receipts, field-comparison receipts, hypotheses, coverage, manifest and receipt digest",
+      "falsifier": "provider execution failure, missing artifact, manifest/digest mismatch, missing required evidence file, or claim_allowed=true",
+      "next_probe": "run Daily Bibliography Evolution by workflow_dispatch on the hardened branch when an authorized dispatch surface is available, or observe the first scheduled/default-branch execution after an independently authorized integration",
+      "claim_allowed": false
+    },
+    {
+      "gap_id": "TV-BIBLIO-ORCID-CREDENTIAL",
+      "state": "TOKEN_VAZIO",
+      "missing_field": "provider-bound proof of a valid ORCID_ACCESS_TOKEN in the execution environment",
+      "next_probe": "preserve fail-closed state until an authenticated ORCID source receipt exists",
+      "claim_allowed": false
+    }
+  ],
+  "boundaries": [
+    "offline invariant test != provider runtime",
+    "provider runtime != scientific validation",
+    "bibliographic compatibility != truth of scientific content",
+    "CI closure != merge authorization",
+    "workflow materialization != observed real acquisition"
+  ],
+  "transitions": {
+    "merge_executed": false,
+    "release_executed": false,
+    "scientific_claim_promoted": false
+  }
+}
