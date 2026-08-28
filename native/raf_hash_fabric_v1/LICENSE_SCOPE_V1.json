@@ -1,0 +1,131 @@
+{
+  "schema": "rafaelia.license-scope.v1",
+  "module": "native/raf_hash_fabric_v1",
+  "default_license_for_listed_original_material": "PolyForm-Noncommercial-1.0.0",
+  "commercial_rights": "separate_written_agreement_required_when_use_is_outside_noncommercial_license",
+  "copyright": "Copyright (c) 2026 Rafael Melo Reis",
+  "authorization_model": {
+    "registration_required_for_license_permitted_school_or_research_use": false,
+    "personal_data_collection_required_for_authorization": false,
+    "approval_database_required": false,
+    "authoritative_surfaces": [
+      "README.md",
+      "LICENSE.md",
+      "LICENSE_SCOPE_V1.json"
+    ],
+    "license_controls_over_summary": true,
+    "responses": {
+      "school": "EDU-PERMITTED",
+      "research": "RESEARCH-PERMITTED",
+      "ambiguous_or_separately_governed": "REVIEW-REQUIRED",
+      "outside_noncommercial_grant": "SEPARATE-LICENSE"
+    }
+  },
+  "permitted_use_orientation": {
+    "school": {
+      "decision": "PERMITTED_IF_WITHIN_CANONICAL_LICENSE",
+      "examples": [
+        "classroom_teaching",
+        "coursework",
+        "educational_laboratory",
+        "educational_demonstration",
+        "study",
+        "educational_modification_and_distribution_subject_to_license_notices"
+      ]
+    },
+    "research": {
+      "decision": "PERMITTED_IF_WITHIN_CANONICAL_LICENSE",
+      "examples": [
+        "qualifying_personal_research",
+        "experiment",
+        "testing",
+        "public_research_organization_use",
+        "benchmarking",
+        "reproducibility_study",
+        "publication_of_findings"
+      ]
+    },
+    "review_required_examples": [
+      "anticipated_commercial_application",
+      "commercial_business_use_or_service",
+      "paid_product_saas_resale_or_managed_production",
+      "unclear_third_party_license_scope",
+      "redistribution_without_required_notices",
+      "requested_trademark_brand_or_other_ungranted_rights"
+    ]
+  },
+  "source_binding": {
+    "scheme": "git_blob_exact_bytes_v1",
+    "readme_git_blob": "0bd0af4cf666b0acbc78c650fce289dc791c36c3",
+    "license_git_blob": "5f2b884a74dbf989a01fdbe7fce4a6846e63b80d",
+    "manifest_git_blob_is_anchored_in_source": true,
+    "source_anchor": "include/raf_hash_fabric.h",
+    "build_gate": "make source-contract-check",
+    "rule": "any_byte_change_to_readme_license_or_manifest_requires_a_corresponding_source_anchor_change_or_the_gate_fails",
+    "security_boundary": "git_object_identity_is_repository_binding_not_a_replacement_for_modern_signature_or_external_timestamp"
+  },
+  "liability_and_enforcement_orientation": {
+    "polyform_no_liability_clause_controls_for_polyform_grant": true,
+    "polyform_text_modified_by_project": false,
+    "separate_commercial_agreement_default_proposal": {
+      "direct_damages_cap_currency": "BRL",
+      "direct_damages_cap_amount": "0.01",
+      "effective_only_if_expressly_adopted_in_separate_written_agreement": true,
+      "mandatory_law_controls": true,
+      "audit_forensic_expert_enforcement_collection_and_legal_costs": "may_be_allocated_to_material_breaching_party_only_if_signed_agreement_and_applicable_law_permit"
+    },
+    "unauthorized_use": {
+      "automatic_debt_created_by_readme_or_license_notice": false,
+      "automatic_audit_right_created_by_notice": false,
+      "rightsholder_reserves_remedies_and_recoverable_costs_under_applicable_law": true
+    }
+  },
+  "real_inventory": {
+    "unique_files_in_module_scope_observed": 17,
+    "covered_original_paths_count": 14,
+    "authorization_metadata_paths_count": 2,
+    "evidence_only_paths_count": 1,
+    "authorization_metadata_paths": [
+      "LICENSE.md",
+      "LICENSE_SCOPE_V1.json"
+    ],
+    "evidence_only_paths": [
+      "evidence/BLAKE3_PORTABLE_LOCAL_KAT_2026-08-28.md"
+    ],
+    "inventory_rule": "this_manifest_is_the_module_inventory_no_parallel_school_or_research_registry"
+  },
+  "covered_original_paths": [
+    "README.md",
+    "SPEC.md",
+    "Makefile",
+    "include/raf_hash_fabric.h",
+    "c/raf_hash_fabric.c",
+    "cpp/raf_hash_fabric.cpp",
+    "rust/lib.rs",
+    "zig/raf_hash_fabric.zig",
+    "d/raf_hash_fabric.d",
+    "forth/raf_hash_fabric.fs",
+    "asm/armv7/rhf_mix32.S",
+    "asm/aarch64/rhf_mix32.S",
+    "asm/x86_64/rhf_mix32.S",
+    "tests/selftest.c"
+  ],
+  "excluded_from_relicensing": [
+    "third_party_code_or_data",
+    "external_algorithm_or_specification_rights",
+    "material_with_its_own_spdx_or_license",
+    "trademarks_and_brand_rights",
+    "patent_rights_not_granted_by_applicable_license_or_separate_agreement"
+  ],
+  "third_party_rule": "use_the_third_party_material_own_license_spdx_or_notice_if_unclear_review_required",
+  "root_repository_license_changed": false,
+  "root_repository_license_gate": "TOKEN_VAZIO",
+  "notes": [
+    "Scope is module-specific and does not silently relicense existing repository material.",
+    "README summaries do not expand or replace the canonical PolyForm terms.",
+    "No school or researcher registry is required for uses already permitted by the applicable license.",
+    "README LICENSE and this manifest are source-contract inputs bound by exact Git blob identity.",
+    "The BRL 0.01 commercial damages position is only a proposal for a separate written commercial agreement and does not modify the PolyForm grant.",
+    "Any future copied or vendorized third-party source must be removed from covered_original_paths and governed by its upstream license."
+  ]
+}

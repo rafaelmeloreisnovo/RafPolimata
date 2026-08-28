@@ -1,0 +1,166 @@
+{
+  "schema": "rafaelia.legal-control-matrix.v1",
+  "status": "REFERENCE",
+  "claim_allowed": false,
+  "principles": [
+    "concept!=implementation!=execution!=evidence!=claim",
+    "TOKEN_VAZIO!=PASS",
+    "brand!=assurance",
+    "official_mandatory_transfer_clauses_are_not_silently_rewritten",
+    "third_party_rights_are_not_relicensed_by_project_policy"
+  ],
+  "states": [
+    "REFERENCE",
+    "IMPLEMENTED",
+    "PASS",
+    "FAIL",
+    "TOKEN_VAZIO",
+    "NOT_APPLICABLE"
+  ],
+  "pillars": [
+    {
+      "id": "P1_IDENTITY_AUTHORITY",
+      "required_for_commercial": true,
+      "controls": [
+        "legal_party_identity",
+        "signatory_authority",
+        "contract_version_identity"
+      ],
+      "state": "TOKEN_VAZIO"
+    },
+    {
+      "id": "P2_IP_LICENSE",
+      "required_for_commercial": true,
+      "controls": [
+        "original_authorship_provenance",
+        "third_party_inventory",
+        "license_compatibility",
+        "commercial_license_scope",
+        "trademark_patent_boundary"
+      ],
+      "state": "TOKEN_VAZIO"
+    },
+    {
+      "id": "P3_DATA_PRIVACY",
+      "required_for_personal_data": true,
+      "controls": [
+        "processing_roles",
+        "purpose_and_data_categories",
+        "lawful_basis_or_controller_instruction",
+        "retention_deletion",
+        "data_subject_rights",
+        "privacy_notice"
+      ],
+      "state": "TOKEN_VAZIO"
+    },
+    {
+      "id": "P4_INTERNATIONAL_TRANSFER",
+      "required_when_cross_border_personal_data": true,
+      "controls": [
+        "origin_destination",
+        "selected_transfer_mechanism",
+        "official_clause_or_adequacy_evidence",
+        "supplementary_safeguards",
+        "onward_transfer_chain",
+        "transparency"
+      ],
+      "transfer_allowed": false,
+      "state": "TOKEN_VAZIO"
+    },
+    {
+      "id": "P5_SECURITY",
+      "required_for_production": true,
+      "controls": [
+        "access_control",
+        "cryptography_key_management",
+        "secure_development",
+        "vulnerability_management",
+        "logging_monitoring",
+        "backup_restore",
+        "incident_response",
+        "fail_safe_failover_rollback_failback"
+      ],
+      "state": "TOKEN_VAZIO"
+    },
+    {
+      "id": "P6_SUPPLY_CHAIN",
+      "required_for_production": true,
+      "controls": [
+        "supplier_exact_service_entity",
+        "terms_and_license",
+        "data_role_location_transfer",
+        "security_evidence",
+        "subprocessor_dependency_chain",
+        "exit_portability"
+      ],
+      "state": "TOKEN_VAZIO"
+    },
+    {
+      "id": "P7_EVIDENCE_RECOVERY",
+      "required_for_claim": true,
+      "controls": [
+        "artifact_hash",
+        "test_receipt",
+        "environment_toolchain",
+        "incident_recovery_receipt",
+        "open_gaps_register",
+        "review_expiry_trigger"
+      ],
+      "state": "TOKEN_VAZIO"
+    }
+  ],
+  "promotion_rules": {
+    "COMMERCIAL_CLEAR": {
+      "requires": [
+        "P1_IDENTITY_AUTHORITY:PASS",
+        "P2_IP_LICENSE:PASS",
+        "P5_SECURITY:PASS",
+        "P6_SUPPLY_CHAIN:PASS",
+        "P7_EVIDENCE_RECOVERY:PASS"
+      ],
+      "conditional_requires": [
+        "P3_DATA_PRIVACY:PASS if personal_data=true",
+        "P4_INTERNATIONAL_TRANSFER:PASS if cross_border_personal_data=true"
+      ]
+    },
+    "TRANSFER_ALLOWED": {
+      "default": false,
+      "requires": [
+        "P3_DATA_PRIVACY:PASS",
+        "P4_INTERNATIONAL_TRANSFER:PASS"
+      ]
+    },
+    "SECURITY_CERTIFIED": {
+      "default": false,
+      "requires": [
+        "actual_valid_certification",
+        "issuer",
+        "scope",
+        "validity_period",
+        "artifact_reference"
+      ]
+    }
+  },
+  "open_gates": [
+    {
+      "id": "GAP-LEGAL-ROOT-LICENSE",
+      "state": "TOKEN_VAZIO",
+      "reason": "repository-wide ownership and third-party compatibility review is not closed"
+    },
+    {
+      "id": "GAP-LEGAL-JURISDICTION",
+      "state": "TOKEN_VAZIO",
+      "reason": "governing law/forum are customer and transaction specific"
+    },
+    {
+      "id": "GAP-PRIVACY-LIVE-PROCESSING-INVENTORY",
+      "state": "TOKEN_VAZIO",
+      "reason": "templates do not establish actual production data flows"
+    },
+    {
+      "id": "GAP-SECURITY-INDEPENDENT-ASSURANCE",
+      "state": "TOKEN_VAZIO",
+      "reason": "no blanket independent certification or audit is claimed by this pack"
+    }
+  ]
+}

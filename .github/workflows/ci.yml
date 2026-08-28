@@ -23,6 +23,40 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: RAF Hash Fabric source-contract binding gate
+        run: make -C native/raf_hash_fabric_v1 source-contract-check
+
+      - name: RAF Hash Fabric one-bit mutation rejection
+        shell: bash
+        run: |
+          set -euo pipefail
+          module='native/raf_hash_fabric_v1'
+          for rel in README.md LICENSE.md LICENSE_SCOPE_V1.json; do
+            path="$module/$rel"
+            backup="$(mktemp)"
+            cp "$path" "$backup"
+            python3 - "$path" <<'PY'
+          import sys
+          from pathlib import Path
+          p = Path(sys.argv[1])
+          data = bytearray(p.read_bytes())
+          if not data:
+              raise SystemExit('cannot flip a bit in an empty file')
+          data[0] ^= 0x01
+          p.write_bytes(data)
+          PY
+            if make -C "$module" source-contract-check; then
+              echo "SOURCE_CONTRACT_NEGATIVE_FAIL: one-bit mutation was accepted for $rel"
+              cp "$backup" "$path"
+              rm -f "$backup"
+              exit 1
+            fi
+            cp "$backup" "$path"
+            rm -f "$backup"
+            make -C "$module" source-contract-check
+            echo "SOURCE_CONTRACT_NEGATIVE_PASS: one-bit mutation rejected for $rel"
+          done
+
       - name: Validate canonical coherence protocol
         run: python3 scripts/validate_coherence_protocol.py
 
