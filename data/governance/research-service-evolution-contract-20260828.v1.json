@@ -1,0 +1,105 @@
+{
+  "schema": "RAFAELIA_RESEARCH_SERVICE_EVOLUTION_CONTRACT_V1",
+  "cycle_id": "RAFAELIA-RESEARCH-SERVICE-20260828",
+  "predecessor": "RafPolimata/main@8054f652b8528b5d9e2c1fab6c246e45554f0e1c",
+  "claim_allowed": false,
+  "purpose": "Convert conversation-level operational requirements into a client-service research pipeline with auditable bibliography acquisition, hypothesis queues, provenance and non-regression gates.",
+  "invariants": [
+    "SOURCE != CLAIM",
+    "DOCUMENTED != EXECUTED",
+    "metadata acquisition != scientific validation",
+    "filename/title != identity",
+    "TOKEN_VAZIO != zero",
+    "same DOI may merge identity but provider occurrences are preserved",
+    "provider-local IDs are preserved when DOI is absent",
+    "hypothesis candidate != supported thesis",
+    "daily workflow artifact != repository authority",
+    "claim_allowed=false until independent closure gate"
+  ],
+  "service_path": [
+    "client question or research gap",
+    "query-set selection",
+    "ORCID/Zenodo/arXiv provider acquisition",
+    "raw payload digest",
+    "provider occurrence ledger",
+    "content identity reconciliation",
+    "bibliographic index",
+    "hypothesis H1/H0 construction",
+    "falsifier and evidence-needed binding",
+    "review/replication queue",
+    "receipt",
+    "Atlas L/O/T/C/P projection",
+    "memory"
+  ],
+  "conversation_items_projected": [
+    {"item":"gaps and TOKEN_VAZIO", "implementation":"source receipts and blocked-source states"},
+    {"item":"urgency and motivation", "implementation":"query-set priorities plus next_gates in daily receipt"},
+    {"item":"provenance and custody", "implementation":"provider_id/raw_sha256/http_payload_sha256/manifest.sha256"},
+    {"item":"indexing and duplicates", "implementation":"occurrences.jsonl + content_identities.jsonl; DOI first, provider-local fallback"},
+    {"item":"hypotheses and theses", "implementation":"hypothesis_ledger.jsonl with H1/H0/test/falsifier; thesis promotion remains gated"},
+    {"item":"real data", "implementation":"network acquisition from public research providers; no synthetic provider success"},
+    {"item":"daily continuous evolution", "implementation":"scheduled GitHub Actions artifact, read-only repository permission"},
+    {"item":"anti-regression", "implementation":"claim fence, syntax gate, manifest hashes, source-state recording"},
+    {"item":"service for third parties", "implementation":"query config decoupled from engine so client-specific research questions can be versioned without rewriting acquisition logic"},
+    {"item":"local/mobile evidence", "implementation":"kept orthogonal; bibliography evidence may inform benchmark/support material but does not substitute handset execution receipts"}
+  ],
+  "atlas": {
+    "L":"daily runs, provider timestamps, predecessor receipts, evidence age",
+    "O":"independent provider agreement/disagreement and later replication/review",
+    "T":"ORCID<->Zenodo<->arXiv<->RafPolimata<->Mapa/papers/client evidence",
+    "C":"query, scope, source availability, authentication state, claim boundary",
+    "P":"provider IDs, DOI/arXiv/Zenodo/ORCID identifiers, SHA-256 manifests, append-only receipts"
+  },
+  "open_gaps": [
+    {
+      "gap_id":"TV-BIBLIO-ORCID-CREDENTIAL",
+      "state":"TOKEN_VAZIO_UNLESS_SECRET_CONFIGURED",
+      "source_pointer":"GitHub Actions secret ORCID_ACCESS_TOKEN",
+      "missing_field":"valid ORCID Public API access token",
+      "blocking_dependency":"ORCID API credentials",
+      "evidence_needed":"daily source receipt state=EXECUTED with payload digest",
+      "falsifier":"missing/invalid token or provider rejection",
+      "next_probe":"configure secret and execute workflow_dispatch",
+      "owner_authority":"repository owner + ORCID provider",
+      "urgency":"P1",
+      "closure_gate":"ORCID query and work retrieval provider-bound",
+      "claim_allowed":false
+    },
+    {
+      "gap_id":"TV-BIBLIO-SCIENTIFIC-PROMOTION",
+      "state":"TOKEN_VAZIO",
+      "source_pointer":"daily hypothesis_ledger.jsonl",
+      "missing_field":"method/data/retraction/replication review evidence",
+      "blocking_dependency":"independent scientific review",
+      "evidence_needed":"field-specific review and replication receipts",
+      "falsifier":"provider conflict, retraction, failed reproduction, unsupported methodology",
+      "next_probe":"prioritize hypotheses by cross-source support and explicit falsifier",
+      "owner_authority":"domain reviewer / producer authority",
+      "urgency":"P0-P1 depending on downstream claim",
+      "closure_gate":"review receipt per hypothesis/thesis",
+      "claim_allowed":false
+    },
+    {
+      "gap_id":"TV-BIBLIO-GLOBAL-EXHAUSTIVITY",
+      "state":"TOKEN_VAZIO",
+      "source_pointer":"configured daily query set",
+      "missing_field":"proof that configured searches exhaust relevant literature",
+      "blocking_dependency":"independent systematic-search protocol and provider coverage analysis",
+      "evidence_needed":"search strategy, inclusion/exclusion criteria, pagination closure and provider coverage",
+      "falsifier":"relevant record discovered outside enumerated search universe",
+      "next_probe":"expand cursor/pagination and systematic-review protocol for high-priority topics",
+      "owner_authority":"research protocol",
+      "urgency":"P1",
+      "closure_gate":"bounded systematic-search receipt, never generic global total",
+      "claim_allowed":false
+    }
+  ],
+  "six_continuous_enclosures": [
+    "content addressing",
+    "orphan/broken-edge sweep",
+    "duplicate/version reconciliation",
+    "evidence-age revalidation",
+    "rollback/idempotence",
+    "shared L/O/T/C/P projection"
+  ]
+}

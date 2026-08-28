@@ -1,0 +1,15 @@
+{
+  "schema": "RAFAELIA_BIBLIOGRAPHY_QUERY_SET_V1",
+  "claim_allowed": false,
+  "arxiv_politeness_seconds": 3,
+  "queries": [
+    {"id": "Q-COSMO-BAO", "query": "cosmology BAO DESI growth rate weak lensing"},
+    {"id": "Q-COSMO-DARK-SECTOR", "query": "dark energy interacting dark sector cosmological constraints"},
+    {"id": "Q-MATH-TOPOLOGY", "query": "topological geometry dynamical systems invariant manifold"},
+    {"id": "Q-MATH-FORMAL", "query": "formal verification theorem proving mathematical physics"},
+    {"id": "Q-LLM-EDGE", "query": "local large language model Android ARM inference quantization benchmark"},
+    {"id": "Q-LOWLEVEL-ARM", "query": "ARM low level freestanding compiler optimization embedded benchmark"},
+    {"id": "Q-PROVENANCE", "query": "scientific provenance evidence graph reproducibility data lineage"},
+    {"id": "Q-HYPOTHESIS", "query": "hypothesis testing falsifiability replication scientific method"}
+  ]
+}

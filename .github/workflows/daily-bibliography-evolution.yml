@@ -1,0 +1,86 @@
+name: Daily Bibliography Evolution
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-bibliography-evolution
+  cancel-in-progress: false
+
+jobs:
+  acquire-and-index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Offline syntax and invariant gates
+        run: |
+          python -m py_compile scripts/daily_bibliography_evolution.py tests/test_daily_bibliography_evolution.py
+          python tests/test_daily_bibliography_evolution.py
+
+      - name: Run real provider acquisition
+        env:
+          ORCID_ACCESS_TOKEN: ${{ secrets.ORCID_ACCESS_TOKEN }}
+        run: |
+          python scripts/daily_bibliography_evolution.py \
+            --config data/science/bibliography_queries.v1.json \
+            --output results/bibliography_daily \
+            --max-per-query 20 | tee daily-bibliography-run.json
+
+      - name: Assert claim fence and receipt structure
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          roots=sorted(pathlib.Path('results/bibliography_daily').glob('*'))
+          assert roots, 'no daily output directory'
+          p=roots[-1]
+          receipt=json.loads((p/'receipt.json').read_text())
+          coverage=json.loads((p/'coverage.json').read_text())
+          assert receipt['claim_allowed'] is False
+          assert coverage['claim_allowed'] is False
+          assert (p/'manifest.sha256').stat().st_size > 0
+          assert (p/'occurrences.jsonl').exists()
+          assert (p/'content_identities.jsonl').exists()
+          assert (p/'hypothesis_ledger.jsonl').exists()
+          print(json.dumps({
+              'output': str(p),
+              'occurrences': coverage['occurrences'],
+              'content_identities': coverage['content_identities'],
+              'cross_source_identities': coverage['cross_source_identities'],
+              'hypothesis_candidates': coverage['hypothesis_candidates'],
+              'blocked_source_queries': coverage['blocked_source_queries'],
+              'claim_allowed': False,
+          }, indent=2))
+          PY
+
+      - name: Job summary
+        if: always()
+        run: |
+          echo '## RAFAELIA Daily Bibliography Evolution' >> "$GITHUB_STEP_SUMMARY"
+          echo '- SOURCE: ORCID + Zenodo + arXiv' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Output is acquisition evidence, not scientific validation.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- ORCID without configured token remains TOKEN_VAZIO; Zenodo/arXiv may still execute.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Provider occurrences remain separate from reconciled content identities.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Hypotheses are TESTABLE candidates, never promoted theses.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- claim_allowed=false' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload immutable daily evidence bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bibliography-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            results/bibliography_daily/
+            daily-bibliography-run.json
+          if-no-files-found: error
+          retention-days: 30
