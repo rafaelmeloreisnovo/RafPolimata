@@ -1,0 +1,146 @@
+name: arXiv Query Recall Probe
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/arxiv-query-recall-probe.yml'
+      - 'data/science/bibliography_queries.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arxiv-query-recall-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Compare arXiv query strategies
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import pathlib
+          import re
+          import time
+          import urllib.parse
+          import urllib.request
+          import xml.etree.ElementTree as ET
+          from datetime import datetime, timezone
+
+          cfg = json.loads(pathlib.Path('data/science/bibliography_queries.v1.json').read_text())
+          outdir = pathlib.Path('results/arxiv_recall_probe')
+          outdir.mkdir(parents=True, exist_ok=True)
+          endpoint = 'https://export.arxiv.org/api/query'
+          ua = 'RafPolimata-ArxivRecallProbe/1.0'
+          stop = {'and','or','the','of','for','in','on','with','a','an','to'}
+          atom = {'a': 'http://www.w3.org/2005/Atom'}
+
+          def sha256(b):
+              return hashlib.sha256(b).hexdigest()
+
+          def terms(q):
+              return [x for x in re.findall(r'[A-Za-z0-9]+', q) if x.casefold() not in stop]
+
+          def strategies(q):
+              ts = terms(q)
+              anchors = [x for x in ts if len(x) >= 4][:3] or ts[:3]
+              return {
+                  'exact_phrase': f'all:"{q}"',
+                  'all_terms_and': ' AND '.join(f'all:{x}' for x in ts),
+                  'anchor_and': ' AND '.join(f'all:{x}' for x in anchors),
+              }
+
+          rows = []
+          for q in cfg['queries']:
+              for strategy, expression in strategies(q['query']).items():
+                  params = urllib.parse.urlencode({
+                      'search_query': expression,
+                      'start': 0,
+                      'max_results': 5,
+                      'sortBy': 'submittedDate',
+                      'sortOrder': 'descending',
+                  })
+                  url = endpoint + '?' + params
+                  rec = {
+                      'schema': 'RAFAELIA_ARXIV_RECALL_PROBE_V1',
+                      'query_id': q['id'],
+                      'query': q['query'],
+                      'strategy': strategy,
+                      'expression': expression,
+                      'observed_at': datetime.now(timezone.utc).isoformat(),
+                      'claim_allowed': False,
+                  }
+                  try:
+                      req = urllib.request.Request(url, headers={'User-Agent': ua})
+                      with urllib.request.urlopen(req, timeout=45) as r:
+                          raw = r.read()
+                      root = ET.fromstring(raw)
+                      entries = root.findall('a:entry', atom)
+                      rec.update({
+                          'state': 'EXECUTED',
+                          'count': len(entries),
+                          'http_payload_sha256': sha256(raw),
+                          'provider_ids': [
+                              (e.findtext('a:id', default='', namespaces=atom).rstrip('/').split('/')[-1])
+                              for e in entries
+                          ],
+                      })
+                  except Exception as e:
+                      rec.update({
+                          'state': 'BLOCKED',
+                          'count': 0,
+                          'error_type': type(e).__name__,
+                          'error': str(e)[:300],
+                      })
+                  rows.append(rec)
+                  time.sleep(float(cfg.get('arxiv_politeness_seconds', 3)))
+
+          p = outdir / 'probe.jsonl'
+          p.write_text(''.join(json.dumps(x, ensure_ascii=False, sort_keys=True) + '\n' for x in rows), encoding='utf-8')
+
+          summary = {'schema': 'RAFAELIA_ARXIV_RECALL_PROBE_SUMMARY_V1', 'claim_allowed': False, 'queries': {}}
+          for q in cfg['queries']:
+              rs = [x for x in rows if x['query_id'] == q['id']]
+              summary['queries'][q['id']] = {
+                  x['strategy']: {'state': x['state'], 'count': x['count'], 'http_payload_sha256': x.get('http_payload_sha256')}
+                  for x in rs
+              }
+          summary['all_rows'] = len(rows)
+          summary['blocked_rows'] = sum(x['state'] == 'BLOCKED' for x in rows)
+          summary['exact_zero_and_alternative_positive'] = sum(
+              1 for qid, x in summary['queries'].items()
+              if x['exact_phrase']['state'] == 'EXECUTED'
+              and x['exact_phrase']['count'] == 0
+              and any(x[s]['state'] == 'EXECUTED' and x[s]['count'] > 0 for s in ('all_terms_and','anchor_and'))
+          )
+          (outdir / 'summary.json').write_text(json.dumps(summary, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          manifest_lines = []
+          for name in ('probe.jsonl','summary.json'):
+              b = (outdir / name).read_bytes()
+              manifest_lines.append(f'{sha256(b)}  {name}')
+          (outdir / 'manifest.sha256').write_text('\n'.join(manifest_lines) + '\n', encoding='utf-8')
+          print(json.dumps(summary, indent=2, sort_keys=True))
+
+          if summary['blocked_rows']:
+              raise SystemExit(f"provider probe blocked rows: {summary['blocked_rows']}")
+          PY
+
+      - name: Upload immutable recall evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arxiv-recall-probe-${{ github.run_id }}-${{ github.run_attempt }}
+          path: results/arxiv_recall_probe/
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,68 @@
+{
+  "schema": "RAFAELIA_ARXIV_PRODUCTION_STRATEGY_RECEIPT_V1",
+  "cycle_id": "OMEGA-20260828-ARXIV-PRODUCTION-STRATEGY-VALIDATED",
+  "predecessor": "925a5b12d4ff7b187eabe7d880ad0d6eee3deb05",
+  "source": {
+    "provider": "GitHub Actions",
+    "workflow": "arXiv Production Strategy Validation",
+    "run_id": 33188918879,
+    "run_number": 1,
+    "job_id": 98909061796,
+    "state": "EXECUTED",
+    "conclusion": "SUCCESS"
+  },
+  "strategy": {
+    "id": "anchor_and_v1",
+    "definition": "remove configured stopwords, take the first up-to-three remaining query tokens, bind each to arXiv all:, and join with AND",
+    "queries": 8,
+    "executed": 8,
+    "nonempty": 8,
+    "blocked": 0,
+    "zero_result_query_ids": [],
+    "claim_allowed": false
+  },
+  "artifact": {
+    "artifact_id": 9692897383,
+    "name": "arxiv-production-strategy-33188918879-1",
+    "size_bytes": 2164,
+    "sha256": "2efe1e01cf67a8ad09f84879c6b667bb51216d9308b9dbfe262525390d636bb8",
+    "expires_at": "2026-09-27T16:13:51Z"
+  },
+  "gates": {
+    "candidate_strategy_validation": "PASS",
+    "production_implementation": "TOKEN_VAZIO",
+    "full_zenodo_arxiv_reacquisition": "TOKEN_VAZIO",
+    "cross_source_identity_reconciliation": "TOKEN_VAZIO",
+    "scientific_claim": "TOKEN_VAZIO"
+  },
+  "gap": {
+    "gap_id": "TV-BIBLIO-ARXIV-PRODUCTION-IMPLEMENTATION-20260828",
+    "state": "TOKEN_VAZIO",
+    "closure_id": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+    "source_pointer": "scripts/daily_bibliography_evolution.py::fetch_arxiv",
+    "missing_field": "strategy-labelled anchor_and_v1 production binding",
+    "blocking_dependency": "apply reviewed delta and rerun full daily acquisition",
+    "evidence_needed": "CI PASS plus provider-bound daily artifact showing arXiv EXECUTED under anchor_and_v1 and preserved manifest/receipt hashes",
+    "falsifier": "production run BLOCKED, manifest mismatch, strategy label absent, or recall regression inconsistent with validation artifact",
+    "next_probe": "apply data/deltas/arxiv-production-anchor-and-v1.delta.json on the audit branch, run CI, then execute Daily Bibliography Evolution",
+    "owner_authority": "rafaelmeloreisnovo/RafPolimata",
+    "urgency": "P0",
+    "closure_gate": "production implementation + CI + provider artifact",
+    "claim_allowed": false,
+    "predecessor_lineage": [
+      "33179100314:recall-probe",
+      "199c050d4156da1a3e82fa7681328b4f033d6416",
+      "925a5b12d4ff7b187eabe7d880ad0d6eee3deb05",
+      "33188918879:production-strategy-validation"
+    ]
+  },
+  "atlas": {
+    "L": "exact-phrase empty -> recall probe -> anchor_and_v1 validation -> production implementation pending",
+    "O": "independent query formulations plus provider-bound rerun evidence",
+    "T": "arXiv retrieval -> bibliography engine -> content identities -> hypothesis ledger",
+    "C": "retrieval adequacy only; not exhaustivity or scientific validation",
+    "P": "commit/run/job/artifact/digest append-only lineage"
+  },
+  "boundary": "validated retrieval strategy != implemented strategy != exhaustive literature coverage != scientific validation",
+  "claim_allowed": false
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "RAFAELIA_PROPOSED_DELTA_V1",
+  "delta_id": "ARXIV-PRODUCTION-ANCHOR-AND-V1",
+  "target": "scripts/daily_bibliography_evolution.py",
+  "base_blob_sha": "6969152fe3909f971364528909d962a565232633",
+  "base_commit": "925a5b12d4ff7b187eabe7d880ad0d6eee3deb05",
+  "status": "PROPOSED_FOR_REVIEW",
+  "evidence_source": {
+    "workflow_run_id": 33188918879,
+    "artifact_id": 9692897383,
+    "artifact_sha256": "2efe1e01cf67a8ad09f84879c6b667bb51216d9308b9dbfe262525390d636bb8",
+    "observed_result": "8/8 EXECUTED, 8/8 nonempty, 0 BLOCKED"
+  },
+  "operations": [
+    {
+      "op": "insert_after",
+      "anchor": "ARXIV_VERSION_RE = re.compile(r\"v(\\d+)$\", re.IGNORECASE)",
+      "content": "ARXIV_QUERY_STRATEGY = \"anchor_and_v1\"\nARXIV_STOPWORDS = frozenset({\"and\", \"or\", \"the\", \"of\", \"for\", \"in\", \"on\", \"with\", \"a\", \"an\", \"to\", \"from\", \"using\", \"toward\", \"towards\"})"
+    },
+    {
+      "op": "insert_before",
+      "anchor": "def fetch_arxiv(query: str, limit: int) -> tuple[list[dict], dict]:",
+      "content": "def arxiv_search_expression(query: str) -> str:\n    terms = [x for x in re.findall(r\"[A-Za-z0-9._+-]+\", query) if x.lower() not in ARXIV_STOPWORDS]\n    anchors = terms[:min(3, len(terms))]\n    if not anchors:\n        anchors = [clean_text(query)]\n    return \" AND \".join(f\"all:{json.dumps(x)}\" for x in anchors)\n\n"
+    },
+    {
+      "op": "replace_exact",
+      "old": "\"search_query\": f'all:\"{query}\"',",
+      "new": "\"search_query\": arxiv_search_expression(query),"
+    },
+    {
+      "op": "insert_in_return_object",
+      "function": "fetch_arxiv",
+      "after_key": "\"state\": \"EXECUTED\",",
+      "content": "\"query_strategy\": ARXIV_QUERY_STRATEGY,\n        \"search_expression\": arxiv_search_expression(query),"
+    }
+  ],
+  "required_tests": [
+    "offline invariant: arxiv_search_expression('dark energy cosmology') == 'all:\"dark\" AND all:\"energy\" AND all:\"cosmology\"'",
+    "offline invariant: strategy label equals anchor_and_v1",
+    "existing daily bibliography invariants remain PASS",
+    "provider-bound Daily Bibliography Evolution produces arXiv EXECUTED receipts with query_strategy=anchor_and_v1",
+    "manifest and receipt digests verify"
+  ],
+  "rollback": "revert only the production-binding commit; retain validation and recall receipts append-only",
+  "boundary": "this delta changes retrieval semantics only; it does not promote literature exhaustivity or scientific claims",
+  "claim_allowed": false
+}

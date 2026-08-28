@@ -1,0 +1,48 @@
+{
+  "schema": "RAFAELIA_BIBLIOGRAPHY_PROVIDER_RERUN_RECEIPT_V1",
+  "closure_id": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+  "cycle_id": "OMEGA-20260828-BIBLIO-ATTEMPT2",
+  "observed_at": "2026-08-28T11:13:55-03:00",
+  "source": {
+    "repository": "rafaelmeloreisnovo/RafPolimata",
+    "main_predecessor": "d9bfce6c4027f7b882e2b242d974fe91225e5373",
+    "workflow_run_id": 33162541582,
+    "workflow_attempt": 2,
+    "job_id": 98831884656,
+    "head_sha": "a8390daeaf741f0a704076797a9c539dedb36318",
+    "artifact_id": 9683664783,
+    "artifact_digest": "sha256:2812c04bceff9a6452d306ff0c95d91087c712ba93a87eaad78981ac8fed9cf3",
+    "artifact_size_bytes": 626864
+  },
+  "transform": "daily_bibliography_evolution.py + provider acquisition + manifest/receipt verification",
+  "execution": {
+    "job": "SUCCESS",
+    "offline_tests": "8/8 PASS",
+    "manifest_verified": true,
+    "output_manifest_sha256": "8da595f2c37f4ef7457b28783c6c1f5a428a2b56fc5e06cc090cb1ccf4f5fc79",
+    "config_sha256": "ea21e49a4918302c544f2cfe9c3be3a7c1417c3f9ba60c36303fc379b375bc2d",
+    "queries": 8,
+    "occurrences": 160,
+    "content_identities": 94,
+    "cross_source_identities": 0,
+    "field_comparisons": 0,
+    "hypothesis_candidates": 0,
+    "blocked_source_queries": 0,
+    "non_executed_source_queries": 8,
+    "claim_allowed": false
+  },
+  "providers": {
+    "zenodo": {"queries_executed": 8, "records_per_query": 20, "observed_records_before_dedup": 160, "state": "EXECUTED"},
+    "arxiv": {"queries_executed": 8, "records_returned_total": 0, "state": "EXECUTED_EMPTY", "interpretation": "HTTP/provider execution succeeded; zero records is not evidence that no relevant arXiv literature exists. Current search_query uses an exact quoted all-field phrase and requires a retrieval-strategy falsifier before treating empty results as coverage."},
+    "orcid": {"queries": 8, "state": "TOKEN_VAZIO", "missing_field": "ORCID_ACCESS_TOKEN", "claim_allowed": false}
+  },
+  "gaps": [
+    {"gap_id": "TV-BIBLIO-ARXIV-EMPTY-QUERY-SEMANTICS-20260828", "state": "TOKEN_VAZIO", "closure_id": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY", "source_pointer": "scripts/daily_bibliography_evolution.py::fetch_arxiv", "missing_field": "evidence that current exact-phrase query semantics has acceptable recall", "blocking_dependency": "arXiv query-strategy revalidation", "evidence_needed": "same bounded query set executed with at least one independent query formulation (e.g. AND-composed terms) and cardinality comparison", "falsifier": "independent formulation also returns zero for all 8 queries under healthy provider execution", "next_probe": "implement/query-test AND-composed arXiv terms in a separate branch; compare counts and preserve both receipts", "owner_authority": "RafPolimata bibliography acquisition pipeline", "urgency": "P0", "closure_gate": "retrieval-strategy comparison receipt with provider payload hashes and no title-based identity merge", "claim_allowed": false, "predecessor_lineage": "run 33162541582 attempt1 timeout -> attempt2 success with 8/8 arXiv EXECUTED_EMPTY"},
+    {"gap_id": "TV-BIBLIO-ORCID-CREDENTIAL", "state": "TOKEN_VAZIO", "closure_id": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY", "source_pointer": ".github/workflows/daily-bibliography-evolution.yml::ORCID_ACCESS_TOKEN", "missing_field": "ORCID_ACCESS_TOKEN", "blocking_dependency": "repository secret/configuration", "evidence_needed": "authenticated ORCID provider receipt", "falsifier": "configured credential still produces BLOCKED/provider failure", "next_probe": "configure credential through repository secret management outside this audit branch", "owner_authority": "repository administrator / ORCID credential owner", "urgency": "P1", "closure_gate": "ORCID EXECUTED receipt with payload hashes", "claim_allowed": false, "predecessor_lineage": "8/8 TOKEN_VAZIO in run 33162541582 attempt2"}
+  ],
+  "atlas": {"L": "attempt1 timeout -> attempt2 SUCCESS; artifact lineage preserved", "O": "Zenodo positive retrieval vs arXiv zero-result retrieval exposes independent-provider disagreement", "T": "GitHub workflow -> artifact -> receipt -> future Drive/Mapa/Atlas projections", "C": "provider execution success is distinct from retrieval recall and scientific validation", "P": "run/job/artifact IDs, SHA-256 digests and commit lineage are append-only anchors"},
+  "claim_allowed": false,
+  "F_ok": "attempt2 executed successfully; Zenodo and arXiv provider calls completed; immutable artifact and manifest verified",
+  "F_gap": "arXiv returned zero records for all queries; ORCID credential absent; no cross-source identities or hypotheses",
+  "F_next": "arXiv query semantics falsifier -> bounded count comparison -> content identity convergence -> field receipts -> hypothesis candidates"
+}

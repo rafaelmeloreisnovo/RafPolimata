@@ -1,0 +1,115 @@
+{
+  "schema": "RAFAELIA_ARXIV_RECALL_DISPOSITION_V1",
+  "cycle_id": "OMEGA-20260828-ARXIV-RECALL-DISPOSITION",
+  "observed_at": "2026-08-28T14:15:15Z",
+  "source": {
+    "repository": "rafaelmeloreisnovo/RafPolimata",
+    "pr": 319,
+    "head_predecessor": "82a58967663db50aeab7ef6476b3a4971d64dd92",
+    "workflow_run_id": 33179100314,
+    "workflow_run_number": 1,
+    "job_id": 98875370241,
+    "artifact_id": 9688956530,
+    "artifact_name": "arxiv-recall-probe-33179100314-1",
+    "artifact_zip_sha256": "70b8de6a16b46b14a3c8c67c291bc0514c27b1b5ba94f5abc30a5d2687172018",
+    "artifact_size_bytes": 4427
+  },
+  "transform": {
+    "queries": 8,
+    "strategies_per_query": 3,
+    "observations": 24,
+    "strategies": ["exact_phrase", "all_terms_and", "anchor_and"],
+    "max_results_per_observation": 5
+  },
+  "evidence": {
+    "workflow_conclusion": "SUCCESS",
+    "blocked_rows": 0,
+    "exact_phrase_zero": 8,
+    "exact_zero_and_alternative_positive": 7,
+    "alternative_positive_query_ids": [
+      "Q-COSMO-BAO",
+      "Q-COSMO-DARK-SECTOR",
+      "Q-HYPOTHESIS",
+      "Q-LLM-EDGE",
+      "Q-MATH-FORMAL",
+      "Q-MATH-TOPOLOGY",
+      "Q-PROVENANCE"
+    ],
+    "all_strategies_zero_query_ids": ["Q-LOWLEVEL-ARM"],
+    "all_terms_and_positive_query_ids": [
+      "Q-COSMO-BAO",
+      "Q-COSMO-DARK-SECTOR",
+      "Q-MATH-FORMAL",
+      "Q-MATH-TOPOLOGY"
+    ],
+    "anchor_and_positive_query_ids": [
+      "Q-COSMO-BAO",
+      "Q-COSMO-DARK-SECTOR",
+      "Q-HYPOTHESIS",
+      "Q-LLM-EDGE",
+      "Q-MATH-FORMAL",
+      "Q-MATH-TOPOLOGY",
+      "Q-PROVENANCE"
+    ]
+  },
+  "disposition": {
+    "TV-BIBLIO-ARXIV-EMPTY-QUERY-SEMANTICS-20260828": {
+      "state": "PARTIALLY_RESOLVED",
+      "finding": "Exact-phrase formulation is empirically over-restrictive for 7 of 8 configured queries because it returned zero while at least one independent alternative returned positive records.",
+      "falsifier_result": "FALSIFIED_AS_DEFAULT_FOR_7_OF_8",
+      "remaining_scope": "Q-LOWLEVEL-ARM remains unresolved because all three tested formulations returned zero.",
+      "claim_allowed": false
+    }
+  },
+  "gaps": [
+    {
+      "gap_id": "TV-BIBLIO-ARXIV-PRODUCTION-QUERY-STRATEGY-20260828",
+      "state": "TOKEN_VAZIO",
+      "source_pointer": "scripts/daily_bibliography_evolution.py::fetch_arxiv",
+      "missing_field": "evidence-bound production query strategy",
+      "blocking_dependency": "select and test a less restrictive strategy without silently broadening semantic scope",
+      "evidence_needed": "offline tests plus provider-bound rerun showing nonzero recall where expected and preserving hashes/cardinality",
+      "falsifier": "new strategy causes unrelated-result explosion, provider errors, identity corruption, or lower reproducibility",
+      "next_probe": "implement bounded anchor/all-terms strategy with explicit query_strategy receipt field; rerun daily acquisition and compare identities/cardinality against run 33179100314",
+      "owner_authority": "RafPolimata scientific acquisition layer",
+      "urgency": "P0",
+      "closure_gate": "production rerun with strategy-labelled source receipts and manifest verification",
+      "closure_id": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+      "claim_allowed": false,
+      "predecessor_lineage": "TV-BIBLIO-ARXIV-EMPTY-QUERY-SEMANTICS-20260828 -> run33179100314"
+    },
+    {
+      "gap_id": "TV-BIBLIO-ARXIV-LOWLEVEL-ARM-RECALL-20260828",
+      "state": "TOKEN_VAZIO",
+      "source_pointer": "data/science/bibliography_queries.v1.json::Q-LOWLEVEL-ARM",
+      "missing_field": "independent evidence of adequate arXiv recall",
+      "blocking_dependency": "all three tested formulations returned zero",
+      "evidence_needed": "independent arXiv search formulation/category/field probe with known-positive control",
+      "falsifier": "known-positive relevant arXiv records are retrievable by an independent formulation",
+      "next_probe": "derive domain-specific title/abstract/category query and known-positive control before interpreting zero",
+      "owner_authority": "RafPolimata scientific acquisition layer",
+      "urgency": "P1",
+      "closure_gate": "independent recall control distinguishes true empty result from query mismatch",
+      "closure_id": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+      "claim_allowed": false,
+      "predecessor_lineage": "run33179100314/Q-LOWLEVEL-ARM"
+    }
+  ],
+  "atlas": {
+    "L": "attempt2 EXECUTED_EMPTY -> recall probe run33179100314 -> 7/8 exact-phrase falsified as default",
+    "O": "three independent query formulations per configured query",
+    "T": "workflow evidence -> acquisition client -> bibliography identities",
+    "C": "max_results=5 probe; result counts measure bounded recall only",
+    "P": "workflow/job/artifact IDs and artifact SHA-256 preserved"
+  },
+  "invariants": [
+    "VISÃO != ARTEFATO != EXECUÇÃO != EVIDÊNCIA != CLAIM",
+    "zero search results != evidence of absence",
+    "provider occurrence != content identity",
+    "probe success != scientific validation"
+  ],
+  "claim_allowed": false,
+  "F_ok": "24/24 observations executed without provider block; exact phrase falsified as default for 7/8 queries; custody artifact preserved",
+  "F_gap": "production strategy not yet changed; Q-LOWLEVEL-ARM recall unresolved; ORCID credential remains separate",
+  "F_next": "implement strategy-labelled production query -> offline tests -> provider rerun -> reconcile identities/field receipts"
+}
