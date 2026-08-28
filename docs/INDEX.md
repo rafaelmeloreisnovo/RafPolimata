@@ -88,9 +88,10 @@ A presença neste índice significa que o documento possui rota conhecida. Não 
 
 | Documento | Função |
 |---|---|
+| **[legal/README.md](legal/README.md)** | **router do Legal & Service Assurance Pack V1: licença autoral escopada, MSA/SOW, LGPD/GDPR, transferência internacional, segurança, fornecedores e gates máquina-legíveis** |
 | [MATRIZ_JURIDICO_TECNOLOGICA.md](MATRIZ_JURIDICO_TECNOLOGICA.md) | matriz jurídico-tecnológica |
 | [LICENCAS_COMPARADAS.md](LICENCAS_COMPARADAS.md) | comparação de licenças e termos |
-| [LICENSE_DECISION_RECORD.md](LICENSE_DECISION_RECORD.md) | decisão P0 fail-closed sobre licença, terceiros e redistribuição |
+| [LICENSE_DECISION_RECORD.md](LICENSE_DECISION_RECORD.md) | decisão P0 fail-closed sobre licença raiz + decisão escopada de módulo |
 | [SECURITY.md](../.github/SECURITY.md) | política de disclosure e fronteira explícita do canal privado |
 | [ATRATORES_42_JURIDICOS.md](ATRATORES_42_JURIDICOS.md) | framework de atratores jurídicos |
 | [BASES_SUPRALEGAIS_E_PADROES.md](BASES_SUPRALEGAIS_E_PADROES.md) | bases supralegais e padrões técnicos |

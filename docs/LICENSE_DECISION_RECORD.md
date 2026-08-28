@@ -1,96 +1,80 @@
 # License Decision Record — RafPolimata
 
-**Estado:** `TOKEN_VAZIO_OWNER_DECISION`  
+**Estado raiz:** `TOKEN_VAZIO_OWNER_DECISION`  
+**Decisão escopada 2026-08-28:** `RAF_HASH_FABRIC_V1 -> PolyForm-Noncommercial-1.0.0 + commercial agreement`  
 **Área:** jurídico / comercial / supply-chain  
 **Responsável lógico:** `human-authorizer` com revisão `security-license`  
-**Gap:** `GAP-LEGAL-LICENSE-DECISION`
+**Gap raiz:** `GAP-LEGAL-LICENSE-DECISION`
 
 ## 1. Fato observado
 
-No corte de 2026-08-16:
-
-- o metadata do repositório GitHub informa `license: null`;
-- não foi encontrado arquivo `LICENSE` na raiz;
-- existe documentação comparativa em `docs/LICENCAS_COMPARADAS.md`, mas ela não substitui a escolha jurídica do proprietário.
-
-Portanto:
+O repositório contém materiais com regimes distintos, inclusive conteúdo com declaração SPDX própria. Portanto:
 
 ```text
 public_repository != open_source_license
+module_license != automatic_root_relicense
 ```
 
-O GitHub documenta que, na ausência de licença, aplicam-se por padrão os direitos autorais correspondentes; uma decisão de licença deve ser explícita se a intenção for conceder permissões de uso, modificação ou distribuição.
+Uma política nova só cobre material cuja titularidade e escopo estejam explicitamente identificados. Terceiros e arquivos com licença própria permanecem sob seus termos.
 
-Fonte de referência: GitHub Docs, “Licensing a repository”.
+## 2. Decisão escopada — RAF Hash Fabric V1
 
-## 2. Por que este gap é P0
+Para `native/raf_hash_fabric_v1/`, os arquivos originais enumerados em `LICENSE_SCOPE_V1.json` serão oferecidos sob **PolyForm Noncommercial License 1.0.0**, com:
 
-A decisão afeta diretamente:
+- `LICENSE.md` apontando para os termos oficiais e Required Notice;
+- escopo explícito e versionado;
+- direitos comerciais/produção fora da concessão não comercial tratados por contrato escrito separado;
+- exclusão explícita de terceiros, algoritmos/especificações, marcas, patentes e arquivos com outra licença.
 
-- redistribuição de binários e código;
-- contribuição externa;
-- uso comercial por terceiros;
-- integração de componentes com licenças diferentes;
-- publicação acadêmica de artefatos;
-- release assets;
-- SBOM e THIRD_PARTY_NOTICES;
-- contratos de suporte e eventual dual licensing.
+A opção por uma licença padronizada reduz ambiguidade em comparação com criar um texto de licença autoral próprio. A autoria/proveniência continua registrada por notice, hashes, manifestos e contratos.
 
-Escolher uma licença errada ou presumir direitos inexistentes é mais grave que deixar o campo como `TOKEN_VAZIO` temporariamente.
+## 3. Por que o gap raiz continua aberto
 
-## 3. Decisões que o agente não pode tomar sozinho
+A decisão do módulo **não** autoriza afirmar que todo RafPolimata está sob PolyForm. O fechamento raiz ainda exige:
 
-Somente o proprietário humano pode determinar a intenção jurídica principal. Exemplos de famílias que podem ser avaliadas, sem recomendação automática:
+1. inventário de autoria/titularidade;
+2. inventário de dependências/snippets/assets/datasets e material importado;
+3. identificação de headers/SPDX/licenças por subárvore;
+4. compatibilidade e obrigações de redistribuição;
+5. patentes/marcas quando materialmente relevantes;
+6. política de contribuições/DCO/CLA para futura relicença comercial;
+7. definição do que será efetivamente distribuído.
 
-| Modelo | Efeito geral | Revisão necessária |
-|---|---|---|
-| permissivo | facilita reuso/distribuição com obrigações de aviso | autoria, patentes, terceiros |
-| copyleft | permite reuso sob obrigações recíprocas específicas | compatibilidade de licenças e distribuição |
-| proprietário | mantém concessões sob termos próprios | termos comerciais, contribuições, distribuição |
-| dual/multi-license | separa cenários comunitário/comercial | titularidade integral e administração de direitos |
+## 4. Terceiros e criptografia
 
-A tabela é apenas uma taxonomia operacional. Termos concretos dependem do texto efetivamente escolhido e do contexto jurídico.
+O registro `legal/THIRD_PARTY_CRYPTO_LICENSE_REGISTER_V1.md` separa algoritmo, especificação, implementação upstream e código autoral. BLAKE3, por exemplo, mantém sua identidade e termos upstream quando código upstream for copiado/vendorized; um adaptador original não cria propriedade sobre o algoritmo ou projeto upstream.
 
-## 4. Pré-condições para a decisão
-
-Antes de adicionar um `LICENSE`, levantar:
-
-1. **autoria e titularidade** — quais arquivos são originais, derivados ou importados;
-2. **terceiros** — dependências, snippets, assets, fontes, datasets e código incorporado;
-3. **termos existentes** — headers, licenças por subdiretório, forks e upstreams;
-4. **patentes/marcas**, se aplicável ao modelo pretendido;
-5. **objetivo comercial** — adoção aberta, serviço, licenciamento proprietário, pesquisa ou combinação;
-6. **contribuições futuras** — necessidade ou não de DCO/CLA/política de contribuição;
-7. **release** — o que será distribuído e sob quais permissões.
-
-## 5. Artefatos de fechamento
-
-O gap só pode mudar de `TOKEN_VAZIO` quando existirem:
+## 5. Modelo comercial
 
 ```text
-owner_decision
-+ inventory_of_third_party_terms
-+ compatibility_review
-+ chosen_license_or_explicit_proprietary_terms
-+ repository_documentation_update
+public research/noncommercial permission where scoped
++ separate commercial license/order
++ MSA/SOW
++ DPA/transfer schedule when personal data applies
++ security assurance
++ supplier/license register
++ release evidence
 ```
 
-Se a decisão for manter todos os direitos reservados sem conceder licença ampla, isso também precisa ser documentado explicitamente como decisão do proprietário; não deve ser inferido por agente.
+Nenhuma permissão comercial é inferida apenas porque o código está publicamente visível.
 
-## 6. Relação com comercialização
+## 6. Gate de release comercial
 
-A topologia define:
+`COMMERCIAL_CLEAR=true` somente para artefato/versionamento que feche:
 
 ```text
-GAP-REL-CURRENT-RELEASE-ASSETS
-  requires GAP-LEGAL-LICENSE-DECISION
-
-GAP-COM-SUPPORT-LIFECYCLE
-  requires GAP-LEGAL-LICENSE-DECISION
+owner/authority
++ provenance
++ third-party inventory
++ license compatibility
++ commercial grant/order
++ security evidence
++ privacy/transfer gates when applicable
++ release receipt
 ```
 
-Isso evita publicar release comercialmente utilizável antes de esclarecer permissões e obrigações.
+Caso contrário: `COMMERCIAL_CLEAR=false` e a lacuna permanece `TOKEN_VAZIO`.
 
 ## 7. Limite jurídico
 
-Este registro organiza o processo técnico e a proveniência da decisão. Não substitui aconselhamento jurídico profissional, análise de titularidade ou parecer de compatibilidade de licenças.
+Este registro organiza a decisão técnica e a cadeia de custódia. Não substitui parecer jurídico profissional nem torna uma licença incompatível compatível por declaração. A revisão por advogado qualificado continua recomendada antes de exploração comercial material, especialmente em contratos internacionais, patentes, consumidor, exportação/sanções e setores regulados.

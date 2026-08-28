@@ -1,0 +1,37 @@
+{
+  "schema": "rafaelia.license-scope.v1",
+  "module": "native/raf_hash_fabric_v1",
+  "default_license_for_listed_original_material": "PolyForm-Noncommercial-1.0.0",
+  "commercial_rights": "separate_written_agreement_required_when_use_is_outside_noncommercial_license",
+  "copyright": "Copyright (c) 2026 Rafael Melo Reis",
+  "covered_original_paths": [
+    "README.md",
+    "SPEC.md",
+    "Makefile",
+    "include/raf_hash_fabric.h",
+    "c/raf_hash_fabric.c",
+    "cpp/raf_hash_fabric.cpp",
+    "rust/lib.rs",
+    "zig/raf_hash_fabric.zig",
+    "d/raf_hash_fabric.d",
+    "forth/raf_hash_fabric.fs",
+    "asm/armv7/rhf_mix32.S",
+    "asm/aarch64/rhf_mix32.S",
+    "asm/x86_64/rhf_mix32.S",
+    "tests/selftest.c"
+  ],
+  "excluded_from_relicensing": [
+    "third_party_code_or_data",
+    "external_algorithm_or_specification_rights",
+    "material_with_its_own_spdx_or_license",
+    "trademarks_and_brand_rights",
+    "patent_rights_not_granted_by_applicable_license_or_separate_agreement"
+  ],
+  "third_party_register": "../../docs/legal/THIRD_PARTY_CRYPTO_LICENSE_REGISTER_V1.md",
+  "root_repository_license_changed": false,
+  "root_repository_license_gate": "TOKEN_VAZIO",
+  "notes": [
+    "Scope is module-specific and does not silently relicense existing repository material.",
+    "Any future copied or vendorized third-party source must be removed from covered_original_paths and governed by its upstream license."
+  ]
+}

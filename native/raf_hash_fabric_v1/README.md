@@ -15,7 +15,7 @@ A seven-language, freestanding-oriented execution fabric for deterministic hash/
 4. Zig freestanding (`zig/`)
 5. D `-betterC` (`d/`)
 6. Forth core (`forth/`)
-7. Assembly (`asm/`) with AArch64 reference kernel and ISA slots for ARMv7/x86-64
+7. Assembly (`asm/`) with ARMv7/AArch64/x86-64 kernels
 
 The implementations share one small control contract: capability profile, fixed-point control values, table-driven state machine, watchdog, fail-safe/failover/rollback/failback and a 16-leaf Merkle scheduling primitive.
 
@@ -47,14 +47,24 @@ AVX-512     16 lanes
 
 This is scheduling parallelism, not a change from (for example) a 512-bit message block to 96 bits. BLAKE3, SHA-256 and other algorithms keep their specified block/chunk/state dimensions.
 
+## Licensing and commercial boundary
+
+Original files enumerated in `LICENSE_SCOPE_V1.json` are offered under **PolyForm Noncommercial License 1.0.0** through `LICENSE.md`. The scope is module-specific; it does not relicense unrelated RafPolimata material or any third-party content.
+
+Research/noncommercial use follows the standardized license. Commercial/production rights outside that grant require a separate written commercial agreement. Third-party components retain their own licenses and must be recorded before distribution.
+
+Contract/privacy/security templates are routed from `../../docs/legal/README.md`.
+
 ## Evidence boundary
 
-Source presence = `IMPLEMENTED` only. No compiler, ISA, device, benchmark or cryptographic vector was executed by the change that introduced this directory. Until a reproducible gate records toolchain, command, exit status and vector equivalence, those claims remain `TOKEN_VAZIO`.
+Source presence = `IMPLEMENTED` only. The original change that introduced this directory did not execute compiler, ISA, device, benchmark or cryptographic vectors.
+
+A later working-container experiment produced a **local** BLAKE3 known-answer-test PASS, documented at `evidence/BLAKE3_PORTABLE_LOCAL_KAT_2026-08-28.md`. The BLAKE3 implementation itself was not persisted to the repository because the available repository write path was blocked by a safety gate. Therefore current-commit BLAKE3 implementation/runtime evidence remains `TOKEN_VAZIO`.
 
 ## F_next
 
-1. Compile C reference with `-ffreestanding -fno-builtin -fno-stack-protector` on host and Termux.
-2. Add known-answer vectors for the first real primitive adapter (recommended: BLAKE3 portable scalar).
-3. Validate each language against identical vectors.
-4. Add NEON 4-way and AVX-512 16-way backends only after scalar equivalence.
+1. Compile/rerun the existing C/C++/ISA gates from the exact PR commit in an available build environment.
+2. Persist the reviewed portable BLAKE3 oracle through an authorized repository path when permitted.
+3. Re-run official known-answer vectors from that exact commit.
+4. Add NEON 4-way, AVX2 8-way and AVX-512 16-way backends only after scalar equivalence.
 5. Record cycles/byte, code size, symbol count, branches and rollback behavior separately.
