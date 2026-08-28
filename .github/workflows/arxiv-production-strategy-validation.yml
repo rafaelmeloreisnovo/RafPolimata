@@ -1,0 +1,64 @@
+name: arXiv Production Strategy Validation
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/arxiv-production-strategy-validation.yml'
+      - 'data/science/bibliography_queries.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-anchor-and:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Execute labelled candidate strategy
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, re, time, urllib.parse, urllib.request, xml.etree.ElementTree as ET
+          cfg=json.loads(pathlib.Path('data/science/bibliography_queries.v1.json').read_text())
+          out=pathlib.Path('results/arxiv-production-strategy'); out.mkdir(parents=True,exist_ok=True)
+          rows=[]
+          stop={'and','or','the','of','for','in','on','with','a','an','to','from','using','toward','towards'}
+          for q in cfg['queries']:
+              terms=[x for x in re.findall(r'[A-Za-z0-9._+-]+',q['query']) if x.lower() not in stop]
+              anchors=terms[:min(3,len(terms))]
+              expr=' AND '.join(f'all:{json.dumps(x)}' for x in anchors)
+              params={'search_query':expr,'start':0,'max_results':20,'sortBy':'submittedDate','sortOrder':'descending'}
+              url='https://export.arxiv.org/api/query?'+urllib.parse.urlencode(params)
+              req=urllib.request.Request(url,headers={'User-Agent':'RafPolimata-ArxivStrategyValidation/1.0'})
+              try:
+                  with urllib.request.urlopen(req,timeout=45) as r: raw=r.read()
+                  root=ET.fromstring(raw); ns={'a':'http://www.w3.org/2005/Atom'}
+                  ids=[(e.findtext('a:id',default='',namespaces=ns) or '').rstrip('/').split('/')[-1] for e in root.findall('a:entry',ns)]
+                  state='EXECUTED'
+                  err=None
+              except Exception as exc:
+                  raw=b''; ids=[]; state='BLOCKED'; err=f'{type(exc).__name__}:{str(exc)[:200]}'
+              rows.append({'query_id':q['id'],'strategy':'anchor_and_v1','expression':expr,'state':state,'count':len(ids),'provider_ids':ids,'http_payload_sha256':hashlib.sha256(raw).hexdigest() if raw else None,'error':err,'claim_allowed':False})
+              time.sleep(float(cfg.get('arxiv_politeness_seconds',3)))
+          p=out/'observations.jsonl'; p.write_text(''.join(json.dumps(x,sort_keys=True)+'\n' for x in rows))
+          summary={'schema':'RAFAELIA_ARXIV_PRODUCTION_STRATEGY_VALIDATION_V1','strategy':'anchor_and_v1','queries':len(rows),'executed':sum(x['state']=='EXECUTED' for x in rows),'nonempty':sum(x['count']>0 for x in rows),'blocked':sum(x['state']=='BLOCKED' for x in rows),'zero_result_query_ids':[x['query_id'] for x in rows if x['state']=='EXECUTED' and x['count']==0],'claim_allowed':False,'boundary':'retrieval validation != literature exhaustivity != scientific validation'}
+          s=out/'summary.json'; s.write_text(json.dumps(summary,sort_keys=True,indent=2)+'\n')
+          manifest=out/'manifest.sha256'; manifest.write_text('\n'.join(f'{hashlib.sha256((out/n).read_bytes()).hexdigest()}  {n}' for n in ('observations.jsonl','summary.json'))+'\n')
+          print(json.dumps(summary,indent=2))
+          if summary['blocked']:
+              raise SystemExit('provider blocked: fail closed')
+          if summary['nonempty']==0:
+              raise SystemExit('candidate strategy produced zero recall across all queries')
+          PY
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arxiv-production-strategy-${{ github.run_id }}-${{ github.run_attempt }}
+          path: results/arxiv-production-strategy/
+          if-no-files-found: error
+          retention-days: 30
