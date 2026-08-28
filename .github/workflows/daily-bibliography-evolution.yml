@@ -4,12 +4,20 @@ on:
   schedule:
     - cron: '17 6 * * *'
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/daily-bibliography-evolution.yml'
+      - 'scripts/daily_bibliography_evolution.py'
+      - 'data/science/bibliography_queries.v1.json'
+      - 'data/governance/research-service-evolution-contract-20260828.v1.json'
+      - 'tests/test_daily_bibliography_evolution.py'
+      - 'data/receipts/daily-bibliography-ci-closure-20260828.v1.json'
 
 permissions:
   contents: read
 
 concurrency:
-  group: daily-bibliography-evolution
+  group: daily-bibliography-evolution-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
 jobs:
