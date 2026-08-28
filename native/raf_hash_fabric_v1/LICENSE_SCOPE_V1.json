@@ -54,6 +54,32 @@
       "requested_trademark_brand_or_other_ungranted_rights"
     ]
   },
+  "source_binding": {
+    "scheme": "git_blob_exact_bytes_v1",
+    "readme_git_blob": "0bd0af4cf666b0acbc78c650fce289dc791c36c3",
+    "license_git_blob": "5f2b884a74dbf989a01fdbe7fce4a6846e63b80d",
+    "manifest_git_blob_is_anchored_in_source": true,
+    "source_anchor": "include/raf_hash_fabric.h",
+    "build_gate": "make source-contract-check",
+    "rule": "any_byte_change_to_readme_license_or_manifest_requires_a_corresponding_source_anchor_change_or_the_gate_fails",
+    "security_boundary": "git_object_identity_is_repository_binding_not_a_replacement_for_modern_signature_or_external_timestamp"
+  },
+  "liability_and_enforcement_orientation": {
+    "polyform_no_liability_clause_controls_for_polyform_grant": true,
+    "polyform_text_modified_by_project": false,
+    "separate_commercial_agreement_default_proposal": {
+      "direct_damages_cap_currency": "BRL",
+      "direct_damages_cap_amount": "0.01",
+      "effective_only_if_expressly_adopted_in_separate_written_agreement": true,
+      "mandatory_law_controls": true,
+      "audit_forensic_expert_enforcement_collection_and_legal_costs": "may_be_allocated_to_material_breaching_party_only_if_signed_agreement_and_applicable_law_permit"
+    },
+    "unauthorized_use": {
+      "automatic_debt_created_by_readme_or_license_notice": false,
+      "automatic_audit_right_created_by_notice": false,
+      "rightsholder_reserves_remedies_and_recoverable_costs_under_applicable_law": true
+    }
+  },
   "real_inventory": {
     "unique_files_in_module_scope_observed": 17,
     "covered_original_paths_count": 14,
@@ -98,6 +124,8 @@
     "Scope is module-specific and does not silently relicense existing repository material.",
     "README summaries do not expand or replace the canonical PolyForm terms.",
     "No school or researcher registry is required for uses already permitted by the applicable license.",
+    "README LICENSE and this manifest are source-contract inputs bound by exact Git blob identity.",
+    "The BRL 0.01 commercial damages position is only a proposal for a separate written commercial agreement and does not modify the PolyForm grant.",
     "Any future copied or vendorized third-party source must be removed from covered_original_paths and governed by its upstream license."
   ]
 }

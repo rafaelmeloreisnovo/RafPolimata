@@ -1,6 +1,32 @@
 #ifndef RAF_HASH_FABRIC_V1_H
 #define RAF_HASH_FABRIC_V1_H
 
+/*
+ * RAF Hash Fabric V1 — SOURCE CONTRACT ANCHOR
+ * SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+ * Required Notice: Copyright (c) 2026 Rafael Melo Reis. RAF Hash Fabric / RAFAELIA original material.
+ *
+ * The complete exact-byte contents of README.md, LICENSE.md and
+ * LICENSE_SCOPE_V1.json are normative source-contract inputs for this module.
+ * Their Git blob identities are anchored below. `make source-contract-check`
+ * must fail if any one-byte change is not accompanied by a corresponding
+ * source-anchor update.
+ *
+ * This anchor makes the documentation/license boundary part of source identity;
+ * it does not replace the canonical PolyForm terms, modern digital signatures,
+ * external trusted timestamps or mandatory applicable law.
+ *
+ * The PolyForm grant keeps its own No Liability clause. BRL 0.01 is only the
+ * stated default negotiation position for a FUTURE SEPARATE WRITTEN COMMERCIAL
+ * AGREEMENT, if expressly adopted there and only to the extent law permits.
+ * This comment does not create an automatic debt, audit right or cost award.
+ */
+#define RHF_SOURCE_README_GIT_BLOB  "0bd0af4cf666b0acbc78c650fce289dc791c36c3"
+#define RHF_SOURCE_LICENSE_GIT_BLOB "5f2b884a74dbf989a01fdbe7fce4a6846e63b80d"
+#define RHF_SOURCE_SCOPE_GIT_BLOB   "ee061b35b6b72a773aeed9966b7db7f09d096e35"
+#define RHF_SOURCE_CONTRACT_V1 \
+    RHF_SOURCE_README_GIT_BLOB ":" RHF_SOURCE_LICENSE_GIT_BLOB ":" RHF_SOURCE_SCOPE_GIT_BLOB
+
 /* Freestanding ABI: no stdint.h, no libc, no heap. */
 typedef unsigned char      rhf_u8;
 typedef unsigned short     rhf_u16;
@@ -86,6 +112,11 @@ typedef rhf_u32 (*rhf_hash_pair_fn)(
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* Compiled source-contract identity. Changing the bound README/LICENSE/manifest
+ * requires this source to change and therefore changes the object identity too.
+ */
+extern const char rhf_source_contract_v1[];
 
 rhf_u8 rhf_lanes32(rhf_u16 vector_bits);
 rhf_u8 rhf_control_q_fraction_bits(void);

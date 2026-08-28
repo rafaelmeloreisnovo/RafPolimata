@@ -121,6 +121,35 @@ O uso pretendido está fora da concessão não comercial ou pede direitos adicio
 
 The evidence receipt is not a persisted BLAKE3 implementation and must not be interpreted as one. Third-party rights are determined from the third-party material's own license/SPDX/notice; an unclear third-party status yields `REVIEW-REQUIRED`, not an invented permission.
 
+## Source-bound license contract — bit-level repository binding
+
+For this module, `README.md`, `LICENSE.md` and `LICENSE_SCOPE_V1.json` are normative source inputs, not detachable prose. Their exact Git blob object IDs are anchored in `include/raf_hash_fabric.h` and checked by `make source-contract-check`.
+
+The binding is deliberately transitive:
+
+```text
+README exact bytes  -> Git blob ID ----\
+                                     +--> LICENSE_SCOPE_V1.json -> Git blob ID -> source anchor
+LICENSE exact bytes -> Git blob ID ----/
+```
+
+A one-byte change to `README.md`, `LICENSE.md` or `LICENSE_SCOPE_V1.json` changes its Git object identity. The source anchor must then change too; otherwise `source-contract-check` fails. This is an integrity/binding mechanism, not a claim that Git object IDs replace modern cryptographic signatures.
+
+The code anchor also carries the `Required Notice` and declares that the complete README, license and manifest are part of the module source contract. A copied source file remains subject to the applicable license and notice obligations even if documentation is separated from it.
+
+## Liability, audit and enforcement boundary
+
+The canonical PolyForm Noncommercial terms already contain a `No Liability` clause. That standardized clause remains controlling for the PolyForm grant; this project does not rewrite it into a weaker nominal-damages promise.
+
+For use outside that grant, the project states the following **commercial negotiation position**, which has no effect unless adopted in a separate written agreement:
+
+- proposed maximum direct-damages liability: **BRL 0.01 (one centavo)**, only to the maximum extent permitted by applicable law;
+- non-waivable statutory rights and liabilities that cannot legally be limited remain unaffected;
+- a separate agreement may allocate reasonable, documented audit, forensic, expert, enforcement, collection and legal costs to a party in material breach, to the extent the agreement and applicable law permit;
+- unauthorized use outside the license does not create an automatic debt merely because this README exists; the rightsholder instead reserves whatever remedies and recoverable costs are available under applicable law and any valid written agreement.
+
+`BRL 0.01` is intentionally used instead of an unstable, obsolete or hyperinflationary currency so that the proposal has a determinate unit and does not introduce ambiguity.
+
 ## Evidence boundary
 
 Source presence = `IMPLEMENTED` only. The original change that introduced this directory did not execute compiler, ISA, device, benchmark or cryptographic vectors.

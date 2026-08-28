@@ -1,5 +1,7 @@
 #include "../include/raf_hash_fabric.h"
 
+const char rhf_source_contract_v1[] = RHF_SOURCE_CONTRACT_V1;
+
 #define S(x) ((rhf_u8)(x))
 
 static const rhf_u8 rhf_fsm[RHF_STATE_COUNT][RHF_EVENT_COUNT] = {
