@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Daily bibliography evolution: ORCID + Zenodo + arXiv, evidence-first and fail-closed."""
+"""Daily bibliography evolution: ORCID + Zenodo + arXiv, evidence-first and fail-closed.
+
+Governance binding: CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.
+"""
 from __future__ import annotations
 
 import argparse

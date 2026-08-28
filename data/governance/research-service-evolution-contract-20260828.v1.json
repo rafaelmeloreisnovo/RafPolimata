@@ -3,6 +3,7 @@
   "cycle_id": "RAFAELIA-RESEARCH-SERVICE-20260828",
   "predecessor": "RafPolimata/main@8054f652b8528b5d9e2c1fab6c246e45554f0e1c",
   "claim_allowed": false,
+  "closure_reference": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
   "purpose": "Convert conversation-level operational requirements into a client-service research pipeline with auditable bibliography acquisition, hypothesis queues, provenance and non-regression gates.",
   "invariants": [
     "SOURCE != CLAIM",
