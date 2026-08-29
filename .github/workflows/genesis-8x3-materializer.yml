@@ -1,0 +1,42 @@
+name: GENESIS 8x3 Materializer
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "schemas/genesis_8x3_group.schema.json"
+      - "scripts/genesis_8x3_materializer.py"
+      - "tests/test_genesis_8x3_materializer.py"
+      - ".github/workflows/genesis-8x3-materializer.yml"
+  pull_request:
+    paths:
+      - "schemas/genesis_8x3_group.schema.json"
+      - "scripts/genesis_8x3_materializer.py"
+      - "tests/test_genesis_8x3_materializer.py"
+      - ".github/workflows/genesis-8x3-materializer.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Run unit tests
+        run: python3 -m unittest tests.test_genesis_8x3_materializer
+      - name: Materialize manifest
+        run: |
+          mkdir -p artifacts
+          python3 scripts/genesis_8x3_materializer.py --out artifacts/genesis_8x3_group.json
+          grep -q '"status": "PASS"' artifacts/genesis_8x3_group.json
+          grep -q '"claim_allowed": false' artifacts/genesis_8x3_group.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: genesis-8x3-group
+          path: artifacts/genesis_8x3_group.json
+          if-no-files-found: error
