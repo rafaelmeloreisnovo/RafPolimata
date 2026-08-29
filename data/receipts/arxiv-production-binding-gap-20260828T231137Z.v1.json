@@ -1,0 +1,59 @@
+{
+  "schema": "RAFAELIA_ARXIV_PRODUCTION_BINDING_GAP_V1",
+  "cycle_id": "OMEGA-20260828-LIVE-RECONCILE-2011",
+  "observed_at": "2026-08-28T23:11:37Z",
+  "claim_allowed": false,
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "main_sha": "c039874bc59d156df7ad9f248d0d03f6e34c8b85",
+  "lineage": [
+    "33977e78e9ab2b0f8c243486318c51fcdfb6910d",
+    "6a87d40a11ed4a34c8c8953c89d1015813cbb28f",
+    "c039874bc59d156df7ad9f248d0d03f6e34c8b85"
+  ],
+  "observed_objects": [
+    {
+      "path": "scripts/arxiv_anchor_and_v1.py",
+      "state": "IMPLEMENTED",
+      "source_pointer": "commit:6a87d40a11ed4a34c8c8953c89d1015813cbb28f",
+      "blob_sha": "14fc60dd2630a0f0106ff5114740f7eb4024c5ba",
+      "strategy_id": "anchor_and_v1"
+    },
+    {
+      "path": "scripts/daily_bibliography_evolution.py",
+      "state": "OBSERVED_LEGACY_BINDING",
+      "source_pointer": "main:c039874bc59d156df7ad9f248d0d03f6e34c8b85",
+      "blob_sha": "6969152fe3909f971364528909d962a565232633",
+      "fetch_arxiv_search_query": "all:\"<full query>\"",
+      "strategy_label_present_in_fetch_receipt": false
+    },
+    {
+      "path": "data/deltas/arxiv-production-anchor-and-v1.delta.json",
+      "state": "PROPOSED_FOR_REVIEW",
+      "source_pointer": "commit:33977e78e9ab2b0f8c243486318c51fcdfb6910d"
+    }
+  ],
+  "gap": {
+    "gap_id": "TV-BIBLIO-ARXIV-PRODUCTION-BINDING-20260828",
+    "state": "TOKEN_VAZIO",
+    "source_pointer": "scripts/daily_bibliography_evolution.py::fetch_arxiv@blob:6969152fe3909f971364528909d962a565232633",
+    "missing_field": "strategy-labelled anchor_and_v1 production binding",
+    "blocking_dependency": "reviewed minimal production patch plus provider-bound rerun",
+    "evidence_needed": "diff preserving existing acquisition invariants; CI PASS; Daily Bibliography Evolution artifact with arXiv query_strategy=anchor_and_v1, search_expression, cardinalities, provider IDs and payload/manifest hashes",
+    "falsifier": "productive fetch still uses exact full phrase, strategy label absent, provider BLOCKED, digest mismatch, or recall regression",
+    "next_probe": "prepare minimal patch from validated delta against blob 6969152fe3909f971364528909d962a565232633; do not merge automatically",
+    "owner_authority": "rafaelmeloreisnovo/RafPolimata",
+    "urgency": "P0",
+    "closure_gate": "production binding observed + provider-bound Daily Bibliography Evolution PASS + receipt/index update",
+    "claim_allowed": false,
+    "predecessor_lineage": "33977e78→6a87d40a→PR#322→merge c039874b"
+  },
+  "distinctions": [
+    "validated strategy != productive binding",
+    "module implemented != client integrated",
+    "CI generic != provider-bound bibliography validation",
+    "nonempty retrieval != scientific exhaustivity"
+  ],
+  "F_ok": ["canonical repository lineage recovered", "anchor_and_v1 module present on main", "legacy productive fetch directly observed"],
+  "F_gap": ["productive strategy binding", "provider-bound reacquisition evidence"],
+  "F_next": ["minimal reversible binding patch", "CI", "Daily Bibliography Evolution real", "CONTENT_IDENTITIES and field receipts"]
+}
