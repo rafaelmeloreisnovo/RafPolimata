@@ -1,0 +1,28 @@
+name: Conversation Permutation Feedback
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/conversation_permutation_feedback.py"
+      - "tests/test_conversation_permutation_feedback.py"
+      - ".github/workflows/conversation-permutation-feedback.yml"
+  pull_request:
+    paths:
+      - "scripts/conversation_permutation_feedback.py"
+      - "tests/test_conversation_permutation_feedback.py"
+      - ".github/workflows/conversation-permutation-feedback.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Run deterministic tests
+        run: python3 -m unittest tests.test_conversation_permutation_feedback
