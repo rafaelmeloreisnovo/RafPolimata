@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rafaelia.genesis-8x3.group/v1",
+  "title": "RAFAELIA GENESIS 8x3 Group",
+  "type": "object",
+  "required": [
+    "schema",
+    "group_id",
+    "question_root",
+    "operator",
+    "dimensions",
+    "stages",
+    "matrix_8x3_cells",
+    "counts",
+    "gates",
+    "claim_allowed"
+  ],
+  "properties": {
+    "schema": {"const": "rafaelia.genesis-8x3.group/v1"},
+    "group_id": {"type": "string", "pattern": "^RAFAELIA-GENESIS-8X3-OMEGA-[0-9TZ]+$"},
+    "timestamp_utc": {"type": "string"},
+    "signature": {"type": "string"},
+    "bitraf64": {"type": "string"},
+    "question_root": {"type": "string"},
+    "operator": {"type": "string"},
+    "dimensions": {"type": "array", "minItems": 8, "maxItems": 8},
+    "stages": {"type": "array", "minItems": 3, "maxItems": 3},
+    "matrix_8x3_cells": {"type": "array", "minItems": 24, "maxItems": 24},
+    "parables": {"type": "array", "minItems": 8, "maxItems": 8},
+    "formulas_50": {"type": "array", "minItems": 50, "maxItems": 50},
+    "counts": {"type": "object"},
+    "variable_catalog": {"type": "object"},
+    "gates": {"type": "array"},
+    "claim_allowed": {"const": false}
+  },
+  "additionalProperties": true
+}
