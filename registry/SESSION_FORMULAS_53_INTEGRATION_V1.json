@@ -1,0 +1,14 @@
+{
+  "schema":"rafaelia.session_formula_integration.v1",
+  "canonical_repo":"rafaelmeloreisnovo/Mapa",
+  "canonical_path":"data/formulas/SESSION_FORMULA_REGISTRY_53_V1.json",
+  "registry_id":"SESSION-FORMULAS-53-20260830-V1",
+  "exact_count":53,
+  "canonical_range":"F01..F53",
+  "local_repo":"rafaelmeloreisnovo/RafPolimata",
+  "role":"FORMAL_MATHEMATICS_AND_REPRESENTATION_AUTHORITY",
+  "applicable_ids":["F01","F02","F03","F04","F05","F06","F07","F08","F09","F10","F11","F12","F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23","F24","F25","F26","F27","F28","F31","F32","F35","F53"],
+  "requirements":["exact_before_approximation","counterexample","domain","representation_boundary"],
+  "non_applicable":"REFERENCE_CANONICAL_NO_DUPLICATION",
+  "claim_allowed":false
+}
