@@ -1,0 +1,97 @@
+{
+  "schema": "rafaelia.audit_readiness_profile.v1",
+  "subject": {
+    "repository": "rafaelmeloreisnovo/RafPolimata",
+    "revision": "69bc5d4b786dca8b9166ce5254d65e65dc8ca7b8",
+    "observed_at_utc": "2026-08-31T03:26:00Z"
+  },
+  "non_certification": true,
+  "claim_allowed": false,
+  "recognition": [
+    {
+      "id": "R1",
+      "name": "Identity and exact revision",
+      "state": "PASS",
+      "evidence": ["provider branch readback main@69bc5d4b786dca8b9166ce5254d65e65dc8ca7b8"],
+      "gaps": []
+    },
+    {
+      "id": "R2",
+      "name": "Provenance, custody and licensing",
+      "state": "PARTIAL",
+      "evidence": ["repository revision-bound source tree", ".github/workflows/apkc-physical-env-provenance.yml"],
+      "gaps": ["TOKEN_VAZIO_EXHAUSTIVE_LICENSE_AND_CUSTODY_REVIEW"]
+    },
+    {
+      "id": "R3",
+      "name": "Scope, requirements and claim boundary",
+      "state": "PASS",
+      "evidence": ["governance/HUMAN_DIGNITY_COMPUTATION_BOUNDARY_V1.md", "main merge #325 governance boundary"],
+      "gaps": []
+    },
+    {
+      "id": "R4",
+      "name": "Deterministic build and verification definition",
+      "state": "PASS",
+      "evidence": [
+        ".github/workflows/apkc-stage11-integrity-truth.yml",
+        ".github/workflows/android-proof-bundle.yml",
+        ".github/workflows/android-runtime-evidence-v1.yml"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "R5",
+      "name": "Security, privacy, safety and risk controls",
+      "state": "PARTIAL",
+      "evidence": ["governance/HUMAN_DIGNITY_COMPUTATION_BOUNDARY_V1.md", ".github/workflows/apkc-physical-gate-codebinding.yml"],
+      "gaps": ["TOKEN_VAZIO_EXHAUSTIVE_SECURITY_PRIVACY_SAFETY_REVIEW"]
+    },
+    {
+      "id": "R6",
+      "name": "Supply-chain and reproducibility controls",
+      "state": "PARTIAL",
+      "evidence": ["physical environment provenance workflow", "recursive receipt workflows"],
+      "gaps": ["TOKEN_VAZIO_ALL_WORKFLOWS_SHA_PINNED_AND_DEPENDENCY_INVENTORY"]
+    },
+    {
+      "id": "R7",
+      "name": "Fail-closed negative gates and typed unknowns",
+      "state": "PARTIAL",
+      "evidence": ["integrity-truth and physical-gate workflows", "human-dignity computation boundary"],
+      "gaps": ["TOKEN_VAZIO_EXHAUSTIVE_NEGATIVE_FIXTURE_RECEIPTS"]
+    },
+    {
+      "id": "R8",
+      "name": "Provider-side governance enforcement",
+      "state": "PARTIAL",
+      "evidence": [
+        "active repository ruleset 17659629",
+        "ruleset enforces deletion and non_fast_forward with current_user_can_bypass=never"
+      ],
+      "gaps": ["TOKEN_VAZIO_REQUIRED_PULL_REQUEST_AND_REQUIRED_STATUS_CHECK_ENFORCEMENT"]
+    },
+    {
+      "id": "R9",
+      "name": "Independent review or replication",
+      "state": "TOKEN_VAZIO",
+      "evidence": [],
+      "gaps": ["TOKEN_VAZIO_INDEPENDENT_REVIEW_OR_REPLICATION"]
+    },
+    {
+      "id": "R10",
+      "name": "Bounded audit-ready evidence bundle",
+      "state": "BLOCKED",
+      "evidence": ["R1-R9 recognition profile"],
+      "gaps": ["BLOCKED_BY_R9_AND_PARTIAL_R2_R5_R6_R7_R8"]
+    }
+  ],
+  "blockers": [
+    "TOKEN_VAZIO_INDEPENDENT_REVIEW_OR_REPLICATION",
+    "TOKEN_VAZIO_REQUIRED_PULL_REQUEST_AND_REQUIRED_STATUS_CHECK_ENFORCEMENT"
+  ],
+  "notes": [
+    "The active ruleset is real evidence, but deletion/non-fast-forward enforcement is not equivalent to required-review/status-check enforcement.",
+    "Recognition is evidence status only; it is not certification."
+  ]
+}
