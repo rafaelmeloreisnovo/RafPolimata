@@ -10,6 +10,10 @@ name: Audit Readiness R1-R10
 permissions:
   contents: read
 
+concurrency:
+  group: audit-readiness-r1-r10-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   audit-readiness:
     runs-on: ubuntu-latest
