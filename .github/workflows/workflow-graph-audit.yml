@@ -23,7 +23,7 @@ jobs:
           persist-credentials: false
 
       - name: Analyze workflow structure, logic and dependencies
-        uses: rafaelmeloreisnovo/RafGitTools/.github/actions/workflow-graph-audit@55759677247dbda8f0186bf2af6a578603e015e4
+        uses: rafaelmeloreisnovo/RafGitTools/.github/actions/workflow-graph-audit@cf021417a5008404459f507c38382ed5a02e28b9
         with:
           mode: strict-changed
           base-ref: ${{ github.event.pull_request.base.sha }}
