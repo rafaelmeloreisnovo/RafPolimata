@@ -1,0 +1,38 @@
+name: Audit Readiness R1-R10
+
+"on":
+  pull_request:
+    paths:
+      - 'governance/AUDIT_READINESS_R1_R10_20260831.v1.json'
+      - '.github/workflows/audit-readiness-r1-r10.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audit-readiness-r1-r10-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Validate R1-R10 profile with pinned RafGitTools action
+        uses: rafaelmeloreisnovo/RafGitTools/.github/actions/audit-readiness-r1-r10@5285a096f759a3c30cf3ef2a8943a6340dd24188
+        with:
+          profile: governance/AUDIT_READINESS_R1_R10_20260831.v1.json
+
+      - name: Expose provider-governance boundary
+        run: |
+          echo 'RULESET_17659629=ACTIVE_LIMITED'
+          echo 'RULES=deletion,non_fast_forward'
+          echo 'REQUIRED_REVIEW_STATUS_ENFORCEMENT=TOKEN_VAZIO'
+          echo 'CERTIFICATION=false'
+          echo 'CLAIM_ALLOWED=false'
