@@ -1,0 +1,38 @@
+name: Workflow Graph Audit
+
+"on":
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+  workflow_dispatch:
+
+# CLOSURE_L13: audit-readiness unknowns remain governed, not resolved.
+permissions:
+  contents: read
+
+jobs:
+  workflow-graph:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Analyze workflow structure, logic and dependencies
+        uses: rafaelmeloreisnovo/RafGitTools/.github/actions/workflow-graph-audit@55759677247dbda8f0186bf2af6a578603e015e4
+        with:
+          mode: strict-changed
+          base-ref: ${{ github.event.pull_request.base.sha }}
+          output-json: workflow-graph-audit.json
+
+      - name: Expose audit boundary
+        run: |
+          echo 'WORKFLOW_GRAPH=LEXICAL_STRUCTURAL_INVENTORY'
+          echo 'LEGACY_MUTABLE_REFS=TRACKED_DEBT'
+          echo 'FULL_YAML_AST=TOKEN_VAZIO'
+          echo 'CLOSURE=CLOSURE_L13'
+          echo 'CLAIM_ALLOWED=false'
