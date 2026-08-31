@@ -11,6 +11,10 @@ name: Workflow Graph Audit
 permissions:
   contents: read
 
+concurrency:
+  group: workflow-graph-audit-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   workflow-graph:
     runs-on: ubuntu-latest
@@ -23,7 +27,7 @@ jobs:
           persist-credentials: false
 
       - name: Analyze workflow structure, logic and dependencies
-        uses: rafaelmeloreisnovo/RafGitTools/.github/actions/workflow-graph-audit@0889679537f1f362fe45c9864e83f9963f60073b
+        uses: rafaelmeloreisnovo/RafGitTools/.github/actions/workflow-graph-audit@86124ef496af3e8c753189b2ce857312f1d0b64c
         with:
           mode: strict-changed
           base-ref: ${{ github.event.pull_request.base.sha }}
