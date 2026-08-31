@@ -1,5 +1,6 @@
 {
   "schema": "rafaelia.audit_readiness_profile.v1",
+  "closure_ref": "CLOSURE_L13",
   "subject": {
     "repository": "rafaelmeloreisnovo/RafPolimata",
     "revision": "69bc5d4b786dca8b9166ce5254d65e65dc8ca7b8",
@@ -92,6 +93,7 @@
   ],
   "notes": [
     "The active ruleset is real evidence, but deletion/non-fast-forward enforcement is not equivalent to required-review/status-check enforcement.",
-    "Recognition is evidence status only; it is not certification."
+    "Recognition is evidence status only; it is not certification.",
+    "CLOSURE_L13 binds these unresolved observations to governance without marking them resolved."
   ]
 }
