@@ -23,16 +23,27 @@ jobs:
           persist-credentials: false
 
       - name: Analyze workflow structure, logic and dependencies
-        uses: rafaelmeloreisnovo/RafGitTools/.github/actions/workflow-graph-audit@cf021417a5008404459f507c38382ed5a02e28b9
+        uses: rafaelmeloreisnovo/RafGitTools/.github/actions/workflow-graph-audit@0889679537f1f362fe45c9864e83f9963f60073b
         with:
           mode: strict-changed
           base-ref: ${{ github.event.pull_request.base.sha }}
           output-json: workflow-graph-audit.json
 
+      - name: Preserve workflow graph evidence
+        if: ${{ always() && hashFiles('workflow-graph-audit.json') != '' }}
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: workflow-graph-audit-${{ github.run_id }}
+          path: workflow-graph-audit.json
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Expose audit boundary
+        if: ${{ always() }}
         run: |
           echo 'WORKFLOW_GRAPH=LEXICAL_STRUCTURAL_INVENTORY'
           echo 'LEGACY_MUTABLE_REFS=TRACKED_DEBT'
           echo 'FULL_YAML_AST=TOKEN_VAZIO'
           echo 'CLOSURE=CLOSURE_L13'
+          echo 'ARTIFACT=EXECUTION_EVIDENCE_NOT_CERTIFICATION'
           echo 'CLAIM_ALLOWED=false'
