@@ -62,6 +62,24 @@
 # endif
 # define RAF_FS_STATUS_REGS 1u
 # define RAF_FS_CONTROL_FAMILY 4u
+
+#elif defined(__powerpc64__) || defined(__ppc64__)
+# define RAF_FS_REGCLASS_MASK (RAF_FS_REGCLASS_GPR | RAF_FS_REGCLASS_PC | RAF_FS_REGCLASS_STATUS | RAF_FS_REGCLASS_FP | RAF_FS_REGCLASS_VECTOR | RAF_FS_REGCLASS_CONTROL | RAF_FS_REGCLASS_DEBUG | RAF_FS_REGCLASS_PMU | RAF_FS_REGCLASS_VIRT | RAF_FS_REGCLASS_SECURITY)
+# define RAF_FS_FP_REGS 32u /* FPR0..31 alias VSR0..31 when VSX exists. */
+# define RAF_FS_STATUS_REGS 5u /* CR/LR/CTR/XER/FPSCR primary scheduler-relevant families. */
+# define RAF_FS_CONTROL_FAMILY 5u /* MSR/SPR families; generic L0 does not access privileged SPRs. */
+
+#elif defined(__loongarch64) || (defined(__loongarch__) && defined(__loongarch_grlen) && (__loongarch_grlen == 64))
+# define RAF_FS_REGCLASS_MASK (RAF_FS_REGCLASS_GPR | RAF_FS_REGCLASS_PC | RAF_FS_REGCLASS_STATUS | RAF_FS_REGCLASS_FP | RAF_FS_REGCLASS_VECTOR | RAF_FS_REGCLASS_CONTROL | RAF_FS_REGCLASS_DEBUG | RAF_FS_REGCLASS_PMU | RAF_FS_REGCLASS_VIRT | RAF_FS_REGCLASS_SECURITY)
+# define RAF_FS_FP_REGS 32u /* FPR/LSX/LASX are overlapping register views. */
+# define RAF_FS_STATUS_REGS 2u
+# define RAF_FS_CONTROL_FAMILY 6u /* CSR families; privilege-dependent. */
+
+#elif defined(__s390x__)
+# define RAF_FS_REGCLASS_MASK (RAF_FS_REGCLASS_GPR | RAF_FS_REGCLASS_PC | RAF_FS_REGCLASS_STATUS | RAF_FS_REGCLASS_FP | RAF_FS_REGCLASS_VECTOR | RAF_FS_REGCLASS_CONTROL | RAF_FS_REGCLASS_DEBUG | RAF_FS_REGCLASS_PMU | RAF_FS_REGCLASS_VIRT | RAF_FS_REGCLASS_SECURITY)
+# define RAF_FS_FP_REGS 16u /* FPR0..15 overlap vector-register low-number views where vector facility exists. */
+# define RAF_FS_STATUS_REGS 1u /* PSW is modeled as the primary flow/status family. */
+# define RAF_FS_CONTROL_FAMILY 7u /* CR0..15 and access-register families are distinct system state. */
 #else
 # error "Unsupported RAFAELIA register topology target"
 #endif
