@@ -10,14 +10,23 @@
     "hidden_scalar_tail": 0,
     "undeclared_shadow": 0
   },
+  "implemented_controls": [
+    "six-ISA scalar/object compile gate",
+    "six-ISA unresolved-helper rejection via nm -u",
+    "separate six-ISA raw Linux syscall compile gate",
+    "mandatory L0 file-comment contract",
+    "zero-runtime source contract gate"
+  ],
+  "dynamic_evidence": {
+    "current_head_ci": "external-github-actions-state",
+    "rule": "Do not persist a current-head PASS in this same static commit; bind reported CI to exact head/run externally."
+  },
   "gaps": [
     {"id":"L0-GAP-001","domain":"implementation","item":"x86 SSE2/AVX2/AVX-512 vector executor","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"equivalence plus no-helper/no-tail codegen gate"},
     {"id":"L0-GAP-002","domain":"implementation","item":"ARM NEON vector executor","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"scalar equivalence plus ARM32/ARM64 target gate"},
     {"id":"L0-GAP-003","domain":"implementation","item":"AArch64 SVE/SME executor","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"predicate/VL semantics plus target gate"},
     {"id":"L0-GAP-004","domain":"implementation","item":"RV32/RV64 vector executor","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"VL/mask semantics plus RVV target gate"},
     {"id":"L0-GAP-005","domain":"implementation","item":"x86 AMX matrix executor","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"explicit ISA profile plus tile-state tests"},
-    {"id":"L0-GAP-006","domain":"implementation","item":"CI unresolved-helper/codegen inspection for six scalar targets","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"current CI proves no unexpected calls or unresolved helpers"},
-    {"id":"L0-GAP-101","domain":"evidence","item":"current-head GitHub CI receipt","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"workflow run bound to current head"},
     {"id":"L0-GAP-102","domain":"device","item":"x86_64 physical runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"current artifact plus target execution receipt"},
     {"id":"L0-GAP-103","domain":"device","item":"i686 physical runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"current artifact plus target execution receipt"},
     {"id":"L0-GAP-104","domain":"device","item":"ARMv7 physical runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"current artifact plus target execution receipt"},
