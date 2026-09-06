@@ -4,7 +4,7 @@
 /*
  * RAFAELIA-L0-FILE-CONTRACT
  * PURPOSE: Fixed-vector, branchless, one-block execution primitives.
- * SCOPE: AVX2, AVX-512F, ARMv7 NEON and AArch64 Advanced SIMD; no OS/runtime contract.
+ * SCOPE: SSE2, AVX2, AVX-512F, ARMv7 NEON and AArch64 Advanced SIMD; no OS/runtime contract.
  * PRECONDITIONS: Selected compiler target enables the exact ISA profile; src/dst expose one full block.
  * REGISTER_OWNERSHIP: Inline assembly owns only the declared vector temporary; C-vector selection owns compiler temporaries.
  * CLOBBERS: Declared vector temporary plus memory for copy/zero; compiler allocates select temporaries.
@@ -55,6 +55,25 @@ RAF_FS_INLINE void raf_fs_vec_zero_block(void *dst) {
         : : "r"(dst) : "ymm0", "memory");
 }
 
+#elif (defined(__x86_64__) || defined(__i386__)) && defined(__SSE2__)
+# define RAF_FS_NATIVE_VECTOR_BITS 128u
+# define RAF_FS_NATIVE_VECTOR_BYTES 16u
+# define RAF_FS_NATIVE_LANES_U32 4u
+typedef raf_u32 raf_fs_native_u32v __attribute__((__vector_size__(16), __may_alias__));
+
+RAF_FS_INLINE void raf_fs_vec_copy_block(void *dst, const void *src) {
+    __asm__ __volatile__(
+        "movdqu (%1), %%xmm0\n\t"
+        "movdqu %%xmm0, (%0)"
+        : : "r"(dst), "r"(src) : "xmm0", "memory");
+}
+RAF_FS_INLINE void raf_fs_vec_zero_block(void *dst) {
+    __asm__ __volatile__(
+        "pxor %%xmm0, %%xmm0\n\t"
+        "movdqu %%xmm0, (%0)"
+        : : "r"(dst) : "xmm0", "memory");
+}
+
 #elif defined(__aarch64__)
 # define RAF_FS_NATIVE_VECTOR_BITS 128u
 # define RAF_FS_NATIVE_VECTOR_BYTES 16u
@@ -94,7 +113,7 @@ RAF_FS_INLINE void raf_fs_vec_zero_block(void *dst) {
 }
 
 #else
-# error "raf_fs_vector.h requires x86_64 AVX2/AVX-512F, ARMv7 NEON, or AArch64 Advanced SIMD"
+# error "raf_fs_vector.h requires SSE2/AVX2/AVX-512F, ARMv7 NEON, or AArch64 Advanced SIMD"
 #endif
 
 RAF_FS_INLINE void raf_fs_vec_select_u32_block(
