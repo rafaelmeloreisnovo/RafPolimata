@@ -1,0 +1,74 @@
+{
+  "schema": "raf.root-file-decisions.v1",
+  "mode": "APPEND_ONLY_SUPPLEMENT",
+  "created_at": "2026-09-06",
+  "decisions": [
+    {
+      "path": "AGENTS.md",
+      "git_blob_sha": "f34288be28dd80997da071e12c400cd87e242e07",
+      "supersedes_git_blob_sha": "38c13f6e6dc4fe4518cd098176201c2aa65ae194",
+      "kind": "repository-agent-router",
+      "content_state": "ACTIVE_CANONICAL_GOVERNANCE",
+      "evidence_state": "IMPLEMENTATION_LINKED",
+      "route": "KEEP_AT_ROOT",
+      "target": "AGENTS.md",
+      "area": "automation",
+      "owner_role": "repository-governance",
+      "risk": "LOW",
+      "findings": [
+        "roteador de agentes permanece necessário na raiz",
+        "blob mudou desde a decisão anterior e exige supersessão explícita auditável"
+      ],
+      "required_gates": [
+        "preservar precedência do contrato canônico de agentes",
+        "manter coerência entre AGENTS.md, docs/AGENTES.md e instruções escopadas"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    },
+    {
+      "path": "CLOUD.md",
+      "git_blob_sha": "0c2e4e51acadea04248c873a3b0bde8e28b7a5cd",
+      "kind": "agent-adapter",
+      "content_state": "ACTIVE_REFERENCE",
+      "evidence_state": "POLICY_LINKED",
+      "route": "KEEP_AT_ROOT",
+      "target": "CLOUD.md",
+      "area": "automation",
+      "owner_role": "repository-governance",
+      "risk": "LOW",
+      "findings": [
+        "adaptador cloud encaminha autoridade para contratos canônicos e código-fonte",
+        "posição na raiz é intencional para descoberta por agentes compatíveis"
+      ],
+      "required_gates": [
+        "não sobrepor AGENTS.md ou docs/AGENTES.md",
+        "preservar limites de evidência e revisão humana"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    },
+    {
+      "path": "GPT.md",
+      "git_blob_sha": "f78920b2fe8ffb3249f5b7c08999b17314212b77",
+      "kind": "agent-adapter",
+      "content_state": "ACTIVE_REFERENCE",
+      "evidence_state": "POLICY_LINKED",
+      "route": "KEEP_AT_ROOT",
+      "target": "GPT.md",
+      "area": "automation",
+      "owner_role": "repository-governance",
+      "risk": "LOW",
+      "findings": [
+        "adaptador GPT encaminha autoridade para contratos canônicos e código-fonte",
+        "posição na raiz é intencional para descoberta por agentes compatíveis"
+      ],
+      "required_gates": [
+        "não sobrepor AGENTS.md ou docs/AGENTES.md",
+        "preservar disciplina freestanding e limites de evidência"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    }
+  ]
+}
