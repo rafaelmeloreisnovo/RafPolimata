@@ -36,5 +36,7 @@ jobs:
         run: sh freestanding/tests/verify_profiles.sh
       - name: Scalable-vector ABI/ISA profiles
         run: sh freestanding/tests/verify_scalable.sh
+      - name: Matrix-register ABI/ISA profiles
+        run: sh freestanding/tests/verify_matrix_accel.sh
       - name: Raw Linux syscall six-ISA compile matrix
         run: sh syscall/tests/verify_matrix.sh
