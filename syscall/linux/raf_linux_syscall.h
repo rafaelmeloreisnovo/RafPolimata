@@ -2,9 +2,17 @@
 #define RAF_LINUX_SYSCALL_H
 
 /*
- * Optional Linux binding. This file is NOT included by freestanding/.
- * Syscall numbers are caller-supplied: architecture + Linux ABI owns them.
- * No errno translation, libc wrapper, TLS, cancellation point or hidden retry.
+ * RAFAELIA-SYSCALL-FILE-CONTRACT
+ * PURPOSE: optional raw Linux syscall trap binding for six initial ISA profiles.
+ * SCOPE: Linux ABI adapter only; this file is never part of freestanding/L0.
+ * PRECONDITIONS: caller supplies the correct Linux syscall number and argument semantics for the selected ABI.
+ * REGISTER_OWNERSHIP: explicit per-ISA bindings below; return value occupies the architecture ABI return register.
+ * CLOBBERS: documented on each inline-assembly statement; memory is conservatively clobbered.
+ * MEMORY_ORDER: compiler ordering across the trap is preserved by the memory clobber; kernel-side ordering is syscall-specific.
+ * RETRY_ERROR: no errno translation, TLS, cancellation point or hidden retry is provided.
+ * EVIDENCE: source + cross-object compile only until OS/architecture runtime receipts exist.
+ *
+ * This adapter does NOT prove or imply a syscall dependency in `freestanding/`.
  */
 #if defined(__GNUC__) || defined(__clang__)
 # define RAF_SC_INLINE static __inline__ __attribute__((__always_inline__, __unused__))
@@ -14,6 +22,7 @@
 
 #if defined(__x86_64__)
 typedef long raf_sc_word;
+/* Linux x86_64: nr=RAX; args=RDI,RSI,RDX,R10,R8,R9; return=RAX; SYSCALL destroys RCX/R11. */
 RAF_SC_INLINE raf_sc_word raf_linux_syscall6(raf_sc_word nr, raf_sc_word a0, raf_sc_word a1, raf_sc_word a2, raf_sc_word a3, raf_sc_word a4, raf_sc_word a5) {
     register raf_sc_word r10 __asm__("r10") = a3;
     register raf_sc_word r8  __asm__("r8")  = a4;
@@ -28,6 +37,7 @@ RAF_SC_INLINE raf_sc_word raf_linux_syscall6(raf_sc_word nr, raf_sc_word a0, raf
 
 #elif defined(__i386__)
 typedef long raf_sc_word;
+/* Linux i386 int80 ABI: nr=EAX; args=EBX,ECX,EDX,ESI,EDI,EBP; return=EAX. Build with frame-pointer omission when EBP is bound. */
 RAF_SC_INLINE raf_sc_word raf_linux_syscall6(raf_sc_word nr, raf_sc_word a0, raf_sc_word a1, raf_sc_word a2, raf_sc_word a3, raf_sc_word a4, raf_sc_word a5) {
     register raf_sc_word eax __asm__("eax") = nr;
     register raf_sc_word ebx __asm__("ebx") = a0;
@@ -42,6 +52,7 @@ RAF_SC_INLINE raf_sc_word raf_linux_syscall6(raf_sc_word nr, raf_sc_word a0, raf
 
 #elif defined(__aarch64__)
 typedef long raf_sc_word;
+/* Linux AArch64: nr=X8; args=X0..X5; return=X0; trap=SVC #0. */
 RAF_SC_INLINE raf_sc_word raf_linux_syscall6(raf_sc_word nr, raf_sc_word a0, raf_sc_word a1, raf_sc_word a2, raf_sc_word a3, raf_sc_word a4, raf_sc_word a5) {
     register raf_sc_word x0 __asm__("x0") = a0;
     register raf_sc_word x1 __asm__("x1") = a1;
@@ -56,6 +67,7 @@ RAF_SC_INLINE raf_sc_word raf_linux_syscall6(raf_sc_word nr, raf_sc_word a0, raf
 
 #elif defined(__arm__) && (__ARM_ARCH >= 7)
 typedef long raf_sc_word;
+/* Linux ARM EABI: nr=R7; args=R0..R5; return=R0; trap=SVC #0. */
 RAF_SC_INLINE raf_sc_word raf_linux_syscall6(raf_sc_word nr, raf_sc_word a0, raf_sc_word a1, raf_sc_word a2, raf_sc_word a3, raf_sc_word a4, raf_sc_word a5) {
     register raf_sc_word r0 __asm__("r0") = a0;
     register raf_sc_word r1 __asm__("r1") = a1;
@@ -70,6 +82,7 @@ RAF_SC_INLINE raf_sc_word raf_linux_syscall6(raf_sc_word nr, raf_sc_word a0, raf
 
 #elif defined(__riscv)
 typedef long raf_sc_word;
+/* Linux RISC-V: nr=A7; args=A0..A5; return=A0; trap=ECALL. XLEN selects RV32/RV64 word width. */
 RAF_SC_INLINE raf_sc_word raf_linux_syscall6(raf_sc_word nr, raf_sc_word a0, raf_sc_word a1, raf_sc_word a2, raf_sc_word a3, raf_sc_word a4, raf_sc_word a5) {
     register raf_sc_word x10 __asm__("a0") = a0;
     register raf_sc_word x11 __asm__("a1") = a1;
