@@ -1,0 +1,36 @@
+name: Freestanding L0
+
+on:
+  pull_request:
+    paths:
+      - 'freestanding/**'
+      - 'syscall/**'
+      - '.github/workflows/freestanding-l0.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freestanding/**'
+      - 'syscall/**'
+      - '.github/workflows/freestanding-l0.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freestanding-l0-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  six-isa-zero-runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Toolchain
+        run: clang --version
+      - name: Freestanding source contract
+        run: sh freestanding/tests/verify_contract.sh
+      - name: Freestanding six-ISA compile matrix
+        run: sh freestanding/tests/verify_matrix.sh
+      - name: Raw Linux syscall six-ISA compile matrix
+        run: sh syscall/tests/verify_matrix.sh
