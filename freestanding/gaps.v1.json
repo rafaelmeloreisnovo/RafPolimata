@@ -1,7 +1,7 @@
 {
   "schema": "rafaelia.freestanding.gaps.v1",
   "scope": "freestanding-l0",
-  "branch": "rafaelia/freestanding-l0-v1",
+  "branch": "rafaelia/freestanding-abi-vector-v2",
   "invariants": {
     "freestanding_os_dependency": 0,
     "heap": 0,
@@ -13,6 +13,10 @@
   "implemented_controls": [
     "six-ISA scalar/object compile gate",
     "six-ISA unresolved-helper rejection via nm -u",
+    "fixed-vector AVX2 AVX-512F ARMv7-NEON AArch64-Advanced-SIMD build/codegen gate",
+    "scalable-vector AArch64-SVE RV32-V RV64-V build/codegen gate",
+    "explicit consumed-lane state for SVE/RVV one-stage execution",
+    "OS-agnostic ABI/register geometry metadata",
     "separate six-ISA raw Linux syscall compile gate",
     "mandatory L0 file-comment contract",
     "zero-runtime source contract gate"
@@ -22,17 +26,21 @@
     "rule": "Do not persist a current-head PASS in this same static commit; bind reported CI to exact head/run externally."
   },
   "gaps": [
-    {"id":"L0-GAP-001","domain":"implementation","item":"x86 SSE2/AVX2/AVX-512 vector executor","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"equivalence plus no-helper/no-tail codegen gate"},
-    {"id":"L0-GAP-002","domain":"implementation","item":"ARM NEON vector executor","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"scalar equivalence plus ARM32/ARM64 target gate"},
-    {"id":"L0-GAP-003","domain":"implementation","item":"AArch64 SVE/SME executor","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"predicate/VL semantics plus target gate"},
-    {"id":"L0-GAP-004","domain":"implementation","item":"RV32/RV64 vector executor","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"VL/mask semantics plus RVV target gate"},
-    {"id":"L0-GAP-005","domain":"implementation","item":"x86 AMX matrix executor","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"explicit ISA profile plus tile-state tests"},
-    {"id":"L0-GAP-102","domain":"device","item":"x86_64 physical runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"current artifact plus target execution receipt"},
+    {"id":"L0-GAP-001","domain":"implementation","item":"explicit SSE2 fixed-vector executor/profile for x86_64 baseline and optional i686 SSE2","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"one-block executor plus no-helper/no-tail codegen gate"},
+    {"id":"L0-GAP-003","domain":"implementation","item":"AArch64 SME/SME2 matrix/streaming executor using ZA/ZT0","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"streaming/matrix state contract plus target compiler/codegen gate"},
+    {"id":"L0-GAP-005","domain":"implementation","item":"x86 AMX matrix/tile executor using TMM0..TMM7","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"explicit ISA/state profile plus tile-state codegen tests"},
+    {"id":"L0-GAP-006","domain":"implementation","item":"AVX-512 native K-mask residual load/store path","state":"TOKEN_VAZIO","closure":"CLOSURE_L11","promotion":"K-register codegen plus bounded masked-memory contract"},
+    {"id":"L0-GAP-102","domain":"device","item":"x86_64 scalar physical runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"current artifact plus target execution receipt"},
     {"id":"L0-GAP-103","domain":"device","item":"i686 physical runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"current artifact plus target execution receipt"},
     {"id":"L0-GAP-104","domain":"device","item":"ARMv7 physical runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"current artifact plus target execution receipt"},
     {"id":"L0-GAP-105","domain":"device","item":"AArch64 physical runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"current artifact plus target execution receipt"},
     {"id":"L0-GAP-106","domain":"device","item":"RV32 runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"current artifact plus explicitly identified physical/emulated target receipt"},
     {"id":"L0-GAP-107","domain":"device","item":"RV64 runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"current artifact plus explicitly identified physical/emulated target receipt"},
-    {"id":"L0-GAP-108","domain":"evidence","item":"raw Linux syscall runtime per architecture","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"OS/ABI-specific runtime receipt kept separate from L0"}
+    {"id":"L0-GAP-108","domain":"evidence","item":"raw Linux syscall runtime per architecture","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"OS/ABI-specific runtime receipt kept separate from L0"},
+    {"id":"L0-GAP-109","domain":"device","item":"x86_64 AVX2 physical profile runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"CPUID/profile identity plus current object execution"},
+    {"id":"L0-GAP-110","domain":"device","item":"x86_64 AVX-512F physical profile runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"CPUID/XSTATE identity plus current object execution"},
+    {"id":"L0-GAP-111","domain":"device","item":"ARMv7 NEON physical profile runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"device feature identity plus current object execution"},
+    {"id":"L0-GAP-112","domain":"device","item":"AArch64 SVE physical profile runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"SVE VL/feature identity plus current object execution"},
+    {"id":"L0-GAP-113","domain":"device","item":"RV32/RV64 V runtime","state":"TOKEN_VAZIO","closure":"CLOSURE_L12","promotion":"VLEN/profile identity plus current object execution"}
   ]
 }
