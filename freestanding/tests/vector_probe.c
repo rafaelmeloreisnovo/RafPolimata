@@ -14,5 +14,9 @@ void raf_fs_vector_compile_probe(void *state) {
     raf_fs_vector_probe_state *s = (raf_fs_vector_probe_state *)state;
     raf_fs_vec_copy_block(s->out, s->src);
     raf_fs_vec_select_u32_block(s->out, s->mask, s->yes, s->no);
+#if defined(__x86_64__) && defined(__AVX512F__)
+    /* Eight active lanes prove native K-mask bounded memory without a scalar tail. */
+    raf_fs_vec_masked_copy_u32(s->out, s->src, 0x00ffu);
+#endif
     raf_fs_vec_zero_block(s->zero);
 }
