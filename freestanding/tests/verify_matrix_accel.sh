@@ -41,7 +41,7 @@ compile_matrix() {
     printf '%s\n' "PASS: $name"
 }
 
-compile_matrix x86_64-amx x86_64-linux-gnu "-mamx-tile -mno-red-zone" 'tilezero.*%?tmm0'
-compile_matrix aarch64-sme aarch64-linux-gnu "-march=armv9-a+sme" 'zero[[:space:]]+\{za\}'
+compile_matrix x86_64-amx x86_64-unknown-none "-mamx-tile -mno-red-zone" 'tilezero.*%?tmm0'
+compile_matrix aarch64-sme aarch64-none-elf "-march=armv9-a+sme" 'zero[[:space:]]+\{za\}'
 
-printf '%s\n' "RAFAELIA matrix-register profiles: 2/2 PASS"
+printf '%s\n' "RAFAELIA OS-neutral matrix-register profiles: 2/2 PASS"
