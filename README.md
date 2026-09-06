@@ -1,223 +1,165 @@
 # RafPolimata
 
-**Estado:** `CANONICAL`  
-**Proprietário lógico:** `documentation-governance`  
-**Repositório:** [`rafaelmeloreisnovo/RafPolimata`](https://github.com/rafaelmeloreisnovo/RafPolimata) — `README.md`
+**State:** `CANONICAL / REVIEW_REQUIRED`  
+**Observed documentation base:** `main@9ed0b8aa93dfb5350b7dbeb9ea1e712ee1298388`  
+**Documentation cut:** 2026-09-06  
+**claim_allowed:** `false`
 
-RafPolimata é uma arquitetura semântica, tecnológica e jurídica para sistemas complexos que combinam:
-
-- modelagem matemática e dinâmica discreta;
-- engenharia de software de baixo nível;
-- Android, ARM32/ARM64, APK, DEX e ELF;
-- criptografia aplicada e rastreabilidade;
-- semiótica, linguística e memória estruturada;
-- governança de evidência, licenças e conformidade.
-
-O repositório separa rigorosamente:
+RafPolimata is a semantic, mathematical, low-level engineering, evidence-governance and research repository. Its core discipline is to keep concepts, implementation and proof levels separate:
 
 ```text
-conceito ≠ implementação ≠ execução ≠ evidência ≠ validação runtime
+concept != implementation != execution != evidence != runtime/device proof
+TOKEN_VAZIO != FAIL != PASS
 ```
 
-## Entrada canônica
+## Canonical reading order
 
-A ordem de leitura é:
+1. [`docs/CURRENT_DOCUMENTATION_STATE_2026-09-06.md`](docs/CURRENT_DOCUMENTATION_STATE_2026-09-06.md) — current source/document/evidence cut;
+2. [`docs/INDEX.md`](docs/INDEX.md) — curated canonical index;
+3. [`docs/AGENTES.md`](docs/AGENTES.md) — operational invariants;
+4. [`docs/DOCUMENT_GOVERNANCE.md`](docs/DOCUMENT_GOVERNANCE.md) — lifecycle, evidence grades and generated-state contract;
+5. subsystem document;
+6. exact source/test/evidence bound to the assessed revision.
 
-1. [`docs/AGENTES.md`](docs/AGENTES.md) — regras operacionais e invariantes;
-2. [`docs/INDEX.md`](docs/INDEX.md) — índice curado da documentação;
-3. [`docs/LOOSE_DOCUMENTATION_INDEX.md`](docs/LOOSE_DOCUMENTATION_INDEX.md) — índice dos documentos soltos, históricos, experimentais e com rota de reconciliação pendente;
-4. [`docs/MAPA_ESTRUTURAL_REPOSITORIO.md`](docs/MAPA_ESTRUTURAL_REPOSITORIO.md) — disposição física;
-5. [`docs/DOCUMENT_GOVERNANCE.md`](docs/DOCUMENT_GOVERNANCE.md) — catálogo, grafo, temporalidade, risco e promoção;
-6. documento técnico do subsistema em alteração.
+Dated audit/evidence snapshots retain their original revision meaning and are not silently rewritten into current state.
 
-## Fontes de verdade executáveis
+## Current source domains
 
-| Corpo | Arquivo | Função |
-|---|---|---|
-| Estado material do ecossistema | [`ECOSYSTEM_RUNTIME_STATE.json`](ECOSYSTEM_RUNTIME_STATE.json) | componente, evidência, lacuna e próxima ação |
-| Contrato do estado | [`contracts/ecosystem-runtime-state.schema.json`](contracts/ecosystem-runtime-state.schema.json) | schema da matriz material |
-| Validação local | [`scripts/validate_runtime_truth_local.sh`](scripts/validate_runtime_truth_local.sh) | build e testes locais sem crédito de Actions |
-| Validador do estado | [`scripts/validate_ecosystem_runtime_state.py`](scripts/validate_ecosystem_runtime_state.py) | coerência de estados com Python stdlib |
-| Build Doctor | [`scripts/ecosystem_build_doctor.py`](scripts/ecosystem_build_doctor.py) | CMake, flags, linker, fontes zumbis e binários sem proveniência |
-| Contrato do Build Doctor | [`contracts/ecosystem-build-doctor-report.schema.json`](contracts/ecosystem-build-doctor-report.schema.json) | envelope de achados, severidade e fronteira de claims |
-| Política documental | [`configs/document-governance.v1.json`](configs/document-governance.v1.json) | áreas, responsáveis, revisão e sensibilidade |
-| Catálogo documental | [`scripts/document_governance.py`](scripts/document_governance.py) | identidade, relações, duplicidade e fila |
-| Aprendizado científico | [`scripts/science_learning_engine.py`](scripts/science_learning_engine.py) | ORCID + Zenodo → 4 estágios → `knowledge_base/` → `vv_scan_buf()` |
+The repository currently spans, among other domains:
 
-> A ausência de execução não vira PASS. GitHub Actions, Safe Extended e Termux são meios de execução; a evidência precisa registrar commit, ambiente, comando, stdout/stderr e hashes.
+- mathematical/formal models and falsifiability routes;
+- ApkC and low-level Android/DEX/ELF/ZIP work;
+- OS-agnostic freestanding L0 plus a separated optional syscall layer;
+- multi-architecture ABI/vector/codegen profiles;
+- conversation/indexing and data-governance surfaces;
+- scientific bibliography/acquisition and evidence orchestration;
+- risk, legal/license, provenance and operational-governance documentation;
+- PBIP-L1 implementation/evidence federation.
 
-## Arquitetura principal
+Source presence never upgrades runtime/device/scientific claims automatically.
 
-| Camada | Arquivo principal | Entrada |
-|---|---|---|
-| Pipeline de alto nível | `raf_compile.h` | `raf_compile_file()` |
-| Micro-toolchain Android | `Apkc/apkc.c` | `apkc_main()` |
-| Tabela multilíngua | `Apkc/lang_profile.h` | `lang_profile_from_path()` |
-| Motor cognitivo T^7 | `rafaelia/verbovivo.c` | `verbovivo_main()` |
-| Runtime router | `Benchmark/raf_runtime_router.h` | seleção de backend |
-| Conversation indexer | `runtime/conversation_indexer/` | codec `segment.v1` |
-| Orquestração local | `raf_shell/raf_shell.c` | TUI e pipeline local |
+## Freestanding L0
 
-## Disciplina de evidência
+The current source tree contains `freestanding/` with `freestanding/include/raf_fs_core.h` documented as the canonical first-cut core.
 
-Estados usados no repositório:
+Its source contract keeps the hot core OS-agnostic and records:
 
-| Estado | Significado |
+- no allocator/syscall/hosted-runtime dependency in L0;
+- caller-owned state;
+- fixed-width primitives without a synthetic source-loop shell;
+- explicit residual lane geometry rather than a hidden scalar cleanup tail;
+- physical runtime as a separate evidence gate.
+
+Recent merged work extends source/codegen profiles across major x86, ARM and RISC-V targets and includes selected SIMD/scalable-vector/matrix-register routes. A compiled metadata profile is not an executor claim; codegen is not physical runtime.
+
+## PBIP-L1
+
+The PBIP evidence chain now includes two implementation families for the same three canonical vectors:
+
+- Vectras-VM-Android — Java / Gradle-JDK21;
+- Rafaelia_Private — C11 freestanding / Clang 18.1.3.
+
+The committed comparison record states equal canonical vectors/classifications and bounded independence across repository, implementation, language and toolchain family.
+
+Still open:
+
+```text
+TOKEN_VAZIO_PBIP_PROVIDER_INDEPENDENT_REPRODUCTION
+TOKEN_VAZIO_PBIP_ANDROID_RUNTIME
+TOKEN_VAZIO_PBIP_DEVICE_PROOF
+claim_allowed=false
+```
+
+See [`docs/evidence/PBIP_L1_EVIDENCE_ROUTE_V1.md`](docs/evidence/PBIP_L1_EVIDENCE_ROUTE_V1.md).
+
+## ApkC and runtime boundaries
+
+ApkC contains experimental/engineering source for direct artifact construction and Android-oriented validation. Current-artifact provenance, signing and physical execution must remain one coherent revision/artifact chain before any release/runtime promotion.
+
+Historic/local build evidence remains useful only within its exact scope.
+
+## Documentation governance
+
+`docs/DOCUMENT_GOVERNANCE.md` defines the repository's six-level governance model:
+
+```text
+L0 physical structure
+L1 file identity
+L2 reference graph
+L3 area / owner / temporal governance
+L4 evidence / duplication / risk
+L5 review queue / promotion
+```
+
+Generated outputs are derived artifacts. They must be regenerated from script + policy + commit and must not be hand-edited to create apparent freshness.
+
+### Current generated-state warning
+
+The committed `docs/generated/DOCUMENT_GOVERNANCE_INDEX.md` and `results/document-governance/summary.json` are bound to historical commit `ff000ab0a38b7ca9ae672300f1534915dcf0e4fe` and report:
+
+```text
+state        = REVIEW_REQUIRED
+files        = 1356 governed records at that historical cut
+relations    = 1265
+review_queue = 841
+blockers     = 0
+```
+
+At current base, `results/document-governance/catalog.jsonl` was observed empty while that historical summary reports a populated catalog. Therefore the current generated plane is classified:
+
+```text
+TOKEN_VAZIO_REGEN_REQUIRED
+```
+
+No generated file was manually rewritten in this docs-only audit.
+
+## Evidence states
+
+| State | Meaning |
 |---|---|
-| `VOID` | referência ou placeholder sem artefato |
-| `PENDING` | conteúdo existe sem gate suficiente |
-| `REFERENCE` | documentação ou especificação |
-| `AUDIT` | relatório, contrato ou trilha |
-| `RUNTIME` | corpo executável dependente de ambiente |
-| `IMPLEMENTED` | código existe, ainda separado de prova runtime |
-| `PASS` | gate definido foi executado e passou |
-| `FAIL` | gate definido foi executado e falhou |
-| `TOKEN_VAZIO` | evidência ausente ou insuficiente |
+| `CANONICAL` | official governance entry |
+| `ACTIVE` | in-use source/document |
+| `REFERENCE` | explanation/specification |
+| `AUDIT` | decision/provenance trail |
+| `EVIDENCE` | result tied to command/test/receipt |
+| `GENERATED` | derived; regenerate, do not hand-edit |
+| `PENDING` | content exists without sufficient gate |
+| `TOKEN_VAZIO` | evidence absent or insufficient |
 
-`TOKEN_VAZIO` é preferível a promover uma conclusão não demonstrada.
+## Current high-priority gaps
 
-## Governança documental
+1. regenerate the documentation-governance outputs against exact current main;
+2. close current-artifact ApkC provenance where claimed;
+3. close physical runtime/device gates with same-artifact receipts;
+4. obtain independent-provider PBIP reproduction before provider-independence claims;
+5. keep metadata/codegen/implementation/scientific novelty levels separate;
+6. reconcile license/provider metadata through explicit provenance review rather than inference.
 
-O motor documental opera em seis níveis:
+See [`docs/URGENCY_GATE_GAP_20260906.md`](docs/URGENCY_GATE_GAP_20260906.md) for the dated append-only audit snapshot and [`docs/ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md`](docs/ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md) for the current documentation/evidence roadmap.
 
-```text
-L0 estrutura física
-L1 identidade SHA-256
-L2 grafo de referências
-L3 área, responsável e temporalidade
-L4 evidência, duplicidade e risco
-L5 fila de revisão e promoção
-```
+## Generated governance command
 
-Comandos:
+The documented canonical route remains:
 
 ```sh
-python3 -m unittest tests.test_document_governance
 python3 scripts/document_governance.py --write --print-summary
 python3 scripts/document_governance.py --check --print-summary
 ```
 
-Saídas principais:
+This README does not claim those commands were executed on `9ed0b8aa...` during this documentation-only transaction.
 
-```text
-results/document-governance/catalog.jsonl
-results/document-governance/relations.jsonl
-results/document-governance/review-queue.json
-docs/generated/DOCUMENT_GOVERNANCE_INDEX.md
-docs/generated/DOCUMENT_REVIEW_QUEUE.md
-```
+## Legal and scientific boundary
 
-Nenhum arquivo é movido ou apagado automaticamente.
+Repository documentation does not substitute for legal advice, external security certification, scientific peer review or independent reproduction. Public visibility does not itself settle license/attribution rights.
 
-## Gate local momentâneo
+## Documentation audit receipt
 
-Enquanto não houver run remoto utilizável, executar:
+The provenance record for this reconciliation is:
 
-```sh
-bash scripts/validate_runtime_truth_local.sh
-```
+[`docs/DOCUMENTATION_AUDIT_RECEIPT_2026-09-06.md`](docs/DOCUMENTATION_AUDIT_RECEIPT_2026-09-06.md)
 
-Para workflows compatíveis com o executor local:
+## R3
 
-```sh
-sh safe-extended run .github/workflows/document-governance.yml
-sh safe-extended run .github/workflows/apkc-first-part.yml
-```
-
-## Conversation Indexer — `segment.v1`
-
-`runtime/conversation_indexer/` inclui:
-
-- header explícito de 64 bytes;
-- conversation record de 96 bytes;
-- message record de 128 bytes;
-- leitor limitado e iteração tipada;
-- CRC32C de header, records, título, autor e conteúdo;
-- rejeição de corrupção, truncamento, roles inválidos e ranges fora do buffer.
-
-Evidências e limites estão em:
-
-- [`docs/RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md`](docs/RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md);
-- [`docs/MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md`](docs/MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md).
-
-Streaming extractor, writer atômico, checkpoint/resume, BLAKE3 e execução em device permanecem pendentes enquanto não houver evidência correspondente.
-
-## ApkC — estado honesto
-
-`Apkc/` contém um micro-toolchain experimental em C para escrita direta de ZIP/APK, AXML, DEX e ELF com backends ARM64 e ARM32.
-
-Documentos de entrada:
-
-- [`docs/APKC_STRUCTURE.md`](docs/APKC_STRUCTURE.md);
-- [`docs/APKC_PROTOCOL.md`](docs/APKC_PROTOCOL.md);
-- [`docs/APKC_FLAGS_LIMITS_AND_COMMANDS.md`](docs/APKC_FLAGS_LIMITS_AND_COMMANDS.md);
-- [`docs/APKC_FIRST_PART_EXECUTION.md`](docs/APKC_FIRST_PART_EXECUTION.md);
-- [`Apkc/proofs/GAPS.md`](Apkc/proofs/GAPS.md).
-
-| Gate | Estado no corte atual |
-|---|---|
-| Geradores ZIP/AXML/DEX/ELF no código | `IMPLEMENTED` estrutural |
-| Gate source→binary AArch64 + ARM32 | `IMPLEMENTED`; execução atual pendente |
-| Reprodutibilidade do binário | `TOKEN_VAZIO` até novo run completo |
-| APK atual gerado pelo mesmo commit | `TOKEN_VAZIO` |
-| ELF ARM32 dentro do APK atual | `TOKEN_VAZIO` |
-| ELF ARM64 dentro do APK atual | `TOKEN_VAZIO` |
-| DEX do APK atual com SHA-1/Adler-32 validados | `TOKEN_VAZIO` |
-| Java/Kotlin/Groovy → D8 → DEX funcional | `IMPLEMENTED` no pipeline; runtime pendente |
-| Assinatura do APK atual | `TOKEN_VAZIO` |
-| Instalação e lançamento Android | `TOKEN_VAZIO` |
-| NativeActivity sem crash/logcat limpo | `TOKEN_VAZIO` |
-
-Resultados históricos continuam úteis como `REFERENCE` ou `AUDIT`, mas não substituem um run coerente do commit atual.
-
-## Qualidade e automação
-
-Principais corpos:
-
-- `.github/workflows/ci.yml` — gates gerais;
-- `.github/workflows/formal-science.yml` — orquestração científica;
-- `.github/workflows/document-governance.yml` — catálogo e fila documental;
-- `.github/workflows/apkc-first-part.yml` — verdade, toolchain e prova inicial ApkC;
-- `.github/workflows/ecosystem-build-doctor.yml` — warnings, CMake, linker, zumbis e proveniência;
-- `scripts/audit_repository_structure.py` — estrutura física `L0`;
-- `scripts/document_governance.py` — governança documental `L1–L5`;
-- `scripts/ecosystem_build_doctor.py` — auditoria read-only de fricção de build;
-- `scripts/validate_apkc_formats.py` — validação independente de APK/DEX/ELF.
-
-## Documentação de profundidade
-
-O índice completo e curado está em [`docs/INDEX.md`](docs/INDEX.md). Entre os núcleos:
-
-- excelência operacional, benchmark e rollback;
-- protocolos de coerência e falsificabilidade;
-- arquitetura semântica;
-- matrizes jurídico-tecnológicas e licenças;
-- convergência do ecossistema;
-- ciência formal e rastreabilidade informacional.
-
-## Aviso jurídico e científico
-
-Este material é técnico-acadêmico. Não substitui parecer jurídico profissional, auditoria de segurança, certificação normativa ou revisão científica independente.
-
-Afirmações de produção, conformidade, desempenho e segurança só podem ser promovidas depois dos gates específicos e da evidência reproduzível correspondente.
-
-
-## README Files neste Repositório
-
-| Arquivo | Estado | Proprietário lógico |
-|---|---|---|
-| [`README.md`](README.md) | CANONICAL | documentation-governance |
-| [`README_RAFAELIA_ROOT_OPTIMIZER.md`](README_RAFAELIA_ROOT_OPTIMIZER.md) | ACTIVE | compiler-maintainer |
-| [`Apkc/proofs/README.md`](Apkc/proofs/README.md) | EVIDENCE | apkc-maintainer |
-| [`build/README.md`](build/README.md) | EVIDENCE | ci-governance |
-| [`docs/CI_COMPILER_EXCELLENCE/README.md`](docs/CI_COMPILER_EXCELLENCE/README.md) | CANONICAL | ci-governance |
-| [`docs/excelencia_operacional/README.md`](docs/excelencia_operacional/README.md) | CANONICAL | documentation-governance |
-| [`fractal_core/README.md`](fractal_core/README.md) | ACTIVE | low-level-methods-maintainer |
-| [`native/rafaelia_omega_v32/README.md`](native/rafaelia_omega_v32/README.md) | EVIDENCE | runtime-maintainer |
-| [`proofs/run-arm64-full-chain/README.md`](proofs/run-arm64-full-chain/README.md) | EVIDENCE | apkc-maintainer |
-| [`research/APKC_RMR_RESEARCH_CORE/README.md`](research/APKC_RMR_RESEARCH_CORE/README.md) | REFERENCE | apkc-maintainer |
-| [`research/APKC_RMR_RESEARCH_CORE/receipts/README.md`](research/APKC_RMR_RESEARCH_CORE/receipts/README.md) | EVIDENCE | evidence-custodian |
-| [`research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/README.md`](research/MULTILINGUAL_SCRIPTURE_SEMANTIC_CORE/README.md) | REFERENCE | semantic-research |
-| [`tests/fixtures/README.md`](tests/fixtures/README.md) | EVIDENCE | quality-assurance |
-| [`tools/rafbbs/README.md`](tools/rafbbs/README.md) | ACTIVE | automation-maintainer |
-| [`tools/rafbbs/tests/README.md`](tools/rafbbs/tests/README.md) | EVIDENCE | quality-assurance |
+- **F_ok:** README now routes the current freestanding/PBIP/governance state without promoting stale generated outputs.
+- **F_gap:** current generator refresh, physical/device evidence and provider-independent reproduction remain open.
+- **F_next:** regenerate derived governance through its own tool, then close runtime/scientific gates independently with revision-bound receipts.
