@@ -1,7 +1,18 @@
 #ifndef RAF_FS_TYPES_H
 #define RAF_FS_TYPES_H
 
-/* No hosted headers: these are language primitive aliases only. */
+/*
+ * RAFAELIA-L0-FILE-CONTRACT
+ * PURPOSE: hosted-header-free primitive integer/pointer/size aliases.
+ * SCOPE: freestanding language primitives only; no OS, ABI or allocator policy.
+ * PRECONDITIONS: GCC/Clang predefined integer pointer/size types are available.
+ * REGISTER_OWNERSHIP: NONE; type declarations do not bind architectural registers.
+ * CLOBBERS: NONE.
+ * MEMORY_ORDER: NONE.
+ * TAIL_SHADOW: creates no tail path and no shadow state.
+ * EVIDENCE: source contract + compile matrix; runtime/device evidence is separate.
+ */
+
 typedef unsigned char      raf_u8;
 typedef signed char        raf_i8;
 typedef unsigned short     raf_u16;
