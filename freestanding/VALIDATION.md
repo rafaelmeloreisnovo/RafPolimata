@@ -1,5 +1,7 @@
 # RAFAELIA L0 — validation receipt
 
+Governance evidence closure: `CLOSURE_L12`.
+
 The initial source was cross-compiled as freestanding objects with Clang 17 for:
 
 ```text
@@ -31,4 +33,4 @@ Validated source units:
 
 Result for all six targets: object compilation succeeded in the local validation environment.
 
-This receipt proves source/toolchain acceptance only. It does not prove runtime execution on physical targets. Runtime and device states remain `TOKEN_VAZIO` until receipts exist.
+This receipt proves source/toolchain acceptance only. It does not prove runtime execution on physical targets. Runtime and device states remain `TOKEN_VAZIO` under `CLOSURE_L12` until receipts exist.
