@@ -38,5 +38,7 @@ jobs:
         run: sh freestanding/tests/verify_scalable.sh
       - name: Matrix-register ABI/ISA profiles
         run: sh freestanding/tests/verify_matrix_accel.sh
+      - name: Additional register topology metadata
+        run: sh freestanding/tests/verify_register_metadata.sh
       - name: Raw Linux syscall six-ISA compile matrix
         run: sh syscall/tests/verify_matrix.sh
