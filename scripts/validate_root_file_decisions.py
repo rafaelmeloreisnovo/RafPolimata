@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Closure ownership for the explicit unknown-evidence sentinel below: CLOSURE_L1.
 POLICY_SCHEMA = "raf.document-governance-policy.v1"
 DECISION_SCHEMA = "raf.root-file-decisions.v1"
 DEFAULT_SUPPLEMENT_DIR = "configs/root-file-decisions.d"
