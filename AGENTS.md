@@ -16,9 +16,9 @@ Before changing code, documentation, configuration, tests, evidence, or generate
 Tool adapters are additive only:
 
 - GitHub Copilot: `.github/copilot-instructions.md` and matching `.github/instructions/*.instructions.md`.
-- Claude Code: `CLAUDE.md`.
+- Claude Code: `CLAUDE.md`; generic cloud coding agents may use `CLOUD.md` as the adapter.
 - OpenAI Codex: this `AGENTS.md` plus any nearer scoped `AGENTS.md`.
-- ChatGPT working through GitHub/repository context: this file and `docs/AGENTES.md` are the repository contract; product-level behavior is not defined by repository files.
+- GPT/ChatGPT working through GitHub/repository context: `GPT.md`, this file and `docs/AGENTES.md`; product-level behavior is not defined by repository files.
 
 If an adapter conflicts with this file or `docs/AGENTES.md`, do not guess. Preserve the stricter evidence/safety rule and record the conflict.
 
@@ -121,6 +121,27 @@ Identify:
 Run the smallest relevant baseline before modification when execution is available.
 
 ## Subsystem minimums
+
+### Freestanding L0 / raw syscall
+
+For `freestanding/**`, read `freestanding/AGENTS.md`, `freestanding/ARCH_CONTRACT.md`, `freestanding/COMMENT_CONTRACT.md`, `freestanding/STUB_POLICY.md`, and `freestanding/GAPS.md` before editing. For `syscall/**`, also read `syscall/AGENTS.md`.
+
+Preserve the strict boundary:
+
+```text
+freestanding/ -> no libc, heap, GC, hosted runtime or syscall
+syscall/      -> optional OS ABI trap bindings, never imported back into L0
+```
+
+Implementation/topology gaps bind to `CLOSURE_L11`; runtime/device gaps bind to `CLOSURE_L12`. Do not close either by documentation alone.
+
+Applicable gates:
+
+```sh
+sh freestanding/tests/verify_contract.sh
+sh freestanding/tests/verify_matrix.sh
+sh syscall/tests/verify_matrix.sh
+```
 
 ### ApkC / compiler
 
