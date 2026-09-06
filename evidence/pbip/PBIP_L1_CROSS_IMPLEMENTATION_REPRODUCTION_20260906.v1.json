@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "federation_id": "PBIP-L1-FED-V1",
+  "formula_id": "PBIP-L1",
+  "object_type": "CROSS_IMPLEMENTATION_REPRODUCTION",
+  "date": "2026-09-06",
+  "state": "CROSS_IMPLEMENTATION_REPRODUCTION_PROVEN_PROVIDER_PENDING",
+  "governance_closure": "CLOSURE_L1",
+  "formal_relation": "Delta_B = 4(r^2 - d_perp^2) = 4q^2",
+  "canonical_vectors": [
+    {"r": 5, "d_perp": 3, "q2": 16, "delta_b": 64, "class": "SECANT"},
+    {"r": 5, "d_perp": 5, "q2": 0, "delta_b": 0, "class": "TANGENT"},
+    {"r": 5, "d_perp": 6, "q2": -11, "delta_b": -44, "class": "NO_REAL_INTERSECTION"}
+  ],
+  "producer_a": {
+    "repository": "rafaelmeloreisnovo/Vectras-VM-Android",
+    "implementation_commit": "836569a69c69b9b5d194108d0079a4a593b9f5d4",
+    "implementation_path": "app/src/main/java/com/vectras/vm/core/PbipL1.java",
+    "implementation_sha256": "1119f44f78f6fe3e2abc3540414522106a92b3570b55cd20808ba147385055a9",
+    "language": "Java",
+    "toolchain_family": "Gradle/JDK21",
+    "workflow_run_id": 34025698586,
+    "workflow_job_id": 101466152645,
+    "receipt_sha256": "2077b4674e263338da12d8d78a312744e01d2f3ba44561cfb61cb848aa551c6b",
+    "artifact_id": 9987007149,
+    "artifact_zip_sha256": "7c569d05c58bbbfd240d1263b7c40546a57ed58367d5facbeb7409469ef5130b"
+  },
+  "producer_b": {
+    "repository": "rafaelmeloreisnovo/Rafaelia_Private",
+    "implementation_commit": "d9bada8895f03805f3187e48cdadb3d435d5f5da",
+    "implementation_path": "src/pbip/pbip_l1_freestanding.c",
+    "implementation_sha256": "41f39d3f30b90237ae6f250976a3b5240aa822ba3f4a72052b4d31814ece791d",
+    "language": "C11",
+    "toolchain": "Ubuntu clang 18.1.3",
+    "freestanding": true,
+    "undefined_external_symbols": 0,
+    "object_sha256": "14b8b5e8580dce137af3af4674c62f0d21a93652752af5455d2204950cd02597",
+    "stdout_sha256": "804cc3e8b4b84dde2547eef530fe0bd7d672ce50e7e63bcffccb6aa86d94824f",
+    "workflow_run_id": 34026460668,
+    "workflow_job_id": 101468184710,
+    "receipt_sha256": "e1b562b2ee719b93e2f9d5326c06943a5a052b873a259ce0b685a3fe18a00c2b",
+    "artifact_id": 9987206552,
+    "artifact_zip_sha256": "0240db4d06925daaee604811d24c87a80ec3dad62f5b70c30cb6f32e09c84e89"
+  },
+  "comparison": {
+    "canonical_vectors_equal": true,
+    "classification_equal": true,
+    "repository_independent": true,
+    "implementation_independent": true,
+    "language_independent": true,
+    "toolchain_independent": true,
+    "ci_provider_independent": false,
+    "device_independent": false,
+    "cross_implementation_reproduction_proven": true,
+    "provider_independent_reproduction_proven": false
+  },
+  "claim_allowed": false,
+  "open_gates": [
+    "TOKEN_VAZIO_PBIP_PROVIDER_INDEPENDENT_REPRODUCTION",
+    "TOKEN_VAZIO_PBIP_DEVICE_PROOF",
+    "TOKEN_VAZIO_PBIP_ANDROID_RUNTIME"
+  ]
+}
