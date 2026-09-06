@@ -29,9 +29,9 @@ compile_scalable() {
         printf '%s\n' "FAIL: $name contains call instruction"
         exit 1
     fi
-    if grep -E -q '(%rsp|%rbp|[[:space:]]sp,|\[sp|push[lq]?[[:space:]]|pop[lq]?[[:space:]])' "$asm"; then
+    if grep -E -q '(%rsp|%rbp|%esp|%ebp|[[:space:]]sp,|\[sp|push[lq]?[[:space:]]|pop[lq]?[[:space:]])' "$asm"; then
         printf '%s\n' "FAIL: $name contains stack traffic"
-        grep -E -n '(%rsp|%rbp|[[:space:]]sp,|\[sp|push[lq]?[[:space:]]|pop[lq]?[[:space:]])' "$asm"
+        grep -E -n '(%rsp|%rbp|%esp|%ebp|[[:space:]]sp,|\[sp|push[lq]?[[:space:]]|pop[lq]?[[:space:]])' "$asm"
         exit 1
     fi
     if ! grep -q "$marker" "$asm"; then
@@ -41,8 +41,8 @@ compile_scalable() {
     printf '%s\n' "PASS: $name"
 }
 
-compile_scalable aarch64-sve aarch64-linux-gnu "-march=armv8.2-a+sve" 'whilelo'
-compile_scalable rv32-v riscv32-linux-gnu "-march=rv32gcv -mabi=ilp32d" 'vsetvli'
-compile_scalable rv64-v riscv64-linux-gnu "-march=rv64gcv -mabi=lp64d" 'vsetvli'
+compile_scalable aarch64-sve aarch64-none-elf "-march=armv8.2-a+sve" 'whilelo'
+compile_scalable rv32-v riscv32-unknown-elf "-march=rv32gcv -mabi=ilp32d" 'vsetvli'
+compile_scalable rv64-v riscv64-unknown-elf "-march=rv64gcv -mabi=lp64d" 'vsetvli'
 
-printf '%s\n' "RAFAELIA scalable-vector profiles: 3/3 PASS"
+printf '%s\n' "RAFAELIA OS-neutral scalable-vector profiles: 3/3 PASS"
