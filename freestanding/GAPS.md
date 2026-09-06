@@ -1,6 +1,6 @@
 # RAFAELIA Freestanding L0 — current gap map
 
-Scope: PR/branch `rafaelia/freestanding-l0-v1`. This is a maintenance map, not a claim that every repository gap is listed here.
+Scope: PR/branch `rafaelia/freestanding-abi-vector-v2`. This is a maintenance map, not a claim that every repository gap is listed here.
 
 Governance:
 
@@ -11,35 +11,46 @@ Governance:
 
 | item | state | evidence boundary |
 |---|---|---|
-| scalar/ordering primitives: x86_64, i686, ARMv7-A, AArch64, RV32, RV64 | IMPLEMENTED | source + cross-object compile gate |
-| branchless fixed-width copy/select/residual core | IMPLEMENTED | source + codegen-oriented probe |
+| scalar/ordering primitives: x86_64, i686, ARMv7-A, AArch64, RV32, RV64 | IMPLEMENTED + BUILD_PROVEN | source + cross-object compile gate |
+| branchless fixed-width copy/select/residual core | IMPLEMENTED + CODEGEN_PROBED | source + codegen-oriented probe |
+| x86_64 AVX2 one-block executor | IMPLEMENTED + BUILD/CODEGEN_PROVEN | `verify_profiles.sh`; YMM path, no unresolved helper/call/stack in probe |
+| x86_64 AVX-512F one-block executor | IMPLEMENTED + BUILD/CODEGEN_PROVEN | `verify_profiles.sh`; ZMM path, no unresolved helper/call/stack in probe |
+| ARMv7-A NEON one-block executor | IMPLEMENTED + BUILD/CODEGEN_PROVEN | `verify_profiles.sh`; NEON D/Q path, no unresolved helper/call/stack in probe |
+| AArch64 Advanced SIMD one-block executor | IMPLEMENTED + BUILD/CODEGEN_PROVEN | `verify_profiles.sh`; Q/V path, no unresolved helper/call/stack in probe |
+| AArch64 SVE one-stage predicated executor | IMPLEMENTED + BUILD/CODEGEN_PROVEN | `verify_scalable.sh`; `whilelo`/predicate path, explicit consumed lanes |
+| RV32/RV64 V one-stage VL executor | IMPLEMENTED + BUILD/CODEGEN_PROVEN | `verify_scalable.sh`; `vsetvli` path, explicit consumed lanes |
+| ABI/register geometry metadata | IMPLEMENTED | `raf_fs_abi.h` + `raf_fs_registers.h`; no privileged access |
 | raw Linux syscall adapters for six targets | IMPLEMENTED, separate from L0 | source + separate cross-object compile gate |
 | source contract gate | IMPLEMENTED | executable shell gate |
 | six-ISA unresolved-helper rejection | IMPLEMENTED | `verify_matrix.sh` rejects undefined helper/runtime symbols per object |
 
-`IMPLEMENTED` above does not mean physical runtime proven.
+`BUILD/CODEGEN_PROVEN` above does **not** mean semantic equivalence on physical silicon or device/runtime proof.
 
 ## Open implementation gaps — CLOSURE_L11
 
 | id | gap | current state | promotion gate |
 |---|---|---|---|
-| L0-GAP-001 | x86 fixed-vector executor (SSE2/AVX2/AVX-512) over the common lane contract | `TOKEN_VAZIO` | equivalence tests + no hidden helper/tail codegen |
-| L0-GAP-002 | ARMv7/AArch64 NEON executor | `TOKEN_VAZIO` | scalar equivalence + ARM32/ARM64 object/codegen gates |
-| L0-GAP-003 | AArch64 SVE/SME scalable/matrix executor | `TOKEN_VAZIO` | predicate/VL semantics + target compiler gate |
-| L0-GAP-004 | RV32/RV64 V executor | `TOKEN_VAZIO` | VL/mask semantics + RVV target compiler gate |
-| L0-GAP-005 | x86 AMX/matrix executor | `TOKEN_VAZIO` | explicit opt-in ISA profile + state/tile contract tests |
+| L0-GAP-001 | explicit SSE2 fixed-vector executor/profile (x86_64 baseline and optional i686 SSE2) | `TOKEN_VAZIO (CLOSURE_L11)` | one-block executor + no-helper/no-tail codegen gate |
+| L0-GAP-003 | AArch64 SME/SME2 matrix/streaming executor (`ZA`/`ZT0`) | `TOKEN_VAZIO (CLOSURE_L11)` | streaming/matrix state contract + target compiler/codegen gate |
+| L0-GAP-005 | x86 AMX matrix/tile executor (`TMM0..TMM7`) | `TOKEN_VAZIO (CLOSURE_L11)` | explicit opt-in ISA/state profile + tile-state codegen tests |
+| L0-GAP-006 | AVX-512 native `K`-mask residual load/store path (current fixed executor uses explicit full-vector lane mask) | `TOKEN_VAZIO (CLOSURE_L11)` | K-register codegen + bounded masked-memory contract |
 
 ## Open execution/evidence gaps — CLOSURE_L12
 
 | id | gap | current state | promotion gate |
 |---|---|---|---|
-| L0-GAP-102 | physical x86_64 runtime receipt | `TOKEN_VAZIO` | target execution + artifact/commit identity |
-| L0-GAP-103 | physical i686 runtime receipt | `TOKEN_VAZIO` | target execution + artifact/commit identity |
-| L0-GAP-104 | physical ARMv7 runtime receipt | `TOKEN_VAZIO` | target execution + artifact/commit identity |
-| L0-GAP-105 | physical AArch64 runtime receipt | `TOKEN_VAZIO` | target execution + artifact/commit identity |
-| L0-GAP-106 | physical RV32 runtime receipt | `TOKEN_VAZIO` | target execution/emulation scope explicitly identified |
-| L0-GAP-107 | physical RV64 runtime receipt | `TOKEN_VAZIO` | target execution/emulation scope explicitly identified |
-| L0-GAP-108 | raw Linux syscall runtime receipts per architecture | `TOKEN_VAZIO` | OS/ABI-specific execution, separate from L0 |
+| L0-GAP-102 | physical x86_64 scalar runtime receipt | `TOKEN_VAZIO (CLOSURE_L12)` | target execution + artifact/commit identity |
+| L0-GAP-103 | physical i686 runtime receipt | `TOKEN_VAZIO (CLOSURE_L12)` | target execution + artifact/commit identity |
+| L0-GAP-104 | physical ARMv7 runtime receipt | `TOKEN_VAZIO (CLOSURE_L12)` | target execution + artifact/commit identity |
+| L0-GAP-105 | physical AArch64 runtime receipt | `TOKEN_VAZIO (CLOSURE_L12)` | target execution + artifact/commit identity |
+| L0-GAP-106 | RV32 runtime receipt | `TOKEN_VAZIO (CLOSURE_L12)` | target execution/emulation scope explicitly identified |
+| L0-GAP-107 | RV64 runtime receipt | `TOKEN_VAZIO (CLOSURE_L12)` | target execution/emulation scope explicitly identified |
+| L0-GAP-108 | raw Linux syscall runtime receipts per architecture | `TOKEN_VAZIO (CLOSURE_L12)` | OS/ABI-specific execution, separate from L0 |
+| L0-GAP-109 | physical x86_64 AVX2 profile receipt | `TOKEN_VAZIO (CLOSURE_L12)` | CPUID/profile identity + current object execution |
+| L0-GAP-110 | physical x86_64 AVX-512F profile receipt | `TOKEN_VAZIO (CLOSURE_L12)` | CPUID/XSTATE profile identity + current object execution |
+| L0-GAP-111 | physical ARMv7 NEON profile receipt | `TOKEN_VAZIO (CLOSURE_L12)` | current object + device feature identity + execution |
+| L0-GAP-112 | physical AArch64 SVE profile receipt | `TOKEN_VAZIO (CLOSURE_L12)` | SVE VL/feature identity + current object execution |
+| L0-GAP-113 | RV32/RV64 V runtime receipt | `TOKEN_VAZIO (CLOSURE_L12)` | VLEN/profile identity + current object execution |
 
 ## Dynamic evidence boundary
 
