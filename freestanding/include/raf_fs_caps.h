@@ -1,6 +1,18 @@
 #ifndef RAF_FS_CAPS_H
 #define RAF_FS_CAPS_H
 
+/*
+ * RAFAELIA-L0-FILE-CONTRACT
+ * PURPOSE: compile-time geometry of scalar/SIMD/vector capacity.
+ * SCOPE: capability description only; this file does not execute vector work.
+ * PRECONDITIONS: target compiler predefined ISA feature macros are authoritative for this build.
+ * REGISTER_OWNERSHIP: NONE; reports register-file geometry without binding registers.
+ * CLOBBERS: NONE.
+ * MEMORY_ORDER: NONE.
+ * TAIL_SHADOW: reports lane geometry only; residual handling remains explicit in the core.
+ * EVIDENCE: capability mapping IMPLEMENTED; vector executors remain closure-bound gaps where listed.
+ */
+
 #include "raf_fs_types.h"
 
 #define RAF_FS_VECTOR_NONE      0u
