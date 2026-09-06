@@ -1,0 +1,55 @@
+{
+  "schema": "rafaelia.urgency-gate-gap.v1",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "observed_main": "820e7ea29bebbf0154ea245d401f691715fea5d8",
+  "date": "2026-09-06",
+  "append_only_snapshot": true,
+  "closure_id": "CLOSURE_L1",
+  "claim_allowed": false,
+  "invariants": [
+    "SOURCE_OBSERVED!=IMPLEMENTED!=BUILD_PROVEN!=RUNTIME_PROVEN!=DEVICE_PROVEN!=REPRODUCED",
+    "TOKEN_VAZIO!=FAIL!=PASS"
+  ],
+  "observed_predecessor_head": "15caf923f660b23a00d7ad899cc39148966cad1c",
+  "observed_predecessor_runs": {
+    "formal_science": {"conclusion": "success"},
+    "internal_custody_ledger": {"conclusion": "success"},
+    "ci": {
+      "run_id": 34029258849,
+      "conclusion": "failure",
+      "failure_boundary": "strict changed-file closure validation"
+    },
+    "document_governance": {
+      "run_id": 34029258912,
+      "conclusion": "failure",
+      "test_boundary": "tests passed",
+      "failure_boundary": "root decision gate",
+      "unmapped": ["CLOUD.md", "GPT.md"],
+      "stale_decision": "AGENTS.md"
+    }
+  },
+  "corrective_delta": {
+    "root_decision_supersession": "explicit exact-SHA fail-closed append-only",
+    "new_root_decisions": ["CLOUD.md", "GPT.md"],
+    "superseded_root_decision": "AGENTS.md",
+    "changed_file_closure": "CLOSURE_L1",
+    "final_head_revalidation_required": true
+  },
+  "items": [
+    {"id":"RP-U0-01","urgency":"U0","surface":"github-governance","state":"UNPROTECTED_OBSERVED","gap":"main protection/ruleset enforcement not active in observed response","gate":"provider policy apply plus independent readback","evidence_required":["provider_json","revision","ruleset_or_protection_receipt"]},
+    {"id":"RP-U0-02","urgency":"U0","surface":"physical-execution","state":"TOKEN_VAZIO","gap":"same-artifact physical execution proof","gate":"exact artifact execution on declared target","evidence_required":["commit","artifact_sha256","device","abi","command","stdout_stderr"]},
+    {"id":"RP-U0-03","urgency":"U0","surface":"pbip-l1","state":"IMPLEMENTATION_REPRODUCED","gap":"independent CI provider plus Android/device proof","gate":"independent provider/runtime reproduction","evidence_required":["provider_receipt","android_runtime_receipt","device_receipt"]},
+    {"id":"RP-U0-04","urgency":"U0","surface":"apkc-provenance","state":"TOKEN_VAZIO","gap":"current source-to-APK complete provenance","gate":"source-binary-APK provenance","evidence_required":["apk_sha256","dex_checksums","elf_abi_inventory","signing_receipt","build_receipt"]},
+    {"id":"RP-U1-01","urgency":"U1","surface":"freestanding-l11","state":"PARTIAL_ADVANCED","gap":"AMX/SME and remaining executor paths","gate":"per-target codegen and behavioral harness","evidence_required":["object_receipt","codegen_receipt","test_vectors"]},
+    {"id":"RP-U1-02","urgency":"U1","surface":"architecture-coverage","state":"METADATA_ONLY_OR_PENDING","gap":"POWER/LoongArch/s390x then Hexagon/MVE/APX executors","gate":"executor plus target-appropriate build/runtime","evidence_required":["per_isa_receipt"]},
+    {"id":"RP-U1-03","urgency":"U1","surface":"conversation-indexer","state":"IMPLEMENTED_PARTIAL","gap":"streaming writer checkpoint resume BLAKE3","gate":"deterministic round-trip and recovery tests","evidence_required":["fixture_hashes","test_receipt"]},
+    {"id":"RP-U1-04","urgency":"U1","surface":"science","state":"REFERENCE_IMPLEMENTED_COMPONENTS","gap":"independent scientific reproduction/novelty","gate":"exact-input reproduction and independent review where applicable","evidence_required":["input_hashes","scripts","outputs","citations","review_receipt"]},
+    {"id":"RP-U2-01","urgency":"U2","surface":"licensing","state":"TOKEN_VAZIO_REPO_LICENSE_METADATA","gap":"recognized repository license/provenance boundary","gate":"license decision plus compatibility audit","evidence_required":["LICENSE","attribution_inventory"]},
+    {"id":"RP-U2-02","urgency":"U2","surface":"documentation-governance","state":"CORRECTIVE_DELTA_IMPLEMENTED_FINAL_HEAD_REVALIDATION_REQUIRED","gap":"predecessor run found CLOUD.md/GPT.md unmapped and AGENTS.md stale","gate":"append decisions plus exact-SHA supersession and rerun","evidence_required":["root_decision_report","unmapped_zero","stale_zero","supersession_history"]},
+    {"id":"RP-U2-03","urgency":"U2","surface":"ci-final-head","state":"CORRECTIVE_DELTA_PENDING_REVALIDATION","gap":"predecessor strict closure validator rejected changed files without closure ownership","gate":"CLOSURE_L1 binding plus exact final-head workflows","evidence_required":["workflow_run_ids","job_ids","artifact_digests","strict_closure_errors_zero"]},
+    {"id":"RP-U3-01","urgency":"U3","surface":"performance","state":"TOKEN_VAZIO_BENCHMARK_MATRIX","gap":"controlled reproducible cross-ISA benchmark denominator","gate":"pinned benchmark protocol","evidence_required":["raw_measurements","environment","statistics"]}
+  ],
+  "f_ok": ["evidence discipline","PBIP cross-implementation reproduction","freestanding codegen coverage","ApkC and governance tooling","append-only exact-SHA root-decision supersession"],
+  "f_gap": ["final-head revalidation","provider protection","physical runtime","complete ApkC provenance","independent provider/device PBIP","remaining ISA executors","independent scientific validation"],
+  "f_next": "Revalidate the corrective head, then close revision-bound U0 gates without converting missing evidence into inference."
+}

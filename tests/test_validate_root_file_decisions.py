@@ -27,10 +27,10 @@ class RootFileDecisionTests(unittest.TestCase):
             }
         }
 
-    def valid_decision(self, path: str = "loose.txt") -> dict:
+    def valid_decision(self, path: str = "loose.txt", sha: str | None = None) -> dict:
         return {
             "path": path,
-            "git_blob_sha": "a" * 40,
+            "git_blob_sha": sha or "a" * 40,
             "kind": "documentation",
             "content_state": "REFERENCE",
             "evidence_state": "PENDING",
@@ -87,19 +87,38 @@ class RootFileDecisionTests(unittest.TestCase):
             supplements.mkdir(parents=True)
             primary = configs / "root-file-decisions.v1.json"
             primary.write_text(
-                json.dumps({"schema": MOD.DECISION_SCHEMA, "decisions": [self.valid_decision("a.txt")]}),
+                json.dumps(
+                    {
+                        "schema": MOD.DECISION_SCHEMA,
+                        "decisions": [self.valid_decision("a.txt")],
+                    }
+                ),
                 encoding="utf-8",
             )
             (supplements / "20.json").write_text(
-                json.dumps({"schema": MOD.DECISION_SCHEMA, "decisions": [self.valid_decision("c.txt")]}),
+                json.dumps(
+                    {
+                        "schema": MOD.DECISION_SCHEMA,
+                        "decisions": [self.valid_decision("c.txt")],
+                    }
+                ),
                 encoding="utf-8",
             )
             (supplements / "10.json").write_text(
-                json.dumps({"schema": MOD.DECISION_SCHEMA, "decisions": [self.valid_decision("b.txt")]}),
+                json.dumps(
+                    {
+                        "schema": MOD.DECISION_SCHEMA,
+                        "decisions": [self.valid_decision("b.txt")],
+                    }
+                ),
                 encoding="utf-8",
             )
             bundle = MOD.load_manifest_bundle(root, primary, supplements)
-            self.assertEqual([d["path"] for d in bundle["decisions"]], ["a.txt", "b.txt", "c.txt"])
+            self.assertEqual(
+                [d["path"] for d in bundle["decisions"]],
+                ["a.txt", "b.txt", "c.txt"],
+            )
+            self.assertEqual(bundle["decision_history"], [])
             self.assertEqual(
                 bundle["bundle_sources"],
                 [
@@ -109,6 +128,97 @@ class RootFileDecisionTests(unittest.TestCase):
                 ],
             )
 
+    def test_manifest_bundle_accepts_exact_explicit_supersession(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            configs = root / "configs"
+            supplements = configs / "root-file-decisions.d"
+            supplements.mkdir(parents=True)
+            primary = configs / "root-file-decisions.v1.json"
+            original = self.valid_decision("a.txt", "a" * 40)
+            replacement = self.valid_decision("a.txt", "b" * 40)
+            replacement["supersedes_git_blob_sha"] = "a" * 40
+            primary.write_text(
+                json.dumps({"schema": MOD.DECISION_SCHEMA, "decisions": [original]}),
+                encoding="utf-8",
+            )
+            (supplements / "10.json").write_text(
+                json.dumps(
+                    {"schema": MOD.DECISION_SCHEMA, "decisions": [replacement]}
+                ),
+                encoding="utf-8",
+            )
+
+            bundle = MOD.load_manifest_bundle(root, primary, supplements)
+
+            self.assertEqual(len(bundle["decisions"]), 1)
+            self.assertEqual(bundle["decisions"][0]["git_blob_sha"], "b" * 40)
+            self.assertEqual(
+                bundle["decision_history"],
+                [
+                    {
+                        "path": "a.txt",
+                        "superseded_git_blob_sha": "a" * 40,
+                        "replacement_git_blob_sha": "b" * 40,
+                    }
+                ],
+            )
+
+    def test_manifest_bundle_rejects_duplicate_without_supersession(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            configs = root / "configs"
+            supplements = configs / "root-file-decisions.d"
+            supplements.mkdir(parents=True)
+            primary = configs / "root-file-decisions.v1.json"
+            primary.write_text(
+                json.dumps(
+                    {
+                        "schema": MOD.DECISION_SCHEMA,
+                        "decisions": [self.valid_decision("a.txt", "a" * 40)],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (supplements / "10.json").write_text(
+                json.dumps(
+                    {
+                        "schema": MOD.DECISION_SCHEMA,
+                        "decisions": [self.valid_decision("a.txt", "b" * 40)],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaises(SystemExit):
+                MOD.load_manifest_bundle(root, primary, supplements)
+
+    def test_manifest_bundle_rejects_wrong_superseded_sha(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            configs = root / "configs"
+            supplements = configs / "root-file-decisions.d"
+            supplements.mkdir(parents=True)
+            primary = configs / "root-file-decisions.v1.json"
+            replacement = self.valid_decision("a.txt", "b" * 40)
+            replacement["supersedes_git_blob_sha"] = "c" * 40
+            primary.write_text(
+                json.dumps(
+                    {
+                        "schema": MOD.DECISION_SCHEMA,
+                        "decisions": [self.valid_decision("a.txt", "a" * 40)],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (supplements / "10.json").write_text(
+                json.dumps(
+                    {"schema": MOD.DECISION_SCHEMA, "decisions": [replacement]}
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaises(SystemExit):
+                MOD.load_manifest_bundle(root, primary, supplements)
+
     def test_manifest_bundle_rejects_bad_supplement_schema(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -117,7 +227,8 @@ class RootFileDecisionTests(unittest.TestCase):
             supplements.mkdir(parents=True)
             primary = configs / "root-file-decisions.v1.json"
             primary.write_text(
-                json.dumps({"schema": MOD.DECISION_SCHEMA, "decisions": []}), encoding="utf-8"
+                json.dumps({"schema": MOD.DECISION_SCHEMA, "decisions": []}),
+                encoding="utf-8",
             )
             (supplements / "bad.json").write_text(
                 json.dumps({"schema": "wrong", "decisions": []}), encoding="utf-8"

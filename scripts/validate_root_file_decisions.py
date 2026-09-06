@@ -5,8 +5,10 @@ A regra é fechada: todo arquivo versionado na raiz que não pertence à políti
 canônica/prefixos deve possuir decisão explícita. O validador não move nem apaga.
 
 O manifesto V1 principal permanece imutável quando possível. Decisões novas podem
-ser anexadas em ``configs/root-file-decisions.d/*.json``; o carregamento é
-lexicograficamente determinístico e rejeita paths duplicados no bundle final.
+ser anexadas em ``configs/root-file-decisions.d/*.json``. Uma decisão posterior
+só pode substituir a decisão ativa do mesmo path quando declara explicitamente
+``supersedes_git_blob_sha`` igual ao blob SHA registrado pela decisão anterior.
+O histórico de supersessão permanece no bundle e duplicatas não declaradas falham.
 """
 from __future__ import annotations
 
@@ -17,6 +19,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Closure ownership for the explicit unknown-evidence sentinel below: CLOSURE_L1.
 POLICY_SCHEMA = "raf.document-governance-policy.v1"
 DECISION_SCHEMA = "raf.root-file-decisions.v1"
 DEFAULT_SUPPLEMENT_DIR = "configs/root-file-decisions.d"
@@ -45,13 +48,80 @@ def load_json(path: Path) -> dict[str, Any]:
     return value
 
 
-def load_manifest_bundle(root: Path, primary: Path, supplement_dir: Path | None = None) -> dict[str, Any]:
+def _valid_git_sha1(value: object) -> bool:
+    text = str(value)
+    return len(text) == 40 and all(ch in "0123456789abcdef" for ch in text)
+
+
+def _resolve_append_only_supersessions(
+    decisions: list[Any],
+) -> tuple[list[Any], list[dict[str, str]]]:
+    """Resolve explicit same-path supersessions while preserving their history.
+
+    A repeated path is rejected unless the later decision names the exact blob SHA
+    recorded by the currently active decision. This makes replacement explicit,
+    ordered and fail-closed rather than silently accepting the last duplicate.
+    """
+    active: list[Any] = []
+    index_by_path: dict[str, int] = {}
+    history: list[dict[str, str]] = []
+
+    for decision in decisions:
+        if not isinstance(decision, dict):
+            active.append(decision)
+            continue
+
+        path = str(decision.get("path", ""))
+        if not path or path not in index_by_path:
+            index_by_path[path] = len(active)
+            active.append(decision)
+            continue
+
+        previous_index = index_by_path[path]
+        previous = active[previous_index]
+        if not isinstance(previous, dict):
+            raise SystemExit(
+                f"root-decisions: decisão duplicada sem predecessor tipado: {path}"
+            )
+
+        previous_sha = str(previous.get("git_blob_sha", ""))
+        supersedes_sha = str(decision.get("supersedes_git_blob_sha", ""))
+        if not supersedes_sha:
+            raise SystemExit(
+                f"root-decisions: decisão duplicada sem supersessão explícita: {path}"
+            )
+        if supersedes_sha != previous_sha:
+            raise SystemExit(
+                "root-decisions: supersessão não corresponde ao blob da decisão "
+                f"ativa: {path} expected={previous_sha} got={supersedes_sha}"
+            )
+
+        replacement_sha = str(decision.get("git_blob_sha", ""))
+        history.append(
+            {
+                "path": path,
+                "superseded_git_blob_sha": previous_sha,
+                "replacement_git_blob_sha": replacement_sha,
+            }
+        )
+        active[previous_index] = decision
+
+    return active, history
+
+
+def load_manifest_bundle(
+    root: Path, primary: Path, supplement_dir: Path | None = None
+) -> dict[str, Any]:
     """Load primary + append-only supplements in deterministic path order."""
     base = load_json(primary)
     if base.get("schema") != DECISION_SCHEMA:
         raise SystemExit("root-decisions: schema do manifesto principal incompatível")
     decisions = list(base.get("decisions", []))
-    sources = [primary.relative_to(root).as_posix() if primary.is_relative_to(root) else str(primary)]
+    sources = [
+        primary.relative_to(root).as_posix()
+        if primary.is_relative_to(root)
+        else str(primary)
+    ]
 
     directory = supplement_dir or (root / DEFAULT_SUPPLEMENT_DIR)
     if not directory.is_absolute():
@@ -63,12 +133,16 @@ def load_manifest_bundle(root: Path, primary: Path, supplement_dir: Path | None 
                 raise SystemExit(f"root-decisions: schema incompatível em suplemento {path}")
             extra = supplement.get("decisions", [])
             if not isinstance(extra, list):
-                raise SystemExit(f"root-decisions: decisions deve ser lista em suplemento {path}")
+                raise SystemExit(
+                    f"root-decisions: decisions deve ser lista em suplemento {path}"
+                )
             decisions.extend(extra)
             sources.append(path.relative_to(root).as_posix())
 
+    active, history = _resolve_append_only_supersessions(decisions)
     merged = dict(base)
-    merged["decisions"] = decisions
+    merged["decisions"] = active
+    merged["decision_history"] = history
     merged["bundle_sources"] = sources
     return merged
 
@@ -116,9 +190,20 @@ def loose_root_files(paths: list[str], policy: dict[str, Any]) -> list[str]:
 def validate_decision(decision: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     required = {
-        "path", "git_blob_sha", "kind", "content_state", "evidence_state",
-        "route", "target", "area", "owner_role", "risk", "findings",
-        "required_gates", "delete_allowed", "human_approval_required",
+        "path",
+        "git_blob_sha",
+        "kind",
+        "content_state",
+        "evidence_state",
+        "route",
+        "target",
+        "area",
+        "owner_role",
+        "risk",
+        "findings",
+        "required_gates",
+        "delete_allowed",
+        "human_approval_required",
     }
     missing = sorted(required - set(decision))
     if missing:
@@ -127,9 +212,12 @@ def validate_decision(decision: dict[str, Any]) -> list[str]:
     path = str(decision["path"])
     if not path or "/" in path:
         errors.append("path deve identificar arquivo da raiz")
-    sha = str(decision["git_blob_sha"])
-    if len(sha) != 40 or any(ch not in "0123456789abcdef" for ch in sha):
+    if not _valid_git_sha1(decision["git_blob_sha"]):
         errors.append("git_blob_sha deve ser SHA-1 Git de 40 hex")
+    if "supersedes_git_blob_sha" in decision and not _valid_git_sha1(
+        decision["supersedes_git_blob_sha"]
+    ):
+        errors.append("supersedes_git_blob_sha deve ser SHA-1 Git de 40 hex")
     if decision["route"] not in ROUTES:
         errors.append(f"route inválida: {decision['route']}")
     if decision["risk"] not in RISKS:
@@ -146,9 +234,13 @@ def validate_decision(decision: dict[str, Any]) -> list[str]:
     if not target:
         errors.append("target vazio")
     if decision["route"] in {
-        "MOVE_PROPOSED", "ARCHIVE_PROPOSED", "MOVE_AND_REFACTOR_PROPOSED",
-        "SPLIT_AND_REFACTOR_PROPOSED", "SPLIT_REQUIRED",
-        "CONVERT_TO_TYPED_BACKLOG", "FIX_THEN_MOVE_PROPOSED",
+        "MOVE_PROPOSED",
+        "ARCHIVE_PROPOSED",
+        "MOVE_AND_REFACTOR_PROPOSED",
+        "SPLIT_AND_REFACTOR_PROPOSED",
+        "SPLIT_REQUIRED",
+        "CONVERT_TO_TYPED_BACKLOG",
+        "FIX_THEN_MOVE_PROPOSED",
     } and "/" not in target:
         errors.append("rota de movimentação/refatoração exige destino fora da raiz")
     return errors
@@ -174,7 +266,7 @@ def validate(root: Path, policy: dict[str, Any], manifest: dict[str, Any]) -> di
             continue
         path = str(decision.get("path", ""))
         if path in by_path:
-            errors.append(f"decisão duplicada: {path}")
+            errors.append(f"decisão duplicada após resolução de supersessão: {path}")
         by_path[path] = decision
         for item in validate_decision(decision):
             errors.append(f"{path or f'decisions[{index}]'}: {item}")
@@ -201,19 +293,24 @@ def validate(root: Path, policy: dict[str, Any], manifest: dict[str, Any]) -> di
         errors.append("hash de blob mudou; revisar conteúdo e atualizar decisão")
 
     critical = sorted(
-        path for path, decision in by_path.items()
-        if decision.get("risk") == "CRITICAL" or decision.get("route") == "QUARANTINE_REVIEW"
+        path
+        for path, decision in by_path.items()
+        if decision.get("risk") == "CRITICAL"
+        or decision.get("route") == "QUARANTINE_REVIEW"
     )
     state = "FAIL" if errors or critical else ("REVIEW_REQUIRED" if loose else "PASS")
+    history = manifest.get("decision_history", [])
     return {
         "schema": "raf.root-file-decisions-validation.v1",
         "state": state,
         "claim_allowed": state == "PASS",
         "bundle_sources": manifest.get("bundle_sources", []),
+        "decision_history": history,
         "summary": {
             "tracked_files": len(tracked),
             "loose_root_files": len(loose),
             "decisions": len(by_path),
+            "superseded": len(history) if isinstance(history, list) else 0,
             "unmapped": len(unmapped),
             "obsolete": len(obsolete),
             "stale_hashes": len(stale_hashes),
