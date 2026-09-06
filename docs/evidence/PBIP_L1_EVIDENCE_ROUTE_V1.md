@@ -6,6 +6,9 @@
 - `state`: `ROUTE_DEFINED / EXECUTION_PENDING`
 - `claim_allowed`: `false`
 - `date`: `2026-09-06`
+- `governance_closure`: `CLOSURE_L1`
+
+Governance anchor: `CLOSURE_L1`. This closure binds missing provenance/toolchain/hash/runtime evidence to governance without promoting the material gap.
 
 ## Purpose
 
@@ -44,7 +47,7 @@ reproduced: false
 claim_allowed: false
 ```
 
-`TOKEN_VAZIO` is not zero, false, or failure; it records an unfilled evidence slot.
+`TOKEN_VAZIO` is not zero, false, or failure; it records an unfilled evidence slot governed here by `CLOSURE_L1` until a concrete receipt fills the field.
 
 ## Finite route
 
@@ -86,5 +89,5 @@ RLL -> cross-domain consumer reference, no physical implication
 ## R3
 
 - `F_ok`: receipt schema and deterministic test vectors are fixed.
-- `F_gap`: no build/runtime/artifact hashes exist yet.
+- `F_gap`: no build/runtime/artifact hashes exist yet; gaps remain explicitly governed by `CLOSURE_L1`.
 - `F_next`: a concrete consumer must emit a receipt using this schema.
