@@ -10,8 +10,8 @@ Before editing L0:
 
 1. repository `AGENTS.md` and `docs/AGENTES.md`;
 2. this file;
-3. `README.md`, `ARCH_CONTRACT.md`, `FLAGS.md`, `NO_SHADOW_NO_TAIL.md`;
-4. `COMMENT_CONTRACT.md`, `STUB_POLICY.md`, `GAPS.md`;
+3. `README.md`, `ARCH_CONTRACT.md`, `ABI_CONTRACT.md`, `REGISTER_TOPOLOGY.md`;
+4. `FLAGS.md`, `NO_SHADOW_NO_TAIL.md`, `COMMENT_CONTRACT.md`, `STUB_POLICY.md`, `GAPS.md`;
 5. the tests/gates under `freestanding/tests/`.
 
 ## Non-negotiable L0 invariants
@@ -33,6 +33,9 @@ external hot helper    = 0
 - A branch used only for value selection should prefer mask/select lowering when the generated code is better or equal. A branch may transfer ownership to the next pipeline stage.
 - Never introduce a compatibility loop merely to consume residual lanes. Residual ownership must stay explicit.
 - Do not raise the baseline ISA silently. NEON/SVE/SME, SSE/AVX/AVX-512/AMX and RVV are explicit build profiles.
+- Do not confuse ISA profiles with host ABI. SysV, Windows x64, AAPCS/EABI and OS entry/exit rules stay outside generic L0.
+- Register aliases are geometry views, not independent storage: XMM/YMM/ZMM, S/D/Q, V/Q/D/S/H/B and similar families must not be double-counted.
+- Privileged/control/debug/PMU/virtualization/security registers may be described as topology but generic L0 must not access them without a separately gated privilege contract.
 
 ## Stub rule
 
@@ -74,14 +77,16 @@ Comments are part of the engineering contract: update them in the same change wh
 
 ## Required gates
 
-For a source change, run when available:
+For a source change, run when applicable:
 
 ```sh
 sh freestanding/tests/verify_contract.sh
 sh freestanding/tests/verify_matrix.sh
+sh freestanding/tests/verify_profiles.sh
+sh freestanding/tests/verify_scalable.sh
 ```
 
-For codegen-sensitive changes, also inspect the generated object/assembly for unexpected calls, branches, stack traffic and unresolved helpers.
+`verify_profiles.sh` owns fixed-vector AVX2/AVX-512/NEON/Advanced-SIMD codegen checks. `verify_scalable.sh` owns SVE/RVV one-stage predicate/VL checks. Codegen-sensitive changes must reject unexpected calls, stack traffic and unresolved helpers rather than documenting them away.
 
 Do not call a physical architecture/runtime proven until a same-scope receipt exists. `TOKEN_VAZIO (CLOSURE_L12)` is valid and preferable to an invented PASS.
 
