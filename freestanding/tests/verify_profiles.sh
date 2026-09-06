@@ -1,0 +1,68 @@
+#!/bin/sh
+set -eu
+
+CC=${CC:-clang}
+NM=${NM:-nm}
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
+SRC="$ROOT/freestanding/tests/vector_probe.c"
+OUT=${TMPDIR:-/tmp}/rafaelia-fs-profiles
+mkdir -p "$OUT"
+
+COMMON="-ffreestanding -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-ident -fomit-frame-pointer -Os"
+
+compile_profile() {
+    name=$1
+    target=$2
+    flags=$3
+    marker=$4
+    obj="$OUT/$name.o"
+    asm="$OUT/$name.s"
+
+    "$CC" -target "$target" $COMMON $flags -I"$ROOT/freestanding" -c "$SRC" -o "$obj"
+    "$CC" -target "$target" $COMMON $flags -I"$ROOT/freestanding" -S "$SRC" -o "$asm"
+
+    if "$NM" -u "$obj" | grep -q .; then
+        printf '%s\n' "FAIL: $name has unresolved external helper(s)"
+        "$NM" -u "$obj"
+        exit 1
+    fi
+
+    if grep -E -q '(^|[[:space:]])(call|callq|bl|blx)[[:space:]]' "$asm"; then
+        printf '%s\n' "FAIL: $name contains external/internal call instruction"
+        grep -E -n '(^|[[:space:]])(call|callq|bl|blx)[[:space:]]' "$asm"
+        exit 1
+    fi
+
+    if grep -E -q '(%rsp|%rbp|%esp|%ebp|[[:space:]]sp,|\[sp|push[lq]?[[:space:]]|pop[lq]?[[:space:]])' "$asm"; then
+        printf '%s\n' "FAIL: $name probe contains stack traffic"
+        grep -E -n '(%rsp|%rbp|%esp|%ebp|[[:space:]]sp,|\[sp|push[lq]?[[:space:]]|pop[lq]?[[:space:]])' "$asm"
+        exit 1
+    fi
+
+    if ! grep -q "$marker" "$asm"; then
+        printf '%s\n' "FAIL: $name did not emit expected vector register class marker: $marker"
+        exit 1
+    fi
+
+    if [ "$name" = "x86_64-avx512" ]; then
+        if ! grep -E -q '(%k1|[[:space:]]k1)' "$asm"; then
+            printf '%s\n' "FAIL: x86_64-avx512 did not emit native K-mask register k1"
+            exit 1
+        fi
+        if ! grep -E -q 'vmovdqu32.*\{.*%?k1.*\}' "$asm"; then
+            printf '%s\n' "FAIL: x86_64-avx512 did not emit masked vmovdqu32 memory operation"
+            exit 1
+        fi
+    fi
+
+    printf '%s\n' "PASS: $name"
+}
+
+compile_profile x86_64-sse2 x86_64-unknown-none "-msse2 -mno-red-zone" 'xmm0'
+compile_profile i686-sse2 i686-unknown-none "-march=i686 -msse2 -mregparm=3" 'xmm0'
+compile_profile x86_64-avx2 x86_64-unknown-none "-mavx2 -mno-red-zone -mno-vzeroupper" 'ymm0'
+compile_profile x86_64-avx512 x86_64-unknown-none "-mavx512f -mno-red-zone -mno-vzeroupper" 'zmm0'
+compile_profile armv7-neon armv7a-none-eabi "-march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=softfp" 'd0'
+compile_profile aarch64-neon aarch64-none-elf "-march=armv8-a" 'q0'
+
+printf '%s\n' "RAFAELIA OS-neutral fixed-vector profiles: 6/6 PASS"

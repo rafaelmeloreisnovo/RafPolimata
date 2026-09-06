@@ -31,11 +31,13 @@ compile() {
     fi
 }
 
-compile x86_64-linux-gnu
-compile i686-linux-gnu
-compile armv7a-linux-gnueabihf
-compile aarch64-linux-gnu
-compile riscv32-linux-gnu
-compile riscv64-linux-gnu
+# L0 proves architecture independence with OS-neutral triples. Linux ABI triples
+# are intentionally reserved for syscall/tests, outside freestanding/.
+compile x86_64-unknown-none
+compile i686-unknown-none
+compile armv7a-none-eabi
+compile aarch64-none-elf
+compile riscv32-unknown-elf
+compile riscv64-unknown-elf
 
-printf '%s\n' "RAFAELIA freestanding compile/helper matrix: 6/6 PASS; unresolved helpers=0"
+printf '%s\n' "RAFAELIA freestanding OS-neutral compile/helper matrix: 6/6 PASS; unresolved helpers=0"
