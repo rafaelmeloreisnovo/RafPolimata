@@ -1,153 +1,157 @@
 # Índice Canônico de Documentação — RafPolimata
 
-> **Entrada canônica:** docs/AGENTES.md §1 (leitura rápida) e §8 (entradas canônicas por subsistema). Índice curado de toda a documentação — regra de leitura README→INDEX→área→código e 10 seções temáticas com estados CANONICAL/REFERENCE/AUDIT.
+> **Observed base:** `main@9ed0b8aa93dfb5350b7dbeb9ea1e712ee1298388`  
+> **Estado:** `CANONICAL`  
+> **Regra:** `README → CURRENT_DOCUMENTATION_STATE → INDEX → área → source/evidence`
 
-**Papel:** entrada curada para documentação técnica, operacional, científica, jurídica e de governança.  
-**Estado:** `CANONICAL`  
-**Catálogo completo:** `generated/DOCUMENT_GOVERNANCE_INDEX.md`
+## 1. Entrada canônica corrente
 
-## Regra de leitura
+| Documento | Papel | Estado |
+|---|---|---|
+| [`../README.md`](../README.md) | router curto do repositório | `CANONICAL` |
+| [`CURRENT_DOCUMENTATION_STATE_2026-09-06.md`](CURRENT_DOCUMENTATION_STATE_2026-09-06.md) | corte atual source↔docs↔evidence | `CANONICAL_CURRENT_ROUTER` |
+| [`AGENTES.md`](AGENTES.md) | invariantes operacionais | `CANONICAL` |
+| [`DOCUMENT_GOVERNANCE.md`](DOCUMENT_GOVERNANCE.md) | identidade, lifecycle, risco, fila e geração | `CANONICAL` |
+| [`MAPA_ESTRUTURAL_REPOSITORIO.md`](MAPA_ESTRUTURAL_REPOSITORIO.md) | disposição estrutural | `CANONICAL` |
+| [`URGENCY_GATE_GAP_20260906.md`](URGENCY_GATE_GAP_20260906.md) | snapshot append-only de gates/gaps | `AUDIT` |
+| [`DOCUMENTATION_AUDIT_RECEIPT_2026-09-06.md`](DOCUMENTATION_AUDIT_RECEIPT_2026-09-06.md) | proveniência da reconciliação docs-only | `AUDIT` |
 
 ```text
-README.md
-→ docs/INDEX.md
-→ documento de área
-→ código/configuração/teste/evidência relacionado
+indexado != validado
+source != execution != evidence != runtime/device proof
+TOKEN_VAZIO != FAIL != PASS
 ```
 
-A presença neste índice significa que o documento possui rota conhecida. Não significa que todas as afirmações estejam validadas em runtime.
+## 2. Freestanding L0 / arquitetura de baixo nível
 
-## 1. Entrada e governança de trabalho
-
-| Documento | Função | Estado de uso |
+| Documento/rota | Papel | Limite |
 |---|---|---|
-| [README.md](README.md) | router curto da árvore `docs/` | `CANONICAL_ROUTER` |
-| [AGENTES.md](AGENTES.md) | guia operacional para agentes humanos e IA | `CANONICAL` |
-| [AGENTES_CHECKLIST.md](AGENTES_CHECKLIST.md) | checklist de início, execução e encerramento | `REFERENCE` |
-| [AGENTES_DECISAO_LOG.md](AGENTES_DECISAO_LOG.md) | decisões, conflitos e escalações | `AUDIT` |
-| [DOCUMENT_GOVERNANCE.md](DOCUMENT_GOVERNANCE.md) | catálogo, indexação, ciclo de vida, risco e promoção | `CANONICAL` |
-| [ROOT_LOOSE_FILES_REVIEW.md](ROOT_LOOSE_FILES_REVIEW.md) | análise e rota de cada arquivo solto da raiz | `AUDIT/REVIEW_REQUIRED` |
-| [MAPA_ESTRUTURAL_REPOSITORIO.md](MAPA_ESTRUTURAL_REPOSITORIO.md) | disposição física e estados por diretório | `CANONICAL` |
-| [SAFE_EXTENDED_LOCAL_CI.md](SAFE_EXTENDED_LOCAL_CI.md) | execução local de workflows no Termux | `REFERENCE` |
+| [`../freestanding/CANONICAL.md`](../freestanding/CANONICAL.md) | aponta o first-cut core canônico | source contract |
+| `freestanding/include/raf_fs_core.h` | header L0 canônico observado em fonte | physical runtime separado |
+| [`ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md`](ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md) | roadmap docs↔source e gates atuais | não é receipt runtime |
+| `freestanding/AGENTS.md` | contrato de manutenção L0 | escopo freestanding |
+| `syscall/AGENTS.md` | fronteira separada de syscall/OS ABI | não fundir com L0 |
 
-## 2. Arquitetura e metodologia
+Estado editorial corrente: source/codegen avançou para múltiplos perfis de ABI/vetor, mas metadata-only não vira executor e codegen não vira device proof.
 
-| Documento | Função |
-|---|---|
-| [ARQUITETURA_21_NIVEIS.md](ARQUITETURA_21_NIVEIS.md) | arquitetura semântica em 21 níveis |
-| [RAFAELIA_MULTIFILAMENT_EXECUTION_CONTRACT_V1.md](RAFAELIA_MULTIFILAMENT_EXECUTION_CONTRACT_V1.md) | contrato produtor RafPolimata → Vectras, com proveniência, handoff, rollback, fail-safe e watchdog |
-| [LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md](LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md) | matriz multilíngue, operadores e promoção 0,1 por evidência |
-| [LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01_ERRATA_V1_1.md](LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01_ERRATA_V1_1.md) | corrige a escada universal: teto 0,5 e perfis próprios acima dele |
-| [LINGUAGEM/COERENCIA_COMMIT_FRACTAL_OMEGA.md](LINGUAGEM/COERENCIA_COMMIT_FRACTAL_OMEGA.md) | commits, fixture SHA-256, sete direções e fechamento Ω |
-| [LINGUAGEM/ATLAS_ARCOS_FLUXOS_LIVROS_ATOS_CRENCAS_MATEMATICA.md](LINGUAGEM/ATLAS_ARCOS_FLUXOS_LIVROS_ATOS_CRENCAS_MATEMATICA.md) | posições metodológicas, árvore canônica aberta, arcos textuais e semântica dos números |
-| [DEZ_DIMENSOES_SEMANTICAS.md](DEZ_DIMENSOES_SEMANTICAS.md) | dimensões e dinâmicas do sentido |
-| [CONVERGENCIA_UNICA_METODOLOGICA.md](CONVERGENCIA_UNICA_METODOLOGICA.md) | convergência metodológica auditável |
-| [CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md](CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md) | relações com repositórios irmãos |
-| [INFO_DYNAMICS_INTERNAL_TRACEABILITY.md](INFO_DYNAMICS_INTERNAL_TRACEABILITY.md) | rastreabilidade interna de dinâmica informacional |
-| [ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md](ROADMAP_CODIGO_DOCUMENTACAO_CONSCIENTE.md) | evolução conjunta de código e documentação |
+## 3. PBIP-L1 / evidência formal e reprodução
 
-## 3. Excelência operacional e evidência
-
-| Documento | Função | Estado |
+| Documento/artefato | Papel | Estado bounded |
 |---|---|---|
-| **[RISCO_GESTAO_FRAMEWORK_CANONICAL.md](RISCO_GESTAO_FRAMEWORK_CANONICAL.md)** | **Framework canônico de gestão de riscos em 4 camadas (acadêmica, normativa, autoral, claims), 7 gates de prevenção (G0-G7), 5 gates de detecção (D1-D5), 4 gates de remediação (R0-R3), 4 gates de melhoria (I0-I3)** | **`CANONICAL`** |
-| **[RISCO_MATRIZ_SUBSISTEMAS.md](RISCO_MATRIZ_SUBSISTEMAS.md)** | **Matriz de riscos específicos por subsistema (ApkC, Indexer, T^7, Router, Governança) com gates operacionalizáveis, remediação e priorização** | **`CANONICAL`** |
-| [OPERATIONAL_GAP_TOPOLOGY_V1.md](OPERATIONAL_GAP_TOPOLOGY_V1.md) | grafo canônico de gaps, urgências, incertezas, owners, proveniência, closures e relações técnico-comerciais | |
-| [closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md](closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md) | liga `TOKEN_VAZIO` estruturado ao grafo sem promover gaps materiais a PASS | |
-| [REPOSITORY_COMMIT_TRACKER_OMEGA.md](REPOSITORY_COMMIT_TRACKER_OMEGA.md) | rastreamento bounded de repositórios, forks, commits, shards e snapshots | |
-| [REPOSITORY_PR_CONTEXT_SIDECAR.md](REPOSITORY_PR_CONTEXT_SIDECAR.md) | sidecar de contexto temporal e semântico dos pull requests | |
-| [EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md](EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md) | governança de otimização, fallback e rollback | |
-| [ROTINA_OPERACIONAL_BENCHMARKS.md](ROTINA_OPERACIONAL_BENCHMARKS.md) | rotina de benchmark e estatística operacional | |
-| [PROTOCOLO_FALSIFICABILIDADE_PK.md](PROTOCOLO_FALSIFICABILIDADE_PK.md) | falsificabilidade mínima em P(k) | |
-| [PROTOCOLO_CANONICO_COHERENCIA.md](PROTOCOLO_CANONICO_COHERENCIA.md) | coerência, invariantes e gates | |
-| [PROTOCOLO_DOIS_CICLOS_OMEGA.md](PROTOCOLO_DOIS_CICLOS_OMEGA.md) | dois ciclos, fail-safe, failover e rollback | |
-| [DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md](DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md) | claim, fonte, ensaio, incerteza e IP | |
-| [CONCEPT_STRUCTURAL_AUDIT.md](CONCEPT_STRUCTURAL_AUDIT.md) | conceitos ligados a arquivos e lacunas | |
-| [ORQUESTRADOR_FORMAL_CIENTIFICO.md](ORQUESTRADOR_FORMAL_CIENTIFICO.md) | orquestração científica e gates dimensionais | |
+| [`evidence/PBIP_L1_EVIDENCE_ROUTE_V1.md`](evidence/PBIP_L1_EVIDENCE_ROUTE_V1.md) | rota humana de evidência | `CROSS_IMPLEMENTATION_REPRODUCED / PROVIDER_DEVICE_PENDING` após reconciliação |
+| `../evidence/pbip/PBIP_L1_CI_RECEIPT_20260906_RUN34025698586.v1.json` | primeiro receipt Vectras executado | provider-bound |
+| `../evidence/pbip/PBIP_L1_CROSS_IMPLEMENTATION_REPRODUCTION_20260906.v1.json` | comparação Java vs C11 freestanding | cross-implementation reproduction proven; provider/device open |
+| [`URGENCY_GATE_GAP_20260906.md`](URGENCY_GATE_GAP_20260906.md) | fechamento e gaps atuais do snapshot | `claim_allowed=false` |
 
-## 4. ApkC e baixo nível Android
+Não promover `provider_independent_reproduction`, Android runtime ou device proof sem receipt próprio.
 
-| Documento | Função | Limite atual |
+## 4. Arquitetura, metodologia e linguagem
+
+- `ARQUITETURA_21_NIVEIS.md`
+- `RAFAELIA_MULTIFILAMENT_EXECUTION_CONTRACT_V1.md`
+- `LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01.md`
+- `LINGUAGEM/MATRIZ_POLIMATA_TOKEN_VAZIO_01_ERRATA_V1_1.md`
+- `LINGUAGEM/COERENCIA_COMMIT_FRACTAL_OMEGA.md`
+- `LINGUAGEM/ATLAS_ARCOS_FLUXOS_LIVROS_ATOS_CRENCAS_MATEMATICA.md`
+- `DEZ_DIMENSOES_SEMANTICAS.md`
+- `CONVERGENCIA_UNICA_METODOLOGICA.md`
+- `CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md`
+- `INFO_DYNAMICS_INTERNAL_TRACEABILITY.md`
+
+## 5. Excelência operacional, risco e evidência
+
+- `RISCO_GESTAO_FRAMEWORK_CANONICAL.md`
+- `RISCO_MATRIZ_SUBSISTEMAS.md`
+- `OPERATIONAL_GAP_TOPOLOGY_V1.md`
+- `REPOSITORY_COMMIT_TRACKER_OMEGA.md`
+- `REPOSITORY_PR_CONTEXT_SIDECAR.md`
+- `EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md`
+- `ROTINA_OPERACIONAL_BENCHMARKS.md`
+- `PROTOCOLO_FALSIFICABILIDADE_PK.md`
+- `PROTOCOLO_CANONICO_COHERENCIA.md`
+- `PROTOCOLO_DOIS_CICLOS_OMEGA.md`
+- `DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md`
+- `CONCEPT_STRUCTURAL_AUDIT.md`
+- `ORQUESTRADOR_FORMAL_CIENTIFICO.md`
+
+## 6. ApkC / Android / runtime
+
+- `APKC_STRUCTURE.md`
+- `APKC_PROTOCOL.md`
+- `APKC_VALUE_AND_GAPS.md`
+- `APKC_FLAGS_LIMITS_AND_COMMANDS.md`
+- `APKC_FIRST_PART_EXECUTION.md`
+- `LACUNAS_PROFUNDAS_MVP_PRODUTO.md`
+- `CI_COMPILER_EXCELLENCE/README.md`
+- `RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md`
+- `MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md`
+
+Current-artifact ApkC provenance and physical runtime remain evidence-gated as recorded in the urgency matrix.
+
+## 7. Ciência, pesquisa e publicação
+
+- bibliography/science engine routes described by current README and subsystem docs;
+- `RAFAELIA_PAPER_MARKET_7_VECTORS.md`;
+- `PROTOCOLO_FALSIFICABILIDADE_PK.md`;
+- PBIP route in section 3.
+
+Engineering reproduction does not automatically establish scientific novelty or independent peer review.
+
+## 8. Jurídico, licença, segurança e padrões
+
+- `legal/README.md`
+- `MATRIZ_JURIDICO_TECNOLOGICA.md`
+- `LICENCAS_COMPARADAS.md`
+- `LICENSE_DECISION_RECORD.md`
+- `../.github/SECURITY.md`
+- `ATRATORES_42_JURIDICOS.md`
+- `BASES_SUPRALEGAIS_E_PADROES.md`
+- `IA_AGENTE_HUMANOS_TECNICO_FORMALIDADE.md`
+
+These documents are technical/governance material and do not constitute external certification or legal advice.
+
+## 9. Generated governance outputs — strict handling
+
+| Output | Historical state at observed base | Editing rule |
 |---|---|---|
-| [APKC_STRUCTURE.md](APKC_STRUCTURE.md) | estrutura do micro-toolchain | implementação estrutural |
-| [APKC_PROTOCOL.md](APKC_PROTOCOL.md) | contrato de APK/AXML/DEX/ELF | runtime parcial |
-| [APKC_VALUE_AND_GAPS.md](APKC_VALUE_AND_GAPS.md) | valor e lacunas | não é valuation certificado |
-| [APKC_FLAGS_LIMITS_AND_COMMANDS.md](APKC_FLAGS_LIMITS_AND_COMMANDS.md) | flags, limites e comandos | validar por versão |
-| [APKC_FIRST_PART_EXECUTION.md](APKC_FIRST_PART_EXECUTION.md) | fechamento inicial de toolchain/ELF/DEX | execução Termux pendente |
-| [LACUNAS_PROFUNDAS_MVP_PRODUTO.md](LACUNAS_PROFUNDAS_MVP_PRODUTO.md) | mapa de lacunas técnicas | estados precisam reconciliar artefatos |
-| [CI_COMPILER_EXCELLENCE/README.md](CI_COMPILER_EXCELLENCE/README.md) | gates de compilador | evidência por run |
+| `generated/DOCUMENT_GOVERNANCE_INDEX.md` | generated from commit `ff000ab...`; `REVIEW_REQUIRED` | **do not edit manually** |
+| `generated/DOCUMENT_REVIEW_QUEUE.md` | derived | regenerate |
+| `../results/document-governance/summary.json` | historical `ff000ab...` summary | regenerate |
+| `../results/document-governance/catalog.jsonl` | observed empty at current base | generator reconciliation required |
 
-## 5. Runtime e segmentação
+The historical generated summary reports 1,356 governed records, 1,265 relations and 841 review-queue items. Those values describe the historical generated cut, not current-main completeness.
 
-| Documento | Função |
+```text
+current generated governance state = TOKEN_VAZIO_REGEN_REQUIRED
+strict governance PASS             = not claimed
+```
+
+## 10. Lifecycle states
+
+| State | Meaning |
 |---|---|
-| [RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md](RUNTIME_TRUTH_LOCAL_VALIDATION_2026-07-18.md) | validação local registrada |
-| [MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md](MANIFESTO_CANONICO_EVIDENCIA_SEGMENTACAO_QUATRO_CORPOS_V1_1.md) | contrato de segmentação e evidência |
+| `CANONICAL` | official governance entry |
+| `ACTIVE` | in-use document/source |
+| `REFERENCE` | explanation/specification |
+| `AUDIT` | decision/evidence trail |
+| `EVIDENCE` | result tied to test/command/receipt |
+| `GENERATED` | derived; regenerate, do not hand-edit |
+| `PENDING` | content exists without sufficient gate |
+| `TOKEN_VAZIO` | evidence absent/insufficient |
 
-## 6. Jurídico, licenças, segurança e padrões
+## 11. Generator route
 
-| Documento | Função |
-|---|---|
-| **[legal/README.md](legal/README.md)** | **router do Legal & Service Assurance Pack V1: licença autoral escopada, MSA/SOW, LGPD/GDPR, transferência internacional, segurança, fornecedores e gates máquina-legíveis** |
-| [MATRIZ_JURIDICO_TECNOLOGICA.md](MATRIZ_JURIDICO_TECNOLOGICA.md) | matriz jurídico-tecnológica |
-| [LICENCAS_COMPARADAS.md](LICENCAS_COMPARADAS.md) | comparação de licenças e termos |
-| [LICENSE_DECISION_RECORD.md](LICENSE_DECISION_RECORD.md) | decisão P0 fail-closed sobre licença raiz + decisão escopada de módulo |
-| [SECURITY.md](../.github/SECURITY.md) | política de disclosure e fronteira explícita do canal privado |
-| [ATRATORES_42_JURIDICOS.md](ATRATORES_42_JURIDICOS.md) | framework de atratores jurídicos |
-| [BASES_SUPRALEGAIS_E_PADROES.md](BASES_SUPRALEGAIS_E_PADROES.md) | bases supralegais e padrões técnicos |
-| [IA_AGENTE_HUMANOS_TECNICO_FORMALIDADE.md](IA_AGENTE_HUMANOS_TECNICO_FORMALIDADE.md) | protocolo IA↔humanos |
-
-> Estes documentos não substituem parecer jurídico profissional, auditoria independente ou certificação normativa.
-
-## 7. Comunicação, mercado e publicação
-
-| Documento | Função |
-|---|---|
-| [RAFAELIA_PAPER_MARKET_7_VECTORS.md](RAFAELIA_PAPER_MARKET_7_VECTORS.md) | tradução técnica e mercadológica |
-| [RELEASE_NOTES_PENDING.md](RELEASE_NOTES_PENDING.md) | pendências de release |
-| [LOGOTIPO_RAFAELIA_60COL.md](LOGOTIPO_RAFAELIA_60COL.md) | representação ASCII |
-
-## 8. Índices e filas geradas
-
-| Saída | Função | Edição manual |
-|---|---|---|
-| [generated/DOCUMENT_GOVERNANCE_INDEX.md](generated/DOCUMENT_GOVERNANCE_INDEX.md) | resumo material do catálogo | proibida; regenerar |
-| [generated/DOCUMENT_REVIEW_QUEUE.md](generated/DOCUMENT_REVIEW_QUEUE.md) | fila ordenada por risco | proibida; regenerar |
-| [generated/REPOSITORY_LOOSE_FILES_MAP.md](generated/REPOSITORY_LOOSE_FILES_MAP.md) | compatibilidade com mapa da primeira parte | regenerar pelo gate original |
-
-## 9. Estados de leitura
-
-| Estado | Interpretação |
-|---|---|
-| `CANONICAL` | entrada oficial de governança |
-| `REFERENCE` | explicação ou especificação |
-| `AUDIT` | trilha e evidência documental |
-| `EVIDENCE` | resultado ligado a teste/comando |
-| `RUNTIME` | código ou rota executável |
-| `PENDING` | conteúdo existente sem gate suficiente |
-| `TOKEN_VAZIO` | evidência ausente ou insuficiente |
-
-## 10. Comando de atualização
+The documented authoritative route remains:
 
 ```sh
-python3 -m unittest \
-  tests.test_document_governance \
-  tests.test_audit_repository_structure \
-  tests.test_validate_root_file_decisions \
-  tests.test_audit_zip_artifact \
-  tests.test_language_matrix \
-  tests.test_language_commit_evidence \
-  tests.test_repo_commit_tracker \
-  tests.test_repo_pr_context_tracker \
-  tests.test_operational_gap_topology
-
-python3 scripts/validate_root_file_decisions.py
-python3 scripts/validate_operational_gap_topology.py
-python3 scripts/language_matrix.py --state data/language/language-matrix-state.v1.json
-python3 scripts/language_commit_evidence.py
-python3 scripts/repo_commit_tracker.py --validate-only
 python3 scripts/document_governance.py --write --print-summary
 python3 scripts/document_governance.py --check --print-summary
 ```
 
-Mudanças em documentação devem atualizar este índice quando adicionarem nova entrada canônica. O catálogo gerado cobre todos os arquivos; este arquivo permanece curado para navegação humana.
+This documentation transaction does not claim those commands were executed against `9ed0b8aa...`; therefore current generated state stays `TOKEN_VAZIO_REGEN_REQUIRED`.
+
+## R3
+
+- **F_ok:** canonical index now routes current freestanding/PBIP state and explicitly separates historical generated outputs.
+- **F_gap:** full generator refresh/current review queue remains unexecuted in this docs-only transaction.
+- **F_next:** regenerate through the repository tool, then review/publish the resulting queue without manually editing derived files.
