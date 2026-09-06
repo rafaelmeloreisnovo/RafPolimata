@@ -5,11 +5,11 @@
  * RAFAELIA-L0-FILE-CONTRACT
  * PURPOSE: Fixed-vector, branchless, one-block execution primitives.
  * SCOPE: SSE2, AVX2, AVX-512F, ARMv7 NEON and AArch64 Advanced SIMD; no OS/runtime contract.
- * PRECONDITIONS: Selected compiler target enables the exact ISA profile; src/dst expose one full block.
- * REGISTER_OWNERSHIP: Inline assembly owns only the declared vector temporary; C-vector selection owns compiler temporaries.
- * CLOBBERS: Declared vector temporary plus memory for copy/zero; compiler allocates select temporaries.
+ * PRECONDITIONS: Selected compiler target enables the exact ISA profile; full-block operations expose one full block.
+ * REGISTER_OWNERSHIP: Inline assembly owns only declared vector/predicate temporaries; C-vector selection owns compiler temporaries.
+ * CLOBBERS: Declared XMM/YMM/ZMM/K or NEON temporary plus memory; compiler allocates select temporaries.
  * MEMORY_ORDER: Ordinary data access; no fence implied. Use raf_fs_arch.h ordering primitives separately.
- * TAIL_SHADOW: Exactly one complete vector block; residuals require explicit mask/full accessible block; no scalar tail/shadow.
+ * TAIL_SHADOW: Full-block paths never create scalar tail; AVX-512 residual may use K-mask bounded memory; other fixed profiles require explicit full accessible block/mask.
  * EVIDENCE: Source implementation; profile compile/codegen gates promote build evidence. CLOSURE_L11/CLOSURE_L12.
  */
 
@@ -34,6 +34,15 @@ RAF_FS_INLINE void raf_fs_vec_zero_block(void *dst) {
         "vpxord %%zmm0, %%zmm0, %%zmm0\n\t"
         "vmovdqu64 %%zmm0, (%0)"
         : : "r"(dst) : "zmm0", "memory");
+}
+/* lane_mask bit i selects u32 lane i. Inactive memory lanes are not accessed. */
+RAF_FS_INLINE void raf_fs_vec_masked_copy_u32(void *dst, const void *src, raf_u32 lane_mask) {
+    raf_u32 mask16 = lane_mask & 0xffffu;
+    __asm__ __volatile__(
+        "kmovw %k2, %%k1\n\t"
+        "vmovdqu32 (%1), %%zmm0%{%%k1%}%{z%}\n\t"
+        "vmovdqu32 %%zmm0, (%0)%{%%k1%}"
+        : : "r"(dst), "r"(src), "r"(mask16) : "k1", "zmm0", "memory");
 }
 
 #elif defined(__x86_64__) && defined(__AVX2__)
