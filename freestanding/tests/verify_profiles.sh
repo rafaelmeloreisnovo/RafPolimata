@@ -33,9 +33,9 @@ compile_profile() {
         exit 1
     fi
 
-    if grep -E -q '(%rsp|%rbp|[[:space:]]sp,|\[sp|push[lq]?[[:space:]]|pop[lq]?[[:space:]])' "$asm"; then
+    if grep -E -q '(%rsp|%rbp|%esp|%ebp|[[:space:]]sp,|\[sp|push[lq]?[[:space:]]|pop[lq]?[[:space:]])' "$asm"; then
         printf '%s\n' "FAIL: $name probe contains stack traffic"
-        grep -E -n '(%rsp|%rbp|[[:space:]]sp,|\[sp|push[lq]?[[:space:]]|pop[lq]?[[:space:]])' "$asm"
+        grep -E -n '(%rsp|%rbp|%esp|%ebp|[[:space:]]sp,|\[sp|push[lq]?[[:space:]]|pop[lq]?[[:space:]])' "$asm"
         exit 1
     fi
 
@@ -47,9 +47,11 @@ compile_profile() {
     printf '%s\n' "PASS: $name"
 }
 
+compile_profile x86_64-sse2 x86_64-linux-gnu "-msse2 -mno-red-zone" 'xmm0'
+compile_profile i686-sse2 i686-linux-gnu "-march=i686 -msse2 -mregparm=3" 'xmm0'
 compile_profile x86_64-avx2 x86_64-linux-gnu "-mavx2 -mno-red-zone -mno-vzeroupper" 'ymm0'
 compile_profile x86_64-avx512 x86_64-linux-gnu "-mavx512f -mno-red-zone -mno-vzeroupper" 'zmm0'
 compile_profile armv7-neon armv7a-linux-gnueabihf "-march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=softfp" 'd0'
 compile_profile aarch64-neon aarch64-linux-gnu "-march=armv8-a" 'q0'
 
-printf '%s\n' "RAFAELIA fixed-vector profiles: 4/4 PASS"
+printf '%s\n' "RAFAELIA fixed-vector profiles: 6/6 PASS"
