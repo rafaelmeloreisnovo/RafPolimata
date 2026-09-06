@@ -58,11 +58,11 @@ compile_profile() {
     printf '%s\n' "PASS: $name"
 }
 
-compile_profile x86_64-sse2 x86_64-linux-gnu "-msse2 -mno-red-zone" 'xmm0'
-compile_profile i686-sse2 i686-linux-gnu "-march=i686 -msse2 -mregparm=3" 'xmm0'
-compile_profile x86_64-avx2 x86_64-linux-gnu "-mavx2 -mno-red-zone -mno-vzeroupper" 'ymm0'
-compile_profile x86_64-avx512 x86_64-linux-gnu "-mavx512f -mno-red-zone -mno-vzeroupper" 'zmm0'
-compile_profile armv7-neon armv7a-linux-gnueabihf "-march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=softfp" 'd0'
-compile_profile aarch64-neon aarch64-linux-gnu "-march=armv8-a" 'q0'
+compile_profile x86_64-sse2 x86_64-unknown-none "-msse2 -mno-red-zone" 'xmm0'
+compile_profile i686-sse2 i686-unknown-none "-march=i686 -msse2 -mregparm=3" 'xmm0'
+compile_profile x86_64-avx2 x86_64-unknown-none "-mavx2 -mno-red-zone -mno-vzeroupper" 'ymm0'
+compile_profile x86_64-avx512 x86_64-unknown-none "-mavx512f -mno-red-zone -mno-vzeroupper" 'zmm0'
+compile_profile armv7-neon armv7a-none-eabi "-march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=softfp" 'd0'
+compile_profile aarch64-neon aarch64-none-elf "-march=armv8-a" 'q0'
 
-printf '%s\n' "RAFAELIA fixed-vector profiles: 6/6 PASS"
+printf '%s\n' "RAFAELIA OS-neutral fixed-vector profiles: 6/6 PASS"
