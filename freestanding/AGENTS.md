@@ -34,8 +34,9 @@ external hot helper    = 0
 - Never introduce a compatibility loop merely to consume residual lanes. Residual ownership must stay explicit.
 - Do not raise the baseline ISA silently. NEON/SVE/SME, SSE/AVX/AVX-512/AMX and RVV are explicit build profiles.
 - Do not confuse ISA profiles with host ABI. SysV, Windows x64, AAPCS/EABI and OS entry/exit rules stay outside generic L0.
-- Register aliases are geometry views, not independent storage: XMM/YMM/ZMM, S/D/Q, V/Q/D/S/H/B and similar families must not be double-counted.
+- Register aliases are geometry views, not independent storage: XMM/YMM/ZMM, S/D/Q, V/Q/D/S/H/B, FPR/VR/VSR and similar families must not be double-counted.
 - Privileged/control/debug/PMU/virtualization/security registers may be described as topology but generic L0 must not access them without a separately gated privilege contract.
+- Metadata compilation is not executor evidence. POWER/LoongArch/s390x metadata may be build-proven while their instruction executors remain `TOKEN_VAZIO (CLOSURE_L11)`.
 
 ## Stub rule
 
@@ -84,9 +85,16 @@ sh freestanding/tests/verify_contract.sh
 sh freestanding/tests/verify_matrix.sh
 sh freestanding/tests/verify_profiles.sh
 sh freestanding/tests/verify_scalable.sh
+sh freestanding/tests/verify_matrix_accel.sh
+sh freestanding/tests/verify_register_metadata.sh
 ```
 
-`verify_profiles.sh` owns fixed-vector AVX2/AVX-512/NEON/Advanced-SIMD codegen checks. `verify_scalable.sh` owns SVE/RVV one-stage predicate/VL checks. Codegen-sensitive changes must reject unexpected calls, stack traffic and unresolved helpers rather than documenting them away.
+- `verify_profiles.sh`: SSE2/AVX2/AVX-512/K/NEON/Advanced-SIMD fixed-vector codegen.
+- `verify_scalable.sh`: SVE/RVV one-stage predicate/VL codegen.
+- `verify_matrix_accel.sh`: direct AMX TMM and SME ZA register ownership/codegen; it does not imply complete matrix data paths.
+- `verify_register_metadata.sh`: POWER64/LoongArch64/s390x metadata only; it must never be reported as executor PASS.
+
+Codegen-sensitive changes must reject unexpected calls, stack traffic and unresolved helpers rather than documenting them away.
 
 Do not call a physical architecture/runtime proven until a same-scope receipt exists. `TOKEN_VAZIO (CLOSURE_L12)` is valid and preferable to an invented PASS.
 
