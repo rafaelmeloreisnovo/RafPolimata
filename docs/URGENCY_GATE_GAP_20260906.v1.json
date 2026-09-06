@@ -1,0 +1,29 @@
+{
+  "schema": "rafaelia.urgency-gate-gap.v1",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "observed_main": "820e7ea29bebbf0154ea245d401f691715fea5d8",
+  "date": "2026-09-06",
+  "append_only_snapshot": true,
+  "claim_allowed": false,
+  "invariants": [
+    "SOURCE_OBSERVED!=IMPLEMENTED!=BUILD_PROVEN!=RUNTIME_PROVEN!=DEVICE_PROVEN!=REPRODUCED",
+    "TOKEN_VAZIO!=FAIL!=PASS"
+  ],
+  "items": [
+    {"id":"RP-U0-01","urgency":"U0","surface":"github-governance","state":"UNPROTECTED_OBSERVED","gap":"main protection/ruleset enforcement not active in observed response","gate":"provider policy apply plus independent readback","evidence_required":["provider_json","revision","ruleset_or_protection_receipt"]},
+    {"id":"RP-U0-02","urgency":"U0","surface":"physical-execution","state":"TOKEN_VAZIO","gap":"same-artifact physical execution proof","gate":"exact artifact execution on declared target","evidence_required":["commit","artifact_sha256","device","abi","command","stdout_stderr"]},
+    {"id":"RP-U0-03","urgency":"U0","surface":"pbip-l1","state":"IMPLEMENTATION_REPRODUCED","gap":"independent CI provider plus Android/device proof","gate":"independent provider/runtime reproduction","evidence_required":["provider_receipt","android_runtime_receipt","device_receipt"]},
+    {"id":"RP-U0-04","urgency":"U0","surface":"apkc-provenance","state":"TOKEN_VAZIO","gap":"current source-to-APK complete provenance","gate":"source-binary-APK provenance","evidence_required":["apk_sha256","dex_checksums","elf_abi_inventory","signing_receipt","build_receipt"]},
+    {"id":"RP-U1-01","urgency":"U1","surface":"freestanding-l11","state":"PARTIAL_ADVANCED","gap":"AMX/SME and remaining executor paths","gate":"per-target codegen and behavioral harness","evidence_required":["object_receipt","codegen_receipt","test_vectors"]},
+    {"id":"RP-U1-02","urgency":"U1","surface":"architecture-coverage","state":"METADATA_ONLY_OR_PENDING","gap":"POWER/LoongArch/s390x then Hexagon/MVE/APX executors","gate":"executor plus target-appropriate build/runtime","evidence_required":["per_isa_receipt"]},
+    {"id":"RP-U1-03","urgency":"U1","surface":"conversation-indexer","state":"IMPLEMENTED_PARTIAL","gap":"streaming writer checkpoint resume BLAKE3","gate":"deterministic round-trip and recovery tests","evidence_required":["fixture_hashes","test_receipt"]},
+    {"id":"RP-U1-04","urgency":"U1","surface":"science","state":"REFERENCE_IMPLEMENTED_COMPONENTS","gap":"independent scientific reproduction/novelty","gate":"exact-input reproduction and independent review where applicable","evidence_required":["input_hashes","scripts","outputs","citations","review_receipt"]},
+    {"id":"RP-U2-01","urgency":"U2","surface":"licensing","state":"TOKEN_VAZIO_REPO_LICENSE_METADATA","gap":"recognized repository license/provenance boundary","gate":"license decision plus compatibility audit","evidence_required":["LICENSE","attribution_inventory"]},
+    {"id":"RP-U2-02","urgency":"U2","surface":"documentation-governance","state":"ACTIVE","gap":"historical/source divergence risk","gate":"document governance scan and queue reconciliation","evidence_required":["catalog_hash","relations_hash","review_queue_hash"]},
+    {"id":"RP-U2-03","urgency":"U2","surface":"ci-final-head","state":"DYNAMIC","gap":"predecessor success cannot prove moved head","gate":"required workflows on exact final head","evidence_required":["workflow_run_ids","job_ids","artifact_digests"]},
+    {"id":"RP-U3-01","urgency":"U3","surface":"performance","state":"TOKEN_VAZIO_BENCHMARK_MATRIX","gap":"controlled reproducible cross-ISA benchmark denominator","gate":"pinned benchmark protocol","evidence_required":["raw_measurements","environment","statistics"]}
+  ],
+  "f_ok": ["evidence discipline","PBIP cross-implementation reproduction","freestanding codegen coverage","ApkC and governance tooling"],
+  "f_gap": ["provider protection","physical runtime","complete ApkC provenance","independent provider/device PBIP","remaining ISA executors","independent scientific validation"],
+  "f_next": "Close revision-bound U0 gates without converting missing evidence into inference."
+}
