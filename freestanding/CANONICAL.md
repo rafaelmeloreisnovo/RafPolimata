@@ -1,7 +1,7 @@
 # Canonical first-cut core
 
-`include/raf_fs_core_noloop.h` is the canonical L0 header for this branch.
+`include/raf_fs_core.h` is the canonical L0 header for this branch.
 
-The earlier `include/raf_fs_core.h` was an intermediate draft that used the conventional source-level `do { } while (0)` macro shell. It is not the canonical implementation and must not be consumed by production code.
+The first macro-shell draft was consolidated in place. The canonical file now avoids the conventional source-level `do { } while (0)` shell and uses GCC/Clang statement expressions for fixed-width primitives.
 
-Reason: although compilers eliminate that shell, RAFAELIA L0 keeps the source representation aligned with the no-synthetic-loop invariant as well as the generated binary.
+Reason: although compilers normally eliminate the shell, RAFAELIA L0 keeps the source representation aligned with the no-synthetic-loop invariant as well as the generated binary.
