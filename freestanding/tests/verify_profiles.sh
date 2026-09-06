@@ -44,6 +44,17 @@ compile_profile() {
         exit 1
     fi
 
+    if [ "$name" = "x86_64-avx512" ]; then
+        if ! grep -E -q '(%k1|[[:space:]]k1)' "$asm"; then
+            printf '%s\n' "FAIL: x86_64-avx512 did not emit native K-mask register k1"
+            exit 1
+        fi
+        if ! grep -E -q 'vmovdqu32.*\{.*%?k1.*\}' "$asm"; then
+            printf '%s\n' "FAIL: x86_64-avx512 did not emit masked vmovdqu32 memory operation"
+            exit 1
+        fi
+    fi
+
     printf '%s\n' "PASS: $name"
 }
 
