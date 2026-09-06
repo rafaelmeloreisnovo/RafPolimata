@@ -1,6 +1,7 @@
 # RAFAELIA L0 — Architecture Contract
 
 The architecture contract is a compile-time map, not an OS abstraction.
+Governance evidence closure: `CLOSURE_L12`.
 
 ## Canonical fields
 
@@ -68,4 +69,4 @@ Raw hexadecimal instruction encodings are permitted only when the assembler cann
 `RUNTIME_PROVEN` requires execution evidence.
 `DEVICE_PROVEN` requires physical device evidence.
 
-Until those exist, the later states remain `TOKEN_VAZIO`.
+Until those exist, the later states remain `TOKEN_VAZIO` under `CLOSURE_L12`.
