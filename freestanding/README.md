@@ -1,6 +1,7 @@
 # RAFAELIA Freestanding L0
 
 Status: initial implementation contract.
+Governance evidence closure: `CLOSURE_L12`.
 
 This directory is the OS-agnostic execution layer. It must remain buildable without libc, malloc, heap, garbage collection, hosted runtime, system calls, or OS headers.
 
