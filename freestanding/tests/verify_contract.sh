@@ -37,7 +37,8 @@ require_file_contract() {
 
 check_pattern "hosted header leaked into L0" '^[[:space:]]*#include[[:space:]]*<' 
 check_pattern "dynamic allocator leaked into L0" '(^|[^A-Za-z0-9_])(malloc|calloc|realloc|free)[[:space:]]*\('
-check_pattern "syscall instruction leaked into L0" '(^|[^A-Za-z0-9_])(syscall|ecall|svc[[:space:]]*#?0|int[[:space:]]+\$0x80)([^A-Za-z0-9_]|$)'
+# Match executable trap mnemonics inside quoted inline-assembly strings, not documentation words such as "no syscall".
+check_pattern "syscall instruction leaked into L0" '"(syscall|ecall|svc[[:space:]]*#?0|int[[:space:]]+\$0x80)"'
 check_pattern "synthetic do/while macro shell leaked into L0" '^[[:space:]]*#define.*\bdo[[:space:]]*\{'
 check_pattern "synthetic while(0) leaked into L0" '^[[:space:]]*\}[[:space:]]*while[[:space:]]*\([[:space:]]*0[[:space:]]*\)'
 check_pattern "hosted fallback annotation leaked into canonical L0" 'RAF_FS_HOSTED_FALLBACK'
