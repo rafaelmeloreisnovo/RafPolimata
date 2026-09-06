@@ -1,6 +1,6 @@
 # RAFAELIA L0 — compile/link flags
 
-These flags describe the zero-runtime object profile. They do not impose an OS ABI.
+These flags describe zero-runtime objects. Freestanding gates use OS-neutral target triples; Linux triples belong only to `syscall/`.
 
 ## Common C/Clang profile
 
@@ -24,9 +24,7 @@ Optional when the final environment guarantees it:
 -fno-pie
 ```
 
-Do not force those two flags into reusable objects that may later be linked into PIE/shared images.
-
-## Link-only profile for a standalone image
+## Standalone link-only profile
 
 ```text
 -nostdlib
@@ -36,92 +34,107 @@ Do not force those two flags into reusable objects that may later be linked into
 -Wl,--build-id=none
 ```
 
-A linker script and entry symbol are environment-owned and therefore intentionally outside the OS-agnostic core.
+The linker script, entry symbol, memory map and external calling convention are environment-owned and remain outside generic L0.
 
-## Target profiles
+## x86 profiles
 
-### x86_64 scalar
+### x86_64 scalar / SSE2
 
 ```text
 -target x86_64-unknown-none
--m64
+-msse2
 -mno-red-zone
 ```
 
-### x86_64 AVX2
-
-Profile gate currently uses:
+### i686 scalar / explicit SSE2
 
 ```text
--target x86_64-linux-gnu
+-target i686-unknown-none
+-march=i686
+-msse2
+-mregparm=3   # codegen probe only: isolates L0 from external cdecl stack argument passing
+```
+
+The production hot core is forced inline; `-mregparm=3` is not declared as a universal external ABI.
+
+### x86_64 AVX2
+
+```text
+-target x86_64-unknown-none
 -mavx2
 -mno-red-zone
 -mno-vzeroupper
 ```
 
-`-mno-vzeroupper` is deliberate for the no-extra-transition-instruction probe. A hosted/external ABI adapter may choose differently outside L0.
-
-### x86_64 AVX-512F
+### x86_64 AVX-512F + K-mask
 
 ```text
--target x86_64-linux-gnu
+-target x86_64-unknown-none
 -mavx512f
 -mno-red-zone
 -mno-vzeroupper
 ```
 
-AVX-512 K-mask residual memory and AMX remain separate explicit profiles; never raise the generic x86_64 floor silently.
+The gate requires `ZMM` plus native `K1` masked `vmovdqu32` codegen. `-mno-vzeroupper` avoids inserting a transition instruction into the probe; an external hosted ABI adapter may choose a different transition policy.
 
-### i686
+### x86_64 AMX-TILE direct-register profile
 
 ```text
--target i686-unknown-none
--m32
--march=i686
--fomit-frame-pointer
+-target x86_64-unknown-none
+-mamx-tile
+-mno-red-zone
 ```
 
-Do not emit `mfence`/SSE2 instructions for baseline i686 unless the build raises the ISA floor explicitly.
+The current L0 primitive gates direct `TMM0` ownership (`tilezero`). Tile-state enablement/configuration is a caller/environment precondition, not an L0 syscall/runtime service.
+
+## ARM profiles
 
 ### ARMv7-A / AArch32 scalar
 
 ```text
--target armv7a-unknown-none-eabi
+-target armv7a-none-eabi
 -march=armv7-a
 ```
 
 ### ARMv7-A NEON
 
-Profile gate currently uses:
-
 ```text
--target armv7a-linux-gnueabihf
+-target armv7a-none-eabi
 -march=armv7-a
 -mfpu=neon-vfpv4
 -mfloat-abi=softfp
 ```
 
-The vector object is still freestanding; the Linux-flavoured target triple is used only to obtain a readily available target configuration in CI, not to introduce libc/syscalls.
-
 ### AArch64 / ARM64 Advanced SIMD
 
 ```text
--target aarch64-linux-gnu
+-target aarch64-none-elf
 -march=armv8-a
 ```
 
-Advanced SIMD is the fixed 128-bit profile.
+`ARM64` and `AArch64` are the same 64-bit Arm execution state in this project.
 
 ### AArch64 SVE
 
 ```text
--target aarch64-linux-gnu
+-target aarch64-none-elf
 -march=armv8.2-a+sve
 ```
 
-The SVE stage uses predicate/VL semantics and reports consumed lanes through caller-owned state; no scalar cleanup loop is added.
+One hardware-predicated stage reports `consumed_lanes` to caller-owned state; no scalar cleanup loop is added.
 
-### RISC-V RV32 scalar
+### AArch64 SME direct ZA profile
+
+```text
+-target aarch64-none-elf
+-march=armv9-a+sme
+```
+
+The current primitive gates direct `ZA` ownership (`zero {za}`). SME/ZA enablement is caller/environment state; generic L0 does not hide an enable/disable sequence.
+
+## RISC-V profiles
+
+### RV32 scalar
 
 ```text
 -target riscv32-unknown-elf
@@ -129,15 +142,15 @@ The SVE stage uses predicate/VL semantics and reports consumed lanes through cal
 -mabi=ilp32
 ```
 
-### RISC-V RV32 V
+### RV32 V
 
 ```text
--target riscv32-linux-gnu
+-target riscv32-unknown-elf
 -march=rv32gcv
 -mabi=ilp32d
 ```
 
-### RISC-V RV64 scalar
+### RV64 scalar
 
 ```text
 -target riscv64-unknown-elf
@@ -145,20 +158,32 @@ The SVE stage uses predicate/VL semantics and reports consumed lanes through cal
 -mabi=lp64
 ```
 
-### RISC-V RV64 V
+### RV64 V
 
 ```text
--target riscv64-linux-gnu
+-target riscv64-unknown-elf
 -march=rv64gcv
 -mabi=lp64d
 ```
 
-The RVV stage executes one `VL`-bounded block and stores the actual consumed lane count in caller-owned state. It does not loop internally.
+RVV executes one `VL`-bounded block and stores the actual consumed lane count in caller-owned state; no internal continuation loop exists.
+
+## Metadata-only next architectures
+
+Current zero-runtime metadata probes compile with:
+
+```text
+-target powerpc64le-unknown-none
+-target loongarch64-unknown-none
+-target s390x-unknown-none
+```
+
+These prove only register/ABI topology headers for POWER64, LoongArch64 and IBM z/s390x. They do not imply VSX/MMA, LSX/LASX or z-vector executor support.
 
 ## Symbol policy
 
-The hot core should compile to no externally required helper symbol. `static inline`, compile-time macros and inline assembly are preferred. Raw opcode bytes/words are allowed only when the selected assembler cannot encode a required instruction; every raw encoding must carry a readable mnemonic and ISA encoding comment.
+The hot core must not require external helper symbols. Prefer compile-time constants, macros, forced `static inline`, then inline assembly. Raw opcode bytes/words are allowed only when the selected assembler cannot express a required instruction; every raw encoding must document readable mnemonic, operands, ISA encoding and clobbers.
 
-## No-tail policy
+## No-tail / no-shadow policy
 
-Do not generate a hidden scalar tail routine. Fixed-vector residuals use explicit masks/full-block preconditions; scalable-vector residuals use hardware predicate/VL state and return consumed lanes to the next pipeline stage.
+Do not generate a hidden scalar tail routine. Fixed-vector residuals use explicit masks or native predication; scalable-vector residuals use hardware predicate/VL and return consumed lanes to the next pipeline stage. No compatibility shadow buffer may appear silently.
