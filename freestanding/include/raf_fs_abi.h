@@ -15,12 +15,15 @@
 
 #include "raf_fs_types.h"
 
-#define RAF_FS_ABI_X86_64   1u
-#define RAF_FS_ABI_I686     2u
-#define RAF_FS_ABI_ARMV7    3u
-#define RAF_FS_ABI_AARCH64  4u
-#define RAF_FS_ABI_RV32     5u
-#define RAF_FS_ABI_RV64     6u
+#define RAF_FS_ABI_X86_64       1u
+#define RAF_FS_ABI_I686         2u
+#define RAF_FS_ABI_ARMV7        3u
+#define RAF_FS_ABI_AARCH64      4u
+#define RAF_FS_ABI_RV32         5u
+#define RAF_FS_ABI_RV64         6u
+#define RAF_FS_ABI_POWER64      7u
+#define RAF_FS_ABI_LOONGARCH64  8u
+#define RAF_FS_ABI_S390X        9u
 
 #if defined(__x86_64__)
 # define RAF_FS_ABI_ID RAF_FS_ABI_X86_64
@@ -129,6 +132,51 @@
 #  define RAF_FS_ABI_VECTOR_REGS 0u
 #  define RAF_FS_ABI_PRED_REGS 0u
 # endif
+# define RAF_FS_ABI_MATRIX_REGS 0u
+
+#elif defined(__powerpc64__) || defined(__ppc64__)
+# define RAF_FS_ABI_ID RAF_FS_ABI_POWER64
+# define RAF_FS_ABI_PTR_BITS 64u
+# define RAF_FS_ABI_GPR_COUNT 32u
+# if defined(__VSX__)
+#  define RAF_FS_ABI_VECTOR_BITS 128u
+#  define RAF_FS_ABI_VECTOR_REGS 64u /* VSR0..VSR63; FPR/VR are overlapping views. */
+# else
+#  define RAF_FS_ABI_VECTOR_BITS 0u
+#  define RAF_FS_ABI_VECTOR_REGS 0u
+# endif
+# define RAF_FS_ABI_PRED_REGS 0u
+# define RAF_FS_ABI_MATRIX_REGS 0u /* MMA ACC0..7 executor remains separately gated. */
+
+#elif defined(__loongarch64) || (defined(__loongarch__) && defined(__loongarch_grlen) && (__loongarch_grlen == 64))
+# define RAF_FS_ABI_ID RAF_FS_ABI_LOONGARCH64
+# define RAF_FS_ABI_PTR_BITS 64u
+# define RAF_FS_ABI_GPR_COUNT 32u
+# if defined(__loongarch_asx)
+#  define RAF_FS_ABI_VECTOR_BITS 256u
+#  define RAF_FS_ABI_VECTOR_REGS 32u
+# elif defined(__loongarch_sx)
+#  define RAF_FS_ABI_VECTOR_BITS 128u
+#  define RAF_FS_ABI_VECTOR_REGS 32u
+# else
+#  define RAF_FS_ABI_VECTOR_BITS 0u
+#  define RAF_FS_ABI_VECTOR_REGS 0u
+# endif
+# define RAF_FS_ABI_PRED_REGS 0u
+# define RAF_FS_ABI_MATRIX_REGS 0u
+
+#elif defined(__s390x__)
+# define RAF_FS_ABI_ID RAF_FS_ABI_S390X
+# define RAF_FS_ABI_PTR_BITS 64u
+# define RAF_FS_ABI_GPR_COUNT 16u
+# if defined(__VEC__) || defined(__VECTOR__)
+#  define RAF_FS_ABI_VECTOR_BITS 128u
+#  define RAF_FS_ABI_VECTOR_REGS 32u
+# else
+#  define RAF_FS_ABI_VECTOR_BITS 0u
+#  define RAF_FS_ABI_VECTOR_REGS 0u
+# endif
+# define RAF_FS_ABI_PRED_REGS 0u
 # define RAF_FS_ABI_MATRIX_REGS 0u
 #else
 # error "Unsupported RAFAELIA freestanding ABI profile"
