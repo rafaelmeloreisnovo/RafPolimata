@@ -1,4 +1,4 @@
-#include "../include/raf_fs_core_noloop.h"
+#include "../include/raf_fs_core.h"
 
 /*
  * Compile-only probe. It deliberately exports one symbol so objdump/nm can inspect
