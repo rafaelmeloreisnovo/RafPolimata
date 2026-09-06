@@ -11,10 +11,11 @@ Governance:
 
 | item | state | evidence boundary |
 |---|---|---|
-| scalar/ordering primitives: x86_64, i686, ARMv7-A, AArch64, RV32, RV64 | IMPLEMENTED | source + local cross-object compile receipt |
-| branchless fixed-width copy/select/residual core | IMPLEMENTED | source + local codegen inspection |
-| raw Linux syscall adapters for six targets | IMPLEMENTED, separate from L0 | source + local cross-object compile receipt |
+| scalar/ordering primitives: x86_64, i686, ARMv7-A, AArch64, RV32, RV64 | IMPLEMENTED | source + cross-object compile gate |
+| branchless fixed-width copy/select/residual core | IMPLEMENTED | source + codegen-oriented probe |
+| raw Linux syscall adapters for six targets | IMPLEMENTED, separate from L0 | source + separate cross-object compile gate |
 | source contract gate | IMPLEMENTED | executable shell gate |
+| six-ISA unresolved-helper rejection | IMPLEMENTED | `verify_matrix.sh` rejects undefined helper/runtime symbols per object |
 
 `IMPLEMENTED` above does not mean physical runtime proven.
 
@@ -27,13 +28,11 @@ Governance:
 | L0-GAP-003 | AArch64 SVE/SME scalable/matrix executor | `TOKEN_VAZIO` | predicate/VL semantics + target compiler gate |
 | L0-GAP-004 | RV32/RV64 V executor | `TOKEN_VAZIO` | VL/mask semantics + RVV target compiler gate |
 | L0-GAP-005 | x86 AMX/matrix executor | `TOKEN_VAZIO` | explicit opt-in ISA profile + state/tile contract tests |
-| L0-GAP-006 | automated unresolved-symbol/codegen inspection in CI for all six scalar targets | `TOKEN_VAZIO` | CI job proves zero unexpected calls/helpers |
 
 ## Open execution/evidence gaps — CLOSURE_L12
 
 | id | gap | current state | promotion gate |
 |---|---|---|---|
-| L0-GAP-101 | current-head GitHub CI receipt after the latest maintenance commits | `TOKEN_VAZIO` | workflow run bound to current head |
 | L0-GAP-102 | physical x86_64 runtime receipt | `TOKEN_VAZIO` | target execution + artifact/commit identity |
 | L0-GAP-103 | physical i686 runtime receipt | `TOKEN_VAZIO` | target execution + artifact/commit identity |
 | L0-GAP-104 | physical ARMv7 runtime receipt | `TOKEN_VAZIO` | target execution + artifact/commit identity |
@@ -41,6 +40,10 @@ Governance:
 | L0-GAP-106 | physical RV32 runtime receipt | `TOKEN_VAZIO` | target execution/emulation scope explicitly identified |
 | L0-GAP-107 | physical RV64 runtime receipt | `TOKEN_VAZIO` | target execution/emulation scope explicitly identified |
 | L0-GAP-108 | raw Linux syscall runtime receipts per architecture | `TOKEN_VAZIO` | OS/ABI-specific execution, separate from L0 |
+
+## Dynamic evidence boundary
+
+Current-head CI is deliberately **not** a static gap row. A file commit changes the head, so storing “current-head CI PASS” in the same commit would be self-invalidating. Current-head workflow state must be read from GitHub Actions and reported with its exact head/run identity.
 
 ## Deliberate non-gaps
 
