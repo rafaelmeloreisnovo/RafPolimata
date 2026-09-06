@@ -52,4 +52,4 @@ L0 primitives do not allocate dynamically and must not rely on a red zone. Profi
 SOURCE_IMPLEMENTED -> BUILD_PROVEN -> CODEGEN_PROVEN -> RUNTIME_PROVEN -> DEVICE_PROVEN
 ```
 
-Missing later stages stay `TOKEN_VAZIO`; compile success is never promoted to physical execution.
+Missing later stages stay `TOKEN_VAZIO (CLOSURE_L12)`; compile success is never promoted to physical execution.
