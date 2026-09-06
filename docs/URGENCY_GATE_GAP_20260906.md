@@ -2,7 +2,9 @@
 
 Status: AUDIT / APPEND-ONLY SNAPSHOT
 Source revision: `820e7ea29bebbf0154ea245d401f691715fea5d8`
-Claim policy: `claim_allowed=false` unless the specific gate below is closed by revision-bound evidence.
+Closure ownership: `CLOSURE_L1`
+Claim policy: `claim_allowed=false` unless the specific gate below is closed by
+revision-bound evidence.
 
 ## Invariants
 
@@ -10,7 +12,8 @@ Claim policy: `claim_allowed=false` unless the specific gate below is closed by 
 
 `TOKEN_VAZIO != FAIL != PASS`
 
-A gap can only leave `TOKEN_VAZIO` when an identified gate is executed against an exact revision/artifact and emits a traceable receipt.
+A gap can only leave `TOKEN_VAZIO` when an identified gate is executed against an
+exact revision/artifact and emits a traceable receipt.
 
 ## Priority scale
 
@@ -32,9 +35,31 @@ A gap can only leave `TOKEN_VAZIO` when an identified gate is executed against a
 | RP-U1-03 | U1 | Conversation Indexer | `IMPLEMENTED_PARTIAL` | streaming extractor, atomic writer, checkpoint/resume and BLAKE3 remain pending | deterministic corpus round-trip and corruption/recovery tests | corpus fixture hashes + test receipt | close writer/recovery before performance expansion |
 | RP-U1-04 | U1 | scientific engine | `REFERENCE/IMPLEMENTED_COMPONENTS` | external scientific reproduction/novelty is not established | exact-input reproduction + citations + independent review where claims require it | dataset/input hashes, scripts, outputs, bibliographic and review receipt | separate engineering validity from scientific novelty |
 | RP-U2-01 | U2 | licensing | `TOKEN_VAZIO_REPO_LICENSE_METADATA` | repository metadata exposes no recognized license | authorial/license decision + compatibility audit for imported/reference material | LICENSE + provenance/attribution inventory | do not infer reuse rights from public visibility |
-| RP-U2-02 | U2 | documentation governance | `ACTIVE` | loose/historical documents may still diverge from source truth | document-governance scan + duplicate/temporal/relation review queue | catalog/relations/review-queue hashes | reconcile without deleting historical evidence |
-| RP-U2-03 | U2 | CI final-head truth | `DYNAMIC` | predecessor success must not be projected onto a moved head | run required workflows on exact PR/final head | workflow run/job IDs + artifact digests | bind every promotion to final-head CI |
+| RP-U2-02 | U2 | documentation governance | `CORRECTIVE_DELTA_IMPLEMENTED_FINAL_HEAD_REVALIDATION_REQUIRED` | predecessor run exposed unmapped `CLOUD.md`/`GPT.md` and stale `AGENTS.md` hash | append decisions for new adapters and exact-SHA supersession, then rerun governance | root-decision report with unmapped=0, stale=0 and tested supersession history | preserve old decision record; never overwrite history silently |
+| RP-U2-03 | U2 | CI final-head truth | `CORRECTIVE_DELTA_PENDING_REVALIDATION` | predecessor CI stopped at changed-file TOKEN_VAZIO closure validation | bind changed files to `CLOSURE_L1` and rerun required workflows on final head | workflow run/job IDs + artifact digests + zero strict closure errors | bind every promotion to final-head CI |
 | RP-U3-01 | U3 | performance | `TOKEN_VAZIO_BENCHMARK_MATRIX` | cross-ISA performance claims lack a controlled reproducible denominator | pinned compiler/flags/corpus/hardware benchmark protocol | raw measurements + environment + confidence/statistics | benchmark only after correctness gates |
+
+## Corrective evidence discovered by the first PR head
+
+The first branch head `15caf923f660b23a00d7ad899cc39148966cad1c` exposed useful debt rather
+than being promoted as a false PASS:
+
+- Formal Science Orchestrator: `success`.
+- Internal Custody Ledger: `success`.
+- CI `34029258849`: stopped at strict changed-file closure validation.
+- Document Governance `34029258912`: tests passed; root decision gate found two unmapped
+  adapters and one stale decision hash.
+
+The corrective delta now:
+
+- binds this audit matrix to `CLOSURE_L1`;
+- adds append-only decisions for `CLOUD.md` and `GPT.md`;
+- supersedes the old `AGENTS.md` blob decision only by exact prior SHA;
+- rejects undeclared duplicate decisions and wrong supersession SHAs;
+- preserves supersession history in the validation report.
+
+These are source-level corrections. Their status becomes PASS only if the exact new head reruns
+and closes the corresponding workflows.
 
 ## Closure order
 
@@ -44,6 +69,9 @@ This ordering is risk-weighted, not a statement that lower-priority items are un
 
 ## R3
 
-- `F_ok`: evidence discipline, PBIP cross-implementation reproduction, freestanding source/codegen coverage, ApkC and governance tooling exist.
-- `F_gap`: provider protection, exact-artifact physical runtime, complete ApkC provenance, independent provider/device PBIP, remaining ISA executors and independent scientific validation.
-- `F_next`: close revision-bound U0 gates without replacing missing evidence with inference.
+- `F_ok`: evidence discipline, PBIP cross-implementation reproduction, freestanding source/codegen
+  coverage, ApkC/governance tooling, and explicit append-only root-decision supersession.
+- `F_gap`: final-head revalidation, provider protection, exact-artifact physical runtime, complete
+  ApkC provenance, independent provider/device PBIP, remaining ISA executors, scientific review.
+- `F_next`: let the exact corrective head prove the governance/closure repairs, then close U0
+  physical and provenance gates without replacing missing evidence with inference.
