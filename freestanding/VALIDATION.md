@@ -26,7 +26,7 @@ Common validation flags:
 
 Validated source units:
 
-1. `freestanding/include/raf_fs_core_noloop.h` through a minimal caller-owned stage.
+1. `freestanding/include/raf_fs_core.h` through a minimal caller-owned stage.
 2. `syscall/linux/raf_linux_syscall.h` through a three-argument raw syscall probe.
 
 Result for all six targets: object compilation succeeded in the local validation environment.
