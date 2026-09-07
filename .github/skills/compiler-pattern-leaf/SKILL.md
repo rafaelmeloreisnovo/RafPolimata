@@ -6,6 +6,7 @@ description: Apply reusable architecture patterns to RafPolimata compiler, ApkC,
 # Compiler / Freestanding Pattern Leaf
 
 Read `AGENTS.md` and the nearest scoped `AGENTS.md` before applying this skill.
+Governance anchor for unresolved operational gaps in this leaf: `CLOSURE_L11`.
 
 ## Local projection
 
@@ -47,7 +48,7 @@ pattern similarity != proof
 skill != authority
 ```
 
-Use the smallest applicable target (`make syntax`, compiler contract/self-test, freestanding matrix, document-governance gate, or path-specific test) when execution is available. Otherwise preserve execution as `TOKEN_VAZIO`.
+Use the smallest applicable target (`make syntax`, compiler contract/self-test, freestanding matrix, document-governance gate, or path-specific test) when execution is available. Otherwise preserve execution as `TOKEN_VAZIO` under `CLOSURE_L11` until the applicable gate is actually executed.
 
 Private derivation may supply a sanitized mechanism only; do not publish raw private corpus or private source pointers.
 
