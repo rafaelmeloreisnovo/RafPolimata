@@ -1,0 +1,49 @@
+{
+  "schema": "rafaelia.tri_repo_mission_cohesion_hotfix_receipt/v1",
+  "receipt_id": "TRI-REPO-MISSION-COHESION-TOKEN-VAZIO-CLOSURE-HOTFIX-20260907",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "pr": 334,
+  "baseline": "3956bc6a7d7527ce3535661d170507c761b27fcb",
+  "failed_head": "3c396695edf20ddaa19db0d864539300f09742ec",
+  "observed_ci": {
+    "workflow": "CI",
+    "run_id": 34100190708,
+    "job_id": 101672616814,
+    "failed_step": "Validate TOKEN_VAZIO gates (Hotfix H1)",
+    "validator_unit_tests": "19/19 PASS",
+    "strict_findings": 10,
+    "cause": "new TOKEN_VAZIO lines in docs/contracts/TRI_REPO_MISSION_COHESION_BINDING_V1.md lacked a valid CLOSURE_L* binding"
+  },
+  "correction": {
+    "commit": "3e144aea9283f60d16e8fae0d0cdcf7718d3f741",
+    "strategy": "bind new unknown/runtime/authority states to existing canonical closures; do not weaken validator",
+    "runtime_device_legal_service": "CLOSURE_L12",
+    "provider_ruleset_server_manual_secret": "CLOSURE_L13"
+  },
+  "invariants": [
+    "TOKEN_VAZIO!=0",
+    "CLOSURE_BINDING!=GAP_PROMOTION",
+    "SOURCE!=EXECUTION!=EVIDENCE!=CLAIM",
+    "RETRIEVAL_CONTEXT!=WEIGHT_UPDATE",
+    "LEARN_APPEND_ONLY!=ONLINE_SELF_TRAINING"
+  ],
+  "F_ok": [
+    "validator correctly failed closed on ten newly unbound TOKEN_VAZIO statements",
+    "Formal Science Orchestrator passed on failed_head",
+    "closure hotfix changes governance documentation only"
+  ],
+  "F_gap": [
+    "current-head CI result remains TOKEN_VAZIO until executed",
+    "physical Android/Termux remains TOKEN_VAZIO_DEVICE",
+    "real multi-repo execution remains TOKEN_VAZIO_EXECUTION",
+    "external provider/ruleset/server/manual/secret authority remains unresolved"
+  ],
+  "F_next": [
+    "observe current-head TOKEN_VAZIO validator result",
+    "continue only on independent safe lanes for any remaining internal CI defect",
+    "do not promote physical or external authority gates without their own receipts"
+  ],
+  "claim_allowed": false,
+  "weight_training_authorized": false,
+  "append_only": true
+}
