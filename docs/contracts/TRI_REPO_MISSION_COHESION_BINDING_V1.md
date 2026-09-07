@@ -5,7 +5,8 @@
 **RafPolimata baseline:** `3956bc6a7d7527ce3535661d170507c761b27fcb`  
 **Vectras baseline:** `89e47837e551a565ceb7158cba1ced6954e72d93`  
 **claim_allowed:** `false`  
-**weight_training_authorized:** `false`
+**weight_training_authorized:** `false`  
+**Governing closures:** `CLOSURE_L12` for runtime/device/legal-service evidence and `CLOSURE_L13` for provider/ruleset/server/manual/secret audit-readiness authority gaps.
 
 RafPolimata is bound as the analysis/compiler/freestanding/research-validation lane of the program mission. This binding does not grant runtime execution authority, provider/legal/repository authority, manual promotion authority, scientific claim promotion, or model-weight update authority.
 
@@ -50,17 +51,19 @@ DATASET_INFORMS              != MISSION_AUTHORITY
 IMPLEMENTED                  != AUTHORIZED
 ```
 
+`TOKEN_VAZIO` statements in this contract are closure-bound observations, not successful gates. `CLOSURE_L12` and `CLOSURE_L13` preserve the owner/evidence route and do not promote the underlying gap.
+
 ## External/runtime gates preserved
 
 ```text
-Android/Termux físico          = TOKEN_VAZIO_DEVICE
-multi-repo runtime real        = TOKEN_VAZIO_EXECUTION
-identidade remota              = TOKEN_VAZIO_RUNTIME
-autorização provider/legal     = TOKEN_VAZIO_EXTERNAL_AUTHORITY
-ruleset live                   = TOKEN_VAZIO_EXTERNAL_AUTHORITY
-server-side enforcement        = TOKEN_VAZIO_EXTERNAL_AUTHORITY
-promoção manual                = TOKEN_VAZIO_MANUAL_AUTHORITY
-CodeScan credencial/análise    = TOKEN_VAZIO_SECRET
+Android/Termux físico          = TOKEN_VAZIO_DEVICE              # CLOSURE_L12
+multi-repo runtime real        = TOKEN_VAZIO_EXECUTION           # CLOSURE_L12
+identidade remota              = TOKEN_VAZIO_RUNTIME             # CLOSURE_L12
+autorização provider/legal     = TOKEN_VAZIO_EXTERNAL_AUTHORITY  # CLOSURE_L12 + CLOSURE_L13
+ruleset live                   = TOKEN_VAZIO_EXTERNAL_AUTHORITY  # CLOSURE_L13
+server-side enforcement        = TOKEN_VAZIO_EXTERNAL_AUTHORITY  # CLOSURE_L13
+promoção manual                = TOKEN_VAZIO_MANUAL_AUTHORITY    # CLOSURE_L13
+CodeScan credencial/análise    = TOKEN_VAZIO_SECRET              # CLOSURE_L13
 treino/fine-tuning de pesos    = NÃO AUTORIZADO
 scientific claim promotion     = false
 claim_allowed                  = false
@@ -70,4 +73,4 @@ claim_allowed                  = false
 
 `LEARN` means observation/action/result/F_ok/F_gap/F_next/successor receipt. It does not mean online self-training and does not modify model weights.
 
-A blocked external gate must remain typed `TOKEN_VAZIO`; work may continue only on independent safe lanes already within approved scope.
+A blocked external gate must remain typed `TOKEN_VAZIO` under its governing closure; work may continue only on independent safe lanes already within approved scope.
