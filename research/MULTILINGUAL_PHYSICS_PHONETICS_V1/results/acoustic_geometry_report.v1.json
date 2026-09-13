@@ -1,0 +1,16 @@
+{
+  "claim_allowed": false,
+  "critical_distinction": "PG(q=sqrt(3)/2) is not a harmonic series; harmonics are integer multiples of f0.",
+  "pg_test_hz": [440.0,381.051177665153,329.99999999999994,285.7883832488647,247.49999999999994,214.34128743664849,185.62499999999991],
+  "q": 0.8660254037844386,
+  "room_acoustics_boundary": "Audience occupancy changes absorption and reverberation; it is not modeled as simple destructive cancellation of all waves.",
+  "schema": "rafpolimata.acoustic-geometry-bridge.report.v1",
+  "triangle": {"expected_side_sq":1.0,"height":0.8660254037844386,"pythagoras_check":0.9999999999999999,"side":1.0},
+  "true_harmonics_hz": [440.0,880.0,1320.0,1760.0,2200.0,2640.0,3080.0],
+  "venturi_example": {
+    "A1":0.01,"A2":0.005,
+    "boundary":"INCOMPRESSIBLE_IDEAL_BERNOULLI_MODEL_NOT_ACOUSTIC_WAVE_EQUATION",
+    "ideal_static_pressure_drop_P1_minus_P2":7.3500000000000005,
+    "v1":2.0,"v2":4.0
+  }
+}

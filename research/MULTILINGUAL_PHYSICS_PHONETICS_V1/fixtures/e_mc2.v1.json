@@ -1,0 +1,125 @@
+{
+  "schema": "rafpolimata.multilingual-physics-phonetics.fixture.v1",
+  "fixture_id": "MPP-E-MC2-20260912-V1",
+  "claim_allowed": false,
+  "formula": {
+    "id": "E_MC2",
+    "canonical_ascii": "E=m*c^2",
+    "canonical_unicode": "E = mc²",
+    "semantic_atoms": ["ENERGY", "EQUALS", "MASS", "MULTIPLY", "SPEED_OF_LIGHT", "SQUARE"],
+    "physics_status": "STANDARD_RELATIVITY_RELATION",
+    "note": "The experiment measures representation and phonetic/acoustic metadata; it does not retest special relativity."
+  },
+  "representations": [
+    {
+      "id": "symbolic",
+      "language_tag": "zxx",
+      "script": "Zsym",
+      "direction": "LTR",
+      "surface": "E=mc²",
+      "kind": "MATHEMATICAL_SYMBOLIC",
+      "atoms_present": ["ENERGY", "EQUALS", "MASS", "MULTIPLY", "SPEED_OF_LIGHT", "SQUARE"],
+      "phonetics": {"status": "NOT_APPLICABLE", "ipa": null}
+    },
+    {
+      "id": "pt-BR.narrative",
+      "language_tag": "pt-BR",
+      "script": "Latn",
+      "direction": "LTR",
+      "surface": "A energia é igual à massa multiplicada pelo quadrado da velocidade da luz.",
+      "kind": "ENGINEERING_GLOSS",
+      "atoms_present": ["ENERGY", "EQUALS", "MASS", "MULTIPLY", "SPEED_OF_LIGHT", "SQUARE"],
+      "phonetics": {
+        "status": "PARTIAL_APPROXIMATE",
+        "profile": "pt-BR_GENERALIZED_NOT_REGION_NEUTRAL",
+        "lexemes": {
+          "energia": "/eneɾˈʒiɐ/",
+          "massa": "/ˈmasɐ/",
+          "luz": "TOKEN_VAZIO_REGIONAL_FINAL_S_OR_Z"
+        }
+      }
+    },
+    {
+      "id": "en-US.narrative",
+      "language_tag": "en-US",
+      "script": "Latn",
+      "direction": "LTR",
+      "surface": "Energy equals mass times the square of the speed of light.",
+      "kind": "ENGINEERING_GLOSS",
+      "atoms_present": ["ENERGY", "EQUALS", "MASS", "MULTIPLY", "SPEED_OF_LIGHT", "SQUARE"],
+      "phonetics": {
+        "status": "PARTIAL_APPROXIMATE",
+        "profile": "en-US_GENERAL_AMERICAN_APPROX",
+        "lexemes": {
+          "energy": "/ˈɛnɚdʒi/",
+          "mass": "/mæs/",
+          "light": "/laɪt/"
+        }
+      }
+    },
+    {
+      "id": "gl-ES.narrative",
+      "language_tag": "gl-ES",
+      "script": "Latn",
+      "direction": "LTR",
+      "surface": "A enerxía é igual á masa polo cadrado da velocidade da luz.",
+      "kind": "ENGINEERING_GLOSS_NEEDS_NATIVE_REVIEW",
+      "atoms_present": ["ENERGY", "EQUALS", "MASS", "MULTIPLY", "SPEED_OF_LIGHT", "SQUARE"],
+      "phonetics": {"status": "TOKEN_VAZIO_NATIVE_REVIEW_REQUIRED", "ipa": null}
+    },
+    {
+      "id": "ja-JP.narrative",
+      "language_tag": "ja-JP",
+      "script": "Jpan",
+      "direction": "HORIZONTAL_LTR_OR_VERTICAL_TTB_COLUMNS_RTL",
+      "surface": "エネルギーは質量と光速の二乗の積に等しい。",
+      "kind": "ENGINEERING_GLOSS_NEEDS_NATIVE_REVIEW",
+      "atoms_present": ["ENERGY", "EQUALS", "MASS", "MULTIPLY", "SPEED_OF_LIGHT", "SQUARE"],
+      "writing_system": ["Kanji", "Hiragana", "Katakana"],
+      "phonetics": {
+        "status": "PARTIAL_APPROXIMATE",
+        "profile": "ja-JP_STANDARD_APPROX",
+        "lexemes": {
+          "エネルギー": "/eneɾɯɡiː/",
+          "質量": "TOKEN_VAZIO_NATIVE_PHONETIC_REVIEW",
+          "光速": "TOKEN_VAZIO_NATIVE_PHONETIC_REVIEW"
+        }
+      }
+    },
+    {
+      "id": "zh-Hans.narrative",
+      "language_tag": "zh-Hans",
+      "script": "Hans",
+      "direction": "HORIZONTAL_LTR_OR_VERTICAL_TTB_COLUMNS_RTL",
+      "surface": "能量等于质量乘以光速的平方。",
+      "kind": "ENGINEERING_GLOSS_NEEDS_NATIVE_REVIEW",
+      "atoms_present": ["ENERGY", "EQUALS", "MASS", "MULTIPLY", "SPEED_OF_LIGHT", "SQUARE"],
+      "phonetics": {"status": "TOKEN_VAZIO_TONE_AND_IPA_PROFILE_REQUIRED", "ipa": null}
+    },
+    {
+      "id": "he-IL.narrative",
+      "language_tag": "he-IL",
+      "script": "Hebr",
+      "direction": "RTL",
+      "surface": "אנרגיה שווה למסה כפול ריבוע מהירות האור.",
+      "kind": "ENGINEERING_GLOSS_NEEDS_NATIVE_REVIEW",
+      "atoms_present": ["ENERGY", "EQUALS", "MASS", "MULTIPLY", "SPEED_OF_LIGHT", "SQUARE"],
+      "phonetics": {"status": "TOKEN_VAZIO_NATIVE_REVIEW_REQUIRED", "ipa": null}
+    },
+    {
+      "id": "el-GR.narrative",
+      "language_tag": "el-GR",
+      "script": "Grek",
+      "direction": "LTR",
+      "surface": "Η ενέργεια ισούται με τη μάζα επί το τετράγωνο της ταχύτητας του φωτός.",
+      "kind": "ENGINEERING_GLOSS_NEEDS_NATIVE_REVIEW",
+      "atoms_present": ["ENERGY", "EQUALS", "MASS", "MULTIPLY", "SPEED_OF_LIGHT", "SQUARE"],
+      "phonetics": {"status": "TOKEN_VAZIO_NATIVE_REVIEW_REQUIRED", "ipa": null}
+    }
+  ],
+  "historical_language_bridge": {
+    "hbo": "USE_EXISTING_MSSC_SOURCE_PROFILE_NO_ANACHRONISTIC_PHYSICS_TRANSLATION",
+    "arc": "USE_EXISTING_MSSC_SOURCE_PROFILE_NO_ANACHRONISTIC_PHYSICS_TRANSLATION",
+    "grc": "USE_EXISTING_MSSC_SOURCE_PROFILE_NO_ANACHRONISTIC_PHYSICS_TRANSLATION"
+  }
+}

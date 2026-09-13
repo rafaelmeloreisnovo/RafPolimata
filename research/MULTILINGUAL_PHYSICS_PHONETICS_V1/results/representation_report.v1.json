@@ -1,0 +1,32 @@
+{
+  "boundaries": [
+    "byte_count_is_not_semantic_information",
+    "same_semantic_atoms_do_not_prove_translation_equivalence",
+    "ipa_drafts_are_not_native_speaker_validation",
+    "writing_direction_is_metadata_not_meaning",
+    "phonetic_difference_is_not_automatically_neural_difference",
+    "cross_cultural_pragmatics_requires_contextual_human_study"
+  ],
+  "claim_allowed": false,
+  "delta_42_58": {
+    "absolute_proportion_delta": 0.16,
+    "expansion_42_to_58_percent": 38.095238,
+    "half_delta": 0.08,
+    "midpoint": 0.5,
+    "percentage_points": 16.0,
+    "reduction_58_to_42_percent": 27.586207
+  },
+  "fixture_id": "MPP-E-MC2-20260912-V1",
+  "formula_id": "E_MC2",
+  "rows": [
+    {"byte_ratio_vs_symbolic":1.0,"codepoints":5,"direction":"LTR","graphemes_approx_nonspace":5,"id":"symbolic","kind":"MATHEMATICAL_SYMBOLIC","language_tag":"zxx","phonetic_lexeme_coverage":null,"script":"Zsym","semantic_coverage":1.0,"surface_sha256":"03b680eab659c430a16c7f515928d31a4e46fb60e668543ca4d080390bfd0aaf","utf8_bytes":6,"whitespace_tokens":1},
+    {"byte_ratio_vs_symbolic":12.666667,"codepoints":74,"direction":"LTR","graphemes_approx_nonspace":62,"id":"pt-BR.narrative","kind":"ENGINEERING_GLOSS","language_tag":"pt-BR","phonetic_lexeme_coverage":0.666667,"script":"Latn","semantic_coverage":1.0,"surface_sha256":"c817a5edd4ac76cd0461f6964f2d789fa492ae77d7b79b2cec7465ca2c7db58c","utf8_bytes":76,"whitespace_tokens":13},
+    {"byte_ratio_vs_symbolic":9.666667,"codepoints":58,"direction":"LTR","graphemes_approx_nonspace":48,"id":"en-US.narrative","kind":"ENGINEERING_GLOSS","language_tag":"en-US","phonetic_lexeme_coverage":1.0,"script":"Latn","semantic_coverage":1.0,"surface_sha256":"3236a3c6d71f81a966fb5b642d764817cb4748d78a32c6f54c7383514f1efe11","utf8_bytes":58,"whitespace_tokens":11},
+    {"byte_ratio_vs_symbolic":10.333333,"codepoints":59,"direction":"LTR","graphemes_approx_nonspace":48,"id":"gl-ES.narrative","kind":"ENGINEERING_GLOSS_NEEDS_NATIVE_REVIEW","language_tag":"gl-ES","phonetic_lexeme_coverage":null,"script":"Latn","semantic_coverage":1.0,"surface_sha256":"458bb26db365f58080d6396ab6d2af8af744039ac15c0a01068d0f475c095524","utf8_bytes":62,"whitespace_tokens":12},
+    {"byte_ratio_vs_symbolic":10.5,"codepoints":21,"direction":"HORIZONTAL_LTR_OR_VERTICAL_TTB_COLUMNS_RTL","graphemes_approx_nonspace":21,"id":"ja-JP.narrative","kind":"ENGINEERING_GLOSS_NEEDS_NATIVE_REVIEW","language_tag":"ja-JP","phonetic_lexeme_coverage":0.333333,"script":"Jpan","semantic_coverage":1.0,"surface_sha256":"d36e248d8b94d70609d013f4c5c15a361b03826c789f3b52b210aa0f8e97c266","utf8_bytes":63,"whitespace_tokens":1},
+    {"byte_ratio_vs_symbolic":7.0,"codepoints":14,"direction":"HORIZONTAL_LTR_OR_VERTICAL_TTB_COLUMNS_RTL","graphemes_approx_nonspace":14,"id":"zh-Hans.narrative","kind":"ENGINEERING_GLOSS_NEEDS_NATIVE_REVIEW","language_tag":"zh-Hans","phonetic_lexeme_coverage":null,"script":"Hans","semantic_coverage":1.0,"surface_sha256":"f026110b6b62682053d7a4411e96792af95ba1cc54de87bcf449a9e708cc1a28","utf8_bytes":42,"whitespace_tokens":1},
+    {"byte_ratio_vs_symbolic":12.166667,"codepoints":40,"direction":"RTL","graphemes_approx_nonspace":34,"id":"he-IL.narrative","kind":"ENGINEERING_GLOSS_NEEDS_NATIVE_REVIEW","language_tag":"he-IL","phonetic_lexeme_coverage":null,"script":"Hebr","semantic_coverage":1.0,"surface_sha256":"92dd1d78ae2116697869161ff2862f0a701c9a8c1a6e67a6348cb8166bc82759","utf8_bytes":73,"whitespace_tokens":7},
+    {"byte_ratio_vs_symbolic":21.5,"codepoints":71,"direction":"LTR","graphemes_approx_nonspace":59,"id":"el-GR.narrative","kind":"ENGINEERING_GLOSS_NEEDS_NATIVE_REVIEW","language_tag":"el-GR","phonetic_lexeme_coverage":null,"script":"Grek","semantic_coverage":1.0,"surface_sha256":"7cba6d7d598ba287ff9717a9a31c99bc1c2a9ec12e031ccc824cf674d899ba3d","utf8_bytes":129,"whitespace_tokens":13}
+  ],
+  "schema": "rafpolimata.multilingual-physics-phonetics.report.v1"
+}
