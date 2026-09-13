@@ -1,0 +1,66 @@
+{
+  "claim_id": "DGM-H1",
+  "proposition": "After controlling sleep stage, arousal and baseline neural activity, a preregistered vector of bioenergetic/electrochemical variables reproducibly improves out-of-sample prediction of neural-manifold geometric/information metrics.",
+  "claim_kind": "HYPOTHESIS",
+  "state": "METHOD_DEFINED",
+  "domain": "biology_biomedicine",
+  "intended_scope": "RESEARCH_ONLY_NONCLINICAL",
+  "assumptions": [
+    "Each physical quantity preserves its own units and constitutive law.",
+    "Neural-manifold metrics are fixed before outcome inspection.",
+    "Sleep stage/arousal and neural-activity baselines are explicit controls."
+  ],
+  "h0": "Adding the preregistered bioenergetic/electrochemical vector does not improve replicable out-of-sample prediction beyond the sleep-stage plus neural-activity baseline.",
+  "h1": "Adding the preregistered vector improves replicable out-of-sample prediction beyond the baseline.",
+  "falsifier": "No preregistered out-of-sample improvement, effect absorbed by controls/artifacts, unstable sign across cohorts, or failure of independent replication.",
+  "protocol": {
+    "version": "v0.1",
+    "frozen": false,
+    "procedure": "Choose one ethically accessible sleep dataset/protocol; freeze observables/proxies, preprocessing, embedding, metrics, baseline, model class, threshold and negative controls; compare nested models out of sample; repeat on an independent cohort/environment."
+  },
+  "metric": "Delta out-of-sample predictive performance for preregistered manifold metrics versus sleep-stage plus neural-activity baseline.",
+  "threshold": null,
+  "data_provenance": [],
+  "code_provenance": [
+    {"repository": "rafaelmeloreisnovo/RafPolimata", "path": "research/dg_manifold_bioionic_v1/reference.py"},
+    {"repository": "rafaelmeloreisnovo/RafPolimata", "path": "research/dg_manifold_bioionic_v1/test_reference.py"}
+  ],
+  "environment": {
+    "reference_execution": "Python 3.13.5 / Linux x86_64 container",
+    "biomedical_execution": "TOKEN_VAZIO"
+  },
+  "evidence": [
+    {"class": "reference_execution", "result": "5/5 PASS", "scope": "mathematical invariants only; not biomedical validation"}
+  ],
+  "negative_evidence": [],
+  "replication": {"level": "VERIFIED_INTERNAL", "independent": false},
+  "limitations": [
+    "No biological dataset has been tested for DGM-H1 in this packet.",
+    "ATP, membrane potential and osmotic variables may require proxies.",
+    "Association does not establish causal direction.",
+    "No clinical or therapeutic claim is allowed."
+  ],
+  "token_vazio": [
+    {
+      "missing": "Frozen dataset/protocol and observable/proxy mapping.",
+      "critical": true,
+      "next_verifiable_action": "Choose one dataset/protocol and preregister definitions and missing-data handling."
+    },
+    {
+      "missing": "Decision threshold and power/sample-size justification.",
+      "critical": true,
+      "next_verifiable_action": "Set them before inspecting final outcomes."
+    },
+    {
+      "missing": "Independent replication.",
+      "critical": true,
+      "next_verifiable_action": "Repeat frozen analysis on an independent cohort/environment."
+    },
+    {
+      "missing": "Ethics/consent approval if new human data are collected.",
+      "critical": true,
+      "next_verifiable_action": "Use consented public data or obtain required ethics approval."
+    }
+  ],
+  "claim_allowed": false
+}
