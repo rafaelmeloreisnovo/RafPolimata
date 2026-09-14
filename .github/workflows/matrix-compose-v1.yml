@@ -1,0 +1,49 @@
+name: Matrix Compose V1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/matrix_compose_v1.py"
+      - "tests/test_matrix_compose_v1.py"
+      - "examples/matrix_compose_v1.input.json"
+      - "docs/MATRIX_COMPOSE_V1.md"
+      - ".github/workflows/matrix-compose-v1.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: matrix-compose-v1-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  matrix-compose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.13"
+      - name: Unit and corruption gates
+        run: python3 -m unittest tests.test_matrix_compose_v1
+      - name: Execute bounded fixture
+        run: |
+          mkdir -p artifacts/matrix-compose-v1
+          python3 scripts/matrix_compose_v1.py \
+            examples/matrix_compose_v1.input.json \
+            --source-root . \
+            --out-dir artifacts/matrix-compose-v1
+      - name: Validate emitted JSON
+        run: |
+          python3 -m json.tool artifacts/matrix-compose-v1/ifdex.v1.json >/dev/null
+          python3 -m json.tool artifacts/matrix-compose-v1/receipt.v1.json >/dev/null
+          python3 -m json.tool artifacts/matrix-compose-v1/matrix.output.json >/dev/null
+      - name: Upload bounded evidence
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: matrix-compose-v1
+          if-no-files-found: error
+          path: artifacts/matrix-compose-v1/
