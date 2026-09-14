@@ -36,4 +36,5 @@ Binary sources are read only inside `--source-root`, at the declared offset and 
 A passing hosted CI run proves only the bounded Python implementation and fixture on that exact
 commit. It does not prove Android/Termux/Frida/device execution.
 
-F_gap: physical runtime and cross-repository consumer receipts remain `TOKEN_VAZIO`.
+F_gap: physical runtime and cross-repository consumer receipts remain `TOKEN_VAZIO`
+under `closure=CLOSURE_L12` until a current-artifact runtime/device receipt exists.
