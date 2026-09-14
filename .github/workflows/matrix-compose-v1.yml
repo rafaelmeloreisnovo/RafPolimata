@@ -1,0 +1,45 @@
+name: Matrix Compose V1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/matrix_compose_v1.py"
+      - "tests/test_matrix_compose_v1.py"
+      - "examples/matrix_compose_v1.input.json"
+      - "docs/MATRIX_COMPOSE_V1.md"
+      - ".github/workflows/matrix-compose-v1.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  matrix-compose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Unit and corruption gates
+        run: python3 -m unittest tests.test_matrix_compose_v1
+      - name: Execute bounded fixture
+        run: |
+          mkdir -p artifacts/matrix-compose-v1
+          python3 scripts/matrix_compose_v1.py \
+            examples/matrix_compose_v1.input.json \
+            --source-root . \
+            --out-dir artifacts/matrix-compose-v1
+      - name: Validate emitted JSON
+        run: |
+          python3 -m json.tool artifacts/matrix-compose-v1/ifdex.v1.json >/dev/null
+          python3 -m json.tool artifacts/matrix-compose-v1/receipt.v1.json >/dev/null
+          python3 -m json.tool artifacts/matrix-compose-v1/matrix.output.json >/dev/null
+      - name: Upload bounded evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: matrix-compose-v1
+          if-no-files-found: error
+          path: artifacts/matrix-compose-v1/
