@@ -1,0 +1,120 @@
+{
+  "schema": "RAFAELIA_SEED_OMEGA_EVOLUTION_PRODUCER_CONTRACT_V1",
+  "contract_id": "SEED-OMEGA-EVOLUTION-PRODUCER-20260915-V1",
+  "date": "2026-09-15",
+  "claim_allowed": false,
+  "implementation_state": "CONTRACT_ONLY",
+  "producer_repo": "rafaelmeloreisnovo/RafPolimata",
+  "predecessor": {
+    "path": "data/governance/research-service-evolution-contract-20260828.v1.json",
+    "blob_sha": "9c64cf65337a782965a39fcfa1fe5e872a134c2b"
+  },
+  "upstream_authorities": [
+    {
+      "repo": "rafaelmeloreisnovo/Mapa",
+      "artifact": "schemas/seed-omega-evolution.v1.schema.json",
+      "pr": 632
+    },
+    {
+      "repo": "rafaelmeloreisnovo/papers",
+      "artifact": "papers/seed_omega_evolution_v1/paper.md",
+      "pr": 91
+    },
+    {
+      "repo": "instituto-Rafael/relativity-living-light",
+      "artifact": "docs/science/SEED_OMEGA_EVOLUTION_V1.md",
+      "pr": 923
+    }
+  ],
+  "purpose": "Define the future evidence producer for bounded non-linear seed evolution without claiming that the simulator already exists.",
+  "topology": "TEMPORAL_TYPED_HYPERGRAPH",
+  "input_contract": [
+    "seed manifest",
+    "parent and ancestor IDs",
+    "operator sequence",
+    "trait registry",
+    "environment",
+    "deterministic RNG seed",
+    "mutation policy",
+    "recombination compatibility matrix",
+    "backcross trait mask",
+    "quiescence/reactivation instructions"
+  ],
+  "operator_minimum": [
+    "DIRECT",
+    "INDIRECT",
+    "DERIVATIVE",
+    "INVERSE",
+    "REVERSE",
+    "ANTIDERIVATIVE",
+    "RECLUSIVE_CLOSURE",
+    "LOG",
+    "ITERATED_LOG",
+    "TANGENTIAL",
+    "ORTHOGONAL",
+    "TRANSVERSAL",
+    "LATERAL",
+    "RECURSIVE",
+    "PERMUTE",
+    "RECOMBINE",
+    "BACKCROSS",
+    "QUIESCE",
+    "REACTIVATE",
+    "LATENT_RELATION_PROBE",
+    "NOISE_RECLASSIFY",
+    "GEODESIC_STEP"
+  ],
+  "noise_contract": {
+    "residual": "Delta_PT=d(practice_observation,theory_prediction)",
+    "initial_owner": "TOKEN_VAZIO_RESIDUAL_OWNER",
+    "rule": "Do not preassign noise to practice or theory."
+  },
+  "backcross_contract": {
+    "formula": "child=B(current,ancestor;trait_mask)",
+    "ancestor_rewrite": false,
+    "current_parent_rewrite": false,
+    "required_receipt_fields": [
+      "current_parent_id",
+      "ancestor_id",
+      "trait_mask",
+      "compatibility_result",
+      "operator_parameters",
+      "pre_trait_vector",
+      "post_trait_vector",
+      "rng_seed",
+      "output_hash"
+    ]
+  },
+  "quiescent_bank": {
+    "enabled": true,
+    "invariant": "QUIESCENT != DELETED",
+    "reactivation": "EXPLICIT_ONLY",
+    "silent_delete": false
+  },
+  "output_contract": [
+    "child manifest",
+    "typed hyperedges",
+    "trait diff",
+    "operator-domain results",
+    "Pareto metrics",
+    "noise residual classification state",
+    "receipt with source hashes and output hashes"
+  ],
+  "hard_gates": [
+    "operator domain/codomain validation",
+    "parent/ancestor existence",
+    "no silent ancestry rewrite",
+    "sqrt(3/2) != sqrt(3)/2 control",
+    "Euclidean q^n != physical/hyperbolic geodesic without metric contract",
+    "deterministic replay under fixed RNG seed",
+    "unknown operator rejection",
+    "claim_allowed fail-closed"
+  ],
+  "receipts": {
+    "execution": "TOKEN_VAZIO",
+    "deterministic_replay": "TOKEN_VAZIO",
+    "negative_tests": "TOKEN_VAZIO",
+    "independent_reproduction": "TOKEN_VAZIO"
+  },
+  "next_gate": "Implement a finite fixture-only producer and validator; do not promote scientific model gain."
+}
