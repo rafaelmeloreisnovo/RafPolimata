@@ -57,6 +57,7 @@ Não promover `provider_independent_reproduction`, Android runtime ou device pro
 - `CONVERGENCIA_UNICA_METODOLOGICA.md`
 - `CONVERGENCIA_ECOSSISTEMA_RMR_RAFAELIA.md`
 - `INFO_DYNAMICS_INTERNAL_TRACEABILITY.md`
+- `LOWFALA_MULTIDIRECTIONAL_BUS_CODE_FIRST_MAP_V1.md` — mapa code-first entre LowFala adjacente, perfis de linguagem, dispatch bus, runtime router e DMA circular; usar quando docs históricos divergirem do código atual.
 
 ## 5. Excelência operacional, risco e evidência
 
