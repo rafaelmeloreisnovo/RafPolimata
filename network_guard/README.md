@@ -21,7 +21,7 @@ The core itself performs no allocation, syscalls, DNS, file IO, socket IO, proce
 - logs are metadata-only by default;
 - `pre tuple` and `post tuple` are distinct objects;
 - NAT/PAT is asserted only when both tuples are independently observable;
-- if post-translation state is not observable, NAT/PAT state is `TOKEN_VAZIO`, never guessed;
+- if post-translation state is not observable, NAT/PAT state is `UNOBSERVED_AT_ADAPTER`, never guessed;
 - UDP is represented as protocol 17 and is not treated as a connected TCP session;
 - rules are first-match, ordered, deterministic;
 - ports are host byte order inside the engine; adapters normalize network byte order;
