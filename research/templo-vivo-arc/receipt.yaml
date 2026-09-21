@@ -1,0 +1,53 @@
+temple_status: PROTECTED
+contract: "Templo Vivo ARC / parent-governance"
+state: EVIDENCE_LIMITED
+claim_allowed: false
+global_scientific_claim: false
+semantic_decipherment: TOKEN_VAZIO
+authorship_claim: TOKEN_VAZIO
+historical_claim: TOKEN_VAZIO
+
+G1:
+  name: Seed Reconstruction
+  result: PASS
+  evidence:
+    - "9/9 hashes-fonte coincidiram"
+    - "10.449 registros reconstruídos"
+    - "reconstrução exata do corpus normalizado declarado"
+  limit: "não prova decifração nem verdade semântica"
+
+G2:
+  name: Total-Cost Compression
+  result: FAIL_STRONG
+  evidence:
+    - "plain+Brotli = 317.003 B"
+    - "seed+Brotli = 320.306 B"
+    - "+ schema + decoder = 324.771 B"
+  limit: "hipótese forte refutada no experimento executado"
+
+G3:
+  name: Null/Shuffle
+  result: PASS
+  evidence:
+    - "3 famílias × 32 permutações"
+    - "p ≈ 0.030303"
+  limit: "efeito de ordem/estrutura, não lei universal"
+
+UDHR_CONTROL:
+  name: Universal Declaration of Human Rights control
+  result: PASS_RECONSTRUCTION
+  evidence:
+    - "90 segmentos"
+    - "270 registros"
+    - "reconstrução exata"
+  limit: "estrutura consistente, não significado universal"
+
+final_meaning:
+  - "reconstruibilidade foi demonstrada"
+  - "estrutura/ordem tem efeito mensurável"
+  - "compressão superior forte foi refutada"
+  - "não há autoridade para afirmar nova ciência ou nova verdade"
+
+F_ok: "G1, G3 e controle UDHR executados e materializados"
+F_gap: "compressão forte refutada; semântica, autoria e ciência global permanecem bloqueadas"
+F_next: "separar formalmente reconstruibilidade, proveniência e compressão antes de qualquer G4/G5"
