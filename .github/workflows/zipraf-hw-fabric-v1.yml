@@ -1,0 +1,39 @@
+name: ZIPRAF HW Fabric V1
+
+on:
+  pull_request:
+    paths:
+      - "native/zipraf_hw_fabric_v1/**"
+      - ".github/workflows/zipraf-hw-fabric-v1.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-gates:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: native/zipraf_hw_fabric_v1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tool identities
+        run: |
+          cc --version
+          clang --version
+          rustc --version
+          python3 --version
+      - name: C selftest GCC
+        run: make clean selftest
+      - name: C selftest Clang
+        run: make clean CC=clang selftest
+      - name: Rust no_std compile
+        run: make rust-check
+      - name: ASM syntax matrix
+        run: make asm-check
+      - name: Registry JSON gates
+        run: |
+          python3 -m json.tool registry/primitive_registry.v1.json >/dev/null
+          python3 -m json.tool profiles/hardware_profiles.v1.json >/dev/null
+          python3 -m json.tool LICENSE_SCOPE_V1.json >/dev/null
