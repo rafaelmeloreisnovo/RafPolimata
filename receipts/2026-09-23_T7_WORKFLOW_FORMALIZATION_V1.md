@@ -4,6 +4,7 @@
 - kind: MATH/WORKFLOW/FORMALIZATION
 - state: IMPLEMENTED_BRANCH / REMOTE_CI_PENDING
 - claim_allowed: false
+- governance_closure: CLOSURE_L9 (governance only; material proof gaps remain open)
 
 ## Material delta
 
