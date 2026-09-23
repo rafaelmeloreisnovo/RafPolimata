@@ -1,5 +1,7 @@
 # RafPolimata — corte documental 2026-09-23
 
+**Governance binding: CLOSURE_L11** — explicit unknown-state markers are governed by the operational gap topology closure; the binding does not promote the underlying gap.
+
 **Base observada:** main@f22efc099ac530d946ff2ec34954455f75632e92  
 **Árvore de origem:** ecd9731dba52cbc255972cfe2fa92e041f74c5b5  
 **Tipo:** documentação de engenharia ligada a revisão  

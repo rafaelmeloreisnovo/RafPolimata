@@ -72,5 +72,7 @@
     "JAVA_SOURCE_NOT_OBSERVED",
     "RUST_CARGO_WORKSPACE_NOT_OBSERVED",
     "REPOSITORY_METADATA_INCOMPLETE"
-  ]
+  ],
+  "governance_closure": "CLOSURE_L11",
+  "governance_closure_note": "Explicit TOKEN_VAZIO markers are bound to the operational gap topology closure; binding does not promote a gap."
 }

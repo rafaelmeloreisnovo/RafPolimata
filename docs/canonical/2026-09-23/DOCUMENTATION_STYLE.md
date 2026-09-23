@@ -1,5 +1,7 @@
 # Padrão de documentação — GitHub-native e auditável
 
+**Governance binding: CLOSURE_L11** — explicit unknown-state markers are governed by the operational gap topology closure; the binding does not promote the underlying gap.
+
 ## 1. Objetivo
 
 Produzir documentação que seja simultaneamente:

@@ -1,5 +1,7 @@
 # Linguagens — contrato, fonte presente e fronteira de prova
 
+**Governance binding: CLOSURE_L11** — explicit unknown-state markers are governed by the operational gap topology closure; the binding does not promote the underlying gap.
+
 **Base:** main@f22efc099ac530d946ff2ec34954455f75632e92  
 **Contrato legível por máquina:** ci/contracts/rafaelia_language_completion_v1.tsv  
 **Dispatch:** Apkc/lang_profile.h

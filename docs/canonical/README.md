@@ -1,5 +1,7 @@
 # RafPolimata — documentação canônica
 
+**Governance binding: CLOSURE_L11** — explicit unknown-state markers are governed by the operational gap topology closure; the binding does not promote the underlying gap.
+
 > [!IMPORTANT]
 > Este diretório é um router. Ele aponta para cortes documentais ligados a uma revisão observada e não substitui fonte, execução, evidência ou receipt.
 

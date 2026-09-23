@@ -1,5 +1,7 @@
 # Suporte — RafPolimata
 
+**Governance binding: CLOSURE_L11** — explicit unknown-state markers are governed by the operational gap topology closure; the binding does not promote the underlying gap.
+
 ## Escopo
 
 O repositório é um projeto técnico e de pesquisa. Não há, neste corte, SLA comercial ou prazo de resposta documentado.

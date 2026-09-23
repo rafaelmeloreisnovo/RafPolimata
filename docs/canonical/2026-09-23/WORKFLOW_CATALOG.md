@@ -1,5 +1,7 @@
 # Catálogo de GitHub Actions
 
+**Governance binding: CLOSURE_L11** — explicit unknown-state markers are governed by the operational gap topology closure; the binding does not promote the underlying gap.
+
 **Base observada:** main@f22efc099ac530d946ff2ec34954455f75632e92  
 **Quantidade:** 50 arquivos .github/workflows/*.yml
 

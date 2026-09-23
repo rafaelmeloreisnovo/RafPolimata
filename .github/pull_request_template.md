@@ -1,5 +1,7 @@
 ## Objective
 
+**Governance binding: CLOSURE_L11** — explicit unknown-state markers are governed by the operational gap topology closure; the binding does not promote the underlying gap.
+
 What concrete gap or change does this PR address?
 
 ## Authority / source
