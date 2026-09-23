@@ -9,13 +9,34 @@
   "root_repository_license_changed": false,
   "third_party_material_included": false,
   "covered_original_paths": [
-    "README.md","SPEC.md","Makefile","include/zipraf_hw_fabric.h",
-    "c/zipraf_hw_fabric.c","rust/lib.rs",
-    "asm/armv7/zipraf_xor4.S","asm/aarch64/zipraf_xor4.S","asm/x86_64/zipraf_xor4.S",
-    "tests/selftest.c","install/bbs_install.sh",
-    "registry/primitive_registry.v1.json","permissions/PERMISSION_MODEL.md"
+    "README.md",
+    "SPEC.md",
+    "Makefile",
+    "include/zipraf_hw_fabric.h",
+    "c/zipraf_hw_fabric.c",
+    "rust/lib.rs",
+    "asm/armv7/zipraf_xor4.S",
+    "asm/aarch64/zipraf_xor4.S",
+    "asm/x86_64/zipraf_xor4.S",
+    "tests/selftest.c",
+    "install/bbs_install.sh",
+    "registry/primitive_registry.v1.json",
+    "permissions/PERMISSION_MODEL.md",
+    "include/zipraf_crypto_adapter.h",
+    "profiles/hardware_profiles.v1.json"
   ],
-  "authorization_metadata_paths": ["LICENSE.md","LICENSE_SCOPE_V1.json","LEGAL_NOTICE.md"],
-  "excluded_rights": ["mathematical_ideas","public_standards","third_party_source","upstream_algorithm_ownership","trademarks","ungranted_patent_rights"],
+  "authorization_metadata_paths": [
+    "LICENSE.md",
+    "LICENSE_SCOPE_V1.json",
+    "LEGAL_NOTICE.md"
+  ],
+  "excluded_rights": [
+    "mathematical_ideas",
+    "public_standards",
+    "third_party_source",
+    "upstream_algorithm_ownership",
+    "trademarks",
+    "ungranted_patent_rights"
+  ],
   "claim_allowed": false
 }
