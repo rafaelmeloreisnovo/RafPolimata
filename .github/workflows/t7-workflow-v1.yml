@@ -6,12 +6,17 @@ on:
       - 'docs/SPEC_T7_TOROID_CONVERGENCE.md'
       - 'configs/t7-workflow-v1.json'
       - 'configs/t7-normalization-registry-v1.json'
+      - 'configs/t7-application-bridge-v2.json'
       - 'scripts/validate_t7_workflow_v1.py'
       - 'scripts/validate_t7_migration_fixtures_v1.py'
+      - 'scripts/validate_t7_application_bridge_v2.py'
       - 'rafaelia/t7_workflow_projection_v1.h'
+      - 'rafaelia/t7_workflow_apply_v2.h'
       - 'tests/test_t7_workflow_projection_v1.c'
+      - 'tests/test_t7_workflow_apply_v2.c'
       - 'tests/fixtures/t7_projection_migration_v1.json'
       - 'receipts/2026-09-23_T7_NORMALIZATION_FIXTURES_V1.md'
+      - 'receipts/2026-09-23_T7_APPLICATION_BRIDGE_V2.md'
       - '.github/workflows/t7-workflow-v1.yml'
   workflow_dispatch:
 
@@ -32,6 +37,8 @@ jobs:
         run: python3 scripts/validate_t7_workflow_v1.py
       - name: Validate normalization registry and migration fixtures
         run: python3 scripts/validate_t7_migration_fixtures_v1.py
+      - name: Validate additive application bridge V2
+        run: python3 scripts/validate_t7_application_bridge_v2.py
       - name: Verify implementation constants
         run: |
           grep -q '#define T7_DIM       7' Benchmark/raf_types.h
@@ -42,12 +49,20 @@ jobs:
           grep -q 't7_step' Benchmark/raf_toroid.h
           grep -q 'phi_attractor' Apkc/coherence.h
           grep -q 't7wf_project_v1' rafaelia/t7_workflow_projection_v1.h
+          grep -q 't7wf_apply_present_v2' rafaelia/t7_workflow_apply_v2.h
       - name: Pi_wf V1 hosted regression
         run: |
           cc -std=c11 -Wall -Wextra -Werror -I. tests/test_t7_workflow_projection_v1.c -o /tmp/t7wf-test
           /tmp/t7wf-test
+      - name: Pi_apply V2 hosted regression
+        run: |
+          cc -std=c11 -Wall -Wextra -Werror -I. tests/test_t7_workflow_apply_v2.c -o /tmp/t7apply-test
+          /tmp/t7apply-test
       - name: Pi_wf V1 freestanding syntax matrix
         run: |
           clang -std=c11 -ffreestanding -fno-builtin -Wall -Wextra -Werror -I. -c tests/test_t7_workflow_projection_v1.c -o /tmp/t7wf-x64.o
           clang -target armv7-none-eabi -std=c11 -ffreestanding -fno-builtin -Wall -Wextra -Werror -I. -c tests/test_t7_workflow_projection_v1.c -o /tmp/t7wf-armv7.o
           clang -target aarch64-none-elf -std=c11 -ffreestanding -fno-builtin -Wall -Wextra -Werror -I. -c tests/test_t7_workflow_projection_v1.c -o /tmp/t7wf-aarch64.o
+          clang -std=c11 -ffreestanding -fno-builtin -Wall -Wextra -Werror -I. -c tests/test_t7_workflow_apply_v2.c -o /tmp/t7apply-x64.o
+          clang -target armv7-none-eabi -std=c11 -ffreestanding -fno-builtin -Wall -Wextra -Werror -I. -c tests/test_t7_workflow_apply_v2.c -o /tmp/t7apply-armv7.o
+          clang -target aarch64-none-elf -std=c11 -ffreestanding -fno-builtin -Wall -Wextra -Werror -I. -c tests/test_t7_workflow_apply_v2.c -o /tmp/t7apply-aarch64.o
