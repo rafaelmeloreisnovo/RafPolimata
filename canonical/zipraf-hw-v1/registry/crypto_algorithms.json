@@ -1,0 +1,27 @@
+{
+  "schema": "ZIPRAF-HW-CRYPTO-REGISTRY-V1",
+  "source_authority": "rafaelmeloreisnovo/BLAKE3 PR#126 @ 1df43ed547522cd7c31a93b7658d346437729816",
+  "boundary": [
+    "ALGORITHM!=PROVIDER!=ARCHITECTURE",
+    "COMPILE!=LINK!=EXECUTION!=EVIDENCE!=CLAIM",
+    "MD5_SHA1_COMPATIBILITY_ONLY"
+  ],
+  "algorithms": [
+    {"id":"blake3","class":"hash","provider":"BLAKE3-upstream","security_use":"current"},
+    {"id":"md5","class":"hash","provider":"OpenSSL-3-EVP","security_use":"compatibility_only"},
+    {"id":"sha1","class":"hash","provider":"OpenSSL-3-EVP","security_use":"compatibility_only"},
+    {"id":"sha256","class":"hash","provider":"OpenSSL-3-EVP","security_use":"current"},
+    {"id":"sha512","class":"hash","provider":"OpenSSL-3-EVP","security_use":"current"},
+    {"id":"sha3-256","class":"hash","provider":"OpenSSL-3-EVP","security_use":"current"},
+    {"id":"blake2b-512","class":"hash","provider":"OpenSSL-3-EVP","security_use":"current"},
+    {"id":"hmac-sha256","class":"mac","provider":"OpenSSL-3-EVP_MAC","security_use":"current"},
+    {"id":"hmac-sha512","class":"mac","provider":"OpenSSL-3-EVP_MAC","security_use":"current"},
+    {"id":"hkdf-sha256","class":"kdf","provider":"OpenSSL-3-EVP_KDF","security_use":"current"},
+    {"id":"pbkdf2-hmac-sha256","class":"password_kdf","provider":"OpenSSL-3-EVP","security_use":"current"},
+    {"id":"ed25519","class":"signature","provider":"OpenSSL-3-EVP_PKEY","security_use":"current"},
+    {"id":"x25519","class":"key_agreement","provider":"OpenSSL-3-EVP_PKEY","security_use":"current"},
+    {"id":"chacha20-poly1305","class":"aead","provider":"OpenSSL-3-EVP_CIPHER","security_use":"current"},
+    {"id":"aes-256-gcm","class":"aead","provider":"OpenSSL-3-EVP_CIPHER","security_use":"current"}
+  ],
+  "claim_allowed": false
+}
