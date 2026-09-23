@@ -1,5 +1,6 @@
 {
   "schema": "RAFPOLIMATA-T7-WORKFLOW-V1",
+  "governance_closure": "CLOSURE_L9",
   "math": {
     "space": "(R/Z)^7",
     "equivalent": "(S^1)^7",
