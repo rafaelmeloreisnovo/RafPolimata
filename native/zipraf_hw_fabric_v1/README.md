@@ -1,5 +1,7 @@
 # ZIPRAF Ω Hardware Capability Fabric V1
 
+**Governance binding:** `CLOSURE_L11` — explicit unknown-state markers remain gaps; this binding does not promote them.
+
 **State:** `IMPLEMENTED_SOURCE / LOCAL_GATES_RECORDED`  
 **Languages:** ASM + C11 + Rust `no_std`  
 **Role:** hardware-capability routing, permission enforcement and adapter registry; **not** the ZIPRAF codec itself.
