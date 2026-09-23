@@ -185,3 +185,9 @@ The provenance record for this reconciliation is:
 - **F_ok:** README now routes the current freestanding/PBIP/governance state without promoting stale generated outputs.
 - **F_gap:** current generator refresh, physical/device evidence and provider-independent reproduction remain open.
 - **F_next:** regenerate derived governance through its own tool, then close runtime/scientific gates independently with revision-bound receipts.
+
+## ZIPRAF Hardware Capability Fabric V1 — candidate route
+
+The review branch adds `native/zipraf_hw_fabric_v1/` as the canonical RafPolimata control plane for ZIPRAF-adjacent hardware capability geometry, mixed FS/capability permissions, typed crypto adapters, C/Rust/ASM routing and evidence gates.
+
+The module does not replace `ZIPRAF_CORE` or `ZIPRAF_OMEGA_FULL`, and source/codegen evidence is not promoted into physical-runtime or cryptographic-security claims.
