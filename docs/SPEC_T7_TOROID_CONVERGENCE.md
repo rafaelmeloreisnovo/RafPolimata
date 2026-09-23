@@ -188,3 +188,47 @@ The evolution to T^7 is accepted at the architecture/formalization layer when th
 F_ok: T^7 formal object, Q16 representation, seven-axis workflow projection and legacy mapping are now explicitly separated.  
 F_gap: semantic projection drift; 42-attractor convergence/stability proof; physical validation of any performance implication.  
 F_next: implement a versioned `Pi_wf` adapter with no silent zero-imputation, then test legacy-vs-semantic projection before changing runtime behavior.
+
+
+## 11. Pi_wf V1 implementation
+
+The versioned semantic adapter is materialized in
+`rafaelia/t7_workflow_projection_v1.h`.
+
+Its low-level representation uses:
+
+```text
+q[7]          = wrapped Q16-grid coordinates
+present_mask  = semantic presence bits
+version       = projection contract version
+source_ref_hash
+normalization_id
+```
+
+The decisive invariant is:
+
+```text
+TOKEN_VAZIO = coordinate bit absent
+numeric 0   = q[i]==0 AND coordinate bit present
+TOKEN_VAZIO != numeric 0
+```
+
+`Pi_wf_V1` does not mutate `T7State`, does not call `t7_map_input`, and
+does not silently fill missing coordinates. It is therefore possible to
+compare semantic and legacy projections before selecting a migration policy.
+
+The compatibility helper `t7wf_legacy_raw_coords_v1` mirrors the existing
+legacy formulas exactly. `t7wf_compare_legacy_v1` returns a seven-bit mask
+of coordinates that are both present in the semantic projection and
+numerically equal to the legacy raw mapping.
+
+The regression test additionally executes the real legacy `t7_map_input`
+and verifies that the extracted legacy raw coordinates reproduce its current
+IIR update. This binds the comparison helper to runtime behavior rather than
+to comments alone.
+
+### Migration gate
+
+Changing `Benchmark/raf_toroid.h::t7_map_input` remains forbidden in V1.
+A later runtime migration requires an explicit version transition, before/after
+fixtures, compatibility policy, and new exact-head receipts.
