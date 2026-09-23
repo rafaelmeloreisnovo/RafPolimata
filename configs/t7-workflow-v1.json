@@ -1,0 +1,49 @@
+{
+  "schema": "RAFPOLIMATA-T7-WORKFLOW-V1",
+  "governance_closure": "CLOSURE_L9",
+  "math": {
+    "space": "(R/Z)^7",
+    "equivalent": "(S^1)^7",
+    "dimensions": 7,
+    "q16_modulus": 65536,
+    "coordinate_domain": "[0,1)"
+  },
+  "coordinates": [
+    {"index":0,"symbol":"u","name":"uncertainty_entropy","source_requirement":"observed_or_token_vazio"},
+    {"index":1,"symbol":"v","name":"coherence_consistency","source_requirement":"explicit_metric"},
+    {"index":2,"symbol":"psi","name":"authorized_intention","source_requirement":"human_declared"},
+    {"index":3,"symbol":"chi","name":"observation","source_requirement":"source_bound"},
+    {"index":4,"symbol":"rho","name":"noise_risk","source_requirement":"measured_or_typed_uncertainty"},
+    {"index":5,"symbol":"delta","name":"material_delta","source_requirement":"receipt_bound"},
+    {"index":6,"symbol":"sigma","name":"memory_accumulated_state","source_requirement":"append_only_lineage"}
+  ],
+  "projection_adapter": {
+    "id":"Pi_wf_V1",
+    "source":"rafaelia/t7_workflow_projection_v1.h",
+    "implemented":true,
+    "mutates_legacy_t7_state":false,
+    "presence_encoding":"7-bit present_mask",
+    "token_vazio_representation":"bit_unset",
+    "numeric_zero_is_valid_present_value":true,
+    "silent_imputation":false,
+    "legacy_comparison":"t7wf_compare_legacy_v1"
+  },
+  "legacy_mapping": {
+    "source":"Benchmark/raf_toroid.h::t7_map_input",
+    "semantic_identity":false,
+    "gap_id":"GAP-T7-SEMANTIC-PROJECTION",
+    "runtime_behavior_changed":false
+  },
+  "auxiliary_42_slot_machine": {
+    "implemented":true,
+    "proven_as_exactly_42_dynamical_attractors":false,
+    "global_convergence_proven":false,
+    "stability_proven":false
+  },
+  "token_vazio": {
+    "allowed":true,
+    "numeric_zero_equivalent":false,
+    "silent_imputation_forbidden":true
+  },
+  "claim_allowed":false
+}
