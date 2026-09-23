@@ -85,11 +85,49 @@ static int test_legacy_vs_semantic_mask(void) {
     return 0;
 }
 
+
+static int test_migration_fixture_reference_values(void) {
+    static const u32 expected_seed[T7_DIM] =
+        {40503u,15470u,55973u,30940u,5907u,46410u,21377u};
+    static const u32 expected_raw[T7_DIM] =
+        {22136u,4660u,4660u,0u,52719u,43981u,39831u};
+    static const u32 expected_after[T7_DIM] =
+        {35912u,12768u,43145u,23205u,17610u,45803u,25990u};
+
+    T7Input in;
+    in.data_hash = 0x12345678u;
+    in.entropy = (q16_t)0x00001234;
+    in.hw_state = 0x89ABCDEFu;
+
+    T7State t;
+    t7_init(&t);
+    for (u32 i=0;i<T7_DIM;++i)
+        if (t.s[i] != expected_seed[i]) return (int)(1u+i);
+
+    u32 raw[T7_DIM];
+    t7wf_legacy_raw_coords_v1(&in, raw);
+    for (u32 i=0;i<T7_DIM;++i)
+        if (raw[i] != expected_raw[i]) return (int)(10u+i);
+
+    t7_map_input(&t, &in);
+    for (u32 i=0;i<T7_DIM;++i)
+        if (t.s[i] != expected_after[i]) return (int)(20u+i);
+
+    T7WorkflowEventV1 e = {{0u},T7WF_PRESENT_ALL,0x12345678u,1u};
+    for (u32 i=0;i<T7_DIM;++i) e.q[i]=expected_raw[i];
+    T7WorkflowProjectionV1 p = {{0u},0u,0u,0u,0u};
+    t7wf_project_v1(&e, &p);
+    if (p.normalization_id != 1u) return 30;
+    if (t7wf_compare_legacy_v1(&p,&in) != T7WF_PRESENT_ALL) return 31;
+    return 0;
+}
+
 int main(void) {
     int r;
     r=test_token_vazio_not_zero(); if (r) return 10+r;
     r=test_projection_wrap_and_metadata(); if (r) return 20+r;
     r=test_legacy_capture_matches_runtime(); if (r) return 30+r;
     r=test_legacy_vs_semantic_mask(); if (r) return 40+r;
+    r=test_migration_fixture_reference_values(); if (r) return 50+r;
     return 0;
 }

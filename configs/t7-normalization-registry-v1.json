@@ -1,0 +1,23 @@
+{
+  "schema": "RAFPOLIMATA-T7-NORMALIZATION-REGISTRY-V1",
+  "version": 1,
+  "governance_closure": "CLOSURE_L9",
+  "q16_modulus": 65536,
+  "entries": [
+    {
+      "id": 1,
+      "name": "PRENORMALIZED_Q16_IDENTITY_V1",
+      "input_domain": "integer",
+      "output_domain": "[0,65535]",
+      "transform": "q_out = q_in & 0xFFFF",
+      "presence_rule": "present_mask controls semantic presence independently of numeric value",
+      "evidence_scope": "representation_only",
+      "scientific_axis_calibration": false
+    }
+  ],
+  "external_source_to_axis_normalization_status": "TOKEN_VAZIO",
+  "external_source_to_axis_normalization_rule": null,
+  "silent_imputation": false,
+  "migration_authorized": false,
+  "claim_allowed": false
+}

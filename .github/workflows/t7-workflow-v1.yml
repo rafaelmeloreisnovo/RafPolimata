@@ -5,9 +5,13 @@ on:
     paths:
       - 'docs/SPEC_T7_TOROID_CONVERGENCE.md'
       - 'configs/t7-workflow-v1.json'
+      - 'configs/t7-normalization-registry-v1.json'
       - 'scripts/validate_t7_workflow_v1.py'
+      - 'scripts/validate_t7_migration_fixtures_v1.py'
       - 'rafaelia/t7_workflow_projection_v1.h'
       - 'tests/test_t7_workflow_projection_v1.c'
+      - 'tests/fixtures/t7_projection_migration_v1.json'
+      - 'receipts/2026-09-23_T7_NORMALIZATION_FIXTURES_V1.md'
       - '.github/workflows/t7-workflow-v1.yml'
   workflow_dispatch:
 
@@ -26,6 +30,8 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Validate T7 formal contract
         run: python3 scripts/validate_t7_workflow_v1.py
+      - name: Validate normalization registry and migration fixtures
+        run: python3 scripts/validate_t7_migration_fixtures_v1.py
       - name: Verify implementation constants
         run: |
           grep -q '#define T7_DIM       7' Benchmark/raf_types.h
