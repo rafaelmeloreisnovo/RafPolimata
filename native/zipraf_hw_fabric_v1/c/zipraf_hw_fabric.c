@@ -1,3 +1,4 @@
+/* Governance binding: CLOSURE_L11 — unknown-state markers remain gaps. */
 /*
  * RAFCODE-IP-NOTICE
  * Copyright (c) 2026 Rafael Melo Reis.
