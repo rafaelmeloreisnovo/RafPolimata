@@ -1,0 +1,71 @@
+name: Bug report
+description: Report a reproducible defect tied to a revision and environment.
+title: "[BUG] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Report observed behavior. Do not include secrets or exploit-ready vulnerability details; use SECURITY.md for security reports.
+  - type: input
+    id: revision
+    attributes:
+      label: Commit, tag or revision
+      placeholder: Full commit SHA when possible
+    validations:
+      required: true
+  - type: input
+    id: component
+    attributes:
+      label: Component or path
+      placeholder: Apkc/, freestanding/, scripts/...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, architecture, compiler/runtime versions and device/provider when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: Commands and smallest input needed to reproduce.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed result
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Sanitized logs, run IDs, artifact hashes or receipt references.
+  - type: dropdown
+    id: state
+    attributes:
+      label: Current evidence state
+      options:
+        - FAIL reproduced
+        - TOKEN_VAZIO needs reproduction
+        - PENDING triage
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed secrets, credentials and sensitive exploit details.
+          required: true

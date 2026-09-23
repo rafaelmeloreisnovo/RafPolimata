@@ -1,0 +1,66 @@
+name: Evidence gap
+description: Register missing execution, artifact, runtime, provider, device or claim evidence.
+title: "[EVIDENCE-GAP] "
+labels: []
+body:
+  - type: input
+    id: gap
+    attributes:
+      label: Gap ID or short name
+      placeholder: GAP-AREA-NNN
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source / authority
+      placeholder: file path, commit, PR, document or dataset
+    validations:
+      required: true
+  - type: dropdown
+    id: missing
+    attributes:
+      label: Missing layer
+      options:
+        - Source
+        - Build artifact
+        - Execution
+        - Runtime or device
+        - Provider independence
+        - Reproduction
+        - Scientific falsifier
+        - Provenance or custody
+        - License or attribution
+        - Documentation route
+    validations:
+      required: true
+  - type: textarea
+    id: known
+    attributes:
+      label: What is already observed
+      description: Facts only; include run IDs/hashes when available.
+    validations:
+      required: true
+  - type: textarea
+    id: absent
+    attributes:
+      label: What is absent or insufficient
+    validations:
+      required: true
+  - type: textarea
+    id: falsifier
+    attributes:
+      label: Gate or falsifier needed
+  - type: textarea
+    id: next
+    attributes:
+      label: Smallest next verifiable step
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Claim boundary
+      options:
+        - label: I will keep the claim unpromoted until the missing gate is satisfied.
+          required: true

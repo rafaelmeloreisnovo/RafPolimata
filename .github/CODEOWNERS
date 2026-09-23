@@ -1,0 +1,13 @@
+# RafPolimata review routing.
+# CODEOWNERS requests review; it does not by itself enforce approval.
+* @rafaelmeloreisnovo
+
+/docs/ @rafaelmeloreisnovo
+/.github/ @rafaelmeloreisnovo
+/Apkc/ @rafaelmeloreisnovo
+/freestanding/ @rafaelmeloreisnovo
+/compiler/ @rafaelmeloreisnovo
+/scripts/ @rafaelmeloreisnovo
+/tests/ @rafaelmeloreisnovo
+/native/ @rafaelmeloreisnovo
+/schemas/ @rafaelmeloreisnovo

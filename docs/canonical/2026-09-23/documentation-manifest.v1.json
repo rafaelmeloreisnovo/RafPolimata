@@ -1,0 +1,76 @@
+{
+  "schema": "rafpolimata.documentation-cut.v1",
+  "generated_by": "documentation-audit",
+  "date": "2026-09-23",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "observed_base_commit": "f22efc099ac530d946ff2ec34954455f75632e92",
+  "observed_base_tree": "ecd9731dba52cbc255972cfe2fa92e041f74c5b5",
+  "state": "CANONICAL_CANDIDATE_REVIEW_REQUIRED",
+  "claim_allowed": false,
+  "invariants": [
+    "SOURCE!=ARTIFACT",
+    "ARTIFACT!=EXECUTION",
+    "EXECUTION!=EVIDENCE",
+    "EVIDENCE!=CLAIM",
+    "TOKEN_VAZIO!=FAIL",
+    "TOKEN_VAZIO!=PASS"
+  ],
+  "observed_counts": {
+    "recursive_tree_entries": 1752,
+    "docs_files": 264,
+    "workflow_files": 50,
+    "md_files": 397,
+    "py_files": 214,
+    "h_files": 207,
+    "json_files": 182,
+    "c_files": 176,
+    "sh_files": 120,
+    "cpp_files": 2,
+    "rust_files": 1,
+    "kotlin_files": 0,
+    "java_files": 0
+  },
+  "source_documents": {
+    "drive_start_here": {
+      "title": "START HERE — A-A auditar — RAFAELIA",
+      "id": "1rczmzAyJfKbh_hf1eRqnM9_v4VIqS4RwA1RrbwyZzr4"
+    },
+    "drive_memory_book": {
+      "title": "RAFAELIA — Implementação Latentes e Papers — Drive GitHub V1",
+      "id": "1g3eVD3zLMuwk0jevAwVL3wSmxhEMkKsAUPFQh2wEn88"
+    }
+  },
+  "current_ci": {
+    "workflow": "CI",
+    "run_id": 35574321825,
+    "head_sha": "f22efc099ac530d946ff2ec34954455f75632e92",
+    "conclusion": "failure",
+    "blocking_step": "Validate TOKEN_VAZIO gates (Hotfix H1)",
+    "validator_unit_tests": "19_PASS",
+    "changed_lines_errors": 5,
+    "changed_lines_warnings": 0,
+    "report_hash": "7833c15d5c0be5cbc667895a74275632dbf2c84d0eeabc95d48d641a7dd66a14"
+  },
+  "manual_documents": [
+    "README.md",
+    "REPOSITORY_SURVEY.md",
+    "ARCHITECTURE.md",
+    "LANGUAGES.md",
+    "BUILD_TEST_EVIDENCE.md",
+    "WORKFLOW_CATALOG.md",
+    "GITHUB_SURFACES.md",
+    "EVIDENCE_AND_CLAIMS.md",
+    "DOCUMENTATION_STYLE.md",
+    "GAPS_AND_NEXT.md"
+  ],
+  "generated_outputs_modified_manually": false,
+  "gaps": [
+    "CURRENT_CI_STRICT_TOKEN_VAZIO_FAIL",
+    "DOCUMENT_GOVERNANCE_REGEN_REQUIRED",
+    "ROOT_LICENSE_DECISION_REQUIRED",
+    "KOTLIN_SOURCE_NOT_OBSERVED",
+    "JAVA_SOURCE_NOT_OBSERVED",
+    "RUST_CARGO_WORKSPACE_NOT_OBSERVED",
+    "REPOSITORY_METADATA_INCOMPLETE"
+  ]
+}

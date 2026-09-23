@@ -4,6 +4,28 @@
 > **Estado:** `CANONICAL`  
 > **Regra:** `README → CURRENT_DOCUMENTATION_STATE → INDEX → área → source/evidence`
 
+
+## 0. Camada documental corrente — 2026-09-23
+
+**Implementation base observada:** main@f22efc099ac530d946ff2ec34954455f75632e92  
+**Router estável:** [canonical/README.md](canonical/README.md)
+
+| Rota | Papel |
+|---|---|
+| [canonical/2026-09-23/README.md](canonical/2026-09-23/README.md) | corte corrente e fontes |
+| [REPOSITORY_SURVEY](canonical/2026-09-23/REPOSITORY_SURVEY.md) | inventário físico e GitHub |
+| [ARCHITECTURE](canonical/2026-09-23/ARCHITECTURE.md) | arquitetura e fronteiras |
+| [LANGUAGES](canonical/2026-09-23/LANGUAGES.md) | contrato de linguagem vs fonte observada |
+| [BUILD_TEST_EVIDENCE](canonical/2026-09-23/BUILD_TEST_EVIDENCE.md) | build, gates e estado do CI |
+| [WORKFLOW_CATALOG](canonical/2026-09-23/WORKFLOW_CATALOG.md) | 50 workflows |
+| [GITHUB_SURFACES](canonical/2026-09-23/GITHUB_SURFACES.md) | recursos GitHub e gaps |
+| [EVIDENCE_AND_CLAIMS](canonical/2026-09-23/EVIDENCE_AND_CLAIMS.md) | níveis de prova |
+| [DOCUMENTATION_STYLE](canonical/2026-09-23/DOCUMENTATION_STYLE.md) | padrão documental |
+| [GAPS_AND_NEXT](canonical/2026-09-23/GAPS_AND_NEXT.md) | backlog tipado |
+
+Os snapshots e receipts anteriores permanecem válidos no seu escopo histórico; não são reescritos silenciosamente.
+
+
 ## 1. Entrada canônica corrente
 
 | Documento | Papel | Estado |

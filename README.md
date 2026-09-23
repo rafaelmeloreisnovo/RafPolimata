@@ -1,5 +1,27 @@
 # RafPolimata
 
+## Current documentation route — 2026-09-23
+
+**Observed implementation base:** main@f22efc099ac530d946ff2ec34954455f75632e92  
+**Documentation layer:** CANONICAL_CANDIDATE / REVIEW_REQUIRED  
+**claim_allowed:** false
+
+[Open the current canonical documentation router](docs/canonical/README.md)
+
+| Route | Purpose |
+|---|---|
+| [Repository survey](docs/canonical/2026-09-23/REPOSITORY_SURVEY.md) | tree, language presence, GitHub metadata |
+| [Architecture](docs/canonical/2026-09-23/ARCHITECTURE.md) | planes, boundaries, evidence path |
+| [Languages](docs/canonical/2026-09-23/LANGUAGES.md) | 23 profiles vs actual source presence |
+| [Build/test/evidence](docs/canonical/2026-09-23/BUILD_TEST_EVIDENCE.md) | Make, CI, receipts and current failure |
+| [Workflow catalog](docs/canonical/2026-09-23/WORKFLOW_CATALOG.md) | 50 GitHub Actions routes |
+| [GitHub surfaces](docs/canonical/2026-09-23/GITHUB_SURFACES.md) | community files, settings and gaps |
+| [Evidence and claims](docs/canonical/2026-09-23/EVIDENCE_AND_CLAIMS.md) | promotion rules |
+| [Gaps and next gates](docs/canonical/2026-09-23/GAPS_AND_NEXT.md) | typed backlog |
+
+> [!WARNING]
+> The 2026-09-06 material below is preserved as a historical documentation snapshot. It does not override the current 2026-09-23 route or evidence tied to newer commits.
+
 **State:** `CANONICAL / REVIEW_REQUIRED`  
 **Observed documentation base:** `main@9ed0b8aa93dfb5350b7dbeb9ea1e712ee1298388`  
 **Documentation cut:** 2026-09-06  
