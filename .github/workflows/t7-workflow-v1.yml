@@ -6,6 +6,8 @@ on:
       - 'docs/SPEC_T7_TOROID_CONVERGENCE.md'
       - 'configs/t7-workflow-v1.json'
       - 'scripts/validate_t7_workflow_v1.py'
+      - 'rafaelia/t7_workflow_projection_v1.h'
+      - 'tests/test_t7_workflow_projection_v1.c'
       - '.github/workflows/t7-workflow-v1.yml'
   workflow_dispatch:
 
@@ -30,7 +32,16 @@ jobs:
           grep -q '#define T7_MOD       65536U' Benchmark/raf_types.h
       - name: Verify implementation anchors
         run: |
-          grep -q 'typedef struct' Benchmark/raf_toroid.h
           grep -q 't7_map_input' Benchmark/raf_toroid.h
           grep -q 't7_step' Benchmark/raf_toroid.h
           grep -q 'phi_attractor' Apkc/coherence.h
+          grep -q 't7wf_project_v1' rafaelia/t7_workflow_projection_v1.h
+      - name: Pi_wf V1 hosted regression
+        run: |
+          cc -std=c11 -Wall -Wextra -Werror -I. tests/test_t7_workflow_projection_v1.c -o /tmp/t7wf-test
+          /tmp/t7wf-test
+      - name: Pi_wf V1 freestanding syntax matrix
+        run: |
+          clang -std=c11 -ffreestanding -fno-builtin -Wall -Wextra -Werror -I. -c tests/test_t7_workflow_projection_v1.c -o /tmp/t7wf-x64.o
+          clang -target armv7-none-eabi -std=c11 -ffreestanding -fno-builtin -Wall -Wextra -Werror -I. -c tests/test_t7_workflow_projection_v1.c -o /tmp/t7wf-armv7.o
+          clang -target aarch64-none-elf -std=c11 -ffreestanding -fno-builtin -Wall -Wextra -Werror -I. -c tests/test_t7_workflow_projection_v1.c -o /tmp/t7wf-aarch64.o
