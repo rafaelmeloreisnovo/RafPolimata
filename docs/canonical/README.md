@@ -39,3 +39,10 @@ A documentação datada permanece histórica. Um corte novo pode superseder o ro
 15. [Gaps e próximos gates](2026-09-23/GAPS_AND_NEXT.md)
 
 R3 = ⟨F_ok: router estável criado; F_gap: promoção depende dos gates do PR; F_next: revisar o corte e regenerar somente saídas derivadas por seus próprios executores⟩.
+
+
+## Post-cut candidate route — ZIPRAF Hardware Capability Fabric V1
+
+The branch under review adds `../../native/zipraf_hw_fabric_v1/README.md` as a canonical candidate module route. It is explicitly separate from the dated 2026-09-23 documentation cut above and does not rewrite that historical base.
+
+Boundary: RafPolimata owns capability/permission/dispatch control; `ZIPRAF_CORE` owns binary/ABI codec surfaces; `ZIPRAF_OMEGA_FULL` owns codec/round-trip behavior. Runtime/security promotion remains evidence-gated.
