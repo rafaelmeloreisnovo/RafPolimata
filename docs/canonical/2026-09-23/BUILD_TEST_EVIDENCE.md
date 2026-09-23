@@ -87,6 +87,25 @@ subsequent gates = NOT_RUN / skipped
 
 Não é correto converter esse run em PASS parcial do pipeline completo.
 
+## 3A. Validação da própria camada documental
+
+A primeira materialização documental, commit 8607ad69b70c880184aacc865cc3c6d21177f9d8, acionou CI run 35825593320 e falhou corretamente no gate de unknown-state: 31 ocorrências novas sem closure.
+
+A correção não alterou o validador. Os documentos passaram a declarar CLOSURE_L11 como binding de governança.
+
+No commit 191df4026e789b9285a97860186610bded35557a:
+
+- CI run: 35825729691;
+- overall job: PASS;
+- validator unit tests: 19/19 PASS;
+- changed-lines diff base: 8607ad69b70c880184aacc865cc3c6d21177f9d8;
+- errors: 0;
+- warnings: 1;
+- gate status: PASS;
+- validator report hash: a262ddd13ab0c925fba64d518a374c2130719738321e2d9399bf2c9306996af1.
+
+Esse run prova a correção incremental entre os dois commits documentais. A validação do conjunto completo contra main fica para o evento de pull request.
+
 ## 4. Negative tests do source contract
 
 No mesmo CI aparecem mensagens SOURCE_CONTRACT_FAIL durante mutações deliberadas de um bit em README/LICENSE/scope do módulo RAF Hash Fabric. Essas mensagens são o comportamento esperado do falsificador. A etapa GitHub correspondente concluiu success porque as mutações foram rejeitadas.

@@ -20,7 +20,9 @@ Evidence: run 35574321825, main@f22efc09....
 - overall job: FAIL;
 - gates posteriores: skipped.
 
-F_next: abrir o artifact/report exato, fechar cada finding com closure válida, rerodar no commit sucessor.
+Observação: um branch-creation run posterior no mesmo SHA-base passou com diff-base igual ao próprio HEAD e zero changed lines; isso não fecha os 5 findings do push original. A validação deve preservar o escopo do evento que produziu a dívida.
+
+F_next: abrir o artifact/report exato do push original, fechar cada finding com closure válida e rerodar em um escopo que realmente inclua aquelas linhas.
 
 ### GAP-DOC-GEN-003 — generated governance freshness
 Os outputs de governança committed eram históricos no router anterior.
