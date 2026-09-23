@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use RafPolimata in research, cite the repository and the exact revision or commit used."
+type: software
+title: "RafPolimata"
+authors:
+  - family-names: "Melo Reis"
+    given-names: "Rafael"
+repository-code: "https://github.com/rafaelmeloreisnovo/RafPolimata"
+url: "https://github.com/rafaelmeloreisnovo/RafPolimata"
+abstract: "Semantic, mathematical, low-level engineering, evidence-governance and research repository with explicit separation between source, artifacts, execution, evidence and claims."

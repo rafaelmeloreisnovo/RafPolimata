@@ -1,0 +1,51 @@
+name: Documentation
+description: Report stale, missing, ambiguous or conflicting documentation.
+title: "[DOC] "
+labels: []
+body:
+  - type: input
+    id: path
+    attributes:
+      label: Document or route
+      placeholder: docs/... or README.md
+    validations:
+      required: true
+  - type: input
+    id: base
+    attributes:
+      label: Observed revision
+      placeholder: Commit SHA if the problem is revision-dependent
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Problem type
+      options:
+        - Stale revision
+        - Broken or missing route
+        - Ambiguous claim
+        - Missing provenance
+        - Generated output drift
+        - Duplicate documentation
+        - Missing example
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current text or behavior
+    validations:
+      required: true
+  - type: textarea
+    id: desired
+    attributes:
+      label: Proposed correction
+      description: Prefer a source pointer or delta over copying a large document.
+    validations:
+      required: true
+  - type: checkboxes
+    id: generated
+    attributes:
+      label: Generated-file check
+      options:
+        - label: If this is generated output, I will fix the source/generator instead of hand-editing the derived file.
