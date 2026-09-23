@@ -1,0 +1,16 @@
+{
+  "schema": "RAFPOLIMATA-T7-APPLICATION-BRIDGE-V2",
+  "version": 2,
+  "governance_closure": "CLOSURE_L9",
+  "bridge_id": "Pi_apply_V2",
+  "input_projection_version": 1,
+  "policy": "PRESENT_ONLY",
+  "present_coordinate_rule": "same integer Q16 alpha=1/4 IIR as legacy t7_map_input",
+  "absent_coordinate_rule": "preserve prior T7State.s[i]",
+  "numeric_zero_when_present": "apply as a real numeric input",
+  "token_vazio_rule": "absence is represented only by an unset present_mask bit",
+  "all_present_legacy_parity_required": true,
+  "modifies_legacy_t7_map_input": false,
+  "runtime_replacement_authorized": false,
+  "claim_allowed": false
+}
