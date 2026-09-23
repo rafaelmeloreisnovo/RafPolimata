@@ -16,10 +16,22 @@
     {"index":5,"symbol":"delta","name":"material_delta","source_requirement":"receipt_bound"},
     {"index":6,"symbol":"sigma","name":"memory_accumulated_state","source_requirement":"append_only_lineage"}
   ],
+  "projection_adapter": {
+    "id":"Pi_wf_V1",
+    "source":"rafaelia/t7_workflow_projection_v1.h",
+    "implemented":true,
+    "mutates_legacy_t7_state":false,
+    "presence_encoding":"7-bit present_mask",
+    "token_vazio_representation":"bit_unset",
+    "numeric_zero_is_valid_present_value":true,
+    "silent_imputation":false,
+    "legacy_comparison":"t7wf_compare_legacy_v1"
+  },
   "legacy_mapping": {
     "source":"Benchmark/raf_toroid.h::t7_map_input",
     "semantic_identity":false,
-    "gap_id":"GAP-T7-SEMANTIC-PROJECTION"
+    "gap_id":"GAP-T7-SEMANTIC-PROJECTION",
+    "runtime_behavior_changed":false
   },
   "auxiliary_42_slot_machine": {
     "implemented":true,
