@@ -182,3 +182,15 @@ This documentation transaction does not claim those commands were executed again
 - **F_ok:** canonical index now routes current freestanding/PBIP state and explicitly separates historical generated outputs.
 - **F_gap:** full generator refresh/current review queue remains unexecuted in this docs-only transaction.
 - **F_next:** regenerate through the repository tool, then review/publish the resulting queue without manually editing derived files.
+
+## 12. ZIPRAF Hardware Service V1
+
+| Documento/rota | Papel | Estado |
+|---|---|---|
+| [`../native/zipraf_hw_service_v1/README.md`](../native/zipraf_hw_service_v1/README.md) | router canônico C11/Rust/ASM medido + crypto/FS/BBS | `IMPLEMENTED_LOCAL / CI_TOKEN_VAZIO` |
+| [`../native/zipraf_hw_service_v1/SPEC.md`](../native/zipraf_hw_service_v1/SPEC.md) | contrato Q16.16, capability gates e acesso misto | `REFERENCE` |
+| [`../native/zipraf_hw_service_v1/LEGAL_BERNE_IP_PROFILE.md`](../native/zipraf_hw_service_v1/LEGAL_BERNE_IP_PROFILE.md) | autoria/proveniência/IP sem sobrepor direitos de terceiros | `ENGINEERING_LEGAL_PROFILE` |
+| [`../native/zipraf_hw_service_v1/receipts/CREATION_LOCAL_20260923.md`](../native/zipraf_hw_service_v1/receipts/CREATION_LOCAL_20260923.md) | receipt de criação e gates locais | `EVIDENCE_LOCAL` |
+
+Autoridades reutilizadas, sem duplicação: `native/raf_hash_fabric_v1/`, `Apkc/hw_dispatch.h`, `freestanding/include/raf_fs_caps.h` e `tools/rafbbs/`. ASM continua medido-only; qualquer ganho físico multi-ISA permanece `TOKEN_VAZIO` até receipt do alvo.
+
