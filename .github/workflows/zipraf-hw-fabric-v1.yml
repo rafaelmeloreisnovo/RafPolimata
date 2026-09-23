@@ -10,14 +10,19 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: zipraf-hw-fabric-v1-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   source-gates:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: native/zipraf_hw_fabric_v1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Tool identities
         run: |
           cc --version
