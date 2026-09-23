@@ -3,18 +3,97 @@
   "claim_allowed": false,
   "rule": "primitive mathematics are never modified by the fabric",
   "primitives": [
-    {"id":1,"name":"SHA-256","class":"CRYPTO_HASH","status":"ADAPTER_TOKEN_VAZIO","security_use":"allowed_when_validated"},
-    {"id":2,"name":"SHA-512","class":"CRYPTO_HASH","status":"ADAPTER_TOKEN_VAZIO","security_use":"allowed_when_validated"},
-    {"id":3,"name":"SHA3-256","class":"CRYPTO_HASH","status":"ADAPTER_TOKEN_VAZIO","security_use":"allowed_when_validated"},
-    {"id":4,"name":"BLAKE2s","class":"CRYPTO_HASH","status":"ADAPTER_TOKEN_VAZIO","security_use":"allowed_when_validated"},
-    {"id":5,"name":"BLAKE2b","class":"CRYPTO_HASH","status":"ADAPTER_TOKEN_VAZIO","security_use":"allowed_when_validated"},
-    {"id":6,"name":"BLAKE3","class":"CRYPTO_HASH","status":"ADAPTER_TOKEN_VAZIO","security_use":"allowed_when_validated"},
-    {"id":7,"name":"ChaCha20","class":"STREAM","status":"ADAPTER_TOKEN_VAZIO","security_use":"allowed_when_validated"},
-    {"id":8,"name":"Poly1305","class":"MAC","status":"ADAPTER_TOKEN_VAZIO","security_use":"allowed_when_validated"},
-    {"id":9,"name":"XChaCha20-Poly1305","class":"AEAD","status":"ADAPTER_TOKEN_VAZIO","security_use":"allowed_when_validated"},
-    {"id":10,"name":"Ed25519","class":"SIGNATURE","status":"ADAPTER_TOKEN_VAZIO","security_use":"allowed_when_validated"},
-    {"id":11,"name":"X25519","class":"KEX","status":"ADAPTER_TOKEN_VAZIO","security_use":"allowed_when_validated"},
-    {"id":12,"name":"CRC32C","class":"CHECKSUM","status":"ADAPTER_TOKEN_VAZIO","security_use":"integrity_error_detection_only"},
-    {"id":13,"name":"MD5","class":"LEGACY_INSECURE","status":"ADAPTER_TOKEN_VAZIO","security_use":"compatibility_only_never_security"}
-  ]
+    {
+      "id": 1,
+      "name": "SHA-256",
+      "class": "CRYPTO_HASH",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "allowed_when_validated"
+    },
+    {
+      "id": 2,
+      "name": "SHA-512",
+      "class": "CRYPTO_HASH",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "allowed_when_validated"
+    },
+    {
+      "id": 3,
+      "name": "SHA3-256",
+      "class": "CRYPTO_HASH",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "allowed_when_validated"
+    },
+    {
+      "id": 4,
+      "name": "BLAKE2s",
+      "class": "CRYPTO_HASH",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "allowed_when_validated"
+    },
+    {
+      "id": 5,
+      "name": "BLAKE2b",
+      "class": "CRYPTO_HASH",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "allowed_when_validated"
+    },
+    {
+      "id": 6,
+      "name": "BLAKE3",
+      "class": "CRYPTO_HASH",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "allowed_when_validated"
+    },
+    {
+      "id": 7,
+      "name": "ChaCha20",
+      "class": "STREAM",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "allowed_when_validated"
+    },
+    {
+      "id": 8,
+      "name": "Poly1305",
+      "class": "MAC",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "allowed_when_validated"
+    },
+    {
+      "id": 9,
+      "name": "XChaCha20-Poly1305",
+      "class": "AEAD",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "allowed_when_validated"
+    },
+    {
+      "id": 10,
+      "name": "Ed25519",
+      "class": "SIGNATURE",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "allowed_when_validated"
+    },
+    {
+      "id": 11,
+      "name": "X25519",
+      "class": "KEX",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "allowed_when_validated"
+    },
+    {
+      "id": 12,
+      "name": "CRC32C",
+      "class": "CHECKSUM",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "integrity_error_detection_only"
+    },
+    {
+      "id": 13,
+      "name": "MD5",
+      "class": "LEGACY_INSECURE",
+      "status": "ADAPTER_TOKEN_VAZIO",
+      "security_use": "compatibility_only_never_security"
+    }
+  ],
+  "governance_binding": "CLOSURE_L11"
 }
