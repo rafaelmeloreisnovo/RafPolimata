@@ -1,5 +1,6 @@
 /* t7_workflow_projection_v1.h — versioned semantic projection into T^7.
  *
+ * Governance: CLOSURE_L9 (T^7 proof/unknown-state claims remain fail-closed).
  * Contract:
  *   TOKEN_VAZIO != numeric zero.
  * Absence is represented by present_mask, never by a numeric sentinel.
