@@ -2,7 +2,8 @@
 
 **State:** `FORMAL_OBJECT_DEFINED / IMPLEMENTATION_MAPPED / CONVERGENCE_PROOF_PENDING`  
 **Parent:** ZIPRAF-HW canonical V1 at `4dbd476791e7a6f26e95c5ff6ed9b4b810dc33a9`  
-**claim_allowed:** false for 42-attractor convergence/stability claims.
+**claim_allowed:** false for 42-attractor convergence/stability claims.  
+**Governance binding:** `CLOSURE_L9` — T^7 unknown/proof markers remain open unless their own evidence gate closes; this binding does not promote a claim.
 
 ## 1. Mathematical object
 
