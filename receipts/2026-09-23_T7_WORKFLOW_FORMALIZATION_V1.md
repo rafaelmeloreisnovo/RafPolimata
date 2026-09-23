@@ -21,3 +21,14 @@
 GAP-T7-SEMANTIC-PROJECTION remains open.
 42-attractor convergence/stability remains TOKEN_VAZIO_FORMAL_PROOF.
 No runtime numerical behavior was changed in this delta.
+
+
+## Successor — Pi_wf V1
+
+- adapter: `rafaelia/t7_workflow_projection_v1.h`
+- test: `tests/test_t7_workflow_projection_v1.c`
+- TOKEN_VAZIO representation: present bit unset
+- numeric zero: valid value when present bit is set
+- legacy runtime mutation: NO
+- compatibility: legacy raw mapping mirrored + real `t7_map_input` regression
+- execution evidence: pending exact-head CI after this code delta
