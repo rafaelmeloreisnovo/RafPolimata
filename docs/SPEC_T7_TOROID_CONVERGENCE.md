@@ -263,3 +263,33 @@ This closes the missing normalization-ID/fixture infrastructure. It does not
 authorize runtime migration. `t7_map_input` remains unchanged until an
 explicit successor defines compatibility, rollback, before/after behavior and
 new exact-head evidence.
+
+
+## 13. Additive application bridge V2
+
+`rafaelia/t7_workflow_apply_v2.h` introduces `Pi_apply_V2` without replacing
+the legacy mapping. Its policy is `PRESENT_ONLY`:
+
+```text
+present(i) -> s'[i] = s[i] - (s[i] >> 2) + (q[i] >> 2)  mod 65536
+absent(i)  -> s'[i] = s[i]
+```
+
+This is intentionally the same integer alpha=1/4 IIR used by
+`t7_map_input` for present coordinates. Therefore an all-present
+`Pi_wf_V1` built from the legacy raw coordinates must reproduce the same
+seven-coordinate state transition as legacy `t7_map_input`.
+
+The crucial semantic difference is explicit rather than silent:
+
+- present + q=0 applies numerical zero;
+- absent preserves prior state;
+- invalid projection version performs no state mutation.
+
+The bridge returns `applied_mask` and `preserved_mask` so the execution can
+be audited. It does not update H/C/phi/attractor fields and it does not replace
+`t7_map_input`.
+
+This closes the executable application-layer gap while preserving rollback.
+Runtime selection of this bridge as a replacement path remains a separate
+versioned decision requiring new exact-head and physical evidence.
