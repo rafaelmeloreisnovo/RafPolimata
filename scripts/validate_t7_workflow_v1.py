@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""T7 V1 contract validator. Governance binding: CLOSURE_L9; no claim promotion."""
 import json
 from pathlib import Path
 
