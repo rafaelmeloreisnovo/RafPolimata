@@ -1,0 +1,50 @@
+{
+  "schema": "RAFPOLIMATA-T7-MIGRATION-FIXTURES-V1",
+  "governance_closure": "CLOSURE_L9",
+  "normalization_registry": "configs/t7-normalization-registry-v1.json",
+  "normalization_id": 1,
+  "legacy_init_seed": [40503, 15470, 55973, 30940, 5907, 46410, 21377],
+  "fixtures": [
+    {
+      "id": "legacy-reference-001",
+      "legacy_input": {
+        "data_hash": 305419896,
+        "entropy": 4660,
+        "hw_state": 2309737967
+      },
+      "expected_legacy_raw": [22136, 4660, 4660, 0, 52719, 43981, 39831],
+      "expected_legacy_after_map": [35912, 12768, 43145, 23205, 17610, 45803, 25990],
+      "semantic_event": {
+        "q": [22136, 4660, 4660, 0, 52719, 43981, 39831],
+        "present_mask": 127,
+        "source_ref_hash": 305419896,
+        "normalization_id": 1
+      },
+      "expected_equal_mask": 127
+    },
+    {
+      "id": "semantic-u-mismatch-001",
+      "legacy_input_ref": "legacy-reference-001",
+      "semantic_event": {
+        "q": [22137, 4660, 4660, 0, 52719, 43981, 39831],
+        "present_mask": 127,
+        "source_ref_hash": 305419896,
+        "normalization_id": 1
+      },
+      "expected_equal_mask": 126
+    },
+    {
+      "id": "semantic-chi-absent-001",
+      "legacy_input_ref": "legacy-reference-001",
+      "semantic_event": {
+        "q": [22136, 4660, 4660, 0, 52719, 43981, 39831],
+        "present_mask": 119,
+        "source_ref_hash": 305419896,
+        "normalization_id": 1
+      },
+      "expected_equal_mask": 119
+    }
+  ],
+  "runtime_migration_authorized": false,
+  "claim_allowed": false
+}
