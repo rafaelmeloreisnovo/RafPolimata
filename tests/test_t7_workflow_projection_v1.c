@@ -1,3 +1,4 @@
+/* Governance binding: CLOSURE_L9; tests do not promote T^7 convergence claims. */
 #include "../rafaelia/t7_workflow_projection_v1.h"
 
 static int test_token_vazio_not_zero(void) {
