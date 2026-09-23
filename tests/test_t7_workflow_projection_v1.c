@@ -48,6 +48,13 @@ static int test_legacy_capture_matches_runtime(void) {
         u32 expected = (before[i] - (before[i] >> 2) + (raw[i] >> 2)) & 0xFFFFu;
         if (t.s[i] != expected) return (int)(i + 1u);
     }
+
+    /* Exercise the remaining canonical static paths under -Werror too.
+     * This is not a convergence claim; it is compile/runtime coverage. */
+    t7_step(&t, Q16_HALF, Q16_HALF);
+    if (t.step != 1u) return 8;
+    q16_t coherence = t7_coherence(&t);
+    (void)coherence;
     return 0;
 }
 
