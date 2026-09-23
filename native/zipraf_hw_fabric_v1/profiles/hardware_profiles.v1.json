@@ -1,0 +1,12 @@
+{
+  "schema": "zipraf.hw.profiles.v1",
+  "claim_allowed": false,
+  "rule": "codegen_or_syntax_pass_is_not_physical_runtime_proof",
+  "profiles": [
+    {"arch":"armv7","word_bits":32,"vector_candidates":[128],"asm_syntax":"PASS_LOCAL_PRECOMMIT","physical_runtime":"TOKEN_VAZIO"},
+    {"arch":"aarch64","word_bits":64,"vector_candidates":[128],"asm_syntax":"PASS_LOCAL_PRECOMMIT","physical_runtime":"TOKEN_VAZIO"},
+    {"arch":"x86_64","word_bits":64,"vector_candidates":[128,256,512],"asm_syntax":"PASS_LOCAL_PRECOMMIT","physical_runtime":"TOKEN_VAZIO"},
+    {"arch":"riscv64","word_bits":64,"vector_candidates":[128],"asm_syntax":"TOKEN_VAZIO","physical_runtime":"TOKEN_VAZIO"},
+    {"arch":"wasm32","word_bits":32,"vector_candidates":[128],"asm_syntax":"TOKEN_VAZIO","physical_runtime":"TOKEN_VAZIO"}
+  ]
+}
