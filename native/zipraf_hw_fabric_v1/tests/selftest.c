@@ -7,7 +7,8 @@
  * Module scope: LICENSE_SCOPE_V1.json. Third-party rights remain separate.
  */
 
-#include "../include/zipraf_hw_fabric.h"\n#include "../include/zipraf_crypto_adapter.h"
+#include "../include/zipraf_hw_fabric.h"
+#include "../include/zipraf_crypto_adapter.h"
 
 static int test_permissions(void) {
     zhf_u64 allow = ZHF_PERM_READ | ZHF_PERM_WRITE | ZHF_PERM_EXEC | ZHF_PERM_SIGN;
