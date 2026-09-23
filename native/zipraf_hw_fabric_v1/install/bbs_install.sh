@@ -1,4 +1,5 @@
 #!/bin/sh
+# Governance binding: CLOSURE_L11 — unknown-state markers remain gaps.
 # RAFCODE-IP-NOTICE
 # Copyright (c) 2026 Rafael Melo Reis.
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
