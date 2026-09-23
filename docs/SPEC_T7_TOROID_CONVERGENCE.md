@@ -233,3 +233,33 @@ to comments alone.
 Changing `Benchmark/raf_toroid.h::t7_map_input` remains forbidden in V1.
 A later runtime migration requires an explicit version transition, before/after
 fixtures, compatibility policy, and new exact-head receipts.
+
+
+## 12. Normalization registry and pre-migration fixtures V1
+
+`configs/t7-normalization-registry-v1.json` assigns stable normalization IDs.
+V1 deliberately defines only ID 1, `PRENORMALIZED_Q16_IDENTITY_V1`:
+
+```text
+q_out = q_in & 0xFFFF
+```
+
+Its scope is representation only. It does not claim that a source observable has
+been scientifically calibrated to any semantic T^7 axis. External metric→axis
+normalizers remain `TOKEN_VAZIO` under `CLOSURE_L9` until source, units,
+transform, uncertainty and falsifier are explicit.
+
+`tests/fixtures/t7_projection_migration_v1.json` fixes three deterministic
+cases: all-present identity, a one-unit u mismatch, and chi absent while the
+numeric slot is zero. The reference legacy input also fixes both the seven raw
+legacy coordinates and the seven coordinates produced after canonical
+`t7_init` + one `t7_map_input`.
+
+`scripts/validate_t7_migration_fixtures_v1.py` independently recomputes those
+vectors and equality masks. The C regression binds the same fixture back to the
+actual implementation.
+
+This closes the missing normalization-ID/fixture infrastructure. It does not
+authorize runtime migration. `t7_map_input` remains unchanged until an
+explicit successor defines compatibility, rollback, before/after behavior and
+new exact-head evidence.
