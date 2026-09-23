@@ -1,5 +1,7 @@
 # ZIPRAF HW Fabric V1 — μReceipt — 2026-09-23
 
+**Governance binding:** `CLOSURE_L11` — explicit unknown-state markers remain gaps; this binding does not promote them.
+
 **Repository:** `rafaelmeloreisnovo/RafPolimata`  
 **Review branch:** `feature/zipraf-hw-fabric-v1-20260923`  
 **Observed branch head before this receipt:** `8a422f615f9560058585fba18e00e334ba76e302`  
