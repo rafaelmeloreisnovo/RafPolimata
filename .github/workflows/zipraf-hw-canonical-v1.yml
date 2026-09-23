@@ -1,0 +1,58 @@
+name: ZIPRAF HW Canonical V1
+
+on:
+  pull_request:
+    paths:
+      - 'canonical/zipraf-hw-v1/**'
+      - 'docs/canonical/2026-09-23/ZIPRAF_HW_CANONICAL_V1.md'
+      - '.github/workflows/zipraf-hw-canonical-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: C hosted selftest
+        run: |
+          cd canonical/zipraf-hw-v1
+          clang -std=c11 -Wall -Wextra -Werror -Iinclude src/zipraf_hw.c tests/selftest.c -o /tmp/zipraf-hw-selftest
+          /tmp/zipraf-hw-selftest
+      - name: Freestanding C gate
+        run: |
+          cd canonical/zipraf-hw-v1
+          clang -std=c11 -ffreestanding -fno-builtin -fno-stack-protector -Wall -Wextra -Werror -Iinclude -c src/zipraf_hw.c -o /tmp/zipraf_hw.o
+          test -z "$(nm -u /tmp/zipraf_hw.o)"
+      - name: ASM syntax matrix
+        run: |
+          cd canonical/zipraf-hw-v1
+          clang -c asm/x86_64/zipraf_patch.S -o /tmp/zipraf_patch_x86_64.o
+          clang -target armv7-none-eabi -c asm/armv7/zipraf_patch32.S -o /tmp/zipraf_patch_armv7.o
+          clang -target aarch64-none-elf -c asm/aarch64/zipraf_patch.S -o /tmp/zipraf_patch_aarch64.o
+      - name: Crypto registry gate
+        run: |
+          cd canonical/zipraf-hw-v1
+          python3 - <<'PY'
+          import json
+          p='registry/crypto_algorithms.json'
+          d=json.load(open(p,encoding='utf-8'))
+          assert d['schema']=='ZIPRAF-HW-CRYPTO-REGISTRY-V1'
+          assert len(d['algorithms'])==15
+          legacy={x['id'] for x in d['algorithms'] if x['security_use']=='compatibility_only'}
+          assert legacy=={'md5','sha1'}
+          print('REGISTRY_PASS algorithms=15 legacy=md5,sha1')
+          PY
+      - name: Rust no_std mirror tests
+        run: cargo test --manifest-path canonical/zipraf-hw-v1/rust/Cargo.toml --quiet
+      - name: BBS and installer
+        run: |
+          cd canonical/zipraf-hw-v1
+          clang -std=c11 -Wall -Wextra -Werror -Iinclude src/zipraf_hw.c tools/zipraf_bbs.c -o /tmp/zipraf-bbs
+          clang -std=c11 -Wall -Wextra -Werror tools/zipraf_installer.c -o /tmp/zipraf-installer
+          rm -rf /tmp/zipraf-install-test
+          /tmp/zipraf-installer /tmp/zipraf-install-test
+          test -f /tmp/zipraf-install-test/share/zipraf/registry/crypto_algorithms.json
+          test -f /tmp/zipraf-install-test/share/zipraf/policy/ZIPRAF_FS_V1.md
