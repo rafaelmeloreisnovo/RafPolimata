@@ -182,3 +182,12 @@ This documentation transaction does not claim those commands were executed again
 - **F_ok:** canonical index now routes current freestanding/PBIP state and explicitly separates historical generated outputs.
 - **F_gap:** full generator refresh/current review queue remains unexecuted in this docs-only transaction.
 - **F_next:** regenerate through the repository tool, then review/publish the resulting queue without manually editing derived files.
+
+## 12. ZIPRAF hardware capability fabric — candidate
+
+- `../native/zipraf_hw_fabric_v1/README.md` — canonical module entry.
+- `../native/zipraf_hw_fabric_v1/SPEC.md` — dispatch mathematics and promotion gates.
+- `../native/zipraf_hw_fabric_v1/permissions/PERMISSION_MODEL.md` — RWX + capability rights.
+- `../native/zipraf_hw_fabric_v1/registry/primitive_registry.v1.json` — 13 primitive families and evidence states.
+
+State: `IMPLEMENTED_SOURCE / REVIEW_REQUIRED`; physical hardware and cryptographic adapters remain evidence-gated.
