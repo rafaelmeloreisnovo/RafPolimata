@@ -1,0 +1,21 @@
+{
+  "schema": "rafcode.module-license-scope.v1",
+  "module": "native/zipraf_hw_fabric_v1",
+  "status": "COUNSEL_REVIEW_REQUIRED",
+  "author": "Rafael Melo Reis",
+  "copyright_year": 2026,
+  "license_policy_reference": "docs/legal/RAFCODE_IP_LICENSE_POLICY_V1.md",
+  "intended_license_route": "PolyForm-Noncommercial-1.0.0 for covered original expression; separate written commercial agreement outside the grant",
+  "root_repository_license_changed": false,
+  "third_party_material_included": false,
+  "covered_original_paths": [
+    "README.md","SPEC.md","Makefile","include/zipraf_hw_fabric.h",
+    "c/zipraf_hw_fabric.c","rust/lib.rs",
+    "asm/armv7/zipraf_xor4.S","asm/aarch64/zipraf_xor4.S","asm/x86_64/zipraf_xor4.S",
+    "tests/selftest.c","install/bbs_install.sh",
+    "registry/primitive_registry.v1.json","permissions/PERMISSION_MODEL.md"
+  ],
+  "authorization_metadata_paths": ["LICENSE.md","LICENSE_SCOPE_V1.json","LEGAL_NOTICE.md"],
+  "excluded_rights": ["mathematical_ideas","public_standards","third_party_source","upstream_algorithm_ownership","trademarks","ungranted_patent_rights"],
+  "claim_allowed": false
+}
