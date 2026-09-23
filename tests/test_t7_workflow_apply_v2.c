@@ -35,6 +35,11 @@ static int test_all_present_matches_legacy(void) {
     if (r.applied_mask != T7WF_PRESENT_ALL || r.preserved_mask != 0u) return 3;
     for (u32 i=0;i<T7_DIM;++i)
         if (semantic.s[i] != legacy.s[i]) return (int)(10u+i);
+
+    /* Exercise canonical static paths under -Werror; this is coverage only. */
+    t7_step(&semantic, Q16_HALF, Q16_HALF);
+    q16_t coherence = t7_coherence(&semantic);
+    (void)coherence;
     return 0;
 }
 
