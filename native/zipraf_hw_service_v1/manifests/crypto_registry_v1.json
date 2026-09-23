@@ -1,0 +1,30 @@
+{
+  "schema": "zipraf.hw.crypto-registry.v1",
+  "contract": "REFERENCE_IDENTITY_NOT_NEW_CRYPTOGRAPHY",
+  "claim_allowed": false,
+  "algorithms": [
+    {"id":1,"name":"SHA-256","class":"HASH","security_use":"CURRENT_REFERENCE","implementation":"TOKEN_VAZIO_ADAPTER","authority":"NIST FIPS 180 family"},
+    {"id":2,"name":"SHA-512","class":"HASH","security_use":"CURRENT_REFERENCE","implementation":"TOKEN_VAZIO_ADAPTER","authority":"NIST FIPS 180 family"},
+    {"id":3,"name":"SHA3-256","class":"HASH","security_use":"CURRENT_REFERENCE","implementation":"TOKEN_VAZIO_ADAPTER","authority":"NIST FIPS 202"},
+    {"id":4,"name":"BLAKE2s-256","class":"HASH","security_use":"REFERENCE","implementation":"TOKEN_VAZIO_ADAPTER","authority":"RFC 7693 / exact implementation license required"},
+    {"id":5,"name":"BLAKE2b-512","class":"HASH","security_use":"REFERENCE","implementation":"TOKEN_VAZIO_ADAPTER","authority":"RFC 7693 / exact implementation license required"},
+    {"id":6,"name":"BLAKE3-256","class":"HASH","security_use":"CANDIDATE_AFTER_KAT","implementation":"TOKEN_VAZIO_REPOSITORY_IMPLEMENTATION","authority":"BLAKE3-team specification/upstream"},
+    {"id":7,"name":"ChaCha20","class":"STREAM_CIPHER","security_use":"REFERENCE","implementation":"TOKEN_VAZIO_ADAPTER","authority":"RFC 8439 profile where applicable"},
+    {"id":8,"name":"ChaCha20-Poly1305","class":"AEAD","security_use":"REFERENCE","implementation":"TOKEN_VAZIO_ADAPTER","authority":"RFC 8439"},
+    {"id":9,"name":"Ed25519","class":"SIGNATURE","security_use":"REFERENCE","implementation":"TOKEN_VAZIO_ADAPTER","authority":"RFC 8032 / exact implementation license required"},
+    {"id":10,"name":"HMAC-SHA256","class":"MAC","security_use":"REFERENCE","implementation":"TOKEN_VAZIO_ADAPTER","authority":"HMAC + SHA-256 standards"},
+    {"id":11,"name":"AES-128-GCM","class":"AEAD","security_use":"REFERENCE","implementation":"TOKEN_VAZIO_ADAPTER","authority":"NIST AES/GCM standards"},
+    {"id":12,"name":"AES-256-GCM","class":"AEAD","security_use":"REFERENCE","implementation":"TOKEN_VAZIO_ADAPTER","authority":"NIST AES/GCM standards"},
+    {"id":13,"name":"MD5","class":"HASH","security_use":"LEGACY_ONLY","implementation":"NO_NEW_SECURITY_USE","authority":"RFC 6151 security boundary"}
+  ],
+  "promotion_requirements": [
+    "exact_source_version_commit",
+    "license_spdx_provenance",
+    "official_or_authoritative_vectors",
+    "interoperability_oracle",
+    "backend_capability_identity",
+    "constant_time_evidence_when_security_relevant",
+    "benchmark_receipt_before_performance_claim"
+  ],
+  "md5_forbidden_for": ["digital_signature","collision_resistant_identity","custody_root","new_protocol_security"]
+}
