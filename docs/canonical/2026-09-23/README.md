@@ -27,6 +27,11 @@ Tornar o RafPolimata navegável como sistema de engenharia e evidência, usando 
 | [GITHUB_SURFACES.md](GITHUB_SURFACES.md) | Quais recursos nativos do GitHub estão presentes ou faltam? |
 | [EVIDENCE_AND_CLAIMS.md](EVIDENCE_AND_CLAIMS.md) | Como promover um resultado sem confundir níveis de prova? |
 | [DOCUMENTATION_STYLE.md](DOCUMENTATION_STYLE.md) | Como escrever documentação nova sem aumentar entropia? |
+| [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md) | Quais são os componentes e suas entradas principais? |
+| [RELEASE_VERSIONING.md](RELEASE_VERSIONING.md) | Como ler releases, changelog e claims históricos? |
+| [RUNTIME_AND_TARGETS.md](RUNTIME_AND_TARGETS.md) | Como separar snapshots runtime, targets e arquitetura? |
+| [SECURITY_SUPPLY_CHAIN.md](SECURITY_SUPPLY_CHAIN.md) | Quais controles de segurança/proveniência existem e quais são seus limites? |
+| [GLOSSARY.md](GLOSSARY.md) | Qual é o vocabulário operacional comum? |
 | [GAPS_AND_NEXT.md](GAPS_AND_NEXT.md) | O que ainda exige decisão, execução ou evidência? |
 | [documentation-manifest.v1.json](documentation-manifest.v1.json) | Qual é o inventário legível por máquina deste corte? |
 

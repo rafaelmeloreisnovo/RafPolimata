@@ -31,6 +31,11 @@ A documentação datada permanece histórica. Um corte novo pode superseder o ro
 7. [Superfícies GitHub](2026-09-23/GITHUB_SURFACES.md)
 8. [Evidência e claims](2026-09-23/EVIDENCE_AND_CLAIMS.md)
 9. [Estilo documental](2026-09-23/DOCUMENTATION_STYLE.md)
-10. [Gaps e próximos gates](2026-09-23/GAPS_AND_NEXT.md)
+10. [Component catalog](2026-09-23/COMPONENT_CATALOG.md)
+11. [Release e versionamento](2026-09-23/RELEASE_VERSIONING.md)
+12. [Runtime e targets](2026-09-23/RUNTIME_AND_TARGETS.md)
+13. [Security e supply chain](2026-09-23/SECURITY_SUPPLY_CHAIN.md)
+14. [Glossário](2026-09-23/GLOSSARY.md)
+15. [Gaps e próximos gates](2026-09-23/GAPS_AND_NEXT.md)
 
 R3 = ⟨F_ok: router estável criado; F_gap: promoção depende dos gates do PR; F_next: revisar o corte e regenerar somente saídas derivadas por seus próprios executores⟩.

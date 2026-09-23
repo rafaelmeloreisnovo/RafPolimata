@@ -21,6 +21,11 @@
 | [GITHUB_SURFACES](canonical/2026-09-23/GITHUB_SURFACES.md) | recursos GitHub e gaps |
 | [EVIDENCE_AND_CLAIMS](canonical/2026-09-23/EVIDENCE_AND_CLAIMS.md) | níveis de prova |
 | [DOCUMENTATION_STYLE](canonical/2026-09-23/DOCUMENTATION_STYLE.md) | padrão documental |
+| [COMPONENT_CATALOG](canonical/2026-09-23/COMPONENT_CATALOG.md) | componentes e entradas principais |
+| [RELEASE_VERSIONING](canonical/2026-09-23/RELEASE_VERSIONING.md) | releases/versionamento/histórico |
+| [RUNTIME_AND_TARGETS](canonical/2026-09-23/RUNTIME_AND_TARGETS.md) | estado temporal, targets e arquiteturas |
+| [SECURITY_SUPPLY_CHAIN](canonical/2026-09-23/SECURITY_SUPPLY_CHAIN.md) | segurança, licença e supply chain |
+| [GLOSSARY](canonical/2026-09-23/GLOSSARY.md) | vocabulário comum |
 | [GAPS_AND_NEXT](canonical/2026-09-23/GAPS_AND_NEXT.md) | backlog tipado |
 
 Os snapshots e receipts anteriores permanecem válidos no seu escopo histórico; não são reescritos silenciosamente.

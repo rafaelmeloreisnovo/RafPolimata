@@ -50,7 +50,12 @@
     "GITHUB_SURFACES.md",
     "EVIDENCE_AND_CLAIMS.md",
     "DOCUMENTATION_STYLE.md",
-    "GAPS_AND_NEXT.md"
+    "GAPS_AND_NEXT.md",
+    "COMPONENT_CATALOG.md",
+    "RELEASE_VERSIONING.md",
+    "RUNTIME_AND_TARGETS.md",
+    "SECURITY_SUPPLY_CHAIN.md",
+    "GLOSSARY.md"
   ],
   "generated_outputs_modified_manually": false,
   "gaps": [
@@ -86,5 +91,16 @@
     "changed_lines_warnings": 1,
     "report_hash": "a262ddd13ab0c925fba64d518a374c2130719738321e2d9399bf2c9306996af1",
     "full_pr_diff_validation": "PENDING_UNTIL_PULL_REQUEST_EVENT"
+  },
+  "historical_state_notes": {
+    "github_release_v1_0_0": {
+      "published": "2026-06-14",
+      "state": "prerelease",
+      "assets": 0
+    },
+    "release_notes_v1_0_0_date": "2026-06-17",
+    "changelog_v1_0_0_date": "2026-06-20",
+    "runtime_state_observed_at": "2026-07-18T20:04:33-03:00",
+    "interpretation": "Historical artifacts are preserved; date/scope differences require explicit reconciliation rather than silent overwrite."
   }
 }
