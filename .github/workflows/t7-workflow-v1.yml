@@ -12,11 +12,16 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: t7-workflow-v1-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   contract:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Validate T7 formal contract
         run: python3 scripts/validate_t7_workflow_v1.py
       - name: Verify implementation constants
