@@ -4,6 +4,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CFG = ROOT / "configs" / "t7-workflow-v1.json"
+HDR = ROOT / "rafaelia" / "t7_workflow_projection_v1.h"
+TEST = ROOT / "tests" / "test_t7_workflow_projection_v1.c"
 
 def fail(msg):
     raise SystemExit("T7_FAIL: " + msg)
@@ -31,6 +33,20 @@ if tv.get("numeric_zero_equivalent") is not False:
 if tv.get("silent_imputation_forbidden") is not True:
     fail("silent imputation gate")
 
+p = d.get("projection_adapter", {})
+if p.get("id") != "Pi_wf_V1" or p.get("implemented") is not True:
+    fail("projection adapter")
+if p.get("presence_encoding") != "7-bit present_mask":
+    fail("presence encoding")
+if p.get("numeric_zero_is_valid_present_value") is not True:
+    fail("zero-present distinction")
+if p.get("silent_imputation") is not False:
+    fail("projection silent imputation")
+if p.get("mutates_legacy_t7_state") is not False:
+    fail("legacy mutation boundary")
+if not HDR.exists() or not TEST.exists():
+    fail("projection source/test missing")
+
 a = d.get("auxiliary_42_slot_machine", {})
 if a.get("implemented") is not True:
     fail("42-slot implementation state")
@@ -40,9 +56,12 @@ for k in ("proven_as_exactly_42_dynamical_attractors",
     if a.get(k) is not False:
         fail(k + " must remain false until proof")
 
-if d.get("legacy_mapping", {}).get("semantic_identity") is not False:
+legacy = d.get("legacy_mapping", {})
+if legacy.get("semantic_identity") is not False:
     fail("legacy semantic identity must remain false")
+if legacy.get("runtime_behavior_changed") is not False:
+    fail("legacy runtime must remain unchanged in V1 adapter")
 if d.get("claim_allowed") is not False:
     fail("claim gate")
 
-print("T7_PASS dimensions=7 q16_modulus=65536 semantic_projection=typed convergence_proof=pending")
+print("T7_PASS dimensions=7 Pi_wf_V1=implemented token_vazio=presence_bit legacy_runtime=unchanged convergence_proof=pending")
