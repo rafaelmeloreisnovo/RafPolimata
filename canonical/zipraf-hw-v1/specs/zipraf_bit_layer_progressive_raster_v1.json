@@ -1,0 +1,33 @@
+{
+  "contract": "ZIPRAF-BIT-LAYER-PROGRESSIVE-RASTER-V1",
+  "version": 1,
+  "claim_allowed": false,
+  "state": "SPEC_CANONICAL",
+  "variables": {
+    "W": "logical raster width",
+    "q": "active bit-layer depth",
+    "M": "block availability/selection mask",
+    "G": "decoder geometry function",
+    "L_k": "bit layer k"
+  },
+  "equations": {
+    "BL-001": "C_xy = sum_{k=0..7} 2^k b_xyk",
+    "BL-003": "I_M = R(B,M,G(M))",
+    "BL-006": "I^(q) = sum_{k=8-q..7} 2^k L_k",
+    "BL-009": "E_s = ||I-U_s(D_s(I))||_2",
+    "BL-010": "I^(t)=R(sum_k 2^k[M_t dot L_k],G(M_t),W_t)"
+  },
+  "gates": {
+    "deterministic_same_state": true,
+    "ambiguous_geometry": "FAIL",
+    "implemented_untested_is_pass": false,
+    "physical_performance": "TOKEN_VAZIO"
+  },
+  "authority": {
+    "math_spec": "rafaelmeloreisnovo/RafPolimata",
+    "raster_adapter": "rafaelmeloreisnovo/Vectras-VM-Android",
+    "decoder_adapter": "rafaelmeloreisnovo/termux-app-rafacodephi",
+    "inspector_adapter": "rafaelmeloreisnovo/RafGitTools",
+    "research_only": "instituto-Rafael/relativity-living-light"
+  }
+}
