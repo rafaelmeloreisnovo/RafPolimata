@@ -24,6 +24,29 @@ typedef char raf_base_assert_u16[(sizeof(u16) == 2u) ? 1 : -1];
 typedef char raf_base_assert_u32[(sizeof(u32) == 4u) ? 1 : -1];
 typedef char raf_base_assert_u64[(sizeof(u64) == 8u) ? 1 : -1];
 
+/* Pure memory/arithmetic helpers shared by encoders and format writers. */
+static inline void *m_set(void *d, u8 v, sz n) {
+    u8 *p = (u8*)d;
+    u64 vv = (u64)v * 0x0101010101010101ULL;
+    sz i = 0;
+    for (; i + 8 <= n; i += 8) *(u64*)(p+i) = vv;
+    for (; i < n; i++) p[i] = v;
+    return d;
+}
+
+static inline void *m_cpy(void *d, const void *s, sz n) {
+    u8 *dp = (u8*)d;
+    const u8 *sp = (const u8*)s;
+    sz i = 0;
+    for (; i + 8 <= n; i += 8) *(u64*)(dp+i) = *(const u64*)(sp+i);
+    for (; i < n; i++) dp[i] = sp[i];
+    return d;
+}
+
+static inline u32 u32_aln(u32 v, u32 a) {
+    return (v + a - 1u) & ~(a - 1u);
+}
+
 static inline void w16(u8 *p, u16 v) {
     p[0] = (u8)v;
     p[1] = (u8)(v >> 8);
