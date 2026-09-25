@@ -2,7 +2,7 @@
  * All functions return 32-bit A32 machine words.
  * No Thumb encoding. No heap. No imports. */
 #pragma once
-#include "mem.h"
+#include "freestanding_base.h"
 
 /* ── Condition codes ─────────────────────────────────────────────────── */
 #define A32_EQ 0x0u
