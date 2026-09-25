@@ -5,6 +5,16 @@ on:
     paths:
       - 'Pkc/**'
       - 'Apkc/apkc_pkc_bridge.h'
+      - 'Apkc/freestanding_base.h'
+      - 'Apkc/arch_arm32.h'
+      - 'Apkc/arch_arm64.h'
+      - 'Apkc/mem.h'
+      - 'Apkc/sys.h'
+      - 'Apkc/freestanding_base.h'
+      - 'Apkc/arch_arm32.h'
+      - 'Apkc/arch_arm64.h'
+      - 'Apkc/mem.h'
+      - 'Apkc/sys.h'
       - 'tests/test_pkc_wordcode.c'
       - 'tests/test_apkc_pkc_bridge.c'
       - 'tests/pkc_freestanding_probe.c'
@@ -51,7 +61,7 @@ jobs:
           /tmp/test_apkc_pkc_bridge
 
           cc -std=c11 -Os -Wall -Wextra -Werror -Wshadow -pedantic \
-             -ffreestanding -fno-builtin -fno-stack-protector \
+             -ffreestanding -nostdinc -fno-builtin -fno-stack-protector \
              -fno-optimize-sibling-calls \
              -fno-asynchronous-unwind-tables -fno-unwind-tables \
              -fvisibility=hidden -ffunction-sections -fdata-sections \
@@ -61,7 +71,7 @@ jobs:
       - name: Freestanding object purity
         run: |
           cc -std=c11 -Os -Wall -Wextra -Werror -Wshadow -pedantic \
-             -ffreestanding -fno-builtin -fno-stack-protector \
+             -ffreestanding -nostdinc -fno-builtin -fno-stack-protector \
              -fno-optimize-sibling-calls \
              -fno-asynchronous-unwind-tables -fno-unwind-tables \
              -fvisibility=hidden -ffunction-sections -fdata-sections \
