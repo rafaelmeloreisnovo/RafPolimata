@@ -1,7 +1,7 @@
 #![no_std]
 
 /*
- * PKC Rust contract mirror V1.
+ * PKC Rust contract mirror V1.\n * Governance: CLOSURE_L2 (target/runtime evidence).
  *
  * No external crates. This is NOT yet a claim that every Rust final artifact
  * is runtime-free on every target. Final strict Rust parity remains
