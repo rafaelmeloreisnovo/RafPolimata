@@ -3,7 +3,8 @@
 Date: 2026-09-25
 Kind: `CANONICAL_REFERENCE_VECTOR_PHASE_A / APPEND_ONLY`
 Parent: `RafPolimata#350`
-claim_allowed=false
+claim_allowed=false  
+Gap governance: `CLOSURE_L1`
 
 ## Delta
 
