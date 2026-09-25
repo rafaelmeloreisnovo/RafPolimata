@@ -4,6 +4,7 @@
   "version": 1,
   "phase": "A_BITPLANES_ONLY",
   "claim_allowed": false,
+  "governance_closure": "CLOSURE_L1",
   "scope": {
     "covered": [
       "BL-001 byte bit-plane decomposition/reconstruction",
