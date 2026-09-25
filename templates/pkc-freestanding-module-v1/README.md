@@ -1,6 +1,6 @@
 # Copy template — PKC freestanding module V1
 
-Copy this directory when creating a new PKC-compatible module.
+Copy this directory when creating a new PKC-compatible module.\n\nGovernance: `CLOSURE_L2` (target runtime) + `CLOSURE_L12` (license).
 
 ## Structural rule
 
