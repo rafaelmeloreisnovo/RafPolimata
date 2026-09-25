@@ -3,7 +3,8 @@
 State: `IMPLEMENTED_UNTESTED`  
 Authority: `rafaelmeloreisnovo/RafPolimata`  
 Parent: `ZIPRAF-BIT-LAYER-PROGRESSIVE-RASTER-V1`  
-claim_allowed=false
+claim_allowed=false  
+Gap governance: `CLOSURE_L1`
 
 ## Why Phase A exists
 
