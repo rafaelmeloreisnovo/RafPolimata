@@ -108,16 +108,8 @@ static inline u32 u32_sel(u32 cond, u32 a, u32 b) {
     u32 m = u32_mask(cond); return (a & m) | (b & ~m);
 }
 
-/* ── Endian-safe writers / readers (unaligned OK) ────────────────────── */
-static inline void w16(u8 *p, u16 v) { p[0]=(u8)v; p[1]=(u8)(v>>8); }
-static inline void w32(u8 *p, u32 v) {
-    p[0]=(u8)v; p[1]=(u8)(v>>8); p[2]=(u8)(v>>16); p[3]=(u8)(v>>24);
-}
-static inline void w64(u8 *p, u64 v) { w32(p,(u32)v); w32(p+4,(u32)(v>>32)); }
-static inline u16 r16(const u8 *p) { return (u16)(p[0]|(u16)(p[1]<<8)); }
-static inline u32 r32(const u8 *p) {
-    return (u32)p[0]|((u32)p[1]<<8)|((u32)p[2]<<16)|((u32)p[3]<<24);
-}
+/* ── Endian-safe writers / readers ────────────────────────────────── */
+/* Canonical definitions live in freestanding_base.h via sys.h. */
 
 /* ── I/O helpers ─────────────────────────────────────────────────────── */
 static inline void pr(const char *s)     { os_write(1, s, s_len(s)); }
