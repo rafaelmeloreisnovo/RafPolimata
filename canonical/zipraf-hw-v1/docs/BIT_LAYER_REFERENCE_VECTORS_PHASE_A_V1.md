@@ -29,7 +29,7 @@ The C reference is header-only, caller-buffer based, and uses no includes, libc,
 
 ## Test mapping
 
-- T-BL-001: **Phase-A covered** for canonical byte samples; exhaustive 0..255 remains the next strengthening step.
+- T-BL-001: **Phase-A covered exhaustively** for byte values 0..255 in the C gate; the JSON keeps a compact canonical witness set.
 - T-BL-002: **Phase-A covered** for repeated bit-layer state.
 - T-BL-006: **Phase-A covered** for q={1,2,4,8} under exact byte information ordering.
 - T-BL-007: **Phase-A covered** for complete out-of-order layer arrival.
