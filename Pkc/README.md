@@ -1,6 +1,6 @@
 # PKC — freestanding wordcode layer (V1)
 
-Status: **CANDIDATE / claim_allowed=false**
+Status: **CANDIDATE / claim_allowed=false**\n\nGovernance: `CLOSURE_L11` (operational/language gaps) + `CLOSURE_L12` (legal terms).
 
 This directory is a new append-only layer beside `Apkc/`. The expansion of the
 initials "PKC" is intentionally **TOKEN_VAZIO_OWNER_NAMING** until the owner
