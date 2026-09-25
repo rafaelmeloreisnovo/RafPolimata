@@ -2,7 +2,7 @@
  * Every function returns the 32-bit machine word (little-endian).
  * No heap. No imports beyond mem.h. Pure bit arithmetic. */
 #pragma once
-#include "mem.h"
+#include "freestanding_base.h"
 
 /* ── Register numbers ────────────────────────────────────────────────── */
 #define R0  0u  /* also XZR in some contexts */
@@ -205,15 +205,15 @@ static inline u32 a64_udiv(u8 rd, u8 rn, u8 rm, u8 sf) {
 /* ── Load / Store ────────────────────────────────────────────────────── */
 /* LDR Xt, [Xn, #off]  unsigned offset (multiple of 8 for 64-bit) */
 static inline u32 a64_ldr(u8 rt, u8 rn, u16 off, u8 sf) {
-    u8 sz = sf ? 3u : 2u;
+    u8 size_code = sf ? 3u : 2u;
     u16 sc = sf ? (off>>3) : (off>>2);
-    return ((u32)sz<<30)|(0x39u<<24)|(1u<<22)|((u32)sc<<10)|((u32)rn<<5)|(u32)rt;
+    return ((u32)size_code<<30)|(0x39u<<24)|(1u<<22)|((u32)sc<<10)|((u32)rn<<5)|(u32)rt;
 }
 /* STR Xt, [Xn, #off] */
 static inline u32 a64_str(u8 rt, u8 rn, u16 off, u8 sf) {
-    u8 sz = sf ? 3u : 2u;
+    u8 size_code = sf ? 3u : 2u;
     u16 sc = sf ? (off>>3) : (off>>2);
-    return ((u32)sz<<30)|(0x39u<<24)|((u32)sc<<10)|((u32)rn<<5)|(u32)rt;
+    return ((u32)size_code<<30)|(0x39u<<24)|((u32)sc<<10)|((u32)rn<<5)|(u32)rt;
 }
 /* LDRB Wt, [Xn, #off]  — byte load (off not scaled) */
 static inline u32 a64_ldrb(u8 rt, u8 rn, u16 off) {
