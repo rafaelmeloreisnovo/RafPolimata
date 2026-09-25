@@ -2,7 +2,8 @@
 
 **State:** `TOKEN_VAZIO_FINAL_LEGAL_TEXT`  
 **Scope:** original PKC material only; no automatic relicensing of third-party code.  
-**claim_allowed:** false  \n**Governance:** `CLOSURE_L12`
+**claim_allowed:** false  
+**Governance:** `CLOSURE_L12`
 
 This file records the owner's requested policy as a **draft governance record**.
 It is not represented as a finalized software license or legal opinion.
