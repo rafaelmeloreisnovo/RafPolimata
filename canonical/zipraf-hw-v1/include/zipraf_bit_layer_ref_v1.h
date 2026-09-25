@@ -3,6 +3,7 @@
  *
  * Authority: rafaelmeloreisnovo/RafPolimata
  * Contract: ZIPRAF-BIT-LAYER-PROGRESSIVE-RASTER-V1
+ * Gap governance: CLOSURE_L1
  * Scope: bit-plane reconstruction and deterministic layer arrival only.
  *
  * No includes. No libc. No libm. No heap. No syscall.
