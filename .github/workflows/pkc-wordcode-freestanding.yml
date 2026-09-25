@@ -6,7 +6,10 @@ on:
       - 'Pkc/**'
       - 'Apkc/apkc_pkc_bridge.h'
       - 'tests/test_pkc_wordcode.c'
+      - 'tests/test_apkc_pkc_bridge.c'
       - 'tests/pkc_freestanding_probe.c'
+      - 'templates/pkc-freestanding-module-v1/**'
+      - 'docs/legal/PKC_USE_POLICY_DRAFT_V1.md'
       - '.github/workflows/pkc-wordcode-freestanding.yml'
   push:
     branches:
@@ -15,26 +18,59 @@ on:
       - 'Pkc/**'
       - 'Apkc/apkc_pkc_bridge.h'
       - 'tests/test_pkc_wordcode.c'
+      - 'tests/test_apkc_pkc_bridge.c'
       - 'tests/pkc_freestanding_probe.c'
+      - 'templates/pkc-freestanding-module-v1/**'
+      - 'docs/legal/PKC_USE_POLICY_DRAFT_V1.md'
+      - '.github/workflows/pkc-wordcode-freestanding.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pkc-wordcode-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   c-wordcode:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Hosted semantic harness
         run: |
-          cc -std=c11 -O2 -Wall -Wextra -Werror -Wshadow -pedantic              tests/test_pkc_wordcode.c -o /tmp/test_pkc_wordcode
+          cc -std=c11 -O2 -Wall -Wextra -Werror -Wshadow -pedantic \
+             tests/test_pkc_wordcode.c -o /tmp/test_pkc_wordcode
           /tmp/test_pkc_wordcode
+
+      - name: PKC to ApkC Stage0 byte parity
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra -Werror -Wshadow -pedantic \
+             tests/test_apkc_pkc_bridge.c -o /tmp/test_apkc_pkc_bridge
+          /tmp/test_apkc_pkc_bridge
+
+          cc -std=c11 -Os -Wall -Wextra -Werror -Wshadow -pedantic \
+             -ffreestanding -fno-builtin -fno-stack-protector \
+             -fno-optimize-sibling-calls \
+             -fno-asynchronous-unwind-tables -fno-unwind-tables \
+             -fvisibility=hidden -ffunction-sections -fdata-sections \
+             -c tests/test_apkc_pkc_bridge.c -o /tmp/pkc_bridge.o
+          test -z "$(nm -u /tmp/pkc_bridge.o)"
 
       - name: Freestanding object purity
         run: |
-          cc -std=c11 -Os -Wall -Wextra -Werror -Wshadow -pedantic              -ffreestanding -fno-builtin -fno-stack-protector              -fno-optimize-sibling-calls              -fno-asynchronous-unwind-tables -fno-unwind-tables              -fvisibility=hidden -ffunction-sections -fdata-sections              -c tests/pkc_freestanding_probe.c -o /tmp/pkc_probe.o
+          cc -std=c11 -Os -Wall -Wextra -Werror -Wshadow -pedantic \
+             -ffreestanding -fno-builtin -fno-stack-protector \
+             -fno-optimize-sibling-calls \
+             -fno-asynchronous-unwind-tables -fno-unwind-tables \
+             -fvisibility=hidden -ffunction-sections -fdata-sections \
+             -c tests/pkc_freestanding_probe.c -o /tmp/pkc_probe.o
           test -z "$(nm -u /tmp/pkc_probe.o)"
           ! strings /tmp/pkc_probe.o | grep -E 'MOVER|SOMAR|SUBTRAIR|MULTIPLICAR|RETORNAR|MOVE|SUBTRACT|MULTIPLY|RETURN'
 
       - name: Rust no_std contract mirror
         run: |
-          rustc --crate-type=lib --emit=obj -C panic=abort -C opt-level=s             Pkc/rust/pkc_contract.rs -o /tmp/pkc_rust.o
+          rustc --crate-type=lib --emit=obj -C panic=abort -C opt-level=s \
+            Pkc/rust/pkc_contract.rs -o /tmp/pkc_rust.o
           test -z "$(nm -u /tmp/pkc_rust.o)"
