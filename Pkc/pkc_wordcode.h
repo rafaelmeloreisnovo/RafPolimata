@@ -2,7 +2,8 @@
  * Pkc/pkc_wordcode.h — bounded VERB + NOUN frontend V1.
  *
  * Copyright (c) 2024-2026 Rafael Melo Reis.
- * License status: TOKEN_VAZIO_FINAL_LEGAL_TEXT\n * Governance: CLOSURE_L11 (lexicon gaps) + CLOSURE_L12 (license gap)
+ * License status: TOKEN_VAZIO_FINAL_LEGAL_TEXT
+ * Governance: CLOSURE_L11 (lexicon gaps) + CLOSURE_L12 (license gap)
  *
  * Properties:
  *   - no includes
