@@ -1,0 +1,7 @@
+# PKC word-assembly V1 — português
+# Apenas VERBO + NOME/operando. Sem pontuação obrigatória.
+MOVER R0 7
+MOVER R1 3
+SOMAR R2 R0 R1
+MULTIPLICAR R3 R2 R1
+RETORNAR
