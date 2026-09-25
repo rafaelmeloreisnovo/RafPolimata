@@ -1,0 +1,92 @@
+{
+  "contract": "ZIPRAF-BIT-LAYER-REFERENCE-VECTORS-V1",
+  "parent_contract": "ZIPRAF-BIT-LAYER-PROGRESSIVE-RASTER-V1",
+  "version": 1,
+  "phase": "A_BITPLANES_ONLY",
+  "claim_allowed": false,
+  "governance_closure": "CLOSURE_L1",
+  "scope": {
+    "covered": [
+      "BL-001 byte bit-plane decomposition/reconstruction",
+      "BL-006 progressive MSB reconstruction",
+      "deterministic repeated layer state",
+      "out-of-order bit-layer convergence",
+      "reference header validation"
+    ],
+    "not_covered": [
+      "canonical block mask M",
+      "historical geometry G(M)",
+      "structural/non-structural block classification",
+      "multiresolution E_s",
+      "Vectra/Termux cross-runtime agreement"
+    ]
+  },
+  "geometry": {
+    "M": "TOKEN_VAZIO_NOT_BOUND",
+    "G(M)": "TOKEN_VAZIO_NOT_BOUND",
+    "T-BL-003": "TOKEN_VAZIO",
+    "T-BL-004": "TOKEN_VAZIO",
+    "T-BL-005": "TOKEN_VAZIO",
+    "T-BL-010": "TOKEN_VAZIO"
+  },
+  "widths": [30, 60],
+  "q_values": [1, 2, 4, 8],
+  "samples": [
+    {
+      "id": "BLV-00",
+      "byte": 0,
+      "planes_lsb_to_msb": [0,0,0,0,0,0,0,0],
+      "q_reconstruction": {"1":0,"2":0,"4":0,"8":0}
+    },
+    {
+      "id": "BLV-01",
+      "byte": 1,
+      "planes_lsb_to_msb": [1,0,0,0,0,0,0,0],
+      "q_reconstruction": {"1":0,"2":0,"4":0,"8":1}
+    },
+    {
+      "id": "BLV-55",
+      "byte": 85,
+      "planes_lsb_to_msb": [1,0,1,0,1,0,1,0],
+      "q_reconstruction": {"1":0,"2":64,"4":80,"8":85}
+    },
+    {
+      "id": "BLV-80",
+      "byte": 128,
+      "planes_lsb_to_msb": [0,0,0,0,0,0,0,1],
+      "q_reconstruction": {"1":128,"2":128,"4":128,"8":128}
+    },
+    {
+      "id": "BLV-A5",
+      "byte": 165,
+      "planes_lsb_to_msb": [1,0,1,0,0,1,0,1],
+      "q_reconstruction": {"1":128,"2":128,"4":160,"8":165}
+    },
+    {
+      "id": "BLV-FF",
+      "byte": 255,
+      "planes_lsb_to_msb": [1,1,1,1,1,1,1,1],
+      "q_reconstruction": {"1":128,"2":192,"4":240,"8":255}
+    }
+  ],
+  "arrival_order_vectors": [
+    {
+      "id": "ORDER-A5-A",
+      "byte": 165,
+      "order": [7,0,5,2,6,1,4,3],
+      "expected_final": 165
+    },
+    {
+      "id": "ORDER-A5-B",
+      "byte": 165,
+      "order": [0,1,2,3,4,5,6,7],
+      "expected_final": 165
+    }
+  ],
+  "negative_vectors": [
+    {"id":"HDR-VERSION","version":2,"width":30,"q":8,"expected":"ZBL_E_VERSION"},
+    {"id":"HDR-WIDTH","version":1,"width":31,"q":8,"expected":"ZBL_E_WIDTH"},
+    {"id":"HDR-Q0","version":1,"width":30,"q":0,"expected":"ZBL_E_Q"},
+    {"id":"DUP-CONFLICT","byte":165,"layer":7,"first_bit":1,"second_bit":0,"expected":"ZBL_E_DUPLICATE_CONFLICT"}
+  ]
+}

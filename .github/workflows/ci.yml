@@ -141,6 +141,25 @@ jobs:
       - name: Validate Android ABI plan
         run: bash scripts/android_build_matrix.sh --plan
 
+      - name: ZIPRAF Bit Layer reference vectors Phase A
+        run: |
+          set -euo pipefail
+          python3 scripts/validate_zipraf_bit_layer_vectors_v1.py
+
+          cc -std=c11 -O2 -Wall -Wextra -Werror -Wshadow -pedantic \
+            tests/test_zipraf_bit_layer_ref_v1.c \
+            -o /tmp/test_zipraf_bit_layer_ref_v1
+          /tmp/test_zipraf_bit_layer_ref_v1
+
+          cc -std=c11 -Os -Wall -Wextra -Werror -Wshadow -pedantic \
+            -ffreestanding -nostdinc -fno-builtin -fno-stack-protector \
+            -fno-optimize-sibling-calls \
+            -fno-asynchronous-unwind-tables -fno-unwind-tables \
+            -fvisibility=hidden -ffunction-sections -fdata-sections \
+            -c tests/zipraf_bit_layer_ref_freestanding_probe.c \
+            -o /tmp/zipraf_bit_layer_ref_probe.o
+          test -z "$(nm -u /tmp/zipraf_bit_layer_ref_probe.o)"
+
       - name: RAF TraceBuf freestanding smoke gate
         run: |
           gcc -std=c11 -Wall -Wextra -Werror \
