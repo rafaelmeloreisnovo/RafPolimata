@@ -1,0 +1,7 @@
+# PKC word-assembly V1 — English
+# VERB + NOUN/operand only. No mandatory punctuation.
+MOVE R0 7
+MOVE R1 3
+ADD R2 R0 R1
+MULTIPLY R3 R2 R1
+RETURN

@@ -1,0 +1,7 @@
+# PKC WORD-ASSEMBLY TEMPLATE V1
+# sujeito implícito = máquina/estado atual
+# verbo + substantivo/operando
+MOVER R0 1
+MOVER R1 2
+SOMAR R2 R0 R1
+RETORNAR

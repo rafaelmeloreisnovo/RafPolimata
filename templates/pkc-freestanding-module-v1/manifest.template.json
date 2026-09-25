@@ -1,0 +1,52 @@
+{
+  "schema": "raf.pkc-freestanding-module-manifest.v1",
+  "module": "REPLACE_MODULE_NAME",
+  "version": "0.1.0",
+  "repository": "REPLACE_REPOSITORY",
+  "commit": "TOKEN_VAZIO_UNBUILT",
+  "path": "REPLACE_PATH",
+  "source_sha256": "TOKEN_VAZIO_UNBUILT",
+  "artifact_sha256": "TOKEN_VAZIO_UNBUILT",
+  "author": "Rafael Melo Reis",
+  "license_status": "TOKEN_VAZIO_FINAL_LEGAL_TEXT",
+  "policy": "docs/legal/PKC_USE_POLICY_DRAFT_V1.md",
+  "upstream": [],
+  "dependencies": {
+    "runtime_external": 0,
+    "libc": 0,
+    "libm": 0,
+    "heap": 0,
+    "syscall": 0
+  },
+  "contract": [
+    "NO_HEAP",
+    "NO_EXTERNAL_RUNTIME",
+    "NO_LIBC",
+    "NO_LIBM",
+    "NO_SYSCALL",
+    "NO_TAILCALL",
+    "NO_SHADOW",
+    "NO_UNWIND",
+    "ZERO_UNDEFINED",
+    "CALLER_BUFFER",
+    "NO_DUP_KERNEL",
+    "DETERMINISTIC"
+  ],
+  "symbol_policy": {
+    "human_aliases_lower_to_canonical_op": true,
+    "duplicate_language_kernels": false,
+    "lexicon_strings_required_in_artifact": false
+  },
+  "evidence": {
+    "compile": "NOT_RUN",
+    "undefined_symbols": "NOT_RUN",
+    "semantic_test": "NOT_RUN",
+    "cross_target": "TOKEN_VAZIO",
+    "claim_allowed": false
+  },
+  "closures": [
+    "CLOSURE_L1",
+    "CLOSURE_L2",
+    "CLOSURE_L12"
+  ]
+}\n
