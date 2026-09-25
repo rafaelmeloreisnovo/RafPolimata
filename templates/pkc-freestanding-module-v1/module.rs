@@ -1,7 +1,7 @@
 #![no_std]
 
 /*
- * PKC RUST MODULE TEMPLATE V1
+ * PKC RUST MODULE TEMPLATE V1\n * Governance: CLOSURE_L2
  *
  * External crates: none.
  * Final strict runtime parity: TOKEN_VAZIO_TARGET_GATE.
