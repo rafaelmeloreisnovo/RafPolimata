@@ -5,7 +5,8 @@
  * Provenance: REPOSITORY@COMMIT:PATH
  * Version: 0.1.0
  * License status: TOKEN_VAZIO_FINAL_LEGAL_TEXT
- * Policy: docs/legal/PKC_USE_POLICY_DRAFT_V1.md\n * Governance: CLOSURE_L12
+ * Policy: docs/legal/PKC_USE_POLICY_DRAFT_V1.md
+ * Governance: CLOSURE_L12
  * Upstream: NONE | LIST_EXPLICITLY
  *
  * Contract: no libc, no libm, no heap, no syscall, no external runtime.
