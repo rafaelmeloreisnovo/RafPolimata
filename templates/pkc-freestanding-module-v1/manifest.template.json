@@ -43,5 +43,10 @@
     "semantic_test": "NOT_RUN",
     "cross_target": "TOKEN_VAZIO",
     "claim_allowed": false
-  }
-}
+  },
+  "closures": [
+    "CLOSURE_L1",
+    "CLOSURE_L2",
+    "CLOSURE_L12"
+  ]
+}\n
