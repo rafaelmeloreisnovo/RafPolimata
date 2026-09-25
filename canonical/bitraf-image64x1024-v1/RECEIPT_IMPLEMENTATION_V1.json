@@ -1,0 +1,38 @@
+{
+  "schema": "rafaelia.bitraf-image64x1024.implementation-receipt/v1",
+  "date": "2026-09-25",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "branch": "bitraf-image64x1024-layers-v1-20260925",
+  "authority": {
+    "sequence_math": "rafaelmeloreisnovo/Matem-tica-/docs/formal/FIBONACCI_INVERSE_REVERSE_JUMP_RULER_V1.md",
+    "bitraf_matrix": "docs/BITRAF_MATRIX_8000_4096_V1.md",
+    "orchestrator": "docs/RAFAELIA_ORQUESTRADOR_ASCII_UTF.md"
+  },
+  "implemented": [
+    "64x1024_image_carrier",
+    "q10_luminance",
+    "rgb_cmyk_layers",
+    "gradient_orientation_22_5deg_bins",
+    "sinusoidal_directional_sweep",
+    "rotated_copy_similarity",
+    "fibonacci_normal_probe",
+    "fibonacci_reverse_traversal",
+    "fibonacci_inverse_nearest_rule",
+    "rafael_affine_probe",
+    "tribonacci_probe",
+    "exploratory_radial_circular_spiral_morphology",
+    "base20_cell_address",
+    "optional_matrix_binary",
+    "optional_svg_receipt"
+  ],
+  "boundaries": [
+    "BITRAF_IMAGE64x1024 != BITRAF_MATRIX_8000_4096",
+    "sequence_probe != matrix_optimality",
+    "exploratory_morphology != external-domain evidence",
+    "sine_sweep != magnetic_field_measurement",
+    "ZIPRAF_carrier_ready != compression_advantage"
+  ],
+  "state": "IMPLEMENTED_CI_PENDING",
+  "claim_allowed": false,
+  "next": "Run CI and batch a frozen session-image corpus with source SHA256 receipts."
+}
