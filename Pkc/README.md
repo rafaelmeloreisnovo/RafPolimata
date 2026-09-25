@@ -59,14 +59,29 @@ No adjective category exists in V1. Punctuation is not needed.
 |---|---|
 | Portuguese ASCII verbs | IMPLEMENTED_BASELINE |
 | English ASCII verbs | IMPLEMENTED_BASELINE |
-| Greek | TOKEN_VAZIO_CORPUS_VALIDATION |
-| Hebrew | TOKEN_VAZIO_CORPUS_VALIDATION |
-| Syriac/Aramaic | TOKEN_VAZIO_CORPUS_VALIDATION |
+| Greek | SOURCE_FOUND__EXECUTABLE_LOWERING_PENDING |
+| Hebrew | SOURCE_FOUND__EXECUTABLE_LOWERING_PENDING |
+| Biblical Aramaic | SOURCE_FOUND_PARTIAL__EXECUTABLE_LOWERING_PENDING |
+| Syriac-script coverage | TOKEN_VAZIO_UTF8_SCRIPT_COVERAGE |
 | accents / Unicode normalization | TOKEN_VAZIO_UTF8_NORMALIZATION |
 
-The repository already contains reference script samples in
-`configs/language-matrix.v1.json`. Reference samples are not treated as a
-validated programming lexicon.
+The earlier local repository samples are not the only source. A larger,
+pre-existing LowFala source of record was located at:
+
+`rafaelmeloreisnovo/Vectras-VM-Android@master:Incluir/compiladorlowFala.txt`
+
+Git blob: `c05847c7b05f4657a156c131e2a43322aeec2ec0`  
+GitHub object size: `106563` bytes.
+
+That source explicitly contains Hebrew and Greek phoneme/lexical material,
+Biblical Aramaic grammar metadata and Aramaic-labelled phoneme entries, plus
+embedded C low-level lexer seeds. Therefore these languages are no longer
+classified as "source/corpus absent". What remains open is the stricter claim:
+deterministic PKC lexical lowering and byte-level parity through the freestanding
+pipeline. See `Pkc/PKC_LANGUAGE_PROVENANCE_V1.md`.
+
+Reference material is not automatically promoted to an executable programming
+lexicon.
 
 ## Relationship to ApkC
 
