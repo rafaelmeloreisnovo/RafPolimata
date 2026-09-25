@@ -1,4 +1,4 @@
-#include "../Pkc/pkc_wordcode.h"
+#include "../Pkc/pkc_wordcode.h"\n\n/* CLOSURE_L11: explicit lexicon gap is expected and fail-closed. */
 
 static int test_pt(void) {
     static const char src[] =
