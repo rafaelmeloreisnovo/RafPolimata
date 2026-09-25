@@ -4,7 +4,8 @@
  * Copyright (c) 2024-2026 Rafael Melo Reis.
  * Provenance: rafaelmeloreisnovo/RafPolimata
  * License status: TOKEN_VAZIO_FINAL_LEGAL_TEXT
- * Policy reference: docs/legal/PKC_USE_POLICY_DRAFT_V1.md\n * Governance: CLOSURE_L11 + CLOSURE_L12
+ * Policy reference: docs/legal/PKC_USE_POLICY_DRAFT_V1.md
+ * Governance: CLOSURE_L11 + CLOSURE_L12
  *
  * No includes. No libc. No libm. No heap. No syscall.
  */
