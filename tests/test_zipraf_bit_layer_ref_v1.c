@@ -40,6 +40,8 @@ int main(void)
     static const zbl_u8 order_b[8] = {0u,1u,2u,3u,4u,5u,6u,7u};
     ZblLayerAccumulatorV1 a;
     zbl_u8 out = 0u;
+    zbl_u32 v;
+    zbl_u32 q;
 
     if (zbl_ref_header_validate(1u, 30u, 8u) != ZBL_OK) return 10;
     if (zbl_ref_header_validate(1u, 60u, 4u) != ZBL_OK) return 11;
@@ -55,8 +57,23 @@ int main(void)
     if (check_sample(165u, 128u,128u,160u,165u) != 0) return 24;
     if (check_sample(255u, 128u,192u,240u,255u) != 0) return 25;
 
-    if (check_order(order_a) != 0) return 30;
-    if (check_order(order_b) != 0) return 31;
+    /* T-BL-001 exhaustive byte reconstruction, plus all q=1..8 masks. */
+    for (v = 0u; v <= 255u; ++v) {
+        zbl_u8 planes[8];
+        zbl_u8 full = 0u;
+        if (zbl_ref_decompose_u8((zbl_u8)v, planes) != ZBL_OK) return 26;
+        if (zbl_ref_reconstruct_u8(planes, &full) != ZBL_OK) return 27;
+        if ((zbl_u32)full != v) return 28;
+        for (q = 1u; q <= 8u; ++q) {
+            zbl_u8 partial = 0u;
+            zbl_u8 mask = zbl_ref_required_layer_mask((zbl_u8)q);
+            if (zbl_ref_reconstruct_msb_q(planes, (zbl_u8)q, &partial) != ZBL_OK) return 29;
+            if (partial != (zbl_u8)(((zbl_u8)v) & mask)) return 30;
+        }
+    }
+
+    if (check_order(order_a) != 0) return 31;
+    if (check_order(order_b) != 0) return 32;
 
     zbl_ref_accumulator_init(&a);
     if (zbl_ref_accumulator_put(&a, 7u, 1u) != ZBL_OK) return 40;
