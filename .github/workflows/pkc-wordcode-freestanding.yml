@@ -1,0 +1,40 @@
+name: PKC wordcode freestanding
+
+on:
+  pull_request:
+    paths:
+      - 'Pkc/**'
+      - 'Apkc/apkc_pkc_bridge.h'
+      - 'tests/test_pkc_wordcode.c'
+      - 'tests/pkc_freestanding_probe.c'
+      - '.github/workflows/pkc-wordcode-freestanding.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'Pkc/**'
+      - 'Apkc/apkc_pkc_bridge.h'
+      - 'tests/test_pkc_wordcode.c'
+      - 'tests/pkc_freestanding_probe.c'
+
+jobs:
+  c-wordcode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Hosted semantic harness
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra -Werror -Wshadow -pedantic              tests/test_pkc_wordcode.c -o /tmp/test_pkc_wordcode
+          /tmp/test_pkc_wordcode
+
+      - name: Freestanding object purity
+        run: |
+          cc -std=c11 -Os -Wall -Wextra -Werror -Wshadow -pedantic              -ffreestanding -fno-builtin -fno-stack-protector              -fno-optimize-sibling-calls              -fno-asynchronous-unwind-tables -fno-unwind-tables              -fvisibility=hidden -ffunction-sections -fdata-sections              -c tests/pkc_freestanding_probe.c -o /tmp/pkc_probe.o
+          test -z "$(nm -u /tmp/pkc_probe.o)"
+          ! strings /tmp/pkc_probe.o | grep -E 'MOVER|SOMAR|SUBTRAIR|MULTIPLICAR|RETORNAR|MOVE|SUBTRACT|MULTIPLY|RETURN'
+
+      - name: Rust no_std contract mirror
+        run: |
+          rustc --crate-type=lib --emit=obj -C panic=abort -C opt-level=s             Pkc/rust/pkc_contract.rs -o /tmp/pkc_rust.o
+          test -z "$(nm -u /tmp/pkc_rust.o)"
