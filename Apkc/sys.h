@@ -4,14 +4,7 @@
  */
 #pragma once
 
-typedef unsigned char       u8;
-typedef unsigned short      u16;
-typedef unsigned int        u32;
-typedef unsigned long long  u64;
-typedef signed char         i8;
-typedef signed short        i16;
-typedef signed int          i32;
-typedef signed long long    i64;
+#include "freestanding_base.h"
 #ifdef __aarch64__
 typedef unsigned long       uptr;
 typedef long                iptr;
@@ -19,7 +12,6 @@ typedef long                iptr;
 typedef unsigned int        uptr;
 typedef int                 iptr;
 #endif
-typedef __SIZE_TYPE__       sz;
 
 /* For x86_64 development builds, include libc headers */
 #if defined(__x86_64__) || defined(__i386__)
@@ -29,7 +21,9 @@ typedef __SIZE_TYPE__       sz;
 #include <sys/wait.h>
 #endif
 
+#ifndef NULL
 #define NULL ((void*)0)
+#endif
 
 /* O_* flags only needed for ARM syscalls; x86_64 gets them from libc */
 #if !defined(__x86_64__) && !defined(__i386__)
