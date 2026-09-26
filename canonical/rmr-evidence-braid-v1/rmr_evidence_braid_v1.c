@@ -1,5 +1,6 @@
 /*
  * RMR Evidence Braid V1
+ * Governance anchor: CLOSURE_L1 (provenance/reproducibility gaps).
  * Freestanding/no-libc/no-heap/no-syscall core.
  *
  * Scope:
