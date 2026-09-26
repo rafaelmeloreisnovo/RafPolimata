@@ -146,6 +146,25 @@ jobs:
           set -euo pipefail
           python3 scripts/validate_zipraf_bit_layer_vectors_v1.py
 
+      - name: RMR Evidence Braid V1 freestanding causal-custody gate
+        run: |
+          set -euo pipefail
+          SRC=canonical/rmr-evidence-braid-v1/rmr_evidence_braid_v1.c
+
+          cc -std=c11 -Wall -Wextra -Werror -DRMR_EVB1_SELFTEST "$SRC" -o /tmp/rmr-evidence-braid-v1
+          /tmp/rmr-evidence-braid-v1
+
+          cc -std=c11 -ffreestanding -fno-builtin -fno-stack-protector -Wall -Wextra -Werror -c "$SRC" -o /tmp/rmr-evidence-braid-x86_64.o
+          test -z "$(nm -u /tmp/rmr-evidence-braid-x86_64.o)"
+
+          clang -target armv7a-linux-gnueabihf -std=c11 -ffreestanding -fno-builtin -fno-stack-protector -Wall -Wextra -Werror -c "$SRC" -o /tmp/rmr-evidence-braid-armv7.o
+          test -z "$(nm -u /tmp/rmr-evidence-braid-armv7.o)"
+
+          clang -target aarch64-linux-gnu -std=c11 -ffreestanding -fno-builtin -fno-stack-protector -Wall -Wextra -Werror -c "$SRC" -o /tmp/rmr-evidence-braid-aarch64.o
+          test -z "$(nm -u /tmp/rmr-evidence-braid-aarch64.o)"
+
+          size /tmp/rmr-evidence-braid-x86_64.o /tmp/rmr-evidence-braid-armv7.o /tmp/rmr-evidence-braid-aarch64.o
+
           cc -std=c11 -O2 -Wall -Wextra -Werror -Wshadow -pedantic \
             tests/test_zipraf_bit_layer_ref_v1.c \
             -o /tmp/test_zipraf_bit_layer_ref_v1
