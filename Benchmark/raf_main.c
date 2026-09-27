@@ -1,7 +1,8 @@
-/* raf_main.c — RAFAELIA Enterprise Fullstack — ponto de entrada
+/* raf_main.c — RAFAELIA no-libc Linux/Android userspace entry point
  * Integra: arena + CRC32C + hash + T^7 + FSM + Lyapunov + benchmark
- * Compila: gcc -O2 -march=native -o raf raf_main.c (nolibc via syscall)
- * sem malloc sem libc heap sem GC sem abstrações sem overhead                */
+ * Runtime boundary: raw Linux syscalls; this is NOT physical bare-metal and
+ * is separate from the OS-neutral freestanding/ L0 contract.
+ * Core: no malloc, no GC runtime, caller/static storage.                    */
 #include "raf_types.h"
 #include "raf_sys.h"
 #include "raf_arena.h"
@@ -222,37 +223,37 @@ static void print_abi_report(u64 freq) {
 #ifdef RAF_ARCH_A32
     raf_puts("  arch=ARM32 ABI=AAPCS\n");
     raf_puts("  regs: r0-r3=args r4-r11=callee-saved r13=sp r14=lr r15=pc\n");
-    raf_puts("  crc32c=software(poly=0x82F63B78) tsc=PMCCNTR\n");
+    raf_puts("  crc32c=software(poly=0x82F63B78) timer=clock_gettime(raw syscall)\n");
 #endif
     raf_puts("  arena_cap="); raf_putu64(ARENA_CAP);
     raf_puts("bytes  bench_k="); raf_putu64(BENCH_K);
-    raf_puts("  cntvct_freq_hz="); raf_putu64(freq);
+    raf_puts("  timer_freq_hz_or_zero_raw_ticks="); raf_putu64(freq);
 }
 
-/* ── Sumário de medianas — tabela final ─────────────────────────────────── */
+/* ── Execution/evidence boundary summary ───────────────────────────────── */
 static void print_summary(void) {
-    raf_puts("\n=== RAFAELIA ENTERPRISE BENCHMARK SUMMARY ===\n");
-    raf_puts("  Benchmark           | Mediana | Unidade\n");
-    raf_puts("  --------------------|---------|--------\n");
-    raf_puts("  crc32c_4kb_hw       | ~52     | ns/4KB\n");
-    raf_puts("  arena_alloc_64b     | ~3      | ns\n");
-    raf_puts("  phi64_mix_64steps   | ~15     | ns\n");
-    raf_puts("  fsm_1000steps       | ~2000   | ns\n");
-    raf_puts("  t7_1000steps        | ~2500   | ns\n");
-    raf_puts("  fraf_1000steps_q16  | ~800    | ns\n");
-    raf_puts("  merkle_100feeds     | ~300    | ns\n");
-    raf_puts("  vs jemalloc_64b     | ~75     | ns (25x mais lento)\n");
-    raf_puts("  vs glibc_malloc_64b | ~180    | ns (60x mais lento)\n");
-    raf_puts("  Heap friction       | 0       | (zero malloc)\n");
-    raf_puts("  GC pause            | 0       | (zero GC)\n");
-    raf_puts("  Syscall overhead    | 0       | (hot path zero-syscall)\n");
+    raf_puts("\n=== RAFAELIA BENCHMARK EXECUTION BOUNDARY ===\n");
+    raf_puts("  measured_values     | emitted above | current process only\n");
+    raf_puts("  dynamic_heap_calls  | 0 in this harness | static arena\n");
+    raf_puts("  GC_runtime          | none | no GC dependency\n");
+#ifdef RAF_ARCH_A32
+    raf_puts("  timer               | clock_gettime | raw Linux syscall; ns\n");
+#endif
+#ifdef RAF_ARCH_A64
+    raf_puts("  timer               | cntvct_el0 | counter + cntfrq_el0\n");
+#endif
+#ifdef RAF_ARCH_X64
+    raf_puts("  timer               | rdtsc+lfence | raw ticks; not calibrated ns\n");
+#endif
+    raf_puts("  I/O + exit          | raw Linux syscalls | OS-bound userspace\n");
+    raf_puts("  physical bare-metal | TOKEN_VAZIO | requires board/startup/device receipt\n");
 }
 
 /* ── Entrada principal — sem argc/argv no modo nolibc ───────────────────── */
 void _start(void) {
     u64 freq = raf_tsc_freq();
-    raf_puts("\nRAFAELIA ENTERPRISE BARE-METAL v1.0\n");
-    raf_puts("nolibc | zero-malloc | Q16 | ARM64/x86-64/ARM32\n");
+    raf_puts("\nRAFAELIA ENTERPRISE NO-LIBC USERSPACE v1.1\n");
+    raf_puts("Linux/Android raw-syscall | zero-malloc | Q16 | ARM64/x86-64/ARM32\n");
     raf_puts("Omega=Amor | bitraf64 | hashchain RAFCODE-PHI\n\n");
     print_abi_report(freq);
     raf_puts("\n");

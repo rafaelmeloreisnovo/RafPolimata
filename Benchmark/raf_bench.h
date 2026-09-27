@@ -1,10 +1,10 @@
 /* raf_bench.h — harness de benchmark, mediana de BENCH_K=31 amostras
  * Mediana elimina outliers: scheduler preemption, IRQ, thermal throttle
  * Insertion sort em array de stack — zero malloc, O(k^2) = O(961) = trivial
- * ARM64: cntvct_el0 — timer 19.2 MHz, resolução ~52 ns, sem syscall
- * x86-64: rdtsc + lfence — ~7 ciclos overhead, nanosegundos via TSC freq
- * ARM32: PMCCNTR — requer userland PMU enable (/sys/bus/event_source/...)
- * Overhead do harness: ~10–15 tsc-ticks (fence + 2× mrs) — desprezível     */
+ * ARM64: cntvct_el0 — hardware counter; frequency read from cntfrq_el0
+ * x86-64: rdtsc + lfence — raw TSC ticks until a calibrated frequency exists
+ * ARM32: clock_gettime(CLOCK_MONOTONIC) raw syscall — values already in ns
+ * Timer overhead is architecture-specific and must not be reported as zero. */
 #pragma once
 #include "raf_types.h"
 #include "raf_sys.h"
@@ -58,15 +58,23 @@ static BenchResult bench_analyze(u64 a[BENCH_K]) {
  * Generalizado: ns = (ticks * 1000000000) / freq
  * Evita overflow: (ticks * 1000) / (freq/1000000)                          */
 static u64 ticks_to_ns(u64 ticks, u64 freq_hz) {
-    if (!freq_hz) return ticks; /* x86: retorna ciclos raw                  */
+#ifdef RAF_ARCH_A32
+    /* ARM32 raf_tsc() already returns nanoseconds. Avoid a 64-bit division
+     * that can introduce an external __aeabi_* helper in a no-libc link. */
+    (void)freq_hz;
+    return ticks;
+#else
+    if (!freq_hz) return ticks; /* raw ticks/cycles; not nanoseconds */
     return (ticks * 1000000ULL) / (freq_hz / 1000ULL);
+#endif
 }
 
-/* Report formatado — sem printf, sem heap                                   */
+/* Report formatado — sem printf, sem heap. Unit follows timer evidence.     */
 static void bench_report(const char *name, BenchResult r, u64 freq) {
+    const char *unit = freq ? "ns" : "ticks";
     raf_puts(name);
     raf_puts("  med=");  raf_putu64(ticks_to_ns(r.med, freq));
-    raf_puts("ns p5=");  raf_putu64(ticks_to_ns(r.p5,  freq));
-    raf_puts("ns p95="); raf_putu64(ticks_to_ns(r.p95, freq));
-    raf_puts("ns\n");
+    raf_puts(unit); raf_puts(" p5=");  raf_putu64(ticks_to_ns(r.p5,  freq));
+    raf_puts(unit); raf_puts(" p95="); raf_putu64(ticks_to_ns(r.p95, freq));
+    raf_puts(unit); raf_puts("\n");
 }

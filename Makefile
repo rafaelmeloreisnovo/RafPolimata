@@ -9,7 +9,7 @@ RAF_ARCH ?= arm64
 SRC ?= tests/fixtures/strict_kernel.c
 OUT ?= build/strict/libmain.so
 
-.PHONY: help syntax apkc-hardened-source verbovivo verbovivo-demo encoders proof audit language-contract compile compile-plan compiler-contract compiler-selftest hotfix-audit library-audit strict-elf report clean
+.PHONY: help syntax apkc-hardened-source verbovivo verbovivo-demo encoders proof audit execution-boundary-audit language-contract compile compile-plan compiler-contract compiler-selftest hotfix-audit library-audit strict-elf report clean
 
 help:
 	@echo 'RafPolimata — make targets:'
@@ -21,6 +21,7 @@ help:
 	@echo '  encoders          ARM32 + ARM64 encoder golden tests'
 	@echo '  proof             one clean reproducible proof run (tools/raf_clean_proof_run.sh)'
 	@echo '  audit             freestanding invariant audit (scripts/ci_freestanding_audit.sh)'
+	@echo '  execution-boundary-audit  L0/syscall/userspace separation + six-ISA compile gates'
 	@echo '  language-contract M063: policies, compiler station and strict ELF gates'
 	@echo '  compile           execute strict compiler: RAF_LANG/RAF_ARCH/SRC/OUT'
 	@echo '  compile-plan      emit deterministic JSON plan without executing'
@@ -67,6 +68,12 @@ audit:
 	else \
 		echo 'audit: TOKEN_VAZIO — scripts/ci_freestanding_audit.sh ausente'; \
 	fi
+
+execution-boundary-audit:
+	sh scripts/verify_execution_boundaries.sh
+	sh freestanding/tests/verify_contract.sh
+	sh freestanding/tests/verify_matrix.sh
+	sh syscall/tests/verify_matrix.sh
 
 language-contract:
 	bash scripts/audit_language_freestanding_contract.sh
