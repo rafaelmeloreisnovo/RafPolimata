@@ -2,7 +2,8 @@
  * Integra: arena + CRC32C + hash + T^7 + FSM + Lyapunov + benchmark
  * Runtime boundary: raw Linux syscalls; this is NOT physical bare-metal and
  * is separate from the OS-neutral freestanding/ L0 contract.
- * Core: no malloc, no GC runtime, caller/static storage.                    */
+ * Core: no malloc, no GC runtime, caller/static storage.
+ * Runtime/device unknowns: CLOSURE_L12.                                     */
 #include "raf_types.h"
 #include "raf_sys.h"
 #include "raf_arena.h"
@@ -246,7 +247,7 @@ static void print_summary(void) {
     raf_puts("  timer               | rdtsc+lfence | raw ticks; not calibrated ns\n");
 #endif
     raf_puts("  I/O + exit          | raw Linux syscalls | OS-bound userspace\n");
-    raf_puts("  physical bare-metal | TOKEN_VAZIO | requires board/startup/device receipt\n");
+    raf_puts("  physical bare-metal | TOKEN_VAZIO (CLOSURE_L12) | requires board/startup/device receipt\n");
 }
 
 /* ── Entrada principal — sem argc/argv no modo nolibc ───────────────────── */

@@ -1,6 +1,6 @@
 # Runtime state, targets and temporal truth
 
-**Governance binding: CLOSURE_L11** — runtime and device unknowns remain unknown until observed.  
+**Governance binding:** CLOSURE_L11 for operational/topology gaps; CLOSURE_L12 for runtime/device evidence gaps.  
 **Historical base:** main@f22efc099ac530d946ff2ec34954455f75632e92  
 **Boundary hotfix parent:** main@d04137f76fffef215428c3c9f7ce12d3695ca390
 
@@ -99,7 +99,7 @@ Termux/RafCodePhi may execute or observe an artifact and emit device evidence. I
 
 `VOID` is a typed structural state for a placeholder/reference without sufficient body. `TOKEN_VAZIO` is an epistemic/evidence state. Neither is a universal numeric zero or a magic compiler flag. APIs may encode them only through the status contract of that API.
 
-Physical bare-metal execution for the Benchmark raw-syscall artifact is structurally inapplicable as-is; a separate firmware/startup adapter would be required. Device evidence for any such future adapter remains `TOKEN_VAZIO` until observed.
+Physical bare-metal execution for the Benchmark raw-syscall artifact is structurally inapplicable as-is; a separate firmware/startup adapter would be required. Device evidence for any such future adapter remains `TOKEN_VAZIO (CLOSURE_L12)` until observed.
 
 ### Modular specialist profiles
 

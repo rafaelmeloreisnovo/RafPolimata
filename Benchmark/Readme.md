@@ -1,6 +1,7 @@
 # Benchmark RAFAELIA — no-libc userspace + Termux boundary
 
 **State:** active engineering path.  
+**Governance:** runtime/device gaps → `CLOSURE_L12`.  
 **Scope:** ARM64/x86-64/ARM32 Linux/Android userspace without libc/CRT ownership in the benchmark executable.
 
 ## Execution classification
@@ -41,7 +42,7 @@ SOURCE        = Benchmark C/headers
 ARTIFACT      = no-libc ELF
 EXECUTION     = Linux/Android userspace via raw syscalls
 EVIDENCE      = current run output + ELF/symbol/hash receipt
-BARE_METAL    = TOKEN_VAZIO until a board/startup/device path is actually executed
+BARE_METAL    = TOKEN_VAZIO (CLOSURE_L12) until a board/startup/device path is actually executed
 ```
 
 ## Low-level design

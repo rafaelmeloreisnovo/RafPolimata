@@ -1,5 +1,6 @@
 #!/bin/sh
 set -eu
+# Governance: runtime/device evidence gaps are bound to CLOSURE_L12.
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 fail=0
