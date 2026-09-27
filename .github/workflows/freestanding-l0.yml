@@ -5,12 +5,28 @@ on:
     paths:
       - 'freestanding/**'
       - 'syscall/**'
+      - 'Benchmark/raf_sys.h'
+      - 'Benchmark/raf_bench.h'
+      - 'Benchmark/raf_main.c'
+      - 'Benchmark/build2.sh'
+      - 'Benchmark/Readme.md'
+      - 'scripts/verify_execution_boundaries.sh'
+      - 'docs/canonical/2026-09-23/RUNTIME_AND_TARGETS.md'
+      - 'Makefile'
       - '.github/workflows/freestanding-l0.yml'
   push:
     branches: [main]
     paths:
       - 'freestanding/**'
       - 'syscall/**'
+      - 'Benchmark/raf_sys.h'
+      - 'Benchmark/raf_bench.h'
+      - 'Benchmark/raf_main.c'
+      - 'Benchmark/build2.sh'
+      - 'Benchmark/Readme.md'
+      - 'scripts/verify_execution_boundaries.sh'
+      - 'docs/canonical/2026-09-23/RUNTIME_AND_TARGETS.md'
+      - 'Makefile'
       - '.github/workflows/freestanding-l0.yml'
 
 permissions:
@@ -42,3 +58,14 @@ jobs:
         run: sh freestanding/tests/verify_register_metadata.sh
       - name: Raw Linux syscall six-ISA compile matrix
         run: sh syscall/tests/verify_matrix.sh
+      - name: Execution-layer terminology and boundary audit
+        run: sh scripts/verify_execution_boundaries.sh
+      - name: No-libc userspace x86-64 build and runtime smoke
+        run: |
+          cd Benchmark
+          bash build2.sh
+          ./raf_enterprise_x64 > "$RUNNER_TEMP/raf-benchmark.out"
+          grep -F 'RAFAELIA ENTERPRISE NO-LIBC USERSPACE' "$RUNNER_TEMP/raf-benchmark.out"
+          grep -F 'physical bare-metal | TOKEN_VAZIO' "$RUNNER_TEMP/raf-benchmark.out"
+          test -z "$(nm -u raf_enterprise_x64)"
+          ! readelf -l raf_enterprise_x64 | grep -q 'INTERP'

@@ -1,5 +1,7 @@
-/* raf_sys.h — syscall bare-metal, nolibc, todas as arquiteturas
- * Fricção eliminada: sem stdio buffer, sem lock, sem errno thread-local
+/* raf_sys.h — raw Linux syscall ABI, no-libc userspace
+ * BOUNDARY: OS-bound Linux/Android adapter; NOT physical bare-metal and NOT
+ * RAFAELIA freestanding L0. Friction reduced: no stdio buffer, libc errno
+ * TLS, heap allocator or CRT ownership in this adapter.
  * ARM64 syscall ABI: x8=nr, x0-x5=args, svc #0, ret em x0
  * x86-64 syscall ABI: rax=nr, rdi,rsi,rdx,r10,r8,r9=args, syscall, ret rax
  * ARM32 syscall ABI: r7=nr, r0-r6=args, svc #0, ret r0                    */
@@ -41,7 +43,7 @@ static __attribute__((always_inline)) inline u64 raf_tsc(void) {
 static __attribute__((always_inline)) inline u64 raf_tsc_freq(void) {
     u64 v;
     __asm__ volatile("mrs %0, cntfrq_el0" : "=r"(v));
-    return v; /* Hz — Dimensity 1080: 19200000 Hz */
+    return v; /* Hz reported by the current execution environment. */
 }
 #endif /* RAF_ARCH_A64 */
 
@@ -101,12 +103,14 @@ s64 _sc1(s64 nr, s64 a) {
     __asm__ volatile("svc #0" : "+r"(r0) : "r"(r7) : "memory","cc");
     return r0;
 }
-/* ARM32/Termux: clock_gettime(CLOCK_MONOTONIC)
- * PMCCNTR pode ser bloqueado em Android userland; monotonic funciona em 100%
- * Retorno em ns para benchmark determinístico entre kernels distintos.      */
+/* ARM32/Termux: clock_gettime(CLOCK_MONOTONIC) through the raw Linux syscall.
+ * PMCCNTR is commonly unavailable to Android userland, so the benchmark uses
+ * this OS-bound timer. The syscall cost is part of the measurement envelope.
+ * A syscall failure yields zero instead of reading uninitialized state.      */
 static __attribute__((always_inline)) inline u64 raf_tsc(void) {
-    Timespec ts;
-    _sc3(SYS_clock_gettime, CLOCK_MONO, (s64)(usize)&ts, 0);
+    Timespec ts = {0, 0};
+    s64 rc = _sc3(SYS_clock_gettime, CLOCK_MONO, (s64)(usize)&ts, 0);
+    if (rc < 0) return 0;
     return (u64)ts.sec * 1000000000ULL + (u64)ts.nsec;
 }
 static __attribute__((always_inline)) inline u64 raf_tsc_freq(void) {

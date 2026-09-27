@@ -1,7 +1,8 @@
 # Runtime state, targets and temporal truth
 
-**Governance binding: CLOSURE_L11** — runtime and device unknowns remain unknown until observed.  
-**Base:** main@f22efc099ac530d946ff2ec34954455f75632e92
+**Governance binding:** CLOSURE_L11 for operational/topology gaps; CLOSURE_L12 for runtime/device evidence gaps.  
+**Historical base:** main@f22efc099ac530d946ff2ec34954455f75632e92  
+**Boundary hotfix parent:** main@d04137f76fffef215428c3c9f7ce12d3695ca390
 
 ## ECOSYSTEM_RUNTIME_STATE.json is a snapshot
 
@@ -69,9 +70,50 @@ source
 
 Missing links preserve the corresponding unknown state.
 
-## Hosted vs freestanding
+## Hosted vs freestanding vs raw-syscall userspace
 
-Hosted development paths may use host services declared by their contract. That does not relax the freestanding L0 or target-specific no-runtime constraints.
+The execution boundary is four-way, not binary:
+
+| class | OS/kernel dependency | valid description | evidence gate |
+|---|---|---|---|
+| `FREESTANDING_L0` | none | OS-neutral, no libc/heap/GC/syscall | source + OS-neutral compile/codegen gates |
+| `RAW_SYSCALL_USERSPACE` | Linux/Android ABI | no-libc userspace with direct kernel traps | ABI compile + same-artifact userspace run |
+| `HOSTED` | declared host runtime | libc/CRT/services permitted by route | route-specific host tests |
+| `PHYSICAL_BARE_METAL` | no OS/kernel syscall | board/firmware owns startup, memory map and device access | board/startup/linker/device receipt |
+
+`-ffreestanding`, `-nostdlib` and static linking are build properties; they do not by themselves prove physical bare-metal execution.
+
+For the current Benchmark path:
+
+```text
+Benchmark/raf_sys.h     = RAW_SYSCALL_USERSPACE
+Benchmark/raf_main.c    = RAW_SYSCALL_USERSPACE
+freestanding/**         = FREESTANDING_L0
+syscall/**              = optional Linux ABI adapter, outside L0
+termux-app-rafacodephi  = runtime/evidence authority for its Android execution lane
+```
+
+Termux/RafCodePhi may execute or observe an artifact and emit device evidence. It does not import Android/Linux assumptions into `freestanding/` and does not promote a raw-syscall ELF into physical bare-metal firmware.
+
+### VOID / TOKEN_VAZIO
+
+`VOID` is a typed structural state for a placeholder/reference without sufficient body. `TOKEN_VAZIO` is an epistemic/evidence state. Neither is a universal numeric zero or a magic compiler flag. APIs may encode them only through the status contract of that API.
+
+Physical bare-metal execution for the Benchmark raw-syscall artifact is structurally inapplicable as-is; a separate firmware/startup adapter would be required. Device evidence for any such future adapter remains `TOKEN_VAZIO (CLOSURE_L12)` until observed.
+
+### Modular specialist profiles
+
+The existing specialized modules remain authoritative instead of introducing another architecture layer:
+
+- scalar/OS-neutral matrix: `freestanding/tests/verify_matrix.sh`;
+- fixed SIMD: `verify_profiles.sh`;
+- scalable vectors: `verify_scalable.sh`;
+- matrix registers: `verify_matrix_accel.sh`;
+- register metadata: `verify_register_metadata.sh`;
+- Linux syscall ABI: `syscall/tests/verify_matrix.sh`;
+- cross-layer classification: `scripts/verify_execution_boundaries.sh`.
+
+The generic L0 remains small; ISA-specific behavior stays in specialist profiles and the OS ABI stays outside it.
 
 ## Temporal reconciliation rule
 
