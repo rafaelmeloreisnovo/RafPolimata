@@ -1,0 +1,96 @@
+name: Maturity Evidence
+
+on:
+  pull_request:
+    paths:
+      - 'sdk/rafpolimata_v1/**'
+      - 'tests/maturity/**'
+      - 'scripts/run_maturity_benchmark.py'
+      - 'scripts/verify_reproducible_sdk.py'
+      - 'scripts/generate_maturity_sbom.py'
+      - 'scripts/generate_supply_chain_receipt.py'
+      - 'scripts/verify_sdk_abi.py'
+      - 'scripts/verify_maturity_contracts.py'
+      - 'contracts/rafpolimata_api_abi_v1.json'
+      - 'docs/canonical/2026-09-28/**'
+      - 'docs/security/THREAT_MODEL_RAFPOLIMATA_V1.md'
+      - 'Benchmark/raf_q16.h'
+      - 'Benchmark/raf_crc32c.h'
+      - 'Benchmark/raf_arena.h'
+      - 'Makefile'
+      - '.github/workflows/maturity-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maturity-evidence-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cross-environment:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Toolchain identity
+        run: |
+          clang --version || true
+          gcc --version | head -1 || true
+          python3 --version
+          uname -a
+
+      - name: SDK, ABI, equivalence, properties and deterministic build
+        run: make maturity-gates
+
+      - name: SHA-bound reproducible benchmark
+        run: python3 scripts/run_maturity_benchmark.py --out build/maturity/benchmark.json
+
+      - name: SPDX SBOM
+        run: python3 scripts/generate_maturity_sbom.py --out build/maturity/sbom.spdx.json
+
+      - name: Supply-chain receipt
+        run: |
+          python3 scripts/generate_supply_chain_receipt.py             --artifact build/sdk/rafpolimata_v1/librafpolimata_v1.a             --out build/maturity/supply-chain.json
+
+      - name: Cross-environment reproduction receipt
+        env:
+          MATRIX_OS: ${{ matrix.os }}
+        run: |
+          python3 - <<'PY'
+          import json, os, pathlib, subprocess
+          out = pathlib.Path("build/maturity/reproduction.json")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          data = {
+              "schema": "rafpolimata.cross-environment-reproduction.v1",
+              "source_sha": subprocess.check_output(["git","rev-parse","HEAD"], text=True).strip(),
+              "provider": "github-actions",
+              "runner_image": os.environ["MATRIX_OS"],
+              "checkout_state": "fresh",
+              "maturity_gates": "PASS",
+              "independent_provider_reproduction": "TOKEN_VAZIO (CLOSURE_L12)"
+          }
+          out.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Validate generated receipts
+        run: |
+          python3 -m json.tool build/maturity/benchmark.json >/dev/null
+          python3 -m json.tool build/maturity/reproducibility.json >/dev/null
+          python3 -m json.tool build/maturity/sbom.spdx.json >/dev/null
+          python3 -m json.tool build/maturity/supply-chain.json >/dev/null
+          python3 -m json.tool build/maturity/reproduction.json >/dev/null
+
+      - name: Preserve maturity evidence
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: maturity-evidence-${{ matrix.os }}-${{ github.run_id }}
+          if-no-files-found: warn
+          path: build/maturity/
