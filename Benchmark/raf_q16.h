@@ -1,7 +1,7 @@
 /* raf_q16.h — Q16.16 fixed-point, todas as operações, zero libm zero float
  * Eq.18: r_n = (sqrt3/2)^n — Spiral RAFAELIA via q16_spiral()
  * Eq.22: F[n+1] = F[n]*sqrt3/2 - pi*sin(279°) — sequência Rafael
- * Eq.5-8: IIR T^7 com alpha=0.25 — filtro estável polo em z=sqrt3/2
+ * Eq.5-8: IIR T^7 com alpha=0.25 — recurrence pole = 1-alpha = 0.75
  * Lyapunov discreto: lambda = ln(sqrt3/2) = -0.1438 nats/step              */
 #pragma once
 #include "raf_types.h"
@@ -69,8 +69,9 @@ q16_t q16_norm(q16_t v) {
 /* ABS branch-free: mask trick                                               */
 static __attribute__((always_inline)) inline
 q16_t q16_abs(q16_t v) {
-    s32 mask = v >> 31;
-    return (v + mask) ^ mask;
+    u32 x = (u32)v;
+    u32 mask = 0U - (x >> 31);
+    return (q16_t)((x ^ mask) + (mask & 1U));
 }
 
 /* IIR logarítmica — memória longa / antiderivada (batch 5, sigma dim 6)

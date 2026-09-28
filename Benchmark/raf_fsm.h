@@ -1,7 +1,8 @@
 /* raf_fsm.h — FSM 10 estados (domínios RAFAELIA) + estimador Lyapunov Q16
  * Lyapunov discreto: lambda = (1/N)*Sigma log2(|delta[k]|/|delta[0]|)
  * Classificação: SOURCE(>0) LIMIT(≈0) SPIRAL(-0.05) TORUS(-0.14) STRANGE
- * Tabela de transição branch-free: lookup O(1), sem if/switch              */
+ * Transition table is direct O(1) lookup; branchlessness is a codegen fact,
+ * not asserted from source text alone.                                      */
 #pragma once
 #include "raf_types.h"
 #include "raf_q16.h"
@@ -72,9 +73,12 @@ static inline AttractorClass fsm_classify(q16_t lambda) {
 }
 
 static void fsm_init(FSMState *f) {
-    __builtin_memset(f, 0, sizeof(*f));
-    f->state = 0; /* começa em MATH */
-    f->lambda = Q16_NEG_LN_S; /* sqrt3/2 Lyapunov como prior */
+    f->state = 0;
+    f->step = 0;
+    f->acc_weight = 0;
+    for (u32 i = 0; i < 16; i++) f->div_log[i] = 0;
+    f->div_idx = 0;
+    f->lambda = Q16_NEG_LN_S; /* explicit prior/reference value */
 }
 
 static void fsm_step(FSMState *f, u32 input) {
@@ -106,11 +110,14 @@ static const char* fsm_domain_name(u8 s) {
         "MATH","COSMO","QUANTUM","BIO","ENG",
         "CONSCIOUS","AI","SYMBOLIC","THERMO","FIELD"
     };
-    return names[s & (FSM_N-1)];
+    if (s >= FSM_N) return "INVALID_STATE";
+    return names[s];
 }
 static const char* attractor_name(AttractorClass a) {
     static const char* names[] = {
         "SOURCE","LIMIT","SPIRAL","TORUS","STRANGE","HOMOCLINIC"
     };
-    return names[(u32)a & 5];
+    u32 idx = (u32)a;
+    if (idx >= 6U) return "INVALID_CLASS";
+    return names[idx];
 }

@@ -1,11 +1,10 @@
-/* raf_toroid.h — Toroide T^7, IIR Q16, atrator, KAM ressonância
- * Eq.1: T^7 = (R/Z)^7 — 7 coordenadas periódicas em [0,1)
- * Eq.2: s = (u,v,psi,chi,rho,delta,sigma)
- * Eq.5-8: IIR alpha=0.25, phi=(1-H)*C, lim s(t) in A, |A|=42
- * KAM: razão phi^{-1} = 0.618 = mais irracional possível → atrator TORUS
- *      é o estado mais resistente à perturbação caótica (Teorema KAM)
- * Coordenadas: u=entropia, v=coerência, psi=intenção, chi=observação,
- *              rho=ruído, delta=transmutação, sigma=memória              */
+/* raf_toroid.h — bounded T^7-inspired Q16 state machine.
+ * Eq.1-2 provide coordinate notation; the implemented 42-value field is a
+ * deterministic bounded state index, NOT proof of 42 dynamical attractors.
+ * Golden-ratio/KAM language is a construction reference, not a theorem about
+ * this implementation's stability. Strong convergence claims remain gated by
+ * the repository T^7 closure/falsifier.
+ * Coordinates: u,v,psi,chi,rho,delta,sigma.                                */
 #pragma once
 #include "raf_types.h"
 #include "raf_q16.h"
@@ -16,7 +15,7 @@ typedef struct {
     q16_t C;         /* coerência IIR acumulada                              */
     q16_t phi;       /* phi_ethica = (1-H)*C — Eq.8                         */
     u32  step;       /* contador de passos                                   */
-    u32  attractor;  /* índice do atrator ativo [0..41] — evolui via Eq.EVO */
+    u32  attractor;  /* historical field name: bounded state index [0..41] */
     /* ── campos de topologia evolutiva (Darwinismo Quântico) ─────────────── */
     u32 phase_acc;    /* Φ: fase acumulada, Φ_{t+1}=Φ_t+Obs_t, nunca reseta */
     u32 delta;        /* Δ=dist circular(atrator, fase%42): incoerência struct */
@@ -44,15 +43,18 @@ typedef struct {
 } T7Input;
 
 static void t7_init(T7State *t) {
-    __builtin_memset(t, 0, sizeof(*t));
-    /* seed: coordenadas em posição KAM-estável (phi^-1 * 65536 = 40503)    */
-    u32 seed = 40503U;
-    for (u32 i = 0; i < T7_DIM; i++) {
-        t->s[i] = (seed * (i + 1)) & 0xFFFFU;
-    }
-    t->H   = Q16_HALF;
-    t->C   = Q16_HALF;
+    u32 seed = 40503U; /* phi^-1 reference seed; no stability claim */
+    for (u32 i = 0; i < T7_DIM; i++) t->s[i] = (seed * (i + 1)) & 0xFFFFU;
+    t->H = Q16_HALF;
+    t->C = Q16_HALF;
     t->phi = q16_phi_ethica(Q16_HALF, Q16_HALF);
+    t->step = 0;
+    t->attractor = 0;
+    t->phase_acc = 0;
+    t->delta = 0;
+    for (u32 i = 0; i < 3; i++) t->omega_inv[i] = 0;
+    t->delta_dir = 0;
+    t->perm_class = 0;
 }
 
 /* ToroidalMap — Eq.3: s = ToroidalMap(x)
@@ -95,7 +97,7 @@ static void t7_step(T7State *t, q16_t H_in, q16_t C_in) {
     u32 u_t   = ((u32)t->H >> 13) % 7u;
     /* φ(t+1) = (φ_t + ω + u_t) mod 42 — Eq.EVO: atrator evolui, não salta */
     t->attractor = (t->attractor + omega + u_t) % 42u;
-    /* Φ_{t+1} = Φ_t + Obs_t — fase acumula, nunca reseta                   */
+    /* phase_acc is an explicit modulo-2^16 accumulator, not unbounded time. */
     t->phase_acc = (t->phase_acc + (u32)(u16)t->H + (u32)(u16)t->C) & 0xFFFFu;
     /* Δ = dist circular(atrator, fase%42) — incoerência estrutural          */
     u32 phi42 = t->phase_acc % 42u;
@@ -120,19 +122,22 @@ static void t7_step(T7State *t, q16_t H_in, q16_t C_in) {
     t->step++;
 }
 
-/* Coerência toroidal: produto interno normalizado entre s e KAM seed
- * Eq.12 discretizado: R = Sigma(s[i]*seed[i]) / (|s|*|seed|)               */
-static q16_t t7_coherence(const T7State *t) {
-    static const u32 KAM_SEED[T7_DIM] = {
-        40503,40503,40503,40503,40503,40503,40503 };
-    u64 dot = 0, ns = 0, nk = 0;
+/* Squared cosine-like coherence against the uniform reference direction:
+ * R^2 = (sum(s)^2) / (T7_DIM * sum(s^2)).
+ * This form is bounded in [0,1] by Cauchy-Schwarz and avoids the previous
+ * overflowing product ns*nk. It is explicitly R^2, not R.                  */
+static q16_t t7_coherence_sq(const T7State *t) {
+    u64 sum = 0, ns = 0;
     for (u32 i = 0; i < T7_DIM; i++) {
-        dot += (u64)t->s[i] * KAM_SEED[i];
-        ns  += (u64)t->s[i] * t->s[i];
-        nk  += (u64)KAM_SEED[i] * KAM_SEED[i];
+        sum += t->s[i];
+        ns += (u64)t->s[i] * t->s[i];
     }
-    /* Evita divisão por zero sem branch: OR 1                               */
-    u64 denom = (ns | 1) * (nk | 1);
-    /* Aproximação sqrt-free: dot^2/denom em Q16                             */
-    return (q16_t)((dot * Q16_ONE) / (denom >> 16 | 1));
+    u64 denom = (u64)T7_DIM * ns;
+    if (!denom) return 0;
+    u64 numer = sum * sum * (u64)Q16_ONE;
+#ifdef RAF_ARCH_A32
+    return (q16_t)raf_udiv64_bounded(numer, denom);
+#else
+    return (q16_t)(numer / denom);
+#endif
 }

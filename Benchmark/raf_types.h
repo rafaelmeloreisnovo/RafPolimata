@@ -14,6 +14,19 @@ typedef signed long long    s64;
 typedef __SIZE_TYPE__       usize;
 typedef __PTRDIFF_TYPE__    isize;
 
+/* Explicit restoring division for ARM32 no-runtime paths.
+ * PRECONDITION: 0 < d < 2^63. */
+static __attribute__((always_inline)) inline
+u64 raf_udiv64_bounded(u64 n, u64 d) {
+    if (!d || (d >> 63)) return 0;
+    u64 q = 0, r = 0;
+    for (s32 i = 63; i >= 0; i--) {
+        r = (r << 1) | ((n >> (u32)i) & 1ULL);
+        if (r >= d) { r -= d; q |= 1ULL << (u32)i; }
+    }
+    return q;
+}
+
 /* Q16.16: 16 bits inteiros + 16 fracionais — range [-32768, 32767.99998] */
 typedef s32 q16_t;
 #define Q16_ONE      65536         /* 1.0  = 1 << 16                        */

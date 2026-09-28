@@ -60,6 +60,18 @@ jobs:
         run: sh syscall/tests/verify_matrix.sh
       - name: Execution-layer terminology and boundary audit
         run: sh scripts/verify_execution_boundaries.sh
+      - name: Benchmark ARM32 full-TU compile and hidden-helper audit
+        run: |
+          clang -target armv7a-linux-gnueabi -march=armv7-a -mfloat-abi=softfp -mfpu=neon \
+            -O2 -ffreestanding -fno-builtin -fno-stack-protector \
+            -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-ident \
+            -fomit-frame-pointer -ffunction-sections -fdata-sections \
+            -I Benchmark -c Benchmark/raf_main.c -o "$RUNNER_TEMP/raf_benchmark_a32.o"
+          NM_TOOL="$(command -v llvm-nm || command -v nm)"
+          test -n "$NM_TOOL"
+          UNDEF="$("$NM_TOOL" -u "$RUNNER_TEMP/raf_benchmark_a32.o")"
+          test -z "$UNDEF"
+          readelf -h "$RUNNER_TEMP/raf_benchmark_a32.o" | grep -F 'Machine:' | grep -E 'ARM|Arm'
       - name: No-libc userspace x86-64 build and runtime smoke
         run: |
           cd Benchmark

@@ -33,6 +33,10 @@ must_not_have "Benchmark/raf_main.c" "ENTERPRISE BARE-METAL" "userspace runtime 
 must_not_have "Benchmark/raf_main.c" "tsc=PMCCNTR" "ARM32 report must match clock_gettime implementation"
 must_not_have "Benchmark/raf_bench.h" "ARM32: PMCCNTR" "benchmark timer documentation must match implementation"
 must_have "Benchmark/raf_main.c" "physical bare-metal | TOKEN_VAZIO" "physical firmware evidence must remain explicit"
+must_have "Benchmark/raf_sys.h" "sizeof(Timespec) == 8" "ARM32 clock_gettime32 ABI size gate missing"
+must_have "Benchmark/raf_sys.h" "clock_gettime32" "ARM32 syscall 263 must be documented as time32 ABI"
+must_not_have "Benchmark/raf_toroid.h" "|A|=42" "T7 source must not assert the falsified strong 42-attractor claim"
+must_have "Benchmark/raf_main.c" "coherence_sq_q16" "R-squared telemetry must be named explicitly"
 must_have "docs/canonical/2026-09-23/RUNTIME_AND_TARGETS.md" "RAW_SYSCALL_USERSPACE" "canonical runtime taxonomy missing"
 
 native_a32_count=$(grep -Ec -- '-o[[:space:]]+raf_enterprise_a32([[:space:]]|$)' "$ROOT/Benchmark/build2.sh" || true)
