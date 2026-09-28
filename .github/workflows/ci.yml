@@ -60,6 +60,12 @@ jobs:
       - name: Validate canonical coherence protocol
         run: python3 scripts/validate_coherence_protocol.py
 
+      - name: Validate recurrence matrix and formula authority references
+        run: |
+          set -euo pipefail
+          python3 -m unittest -v tests.test_recurrence_matrix_reference
+          python3 scripts/validate_formula_authority_index.py
+
       - name: Validate TOKEN_VAZIO gates (Hotfix H1)
         env:
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
