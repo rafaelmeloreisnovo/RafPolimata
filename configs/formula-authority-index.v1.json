@@ -1,0 +1,54 @@
+{
+  "schema": "RAFPOLIMATA_FORMULA_AUTHORITY_INDEX_V1",
+  "version": "1.0.0",
+  "state": "IMPLEMENTED_UNTESTED",
+  "claim_allowed": false,
+  "governance_closure": "CLOSURE_G1",
+  "entries": [
+    {
+      "id": "F-SPIRAL-SQRT3-OVER-2",
+      "semantics": "(sqrt(3)/2)^n",
+      "semantic_authority": "rafaelmeloreisnovo/Mapa:indices/SEED_OMEGA_EVOLUTION_V1.md",
+      "local_role": "reference_and_validation_consumer",
+      "producer_refs": [
+        "rafaelmeloreisnovo/ChipQuantum:experiments/math_only_validation/q16_spiral_verify.c",
+        "rafaelmeloreisnovo/Vectras-VM-Android:engine/rmr/src/rafaelia_formulas_core.c"
+      ],
+      "gap": "angular variants remain separate"
+    },
+    {
+      "id": "F-FIBONACCI-MATRIX",
+      "semantics": "F0=0,F1=1; exact companion-matrix recurrence",
+      "semantic_authority": "TOKEN_VAZIO_CROSSREPO_CANONICAL",
+      "local_role": "deterministic_reference_producer",
+      "producer_refs": [
+        "research/recurrence_matrix_reference/reference.py",
+        "data/formulas/recurrence-matrix-vectors.v1.json"
+      ],
+      "gap": "cross-repository canonical authority not promoted"
+    },
+    {
+      "id": "F-TRIBONACCI-MATRIX",
+      "semantics": "T0=0,T1=0,T2=1; exact companion-matrix recurrence",
+      "semantic_authority": "TOKEN_VAZIO_CROSSREPO_CANONICAL",
+      "local_role": "deterministic_reference_producer",
+      "producer_refs": [
+        "research/recurrence_matrix_reference/reference.py",
+        "data/formulas/recurrence-matrix-vectors.v1.json"
+      ],
+      "gap": "cross-repository canonical authority not promoted"
+    },
+    {
+      "id": "F-TRINITY633",
+      "semantics": "Amor^6 * Luz^3 * Consciencia^3",
+      "semantic_authority": "TOKEN_VAZIO_CROSSREPO_CANONICAL",
+      "local_role": "deterministic_reference_producer",
+      "producer_refs": [
+        "research/recurrence_matrix_reference/reference.py",
+        "data/formulas/recurrence-matrix-vectors.v1.json",
+        "rafaelmeloreisnovo/Vectras-VM-Android:engine/rmr/src/rafaelia_formulas_core.c"
+      ],
+      "gap": "symbolic interpretation is not promoted by executable arithmetic"
+    }
+  ]
+}

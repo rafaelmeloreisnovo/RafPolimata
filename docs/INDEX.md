@@ -130,6 +130,17 @@ Não promover `provider_independent_reproduction`, Android runtime ou device pro
 
 Current-artifact ApkC provenance and physical runtime remain evidence-gated as recorded in the urgency matrix.
 
+## 6.1 Fórmulas — referência executável e autoridade
+
+Governance: `CLOSURE_G1`  
+
+| Rota | Papel | Limite |
+|---|---|---|
+| [FORMULA_AUTHORITY_BRIDGE_V1.md](FORMULA_AUTHORITY_BRIDGE_V1.md) | entrada humana/IA para fórmula → produtor → vetor → gate | não promove autoridade global |
+| `../configs/formula-authority-index.v1.json` | índice máquina de autoridade/producer/gap | `TOKEN_VAZIO` preservado |
+| `../research/recurrence_matrix_reference/reference.py` | Fibonacci/Tribonacci matricial + Trinity633 escalar | sem fusão semântica |
+| `../data/formulas/recurrence-matrix-vectors.v1.json` | vetores dourados cross-language | referência, não device proof |
+
 ## 7. Ciência, pesquisa e publicação
 
 - bibliography/science engine routes described by current README and subsystem docs;
