@@ -1,7 +1,8 @@
 # Formula Authority Bridge V1
 
 **State:** `IMPLEMENTED_UNTESTED`  
-**claim_allowed:** `false`
+**claim_allowed:** `false`  
+**Governance:** `CLOSURE_G1`
 
 ## Purpose
 
