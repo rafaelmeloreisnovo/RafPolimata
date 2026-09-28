@@ -9,7 +9,7 @@ RAF_ARCH ?= arm64
 SRC ?= tests/fixtures/strict_kernel.c
 OUT ?= build/strict/libmain.so
 
-.PHONY: help syntax apkc-hardened-source verbovivo verbovivo-demo encoders proof audit execution-boundary-audit language-contract compile compile-plan compiler-contract compiler-selftest hotfix-audit library-audit strict-elf report clean
+.PHONY: help syntax apkc-hardened-source verbovivo verbovivo-demo encoders proof audit execution-boundary-audit maturity-sdk maturity-equivalence maturity-repro maturity-gates maturity-benchmark maturity-all language-contract compile compile-plan compiler-contract compiler-selftest hotfix-audit library-audit strict-elf report clean
 
 help:
 	@echo 'RafPolimata — make targets:'
@@ -22,6 +22,12 @@ help:
 	@echo '  proof             one clean reproducible proof run (tools/raf_clean_proof_run.sh)'
 	@echo '  audit             freestanding invariant audit (scripts/ci_freestanding_audit.sh)'
 	@echo '  execution-boundary-audit  L0/syscall/userspace separation + six-ISA compile gates'
+	@echo '  maturity-sdk      build public SDK v1 + exact ABI symbol gate'
+	@echo '  maturity-equivalence  run 2,000,000 deterministic equivalence/property cases'
+	@echo '  maturity-repro    double-build SDK and require bit-identical object/library'
+	@echo '  maturity-gates    SDK + ABI + equivalence + reproducibility + contracts + SBOM'
+	@echo '  maturity-benchmark  SHA-bound 31-sample benchmark receipt'
+	@echo '  maturity-all      maturity-gates + maturity-benchmark'
 	@echo '  language-contract M063: policies, compiler station and strict ELF gates'
 	@echo '  compile           execute strict compiler: RAF_LANG/RAF_ARCH/SRC/OUT'
 	@echo '  compile-plan      emit deterministic JSON plan without executing'
@@ -75,6 +81,27 @@ execution-boundary-audit:
 	sh freestanding/tests/verify_matrix.sh
 	sh syscall/tests/verify_matrix.sh
 
+maturity-sdk:
+	bash sdk/rafpolimata_v1/build.sh build/sdk/rafpolimata_v1
+	python3 scripts/verify_sdk_abi.py --library build/sdk/rafpolimata_v1/librafpolimata_v1.a
+
+maturity-equivalence: maturity-sdk
+	bash tests/maturity/run_million_properties.sh
+
+maturity-repro:
+	python3 scripts/verify_reproducible_sdk.py --out build/maturity/reproducibility.json
+
+maturity-gates: maturity-equivalence maturity-repro
+	python3 scripts/verify_maturity_contracts.py
+	python3 scripts/generate_maturity_sbom.py --out build/maturity/sbom.spdx.json
+	python3 scripts/generate_supply_chain_receipt.py --artifact build/sdk/rafpolimata_v1/librafpolimata_v1.a --out build/maturity/supply-chain.json
+	@echo 'RafPolimata maturity gates: PASS'
+
+maturity-benchmark:
+	python3 scripts/run_maturity_benchmark.py --out build/maturity/benchmark.json
+
+maturity-all: maturity-gates maturity-benchmark
+
 language-contract:
 	bash scripts/audit_language_freestanding_contract.sh
 
@@ -123,6 +150,6 @@ report:
 
 clean:
 	rm -f $(VERBOVIVO) /tmp/engram.svg *.o raf_compile apkc_host
-	rm -rf build/strict build_host_check/ops_manifest build/generated/Apkc
+	rm -rf build/strict build_host_check/ops_manifest build/generated/Apkc build/maturity build/sdk
 	find . -maxdepth 4 -type f \( -name '*.tmp.*' -o -name '*.so.receipt.json' \) -delete
 	@echo 'clean: done'

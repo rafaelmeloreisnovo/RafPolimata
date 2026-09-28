@@ -66,10 +66,11 @@ q16_t q16_norm(q16_t v) {
     return (q16_t)((u32)v & 0xFFFFU);
 }
 
-/* ABS branch-free: mask trick                                               */
+/* Saturating absolute value: INT32_MIN maps to INT32_MAX without UB.       */
 static __attribute__((always_inline)) inline
 q16_t q16_abs(q16_t v) {
     u32 x = (u32)v;
+    if (x == 0x80000000U) return (q16_t)0x7FFFFFFFU;
     u32 mask = 0U - (x >> 31);
     return (q16_t)((x ^ mask) + (mask & 1U));
 }

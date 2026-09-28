@@ -5,7 +5,22 @@
 > **Regra:** `README → CURRENT_DOCUMENTATION_STATE → INDEX → área → source/evidence`
 
 
-## 0. Camada documental corrente — 2026-09-23
+## 0A. Suplemento de maturidade corrente — 2026-09-28
+
+**Observed main base:** f840fde2de65edacf8b2abbee8ca9d1f9c912b6d  
+**Predecessor review:** PR#358@f35fc8402ea790a8dead96817c0847bbaf9c1a98
+
+| Rota | Papel |
+|---|---|
+| [2026-09-28/README](canonical/2026-09-28/README.md) | router do suplemento |
+| [MATURITY_AND_PRODUCTIZATION_V1](canonical/2026-09-28/MATURITY_AND_PRODUCTIZATION_V1.md) | oito superfícies de maturidade |
+| [THREAT_MODEL_RAFPOLIMATA_V1](security/THREAT_MODEL_RAFPOLIMATA_V1.md) | ameaças, fronteiras e não-objetivos |
+| ../contracts/rafpolimata_api_abi_v1.json | API 0.1.0 / ABI 1 |
+| ../sdk/rafpolimata_v1/ | primeiro slice de SDK estático |
+
+O workflow de maturidade executa o mesmo bundle em checkout limpo de Ubuntu 22.04 e 24.04. Isso é reprodução cross-environment, não reprodução independente de provider.
+
+## 0. Camada documental ampla — 2026-09-23
 
 **Implementation base observada:** main@f22efc099ac530d946ff2ec34954455f75632e92  
 **Router estável:** [canonical/README.md](canonical/README.md)
