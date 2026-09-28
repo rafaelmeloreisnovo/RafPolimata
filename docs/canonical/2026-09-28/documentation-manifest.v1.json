@@ -1,0 +1,15 @@
+{
+  "schema": "rafpolimata.documentation-cut.v1",
+  "date": "2026-09-28",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "observed_main_base": "f840fde2de65edacf8b2abbee8ca9d1f9c912b6d",
+  "predecessor_review_head": "f35fc8402ea790a8dead96817c0847bbaf9c1a98",
+  "state": "CANONICAL_CANDIDATE_REVIEW_REQUIRED",
+  "claim_allowed": false,
+  "documents": [
+    "docs/canonical/2026-09-28/README.md",
+    "docs/canonical/2026-09-28/MATURITY_AND_PRODUCTIZATION_V1.md",
+    "docs/security/THREAT_MODEL_RAFPOLIMATA_V1.md",
+    "contracts/rafpolimata_api_abi_v1.json"
+  ]
+}

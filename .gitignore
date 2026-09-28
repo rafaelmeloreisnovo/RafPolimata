@@ -69,3 +69,7 @@ tests/data/
 # Internal custody ledger (generated event logs)
 data/ledgers/*.jsonl
 *.custody.jsonl
+
+# Maturity/productization generated artifacts
+build/maturity/
+build/sdk/

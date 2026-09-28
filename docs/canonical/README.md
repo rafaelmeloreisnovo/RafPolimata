@@ -5,7 +5,17 @@
 > [!IMPORTANT]
 > Este diretório é um router. Ele aponta para cortes documentais ligados a uma revisão observada e não substitui fonte, execução, evidência ou receipt.
 
-## Corte corrente
+## Suplemento de engenharia corrente — 2026-09-28
+
+- [Maturity/Productization V1](2026-09-28/MATURITY_AND_PRODUCTIZATION_V1.md)
+- [Router do suplemento](2026-09-28/README.md)
+- Base observada do main: f840fde2de65edacf8b2abbee8ca9d1f9c912b6d
+- Predecessor de revisão: PR#358@f35fc8402ea790a8dead96817c0847bbaf9c1a98
+- Escopo: equivalência, propriedades, benchmark receipts, ABI/API, supply chain, threat model, SDK e reprodução cross-environment.
+
+O corte amplo de 2026-09-23 permanece como base documental histórica; o suplemento de 2026-09-28 supersede apenas o estado das superfícies de maturidade acima.
+
+## Corte amplo anterior
 
 - Corte documental corrente: [2026-09-23](2026-09-23/README.md)
 - Base de implementação observada: main@f22efc099ac530d946ff2ec34954455f75632e92

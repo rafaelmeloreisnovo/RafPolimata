@@ -67,9 +67,13 @@ static inline AttractorClass fsm_classify(q16_t lambda) {
     u32 lt_str  = (u32)(lambda < -LYAP_TORUS_THR);
     u32 lt_tor  = (u32)(lambda < -LYAP_SPIRAL_THR);
     u32 lt_spi  = (u32)(lambda < -LYAP_LIMIT_THR);
-    return (AttractorClass)(gt_src*0 + lt_hom*5 +
-            (!lt_hom & lt_str)*4 + (!lt_str & lt_tor)*3 +
-            (!lt_tor & lt_spi)*2 + (!lt_spi & !gt_src)*1);
+    /* Comparison results are 0/1. Keep selection arithmetic explicit and
+     * avoid mixing logical-not with bitwise operators. */
+    return (AttractorClass)(lt_hom*5 +
+            ((1u-lt_hom) & lt_str)*4 +
+            ((1u-lt_str) & lt_tor)*3 +
+            ((1u-lt_tor) & lt_spi)*2 +
+            ((1u-lt_spi) & (1u-gt_src))*1);
 }
 
 static void fsm_init(FSMState *f) {

@@ -1,0 +1,40 @@
+{
+  "schema": "rafpolimata.api-abi.v1",
+  "surface": "sdk/rafpolimata_v1",
+  "api_version": "0.1.0",
+  "abi_version": 1,
+  "stability": "EXPERIMENTAL_VERSIONED",
+  "distribution": ["static_library", "public_c_header"],
+  "public_header": "sdk/rafpolimata_v1/include/rafpolimata_v1.h",
+  "public_symbols": [
+    "rafp_v1_arena_alloc",
+    "rafp_v1_arena_init",
+    "rafp_v1_arena_peak",
+    "rafp_v1_arena_reset",
+    "rafp_v1_arena_used",
+    "rafp_v1_crc32c",
+    "rafp_v1_q16_abs_sat",
+    "rafp_v1_q16_iir",
+    "rafp_v1_q16_mul"
+  ],
+  "breaking_changes_require_abi_increment": [
+    "remove_or_rename_public_symbol",
+    "change_function_parameter_or_return_type",
+    "change_rafp_arena_v1_field_order_or_semantics",
+    "change_numeric_seed_or_crc_semantics",
+    "change_q16_scale"
+  ],
+  "compatible_within_abi": [
+    "add_documentation",
+    "add_private_symbol",
+    "optimize_implementation_without_output_change",
+    "add_new_public_symbol_when_existing_behavior_is_preserved"
+  ],
+  "architecture_notes": {
+    "pointer_width": "target_abi_dependent",
+    "integer_widths": "explicit_except_rafp_size",
+    "endianness": "CRC byte-stream semantics are endian-independent"
+  },
+  "runtime_external_dependencies": [],
+  "claim_scope": "source_build_equivalence_ci_until_separate_runtime_or_device_receipt"
+}

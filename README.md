@@ -1,5 +1,23 @@
 # RafPolimata
 
+## Engineering maturity supplement — 2026-09-28
+
+A new bounded productization/evidence layer is routed from [Maturity and Productization V1](docs/canonical/2026-09-28/MATURITY_AND_PRODUCTIZATION_V1.md).
+
+It materializes:
+
+- a public C SDK reference surface (API 0.1.0 / ABI 1);
+- specialized-vs-reference functional equivalence gates;
+- 2,000,000 deterministic property/adversarial cases;
+- SHA-bound benchmark receipts with raw samples and variance;
+- deterministic double-build verification;
+- SPDX 2.3 SBOM and toolchain/artifact hashing;
+- a versioned threat model;
+- fresh-checkout Ubuntu 22.04/24.04 cross-environment reproduction.
+
+Physical/device execution, calibrated energy and independent-provider reproduction remain separate evidence gates.
+
+
 ## Current documentation route — 2026-09-23
 
 **Observed implementation base:** main@f22efc099ac530d946ff2ec34954455f75632e92  
