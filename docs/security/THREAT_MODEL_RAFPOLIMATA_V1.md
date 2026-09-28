@@ -26,8 +26,8 @@
 
 | Threat | Consequence | Current control |
 |---|---|---|
-| length/integer overflow | OOB/corruption | bounded arena arithmetic + property boundaries |
-| unaligned input | target fault/semantic drift | alignment-rotating CRC property cases; ARM32 byte path |
+| length/integer overflow | OOB/corruption | bounded arena arithmetic + property boundaries + ASan/UBSan hosted pass |
+| unaligned input/storage | target fault/semantic drift | alignment-rotating CRC cases; ARM32 byte path; arena base alignment contract/rejection |
 | ABI drift | downstream binary/source breakage | machine ABI contract + exact nm symbol gate |
 | hidden runtime/helper | undeclared dependency | ARM32 full-TU undefined-symbol audit + freestanding gates |
 | optimized/reference divergence | silent wrong answer | public reference implementation + equivalence campaign |
@@ -64,7 +64,7 @@ Where runtime/device or independent-provider evidence is required and unavailabl
 
 ## Next security gates
 
-- sanitizer/fuzz campaigns for hosted adapters where sanitizers are semantically applicable;
+- sanitizer campaigns for additional hosted adapters beyond the current SDK/equivalence scope;
 - side-channel review for any future secret-bearing cryptographic API;
 - signed release provenance after a release policy is authorized;
 - independent external reproduction of the SDK gate bundle;

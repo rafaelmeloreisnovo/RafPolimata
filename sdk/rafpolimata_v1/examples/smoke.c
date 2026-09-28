@@ -1,6 +1,6 @@
 #include "rafpolimata_v1.h"
 
-static rafp_u8 storage[128];
+_Alignas(RAFP_V1_ARENA_ALIGN) static rafp_u8 storage[128];
 
 int main(void) {
     static const rafp_u8 v[] = "123456789";

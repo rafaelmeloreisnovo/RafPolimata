@@ -11,6 +11,7 @@ on:
       - 'scripts/generate_supply_chain_receipt.py'
       - 'scripts/verify_sdk_abi.py'
       - 'scripts/verify_maturity_contracts.py'
+      - 'tools/reproduce_maturity_bundle.sh'
       - 'contracts/rafpolimata_api_abi_v1.json'
       - 'docs/canonical/2026-09-28/**'
       - 'docs/security/THREAT_MODEL_RAFPOLIMATA_V1.md'
@@ -38,6 +39,14 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+
+      - name: Verify checked-out source identity
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
 
       - name: Toolchain identity
         run: |
@@ -48,6 +57,11 @@ jobs:
 
       - name: SDK, ABI, equivalence, properties and deterministic build
         run: make maturity-gates
+
+      - name: ASan + UBSan adversarial property pass
+        env:
+          SANITIZE: '1'
+        run: bash tests/maturity/run_million_properties.sh
 
       - name: SHA-bound reproducible benchmark
         run: python3 scripts/run_maturity_benchmark.py --out build/maturity/benchmark.json

@@ -8,7 +8,7 @@ This directory is the first bounded productization slice of the low-level work.
 - ABI version: **1**
 - distribution form in this cut: static C library + public header;
 - runtime dependencies of the library: none;
-- allocator: caller-owned memory only;
+- allocator: caller-owned memory only; storage base must be 8-byte aligned and misaligned storage is rejected;
 - syscall/OS ABI: none;
 - hidden heap/GC/TLS: none.
 

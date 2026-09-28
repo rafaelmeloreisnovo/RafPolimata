@@ -23,6 +23,7 @@ typedef unsigned long long rafp_u64;
 typedef signed int         rafp_s32;
 typedef signed long long   rafp_s64;
 typedef __SIZE_TYPE__      rafp_size;
+typedef __UINTPTR_TYPE__   rafp_uptr;
 typedef rafp_s32           rafp_q16;
 
 typedef struct rafp_arena_v1 {

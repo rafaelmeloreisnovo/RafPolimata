@@ -21,6 +21,7 @@ def main():
     require((ROOT / "docs/canonical/2026-09-28/MATURITY_AND_PRODUCTIZATION_V1.md").is_file(), "maturity document missing")
     require((ROOT / "docs/security/THREAT_MODEL_RAFPOLIMATA_V1.md").is_file(), "threat model missing")
     require((ROOT / ".github/workflows/maturity-evidence.yml").is_file(), "maturity workflow missing")
+    require((ROOT / "tools/reproduce_maturity_bundle.sh").is_file(), "external reproduction bundle missing")
     print("MATURITY_CONTRACT_PASS abi=1 api=0.1.0")
 
 if __name__ == "__main__":

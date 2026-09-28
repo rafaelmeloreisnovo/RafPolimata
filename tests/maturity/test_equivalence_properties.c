@@ -25,7 +25,7 @@ static int streq(const char *a, const char *b) {
 static int test_arena_boundaries(void) {
     static const uint32_t sizes[] = {0u,1u,7u,8u,9u,65527u,65528u,65529u,65535u,65536u,65537u,0xffffffffu};
     static Arena internal;
-    static unsigned char storage[ARENA_CAP];
+    _Alignas(RAFP_V1_ARENA_ALIGN) static unsigned char storage[ARENA_CAP];
     rafp_arena_v1 public_arena;
 
     for (unsigned i = 0; i < sizeof(sizes)/sizeof(sizes[0]); i++) {
@@ -35,7 +35,42 @@ static int test_arena_boundaries(void) {
         void *b = rafp_v1_arena_alloc(&public_arena, sizes[i]);
         if ((a == 0) != (b == 0)) return 20;
         if (internal.top != public_arena.top) return 21;
+        if (a && (((uintptr_t)a & (ARENA_ALIGN - 1u)) != 0u)) return 22;
+        if (b && (((uintptr_t)b & (RAFP_V1_ARENA_ALIGN - 1u)) != 0u)) return 23;
     }
+    return 0;
+}
+
+static int test_arena_aliasing_alignment(void) {
+    static Arena internal;
+    _Alignas(RAFP_V1_ARENA_ALIGN) static unsigned char storage[256];
+    _Alignas(RAFP_V1_ARENA_ALIGN) static unsigned char misaligned[64 + RAFP_V1_ARENA_ALIGN];
+    static const uint32_t sizes[] = {1u, 7u, 8u, 9u, 15u, 31u, 64u};
+    rafp_arena_v1 public_arena;
+
+    internal.top = internal.peak = 0u;
+    rafp_v1_arena_init(&public_arena, storage, (rafp_u32)sizeof(storage));
+
+    uintptr_t prev_i_end = 0u, prev_p_end = 0u;
+    for (unsigned i = 0; i < sizeof(sizes)/sizeof(sizes[0]); i++) {
+        uint32_t sz = sizes[i];
+        void *pi = arena_alloc(&internal, sz);
+        void *pp = rafp_v1_arena_alloc(&public_arena, sz);
+        if (!pi || !pp) return 30;
+        uintptr_t ai = (uintptr_t)pi;
+        uintptr_t ap = (uintptr_t)pp;
+        if ((ai & (ARENA_ALIGN - 1u)) != 0u) return 31;
+        if ((ap & (RAFP_V1_ARENA_ALIGN - 1u)) != 0u) return 32;
+        if (prev_i_end && ai < prev_i_end) return 33;
+        if (prev_p_end && ap < prev_p_end) return 34;
+        prev_i_end = ai + sz;
+        prev_p_end = ap + sz;
+        if (internal.top != public_arena.top) return 35;
+    }
+
+    rafp_v1_arena_init(&public_arena, misaligned + 1u, 64u);
+    if (public_arena.capacity != 0u || public_arena.base != (void *)0) return 36;
+    if (rafp_v1_arena_alloc(&public_arena, 1u) != (void *)0) return 37;
     return 0;
 }
 
@@ -74,7 +109,9 @@ int main(void) {
 
     int arena_rc = test_arena_boundaries();
     if (arena_rc) return arena_rc;
+    arena_rc = test_arena_aliasing_alignment();
+    if (arena_rc) return arena_rc;
 
-    printf("MATURITY_EQUIVALENCE_PASS cases=%u crc=reference_vs_specialized q16=exact arena=boundary\n", PROPERTY_CASES);
+    printf("MATURITY_EQUIVALENCE_PASS cases=%u crc=reference_vs_specialized q16=exact arena=boundary_alignment_nonoverlap\n", PROPERTY_CASES);
     return 0;
 }

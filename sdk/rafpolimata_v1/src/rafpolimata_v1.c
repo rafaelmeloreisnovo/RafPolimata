@@ -34,10 +34,14 @@ rafp_q16 rafp_v1_q16_abs_sat(rafp_q16 value) {
 
 void rafp_v1_arena_init(rafp_arena_v1 *arena, void *storage, rafp_u32 capacity) {
     if (!arena) return;
-    arena->base = (rafp_u8 *)storage;
-    arena->capacity = storage ? capacity : 0u;
+    arena->base = (rafp_u8 *)0;
+    arena->capacity = 0u;
     arena->top = 0u;
     arena->peak = 0u;
+    if (!storage) return;
+    if (((rafp_uptr)storage & (RAFP_V1_ARENA_ALIGN - 1u)) != 0u) return;
+    arena->base = (rafp_u8 *)storage;
+    arena->capacity = capacity;
 }
 
 void *rafp_v1_arena_alloc(rafp_arena_v1 *arena, rafp_u32 size) {

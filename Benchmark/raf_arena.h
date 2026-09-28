@@ -5,7 +5,7 @@
 #include "raf_types.h"
 
 typedef struct {
-    u8  buf[ARENA_CAP]; /* 64 KB estático — sem .bss heap segment           */
+    _Alignas(ARENA_ALIGN) u8 buf[ARENA_CAP]; /* guaranteed aligned arena base */
     u32 top;            /* cursor — único campo mutável                      */
     u32 peak;           /* high watermark para métricas                      */
 } Arena;

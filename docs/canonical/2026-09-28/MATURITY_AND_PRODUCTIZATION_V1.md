@@ -7,7 +7,7 @@ This cut converts eight previously open engineering gaps into executable, falsif
 | Aspect | Materialized now | Gate / evidence | Remaining boundary |
 |---|---|---|---|
 | Functional equivalence | public reference SDK + comparison harness | specialized host CRC32C vs reference; internal Q16 vs reference; arena boundary behavior | runtime equivalence of every ARM32/ARM64/vector specialist remains separate |
-| Property/fuzz testing | deterministic PRNG suite with 2,000,000 cases plus boundary vectors | alignment offsets, seeds, zero length, Q16 arithmetic, arena overflow and invalid FSM labels | not exhaustive formal proof; sanitizer/provider/device campaigns may extend it |
+| Property/fuzz testing | deterministic PRNG suite with 2,000,000 cases plus boundary vectors | alignment offsets, seeds, zero length, Q16 arithmetic, arena overflow, non-overlap, invalid storage alignment and invalid FSM labels; second ASan+UBSan pass | not exhaustive formal proof; provider/device campaigns may extend it |
 | Reproducible benchmarks | SHA-bound hosted benchmark receipt with 31 raw samples | ns, RDTSC cycles on x86, bytes/s, cycles/byte, variance, binary size, max RSS | calibrated energy is TOKEN_VAZIO (CLOSURE_L12) until measured |
 | ABI/API stability | API 0.1.0 / ABI 1 machine contract | exact exported symbol set checked with nm | shared-object SONAME, language bindings and long-term support policy not yet declared |
 | Supply chain | deterministic SPDX 2.3 SBOM for SDK slice + toolchain/artifact receipt | source hashes, compiler/ar/python identity and hashes, artifact SHA256 | repository-wide license compatibility remains REVIEW_REQUIRED |
@@ -38,7 +38,7 @@ Compile-only evidence on another ISA is not promoted to runtime equivalence.
 
 tests/maturity/test_equivalence_properties.c executes **2,000,000 deterministic generated cases**. Each case varies CRC seed, payload bytes, length and pointer alignment offset and also compares bounded Q16 operations.
 
-Targeted boundaries include zero-length data, the standard CRC32C vector 123456789, arena capacities around alignment/capacity limits, 0xffffffff allocation requests and invalid FSM/class indices.
+Targeted boundaries include zero-length data, the standard CRC32C vector 123456789, arena capacities around alignment/capacity limits, 0xffffffff allocation requests, pointer-base alignment, non-overlapping sequential allocations and invalid FSM/class indices. A second execution compiles the same campaign with AddressSanitizer and UndefinedBehaviorSanitizer on the hosted CI runners.
 
 This is a high-volume falsifier, not a mathematical proof over all possible machine states.
 
@@ -85,7 +85,7 @@ fresh checkout
 + deterministic double-build
 + SBOM/supply-chain receipt
 
-Both images are still GitHub-hosted environments. Therefore this closes cross-environment/local-state reproduction only, not independent-provider reproduction.
+Both images are still GitHub-hosted environments. Therefore this closes cross-environment/local-state reproduction only, not independent-provider reproduction. Same-environment double-build identity is required. Bit-identical artifacts across different compiler/toolchain environments are a separate stronger property and are not inferred from functional cross-environment PASS.
 
 ## Promotion ladder
 
@@ -102,4 +102,4 @@ REFERENCE
 
 Each arrow needs its own receipt. No later state is inferred from an earlier one.
 
-R3 = ⟨F_ok: eight maturity surfaces have executable artifacts/gates; F_gap: cross-ISA runtime, energy/device, full-repo legal closure and independent provider remain separate; F_next: run exact-head matrix and consume the receipts before promotion⟩.
+R3 = ⟨F_ok: eight maturity surfaces have executable artifacts/gates including sanitizer and alignment/non-overlap checks; F_gap: cross-toolchain bit identity, cross-ISA runtime, energy/device, full-repo legal closure and independent provider remain separate; F_next: run exact-head matrix and consume the receipts before promotion⟩.
