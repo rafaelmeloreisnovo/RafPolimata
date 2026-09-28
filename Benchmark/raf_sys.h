@@ -8,8 +8,16 @@
 #pragma once
 #include "raf_types.h"
 
+#ifdef RAF_ARCH_A32
+/* Linux ARM EABI syscall 263 is clock_gettime32: two signed 32-bit longs. */
+typedef struct { s32 sec; s32 nsec; } Timespec;
+_Static_assert(sizeof(Timespec) == 8, "ARM32 clock_gettime32 ABI requires 8-byte timespec");
+#else
 typedef struct { s64 sec; s64 nsec; } Timespec;
+_Static_assert(sizeof(Timespec) == 16, "64-bit Linux timespec requires two 64-bit longs");
+#endif
 #define CLOCK_MONO 1
+static u32 RAF_TIMER_FAULT = 0;
 
 /* ── ARM64 ──────────────────────────────────────────────────────────────── */
 #ifdef RAF_ARCH_A64
@@ -110,8 +118,11 @@ s64 _sc1(s64 nr, s64 a) {
 static __attribute__((always_inline)) inline u64 raf_tsc(void) {
     Timespec ts = {0, 0};
     s64 rc = _sc3(SYS_clock_gettime, CLOCK_MONO, (s64)(usize)&ts, 0);
-    if (rc < 0) return 0;
-    return (u64)ts.sec * 1000000000ULL + (u64)ts.nsec;
+    if (rc < 0 || ts.sec < 0 || ts.nsec < 0 || ts.nsec >= 1000000000) {
+        RAF_TIMER_FAULT = 1;
+        return 0;
+    }
+    return (u64)(u32)ts.sec * 1000000000ULL + (u64)(u32)ts.nsec;
 }
 static __attribute__((always_inline)) inline u64 raf_tsc_freq(void) {
     return 1000000000ULL; /* tsc já em nanos: 1e9 ticks/s */
@@ -127,16 +138,32 @@ static inline void raf_exit(s32 code) {
     _sc1(SYS_exit, code);
     __builtin_unreachable();
 }
-static inline void raf_clock(Timespec *ts) {
-    _sc3(SYS_clock_gettime, CLOCK_MONO, (s64)(usize)ts, 0);
+static inline s64 raf_clock(Timespec *ts) {
+    if (!ts) return -1;
+    s64 rc = _sc3(SYS_clock_gettime, CLOCK_MONO, (s64)(usize)ts, 0);
+    if (rc < 0) RAF_TIMER_FAULT = 1;
+    return rc;
 }
-/* print decimal u64 — sem printf, sem buffer dinâmico                       */
+static inline u32 raf_timer_ok(void) { return RAF_TIMER_FAULT == 0; }
+
+/* Inline decimal output: no implicit newline and no dynamic buffer. */
 static void raf_putu64(u64 v) {
-    char buf[21]; s32 i = 20;
-    buf[i] = '\n'; i--;
-    if (!v) { buf[i--] = '0'; }
-    else { while (v) { buf[i--] = '0' + (char)(v % 10); v /= 10; } }
-    raf_write(buf + i + 1, 20 - (usize)i);
+    char buf[20]; s32 i = 20;
+    if (!v) buf[--i] = '0';
+    else {
+        while (v) {
+#ifdef RAF_ARCH_A32
+            u64 q = raf_udiv64_bounded(v, 10);
+            u32 digit = (u32)(v - q * 10);
+            v = q;
+#else
+            u32 digit = (u32)(v % 10);
+            v /= 10;
+#endif
+            buf[--i] = (char)('0' + digit);
+        }
+    }
+    raf_write(buf + i, (usize)(20 - i));
 }
 static void raf_puts(const char *s) {
     usize n = 0;

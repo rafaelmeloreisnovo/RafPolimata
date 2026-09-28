@@ -7,6 +7,25 @@ set -euo pipefail
 echo "=== RAFAELIA no-libc userspace build ==="
 
 ARCH="$(uname -m)"
+if [[ -n "${CC:-}" ]]; then
+    NATIVE_CC="$CC"
+elif command -v clang >/dev/null 2>&1; then
+    NATIVE_CC=clang
+elif command -v gcc >/dev/null 2>&1; then
+    NATIVE_CC=gcc
+else
+    echo "FAIL: no native C compiler (set CC or install clang/gcc)" >&2
+    exit 127
+fi
+if command -v llvm-strip >/dev/null 2>&1; then
+    NATIVE_STRIP=llvm-strip
+elif command -v strip >/dev/null 2>&1; then
+    NATIVE_STRIP=strip
+else
+    NATIVE_STRIP=
+fi
+echo "compiler=$NATIVE_CC arch=$ARCH"
+
 CFLAGS="-O2 -nostdlib -nostartfiles -nodefaultlibs -ffreestanding -fno-builtin \
         -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables \
         -fno-ident -fomit-frame-pointer -ffunction-sections -fdata-sections -fno-plt \
@@ -17,7 +36,7 @@ LDFLAGS="-Wl,--gc-sections -Wl,--build-id=none"
 case "$ARCH" in
   armv7l|armv8l)
     echo "[ARM32] Termux native build (EABI softfp + NEON; clock_gettime timer)"
-    gcc $CFLAGS $LDFLAGS \
+    "$NATIVE_CC" $CFLAGS $LDFLAGS \
         -march=armv7-a -mfloat-abi=softfp -mfpu=neon -fno-pic \
         -static -e _start -o raf_enterprise_a32 raf_main.c
     echo "[ARM32] OK -> raf_enterprise_a32"
@@ -28,7 +47,7 @@ esac
 # ARM64 native Linux/Android userspace.
 if [[ "$ARCH" == "aarch64" ]]; then
     echo "[ARM64] gcc -march=armv8.2-a+crc+crypto ..."
-    gcc $CFLAGS $LDFLAGS \
+    "$NATIVE_CC" $CFLAGS $LDFLAGS \
         -march=armv8.2-a+crc+crypto \
         -static -e _start -o raf_enterprise_a64 raf_main.c
     echo "[ARM64] OK -> raf_enterprise_a64"
@@ -38,7 +57,7 @@ fi
 # x86-64 native Linux userspace.
 if [[ "$ARCH" == "x86_64" ]]; then
     echo "[x86-64] gcc -march=native ..."
-    gcc $CFLAGS $LDFLAGS \
+    "$NATIVE_CC" $CFLAGS $LDFLAGS \
         -march=native -static -e _start -o raf_enterprise_x64 raf_main.c
     echo "[x86-64] OK -> raf_enterprise_x64"
     size raf_enterprise_x64
@@ -54,6 +73,15 @@ if command -v arm-linux-gnueabihf-gcc >/dev/null 2>&1; then
 fi
 
 echo "=== Build complete ==="
-for b in raf_enterprise_*; do
-    [[ -f "$b" ]] && strip --strip-all "$b" && echo "stripped: $(du -h "$b" | cut -f1) $b"
+for b in raf_enterprise_a32 raf_enterprise_a64 raf_enterprise_x64; do
+    if [[ -f "$b" ]]; then
+        if [[ -n "$NATIVE_STRIP" ]]; then "$NATIVE_STRIP" --strip-all "$b"; fi
+        echo "artifact: $(du -h "$b" | cut -f1) $b"
+    fi
 done
+if [[ -f raf_enterprise_a32_hf ]]; then
+    if command -v arm-linux-gnueabihf-strip >/dev/null 2>&1; then
+        arm-linux-gnueabihf-strip --strip-all raf_enterprise_a32_hf
+    fi
+    echo "artifact: $(du -h raf_enterprise_a32_hf | cut -f1) raf_enterprise_a32_hf"
+fi

@@ -1,7 +1,7 @@
 # RAFAELIA L0 — Architecture Contract
 
 The architecture contract is a compile-time map, not an OS abstraction.
-Governance evidence closure: `CLOSURE_L12`.
+Governance: implementation/topology gaps bind to `CLOSURE_L11`; runtime/device evidence gaps bind to `CLOSURE_L12`.
 
 ## Canonical fields
 

@@ -1,9 +1,6 @@
-/* raf_arena.h — bump allocator, zero malloc, zero free, zero GC
- * Latência mediana medida: 2–3 ns (2 instruções: add + cmp)
- * vs jemalloc: 50–100 ns · vs glibc malloc: 100–300 ns
- * Estratégia: static arena + reset por sessão — sem fragmentation
- * Heap friction eliminada: sem lock, sem TLB pressure, sem metadata overhead
- * AAPCS64: p retornado em x0, sz em x0 (arg), arena ptr em x1            */
+/* raf_arena.h — bounded static bump arena: no malloc/free/GC dependency.
+ * Performance is runtime-receipt scoped; source text does not assert latency.
+ * Allocation fails closed on size/alignment/capacity overflow. */
 #pragma once
 #include "raf_types.h"
 
@@ -13,18 +10,17 @@ typedef struct {
     u32 peak;           /* high watermark para métricas                      */
 } Arena;
 
-/* alloc: branch-free quando inlined — compilador emite: add + cmp + cmovhi */
+/* Allocation safety precedes branch-count optimization. */
 static __attribute__((always_inline)) inline
 void* arena_alloc(Arena * __restrict__ a, u32 sz) {
-    /* align 8 bytes: round up sem branch                                    */
-    u32 aligned = (sz + (ARENA_ALIGN - 1)) & ~(ARENA_ALIGN - 1);
-    u32 next    = a->top + aligned;
-    /* sem if: retorna NULL via conditional — zero branch prediction miss    */
-    void *p     = (next <= ARENA_CAP) ? (void*)(a->buf + a->top) : (void*)0;
-    /* update condicional — evita write quando falha                         */
-    a->top  = (next <= ARENA_CAP) ? next       : a->top;
-    a->peak = (a->top > a->peak) ? a->top      : a->peak;
-    return p;
+    if (!a || sz > ARENA_CAP) return (void*)0;
+    if (sz > 0xFFFFFFFFU - (ARENA_ALIGN - 1U)) return (void*)0;
+    u32 aligned = (sz + (ARENA_ALIGN - 1U)) & ~(ARENA_ALIGN - 1U);
+    if (a->top > ARENA_CAP || aligned > ARENA_CAP - a->top) return (void*)0;
+    u32 old = a->top;
+    a->top = old + aligned;
+    if (a->top > a->peak) a->peak = a->top;
+    return (void*)(a->buf + old);
 }
 
 /* reset: O(1) — simplesmente zera cursor. Sem free() individual            */
