@@ -117,6 +117,8 @@ Current-artifact ApkC provenance and physical runtime remain evidence-gated as r
 
 ## 6.1 Fórmulas — referência executável e autoridade
 
+Governance: `CLOSURE_G1`  
+
 | Rota | Papel | Limite |
 |---|---|---|
 | [FORMULA_AUTHORITY_BRIDGE_V1.md](FORMULA_AUTHORITY_BRIDGE_V1.md) | entrada humana/IA para fórmula → produtor → vetor → gate | não promove autoridade global |
