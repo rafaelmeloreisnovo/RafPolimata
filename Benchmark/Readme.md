@@ -18,7 +18,8 @@ Therefore `-nostdlib` or a static ELF with direct syscalls is **not** sufficient
 ## ARM32 / Termux correction
 
 - `raf_sys.h` uses `clock_gettime(CLOCK_MONOTONIC)` through the raw Linux syscall ABI because PMU access is commonly unavailable in Android userland.
-- ARM32 timer samples are already nanoseconds; `raf_bench.h` avoids a generic 64-bit division that could synthesize an external `__aeabi_*` helper.
+- ARM32 syscall 263 is treated as `clock_gettime32`: the userspace timespec is exactly two signed 32-bit fields (8 bytes). Samples are converted to nanoseconds only after return-value/range validation.
+- `raf_bench.h` and the decimal reporter avoid hidden ARM32 `__aeabi_*` division helpers in the paths exercised by the benchmark.
 - Timer syscall cost is part of the ARM32 measurement envelope and is no longer reported as zero.
 - `build2.sh` has one native ARM32 profile only: `armv7-a + softfp + NEON`. The previous second ARM32 build overwrote the first artifact with different flags.
 - The optional `arm-linux-gnueabihf-gcc` cross artifact remains separate as `raf_enterprise_a32_hf`.
@@ -31,7 +32,7 @@ Therefore `-nostdlib` or a static ELF with direct syscalls is **not** sufficient
 
 ```bash
 cd Benchmark
-bash build2.sh
+CC=clang bash build2.sh
 ./raf_enterprise_a32
 ```
 
@@ -60,3 +61,10 @@ sh scripts/verify_execution_boundaries.sh
 ```
 
 For the strict OS-neutral L0, use the independent `freestanding/tests/*` gates.
+
+
+## Review hardening
+
+The Benchmark CI cross-compiles the full ARM32 translation unit and rejects unresolved external symbols. This closes a gap that syscall-header-only compilation could not detect.
+
+The T^7 output field `state_index_42` is a bounded implementation index, not evidence of 42 dynamical attractors. The reported `coherence_sq_q16` is squared normalized coherence (R²), explicitly distinguished from R.

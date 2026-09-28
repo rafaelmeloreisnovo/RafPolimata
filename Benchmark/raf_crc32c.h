@@ -1,13 +1,10 @@
-/* raf_crc32c.h — CRC32C hardware em ARM64/x86-64, software em ARM32
- * Mediana medida A78 @ 2.4 GHz: ~19 GB/s (crc32cx, 8B/ciclo unrolled×8)
- * Mediana OpenSSL ARM64 referência: ~15 GB/s
- * x86-64 (crc32q, SSE4.2): ~22 GB/s (Zen4), ~18 GB/s (Skylake)
- * ARM32 software poly 0x82F63B78: ~1.1 GB/s (Cortex-A9)
- * Poly CRC32C (Castagnoli): 0x1EDC6F41 (normal) 0x82F63B78 (reversed)     */
+/* raf_crc32c.h — CRC32C hardware profile on ARM64/x86-64, software on ARM32.
+ * Performance is current-receipt scoped; source comments carry no throughput claim.
+ * Poly CRC32C: 0x1EDC6F41 normal / 0x82F63B78 reversed.                    */
 #pragma once
 #include "raf_types.h"
 
-/* ── ARM64: crc32cx — instrução ARMv8.1, A78 1 ciclo throughput ─────────── */
+/* ── ARM64: crc32cx — requires the ARMv8-A CRC extension profile ───────── */
 #ifdef RAF_ARCH_A64
 static __attribute__((always_inline)) inline
 u32 crc32c_u64(u32 crc, u64 w) {
@@ -61,23 +58,27 @@ u32 crc32c_u64(u32 crc, u64 w) {
 }
 #endif /* RAF_ARCH_A32 */
 
-/* ── Kernel unificado — 8×unroll reduz loop overhead 8× ─────────────────── */
+/* Constant-size copy must inline; ARM32 stays byte-wise to avoid alignment-sensitive u64 loads. */
+static __attribute__((always_inline)) inline u64 crc_load_u64(const u8 *p) {
+    u64 w; __builtin_memcpy(&w, p, sizeof(w)); return w;
+}
 static u32 crc32c_buf(const u8 *buf, usize len, u32 seed) {
     u32 crc = ~seed;
-    const u64 *p64 = (const u64*)(const void*)buf;
+#ifdef RAF_ARCH_A32
+    while (len--) crc = crc32c_u8(crc, *buf++);
+#else
     usize n64 = len >> 3;
-    /* Unroll ×8: 8 instruções crc32cx por iteração = 64 bytes/iter          */
     while (n64 >= 8) {
-        crc = crc32c_u64(crc, p64[0]); crc = crc32c_u64(crc, p64[1]);
-        crc = crc32c_u64(crc, p64[2]); crc = crc32c_u64(crc, p64[3]);
-        crc = crc32c_u64(crc, p64[4]); crc = crc32c_u64(crc, p64[5]);
-        crc = crc32c_u64(crc, p64[6]); crc = crc32c_u64(crc, p64[7]);
-        p64 += 8; n64 -= 8;
+        crc = crc32c_u64(crc, crc_load_u64(buf+0));  crc = crc32c_u64(crc, crc_load_u64(buf+8));
+        crc = crc32c_u64(crc, crc_load_u64(buf+16)); crc = crc32c_u64(crc, crc_load_u64(buf+24));
+        crc = crc32c_u64(crc, crc_load_u64(buf+32)); crc = crc32c_u64(crc, crc_load_u64(buf+40));
+        crc = crc32c_u64(crc, crc_load_u64(buf+48)); crc = crc32c_u64(crc, crc_load_u64(buf+56));
+        buf += 64; n64 -= 8;
     }
-    while (n64--) { crc = crc32c_u64(crc, *p64++); }
-    const u8 *tail = (const u8*)p64;
+    while (n64--) { crc = crc32c_u64(crc, crc_load_u64(buf)); buf += 8; }
     usize rem = len & 7;
-    while (rem--) { crc = crc32c_u8(crc, *tail++); }
+    while (rem--) crc = crc32c_u8(crc, *buf++);
+#endif
     return ~crc;
 }
 /* XOR AETHER: dual CRC32C com seed complementar — GAIA-BBS dual hash        */

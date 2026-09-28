@@ -18,7 +18,7 @@
 static const u8 BENCH_BUF[4096] = {
     0xDE,0xAD,0xBE,0xEF,0xCA,0xFE,0xBA,0xBE,
     0x01,0x23,0x45,0x67,0x89,0xAB,0xCD,0xEF,
-    /* ... restante inicializado a 0x00 pelo BSS — padrão válido para bench */
+    /* ... restante zero-inicializado no objeto const; não é BSS. */
 };
 
 /* ── Sessão de benchmark de CRC32C ──────────────────────────────────────── */
@@ -57,7 +57,7 @@ static void run_bench_arena(u64 freq) {
     BenchResult r = bench_analyze(samp);
     bench_report("arena_alloc_64b", r, freq);
     raf_puts("  arena_peak_bytes=");
-    raf_putu64(arena_peak(&G_ARENA));
+    raf_putu64(arena_peak(&G_ARENA)); raf_puts("\n");
 }
 
 /* ── Sessão de benchmark: phi64_mix hash ────────────────────────────────── */
@@ -130,7 +130,7 @@ static void run_bench_fsm(u64 freq) {
     raf_puts("\n  lambda_q16=");
     raf_putu64((u64)(u32)(s32)fsm.lambda);
     raf_puts("  acc_weight_q16=");
-    raf_putu64((u64)(u32)(s32)fsm.acc_weight);
+    raf_putu64((u64)(u32)(s32)fsm.acc_weight); raf_puts("\n");
 }
 
 /* ── Sessão: T^7 toroide 1000 steps ────────────────────────────────────── */
@@ -154,9 +154,9 @@ static void run_bench_toroid(u64 freq) {
     });
     BenchResult r = bench_analyze(samp);
     bench_report("t7_toroid_1000steps", r, freq);
-    raf_puts("  attractor_idx=");  raf_putu64(t7.attractor);
-    raf_puts("  coherence_q16=");  raf_putu64((u64)(u32)t7_coherence(&t7));
-    raf_puts("  phi_ethica_q16="); raf_putu64((u64)(u32)t7.phi);
+    raf_puts("  state_index_42=");    raf_putu64(t7.attractor);
+    raf_puts("  coherence_sq_q16="); raf_putu64((u64)(u32)t7_coherence_sq(&t7));
+    raf_puts("  phi_ethica_q16=");   raf_putu64((u64)(u32)t7.phi); raf_puts("\n");
 }
 
 /* ── Sessão: spiral + fibonacci-rafael ──────────────────────────────────── */
@@ -173,7 +173,7 @@ static void run_bench_spiral(u64 freq) {
     });
     BenchResult r = bench_analyze(samp);
     bench_report("fraf_1000steps_q16", r, freq);
-    raf_puts("  fraf_q16="); raf_putu64((u64)(u32)fraf);
+    raf_puts("  fraf_q16="); raf_putu64((u64)(u32)fraf); raf_puts("\n");
 }
 
 /* ── Sessão: Merkle chain ───────────────────────────────────────────────── */
@@ -203,7 +203,7 @@ static void run_bench_merkle(u64 freq) {
         merkle_feed(&mc, dh); hashvivo_feed(&hv, dh);
     }
     raf_puts("  merkle_root=");  raf_putu64(merkle_root(&mc));
-    raf_puts("  hashvivo=");     raf_putu64(hashvivo_digest(&hv));
+    raf_puts("  hashvivo=");     raf_putu64(hashvivo_digest(&hv)); raf_puts("\n");
 }
 
 /* ── ABI report em runtime ──────────────────────────────────────────────── */
@@ -228,7 +228,7 @@ static void print_abi_report(u64 freq) {
 #endif
     raf_puts("  arena_cap="); raf_putu64(ARENA_CAP);
     raf_puts("bytes  bench_k="); raf_putu64(BENCH_K);
-    raf_puts("  timer_freq_hz_or_zero_raw_ticks="); raf_putu64(freq);
+    raf_puts("  timer_freq_hz_or_zero_raw_ticks="); raf_putu64(freq); raf_puts("\n");
 }
 
 /* ── Execution/evidence boundary summary ───────────────────────────────── */

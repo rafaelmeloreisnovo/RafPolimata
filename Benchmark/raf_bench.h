@@ -32,7 +32,7 @@ static u64 bench_median(u64 a[BENCH_K]) {
             u64 _t0 = raf_tsc();           \
             { code_block }                 \
             u64 _t1 = raf_tsc();           \
-            (samples)[_bi] = _t1 - _t0;   \
+            (samples)[_bi] = (raf_timer_ok() && _t1 >= _t0) ? (_t1 - _t0) : 0; \
         }                                  \
     } while(0)
 
@@ -54,9 +54,9 @@ static BenchResult bench_analyze(u64 a[BENCH_K]) {
     return r;
 }
 
-/* Converte ticks para ns — ARM64: freq=19.2 MHz → 1 tick = 52.08 ns
- * Generalizado: ns = (ticks * 1000000000) / freq
- * Evita overflow: (ticks * 1000) / (freq/1000000)                          */
+/* Convert ticks to ns only when a counter frequency is known.
+ * ARM32 clock_gettime32 values are already nanoseconds; x86 stays raw ticks
+ * until an explicit TSC calibration exists.                                */
 static u64 ticks_to_ns(u64 ticks, u64 freq_hz) {
 #ifdef RAF_ARCH_A32
     /* ARM32 raf_tsc() already returns nanoseconds. Avoid a 64-bit division
@@ -71,6 +71,10 @@ static u64 ticks_to_ns(u64 ticks, u64 freq_hz) {
 
 /* Report formatado — sem printf, sem heap. Unit follows timer evidence.     */
 static void bench_report(const char *name, BenchResult r, u64 freq) {
+    if (!raf_timer_ok()) {
+        raf_puts(name); raf_puts("  status=FAIL_TIMER\n");
+        return;
+    }
     const char *unit = freq ? "ns" : "ticks";
     raf_puts(name);
     raf_puts("  med=");  raf_putu64(ticks_to_ns(r.med, freq));
