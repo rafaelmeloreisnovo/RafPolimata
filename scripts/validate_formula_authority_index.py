@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Validate formula authority index. Governance: CLOSURE_G1."""
 from __future__ import annotations
 
 import json
