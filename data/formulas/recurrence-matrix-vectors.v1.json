@@ -1,0 +1,28 @@
+{
+  "schema": "RAFAELIA_RECURRENCE_MATRIX_VECTORS_V1",
+  "state": "REFERENCE_VECTORS",
+  "claim_allowed": false,
+  "integer_semantics": "exact",
+  "fibonacci": {
+    "definition": "F0=0,F1=1; F(n+2)=F(n+1)+F(n)",
+    "companion_matrix": [[1,1],[1,0]],
+    "values_n_0_12": [0,1,1,2,3,5,8,13,21,34,55,89,144]
+  },
+  "tribonacci": {
+    "definition": "T0=0,T1=0,T2=1; T(n+3)=T(n+2)+T(n+1)+T(n)",
+    "companion_matrix": [[1,1,1],[1,0,0],[0,1,0]],
+    "values_n_0_12": [0,0,1,1,2,4,7,13,24,44,81,149,274]
+  },
+  "trinity633": {
+    "definition": "Amor^6 * Luz^3 * Consciencia^3",
+    "matrix_semantics": "NOT_APPLICABLE",
+    "vectors": [
+      {"input":[1,1,1],"output":1},
+      {"input":[2,1,1],"output":64},
+      {"input":[1,2,1],"output":8},
+      {"input":[1,1,2],"output":8},
+      {"input":[2,3,5],"output":216000}
+    ]
+  },
+  "boundary": "The three operators share a reproducibility packet; no algebraic equivalence among them is claimed."
+}
