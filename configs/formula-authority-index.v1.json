@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "state": "IMPLEMENTED_UNTESTED",
   "claim_allowed": false,
+  "governance_closure": "CLOSURE_G1",
   "entries": [
     {
       "id": "F-SPIRAL-SQRT3-OVER-2",
