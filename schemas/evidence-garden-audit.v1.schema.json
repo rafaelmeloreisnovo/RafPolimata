@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rafaelia.local/schemas/evidence-garden-audit.v1.schema.json",
+  "title": "RafPolimata Evidence Garden audit V1",
+  "type": "object",
+  "required": ["schema", "source", "profiles", "claim_allowed", "gates", "gaps", "stations", "F_ok", "F_gap", "F_next"],
+  "properties": {
+    "schema": {"const": "rafpolimata.evidence-garden.audit.v1"},
+    "source": {
+      "type": "object",
+      "required": ["kind", "name", "sha256", "size_bytes"],
+      "properties": {
+        "kind": {"type": "string"},
+        "name": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "size_bytes": {"type": "integer", "minimum": 0}
+      }
+    },
+    "profiles": {"type": "array", "items": {"enum": ["academic_falsifiable", "enterprise", "industrial", "fullstack"]}, "uniqueItems": true},
+    "claim_allowed": {"type": "boolean"},
+    "gates": {"type": "object", "additionalProperties": {"enum": ["PASS", "FAIL", "PASS_LIMITED", "NOT_RUN", "PENDING", "AUDIT", "IMPLEMENTED_UNTESTED", "OBSERVED_UNPROMOTED", "ROUTE_STATE_BLOCKED", "TOKEN_VAZIO"]}},
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "urgency", "state", "description", "evidence_required", "next"],
+        "properties": {
+          "id": {"type": "string"},
+          "urgency": {"enum": ["U0", "U1", "U2", "U3"]},
+          "state": {"type": "string"},
+          "description": {"type": "string"},
+          "evidence_required": {"type": "array"},
+          "next": {"type": "string"}
+        }
+      }
+    },
+    "stations": {"type": "array"},
+    "F_ok": {"type": "array", "items": {"type": "string"}},
+    "F_gap": {"type": "array", "items": {"type": "string"}},
+    "F_next": {"type": "string"}
+  },
+  "additionalProperties": true
+}
