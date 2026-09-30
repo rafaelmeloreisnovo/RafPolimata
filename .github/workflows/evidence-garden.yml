@@ -43,7 +43,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout exact revision
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
 
@@ -62,7 +62,7 @@ jobs:
 
       - name: Upload environment-bound receipt
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: evidence-garden-${{ matrix.os }}-${{ github.run_id }}
           path: build/evidence-garden/
@@ -76,12 +76,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout exact revision
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
 
       - name: Download receipts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           pattern: evidence-garden-*-${{ github.run_id }}
           path: build/evidence-garden/downloaded
@@ -96,7 +96,7 @@ jobs:
 
       - name: Upload reproduction summary
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: evidence-garden-reproduction-${{ github.run_id }}
           path: build/evidence-garden/reproduction.json
