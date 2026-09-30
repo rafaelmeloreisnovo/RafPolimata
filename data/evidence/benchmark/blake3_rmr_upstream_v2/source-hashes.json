@@ -1,0 +1,27 @@
+{
+  "schema": "rafpolimata.evidence-garden.source-import.v1",
+  "claim_allowed": false,
+  "sources": [
+    {
+      "name": "blake3_rmr_vs_oficial.pdf",
+      "sha256": "603515e499a88d86dbe18bbf4e805e9685ad02a6dadaa30a36e517c6199a0c9d",
+      "size_bytes": 68502,
+      "state": "SOURCE_EXTERNAL_NOT_REPOSITORY_STORED"
+    },
+    {
+      "name": "blake3_rmr_vs_oficial.md",
+      "sha256": "73dc38a1ee1095bc28c9895592fe3e0a5788772af996d802892e7b64423fed8d",
+      "size_bytes": 3741,
+      "state": "SOURCE_EXTERNAL_NOT_REPOSITORY_STORED"
+    },
+    {
+      "name": "rmr-blake3-upstream-compare-v2.zip",
+      "sha256": "c10e509c41bb3659efd1071d7e3896660ba522294273d6c6d794d4d9d4ca4fd8",
+      "size_bytes": 9986,
+      "state": "SOURCE_EXTERNAL_NOT_REPOSITORY_STORED"
+    }
+  ],
+  "identity_bridge_pdf_md_to_zip": "TOKEN_VAZIO",
+  "note": "Hashes bind the locally audited user-supplied sources without publishing their raw bytes in this public repository.",
+  "governance_closure": "CLOSURE_L2"
+}

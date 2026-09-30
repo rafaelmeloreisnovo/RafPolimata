@@ -1,0 +1,42 @@
+{
+  "schema": "rafpolimata.evidence-garden.catalog.v1",
+  "state": "REFERENCE",
+  "governance_closure": "CLOSURE_L2",
+  "claim_allowed": false,
+  "scaling_policy": "one immutable experiment config -> one environment-bound receipt",
+  "index_keys": [
+    "experiment_id",
+    "source_sha",
+    "config_sha",
+    "artifact_sha",
+    "factor_vector",
+    "host_fingerprint",
+    "station_states",
+    "receipt_sha"
+  ],
+  "experiments": [
+    {
+      "experiment_id": "evidence-garden-selftest-v1",
+      "config": "Benchmark/evidence_garden/demo_experiment.json",
+      "role": "framework self-test",
+      "claim_scope": "runner contract only"
+    },
+    {
+      "experiment_id": "blake3-rmr-upstream-v2-import-20260929",
+      "config": "TOKEN_VAZIO_EXTERNAL_SOURCE_AUDIT",
+      "role": "external evidence import / bounded audit",
+      "source_identity": "data/evidence/benchmark/blake3_rmr_upstream_v2/source-hashes.json",
+      "audit": "data/evidence/benchmark/blake3_rmr_upstream_v2/audit.json",
+      "receipt": "docs/receipts/EVIDENCE_GARDEN_BLAKE3_IMPORT_20260929.md",
+      "claim_scope": "archive-integrity/correctness/statistics audit only; no new BLAKE3 execution",
+      "claim_allowed": false
+    }
+  ],
+  "quality_dimensions": {
+    "accuracy": "Reference-bound only; TOKEN_VAZIO without a declared golden digest.",
+    "execution_reliability": "successful measured runs / attempted measured runs for one receipt",
+    "timing_margin": "p95-p05 and relative spread for one receipt",
+    "confidence": "distribution-free 95% median interval when n permits",
+    "reproducibility": "cross-receipt identity/correctness comparison; independent-provider status remains separate"
+  }
+}

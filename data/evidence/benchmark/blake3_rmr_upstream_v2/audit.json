@@ -1,0 +1,262 @@
+{
+  "schema": "rafpolimata.evidence-garden.audit.v1",
+  "source": {
+    "kind": "user_supplied_archive",
+    "name": "rmr-blake3-upstream-compare-v2.zip",
+    "sha256": "c10e509c41bb3659efd1071d7e3896660ba522294273d6c6d794d4d9d4ca4fd8",
+    "size_bytes": 9986
+  },
+  "profiles": [
+    "academic_falsifiable",
+    "enterprise",
+    "industrial",
+    "fullstack"
+  ],
+  "claim_allowed": false,
+  "policy": {
+    "path": "configs/evidence-garden-policy.v1.json",
+    "sha256": "c08d0c02421e014e097838e5714ff2d53f9fe43876f8798907ee800aac0e69a3"
+  },
+  "source_commits": {
+    "official": "6aab490a26124663329dfd3961b8469f8fdb158b",
+    "fork": "9571c928808b9aba96e7b9586c54c12ac66cdc3e"
+  },
+  "observed_environment": {
+    "observed_at_utc": "2026-09-28T06:46:37Z",
+    "compiler": "Ubuntu clang 18.1.3",
+    "cmake": "3.31.6",
+    "rounds": 9,
+    "size_stations": 7
+  },
+  "raw_row_count": 126,
+  "gates": {
+    "ARCHIVE_INTERNAL_INTEGRITY": "PASS",
+    "EXACT_SOURCE_COMMITS": "PASS",
+    "RAW_SAMPLE_SCHEMA": "PASS",
+    "PAIRED_DIGEST_EQUIVALENCE": "PASS",
+    "CORRECTNESS_LANE": "PASS",
+    "HASH_MANIFEST_COVERAGE": "PASS_LIMITED",
+    "P95_P99_FROM_RAW_SAMPLES": "PASS_LIMITED",
+    "ZERO_WARNING_ALL_PHASES": "FAIL",
+    "OBSERVABILITY_LANE": "TOKEN_VAZIO",
+    "PERFORMANCE_LANE": "OBSERVED_UNPROMOTED",
+    "UNIVERSAL_SUPERIORITY": "TOKEN_VAZIO",
+    "PHYSICAL_CAUSALITY": "TOKEN_VAZIO"
+  },
+  "stations": [
+    {
+      "size_bytes": 64,
+      "n_per_variant": 9,
+      "official_median_mib_s": 697.525,
+      "fork_median_mib_s": 698.06,
+      "median_delta_percent": 0.07669975986523969,
+      "performance_state": "OBSERVED_UNPROMOTED"
+    },
+    {
+      "size_bytes": 256,
+      "n_per_variant": 9,
+      "official_median_mib_s": 844.404,
+      "fork_median_mib_s": 846.752,
+      "median_delta_percent": 0.2780659494744153,
+      "performance_state": "OBSERVED_UNPROMOTED"
+    },
+    {
+      "size_bytes": 1024,
+      "n_per_variant": 9,
+      "official_median_mib_s": 841.845,
+      "fork_median_mib_s": 842.409,
+      "median_delta_percent": 0.06699570586032877,
+      "performance_state": "OBSERVED_UNPROMOTED"
+    },
+    {
+      "size_bytes": 4096,
+      "n_per_variant": 9,
+      "official_median_mib_s": 2601.645,
+      "fork_median_mib_s": 2605.545,
+      "median_delta_percent": 0.14990515616082334,
+      "performance_state": "OBSERVED_UNPROMOTED"
+    },
+    {
+      "size_bytes": 65536,
+      "n_per_variant": 9,
+      "official_median_mib_s": 4056.455,
+      "fork_median_mib_s": 4055.675,
+      "median_delta_percent": -0.019228612174915227,
+      "performance_state": "OBSERVED_UNPROMOTED"
+    },
+    {
+      "size_bytes": 1048576,
+      "n_per_variant": 9,
+      "official_median_mib_s": 3994.851,
+      "fork_median_mib_s": 4001.137,
+      "median_delta_percent": 0.15735255207265375,
+      "performance_state": "OBSERVED_UNPROMOTED"
+    },
+    {
+      "size_bytes": 16777216,
+      "n_per_variant": 9,
+      "official_median_mib_s": 3850.778,
+      "fork_median_mib_s": 3888.656,
+      "median_delta_percent": 0.9836453828291347,
+      "performance_state": "OBSERVED_UNPROMOTED"
+    }
+  ],
+  "warnings": [
+    {
+      "member": "rmr/benchmark_framework/output/comparisons-v2/20260928T064614Z/fork-configure.log",
+      "line": 1,
+      "text": "CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):"
+    }
+  ],
+  "gaps": [
+    {
+      "id": "EG-U0-ARTIFACT-HASH",
+      "urgency": "U0",
+      "state": "TOKEN_VAZIO",
+      "description": "Exact benchmark executable hashes are absent; source -> built artifact -> measured execution is not fully bound.",
+      "evidence_required": [
+        "artifact_sha256"
+      ],
+      "next": "hash and retain the exact official and fork benchmark executables used by each lane"
+    },
+    {
+      "id": "EG-U1-HASH-COVERAGE",
+      "urgency": "U1",
+      "state": "PASS_LIMITED",
+      "description": "Internal SHA256SUMS verifies its 9 listed evidence files but does not cover build/rmr-source-authority.json.",
+      "evidence_required": [
+        "digest_for_each_evidence_member"
+      ],
+      "next": "extend the internal digest manifest to every evidence member except the manifest itself"
+    },
+    {
+      "id": "EG-U1-BUILD-COMMAND",
+      "urgency": "U1",
+      "state": "TOKEN_VAZIO",
+      "description": "Full compiler/link argv and effective flags are not preserved in the supplied archive.",
+      "evidence_required": [
+        "argv",
+        "effective_flags",
+        "linker_identity"
+      ],
+      "next": "capture verbose compile and link commands with toolchain identity"
+    },
+    {
+      "id": "EG-U1-RUNNER-CONTROLS",
+      "urgency": "U1",
+      "state": "TOKEN_VAZIO",
+      "description": "Governor/frequency, affinity, thermal/load/steal and virtualization controls are not fully captured.",
+      "evidence_required": [
+        "cpu_model",
+        "governor",
+        "affinity",
+        "load",
+        "thermal",
+        "virtualization"
+      ],
+      "next": "capture the measurement envelope before and after each station"
+    },
+    {
+      "id": "EG-U1-OBSERVER-EFFECT",
+      "urgency": "U1",
+      "state": "TOKEN_VAZIO",
+      "description": "Timer and instrumentation overhead are not separately calibrated.",
+      "evidence_required": [
+        "timer_overhead",
+        "observer_overhead"
+      ],
+      "next": "keep correctness/observability/performance lanes separate and calibrate observer overhead"
+    },
+    {
+      "id": "EG-U1-MULTIPLE-COMPARISONS",
+      "urgency": "U1",
+      "state": "TOKEN_VAZIO",
+      "description": "Seven size stations are inspected without a declared family-wise/FDR policy or minimum relevant effect.",
+      "evidence_required": [
+        "multiple_comparison_policy",
+        "alpha",
+        "minimum_relevant_effect"
+      ],
+      "next": "predeclare multiplicity treatment and an engineering effect threshold"
+    },
+    {
+      "id": "EG-U1-TAIL-SAMPLE-COUNT",
+      "urgency": "U1",
+      "state": "PASS_LIMITED",
+      "description": "p95/p99 are derivable, but only 9 samples exist per variant per station.",
+      "evidence_required": [
+        "predeclared_min_samples_for_tail_metrics"
+      ],
+      "next": "increase per-station sample count or keep tail claims downgraded"
+    },
+    {
+      "id": "EG-U1-WARNINGS",
+      "urgency": "U1",
+      "state": "FAIL",
+      "description": "fork-configure.log contains one CMake Deprecation Warning.",
+      "evidence_required": [
+        "warning classification or corrected configure"
+      ],
+      "next": "correct or explicitly waive the configure warning with rationale"
+    },
+    {
+      "id": "EG-U2-MULTITHREAD",
+      "urgency": "U2",
+      "state": "TOKEN_VAZIO",
+      "description": "Multithread scaling is outside this C-core archive's demonstrated scope.",
+      "evidence_required": [
+        "thread_counts",
+        "raw_samples",
+        "affinity"
+      ],
+      "next": "add declared 1/2/4/N thread stations where the implementation supports them"
+    },
+    {
+      "id": "EG-U2-PHYSICAL",
+      "urgency": "U2",
+      "state": "TOKEN_VAZIO",
+      "description": "Bare-metal/device and physical-signal evidence are absent.",
+      "evidence_required": [
+        "device_receipt",
+        "artifact_sha256",
+        "counter_availability"
+      ],
+      "next": "execute the same frozen artifact on declared physical targets when that claim is required"
+    },
+    {
+      "id": "EG-U2-INDEPENDENT-REPRO",
+      "urgency": "U2",
+      "state": "TOKEN_VAZIO",
+      "description": "Independent third-party reproduction is explicitly absent.",
+      "evidence_required": [
+        "independent_operator",
+        "independent_environment",
+        "same_frozen_inputs"
+      ],
+      "next": "reproduce from frozen inputs in an independent environment"
+    }
+  ],
+  "F_ok": [
+    "ARCHIVE_INTERNAL_INTEGRITY",
+    "EXACT_SOURCE_COMMITS",
+    "RAW_SAMPLE_SCHEMA",
+    "PAIRED_DIGEST_EQUIVALENCE",
+    "CORRECTNESS_LANE"
+  ],
+  "F_gap": [
+    "EG-U0-ARTIFACT-HASH",
+    "EG-U1-HASH-COVERAGE",
+    "EG-U1-BUILD-COMMAND",
+    "EG-U1-RUNNER-CONTROLS",
+    "EG-U1-OBSERVER-EFFECT",
+    "EG-U1-MULTIPLE-COMPARISONS",
+    "EG-U1-TAIL-SAMPLE-COUNT",
+    "EG-U1-WARNINGS",
+    "EG-U2-MULTITHREAD",
+    "EG-U2-PHYSICAL",
+    "EG-U2-INDEPENDENT-REPRO"
+  ],
+  "F_next": "hash and retain the exact official and fork benchmark executables used by each lane",
+  "scope_note": "Derived audit only. Raw user-supplied archive is not published in this repository; its SHA-256 binds the audited source object. PDF/Markdown evidence remains a separate source cut until an identity bridge exists.",
+  "governance_closure": "CLOSURE_L2"
+}

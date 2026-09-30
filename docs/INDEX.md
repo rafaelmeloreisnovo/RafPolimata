@@ -1,7 +1,8 @@
 # Índice Canônico de Documentação — RafPolimata
 
 > **Observed base:** `main@9ed0b8aa93dfb5350b7dbeb9ea1e712ee1298388`  
-> **Estado:** `CANONICAL`  
+> **Estado:** `CANONICAL`
+> **Evidence-gap governance:** `CLOSURE_L2`  
 > **Regra:** `README → CURRENT_DOCUMENTATION_STATE → INDEX → área → source/evidence`
 
 
@@ -146,6 +147,8 @@ Governance: `CLOSURE_G1`
 - bibliography/science engine routes described by current README and subsystem docs;
 - `RAFAELIA_PAPER_MARKET_7_VECTORS.md`;
 - `PROTOCOLO_FALSIFICABILIDADE_PK.md`;
+- `EVIDENCE_GARDEN_V1.md` — profiles falsificável/enterprise/industrial/fullstack, DMAIC/PDCA, claim gate e TOKEN_VAZIO;
+- `receipts/EVIDENCE_GARDEN_BLAKE3_IMPORT_20260929.md` — receipt bounded do primeiro source-audit BLAKE3;
 - PBIP route in section 3.
 
 Engineering reproduction does not automatically establish scientific novelty or independent peer review.

@@ -1,0 +1,130 @@
+name: Evidence Garden Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      experiment:
+        description: Evidence Garden experiment config
+        required: false
+        default: Benchmark/evidence_garden/demo_experiment.json
+        type: string
+  workflow_call:
+    inputs:
+      experiment:
+        description: Evidence Garden experiment config
+        required: false
+        default: Benchmark/evidence_garden/demo_experiment.json
+        type: string
+  pull_request:
+    paths:
+      - "Benchmark/evidence_garden/**"
+      - "scripts/evidence_garden.py"
+      - "tests/test_evidence_garden.py"
+      - "tests/fixtures/evidence_garden_target.sh"
+      - ".github/workflows/evidence-garden.yml"
+      - "Benchmark/Readme.md"
+      - "configs/evidence-garden-policy.v1.json"
+      - "schemas/evidence-garden-audit.v1.schema.json"
+      - "data/evidence/benchmark/blake3_rmr_upstream_v2/**"
+      - "docs/EVIDENCE_GARDEN_V1.md"
+      - "docs/receipts/EVIDENCE_GARDEN_BLAKE3_IMPORT_20260929.md"
+      - "docs/INDEX.md"
+      - "Makefile"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evidence-garden-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run:
+    name: Evidence Garden / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+
+      - name: Framework unit tests
+        run: python3 -m unittest -v tests.test_evidence_garden
+
+      - name: Validate Evidence Garden governance JSON
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool configs/evidence-garden-policy.v1.json >/dev/null
+          python3 -m json.tool schemas/evidence-garden-audit.v1.schema.json >/dev/null
+          python3 -m json.tool Benchmark/evidence_garden/catalog.v1.json >/dev/null
+          python3 -m json.tool data/evidence/benchmark/blake3_rmr_upstream_v2/source-hashes.json >/dev/null
+          python3 -m json.tool data/evidence/benchmark/blake3_rmr_upstream_v2/audit.json >/dev/null
+          python3 - <<'PY'
+          import json
+          p="data/evidence/benchmark/blake3_rmr_upstream_v2/audit.json"
+          d=json.load(open(p,encoding="utf-8"))
+          assert d["claim_allowed"] is False
+          assert d["gates"]["CORRECTNESS_LANE"] == "PASS"
+          assert d["gates"]["PERFORMANCE_LANE"] == "OBSERVED_UNPROMOTED"
+          assert d["gates"]["UNIVERSAL_SUPERIORITY"] == "TOKEN_VAZIO"
+          assert d["F_next"]
+          print("EVIDENCE_GARDEN_IMPORTED_AUDIT_BOUNDARY_PASS")
+          PY
+
+      - name: Run bounded experiment
+        env:
+          REQUESTED_EXPERIMENT: ${{ inputs.experiment }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPERIMENT="${REQUESTED_EXPERIMENT:-Benchmark/evidence_garden/demo_experiment.json}"
+          OUT="build/evidence-garden/${RUNNER_OS}-${RUNNER_ARCH}/receipt.json"
+          python3 scripts/evidence_garden.py run --config "$EXPERIMENT" --out "$OUT"
+
+      - name: Upload environment-bound receipt
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: evidence-garden-${{ matrix.os }}-${{ github.run_id }}
+          path: build/evidence-garden/
+          if-no-files-found: error
+
+  reproduction:
+    name: Evidence Garden / cross-environment receipt comparison
+    needs: run
+    if: ${{ needs.run.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+
+      - name: Download receipts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: evidence-garden-*-${{ github.run_id }}
+          path: build/evidence-garden/downloaded
+
+      - name: Compare receipts without promoting performance causality
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' RECEIPTS < <(find build/evidence-garden/downloaded -type f -name receipt.json -print0 | sort -z)
+          test "${#RECEIPTS[@]}" -ge 2
+          python3 scripts/evidence_garden.py compare             --out build/evidence-garden/reproduction.json             "${RECEIPTS[@]}"
+
+      - name: Upload reproduction summary
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: evidence-garden-reproduction-${{ github.run_id }}
+          path: build/evidence-garden/reproduction.json
+          if-no-files-found: error
