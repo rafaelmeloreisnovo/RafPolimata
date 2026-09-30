@@ -66,6 +66,12 @@ jobs:
           python3 -m unittest -v tests.test_recurrence_matrix_reference
           python3 scripts/validate_formula_authority_index.py
 
+      - name: Validate Authorial Omega assurance exact pins and falsifiers
+        run: |
+          set -euo pipefail
+          python3 -m unittest -v tests.test_authorial_omega_assurance
+          python3 scripts/validate_authorial_omega_assurance.py
+
       - name: Validate TOKEN_VAZIO gates (Hotfix H1)
         env:
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
