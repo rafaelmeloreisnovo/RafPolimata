@@ -12,7 +12,12 @@
     "ROUTE_STATE_BLOCKED",
     "TOKEN_VAZIO"
   ],
-  "urgency_order": ["U0", "U1", "U2", "U3"],
+  "urgency_order": [
+    "U0",
+    "U1",
+    "U2",
+    "U3"
+  ],
   "lanes": {
     "correctness": "maximum checking; logging allowed; correctness claims only",
     "observability": "syscall/scheduler/PMU/runtime tracing; observer overhead must be measured",
@@ -111,5 +116,6 @@
       "use": "Define-Measure-Analyze-Improve-Control as improvement loop; no sigma-level claim without measured defect/opportunity model",
       "conformance_claim": false
     }
-  ]
+  ],
+  "governance_closure": "CLOSURE_L2"
 }
