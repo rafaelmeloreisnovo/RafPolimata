@@ -102,12 +102,12 @@ def percentile_nearest(xs,p):
     ys=sorted(xs); return ys[max(0,min(len(ys)-1,math.ceil(p*len(ys))-1))]
 
 
-def stats(values):
-    xs=list(values); n=len(xs)
-    if not xs: return {"state":TOKEN_VAZIO,"reason":"no successful samples"}
+def stats(values, attempted=None):
+    xs=list(values); n=len(xs); attempted=n if attempted is None else attempted
+    if not xs: return {"state":TOKEN_VAZIO,"reason":"no successful samples","attempted_samples":attempted,"successful_samples":0,"execution_success_fraction":0.0 if attempted else TOKEN_VAZIO}
     med=statistics.median(xs); mad=statistics.median([abs(x-med) for x in xs]); mean=statistics.fmean(xs)
-    return {"state":"PASS","n":n,"min":min(xs),"p05":percentile_nearest(xs,.05),"median":med,"mean":mean,"p95":percentile_nearest(xs,.95),"max":max(xs),"sample_stdev":statistics.stdev(xs) if n>1 else 0.0,"mad":mad,"cv":(statistics.stdev(xs)/mean if n>1 and mean else TOKEN_VAZIO),"median_ci_95":median_ci_nonparametric(xs,.95)}
-
+    p05=percentile_nearest(xs,.05); p95=percentile_nearest(xs,.95); spread=p95-p05
+    return {"state":"PASS","n":n,"attempted_samples":attempted,"successful_samples":n,"execution_success_fraction":(n/attempted if attempted else TOKEN_VAZIO),"min":min(xs),"p05":p05,"median":med,"mean":mean,"p95":p95,"max":max(xs),"spread_p95_p05":spread,"relative_spread_p95_p05":(spread/med if med else TOKEN_VAZIO),"sample_stdev":statistics.stdev(xs) if n>1 else 0.0,"mad":mad,"cv":(statistics.stdev(xs)/mean if n>1 and mean else TOKEN_VAZIO),"median_ci_95":median_ci_nonparametric(xs,.95)}
 
 def factors_delta(a,b):
     keys=sorted(set(a)|set(b)); return {k:{"baseline":a.get(k,TOKEN_VAZIO),"variant":b.get(k,TOKEN_VAZIO)} for k in keys if a.get(k,TOKEN_VAZIO)!=b.get(k,TOKEN_VAZIO)}
@@ -159,7 +159,7 @@ def performance_station(cfg):
             x=run_capture(v["command"]+lane.get("args",[]),timeout,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
             raw.append({"variant":v["id"],"round":rno,"order_index":pos,"wall_ns":x["wall_ns"],"exit_code":x.get("exit_code"),"state":x["state"],"timeout":bool(x.get("timeout",False))})
     by={v["id"]:[x for x in raw if x["variant"]==v["id"] and x["state"]=="PASS"] for v in variants}
-    st={k:stats([x["wall_ns"] for x in vals]) for k,vals in by.items()}
+    st={k:stats([x["wall_ns"] for x in vals], rounds) for k,vals in by.items()}
     base=cfg["baseline_variant"]; comparisons={}; vmap={v["id"]:v for v in variants}
     bround={x["round"]:x["wall_ns"] for x in by[base]}
     for vid,vals in by.items():
@@ -179,7 +179,7 @@ def run_experiment(cfg, config_sha, out_path):
     s3=performance_station(cfg)
     comps=s3.get("comparisons_to_baseline",{}) if isinstance(s3,dict) else {}
     s4={"state":"OBSERVED_UNPROMOTED" if comps else TOKEN_VAZIO,"comparisons":comps,"rule":"paired deltas and declared factor differences do not by themselves establish causality"}
-    s5={"state":"PASS" if s3.get("state")=="PASS" else s3.get("state",TOKEN_VAZIO),"per_variant":s3.get("statistics",{}),"method_note":"descriptive metrics + exact-binomial order-statistic interval for median where n permits"}
+    s5={"state":"PASS" if s3.get("state")=="PASS" else s3.get("state",TOKEN_VAZIO),"per_variant":s3.get("statistics",{}),"method_note":"descriptive metrics + exact-binomial order-statistic interval for median where n permits","semantics":{"accuracy":"requires a predeclared reference digest; otherwise TOKEN_VAZIO","execution_reliability":"successful measured runs / attempted measured runs for this receipt only","timing_margin":"p95-p05 plus relative spread; not a universal tolerance","confidence":"95% distribution-free median interval when sample count permits"}}
     s6={"state":"PENDING","reason":"single receipt; use compare with two or more receipts"}
     s7={"state":"AUDIT","claim_allowed":False,"bounded_claims":["declared commands/artifacts/config were identified for this run","correctness statements are limited to executed cases","performance statements are limited to this run/environment"],"not_claimed":["universal performance superiority","universal semantic equivalence","isolated physical causality","constant-time behavior","bare-metal physical proof","independent-provider reproduction"],"physical_signal_visibility":TOKEN_VAZIO}
     blocking=[s0.get("state"),s1.get("state"),s3.get("state")]
