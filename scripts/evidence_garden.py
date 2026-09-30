@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """RafPolimata Evidence Garden V1: bounded benchmark/evidence runner."""
+# Governance anchor: CLOSURE_L2.
 import argparse, hashlib, json, math, os, pathlib, platform, shutil, statistics, subprocess, time
 from datetime import datetime, timezone
 
