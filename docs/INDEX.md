@@ -111,6 +111,7 @@ Não promover `provider_independent_reproduction`, Android runtime ou device pro
 - `EXCELENCIA_OPERACIONAL_GPU_SIMD_GOVERNANCA.md`
 - `ROTINA_OPERACIONAL_BENCHMARKS.md`
 - `PROTOCOLO_FALSIFICABILIDADE_PK.md`
+- `contracts/AUTHORIAL_OMEGA_ASSURANCE_V1.md` — assurance/falsificadores da federação autoral Ω; Mapa/RafGitTools por exact pin; runtime/device permanece CLOSURE_L12
 - `PROTOCOLO_CANONICO_COHERENCIA.md`
 - `PROTOCOLO_DOIS_CICLOS_OMEGA.md`
 - `DEEPRafa2_PROTOCOLO_EVIDENCIA_MULTIDOMINIO.md`

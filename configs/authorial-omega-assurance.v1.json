@@ -1,0 +1,162 @@
+{
+  "schema": "rafpolimata.authorial-omega-assurance.v1",
+  "version": "1.0.0",
+  "state": "IMPLEMENTED_UNTESTED",
+  "claim_allowed": false,
+  "governance": {
+    "implementation_topology": "CLOSURE_L11",
+    "runtime_device": "CLOSURE_L12"
+  },
+  "role": "ASSURANCE_BENCHMARK_FALSIFIER",
+  "purpose": "Assure the authorial Omega federation without importing Vectra/PCR inherited implementation and without promoting source/CI evidence into physical-runtime or legal-authorship claims.",
+  "source_bindings": {
+    "federation": {
+      "repository": "rafaelmeloreisnovo/Mapa",
+      "pull_request": 717,
+      "commit": "3d54e8e36f1de787e1a815d899490a0fb7f0b326",
+      "path": "data/manifold/authorial_omega_hypervisor_federation_v1.json",
+      "blob_sha1": "5ec155d2e67fb7e6f46fb2589c6e32149d570091",
+      "structural_gate": "PASS_EXACT_HEAD_BOUNDED",
+      "promotion": "NOT_AUTHORIZED"
+    },
+    "executor": {
+      "repository": "rafaelmeloreisnovo/RafGitTools",
+      "pull_request": 591,
+      "commit": "c949595817ac70144001c2a597aaac84eab06c10",
+      "path": "configs/authorial-omega-hypervisor-executor.v1.json",
+      "blob_sha1": "dab95ef7489a72f24fccb22d822fcc5a59900b56",
+      "exact_head_pipeline": "PENDING_OR_TOKEN_VAZIO(CLOSURE_L11)",
+      "promotion": "NOT_AUTHORIZED"
+    },
+    "assurance_base": {
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "commit": "0c8a3dcbc2dfeda86b3e1d139dbe44a6e6f4bcb7"
+    }
+  },
+  "authorial_policy": {
+    "selection_mode": "AUTHORIAL_ONLY_FAIL_CLOSED",
+    "admit_states": [
+      "AUTHORIAL_PATH_PROVEN_IN_REPOSITORY_HISTORY"
+    ],
+    "reference_only_states": [
+      "PATH_LEVEL_REQUIRED",
+      "UPSTREAM_REFERENCE_ONLY",
+      "MIXED_DERIVATIVE_REFERENCE_ONLY",
+      "TOKEN_VAZIO_AUTHORSHIP"
+    ],
+    "whole_fork_authorship_allowed": false,
+    "ambiguous_origin_default": "UPSTREAM_REFERENCE_ONLY",
+    "legal_authorship_from_git_history": false,
+    "external_primitive_rebranding_allowed": false
+  },
+  "assured_payloads": [
+    {
+      "artifact_id": "RAF_BL0_V0",
+      "classification": "AUTHORIAL_PATH_PROVEN_IN_REPOSITORY_HISTORY",
+      "expected_blob_sha1": "132f948d199f6679fcae4f33912e0a3ad69691a3",
+      "assurance_scope": "identity_and_repository_history_boundary_only",
+      "runtime_state": "TOKEN_VAZIO(CLOSURE_L12)"
+    }
+  ],
+  "model_boundaries": {
+    "Vectra": {
+      "use": "STRUCTURAL_REFERENCE_ONLY",
+      "code_import_allowed": false,
+      "whole_repository_authorial": false
+    },
+    "PCR_Rafaelia_Code_seed": {
+      "use": "CUSTODY_CYCLE_REFERENCE_ONLY",
+      "code_import_allowed": false,
+      "whole_repository_authorial": false
+    },
+    "Termux_upstream_or_ambiguous_paths": {
+      "use": "UPSTREAM_REFERENCE_ONLY",
+      "code_import_allowed": false
+    }
+  },
+  "cycle_contract": [
+    "C01_INTENT",
+    "C02_AUTHORSHIP",
+    "C03_GAPS",
+    "C04_MOUNT",
+    "C05_EXECUTE",
+    "C06_VERIFY",
+    "C07_CUSTODY",
+    "C08_OMEGA"
+  ],
+  "falsifiers": [
+    {
+      "id": "OH-AF-01",
+      "claim": "whole fork is authorial",
+      "falsifier": "any upstream/mixed/ambiguous path exists",
+      "expected": "REJECT"
+    },
+    {
+      "id": "OH-AF-02",
+      "claim": "structural model reference equals code inheritance",
+      "falsifier": "Vectra/PCR imported implementation bytes appear in the new executor",
+      "expected": "REJECT"
+    },
+    {
+      "id": "OH-AF-03",
+      "claim": "source or object build proves physical runtime",
+      "falsifier": "no exact-artifact named-device receipt",
+      "expected": "REJECT"
+    },
+    {
+      "id": "OH-AF-04",
+      "claim": "C08 may reenter C01 with a missing mandatory gate",
+      "falsifier": "transition succeeds with missing dynamic C08 mask",
+      "expected": "REJECT"
+    },
+    {
+      "id": "OH-AF-05",
+      "claim": "private payload may be copied to public control plane",
+      "falsifier": "raw private body appears in public federation/receipt fixtures",
+      "expected": "REJECT"
+    },
+    {
+      "id": "OH-AF-06",
+      "claim": "relation label proves causality",
+      "falsifier": "DIRECT/TRANSVERSAL/ANALOGY metadata is promoted without source+gate evidence",
+      "expected": "REJECT"
+    }
+  ],
+  "assurance_gates": [
+    {"id":"A01_EXACT_PIN","state":"IMPLEMENTED_UNTESTED","closure":"CLOSURE_L11"},
+    {"id":"A02_AUTHORIAL_BOUNDARY","state":"IMPLEMENTED_UNTESTED","closure":"CLOSURE_L11"},
+    {"id":"A03_CYCLE_AND_C08","state":"IMPLEMENTED_UNTESTED","closure":"CLOSURE_L11"},
+    {"id":"A04_NO_INHERITED_CODE_PROMOTION","state":"IMPLEMENTED_UNTESTED","closure":"CLOSURE_L11"},
+    {"id":"A05_EXECUTOR_EXACT_HEAD","state":"TOKEN_VAZIO","closure":"CLOSURE_L11"},
+    {"id":"A06_PHYSICAL_RUNTIME","state":"TOKEN_VAZIO","closure":"CLOSURE_L12"},
+    {"id":"A07_INDEPENDENT_REPRODUCTION","state":"TOKEN_VAZIO","closure":"CLOSURE_L12"}
+  ],
+  "receipt_requirements": [
+    "repository_commit",
+    "input_identity",
+    "command",
+    "toolchain_identity",
+    "environment_architecture",
+    "exit_code",
+    "output_identity",
+    "evidence_scope",
+    "limitations",
+    "rollback",
+    "F_ok",
+    "F_gap",
+    "F_next"
+  ],
+  "F_ok": [
+    "exact upstream federation/executor pins defined",
+    "authorial-only fail-closed policy defined",
+    "six explicit falsifiers defined",
+    "runtime/device boundary bound to CLOSURE_L12"
+  ],
+  "F_gap": [
+    "A01..A04 need exact-head RafPolimata execution",
+    "RafGitTools c949 exact-head pipeline terminal state is not yet bound here",
+    "physical runtime remains TOKEN_VAZIO(CLOSURE_L12)",
+    "independent reproduction remains TOKEN_VAZIO(CLOSURE_L12)"
+  ],
+  "F_next": "Run this branch's deterministic assurance tests; then fresh-read RafGitTools PR591 exact-head pipeline and emit a successor receipt without changing physical/runtime claims."
+}
