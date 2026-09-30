@@ -47,5 +47,6 @@
     "body_copy_required": false,
     "local_gate_required_before_promotion": true
   },
-  "claim_allowed": false
+  "claim_allowed": false,
+  "closure_id": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY"
 }

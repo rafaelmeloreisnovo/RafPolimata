@@ -1,0 +1,35 @@
+{
+  "schema": "rafaelia.ecosystem-federation-hotfix-result/v3",
+  "date": "2026-09-30",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "supersedes": "federation/receipts/2026-09-30-ecosystem-hotfix.v2.json",
+  "closure_id": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+  "hotfix": {
+    "cause": "two federation-introduced TOKEN_VAZIO references lacked valid closure binding",
+    "commits": [
+      "1d747af17cafddbb88f9a2de6cc4f8a076d8d1ab",
+      "64ad3a6cbef8230a07ab5a524ab7756ef3e68a4d",
+      "2a3c6c217a9c0de7b7f3160ce8f3e0f052cc44dd"
+    ]
+  },
+  "evidence": {
+    "workflow": "CI",
+    "run_id": 36705649532,
+    "job_id": 109855143660,
+    "job": "Semantic coherence and falsifiability gates",
+    "conclusion": "success",
+    "token_vazio_gate": "PASS",
+    "all_exposed_steps": "PASS"
+  },
+  "corrected_interpretation": "SOURCE_CONTRACT_FAIL lines belong to the intentional one-bit mutation rejection vectors; source-contract binding and negative-mutation steps both passed.",
+  "remaining_gaps": [
+    "device/runtime evidence remains governed by separate gates; this receipt proves repository CI only"
+  ],
+  "rollback": "Revert closure-binding hotfix commits and this result receipt; do not rewrite predecessor receipts.",
+  "claim_allowed": false,
+  "R3": {
+    "F_ok": "RafPolimata federation closure hotfix verified by CI",
+    "F_gap": "cross-repository/device claims remain separate",
+    "F_next": "consume Vectras and provider/package successor gates"
+  }
+}
