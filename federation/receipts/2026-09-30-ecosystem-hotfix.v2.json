@@ -38,5 +38,6 @@
       "claim promotion remains disabled until rerun"
     ],
     "F_next": "rerun CI TOKEN_VAZIO gate"
-  }
+  },
+  "closure_id": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY"
 }
