@@ -1,0 +1,306 @@
+{
+  "schema": "rafpolimata.evidence-garden.falsifier-matrix.v2",
+  "state": "AUDIT",
+  "governance_closure": "CLOSURE_L2",
+  "claim_allowed": false,
+  "principle": {
+    "name": "ALPHA_OMEGA_OPEN_WORLD_GUARD",
+    "statement": "A finite suite may close the declared known falsifier domain, but it cannot prove that no unknown falsifier exists.",
+    "known_domain_pass": "Every declared void dimension has an executable or explicitly bounded disposition, every station has negative coverage, and every declared pairwise void permutation is assigned a fail-closed composition rule.",
+    "open_world_state": "TOKEN_VAZIO",
+    "promotion_rule": "UNKNOWN_UNKNOWN never becomes PASS; narrow the claim instead."
+  },
+  "void_dimensions": [
+    {
+      "id": "source_identity",
+      "blocking": true,
+      "station": "S0_identity"
+    },
+    {
+      "id": "config_contract",
+      "blocking": true,
+      "station": "S0_identity"
+    },
+    {
+      "id": "artifact_identity",
+      "blocking": true,
+      "station": "S0_identity"
+    },
+    {
+      "id": "command_identity",
+      "blocking": true,
+      "station": "S0_identity"
+    },
+    {
+      "id": "correctness_oracle",
+      "blocking": true,
+      "station": "S1_correctness"
+    },
+    {
+      "id": "observer_channel",
+      "blocking": false,
+      "station": "S2_observability"
+    },
+    {
+      "id": "performance_samples",
+      "blocking": true,
+      "station": "S3_performance"
+    },
+    {
+      "id": "intervention_attribution",
+      "blocking": false,
+      "station": "S4_intervention"
+    },
+    {
+      "id": "statistical_support",
+      "blocking": false,
+      "station": "S5_statistics"
+    },
+    {
+      "id": "reproduction_identity",
+      "blocking": true,
+      "station": "S6_reproduction"
+    },
+    {
+      "id": "physical_visibility",
+      "blocking": false,
+      "station": "S7_claim_gate"
+    },
+    {
+      "id": "claim_scope",
+      "blocking": true,
+      "station": "S7_claim_gate"
+    }
+  ],
+  "pairwise_rule": {
+    "generator": "all unordered pairs of void_dimensions",
+    "expected_count": 66,
+    "disposition": "COVERED_BY_FAIL_CLOSED_COMPOSITION",
+    "semantics": "If either member is claim-blocking the composed claim cannot PASS. If both are bounded non-blocking unknowns, the claim must retain explicit TOKEN_VAZIO/OBSERVED_UNPROMOTED fields."
+  },
+  "falsifiers": [
+    {
+      "id": "F00_wrong_schema",
+      "station": "S0_identity",
+      "dimensions": [
+        "config_contract"
+      ],
+      "kind": "executable_unit",
+      "expected": "REJECT"
+    },
+    {
+      "id": "F01_missing_experiment_id",
+      "station": "S0_identity",
+      "dimensions": [
+        "config_contract"
+      ],
+      "kind": "executable_unit",
+      "expected": "REJECT"
+    },
+    {
+      "id": "F02_duplicate_variant_id",
+      "station": "S0_identity",
+      "dimensions": [
+        "config_contract"
+      ],
+      "kind": "executable_unit",
+      "expected": "REJECT"
+    },
+    {
+      "id": "F03_unknown_baseline",
+      "station": "S0_identity",
+      "dimensions": [
+        "config_contract"
+      ],
+      "kind": "executable_unit",
+      "expected": "REJECT"
+    },
+    {
+      "id": "F04_invalid_command_argv",
+      "station": "S0_identity",
+      "dimensions": [
+        "command_identity"
+      ],
+      "kind": "executable_unit",
+      "expected": "REJECT"
+    },
+    {
+      "id": "F05_path_escape",
+      "station": "S0_identity",
+      "dimensions": [
+        "artifact_identity"
+      ],
+      "kind": "executable_unit",
+      "expected": "REJECT"
+    },
+    {
+      "id": "F06_missing_required_artifact",
+      "station": "S0_identity",
+      "dimensions": [
+        "artifact_identity"
+      ],
+      "kind": "executable_unit",
+      "expected": "FAIL"
+    },
+    {
+      "id": "F07_missing_command_executable",
+      "station": "S0_identity",
+      "dimensions": [
+        "command_identity"
+      ],
+      "kind": "executable_unit",
+      "expected": "FAIL"
+    },
+    {
+      "id": "F08_wrong_expected_exit",
+      "station": "S1_correctness",
+      "dimensions": [
+        "correctness_oracle"
+      ],
+      "kind": "executable_unit",
+      "expected": "FAIL"
+    },
+    {
+      "id": "F09_wrong_reference_digest",
+      "station": "S1_correctness",
+      "dimensions": [
+        "correctness_oracle"
+      ],
+      "kind": "executable_unit",
+      "expected": "FAIL"
+    },
+    {
+      "id": "F10_required_probe_unavailable",
+      "station": "S2_observability",
+      "dimensions": [
+        "observer_channel"
+      ],
+      "kind": "executable_unit",
+      "expected": "FAIL"
+    },
+    {
+      "id": "F11_optional_probe_unavailable",
+      "station": "S2_observability",
+      "dimensions": [
+        "observer_channel"
+      ],
+      "kind": "executable_unit",
+      "expected": "TOKEN_VAZIO_BOUNDED"
+    },
+    {
+      "id": "F12_zero_rounds",
+      "station": "S3_performance",
+      "dimensions": [
+        "performance_samples"
+      ],
+      "kind": "executable_unit",
+      "expected": "REJECT"
+    },
+    {
+      "id": "F13_negative_warmup",
+      "station": "S3_performance",
+      "dimensions": [
+        "performance_samples"
+      ],
+      "kind": "executable_unit",
+      "expected": "REJECT"
+    },
+    {
+      "id": "F14_unsupported_order",
+      "station": "S3_performance",
+      "dimensions": [
+        "performance_samples"
+      ],
+      "kind": "executable_unit",
+      "expected": "REJECT"
+    },
+    {
+      "id": "F15_execution_timeout",
+      "station": "S3_performance",
+      "dimensions": [
+        "performance_samples"
+      ],
+      "kind": "executable_unit",
+      "expected": "FAIL"
+    },
+    {
+      "id": "F16_multi_factor_causality",
+      "station": "S4_intervention",
+      "dimensions": [
+        "intervention_attribution"
+      ],
+      "kind": "contract_assertion",
+      "expected": "OBSERVED_UNPROMOTED"
+    },
+    {
+      "id": "F17_small_n_interval",
+      "station": "S5_statistics",
+      "dimensions": [
+        "statistical_support"
+      ],
+      "kind": "executable_unit",
+      "expected": "TOKEN_VAZIO_BOUNDED"
+    },
+    {
+      "id": "F18_receipt_schema_mismatch",
+      "station": "S6_reproduction",
+      "dimensions": [
+        "reproduction_identity"
+      ],
+      "kind": "executable_unit",
+      "expected": "FAIL"
+    },
+    {
+      "id": "F19_receipt_source_mismatch",
+      "station": "S6_reproduction",
+      "dimensions": [
+        "reproduction_identity",
+        "source_identity"
+      ],
+      "kind": "executable_unit",
+      "expected": "FAIL"
+    },
+    {
+      "id": "F20_receipt_correctness_mismatch",
+      "station": "S6_reproduction",
+      "dimensions": [
+        "reproduction_identity",
+        "correctness_oracle"
+      ],
+      "kind": "executable_unit",
+      "expected": "FAIL"
+    },
+    {
+      "id": "F21_claim_promotion_forbidden",
+      "station": "S7_claim_gate",
+      "dimensions": [
+        "claim_scope"
+      ],
+      "kind": "executable_unit",
+      "expected": "FAIL_CLOSED"
+    },
+    {
+      "id": "F22_physical_visibility_absent",
+      "station": "S7_claim_gate",
+      "dimensions": [
+        "physical_visibility"
+      ],
+      "kind": "contract_assertion",
+      "expected": "TOKEN_VAZIO_BOUNDED"
+    },
+    {
+      "id": "F23_unknown_unknown",
+      "station": "S7_claim_gate",
+      "dimensions": [
+        "claim_scope"
+      ],
+      "kind": "open_world_guard",
+      "expected": "TOKEN_VAZIO_PERMANENT"
+    }
+  ],
+  "stop_rule": {
+    "finite_stop": "KNOWN_FALSIFIER_CLOSURE may PASS only when the matrix audit and executable falsifier suite pass for the current commit.",
+    "universal_stop": "FORBIDDEN",
+    "reason": "No finite test suite proves that no future counterexample or new test class exists."
+  }
+}
