@@ -1,0 +1,193 @@
+{
+  "schema": "rafpolimata.psi-biomagnetism-boundary.v1",
+  "state": "AUDIT",
+  "governance_closure": "CLOSURE_L2",
+  "claim_allowed": false,
+  "alphaXiv_library": {
+    "folder_name": "Biomagnetism & Psi Boundary — Evidence Garden",
+    "folder_id": "01a0f33f-89df-77df-a65c-32386398bdb5",
+    "papers": [
+      {
+        "id": "2402.10113",
+        "title": "An optically pumped magnetic gradiometer for the detection of human biomagnetism",
+        "lane": "ESTABLISHED_PHYSICAL_SIGNAL"
+      },
+      {
+        "id": "2212.03101",
+        "title": "Small animal biomagnetism applications",
+        "lane": "ESTABLISHED_PHYSICAL_SIGNAL"
+      },
+      {
+        "id": "2204.09147",
+        "title": "Magnetic field effects in biology from the perspective of the radical pair mechanism",
+        "lane": "BIOPHYSICAL_MECHANISM_REVIEW"
+      },
+      {
+        "id": "2306.16292",
+        "title": "Geomagnetic field influences probabilistic abstract decision-making in humans",
+        "lane": "SINGLE_STUDY_NEEDS_INDEPENDENT_REPLICATION"
+      }
+    ]
+  },
+  "historical_sources": [
+    {
+      "id": "PMID:12081299",
+      "title": "Remote viewing with the artist Ingo Swann: neuropsychological profile, electroencephalographic correlates, magnetic resonance imaging (MRI), and possible mechanisms",
+      "year": 2002,
+      "authors": [
+        "M. A. Persinger",
+        "W. G. Roll",
+        "S. G. Tiller",
+        "S. A. Koren",
+        "C. M. Cook"
+      ],
+      "lane": "PARAPSYCHOLOGY_EXPERIMENT_REPORTED",
+      "limits": [
+        "single named subject",
+        "does not establish a generally accepted mechanism",
+        "correlation and experimental perturbation do not by themselves prove anomalous information transfer"
+      ]
+    },
+    {
+      "id": "PMID:12509207",
+      "title": "Possible disruption of remote viewing by complex weak magnetic fields around the stimulus site and the possibility of accessing real phase space: a pilot study",
+      "year": 2002,
+      "authors": [
+        "S. A. Koren",
+        "M. A. Persinger"
+      ],
+      "lane": "PILOT_PARAPSYCHOLOGY_EXPERIMENT",
+      "limits": [
+        "pilot study",
+        "single named subject",
+        "requires independent replication and stronger controls"
+      ]
+    },
+    {
+      "id": "CIA-RDP96-00791R000200180006-4",
+      "title": "An Evaluation of Remote Viewing: Research and Applications",
+      "year": 1995,
+      "authors": [
+        "Michael D. Mumford",
+        "Andrew M. Rose",
+        "David A. Goslin"
+      ],
+      "lane": "GOVERNMENT_PROGRAM_EVALUATION",
+      "findings_bound": [
+        "laboratory hit rates were reported above chance in reviewed work",
+        "the evaluation said attribution to paranormal ability was not unambiguous",
+        "the evaluation found no demonstrated operational value sufficient for intelligence use"
+      ]
+    }
+  ],
+  "candidate_identity_resolution": {
+    "user_description": "neuroscientist/neurosurgeon studying a man who sketched distant places and magnetic-field conditions",
+    "strongest_candidate_pair": {
+      "subject": "Ingo Swann",
+      "researcher": "Michael A. Persinger",
+      "match_basis": [
+        "published remote-viewing study",
+        "sketching/describing distant stimuli",
+        "circumcerebral magnetic-field manipulation",
+        "EEG and MRI measures"
+      ],
+      "mismatch": [
+        "Persinger is identified in the paper through a Behavioral Neuroscience/Psychology affiliation, not established here as a neurosurgeon"
+      ]
+    },
+    "separate_1972_magnetometer_story": {
+      "candidate_subject": "Ingo Swann",
+      "state": "HISTORICAL_CLAIM_CONTESTED",
+      "note": "A 1972 SRI magnetometer episode is reported in later accounts, but the claim that Swann 'burned' or destroyed a magnetic-isolation machine is not established by the sources bound here."
+    }
+  },
+  "claim_ladder": [
+    {
+      "id": "C0",
+      "claim": "Living tissue generates measurable magnetic fields.",
+      "state": "PASS_BOUNDED",
+      "evidence": [
+        "2402.10113",
+        "2212.03101"
+      ]
+    },
+    {
+      "id": "C1",
+      "claim": "Weak magnetic fields can interact with biological systems through physically studied mechanisms.",
+      "state": "PASS_BOUNDED_REVIEW",
+      "evidence": [
+        "2204.09147"
+      ]
+    },
+    {
+      "id": "C2",
+      "claim": "Human decision behavior can be modulated by geomagnetic conditions.",
+      "state": "OBSERVED_UNPROMOTED",
+      "evidence": [
+        "2306.16292"
+      ],
+      "gate": "independent replication"
+    },
+    {
+      "id": "C3",
+      "claim": "A person can identify another specific person at a distance from that person's endogenous biomagnetic field.",
+      "state": "TOKEN_VAZIO",
+      "evidence_required": [
+        "pre-registered discrimination experiment",
+        "field measurements at receiver location",
+        "sensory shielding controls",
+        "blinding",
+        "independent replication"
+      ]
+    },
+    {
+      "id": "C4",
+      "claim": "Remote viewing is mediated by magnetic fields.",
+      "state": "TOKEN_VAZIO",
+      "evidence": [
+        "PMID:12081299",
+        "PMID:12509207"
+      ],
+      "reason": "reported correlations/perturbations do not establish a validated causal channel"
+    },
+    {
+      "id": "C5",
+      "claim": "Remote viewing has robust operational predictive utility.",
+      "state": "FAIL_OR_NOT_ESTABLISHED_FOR_REVIEWED_PROGRAM",
+      "evidence": [
+        "CIA-RDP96-00791R000200180006-4"
+      ]
+    },
+    {
+      "id": "C6",
+      "claim": "Anecdotal football/world-cup predictions demonstrate a magnetic or parapsychological mechanism.",
+      "state": "TOKEN_VAZIO",
+      "evidence_required": [
+        "exact claimant",
+        "dated pre-event record",
+        "complete prediction set",
+        "base rate",
+        "scoring rule",
+        "multiple-comparison policy",
+        "independent verification"
+      ]
+    }
+  ],
+  "hypothesis_map": {
+    "observation_to_test": [
+      "ordinary visual recognition",
+      "learned association and routine",
+      "timing/context cues",
+      "auditory/vibrational cues",
+      "polarization/optical cues when relevant",
+      "measured magnetic-field cue",
+      "anomalous-information hypothesis"
+    ],
+    "rule": "Do not test the anomalous mechanism last after uncontrolled ordinary channels; randomize and isolate channels prospectively."
+  },
+  "open_world": {
+    "known_domain": "AUDITABLE",
+    "unknown_unknown": "TOKEN_VAZIO",
+    "universal_completeness": "FORBIDDEN"
+  }
+}
