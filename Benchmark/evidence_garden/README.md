@@ -72,6 +72,26 @@ and reports median delta, sign counts, relative median delta and the same non-pa
 
 The interval is an inference under its recorded assumptions; it is not converted into an absolute claim about all machines, builds or future executions.
 
+## Accuracy, reliability, confidence and margins
+
+These names are deliberately bounded to the executed experiment:
+
+```text
+R_exec = N_success / N_attempted
+M_spread = P95 - P05
+M_rel = (P95 - P05) / median
+CV = sample_stdev / mean
+Delta_r = T_variant,r - T_baseline,r
+```
+
+- **accuracy** is only promoted when the experiment declares a golden/reference stdout SHA-256; otherwise it remains `TOKEN_VAZIO` under `CLOSURE_L2`;
+- **execution reliability** means the successful-run fraction in that receipt, not long-term product reliability;
+- **timing margin** is the observed p95-p05 spread (and relative spread), not a guaranteed tolerance;
+- **confidence** is the recorded distribution-free median interval when the sample size permits it;
+- **reproducibility** is a separate cross-receipt station and does not imply independent-provider replication.
+
+The scalable machine index is `Benchmark/evidence_garden/catalog.v1.json`. It is designed so thousands of configs can be added without collapsing their receipts into one opaque benchmark.
+
 ## Observability probes
 
 V1 supports these optional external probes:
