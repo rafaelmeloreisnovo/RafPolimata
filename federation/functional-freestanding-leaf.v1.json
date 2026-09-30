@@ -1,0 +1,30 @@
+{
+  "schema": "rafcodephi.functional-federation-leaf/v1",
+  "mode": "freestanding-concrete-contract",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "authority": "semantic-governance-and-freestanding-language",
+  "conditions": {
+    "relationship_is_not_authority_merge": true,
+    "source_body_copy_required": false,
+    "missing_evidence_may_be_promoted": false,
+    "freestanding_must_be_evidenced": true,
+    "local_gate_required_before_promotion": true,
+    "claim_promotion_by_failover": false
+  },
+  "required_paths": [
+    "scripts/ci_freestanding_audit.sh",
+    "freestanding/tests/verify_contract.sh",
+    "scripts/federated_doctor_pass.py"
+  ],
+  "verification_commands": [
+    "bash scripts/ci_freestanding_audit.sh",
+    "bash freestanding/tests/verify_contract.sh"
+  ],
+  "freestanding_evidence": "ci/reports/freestanding-audit.md",
+  "integration": {
+    "body_copy_allowed": false,
+    "authority_transfer_allowed": false,
+    "contract_or_artifact_boundary_required": true
+  },
+  "claim_allowed": false
+}
