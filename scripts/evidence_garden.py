@@ -223,7 +223,9 @@ def performance_station(cfg):
         if vid==base: continue
         vround={x["round"]:x["wall_ns"] for x in vals}; rs=sorted(set(bround)&set(vround)); ds=[vround[r]-bround[r] for r in rs]
         medb=st[base].get("median"); medv=st[vid].get("median"); fd=factors_delta(vmap[base].get("factors",{}),vmap[vid].get("factors",{}))
-        comparisons[vid]={"state":"OBSERVED_UNPROMOTED","paired_rounds":len(ds),"median_delta_ns":statistics.median(ds) if ds else TOKEN_VAZIO,"relative_median_delta_pct":(((medv-medb)/medb)*100 if medb not in (0,TOKEN_VAZIO) and medv!=TOKEN_VAZIO else TOKEN_VAZIO),"delta_median_ci_95":median_ci_nonparametric(ds,.95),"sign_counts":{"variant_faster":sum(d<0 for d in ds),"equal":sum(d==0 for d in ds),"variant_slower":sum(d>0 for d in ds)},"declared_factor_differences":fd,"single_declared_factor":len(fd)==1,"causality":"NOT_PROMOTED"}
+        numeric_medians=isinstance(medb,(int,float)) and not isinstance(medb,bool) and isinstance(medv,(int,float)) and not isinstance(medv,bool)
+        comparison_state="OBSERVED_UNPROMOTED" if ds and st[base].get("state")=="PASS" and st[vid].get("state")=="PASS" else TOKEN_VAZIO
+        comparisons[vid]={"state":comparison_state,"paired_rounds":len(ds),"median_delta_ns":statistics.median(ds) if ds else TOKEN_VAZIO,"relative_median_delta_pct":(((medv-medb)/medb)*100 if numeric_medians and medb!=0 else TOKEN_VAZIO),"delta_median_ci_95":median_ci_nonparametric(ds,.95),"sign_counts":{"variant_faster":sum(d<0 for d in ds),"equal":sum(d==0 for d in ds),"variant_slower":sum(d>0 for d in ds)},"declared_factor_differences":fd,"single_declared_factor":len(fd)==1,"causality":"NOT_PROMOTED" if comparison_state=="OBSERVED_UNPROMOTED" else TOKEN_VAZIO}
     state="PASS" if all(len(v)==rounds for v in by.values()) else "FAIL"
     return {"state":state,"timer":"time.monotonic_ns","warmup":warmup,"rounds":rounds,"order":lane.get("order","rotating_interleaved"),"raw_samples":raw,"statistics":st,"baseline_variant":base,"comparisons_to_baseline":comparisons}
 
