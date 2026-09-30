@@ -1,0 +1,51 @@
+{
+  "schema": "rafaelia.ecosystem-member/v1",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "authority": "semantic-governance-and-freestanding-language",
+  "authority_sources": [
+    "docs/canonical/2026-09-23/COMPONENT_CATALOG.md",
+    "federation/functional-freestanding-leaf.v1.json"
+  ],
+  "planes": [
+    "knowledge",
+    "analysis",
+    "execution-support"
+  ],
+  "interface": {
+    "produces": [
+      "semantic-ir",
+      "conversation-index",
+      "compiler-output",
+      "validation-receipt"
+    ],
+    "consumes": [
+      "corpus",
+      "source-record",
+      "bounded-artifact"
+    ],
+    "boundary": "contract-or-artifact-reference"
+  },
+  "shared_components": [
+    {
+      "id": "raf_bl0.c",
+      "path": "native/raf_bl0/raf_bl0.c",
+      "blob_sha": "132f948d199f6679fcae4f33912e0a3ad69691a3"
+    }
+  ],
+  "invariants": {
+    "relationship_is_not_authority_merge": true,
+    "source_is_not_artifact": true,
+    "artifact_is_not_execution": true,
+    "execution_is_not_evidence": true,
+    "evidence_is_not_claim": true,
+    "token_vazio_is_not_zero": true,
+    "implemented_untested_is_not_pass": true,
+    "missing_evidence_may_be_promoted": false
+  },
+  "federation": {
+    "authority_transfer_allowed": false,
+    "body_copy_required": false,
+    "local_gate_required_before_promotion": true
+  },
+  "claim_allowed": false
+}
