@@ -9,6 +9,23 @@ TOKEN_VAZIO = "TOKEN_VAZIO"
 SCHEMA_CONFIG = "rafpolimata.evidence-garden.experiment.v1"
 SCHEMA_RECEIPT = "rafpolimata.evidence-garden.receipt.v1"
 SCHEMA_REPRO = "rafpolimata.evidence-garden.reproduction.v1"
+SUPPORTED_PROBES = {"strace_full", "strace_summary", "perf_stat"}
+SUPPORTED_PERFORMANCE_ORDERS = {"rotating_interleaved"}
+
+
+def _require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def _argv(value, field):
+    _require(isinstance(value, list) and all(isinstance(x, str) for x in value), f"{field} must be a string argv array")
+    return value
+
+
+def _positive_timeout(value, field):
+    _require(isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0, f"{field} must be > 0")
+    return value
 
 
 def sha256_bytes(data): return hashlib.sha256(data).hexdigest()
@@ -41,13 +58,53 @@ def safe_repo_path(rel):
 
 def load_config(path):
     raw=path.read_bytes(); cfg=json.loads(raw)
-    if cfg.get("schema") != SCHEMA_CONFIG: raise ValueError("unsupported experiment schema")
-    ids=[v.get("id") for v in cfg.get("variants",[])]
-    if len(ids)<1 or any(not x for x in ids) or len(set(ids))!=len(ids): raise ValueError("variant ids must be unique and non-empty")
-    if cfg.get("baseline_variant") not in ids: raise ValueError("baseline_variant must name a variant")
-    for v in cfg["variants"]:
-        if not isinstance(v.get("command"),list) or not v["command"] or not all(isinstance(x,str) for x in v["command"]):
-            raise ValueError("variant command must be a non-empty argv array")
+    _require(cfg.get("schema") == SCHEMA_CONFIG, "unsupported experiment schema")
+    _require(isinstance(cfg.get("experiment_id"), str) and bool(cfg["experiment_id"].strip()), "experiment_id must be non-empty")
+    variants=cfg.get("variants",[])
+    _require(isinstance(variants,list) and len(variants)>=1, "at least one variant is required")
+    ids=[v.get("id") if isinstance(v,dict) else None for v in variants]
+    _require(all(isinstance(x,str) and x for x in ids) and len(set(ids))==len(ids), "variant ids must be unique and non-empty")
+    _require(cfg.get("baseline_variant") in ids, "baseline_variant must name a variant")
+    for i,v in enumerate(variants):
+        _require(isinstance(v,dict), f"variants[{i}] must be an object")
+        _argv(v.get("command"), f"variants[{i}].command")
+        _require(bool(v["command"]), f"variants[{i}].command must not be empty")
+        _require(isinstance(v.get("factors",{}),dict), f"variants[{i}].factors must be an object")
+
+    artifacts=cfg.get("artifacts",[])
+    _require(isinstance(artifacts,list), "artifacts must be an array")
+    for i,a in enumerate(artifacts):
+        _require(isinstance(a,dict) and isinstance(a.get("path"),str) and bool(a["path"]), f"artifacts[{i}].path must be non-empty")
+        if "required" in a: _require(isinstance(a["required"],bool), f"artifacts[{i}].required must be boolean")
+        safe_repo_path(a["path"])
+
+    correctness=cfg.get("correctness",{})
+    _require(isinstance(correctness,dict), "correctness must be an object")
+    _argv(correctness.get("args",[]), "correctness.args")
+    if "timeout_seconds" in correctness: _positive_timeout(correctness["timeout_seconds"], "correctness.timeout_seconds")
+    if "expected_exit" in correctness: _require(isinstance(correctness["expected_exit"],int) and not isinstance(correctness["expected_exit"],bool), "correctness.expected_exit must be integer")
+    ref=correctness.get("reference_stdout_sha256")
+    if ref is not None:
+        _require(isinstance(ref,str) and len(ref)==64 and all(ch in "0123456789abcdef" for ch in ref), "correctness.reference_stdout_sha256 must be lowercase sha256 hex")
+
+    observability=cfg.get("observability",{})
+    _require(isinstance(observability,dict), "observability must be an object")
+    _argv(observability.get("args",[]), "observability.args")
+    if "timeout_seconds" in observability: _positive_timeout(observability["timeout_seconds"], "observability.timeout_seconds")
+    probes=observability.get("probes",[])
+    _require(isinstance(probes,list), "observability.probes must be an array")
+    for i,p in enumerate(probes):
+        _require(isinstance(p,dict) and p.get("kind") in SUPPORTED_PROBES, f"observability.probes[{i}].kind unsupported")
+        if "required" in p: _require(isinstance(p["required"],bool), f"observability.probes[{i}].required must be boolean")
+
+    performance=cfg.get("performance",{})
+    _require(isinstance(performance,dict), "performance must be an object")
+    _argv(performance.get("args",[]), "performance.args")
+    rounds=performance.get("rounds",31); warmup=performance.get("warmup",3); order=performance.get("order","rotating_interleaved")
+    _require(isinstance(rounds,int) and not isinstance(rounds,bool) and rounds>=1, "performance.rounds must be integer >= 1")
+    _require(isinstance(warmup,int) and not isinstance(warmup,bool) and warmup>=0, "performance.warmup must be integer >= 0")
+    _require(order in SUPPORTED_PERFORMANCE_ORDERS, "unsupported performance.order")
+    if "timeout_seconds" in performance: _positive_timeout(performance["timeout_seconds"], "performance.timeout_seconds")
     return cfg, sha256_bytes(raw)
 
 
@@ -173,7 +230,8 @@ def performance_station(cfg):
 
 def run_experiment(cfg, config_sha, out_path):
     artifacts=artifact_identity(cfg); missing=[a["path"] for a in artifacts if a["required"] and not a["exists"]]
-    s0={"state":"FAIL" if missing else "PASS","config_sha256":config_sha,"repository_head":git_text("rev-parse","HEAD"),"git_status_sha256":sha256_bytes(git_text("status","--porcelain=v1").encode()),"artifacts":artifacts,"commands":{v["id"]:command_identity(v["command"]) for v in cfg["variants"]},"missing_required_artifacts":missing}
+    commands={v["id"]:command_identity(v["command"]) for v in cfg["variants"]}; missing_commands=[vid for vid,ci in commands.items() if ci["executable"]==TOKEN_VAZIO or ci["executable_sha256"]==TOKEN_VAZIO]
+    s0={"state":"FAIL" if missing or missing_commands else "PASS","config_sha256":config_sha,"repository_head":git_text("rev-parse","HEAD"),"git_status_sha256":sha256_bytes(git_text("status","--porcelain=v1").encode()),"artifacts":artifacts,"commands":commands,"missing_required_artifacts":missing,"missing_commands":missing_commands}
     s1=correctness_station(cfg)
     s2=observability_station(cfg,out_path.parent/"observability")
     s3=performance_station(cfg)
@@ -182,7 +240,7 @@ def run_experiment(cfg, config_sha, out_path):
     s5={"state":"PASS" if s3.get("state")=="PASS" else s3.get("state",TOKEN_VAZIO),"per_variant":s3.get("statistics",{}),"method_note":"descriptive metrics + exact-binomial order-statistic interval for median where n permits","semantics":{"accuracy":"requires a predeclared reference digest; otherwise TOKEN_VAZIO","execution_reliability":"successful measured runs / attempted measured runs for this receipt only","timing_margin":"p95-p05 plus relative spread; not a universal tolerance","confidence":"95% distribution-free median interval when sample count permits"}}
     s6={"state":"PENDING","reason":"single receipt; use compare with two or more receipts"}
     s7={"state":"AUDIT","claim_allowed":False,"bounded_claims":["declared commands/artifacts/config were identified for this run","correctness statements are limited to executed cases","performance statements are limited to this run/environment"],"not_claimed":["universal performance superiority","universal semantic equivalence","isolated physical causality","constant-time behavior","bare-metal physical proof","independent-provider reproduction"],"physical_signal_visibility":TOKEN_VAZIO}
-    blocking=[s0.get("state"),s1.get("state"),s3.get("state")]
+    blocking=[s0.get("state"),s1.get("state"),("FAIL" if s2.get("state")=="FAIL" else "PASS"),s3.get("state")]
     receipt={"schema":SCHEMA_RECEIPT,"experiment_id":cfg["experiment_id"],"created_at":utc_now(),"run_state":"PASS" if all(x=="PASS" for x in blocking) else "FAIL","claim_allowed":False,"host":host_identity(),"stations":{"S0_identity":s0,"S1_correctness":s1,"S2_observability":s2,"S3_performance":s3,"S4_intervention":s4,"S5_statistics":s5,"S6_reproduction":s6,"S7_claim_gate":s7}}
     out_path.parent.mkdir(parents=True,exist_ok=True); out_path.write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     return receipt
@@ -193,11 +251,29 @@ def correctness_signature(r):
     return {k:(x.get("exit_code"),x.get("stdout_sha256"),x.get("stderr_sha256")) for k,x in sorted(v.items())}
 
 
+def receipt_contract_state(r):
+    if not isinstance(r,dict): return "FAIL"
+    if r.get("schema") != SCHEMA_RECEIPT or r.get("claim_allowed") is not False: return "FAIL"
+    if not isinstance(r.get("experiment_id"),str) or not r["experiment_id"]: return "FAIL"
+    stations=r.get("stations")
+    if not isinstance(stations,dict): return "FAIL"
+    required={"S0_identity","S1_correctness","S3_performance","S7_claim_gate"}
+    if not required.issubset(stations): return "FAIL"
+    if stations.get("S7_claim_gate",{}).get("claim_allowed") is not False: return "FAIL"
+    return "PASS"
+
+
 def compare_receipts(receipts):
     if len(receipts)<2: return {"schema":SCHEMA_REPRO,"state":TOKEN_VAZIO,"claim_allowed":False,"reason":"need at least two receipts"}
-    exps={r.get("experiment_id") for r in receipts}; configs={r.get("stations",{}).get("S0_identity",{}).get("config_sha256") for r in receipts}; srcs={r.get("stations",{}).get("S0_identity",{}).get("repository_head") for r in receipts}; sigs=[correctness_signature(r) for r in receipts]
-    identity_ok=len(exps)==1 and len(configs)==1 and len(srcs)==1; corr_ok=all(s==sigs[0] for s in sigs[1:]) and all(r.get("run_state")=="PASS" for r in receipts)
-    return {"schema":SCHEMA_REPRO,"state":"PASS" if identity_ok and corr_ok else "FAIL","claim_allowed":False,"receipt_count":len(receipts),"identity":{"experiment_same":len(exps)==1,"config_same":len(configs)==1,"source_same":len(srcs)==1},"correctness":{"state":"PASS" if corr_ok else "FAIL","basis":"receipt correctness signatures"},"performance":{"state":"OBSERVED_UNPROMOTED","reason":"cross-environment timing is retained as observation, not winner/causality proof"},"independent_provider_reproduction":TOKEN_VAZIO}
+    contract=[receipt_contract_state(r) for r in receipts]
+    exps={r.get("experiment_id") for r in receipts if isinstance(r,dict)}
+    configs={r.get("stations",{}).get("S0_identity",{}).get("config_sha256") for r in receipts if isinstance(r,dict)}
+    srcs={r.get("stations",{}).get("S0_identity",{}).get("repository_head") for r in receipts if isinstance(r,dict)}
+    sigs=[correctness_signature(r) for r in receipts if isinstance(r,dict)]
+    identity_ok=len(exps)==1 and len(configs)==1 and len(srcs)==1 and None not in configs and None not in srcs
+    corr_ok=len(sigs)==len(receipts) and all(s==sigs[0] for s in sigs[1:]) and all(r.get("run_state")=="PASS" for r in receipts if isinstance(r,dict))
+    contract_ok=all(x=="PASS" for x in contract)
+    return {"schema":SCHEMA_REPRO,"state":"PASS" if contract_ok and identity_ok and corr_ok else "FAIL","claim_allowed":False,"receipt_count":len(receipts),"contract":{"state":"PASS" if contract_ok else "FAIL","per_receipt":contract},"identity":{"experiment_same":len(exps)==1,"config_same":len(configs)==1,"source_same":len(srcs)==1},"correctness":{"state":"PASS" if corr_ok else "FAIL","basis":"receipt correctness signatures"},"performance":{"state":"OBSERVED_UNPROMOTED","reason":"cross-environment timing is retained as observation, not winner/causality proof"},"independent_provider_reproduction":TOKEN_VAZIO}
 
 
 def main():
