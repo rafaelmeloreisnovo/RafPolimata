@@ -214,3 +214,11 @@ VM observation          != bare-metal physical proof
 `F_ok`: machine-readable stations, generic runner, three lanes, paired statistics, optional syscall/PMU probes, cross-receipt comparison and dual-Ubuntu CI are implemented in V1.  
 `F_gap`: physical/device stations, calibrated energy, hardware-current visibility and independent-provider replication remain separate evidence gates.  
 `F_next`: add domain adapters (for example exact-SHA BLAKE3 upstream/RMR builds) as small experiment configs plus artifact-production steps, without weakening the common receipt contract.
+
+## Rigor profiles and imported evidence
+
+Policy: `configs/evidence-garden-policy.v1.json` defines four non-certifying profiles: `academic_falsifiable`, `enterprise`, `industrial`, and `fullstack`. The companion rationale is `docs/EVIDENCE_GARDEN_V1.md`.
+
+The first source-audit seed is BLAKE3 RMR↔upstream. Its raw uploaded sources are not copied into this public repository; immutable hashes are recorded in `data/evidence/benchmark/blake3_rmr_upstream_v2/source-hashes.json`, the machine audit is `data/evidence/benchmark/blake3_rmr_upstream_v2/audit.json`, and the human receipt is `docs/receipts/EVIDENCE_GARDEN_BLAKE3_IMPORT_20260929.md`.
+
+That import is evidence analysis, not a new benchmark execution. In particular, PDF/Markdown and V2 archive remain separate source cuts while `identity_bridge_pdf_md_to_zip=TOKEN_VAZIO`.
