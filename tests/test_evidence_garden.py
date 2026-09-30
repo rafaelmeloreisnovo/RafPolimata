@@ -1,3 +1,4 @@
+# Governance anchor: CLOSURE_L2.
 import importlib.util
 import json
 import pathlib
