@@ -1,0 +1,13 @@
+{
+  "schema": "rafpolimata.evidence-garden.experiment.v1",
+  "experiment_id": "evidence-garden-selftest-v1",
+  "baseline_variant": "reference",
+  "artifacts": [{"path":"tests/fixtures/evidence_garden_target.sh","required":true}],
+  "variants": [
+    {"id":"reference","command":["sh","tests/fixtures/evidence_garden_target.sh","reference"],"factors":{"fixture_variant":"reference"}},
+    {"id":"alternate","command":["sh","tests/fixtures/evidence_garden_target.sh","alternate"],"factors":{"fixture_variant":"alternate"}}
+  ],
+  "correctness": {"enabled":true,"args":["correctness"],"compare_stdout":true,"expected_exit":0,"timeout_seconds":10},
+  "observability": {"enabled":true,"args":["observe"],"timeout_seconds":10,"probes":[{"kind":"strace_summary","required":false}]},
+  "performance": {"enabled":true,"args":["performance"],"warmup":1,"rounds":7,"order":"rotating_interleaved","timeout_seconds":10}
+}
