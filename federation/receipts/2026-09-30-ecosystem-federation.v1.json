@@ -21,18 +21,16 @@
     }
   ],
   "observed_failure_scope": {
-    "source_contract_mismatches": [
-      "README.md",
-      "LICENSE.md",
-      "LICENSE_SCOPE_V1.json"
-    ],
     "token_vazio_validation": "FAIL",
-    "attribution_to_this_delta": "NOT_ESTABLISHED"
+    "attribution_to_this_delta": "CONFIRMED_NEW_FEDERATION_TOKEN_REFERENCES_WITHOUT_CLOSURE",
+    "actual_blocking_step": "Validate TOKEN_VAZIO gates (Hotfix H1)"
   },
   "claim_allowed": false,
   "R3": {
-    "F_ok": "two workflows green and federation materialized",
-    "F_gap": "semantic/source-contract CI red",
-    "F_next": "reconcile source-contract authority separately"
-  }
+    "F_ok": "Formal Science Orchestrator and Internal Custody Ledger pass; source-contract positive/negative gates pass",
+    "F_gap": "two new federation TOKEN_VAZIO references lacked closure binding",
+    "F_next": "bind new references to CLOSURE_L11 and rerun CI"
+  },
+  "closure_id": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+  "correction_note": "Hotfix: TOKEN_VAZIO references in this new federation receipt are governed by CLOSURE_L11; source-contract mutation FAIL lines observed in CI are expected negative-test evidence, not a source-contract failure."
 }
