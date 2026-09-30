@@ -1,0 +1,38 @@
+{
+  "schema": "rafaelia.ecosystem-federation-receipt/v1",
+  "date": "2026-09-30",
+  "state": "AUDIT",
+  "materialized": [
+    "federation/functional-freestanding-leaf.v1.json",
+    "federation/ecosystem-member.v1.json"
+  ],
+  "workflows": [
+    {
+      "name": "Formal Science Orchestrator",
+      "state": "PASS"
+    },
+    {
+      "name": "Internal Custody Ledger",
+      "state": "PASS"
+    },
+    {
+      "name": "CI",
+      "state": "FAIL"
+    }
+  ],
+  "observed_failure_scope": {
+    "source_contract_mismatches": [
+      "README.md",
+      "LICENSE.md",
+      "LICENSE_SCOPE_V1.json"
+    ],
+    "token_vazio_validation": "FAIL",
+    "attribution_to_this_delta": "NOT_ESTABLISHED"
+  },
+  "claim_allowed": false,
+  "R3": {
+    "F_ok": "two workflows green and federation materialized",
+    "F_gap": "semantic/source-contract CI red",
+    "F_next": "reconcile source-contract authority separately"
+  }
+}
