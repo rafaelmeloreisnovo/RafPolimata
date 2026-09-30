@@ -4,7 +4,8 @@
 **Logical owner:** RafPolimata Benchmark group  
 **State:** `IMPLEMENTED / CURRENT-COMMIT-CI-PENDING`  
 **Canonical entry:** `Benchmark/Readme.md -> Benchmark/evidence_garden/README.md`  
-**Machine contract:** `Benchmark/evidence_garden/stations.v1.json`
+**Machine contract:** `Benchmark/evidence_garden/stations.v1.json`  
+**Governance:** `CLOSURE_L2` for runtime evidence; `CLOSURE_L12` remains the physical/device boundary.
 
 Evidence Garden is the reusable experiment layer for cases where two or more implementations, build profiles, runtimes, machines, virtual environments or interventions must be compared without turning a measurement into a stronger claim than the run supports.
 
