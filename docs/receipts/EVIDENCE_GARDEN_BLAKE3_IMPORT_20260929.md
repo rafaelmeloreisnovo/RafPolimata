@@ -1,5 +1,7 @@
 # Evidence Garden - BLAKE3 source import/audit receipt - 2026-09-29
 
+**Governance:** `CLOSURE_L2` for runtime-evidence uncertainty.
+
 **State:** `PASS_LIMITED`  
 **claim_allowed:** `false`  
 **Execution:** local audit of user-supplied evidence files; no BLAKE3 rebuild or rerun was performed in this transaction.
