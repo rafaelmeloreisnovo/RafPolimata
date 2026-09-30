@@ -183,8 +183,7 @@ def run_experiment(cfg, config_sha, out_path):
     s7={"state":"AUDIT","claim_allowed":False,"bounded_claims":["declared commands/artifacts/config were identified for this run","correctness statements are limited to executed cases","performance statements are limited to this run/environment"],"not_claimed":["universal performance superiority","universal semantic equivalence","isolated physical causality","constant-time behavior","bare-metal physical proof","independent-provider reproduction"],"physical_signal_visibility":TOKEN_VAZIO}
     blocking=[s0.get("state"),s1.get("state"),s3.get("state")]
     receipt={"schema":SCHEMA_RECEIPT,"experiment_id":cfg["experiment_id"],"created_at":utc_now(),"run_state":"PASS" if all(x=="PASS" for x in blocking) else "FAIL","claim_allowed":False,"host":host_identity(),"stations":{"S0_identity":s0,"S1_correctness":s1,"S2_observability":s2,"S3_performance":s3,"S4_intervention":s4,"S5_statistics":s5,"S6_reproduction":s6,"S7_claim_gate":s7}}
-    out_path.parent.mkdir(parents=True,exist_ok=True); out_path.write_text(json.dumps(receipt,indent=2,sort_keys=True)+"
-",encoding="utf-8")
+    out_path.parent.mkdir(parents=True,exist_ok=True); out_path.write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     return receipt
 
 
@@ -207,7 +206,6 @@ def main():
     a=ap.parse_args()
     if a.cmd=="run":
         cfg,cs=load_config(safe_repo_path(a.config)); r=run_experiment(cfg,cs,safe_repo_path(a.out)); print(f"EVIDENCE_GARDEN_{r['run_state']} out={a.out} experiment={cfg['experiment_id']}"); raise SystemExit(0 if r["run_state"]=="PASS" else 1)
-    rec=[json.loads(safe_repo_path(p).read_text(encoding="utf-8")) for p in a.receipts]; s=compare_receipts(rec); out=safe_repo_path(a.out); out.parent.mkdir(parents=True,exist_ok=True); out.write_text(json.dumps(s,indent=2,sort_keys=True)+"
-",encoding="utf-8"); print(f"EVIDENCE_GARDEN_REPRO_{s['state']} out={a.out}"); raise SystemExit(0 if s["state"]=="PASS" else 1)
+    rec=[json.loads(safe_repo_path(p).read_text(encoding="utf-8")) for p in a.receipts]; s=compare_receipts(rec); out=safe_repo_path(a.out); out.parent.mkdir(parents=True,exist_ok=True); out.write_text(json.dumps(s,indent=2,sort_keys=True)+"\n",encoding="utf-8"); print(f"EVIDENCE_GARDEN_REPRO_{s['state']} out={a.out}"); raise SystemExit(0 if s["state"]=="PASS" else 1)
 
 if __name__=="__main__": main()
