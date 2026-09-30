@@ -1,7 +1,8 @@
 # Índice Canônico de Documentação — RafPolimata
 
 > **Observed base:** `main@9ed0b8aa93dfb5350b7dbeb9ea1e712ee1298388`  
-> **Estado:** `CANONICAL`  
+> **Estado:** `CANONICAL`
+> **Evidence-gap governance:** `CLOSURE_L2`  
 > **Regra:** `README → CURRENT_DOCUMENTATION_STATE → INDEX → área → source/evidence`
 
 
