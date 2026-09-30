@@ -257,5 +257,6 @@
     "EG-U2-INDEPENDENT-REPRO"
   ],
   "F_next": "hash and retain the exact official and fork benchmark executables used by each lane",
-  "scope_note": "Derived audit only. Raw user-supplied archive is not published in this repository; its SHA-256 binds the audited source object. PDF/Markdown evidence remains a separate source cut until an identity bridge exists."
+  "scope_note": "Derived audit only. Raw user-supplied archive is not published in this repository; its SHA-256 binds the audited source object. PDF/Markdown evidence remains a separate source cut until an identity bridge exists.",
+  "governance_closure": "CLOSURE_L2"
 }
