@@ -1,0 +1,115 @@
+{
+  "schema": "rafpolimata.evidence-garden-policy.v1",
+  "status_vocabulary": [
+    "PASS",
+    "FAIL",
+    "PASS_LIMITED",
+    "NOT_RUN",
+    "PENDING",
+    "AUDIT",
+    "IMPLEMENTED_UNTESTED",
+    "OBSERVED_UNPROMOTED",
+    "ROUTE_STATE_BLOCKED",
+    "TOKEN_VAZIO"
+  ],
+  "urgency_order": ["U0", "U1", "U2", "U3"],
+  "lanes": {
+    "correctness": "maximum checking; logging allowed; correctness claims only",
+    "observability": "syscall/scheduler/PMU/runtime tracing; observer overhead must be measured",
+    "performance": "minimal instrumentation; raw samples retained; no tracing mixed into headline timing"
+  },
+  "profiles": {
+    "academic_falsifiable": {
+      "requires": [
+        "predeclared_hypothesis_and_null",
+        "falsifier",
+        "raw_samples",
+        "effect_size",
+        "confidence_interval",
+        "multiple_comparison_policy_when_applicable",
+        "limitations",
+        "independent_reproduction_for_strong_claim"
+      ]
+    },
+    "enterprise": {
+      "requires": [
+        "source_commit",
+        "artifact_digest",
+        "input_digest",
+        "toolchain_identity",
+        "audit_log",
+        "rollback",
+        "risk_owner",
+        "nonconformity_and_corrective_action"
+      ]
+    },
+    "industrial": {
+      "requires": [
+        "measurement_envelope",
+        "calibrated_timer_or_declared_unit",
+        "repeatability",
+        "reproducibility",
+        "thermal_frequency_affinity_state",
+        "tail_metrics",
+        "measurement_system_limitations"
+      ]
+    },
+    "fullstack": {
+      "requires": [
+        "source",
+        "build",
+        "artifact",
+        "process_thread",
+        "kernel_os",
+        "microarchitecture_when_exposed",
+        "virtualization_when_present",
+        "physical_device_when_claimed",
+        "receipt"
+      ]
+    }
+  },
+  "claim_gate": {
+    "rule": "SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM",
+    "missing_evidence": "TOKEN_VAZIO",
+    "universal_superiority_default": false,
+    "physical_causality_default": false
+  },
+  "stop_rule": "continue from highest urgency unresolved gate to the smallest reproducible next action; stop only when all claim-blocking fields are determined as PASS, FAIL, or an explicitly bounded TOKEN_VAZIO outside the authorized measurement scope",
+  "standards_alignment": [
+    {
+      "reference": "ISO 9001 quality management system family",
+      "use": "process approach, PDCA, risk-based thinking, corrective action and continual improvement",
+      "conformance_claim": false
+    },
+    {
+      "reference": "ISO/IEC 27001:2022",
+      "use": "information-security management, risk treatment, controlled evidence and continual improvement",
+      "conformance_claim": false
+    },
+    {
+      "reference": "ISO 8000-61:2016 and ISO 8000-100:2016",
+      "use": "data-quality process, master-data quality metrics, provenance and data-quality strategy",
+      "conformance_claim": false
+    },
+    {
+      "reference": "NIST SP 800-218 SSDF v1.1 and NIST SP 800-53 Rev.5",
+      "use": "secure-development practice, configuration, audit/accountability, assessment, integrity and supply-chain controls",
+      "conformance_claim": false
+    },
+    {
+      "reference": "RFC 2119 + RFC 8174, RFC 3339, RFC 8785",
+      "use": "normative vocabulary, unambiguous timestamps and canonical JSON for repeatable hashing/signing",
+      "conformance_claim": false
+    },
+    {
+      "reference": "IEEE 1012-2024 and ISO/IEC/IEEE 29119 series",
+      "use": "verification/validation and software-test process/documentation/design techniques",
+      "conformance_claim": false
+    },
+    {
+      "reference": "Six Sigma DMAIC",
+      "use": "Define-Measure-Analyze-Improve-Control as improvement loop; no sigma-level claim without measured defect/opportunity model",
+      "conformance_claim": false
+    }
+  ]
+}
