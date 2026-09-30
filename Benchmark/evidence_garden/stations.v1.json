@@ -1,0 +1,28 @@
+{
+  "schema": "rafpolimata.evidence-garden.stations.v1",
+  "state": "REFERENCE",
+  "claim_allowed": false,
+  "invariants": [
+    "SOURCE!=ARTIFACT!=EXECUTION!=EVIDENCE!=CLAIM",
+    "TOKEN_VAZIO!=0",
+    "IMPLEMENTED_UNTESTED!=PASS",
+    "MEASUREMENT!=CAUSALITY",
+    "SINGLE_RUN!=REPRODUCTION"
+  ],
+  "stations": [
+    {"id":"S0_identity","role":"Bind config, repository HEAD, declared artifacts and command identities by digest.","promotion_limit":"Identity/integrity does not prove semantic correctness."},
+    {"id":"S1_correctness","role":"Execute declared correctness cases and compare exit/output digests.","promotion_limit":"Equality is limited to executed cases; external accuracy needs a declared reference."},
+    {"id":"S2_observability","role":"Collect optional syscall/performance-counter-facing evidence without merging it into timing truth.","promotion_limit":"Unexposed or rejected probes stay TOKEN_VAZIO; VM visibility is not physical-wire visibility."},
+    {"id":"S3_performance","role":"Collect rotating-interleaved raw wall-clock samples with reduced output observer load.","promotion_limit":"Performance observations are run/environment bounded."},
+    {"id":"S4_intervention","role":"Compute paired deltas against a baseline and enumerate declared factor differences.","promotion_limit":"Results remain OBSERVED_UNPROMOTED; metadata alone does not isolate causality."},
+    {"id":"S5_statistics","role":"Compute descriptive robustness metrics and a non-parametric median interval when sample count permits.","promotion_limit":"Inference assumptions are explicit and do not establish universal truth."},
+    {"id":"S6_reproduction","role":"Compare multiple receipts for config/source/output identity and cross-environment execution reproduction.","promotion_limit":"Independent-provider reproduction requires an actually independent provider receipt."},
+    {"id":"S7_claim_gate","role":"Expose only bounded statements supported by prior stations and preserve open gaps.","promotion_limit":"V1 claim_allowed remains false; domain-specific promotion is external."}
+  ],
+  "statistics": {
+    "descriptive": ["min","p05","median","mean","p95","max","sample_stdev","MAD","CV"],
+    "paired": ["median_delta","relative_median_delta_pct","sign_counts"],
+    "interval": "95% exact order-statistic/binomial interval for the median when n is sufficient"
+  },
+  "observability_probes": ["strace_full","strace_summary","perf_stat"]
+}
