@@ -9,7 +9,7 @@ RAF_ARCH ?= arm64
 SRC ?= tests/fixtures/strict_kernel.c
 OUT ?= build/strict/libmain.so
 
-.PHONY: help syntax apkc-hardened-source verbovivo verbovivo-demo encoders proof audit execution-boundary-audit evidence-garden maturity-sdk maturity-equivalence maturity-repro maturity-gates maturity-benchmark maturity-all language-contract compile compile-plan compiler-contract compiler-selftest hotfix-audit library-audit strict-elf report clean
+.PHONY: help syntax apkc-hardened-source verbovivo verbovivo-demo encoders proof audit execution-boundary-audit evidence-garden evidence-garden-falsifiers maturity-sdk maturity-equivalence maturity-repro maturity-gates maturity-benchmark maturity-all language-contract compile compile-plan compiler-contract compiler-selftest hotfix-audit library-audit strict-elf report clean
 
 help:
 	@echo 'RafPolimata — make targets:'
@@ -23,6 +23,7 @@ help:
 	@echo '  audit             freestanding invariant audit (scripts/ci_freestanding_audit.sh)'
 	@echo '  execution-boundary-audit  L0/syscall/userspace separation + six-ISA compile gates'
 	@echo '  evidence-garden   bounded correctness/observability/performance evidence runner'
+	@echo '  evidence-garden-falsifiers  negative tests + known-domain/pairwise void closure audit'
 	@echo '  maturity-sdk      build public SDK v1 + exact ABI symbol gate'
 	@echo '  maturity-equivalence  run 2,000,000 deterministic equivalence/property cases'
 	@echo '  maturity-repro    double-build SDK and require bit-identical object/library'
@@ -83,8 +84,13 @@ execution-boundary-audit:
 	sh syscall/tests/verify_matrix.sh
 
 evidence-garden:
-	python3 -m unittest -v tests.test_evidence_garden
+	python3 -m unittest -v tests.test_evidence_garden tests.test_evidence_garden_falsifiers
+	python3 scripts/evidence_garden_falsifier_audit.py --out build/evidence-garden/falsifier-audit.json
 	python3 scripts/evidence_garden.py run --config Benchmark/evidence_garden/demo_experiment.json --out build/evidence-garden/local/receipt.json
+
+evidence-garden-falsifiers:
+	python3 -m unittest -v tests.test_evidence_garden_falsifiers
+	python3 scripts/evidence_garden_falsifier_audit.py --out build/evidence-garden/falsifier-audit.json
 
 maturity-sdk:
 	bash sdk/rafpolimata_v1/build.sh build/sdk/rafpolimata_v1
