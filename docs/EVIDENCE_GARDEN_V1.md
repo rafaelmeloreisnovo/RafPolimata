@@ -1,5 +1,7 @@
 # Evidence Garden V1 - rigor falsificavel, enterprise, industrial e full-stack
 
+**Governance:** `CLOSURE_L2` for runtime-evidence uncertainty.
+
 **Lifecycle:** `ACTIVE / PASS_LIMITED_BY_EXECUTION`.  
 **Area:** benchmark + evidence + data quality + security + research methodology.  
 **Owner roles:** evidence-custodian, quality-assurance, ci-governance.  
