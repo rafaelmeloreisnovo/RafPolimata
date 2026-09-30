@@ -2,6 +2,8 @@
 
 Applies to `Benchmark/evidence_garden/**`.
 
+Governance anchor: `CLOSURE_L2` (runtime-evidence uncertainty remains a gap, never a promoted claim).
+
 Read the repository root `AGENTS.md` and `docs/AGENTES.md` first. This file adds benchmark-specific constraints.
 
 ## Invariants
