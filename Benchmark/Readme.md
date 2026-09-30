@@ -68,3 +68,28 @@ For the strict OS-neutral L0, use the independent `freestanding/tests/*` gates.
 The Benchmark CI cross-compiles the full ARM32 translation unit and rejects unresolved external symbols. This closes a gap that syscall-header-only compilation could not detect.
 
 The T^7 output field `state_index_42` is a bounded implementation index, not evidence of 42 dynamical attractors. The reported `coherence_sq_q16` is squared normalized coherence (R²), explicitly distinguished from R.
+
+
+## Evidence Garden V1 — reusable benchmark evidence station
+
+For comparisons across implementations, build profiles, virtual environments or machines where the goal is to preserve raw observations without inflating them into absolute proof, use:
+
+`Benchmark/evidence_garden/README.md`
+
+The Evidence Garden keeps three independent lanes:
+
+```text
+correctness
+observability
+performance
+```
+
+and binds them through config/source/artifact/command identity. It records raw interleaved samples, robust statistics, paired deltas, optional syscall/PMU-facing probes and cross-receipt reproduction state. Optional unavailable probes remain `TOKEN_VAZIO`; performance differences remain `OBSERVED_UNPROMOTED` until a stronger domain-specific causal gate exists.
+
+Canonical self-test:
+
+```sh
+make evidence-garden
+```
+
+CI route: `.github/workflows/evidence-garden.yml`.
