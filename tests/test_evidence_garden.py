@@ -24,6 +24,7 @@ class EvidenceGardenTests(unittest.TestCase):
             self.assertFalse(receipt["claim_allowed"])
             self.assertEqual(receipt["stations"]["S1_correctness"]["cross_variant_stdout_equivalence"]["state"], "PASS")
             self.assertEqual(receipt["stations"]["S3_performance"]["state"], "PASS")
+            self.assertEqual(receipt["stations"]["S3_performance"]["statistics"]["reference"]["execution_success_fraction"], 1.0)
             self.assertIn("alternate", receipt["stations"]["S3_performance"]["comparisons_to_baseline"])
             self.assertEqual(receipt["stations"]["S6_reproduction"]["state"], "PENDING")
             self.assertTrue(out.is_file())
