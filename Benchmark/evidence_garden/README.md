@@ -222,3 +222,28 @@ Policy: `configs/evidence-garden-policy.v1.json` defines four non-certifying pro
 The first source-audit seed is BLAKE3 RMR↔upstream. Its raw uploaded sources are not copied into this public repository; immutable hashes are recorded in `data/evidence/benchmark/blake3_rmr_upstream_v2/source-hashes.json`, the machine audit is `data/evidence/benchmark/blake3_rmr_upstream_v2/audit.json`, and the human receipt is `docs/receipts/EVIDENCE_GARDEN_BLAKE3_IMPORT_20260929.md`.
 
 That import is evidence analysis, not a new benchmark execution. In particular, PDF/Markdown and V2 archive remain separate source cuts while `identity_bridge_pdf_md_to_zip=TOKEN_VAZIO`.
+
+
+## V2 falsifier closure — informational void as a first-class test surface
+
+The V2 audit route is `docs/EVIDENCE_GARDEN_FALSIFIER_CLOSURE_V2.md`.
+
+Machine contract:
+
+`Benchmark/evidence_garden/falsifier_matrix.v2.json`
+
+Executable gates:
+
+```sh
+make evidence-garden-falsifiers
+python3 scripts/evidence_garden_falsifier_audit.py \
+  --out build/evidence-garden/falsifier-audit.json
+```
+
+V2 declares 12 void dimensions and audits all 66 unordered pairwise permutations. A PASS means **known-domain closure for the declared matrix on the current commit**. It does not mean that no future falsifier can exist:
+
+```text
+KNOWN_FALSIFIER_CLOSURE = PASS
+UNKNOWN_UNKNOWN = TOKEN_VAZIO
+UNIVERSAL_COMPLETENESS = FORBIDDEN
+```

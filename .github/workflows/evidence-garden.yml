@@ -20,6 +20,11 @@ on:
       - "Benchmark/evidence_garden/**"
       - "scripts/evidence_garden.py"
       - "tests/test_evidence_garden.py"
+      - "tests/test_evidence_garden_falsifiers.py"
+      - "tests/test_psi_biomagnetism_boundary.py"
+      - "research/evidence_garden/psi_biomagnetism_boundary.v1.json"
+      - "docs/PSI_BIOMAGNETISM_EVIDENCE_BOUNDARY_V1.md"
+      - "scripts/evidence_garden_falsifier_audit.py"
       - "tests/fixtures/evidence_garden_target.sh"
       - ".github/workflows/evidence-garden.yml"
       - "Benchmark/Readme.md"
@@ -53,8 +58,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Framework unit tests
-        run: python3 -m unittest -v tests.test_evidence_garden
+      - name: Framework and falsifier unit tests
+        run: |
+          python3 -m unittest -v tests.test_evidence_garden tests.test_evidence_garden_falsifiers tests.test_psi_biomagnetism_boundary
+
+      - name: Audit declared falsifier closure and pairwise void permutations
+        run: |
+          python3 scripts/evidence_garden_falsifier_audit.py \
+            --matrix Benchmark/evidence_garden/falsifier_matrix.v2.json \
+            --out build/evidence-garden/falsifier-audit.json
 
       - name: Validate Evidence Garden governance JSON
         shell: bash
@@ -63,6 +75,8 @@ jobs:
           python3 -m json.tool configs/evidence-garden-policy.v1.json >/dev/null
           python3 -m json.tool schemas/evidence-garden-audit.v1.schema.json >/dev/null
           python3 -m json.tool Benchmark/evidence_garden/catalog.v1.json >/dev/null
+          python3 -m json.tool Benchmark/evidence_garden/falsifier_matrix.v2.json >/dev/null
+          python3 -m json.tool research/evidence_garden/psi_biomagnetism_boundary.v1.json >/dev/null
           python3 -m json.tool data/evidence/benchmark/blake3_rmr_upstream_v2/source-hashes.json >/dev/null
           python3 -m json.tool data/evidence/benchmark/blake3_rmr_upstream_v2/audit.json >/dev/null
           python3 - <<'PY'
