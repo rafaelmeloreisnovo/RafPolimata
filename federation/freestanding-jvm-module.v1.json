@@ -1,0 +1,44 @@
+{
+  "schema": "rafaelia.freestanding-jvm-module/v1",
+  "id": "rafpolimata-l0",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "authority": "RafPolimata owns L0/compiler/freestanding implementation and its gates",
+  "authority_path": "freestanding/",
+  "module_kind": "POLIMATA_L0",
+  "boundary": "FREESTANDING_CORE",
+  "jvm_is_freestanding": false,
+  "hosted_adapter_policy": "JVM/JNI/host wrappers remain outside freestanding L0",
+  "required_flags": [
+    "SOURCE_BOUND",
+    "AUTHORITY_BOUND",
+    "FAIL_CLOSED",
+    "SHADOW_GUARD"
+  ],
+  "friction_controls": {
+    "tail_recursion": false,
+    "reflection_dispatch": false,
+    "shadow_state": "CALLER_OWNED_L0_STATE",
+    "warning_transport": "BITMASK_OR_TYPED_STATUS"
+  },
+  "state": "IMPLEMENTED_UNTESTED",
+  "urgency": "P1",
+  "claim_allowed": false,
+  "central_contract": "rafaelmeloreisnovo/RafGitTools:docs/architecture/FREESTANDING_JVM_ORCHESTRATION_V1.md",
+  "token_vazio": [
+    {
+      "id": "TOKEN_VAZIO_RAFPOLIMATA_JVM_ADAPTER_CURRENT_HEAD",
+      "missing": "current-head producer/consumer adapter execution evidence",
+      "evidence_needed": "same-revision adapter/core gate receipt",
+      "urgency": "P1",
+      "next": "bind one bounded adapter to an existing L0 ABI and execute its owner gate"
+    },
+    {
+      "id": "TOKEN_VAZIO_RAFPOLIMATA_PHYSICAL_RUNTIME",
+      "missing": "physical runtime evidence for claims that require a device",
+      "evidence_needed": "artifact+device+runtime receipt bound to the exact commit",
+      "urgency": "P2",
+      "next": "preserve open until a device-scoped claim is requested and executed"
+    }
+  ],
+  "rollback": "close draft PR or revert only this federation leaf; do not weaken freestanding gates"
+}
