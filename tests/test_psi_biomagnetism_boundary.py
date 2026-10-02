@@ -36,9 +36,25 @@ class PsiBiomagnetismBoundaryTests(unittest.TestCase):
             "HISTORICAL_CLAIM_CONTESTED",
         )
 
-    def test_alphaxiv_custody_has_four_papers(self):
+    def test_alphaxiv_custody_has_seven_papers(self):
         papers=self.d["alphaXiv_library"]["papers"]
-        self.assertEqual({p["id"] for p in papers},{"2306.16292","2204.09147","2402.10113","2212.03101"})
+        self.assertEqual(self.d["alphaXiv_library"]["paper_count_bound"],7)
+        self.assertEqual(
+            {p["id"] for p in papers},
+            {"2306.16292","2204.09147","2402.10113","2212.03101","2603.20312","2607.20513","2410.07186"},
+        )
+
+    def test_species_transfer_guard_stays_closed(self):
+        guard=self.d["species_transfer_guard"]
+        self.assertEqual(guard["bee_to_octopus"],"FORBIDDEN_INFERENCE_WITHOUT_OCTOPUS_SPECIFIC_EVIDENCE")
+        self.assertEqual(guard["amphibian_to_octopus"],"FORBIDDEN_INFERENCE_WITHOUT_OCTOPUS_SPECIFIC_EVIDENCE")
+        self.assertEqual(guard["human_biomagnetism_to_identity_detection"],"FORBIDDEN_INFERENCE_WITHOUT_DISCRIMINATION_EVIDENCE")
+
+    def test_new_animal_magnetism_claims_are_bounded(self):
+        claims={x["id"]:x for x in self.d["claim_ladder"]}
+        self.assertEqual(claims["C1B"]["state"],"OBSERVED_PHYSICAL_PROXY_UNPROMOTED")
+        self.assertEqual(claims["C1C"]["state"],"OBSERVED_MECHANISM_CONSISTENT")
+        self.assertEqual(claims["C1D"]["state"],"THEORETICAL_CONSISTENCY_ONLY")
 
 
 if __name__=="__main__":
