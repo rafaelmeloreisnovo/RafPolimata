@@ -51,6 +51,25 @@ alphaXiv `2204.09147` reviews weak-field effects in biology and radical-pair mec
 
 alphaXiv `2306.16292` reports geomagnetic-condition effects on a probabilistic Go stone-selection paradigm in humans. Because this is a strong behavioral interpretation, Evidence Garden stores it as `OBSERVED_UNPROMOTED` pending independent replication and stronger generalization controls.
 
+alphaXiv `2603.20312` measured magnetic hysteresis in 185 insect specimens, including 138 bee specimens representing 96 bee species. The authors report ferromagnetic responses in a large fraction of the sampled bees and use thresholds derived from species with prior behavioral evidence to classify many samples as *putatively* magnetoreceptive. The paper itself explicitly states that it contains no behavioral component and therefore does not definitively prove magnetoreception for the newly sampled species. Evidence Garden stores this as `OBSERVED_PHYSICAL_PROXY_UNPROMOTED`.
+
+alphaXiv `2607.20513` reports that weak magnetic fields altered perioptic melanophore counts in *Xenopus laevis* tadpoles in a light- and eye-dependent manner. The response was absent after eye removal and in constant darkness, and the observed field-strength dependence was consistent with a radical-pair model. The authors also state that the specific radical pair and CRY4 causal role remain unresolved. Evidence Garden therefore records `OBSERVED_MECHANISM_CONSISTENT`, not mechanism-proven.
+
+alphaXiv `2410.07186` is a theoretical consistency analysis using the energy-resolution limit to constrain candidate magnetoreception mechanisms. Its own conclusion distinguishes physical viability from proof that a mechanism is correct; Evidence Garden records it as `THEORETICAL_CONSISTENCY_ONLY`.
+
+### Species-transfer guard
+
+Evidence about magnetic materials or magnetosensitivity in one species must not be promoted into the same mechanism in another species without species-specific evidence.
+
+```text
+bee magnetism       != octopus magnetoreception
+Xenopus response    != octopus magnetoreception
+human biomagnetism  != identity recognition by another organism
+physical viability  != demonstrated sensory channel
+```
+
+The bee and amphibian results make magnetic variables scientifically legitimate hypotheses to measure. They do not establish a magnetic explanation for an octopus observation.
+
 ### Layer C — parapsychology-adjacent experiments
 
 Two 2002 publications involving Ingo Swann are relevant to the historical description:
@@ -127,7 +146,42 @@ independent replication
 
 No risky physical intervention is needed; the experiment can be passive and observational with controlled, non-harmful laboratory conditions.
 
-## 5. Prediction claims
+## 5. Octopus observation — retrospective geometry boundary
+
+The described aquarium episode should be preserved as an observation, not rewritten as its mechanism.
+
+```text
+O1 = animal was usually hidden during daytime visits
+O2 = approach route contained multiple turns / an apparent W-like geometry
+O3 = corridor before the final viewing point was described as very dark with opaque dark surfaces
+O4 = tank region itself was illuminated
+O5 = animal was already exposed/approaching before ordinary direct visual contact was perceived
+```
+
+The rigorous retrospective target is:
+
+```text
+t_response vs t_channel_available(i)
+```
+
+for each candidate channel `i`:
+
+```text
+ordinary direct vision
+indirect optical / polarization cues
+auditory cues
+structural vibration
+routine/timing association
+other environmental cues
+measured magnetic-field cue
+unknown channel
+```
+
+If a reconstructed geometry shows `t_response < t_direct_line_of_sight`, that can falsify ordinary direct vision for that reconstructed route. It still does not select magnetism unless competing channels are independently bounded.
+
+A future controlled study should not disturb or expose an animal to risky conditions. The strongest design is passive, blinded, preregistered and based on existing husbandry constraints.
+
+## 6. Prediction claims
 
 A World-Cup or other future-event claim can be scientifically scored only if the full prediction set is frozen **before** outcomes are known.
 
@@ -145,7 +199,7 @@ out-of-sample repetition
 
 Without that, successful anecdotes are vulnerable to selection effects and cannot establish a mechanism.
 
-## 6. Open-world rule
+## 7. Open-world rule
 
 This domain uses the same V2 closure:
 
@@ -159,6 +213,6 @@ The point is not to dismiss anomalous observations. It is to preserve them witho
 
 ## R3
 
-`F_ok`: established biomagnetism, biophysical magnetic-sensitivity literature, historical remote-viewing experiments, and the 1995 government evaluation are separated into distinct evidence lanes.  
-`F_gap`: identity-specific magnetic detection, magnetic mediation of remote viewing, the remembered machine-destruction event, and the football-prediction identity/corpus remain unproved or source-unresolved.  
-`F_next`: freeze the exact historical source identities for the football/prediction case and build a preregistered hypothesis matrix before importing any anecdotal success as evidence.
+`F_ok`: established biomagnetism, weak-field biophysics, species-specific animal magnetosensitivity, historical remote-viewing experiments, and the 1995 government evaluation are separated into distinct evidence lanes; seven alphaXiv sources are now bound.  
+`F_gap`: no octopus-specific magnetoreception evidence is established here; identity-specific magnetic detection, magnetic mediation of remote viewing, the remembered machine-destruction event, and the football-prediction identity/corpus remain unproved or source-unresolved.  
+`F_next`: preserve the octopus episode as a retrospective geometry/timeline hypothesis map and require octopus-specific or controlled channel evidence before any magnetic claim promotion.
