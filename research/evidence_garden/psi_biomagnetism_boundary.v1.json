@@ -6,6 +6,7 @@
   "alphaXiv_library": {
     "folder_name": "Biomagnetism & Psi Boundary — Evidence Garden",
     "folder_id": "01a0f33f-89df-77df-a65c-32386398bdb5",
+    "paper_count_bound": 7,
     "papers": [
       {
         "id": "2402.10113",
@@ -26,6 +27,21 @@
         "id": "2306.16292",
         "title": "Geomagnetic field influences probabilistic abstract decision-making in humans",
         "lane": "SINGLE_STUDY_NEEDS_INDEPENDENT_REPLICATION"
+      },
+      {
+        "id": "2603.20312",
+        "title": "Broad presence of ferromagnetism in bees and relationship to phylogeny, natural history, and sociality",
+        "lane": "PHYSICAL_PROXY_FOR_PUTATIVE_MAGNETORECEPTION"
+      },
+      {
+        "id": "2607.20513",
+        "title": "Magnetosensitivity of amphibian morphological pigmentation is light- and eye-dependent and consistent with the radical pair mechanism",
+        "lane": "SPECIES_SPECIFIC_MAGNETOSENSITIVITY_EXPERIMENT"
+      },
+      {
+        "id": "2410.07186",
+        "title": "Approaching the quantum limit of energy resolution in animal magnetoreception",
+        "lane": "THEORETICAL_CONSISTENCY_ANALYSIS"
       }
     ]
   },
@@ -120,6 +136,37 @@
       ]
     },
     {
+      "id": "C1B",
+      "claim": "Ferromagnetic signals are widespread in the sampled bee material and are consistent with putative magnetoreception, but the cited study does not itself demonstrate magnetoreceptive behavior.",
+      "state": "OBSERVED_PHYSICAL_PROXY_UNPROMOTED",
+      "evidence": [
+        "2603.20312"
+      ],
+      "gate": "species-level behavioral experiments with controlled magnetic perturbation"
+    },
+    {
+      "id": "C1C",
+      "claim": "Weak magnetic fields modulate Xenopus laevis perioptic pigmentation in a light- and eye-dependent experiment, with field-strength dependence consistent with a radical-pair model.",
+      "state": "OBSERVED_MECHANISM_CONSISTENT",
+      "evidence": [
+        "2607.20513"
+      ],
+      "limits": [
+        "species-specific phenotype",
+        "fields used for the morphological response were above geomagnetic strength",
+        "radical-pair identity is not established",
+        "CRY4 causality remains to be tested by loss-of-function"
+      ]
+    },
+    {
+      "id": "C1D",
+      "claim": "Energy-resolution analysis can constrain theoretical animal-magnetoreception models but physical viability is not proof that any particular mechanism is correct.",
+      "state": "THEORETICAL_CONSISTENCY_ONLY",
+      "evidence": [
+        "2410.07186"
+      ]
+    },
+    {
       "id": "C2",
       "claim": "Human decision behavior can be modulated by geomagnetic conditions.",
       "state": "OBSERVED_UNPROMOTED",
@@ -173,6 +220,12 @@
       ]
     }
   ],
+  "species_transfer_guard": {
+    "rule": "Evidence for magnetoreception or magnetic materials in one species does not establish the same sensory mechanism in another species.",
+    "bee_to_octopus": "FORBIDDEN_INFERENCE_WITHOUT_OCTOPUS_SPECIFIC_EVIDENCE",
+    "amphibian_to_octopus": "FORBIDDEN_INFERENCE_WITHOUT_OCTOPUS_SPECIFIC_EVIDENCE",
+    "human_biomagnetism_to_identity_detection": "FORBIDDEN_INFERENCE_WITHOUT_DISCRIMINATION_EVIDENCE"
+  },
   "hypothesis_map": {
     "observation_to_test": [
       "ordinary visual recognition",
