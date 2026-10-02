@@ -20,6 +20,10 @@
     "shadow_state": "CALLER_OWNED_L0_STATE",
     "warning_transport": "BITMASK_OR_TYPED_STATUS"
   },
+  "closure_refs": [
+    "CLOSURE_L11",
+    "CLOSURE_L12"
+  ],
   "state": "IMPLEMENTED_UNTESTED",
   "urgency": "P1",
   "claim_allowed": false,
