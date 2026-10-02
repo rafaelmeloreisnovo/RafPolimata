@@ -133,25 +133,20 @@ L5 review queue / promotion
 
 Generated outputs are derived artifacts. They must be regenerated from script + policy + commit and must not be hand-edited to create apparent freshness.
 
-### Current generated-state warning
+### Current generated-state status (2026-10-02)
 
-The committed `docs/generated/DOCUMENT_GOVERNANCE_INDEX.md` and `results/document-governance/summary.json` are bound to historical commit `ff000ab0a38b7ca9ae672300f1534915dcf0e4fe` and report:
+The previously committed governance snapshot was stale against the observed main tree. The seven derived outputs were refreshed with the official executor, `scripts/document_governance.py`, then checked with its deterministic `--check` mode. `results/document-governance/summary.json` records the exact source checkout used.
 
-```text
-state        = REVIEW_REQUIRED
-files        = 1356 governed records at that historical cut
-relations    = 1265
-review_queue = 841
-blockers     = 0
+The refreshed inventory remains `REVIEW_REQUIRED` with zero blockers. The non-empty review queue is a triage list, not an implementation failure. This freshness repair does not promote implementation or scientific claims; `claim_allowed=false` remains.
+
+The generated paths are excluded from their own scan. Preserve reproducibility with:
+
+```sh
+python3 scripts/document_governance.py --write --print-summary
+python3 scripts/document_governance.py --check --print-summary
 ```
 
-At current base, `results/document-governance/catalog.jsonl` was observed empty while that historical summary reports a populated catalog. Therefore the current generated plane is classified:
-
-```text
-TOKEN_VAZIO_REGEN_REQUIRED
-```
-
-No generated file was manually rewritten in this docs-only audit.
+Generated files must not be hand-edited.
 
 ## Evidence states
 

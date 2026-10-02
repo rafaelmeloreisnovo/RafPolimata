@@ -38,9 +38,17 @@
       "Apkc/proofs/runs/20260816T034940Z/g5_arm64_encoders.txt",
       "Apkc/proofs/runs/20260816T034943Z/g5_arm64_encoders.txt",
       "Apkc/proofs/runs/20260816T035020Z/g5_arm64_encoders.txt"
+    ],
+    "f89814eff8a7cfff57078edb043a6bb1ea8c9b5a659e0ab014ff2e5d214e8bc6": [
+      "native/raf_bl0/raf_bl0.c",
+      "ports/hafnium/raf_bl0.c"
     ]
   },
   "normalized_candidates": {
+    "1a75565ad9aa1adf4e22e6daa04a75a32d64aa4577fde95b92e432ee895b8ee3": [
+      "native/raf_bl0/raf_bl0.c",
+      "ports/hafnium/raf_bl0.c"
+    ],
     "27a8b2f9983957092505898097bd9daf34a639205c4bf18531af2f76c6f8d1b5": [
       "Apkc/proofs/runs/20260816T034940Z/apkc_hardened.c",
       "Apkc/proofs/runs/20260816T034943Z/apkc_hardened.c",
