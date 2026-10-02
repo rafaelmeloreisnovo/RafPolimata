@@ -1,6 +1,6 @@
 {
   "schemaVersion": "rafgittools.rafpolimata-custody-bridge.v1",
-  "bridgeId": "EXAMPLE-SYNTHETIC-001",
+  "bridgeId": "EXAMPLE-SYNTHETIC-CLOSURE_L9-001",
   "producer": "rafaelmeloreisnovo/RafGitTools",
   "consumer": "rafaelmeloreisnovo/RafPolimata",
   "sourceRef": "example:synthetic-source",
