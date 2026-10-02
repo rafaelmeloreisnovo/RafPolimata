@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "rafgittools.rafpolimata-custody-bridge.v1",
+  "bridgeId": "EXAMPLE-SYNTHETIC-CLOSURE_L9-001",
+  "producer": "rafaelmeloreisnovo/RafGitTools",
+  "consumer": "rafaelmeloreisnovo/RafPolimata",
+  "sourceRef": "example:synthetic-source",
+  "artifactRef": "TOKEN_VAZIO",
+  "executionRef": "NOT_RUN",
+  "evidenceRefs": [],
+  "state": "IMPLEMENTED_UNTESTED",
+  "claimAllowed": false,
+  "predecessorReceipt": "TOKEN_VAZIO",
+  "supersedesReceipt": "TOKEN_VAZIO",
+  "capabilityLabels": ["Pat_actions", "Pat_envir"],
+  "observedAt": "2026-10-02T00:00:00Z"
+}

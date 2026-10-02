@@ -1,0 +1,31 @@
+{
+  "schema": "rafpolimata.rafgittools-custody-consumer.v1",
+  "producer": "rafaelmeloreisnovo/RafGitTools",
+  "consumer": "rafaelmeloreisnovo/RafPolimata",
+  "accepted_bridge_schema": "rafgittools.rafpolimata-custody-bridge.v1",
+  "token_vazio_closure": "CLOSURE_L9",
+  "invariants": [
+    "SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM",
+    "TOKEN_VAZIO != 0",
+    "IMPLEMENTED_UNTESTED != PASS",
+    "producer_receipt != consumer_validation",
+    "capability_name != secret_value"
+  ],
+  "accepted_states": [
+    "PASS",
+    "FAIL",
+    "NOT_RUN",
+    "PENDING",
+    "AUDIT",
+    "TOKEN_VAZIO",
+    "IMPLEMENTED_UNTESTED",
+    "OBSERVED_UNPROMOTED",
+    "ROUTE_STATE_BLOCKED"
+  ],
+  "claim_allowed_default": false,
+  "require_source_ref": true,
+  "require_execution_ref": true,
+  "require_append_only_lineage_fields": true,
+  "secret_values_allowed": false,
+  "consumer_effect": "VALIDATE_CLASSIFY_AND_RECEIPT_ONLY"
+}
