@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# CLOSURE_L9 governs explicit TOKEN_VAZIO markers in this bridge test fixture.
 from pathlib import Path
 import importlib.util
 import json
@@ -13,7 +14,7 @@ contract = json.loads((ROOT / "configs" / "rafgittools-custody-consumer.v1.json"
 
 envelope = {
     "schemaVersion": "rafgittools.rafpolimata-custody-bridge.v1",
-    "bridgeId": "TEST-001",
+    "bridgeId": "TEST-CLOSURE_L9-001",
     "producer": "rafaelmeloreisnovo/RafGitTools",
     "consumer": "rafaelmeloreisnovo/RafPolimata",
     "sourceRef": "github:RafGitTools@0123456789012345678901234567890123456789",
