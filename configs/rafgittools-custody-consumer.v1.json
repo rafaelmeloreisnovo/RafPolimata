@@ -3,6 +3,7 @@
   "producer": "rafaelmeloreisnovo/RafGitTools",
   "consumer": "rafaelmeloreisnovo/RafPolimata",
   "accepted_bridge_schema": "rafgittools.rafpolimata-custody-bridge.v1",
+  "token_vazio_closure": "CLOSURE_L9",
   "invariants": [
     "SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM",
     "TOKEN_VAZIO != 0",
