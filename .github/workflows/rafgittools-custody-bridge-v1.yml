@@ -1,0 +1,53 @@
+name: RafGitTools Custody Bridge V1
+
+on:
+  pull_request:
+    paths:
+      - 'configs/rafgittools-custody-consumer.v1.json'
+      - 'scripts/validate_rafgittools_custody_bridge.py'
+      - 'tests/test_rafgittools_custody_bridge.py'
+      - 'examples/rafgittools-custody-bridge.example.json'
+      - 'docs/RAFGITTOOLS_CUSTODY_BRIDGE_V1.md'
+      - '.github/workflows/rafgittools-custody-bridge-v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'configs/rafgittools-custody-consumer.v1.json'
+      - 'scripts/validate_rafgittools_custody_bridge.py'
+      - 'tests/test_rafgittools_custody_bridge.py'
+      - 'examples/rafgittools-custody-bridge.example.json'
+      - 'docs/RAFGITTOOLS_CUSTODY_BRIDGE_V1.md'
+      - '.github/workflows/rafgittools-custody-bridge-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  custody-bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exact shell checkout
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SHA: ${{ github.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          sha="$EVENT_SHA"
+          if [ "$EVENT_NAME" = pull_request ]; then sha="$PR_HEAD_SHA"; fi
+          git init .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch --no-tags --depth=1 origin "$sha"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$sha"
+      - name: Validate producer envelope
+        run: python3 scripts/validate_rafgittools_custody_bridge.py examples/rafgittools-custody-bridge.example.json
+      - name: Fail-closed consumer tests
+        run: python3 tests/test_rafgittools_custody_bridge.py
+      - name: Receipt boundary
+        run: |
+          echo 'CUSTODY_BRIDGE_CONSUMER=PASS_EXECUTED_SCOPE'
+          echo 'SECRET_VALUES=NOT_MATERIALIZED'
+          echo 'CLAIM_ALLOWED=false'
