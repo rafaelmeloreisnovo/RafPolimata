@@ -2,6 +2,8 @@
 
 Status: `IMPLEMENTED_UNTESTED` until exact-head CI executes this branch.
 
+Closure binding for explicit unknowns: `CLOSURE_L9`.
+
 RafPolimata consumes custody envelopes produced by RafGitTools. It may validate structure, classify uncertainty/gaps and emit its own consumer receipt. It does not inherit source, provider or execution authority from the producer.
 
 ## Invariants
