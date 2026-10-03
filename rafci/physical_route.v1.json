@@ -3,7 +3,7 @@
   "authority": "authority.rafpolimata.rafci",
   "closure": "CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE",
   "claim_allowed": false,
-  "purpose": "Route existing physical evidence producers by evidentiary ceiling without creating a duplicate receipt format or promoting structural/readiness evidence into runtime execution.",
+  "purpose": "Route physical/runtime evidence producers by evidentiary ceiling, reusing existing contracts and adding only the previously missing same-artifact physical-execution acquisition class.",
   "sources": [
     {
       "id": "physical.runtime-doctor-readonly",
@@ -67,6 +67,30 @@
       ],
       "rafci_physical_execution_gate": "TOKEN_VAZIO",
       "reason": "current schema is federated VM/runtime evidence and does not itself assert a same-artifact physical-device execution"
+    },
+    {
+      "id": "physical.rafci-same-artifact",
+      "producer": "rafci/tools/capture_physical_execution_v1.sh",
+      "contract": "rafci/tools/verify_physical_execution_v1.py",
+      "receipt_schema": "rafaelia.rafci.physical-execution-receipt/v1",
+      "evidence_class": "PHYSICAL_SAME_ARTIFACT_EXECUTION_ACQUISITION",
+      "can_establish": [
+        "physical-termux-environment-observed",
+        "target-abi-scope-match",
+        "exact-artifact-sha256-before-and-after",
+        "same-measured-artifact-executed",
+        "zero-argument-execution-exit-status",
+        "stdout-stderr-addressing",
+        "receipt-manifest-integrity-after-verification"
+      ],
+      "cannot_establish": [
+        "apk-installation-by-itself",
+        "production-readiness",
+        "universal-device-compatibility",
+        "independent-device-replication"
+      ],
+      "rafci_physical_execution_gate": "TOKEN_VAZIO",
+      "reason": "acquisition producer and falsifiers are implemented, but no same-artifact physical ARM32/ARM64 receipt for the current head has executed yet"
     }
   ],
   "promotion_contract": {
@@ -77,11 +101,13 @@
       "exact target artifact SHA-256 measured before execution",
       "same measured artifact executed on that physical target",
       "execution exit/status captured",
+      "artifact SHA-256 unchanged after execution",
       "receipt integrity verified",
+      "source commit exactly bound to the requested head",
       "source/artifact/evidence identities remain distinct"
     ],
     "current_state": "TOKEN_VAZIO",
-    "why": "no existing canonical producer currently binds all required fields in one same-artifact physical execution receipt"
+    "why": "the missing acquisition producer now exists, but current-head physical execution evidence remains absent until an explicit device run is verified"
   },
   "invariants": [
     "PHYSICAL_READINESS != PHYSICAL_EXECUTION",
@@ -89,6 +115,7 @@
     "VM_RUNTIME != PHYSICAL_DEVICE_RUNTIME",
     "ARTIFACT_HASH != EXECUTION",
     "EXECUTION != CLAIM",
+    "IMPLEMENTED_UNTESTED != PASS",
     "TOKEN_VAZIO != PASS"
   ]
 }
