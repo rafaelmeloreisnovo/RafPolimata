@@ -6,9 +6,13 @@ This file scopes `rafci/**`.
 
 1. `rafci/README.md`
 2. `rafci/graph.v1.json`
-3. `rafci/contracts/rafci_wire_v1.h`
-4. `rafci/contracts/rafci_anchors_v1.c`
-5. `rafci/tools/verify_rafci_v1.py`
+3. `rafci/provider_policy.v1.json`
+4. `rafci/physical_route.v1.json`
+5. `rafci/contracts/rafci_wire_v1.h`
+6. `rafci/contracts/rafci_anchors_v1.c`
+7. `rafci/tools/verify_rafci_v1.py`
+8. `rafci/tools/audit_provider_rules_v1.py` only when provider enforcement matters
+9. `rafci/tools/verify_physical_route_v1.py` only when physical/runtime evidence matters
 
 The repository-root `AGENTS.md` and `docs/AGENTES.md` remain authoritative above this file.
 
@@ -27,6 +31,36 @@ IMPLEMENTED_UNTESTED != PASS
 Closure routing is explicit: structural/operational gaps bind to `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`; runtime/device evidence gaps bind to `CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE`. Closure linkage classifies an unresolved obligation and never promotes it.
 
 The provider repo keeps implementation authority. Relationship never implies authority transfer.
+
+## Provider route
+
+Provider configuration readback is observational evidence only. `provider_policy.v1.json` defines readiness; `audit_provider_rules_v1.py` records what GitHub actually exposes. Provider enforcement remains `TOKEN_VAZIO` until both configuration readiness and a separate negative rejection receipt exist.
+
+Do not use a merge as an enforcement experiment without explicit human authorization.
+
+## Physical route
+
+`physical_route.v1.json` is the canonical RafCI router for existing physical/runtime evidence producers. It does not create a competing physical receipt schema.
+
+The evidence classes remain disjoint:
+
+```text
+PHYSICAL_ENVIRONMENT_READINESS
+    != PHYSICAL_STRUCTURAL_BUILD_ARM32
+    != FEDERATED_ANDROID_VM_RUNTIME
+    != PHYSICAL_EXECUTION
+```
+
+A source may be routed and verified while `gate.physical-execution` remains `TOKEN_VAZIO`. Never infer physical execution from:
+
+- Android/Termux environment observation;
+- cross-compilation;
+- ARM32 APK generation;
+- ZIP/DEX/ELF structure;
+- VM guest boot;
+- artifact hash alone.
+
+Physical execution promotion requires the evidence named in `physical_route.v1.json`, including physical ABI observation, exact target artifact SHA-256, execution of that same measured artifact, execution exit/status and verified receipt integrity.
 
 ## RAFCI-BIT rule
 
@@ -77,6 +111,12 @@ Minimum source gate:
 python3 rafci/tools/verify_rafci_v1.py --selftest
 ```
 
+Minimum physical-routing gate:
+
+```sh
+python3 rafci/tools/verify_physical_route_v1.py --selftest
+```
+
 Minimum binary gate:
 
 ```text
@@ -91,8 +131,9 @@ Keep changes local to `rafci/**`, its workflow, and the existing federation disc
 
 Do not:
 - copy provider repositories into RafPolimata;
+- duplicate an existing physical receipt format;
 - weaken a provider/protection gate to obtain green CI;
-- infer physical execution from cross-compilation;
+- infer physical execution from cross-compilation/readiness/build/VM evidence;
 - edit unrelated science/runtime code;
 - merge without explicit human authorization.
 
