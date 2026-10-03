@@ -96,23 +96,32 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           ref: ${{ env.RAFCI_SOURCE_SHA }}
-      - name: Validate existing physical producers and promotion ceilings
+      - name: Validate physical routing and acquisition contract without device execution
         run: |
           set -euo pipefail
           mkdir -p build/rafci/physical-route
+          sh -n rafci/tools/capture_physical_execution_v1.sh
           python3 rafci/tools/verify_physical_route_v1.py \
             --selftest \
             --receipt build/rafci/physical-route/receipt.json
+          python3 rafci/tools/verify_physical_execution_v1.py \
+            --selftest \
+            --out build/rafci/physical-route/acquisition-selftest.json
           python3 -m json.tool build/rafci/physical-route/receipt.json >/dev/null
+          python3 -m json.tool build/rafci/physical-route/acquisition-selftest.json >/dev/null
           python3 - <<'PY'
           import json
           from pathlib import Path
 
-          receipt = json.loads(Path("build/rafci/physical-route/receipt.json").read_text(encoding="utf-8"))
-          assert receipt["state"] == "PASS_ROUTE_ONLY"
-          assert receipt["physical_execution_gate"] == "TOKEN_VAZIO"
-          assert receipt["claim_allowed"] is False
-          assert receipt["closure"] == "CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE"
+          route = json.loads(Path("build/rafci/physical-route/receipt.json").read_text(encoding="utf-8"))
+          selftest = json.loads(Path("build/rafci/physical-route/acquisition-selftest.json").read_text(encoding="utf-8"))
+          assert route["state"] == "PASS_ROUTE_ONLY"
+          assert route["physical_execution_gate"] == "TOKEN_VAZIO"
+          assert route["claim_allowed"] is False
+          assert route["closure"] == "CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE"
+          assert selftest["state"] == "PASS_CONTRACT_ONLY"
+          assert selftest["physical_execution_observed"].startswith("TOKEN_VAZIO")
+          assert selftest["claim_allowed"] is False
           PY
       - name: Preserve physical-route receipt
         if: always()
