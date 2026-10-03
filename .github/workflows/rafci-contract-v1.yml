@@ -87,6 +87,41 @@ jobs:
           path: build/rafci/provider/
           if-no-files-found: warn
 
+  physical-route:
+    name: physical evidence route ceilings
+    needs: contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.RAFCI_SOURCE_SHA }}
+      - name: Validate existing physical producers and promotion ceilings
+        run: |
+          set -euo pipefail
+          mkdir -p build/rafci/physical-route
+          python3 rafci/tools/verify_physical_route_v1.py \
+            --selftest \
+            --receipt build/rafci/physical-route/receipt.json
+          python3 -m json.tool build/rafci/physical-route/receipt.json >/dev/null
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(Path("build/rafci/physical-route/receipt.json").read_text(encoding="utf-8"))
+          assert receipt["state"] == "PASS_ROUTE_ONLY"
+          assert receipt["physical_execution_gate"] == "TOKEN_VAZIO"
+          assert receipt["claim_allowed"] is False
+          assert receipt["closure"] == "CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE"
+          PY
+      - name: Preserve physical-route receipt
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: rafci-physical-route-${{ github.run_id }}
+          path: build/rafci/physical-route/
+          if-no-files-found: warn
+
   object-matrix:
     name: ELF anchors / ${{ matrix.id }}
     needs: contract
