@@ -4,7 +4,8 @@
 CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE
 
 This verifier protects evidence-class boundaries. It does not convert readiness,
-structural build, or VM evidence into physical execution evidence.
+structural build, VM evidence, or an unexecuted acquisition producer into
+physical execution evidence.
 """
 from __future__ import annotations
 
@@ -32,6 +33,11 @@ EXPECTED = {
         "producer": "scripts/compile_android_runtime_evidence.py",
         "contract": "docs/ANDROID_FEDERATED_RUNTIME_EVIDENCE_V1.md",
         "class": "FEDERATED_ANDROID_VM_RUNTIME",
+    },
+    "physical.rafci-same-artifact": {
+        "producer": "rafci/tools/capture_physical_execution_v1.sh",
+        "contract": "rafci/tools/verify_physical_execution_v1.py",
+        "class": "PHYSICAL_SAME_ARTIFACT_EXECUTION_ACQUISITION",
     },
 }
 
@@ -88,9 +94,9 @@ def validate(route: dict[str, Any]) -> dict[str, Any]:
     require(promotion.get("gate") == "gate.physical-execution", "promotion gate drift")
     require(promotion.get("current_state") == "TOKEN_VAZIO", "physical gate promoted without receipt")
     required = promotion.get("required_for_arm32_or_arm64")
-    require(isinstance(required, list) and len(required) >= 6, "physical promotion requirements incomplete")
+    require(isinstance(required, list) and len(required) >= 8, "physical promotion requirements incomplete")
     joined = "\n".join(str(x).lower() for x in required)
-    for needle in ("abi", "artifact sha-256", "executed", "exit/status", "receipt integrity"):
+    for needle in ("abi", "artifact sha-256", "executed", "exit/status", "unchanged", "receipt integrity", "source commit"):
         require(needle in joined, f"physical promotion requirement missing: {needle}")
 
     invariants = route.get("invariants")
@@ -101,6 +107,7 @@ def validate(route: dict[str, Any]) -> dict[str, Any]:
         "VM_RUNTIME != PHYSICAL_DEVICE_RUNTIME",
         "ARTIFACT_HASH != EXECUTION",
         "EXECUTION != CLAIM",
+        "IMPLEMENTED_UNTESTED != PASS",
         "TOKEN_VAZIO != PASS",
     }
     require(expected_invariants.issubset(set(invariants)), "physical evidence invariants incomplete")
@@ -128,7 +135,19 @@ def selftest(route: dict[str, Any]) -> None:
     else:
         raise RouteError("selftest accepted readiness->physical PASS mutation")
 
-    # Falsifier 2: removing artifact identity from promotion requirements must fail.
+    # Falsifier 2: even an implemented acquisition producer cannot self-promote.
+    mutated = json.loads(json.dumps(route))
+    for source in mutated["sources"]:
+        if source["id"] == "physical.rafci-same-artifact":
+            source["rafci_physical_execution_gate"] = "PASS"
+    try:
+        validate(mutated)
+    except RouteError:
+        pass
+    else:
+        raise RouteError("selftest accepted acquisition-implemented->physical PASS mutation")
+
+    # Falsifier 3: removing artifact identity from promotion requirements must fail.
     mutated = json.loads(json.dumps(route))
     mutated["promotion_contract"]["required_for_arm32_or_arm64"] = [
         value for value in mutated["promotion_contract"]["required_for_arm32_or_arm64"]
