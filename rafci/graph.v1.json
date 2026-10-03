@@ -15,6 +15,11 @@
   "source_state": "IMPLEMENTED",
   "claim_allowed": false,
   "provider_reference_policy": "repository+role in contract; exact commit SHA required in execution receipt",
+  "closure_bindings": {
+    "structural_operational": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+    "runtime_device": "CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE",
+    "rule": "closure linkage classifies an unresolved evidence obligation and never promotes TOKEN_VAZIO to PASS"
+  },
   "providers": [
     {
       "id": "provider.rafpolimata",
@@ -268,21 +273,25 @@
     {
       "id": "gap.provider-enforcement",
       "state": "TOKEN_VAZIO",
+      "closure": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
       "evidence_rule": "authorized provider readback plus zero-approval rejection receipt"
     },
     {
       "id": "gap.physical-arm32",
       "state": "TOKEN_VAZIO",
+      "closure": "CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE",
       "evidence_rule": "same-artifact physical ARM32 execution receipt"
     },
     {
       "id": "gap.physical-arm64",
       "state": "TOKEN_VAZIO",
+      "closure": "CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE",
       "evidence_rule": "same-artifact physical ARM64 execution receipt"
     },
     {
       "id": "gap.provider-independent-runtime",
       "state": "TOKEN_VAZIO",
+      "closure": "CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE",
       "evidence_rule": "independent-provider execution with exact artifact/source identity"
     }
   ],
