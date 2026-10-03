@@ -48,6 +48,45 @@ jobs:
           path: build/rafci/source-contract-receipt.json
           if-no-files-found: warn
 
+  provider-observation:
+    name: provider ruleset observation
+    needs: contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.RAFCI_SOURCE_SHA }}
+      - name: Observe provider rules and preserve fail-closed state
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p build/rafci/provider
+          python3 rafci/tools/audit_provider_rules_v1.py \
+            --selftest \
+            --repository "${GITHUB_REPOSITORY}" \
+            --receipt build/rafci/provider/receipt.json \
+            --snapshot build/rafci/provider/normalized-rulesets.json
+          python3 -m json.tool build/rafci/provider/receipt.json >/dev/null
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(Path("build/rafci/provider/receipt.json").read_text(encoding="utf-8"))
+          assert receipt["claim_allowed"] is False
+          assert receipt["provider_enforcement_gate"] == "TOKEN_VAZIO"
+          assert receipt["zero_approval_rejection_receipt"].startswith("TOKEN_VAZIO")
+          assert receipt["closure"] == "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY"
+          PY
+      - name: Preserve provider observation receipt
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: rafci-provider-observation-${{ github.run_id }}
+          path: build/rafci/provider/
+          if-no-files-found: warn
+
   object-matrix:
     name: ELF anchors / ${{ matrix.id }}
     needs: contract
