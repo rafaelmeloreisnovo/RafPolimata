@@ -9,7 +9,7 @@ REGISTER_OWNERSHIP=NONE
 CLOBBERS=NONE
 MEMORY_ORDER=NONE
 TAIL_SHADOW=NONE
-EVIDENCE=Section/symbol presence is structural build evidence only.
+EVIDENCE=Section/symbol presence is structural build evidence only. Structural unknowns bind CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY; runtime/device evidence binds CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.
 */
 
 /*
@@ -18,7 +18,7 @@ ID=rafci.bit.anchor.file.v1
 KIND=anchor
 ROUTE=stage.source>stage.artifact
 AUTHORITY=authority.rafpolimata.rafci
-EVIDENCE=Defines linker-visible metadata; physical/runtime evidence remains TOKEN_VAZIO.
+EVIDENCE=Defines linker-visible metadata; physical/runtime evidence remains TOKEN_VAZIO under CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.
 */
 
 #if defined(__clang__) || defined(__GNUC__)
