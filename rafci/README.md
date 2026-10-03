@@ -102,7 +102,7 @@ readelf -SW anchors.linked.o
 readelf -sW anchors.linked.o
 ```
 
-The GitHub workflow runs the same structural idea for x86_64, ARMv7 and AArch64 and emits bounded receipts. A green structural workflow does **not** establish physical ARM32/ARM64 runtime, provider enforcement, scientific validity, or production readiness.
+The GitHub workflow compiles and inspects the anchor object for x86_64, ARMv7 and AArch64, then separately proves relocatable-link survival on hosted x86_64 with the runner's available system linker. Cross-target linking is toolchain-dependent and is not inferred from object compilation. A green structural workflow does **not** establish physical ARM32/ARM64 runtime, provider enforcement, scientific validity, or production readiness.
 
 ## Provider boundary
 
