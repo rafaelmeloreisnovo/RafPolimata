@@ -141,7 +141,7 @@ PHYSICAL_ENVIRONMENT_READINESS
 
 The first three reuse canonical producers already present in the repository. The fourth exists only because no prior canonical producer bound the exact evidence needed for `gate.physical-execution`.
 
-`tools/capture_physical_execution_v1.sh` is **manual and explicit**. It requires `--execute`, runs exactly one zero-argument executable, stores no raw device serial or raw artifact path, and records physical Termux shape, ABI, expected/measured SHA-256 before and after, exit code, stdout/stderr digests and a receipt manifest. It performs no package install, attach, hook, runtime patch, privilege escalation, APK build or VM boot.
+`tools/capture_physical_execution_v1.sh` is **manual and explicit**. It requires `--execute`, runs exactly one zero-argument native ARM executable, stores no raw device serial or raw artifact path, derives the artifact scope from the ELF header (`ELF32+EM_ARM -> arm32`, `ELF64+EM_AARCH64 -> arm64`), and records physical Termux shape, device ABI support, expected/measured SHA-256 before and after, exit code, stdout/stderr digests and a receipt manifest. It performs no package install, attach, hook, runtime patch, privilege escalation, APK build or VM boot.
 
 Example acquisition on a physical Termux target:
 
@@ -154,18 +154,19 @@ sh rafci/tools/capture_physical_execution_v1.sh \
   --execute
 ```
 
-The receipt does not appoint its own trust anchor. Verification additionally requires the **externally known** source HEAD and artifact SHA-256:
+The receipt does not appoint its own trust anchor. Verification additionally requires the **externally known** source HEAD, artifact SHA-256 and expected ABI scope:
 
 ```sh
 python3 rafci/tools/verify_physical_execution_v1.py \
   --receipt-dir ./rafci-physical-receipt \
   --expected-source-sha EXPECTED_40_HEX_HEAD \
-  --expected-artifact-sha256 EXPECTED_64_HEX_ARTIFACT
+  --expected-artifact-sha256 EXPECTED_64_HEX_ARTIFACT \
+  --expected-scope arm32
 ```
 
 Only a verified receipt can produce `PASS_PHYSICAL_EXECUTION_BOUNDED`, scoped to those exact bytes, source HEAD and ABI. Even then `claim_allowed=false` remains and independent replication is still `TOKEN_VAZIO`.
 
-CI never runs the physical acquisition. It executes syntax checks and synthetic falsifiers only. `PASS_CONTRACT_ONLY` therefore proves the acquisition/verification logic, **not** a physical device run.
+CI never runs the physical acquisition. It executes shell syntax checks and synthetic falsifiers only. `PASS_CONTRACT_ONLY` therefore proves the acquisition/verification logic, **not** a physical device run.
 
 ## Current explicit gaps
 
@@ -186,4 +187,4 @@ This subsystem is additive. Rollback is repository-local: revert the RafCI commi
 
 `F_ok` = source contract, semantic graph, unique bits, linker anchors, closure discipline, live provider readback, physical evidence routing and same-artifact physical acquisition contract are defined and falsifiable.  
 `F_gap` = provider negative rejection and actual current-head physical ARM32/ARM64 receipts remain unexecuted; independent reproduction remains open.  
-`F_next` = consume an externally pinned artifact on a physical target with the manual acquisition route, then verify the receipt against the expected HEAD/hash; do not infer PASS from CI selftests.
+`F_next` = consume an externally pinned native ARM artifact on a physical target with the manual acquisition route, then verify the receipt against expected HEAD/hash/scope; do not infer PASS from CI selftests.
