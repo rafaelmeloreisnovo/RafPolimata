@@ -3,9 +3,10 @@
 
 CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE
 
-A PASS here is bounded to the exact source commit, artifact SHA-256, ABI scope,
-physical Termux observation, execution exit status and verified receipt files.
-It does not imply production readiness, universal compatibility or independent
+A PASS here is bounded to externally supplied source/artifact pins, physical
+Termux ABI observation, execution exit status and verified receipt files. The
+receipt cannot appoint its own expected source or artifact identity. This does
+not imply production readiness, universal compatibility or independent
 replication.
 """
 from __future__ import annotations
@@ -70,8 +71,17 @@ def verify_manifest(root: Path) -> str:
     return digest(manifest)
 
 
-def verify(root: Path, expected_source_sha: str | None = None) -> dict[str, Any]:
+def verify(
+    root: Path,
+    expected_source_sha: str,
+    expected_artifact_sha256: str,
+) -> dict[str, Any]:
     root = root.resolve()
+    expected_source_sha = expected_source_sha.lower()
+    expected_artifact_sha256 = expected_artifact_sha256.lower()
+    require(bool(HEX40.fullmatch(expected_source_sha)), "external expected source SHA must be 40 hex")
+    require(bool(HEX64.fullmatch(expected_artifact_sha256)), "external expected artifact SHA-256 must be 64 hex")
+
     receipt_path = root / "receipt.json"
     require(receipt_path.is_file(), "receipt.json missing")
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
@@ -83,8 +93,7 @@ def verify(root: Path, expected_source_sha: str | None = None) -> dict[str, Any]
 
     source_commit = str(receipt.get("source_commit", "")).lower()
     require(bool(HEX40.fullmatch(source_commit)), "source commit is not exact 40-hex")
-    if expected_source_sha is not None:
-        require(source_commit == expected_source_sha.lower(), "source commit does not match expected head")
+    require(source_commit == expected_source_sha, "source commit does not match external expected head")
 
     env = receipt.get("environment")
     require(isinstance(env, dict), "environment missing")
@@ -102,11 +111,14 @@ def verify(root: Path, expected_source_sha: str | None = None) -> dict[str, Any]
     artifact = receipt.get("artifact")
     require(isinstance(artifact, dict), "artifact block missing")
     require(artifact.get("raw_path_stored") is False, "raw artifact path exposure")
-    expected = str(artifact.get("expected_sha256", "")).lower()
+    receipt_expected = str(artifact.get("expected_sha256", "")).lower()
     before = str(artifact.get("sha256_before", "")).lower()
     after = str(artifact.get("sha256_after", "")).lower()
-    require(bool(HEX64.fullmatch(expected)), "expected artifact SHA-256 invalid")
-    require(expected == before == after, "artifact identity/mutation contradiction")
+    require(bool(HEX64.fullmatch(receipt_expected)), "receipt expected artifact SHA-256 invalid")
+    require(
+        expected_artifact_sha256 == receipt_expected == before == after,
+        "external artifact pin / measured artifact identity contradiction",
+    )
 
     execution = receipt.get("execution")
     require(isinstance(execution, dict), "execution block missing")
@@ -131,7 +143,9 @@ def verify(root: Path, expected_source_sha: str | None = None) -> dict[str, Any]
         "gate": "gate.physical-execution",
         "scope": scope,
         "source_commit": source_commit,
-        "artifact_sha256": expected,
+        "artifact_sha256": expected_artifact_sha256,
+        "external_source_pin_verified": True,
+        "external_artifact_pin_verified": True,
         "receipt_sha256": receipt_sha,
         "manifest_sha256": manifest_sha,
         "independent_replication": "TOKEN_VAZIO",
@@ -204,11 +218,19 @@ def write_fixture(root: Path, *, scope: str = "arm32") -> None:
     )
 
 
+def rewrite_manifest(root: Path) -> None:
+    members = ["receipt.json", "target.stderr.bin", "target.stdout.bin"]
+    (root / "receipt.sha256").write_text(
+        "".join(f"{digest(root / member)}  ./{member}\n" for member in members),
+        encoding="utf-8",
+    )
+
+
 def selftest() -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix="rafci-physical-v1-") as temp:
         root = Path(temp) / "good"
         write_fixture(root)
-        good = verify(root, expected_source_sha="b" * 40)
+        good = verify(root, "b" * 40, "a" * 64)
 
         cases: list[tuple[str, Any]] = [
             ("artifact-mutation", lambda x: x["artifact"].__setitem__("sha256_after", "c" * 64)),
@@ -225,19 +247,29 @@ def selftest() -> dict[str, Any]:
             receipt = copy.deepcopy(original)
             mutate(receipt)
             (case_root / "receipt.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-            members = ["receipt.json", "target.stderr.bin", "target.stdout.bin"]
-            (case_root / "receipt.sha256").write_text(
-                "".join(f"{digest(case_root / member)}  ./{member}\n" for member in members),
-                encoding="utf-8",
-            )
+            rewrite_manifest(case_root)
             try:
-                verify(case_root, expected_source_sha="b" * 40)
+                verify(case_root, "b" * 40, "a" * 64)
             except PhysicalReceiptError:
                 rejected.append(name)
             else:
                 raise PhysicalReceiptError(f"selftest falsifier accepted: {name}")
 
-        require(len(rejected) == len(cases), "not all falsifiers rejected")
+        try:
+            verify(root, "c" * 40, "a" * 64)
+        except PhysicalReceiptError:
+            rejected.append("external-source-pin-mismatch")
+        else:
+            raise PhysicalReceiptError("selftest accepted external source pin mismatch")
+
+        try:
+            verify(root, "b" * 40, "c" * 64)
+        except PhysicalReceiptError:
+            rejected.append("external-artifact-pin-mismatch")
+        else:
+            raise PhysicalReceiptError("selftest accepted external artifact pin mismatch")
+
+        require(len(rejected) == len(cases) + 2, "not all falsifiers rejected")
         return {
             "schema": "rafaelia.rafci.physical-execution-selftest/v1",
             "state": "PASS_CONTRACT_ONLY",
@@ -252,6 +284,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--receipt-dir", type=Path)
     parser.add_argument("--expected-source-sha")
+    parser.add_argument("--expected-artifact-sha256")
     parser.add_argument("--selftest", action="store_true")
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
@@ -260,9 +293,9 @@ def main() -> int:
         result = selftest()
     else:
         require(args.receipt_dir is not None, "--receipt-dir required unless --selftest")
-        if args.expected_source_sha is not None:
-            require(bool(HEX40.fullmatch(args.expected_source_sha.lower())), "expected source SHA must be 40 hex")
-        result = verify(args.receipt_dir, args.expected_source_sha)
+        require(args.expected_source_sha is not None, "--expected-source-sha required for physical receipt verification")
+        require(args.expected_artifact_sha256 is not None, "--expected-artifact-sha256 required for physical receipt verification")
+        result = verify(args.receipt_dir, args.expected_source_sha, args.expected_artifact_sha256)
 
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"
     if args.out:
