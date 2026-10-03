@@ -3,11 +3,11 @@
 
 CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE
 
-A PASS here is bounded to externally supplied source/artifact pins, physical
-Termux ABI observation, execution exit status and verified receipt files. The
-receipt cannot appoint its own expected source or artifact identity. This does
-not imply production readiness, universal compatibility or independent
-replication.
+A PASS here is bounded to externally supplied source/artifact/scope pins,
+artifact ELF class+machine, physical Termux device-support observation,
+execution exit status and verified receipt files. The receipt cannot appoint
+its own expected identity. This does not imply production readiness, universal
+compatibility or independent replication.
 """
 from __future__ import annotations
 
@@ -37,11 +37,17 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def abi_matches(scope: str, abi: str, uname_m: str) -> bool:
+def device_supports(scope: str, abi: str, abilist32: str, abilist64: str, uname_m: str) -> bool:
     if scope == "arm32":
-        return abi in {"armeabi-v7a", "armeabi"} or uname_m.startswith("armv7") or uname_m == "armv8l"
+        return (
+            "armeabi-v7a" in abilist32
+            or "armeabi" in abilist32
+            or abi in {"armeabi-v7a", "armeabi"}
+            or uname_m.startswith("armv7")
+            or uname_m == "armv8l"
+        )
     if scope == "arm64":
-        return abi == "arm64-v8a" or uname_m == "aarch64"
+        return "arm64-v8a" in abilist64 or abi == "arm64-v8a" or uname_m == "aarch64"
     return False
 
 
@@ -75,12 +81,14 @@ def verify(
     root: Path,
     expected_source_sha: str,
     expected_artifact_sha256: str,
+    expected_scope: str,
 ) -> dict[str, Any]:
     root = root.resolve()
     expected_source_sha = expected_source_sha.lower()
     expected_artifact_sha256 = expected_artifact_sha256.lower()
     require(bool(HEX40.fullmatch(expected_source_sha)), "external expected source SHA must be 40 hex")
     require(bool(HEX64.fullmatch(expected_artifact_sha256)), "external expected artifact SHA-256 must be 64 hex")
+    require(expected_scope in {"arm32", "arm64"}, "external expected scope must be arm32 or arm64")
 
     receipt_path = root / "receipt.json"
     require(receipt_path.is_file(), "receipt.json missing")
@@ -95,22 +103,26 @@ def verify(
     require(bool(HEX40.fullmatch(source_commit)), "source commit is not exact 40-hex")
     require(source_commit == expected_source_sha, "source commit does not match external expected head")
 
+    scope = str(receipt.get("target_scope", ""))
+    require(scope == expected_scope, "receipt target scope does not match external expected scope")
+
     env = receipt.get("environment")
     require(isinstance(env, dict), "environment missing")
     require(env.get("physical_termux_observed") is True, "physical Termux not observed")
-    require(env.get("abi_scope_match") is True, "producer ABI match false")
+    require(env.get("abi_scope_match") is True, "producer ABI scope match false")
+    require(env.get("device_scope_supported") is True, "producer device scope support false")
     require(env.get("raw_device_serial_stored") is False, "raw device serial exposure")
     require(env.get("raw_termux_prefix_stored") is False, "raw Termux prefix exposure")
-
-    scope = str(receipt.get("target_scope", ""))
-    require(scope in {"arm32", "arm64"}, "unsupported target scope")
     abi = str(env.get("android_abi", ""))
+    abilist32 = str(env.get("android_abilist32", ""))
+    abilist64 = str(env.get("android_abilist64", ""))
     uname_m = str(env.get("uname_machine", ""))
-    require(abi_matches(scope, abi, uname_m), "observed ABI does not match target scope")
+    require(device_supports(scope, abi, abilist32, abilist64, uname_m), "device support evidence does not match target scope")
 
     artifact = receipt.get("artifact")
     require(isinstance(artifact, dict), "artifact block missing")
     require(artifact.get("raw_path_stored") is False, "raw artifact path exposure")
+    require(artifact.get("elf_scope") == expected_scope, "artifact ELF class/machine does not match external scope")
     receipt_expected = str(artifact.get("expected_sha256", "")).lower()
     before = str(artifact.get("sha256_before", "")).lower()
     after = str(artifact.get("sha256_after", "")).lower()
@@ -146,6 +158,8 @@ def verify(
         "artifact_sha256": expected_artifact_sha256,
         "external_source_pin_verified": True,
         "external_artifact_pin_verified": True,
+        "external_scope_pin_verified": True,
+        "artifact_elf_scope_verified": True,
         "receipt_sha256": receipt_sha,
         "manifest_sha256": manifest_sha,
         "independent_replication": "TOKEN_VAZIO",
@@ -160,8 +174,10 @@ def write_fixture(root: Path, *, scope: str = "arm32") -> None:
     (root / "target.stderr.bin").write_bytes(b"")
     empty_sha = hashlib.sha256(b"").hexdigest()
     artifact_sha = "a" * 64
-    abi = "armeabi-v7a" if scope == "arm32" else "arm64-v8a"
-    uname_m = "armv7l" if scope == "arm32" else "aarch64"
+    if scope == "arm32":
+        abi, abilist32, abilist64, uname_m = "armeabi-v7a", "armeabi-v7a,armeabi", "TOKEN_VAZIO", "armv7l"
+    else:
+        abi, abilist32, abilist64, uname_m = "arm64-v8a", "armeabi-v7a,armeabi", "arm64-v8a", "aarch64"
     receipt = {
         "schema": "rafaelia.rafci.physical-execution-receipt/v1",
         "repository": "rafaelmeloreisnovo/RafPolimata",
@@ -172,7 +188,10 @@ def write_fixture(root: Path, *, scope: str = "arm32") -> None:
         "environment": {
             "physical_termux_observed": True,
             "abi_scope_match": True,
+            "device_scope_supported": True,
             "android_abi": abi,
+            "android_abilist32": abilist32,
+            "android_abilist64": abilist64,
             "uname_machine": uname_m,
             "android_release": "selftest",
             "android_sdk": "selftest",
@@ -182,6 +201,7 @@ def write_fixture(root: Path, *, scope: str = "arm32") -> None:
         "artifact": {
             "name": "selftest.bin",
             "raw_path_stored": False,
+            "elf_scope": scope,
             "expected_sha256": artifact_sha,
             "sha256_before": artifact_sha,
             "sha256_after": artifact_sha,
@@ -211,11 +231,7 @@ def write_fixture(root: Path, *, scope: str = "arm32") -> None:
         "F_next": ["selftest"],
     }
     (root / "receipt.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    members = ["receipt.json", "target.stderr.bin", "target.stdout.bin"]
-    (root / "receipt.sha256").write_text(
-        "".join(f"{digest(root / name)}  ./{name}\n" for name in members),
-        encoding="utf-8",
-    )
+    rewrite_manifest(root)
 
 
 def rewrite_manifest(root: Path) -> None:
@@ -230,11 +246,12 @@ def selftest() -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix="rafci-physical-v1-") as temp:
         root = Path(temp) / "good"
         write_fixture(root)
-        good = verify(root, "b" * 40, "a" * 64)
+        good = verify(root, "b" * 40, "a" * 64, "arm32")
 
         cases: list[tuple[str, Any]] = [
             ("artifact-mutation", lambda x: x["artifact"].__setitem__("sha256_after", "c" * 64)),
-            ("abi-mismatch", lambda x: x["environment"].__setitem__("android_abi", "arm64-v8a")),
+            ("artifact-elf-scope-mismatch", lambda x: x["artifact"].__setitem__("elf_scope", "arm64")),
+            ("device-scope-not-supported", lambda x: x["environment"].__setitem__("device_scope_supported", False)),
             ("nonzero-exit", lambda x: x["execution"].__setitem__("exit_code", 7)),
             ("not-physical", lambda x: x["environment"].__setitem__("physical_termux_observed", False)),
             ("claim-promotion", lambda x: x.__setitem__("claim_allowed", True)),
@@ -249,27 +266,26 @@ def selftest() -> dict[str, Any]:
             (case_root / "receipt.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
             rewrite_manifest(case_root)
             try:
-                verify(case_root, "b" * 40, "a" * 64)
+                verify(case_root, "b" * 40, "a" * 64, "arm32")
             except PhysicalReceiptError:
                 rejected.append(name)
             else:
                 raise PhysicalReceiptError(f"selftest falsifier accepted: {name}")
 
-        try:
-            verify(root, "c" * 40, "a" * 64)
-        except PhysicalReceiptError:
-            rejected.append("external-source-pin-mismatch")
-        else:
-            raise PhysicalReceiptError("selftest accepted external source pin mismatch")
+        external_cases = [
+            ("external-source-pin-mismatch", ("c" * 40, "a" * 64, "arm32")),
+            ("external-artifact-pin-mismatch", ("b" * 40, "c" * 64, "arm32")),
+            ("external-scope-pin-mismatch", ("b" * 40, "a" * 64, "arm64")),
+        ]
+        for name, args in external_cases:
+            try:
+                verify(root, *args)
+            except PhysicalReceiptError:
+                rejected.append(name)
+            else:
+                raise PhysicalReceiptError(f"selftest accepted: {name}")
 
-        try:
-            verify(root, "b" * 40, "c" * 64)
-        except PhysicalReceiptError:
-            rejected.append("external-artifact-pin-mismatch")
-        else:
-            raise PhysicalReceiptError("selftest accepted external artifact pin mismatch")
-
-        require(len(rejected) == len(cases) + 2, "not all falsifiers rejected")
+        require(len(rejected) == len(cases) + len(external_cases), "not all falsifiers rejected")
         return {
             "schema": "rafaelia.rafci.physical-execution-selftest/v1",
             "state": "PASS_CONTRACT_ONLY",
@@ -285,6 +301,7 @@ def main() -> int:
     parser.add_argument("--receipt-dir", type=Path)
     parser.add_argument("--expected-source-sha")
     parser.add_argument("--expected-artifact-sha256")
+    parser.add_argument("--expected-scope", choices=("arm32", "arm64"))
     parser.add_argument("--selftest", action="store_true")
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
@@ -295,7 +312,8 @@ def main() -> int:
         require(args.receipt_dir is not None, "--receipt-dir required unless --selftest")
         require(args.expected_source_sha is not None, "--expected-source-sha required for physical receipt verification")
         require(args.expected_artifact_sha256 is not None, "--expected-artifact-sha256 required for physical receipt verification")
-        result = verify(args.receipt_dir, args.expected_source_sha, args.expected_artifact_sha256)
+        require(args.expected_scope is not None, "--expected-scope required for physical receipt verification")
+        result = verify(args.receipt_dir, args.expected_source_sha, args.expected_artifact_sha256, args.expected_scope)
 
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"
     if args.out:
