@@ -1,0 +1,94 @@
+{
+  "schema": "rafaelia.rafci.physical-route/v1",
+  "authority": "authority.rafpolimata.rafci",
+  "closure": "CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE",
+  "claim_allowed": false,
+  "purpose": "Route existing physical evidence producers by evidentiary ceiling without creating a duplicate receipt format or promoting structural/readiness evidence into runtime execution.",
+  "sources": [
+    {
+      "id": "physical.runtime-doctor-readonly",
+      "producer": "scripts/runtime_doctor_physical_readonly_gate.sh",
+      "contract": "configs/runtime-doctor-physical-readonly.v1.json",
+      "receipt_schema": "raf.runtime-doctor-physical-readonly-receipt.v1",
+      "evidence_class": "PHYSICAL_ENVIRONMENT_READINESS",
+      "can_establish": [
+        "android-environment-observed",
+        "termux-prefix-shape-observed",
+        "android-abi-observed",
+        "read-only-probe-exit-status",
+        "receipt-hash-integrity"
+      ],
+      "cannot_establish": [
+        "target-artifact-executed",
+        "apk-installed",
+        "apk-opened",
+        "native-target-runtime-behavior"
+      ],
+      "rafci_physical_execution_gate": "TOKEN_VAZIO",
+      "reason": "receipt has physical environment/ABI evidence but no exact target artifact identity bound to a target execution"
+    },
+    {
+      "id": "physical.apkc-termux-arm32",
+      "producer": "scripts/apkc_validate_termux_arm32.sh",
+      "contract": "docs/receipts/APKC_TERMUX_SEALED_STDIN_PREFLIGHT_20260814.md",
+      "receipt_schema": "apkc-termux-arm32-run-directory+receipt.sha256",
+      "evidence_class": "PHYSICAL_STRUCTURAL_BUILD_ARM32",
+      "can_establish": [
+        "termux-native-apkc-build",
+        "arm32-apk-generation",
+        "same-environment-byte-reproduction",
+        "zip-dex-elf-structural-gates",
+        "receipt-hash-integrity"
+      ],
+      "cannot_establish": [
+        "apk-signature-runtime-acceptance",
+        "apk-installation",
+        "apk-launch",
+        "runtime-logcat-behavior",
+        "cross-device-reproduction"
+      ],
+      "rafci_physical_execution_gate": "TOKEN_VAZIO",
+      "reason": "producer explicitly keeps installation/open/runtime/logcat unpromoted"
+    },
+    {
+      "id": "runtime.android-federated",
+      "producer": "scripts/compile_android_runtime_evidence.py",
+      "contract": "docs/ANDROID_FEDERATED_RUNTIME_EVIDENCE_V1.md",
+      "receipt_schema": "raf.android-runtime-receipt.v1",
+      "evidence_class": "FEDERATED_ANDROID_VM_RUNTIME",
+      "can_establish": [
+        "dispatch-state",
+        "execution-exit-code",
+        "guest-boot-artifact-addressing"
+      ],
+      "cannot_establish": [
+        "physical-device-runtime-by-schema-alone",
+        "independent-device-replication"
+      ],
+      "rafci_physical_execution_gate": "TOKEN_VAZIO",
+      "reason": "current schema is federated VM/runtime evidence and does not itself assert a same-artifact physical-device execution"
+    }
+  ],
+  "promotion_contract": {
+    "gate": "gate.physical-execution",
+    "required_for_arm32_or_arm64": [
+      "physical Android/Termux environment observed",
+      "target ABI observed and matches requested gate scope",
+      "exact target artifact SHA-256 measured before execution",
+      "same measured artifact executed on that physical target",
+      "execution exit/status captured",
+      "receipt integrity verified",
+      "source/artifact/evidence identities remain distinct"
+    ],
+    "current_state": "TOKEN_VAZIO",
+    "why": "no existing canonical producer currently binds all required fields in one same-artifact physical execution receipt"
+  },
+  "invariants": [
+    "PHYSICAL_READINESS != PHYSICAL_EXECUTION",
+    "PHYSICAL_STRUCTURAL_BUILD != PHYSICAL_RUNTIME",
+    "VM_RUNTIME != PHYSICAL_DEVICE_RUNTIME",
+    "ARTIFACT_HASH != EXECUTION",
+    "EXECUTION != CLAIM",
+    "TOKEN_VAZIO != PASS"
+  ]
+}
