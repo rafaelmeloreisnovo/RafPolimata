@@ -10,22 +10,37 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "configs" / "rafgittools-custody-consumer.v1.json"
 SECRET_PREFIXES = ("ghp_", "github_pat_", "gho_", "ghu_", "ghs_", "ghr_", "sk-")
+REQUIRED_FIELDS = {
+    "schemaVersion", "bridgeId", "producer", "consumer", "sourceRef",
+    "artifactRef", "executionRef", "evidenceRefs", "state", "claimAllowed",
+    "predecessorReceipt", "supersedesReceipt", "capabilityLabels", "observedAt",
+}
+STRING_REF_FIELDS = (
+    "sourceRef", "artifactRef", "executionRef", "predecessorReceipt", "supersedesReceipt"
+)
 
 
 def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _non_empty_string(value: object) -> bool:
+    return isinstance(value, str) and bool(value)
+
+
 def validate(envelope: dict, contract: dict) -> list[str]:
     errors: list[str] = []
-    required = {
-        "schemaVersion", "bridgeId", "producer", "consumer", "sourceRef",
-        "artifactRef", "executionRef", "evidenceRefs", "state", "claimAllowed",
-        "predecessorReceipt", "supersedesReceipt", "capabilityLabels", "observedAt",
-    }
-    missing = sorted(required - set(envelope))
+    if not isinstance(envelope, dict):
+        return ["envelope must be an object"]
+
+    missing = sorted(REQUIRED_FIELDS - set(envelope))
     if missing:
         errors.append(f"missing fields: {missing}")
+
+    unexpected = sorted(set(envelope) - REQUIRED_FIELDS)
+    if unexpected:
+        errors.append(f"unexpected fields: {unexpected}")
+
     if envelope.get("schemaVersion") != contract.get("accepted_bridge_schema"):
         errors.append("bridge schema mismatch")
     if envelope.get("producer") != contract.get("producer"):
@@ -36,23 +51,33 @@ def validate(envelope: dict, contract: dict) -> list[str]:
         errors.append("state not accepted")
     if envelope.get("claimAllowed") is not False:
         errors.append("claimAllowed must remain false")
-    for field in ("sourceRef", "artifactRef", "executionRef", "predecessorReceipt", "supersedesReceipt"):
-        value = envelope.get(field)
-        if not isinstance(value, str) or not value:
+
+    if not _non_empty_string(envelope.get("bridgeId")):
+        errors.append("bridgeId must be a non-empty string")
+    if not _non_empty_string(envelope.get("observedAt")):
+        errors.append("observedAt must be a non-empty string")
+
+    for field in STRING_REF_FIELDS:
+        if not _non_empty_string(envelope.get(field)):
             errors.append(f"{field} must be a non-empty string")
+
     refs = envelope.get("evidenceRefs")
-    if not isinstance(refs, list) or any(not isinstance(v, str) or not v for v in refs):
+    if not isinstance(refs, list) or any(not _non_empty_string(v) for v in refs):
         errors.append("evidenceRefs must be a string array")
+
     labels = envelope.get("capabilityLabels")
     if not isinstance(labels, list):
         errors.append("capabilityLabels must be an array")
     else:
+        if len(labels) != len(set(labels)):
+            errors.append("capabilityLabels must be unique")
         for label in labels:
             if not isinstance(label, str) or not re.fullmatch(r"[A-Z][a-z0-9_]*", label):
                 errors.append(f"invalid capability label: {label!r}")
                 continue
-            if label.startswith(SECRET_PREFIXES):
+            if label.lower().startswith(SECRET_PREFIXES):
                 errors.append("secret-looking credential material is forbidden")
+
     return errors
 
 
