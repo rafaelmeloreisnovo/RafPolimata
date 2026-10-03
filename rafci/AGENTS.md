@@ -24,6 +24,8 @@ TOKEN_VAZIO != 0
 IMPLEMENTED_UNTESTED != PASS
 ```
 
+Closure routing is explicit: structural/operational gaps bind to `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`; runtime/device evidence gaps bind to `CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE`. Closure linkage classifies an unresolved obligation and never promotes it.
+
 The provider repo keeps implementation authority. Relationship never implies authority transfer.
 
 ## RAFCI-BIT rule
