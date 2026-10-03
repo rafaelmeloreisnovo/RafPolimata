@@ -28,7 +28,7 @@ IMPLEMENTED_UNTESTED != PASS
 
 **Closure routing:** structural/operational unknowns in this subsystem bind to `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`; runtime/device evidence gaps bind to `CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE`. A closure classifies the open evidence obligation; it does not convert an unknown into PASS.
 
-A CI YAML, an ELF object, a linker section, a receipt file, and a physical-device observation are different evidence classes.
+A CI YAML, an ELF object, a linker section, a provider ruleset readback, a receipt file, and a physical-device observation are different evidence classes.
 
 ## Small route
 
@@ -41,7 +41,7 @@ source identity
     -> claim gate
 ```
 
-`graph.v1.json` is the machine-readable route. `contracts/rafci_wire_v1.h` is the fixed binary vocabulary. `contracts/rafci_anchors_v1.c` materializes route metadata as symbols and ELF sections. `tools/verify_rafci_v1.py` proves that the graph, bit assignments, source comments, and anchors do not silently drift.
+`graph.v1.json` is the machine-readable route. `contracts/rafci_wire_v1.h` is the fixed binary vocabulary. `contracts/rafci_anchors_v1.c` materializes route metadata as symbols and ELF sections. `tools/verify_rafci_v1.py` proves that the graph, bit assignments, source comments, closures and anchors do not silently drift.
 
 ## Comments as semantic databits
 
@@ -98,7 +98,7 @@ Freestanding-compatible metadata object, example:
 clang -std=c11 -ffreestanding -fno-builtin -fno-stack-protector \
   -fno-unwind-tables -fno-asynchronous-unwind-tables \
   -I rafci/contracts -c rafci/contracts/rafci_anchors_v1.c -o anchors.o
-ld.lld -r anchors.o -o anchors.linked.o
+ld -r anchors.o -o anchors.linked.o
 nm -u anchors.linked.o
 readelf -SW anchors.linked.o
 readelf -sW anchors.linked.o
@@ -111,6 +111,22 @@ The GitHub workflow compiles and inspects the anchor object for x86_64, ARMv7 an
 The authorial contract references providers by repository + role. Exact provider SHAs belong in execution receipts, not in this long-lived semantic dictionary, so the contract does not become stale merely because a provider advances.
 
 `RafGitTools` may dispatch and display the route but does not silently rewrite authority. `termux-packages` may provide a toolchain but does not become evidence authority. `runner-images_RAFCODE` may provide a host but does not make the host freestanding. `actions` may provide action implementations but does not define RafCI truth semantics.
+
+### Provider enforcement observation
+
+`provider_policy.v1.json` defines the configuration needed before provider enforcement can even be considered ready: active branch ruleset, target-ref coverage, zero bypass actors, deletion and non-fast-forward protection, pull-request enforcement, at least one required approval and at least one required status check.
+
+`tools/audit_provider_rules_v1.py` performs a live GitHub ruleset readback using only Python stdlib, normalizes the provider state, emits a deterministic observation digest and records the missing controls. The tool is intentionally incapable of promoting `gate.provider-enforcement` to PASS. Even a fully configured readback still requires a **separate zero-approval rejection receipt** against the protected promotion path.
+
+This distinction is deliberate:
+
+```text
+provider configuration readback
+    != rejected unauthorized/zero-approval promotion attempt
+    != provider-enforcement PASS
+```
+
+The Actions job preserves the normalized readback and receipt and asserts that `claim_allowed=false`, `provider_enforcement_gate=TOKEN_VAZIO`, and closure L11 remain intact.
 
 ## Current explicit gaps
 
@@ -129,6 +145,6 @@ This subsystem is additive. Rollback is repository-local: revert the RafCI commi
 
 ## R3
 
-`F_ok` = source-level contract, semantic graph, unique bits, linker anchors and CI gate are defined.  
-`F_gap` = current-head CI and physical/provider evidence are separate until executed.  
-`F_next` = run exact-head RafCI workflow; only after its receipts exist may the structural scope become PASS.
+`F_ok` = source-level contract, semantic graph, unique bits, linker anchors, closure discipline and live provider readback machinery are defined.  
+`F_gap` = provider negative rejection evidence and physical/provider-independent execution remain separate until executed.  
+`F_next` = consume exact-head receipts; provider configuration may be observed, but promotion remains closed until an authorized negative rejection test exists.
