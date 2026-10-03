@@ -10,7 +10,7 @@ REGISTER_OWNERSHIP=NONE
 CLOBBERS=NONE
 MEMORY_ORDER=NONE
 TAIL_SHADOW=NONE
-EVIDENCE=Source/layout existence only until an executed compile/link gate produces a receipt.
+EVIDENCE=Source/layout existence only until an executed compile/link gate produces a receipt. Structural unknowns bind CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY; runtime/device evidence binds CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.
 */
 
 /*
