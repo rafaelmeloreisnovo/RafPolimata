@@ -1,0 +1,138 @@
+name: RafCI Authority V1
+
+on:
+  pull_request:
+    paths:
+      - 'rafci/**'
+      - 'federation/ecosystem-member.v1.json'
+      - '.github/workflows/rafci-contract-v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'rafci/**'
+      - 'federation/ecosystem-member.v1.json'
+      - '.github/workflows/rafci-contract-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rafci-v1-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    name: semantic contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Validate graph, unique bits, comments and wire layout
+        run: |
+          mkdir -p build/rafci
+          python3 rafci/tools/verify_rafci_v1.py \
+            --selftest \
+            --receipt build/rafci/source-contract-receipt.json
+          python3 -m json.tool build/rafci/source-contract-receipt.json >/dev/null
+      - name: Preserve source-contract receipt
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: rafci-source-contract-${{ github.run_id }}
+          path: build/rafci/source-contract-receipt.json
+          if-no-files-found: warn
+
+  linker-matrix:
+    name: linker anchors / ${{ matrix.id }}
+    needs: contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: x86_64
+            target: x86_64-linux-gnu
+          - id: armv7
+            target: armv7a-linux-gnueabi
+          - id: aarch64
+            target: aarch64-linux-gnu
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Toolchain identity
+        run: |
+          clang --version
+          ld.lld --version
+      - name: Compile and relocatable-link metadata anchors
+        env:
+          RAFCI_TARGET: ${{ matrix.target }}
+          RAFCI_ID: ${{ matrix.id }}
+        run: |
+          set -euo pipefail
+          mkdir -p "build/rafci/${RAFCI_ID}"
+          obj="build/rafci/${RAFCI_ID}/anchors.o"
+          linked="build/rafci/${RAFCI_ID}/anchors.linked.o"
+
+          clang -target "${RAFCI_TARGET}" \
+            -std=c11 -O2 -ffreestanding -fno-builtin -fno-stack-protector \
+            -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-ident \
+            -Wall -Wextra -Werror \
+            -I rafci/contracts \
+            -c rafci/contracts/rafci_anchors_v1.c \
+            -o "${obj}"
+
+          ld.lld -r "${obj}" -o "${linked}"
+
+          NM_TOOL="$(command -v llvm-nm || command -v nm)"
+          READELF_TOOL="$(command -v llvm-readelf || command -v readelf)"
+          test -n "${NM_TOOL}"
+          test -n "${READELF_TOOL}"
+          test -z "$("${NM_TOOL}" -u "${linked}")"
+
+          "${READELF_TOOL}" -SW "${linked}" | grep -F '.rafci.authority'
+          "${READELF_TOOL}" -SW "${linked}" | grep -F '.rafci.route'
+          "${READELF_TOOL}" -SW "${linked}" | grep -F '.rafci.gates'
+
+          "${READELF_TOOL}" -sW "${linked}" | grep -F 'rafci_authority_anchor_v1'
+          "${READELF_TOOL}" -sW "${linked}" | grep -F 'rafci_route_anchor_v1'
+          "${READELF_TOOL}" -sW "${linked}" | grep -F 'rafci_gate_anchor_v1'
+
+          sha256sum "${obj}" "${linked}" > "build/rafci/${RAFCI_ID}/sha256.txt"
+
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          ident = os.environ["RAFCI_ID"]
+          target = os.environ["RAFCI_TARGET"]
+          root = Path("build/rafci") / ident
+          linked = root / "anchors.linked.o"
+          digest = hashlib.sha256(linked.read_bytes()).hexdigest()
+          receipt = {
+              "schema": "rafaelia.rafci.linker-receipt/v1",
+              "repository": "rafaelmeloreisnovo/RafPolimata",
+              "commit": os.environ.get("GITHUB_SHA", "TOKEN_VAZIO"),
+              "target": target,
+              "artifact": str(linked),
+              "artifact_sha256": digest,
+              "gate": "linker-anchors+no-undefined",
+              "status": "PASS",
+              "runtime_execution": "TOKEN_VAZIO",
+              "physical_execution": "TOKEN_VAZIO",
+              "claim_allowed": False,
+          }
+          (root / "receipt.json").write_text(
+              json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+      - name: Preserve linker receipt
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: rafci-linker-${{ matrix.id }}-${{ github.run_id }}
+          path: build/rafci/${{ matrix.id }}/
+          if-no-files-found: warn

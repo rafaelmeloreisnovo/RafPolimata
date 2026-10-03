@@ -1,0 +1,300 @@
+{
+  "schema": "rafaelia.rafci.graph/v1",
+  "authority": {
+    "id": "authority.rafpolimata.rafci",
+    "repository": "rafaelmeloreisnovo/RafPolimata",
+    "scope": [
+      "rafci-contract",
+      "semantic-route-graph",
+      "bit-dictionary",
+      "receipt-wire",
+      "structural-gates"
+    ],
+    "authority_transfer_allowed": false
+  },
+  "source_state": "IMPLEMENTED",
+  "claim_allowed": false,
+  "provider_reference_policy": "repository+role in contract; exact commit SHA required in execution receipt",
+  "providers": [
+    {
+      "id": "provider.rafpolimata",
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "role": "AUTHORITY",
+      "scope": [
+        "contract",
+        "route-graph",
+        "gate-dictionary",
+        "receipt-wire"
+      ]
+    },
+    {
+      "id": "provider.rafgittools",
+      "repository": "rafaelmeloreisnovo/RafGitTools",
+      "role": "OPERATOR",
+      "scope": [
+        "dispatch",
+        "ui",
+        "receipt-consumption"
+      ]
+    },
+    {
+      "id": "provider.actions",
+      "repository": "rafaelmeloreisnovo/actions",
+      "role": "ACTION_PROVIDER",
+      "scope": [
+        "action-implementation",
+        "upstream-derived-fork-lab"
+      ]
+    },
+    {
+      "id": "provider.runner-images",
+      "repository": "rafaelmeloreisnovo/runner-images_RAFCODE",
+      "role": "HOST_PROVIDER",
+      "scope": [
+        "host-image-definition",
+        "host-tool-surface"
+      ]
+    },
+    {
+      "id": "provider.termux-packages",
+      "repository": "rafaelmeloreisnovo/termux-packages",
+      "role": "TOOLCHAIN_PROVIDER",
+      "scope": [
+        "toolchain",
+        "distribution",
+        "termux-package-surface"
+      ]
+    }
+  ],
+  "stages": [
+    {
+      "id": "stage.source",
+      "kind": "SOURCE"
+    },
+    {
+      "id": "stage.artifact",
+      "kind": "ARTIFACT"
+    },
+    {
+      "id": "stage.execution",
+      "kind": "EXECUTION"
+    },
+    {
+      "id": "stage.evidence",
+      "kind": "EVIDENCE"
+    },
+    {
+      "id": "stage.claim",
+      "kind": "CLAIM"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge.source-artifact",
+      "from": "stage.source",
+      "to": "stage.artifact",
+      "kind": "builds"
+    },
+    {
+      "id": "edge.artifact-execution",
+      "from": "stage.artifact",
+      "to": "stage.execution",
+      "kind": "executes_exact_artifact"
+    },
+    {
+      "id": "edge.execution-evidence",
+      "from": "stage.execution",
+      "to": "stage.evidence",
+      "kind": "emits_receipt"
+    },
+    {
+      "id": "edge.evidence-claim",
+      "from": "stage.evidence",
+      "to": "stage.claim",
+      "kind": "gates_claim"
+    }
+  ],
+  "provider_bindings": [
+    {
+      "provider": "provider.rafpolimata",
+      "stages": [
+        "stage.source",
+        "stage.evidence"
+      ]
+    },
+    {
+      "provider": "provider.rafgittools",
+      "stages": [
+        "stage.execution",
+        "stage.evidence"
+      ]
+    },
+    {
+      "provider": "provider.actions",
+      "stages": [
+        "stage.execution"
+      ]
+    },
+    {
+      "provider": "provider.runner-images",
+      "stages": [
+        "stage.execution"
+      ]
+    },
+    {
+      "provider": "provider.termux-packages",
+      "stages": [
+        "stage.artifact"
+      ]
+    }
+  ],
+  "bit_dictionary": {
+    "capabilities": [
+      {
+        "id": "cap.authority",
+        "bit": 0,
+        "symbol": "RAFCI_CAP_AUTHORITY_BIT"
+      },
+      {
+        "id": "cap.operator",
+        "bit": 1,
+        "symbol": "RAFCI_CAP_OPERATOR_BIT"
+      },
+      {
+        "id": "cap.action-provider",
+        "bit": 2,
+        "symbol": "RAFCI_CAP_ACTION_PROVIDER_BIT"
+      },
+      {
+        "id": "cap.host-provider",
+        "bit": 3,
+        "symbol": "RAFCI_CAP_HOST_PROVIDER_BIT"
+      },
+      {
+        "id": "cap.toolchain-provider",
+        "bit": 4,
+        "symbol": "RAFCI_CAP_TOOLCHAIN_PROVIDER_BIT"
+      },
+      {
+        "id": "cap.freestanding-target",
+        "bit": 5,
+        "symbol": "RAFCI_CAP_FREESTANDING_TARGET_BIT"
+      },
+      {
+        "id": "cap.physical-target",
+        "bit": 6,
+        "symbol": "RAFCI_CAP_PHYSICAL_TARGET_BIT"
+      },
+      {
+        "id": "cap.receipt-sink",
+        "bit": 7,
+        "symbol": "RAFCI_CAP_RECEIPT_SINK_BIT"
+      }
+    ],
+    "gates": [
+      {
+        "id": "gate.source-identity",
+        "bit": 0,
+        "symbol": "RAFCI_GATE_SOURCE_IDENTITY_BIT"
+      },
+      {
+        "id": "gate.artifact-identity",
+        "bit": 1,
+        "symbol": "RAFCI_GATE_ARTIFACT_IDENTITY_BIT"
+      },
+      {
+        "id": "gate.no-needed",
+        "bit": 2,
+        "symbol": "RAFCI_GATE_NO_NEEDED_BIT"
+      },
+      {
+        "id": "gate.no-interp",
+        "bit": 3,
+        "symbol": "RAFCI_GATE_NO_INTERP_BIT"
+      },
+      {
+        "id": "gate.no-undefined",
+        "bit": 4,
+        "symbol": "RAFCI_GATE_NO_UNDEFINED_BIT"
+      },
+      {
+        "id": "gate.linker-anchors",
+        "bit": 5,
+        "symbol": "RAFCI_GATE_LINKER_ANCHORS_BIT"
+      },
+      {
+        "id": "gate.hosted-execution",
+        "bit": 6,
+        "symbol": "RAFCI_GATE_HOSTED_EXECUTION_BIT"
+      },
+      {
+        "id": "gate.physical-execution",
+        "bit": 7,
+        "symbol": "RAFCI_GATE_PHYSICAL_EXECUTION_BIT"
+      },
+      {
+        "id": "gate.provider-enforcement",
+        "bit": 8,
+        "symbol": "RAFCI_GATE_PROVIDER_ENFORCEMENT_BIT"
+      },
+      {
+        "id": "gate.provenance",
+        "bit": 9,
+        "symbol": "RAFCI_GATE_PROVENANCE_BIT"
+      }
+    ]
+  },
+  "anchors": [
+    {
+      "id": "anchor.authority",
+      "section": ".rafci.authority",
+      "symbol": "rafci_authority_anchor_v1",
+      "meaning": "RafPolimata owns the RafCI semantic contract only"
+    },
+    {
+      "id": "anchor.route",
+      "section": ".rafci.route",
+      "symbol": "rafci_route_anchor_v1",
+      "meaning": "SOURCE->ARTIFACT->EXECUTION->EVIDENCE->CLAIM"
+    },
+    {
+      "id": "anchor.gates",
+      "section": ".rafci.gates",
+      "symbol": "rafci_gate_anchor_v1",
+      "meaning": "gate dictionary version anchor"
+    }
+  ],
+  "gaps": [
+    {
+      "id": "gap.provider-enforcement",
+      "state": "TOKEN_VAZIO",
+      "evidence_rule": "authorized provider readback plus zero-approval rejection receipt"
+    },
+    {
+      "id": "gap.physical-arm32",
+      "state": "TOKEN_VAZIO",
+      "evidence_rule": "same-artifact physical ARM32 execution receipt"
+    },
+    {
+      "id": "gap.physical-arm64",
+      "state": "TOKEN_VAZIO",
+      "evidence_rule": "same-artifact physical ARM64 execution receipt"
+    },
+    {
+      "id": "gap.provider-independent-runtime",
+      "state": "TOKEN_VAZIO",
+      "evidence_rule": "independent-provider execution with exact artifact/source identity"
+    }
+  ],
+  "invariants": {
+    "source_is_not_artifact": true,
+    "artifact_is_not_execution": true,
+    "execution_is_not_evidence": true,
+    "evidence_is_not_claim": true,
+    "token_vazio_is_not_zero": true,
+    "implemented_untested_is_not_pass": true,
+    "relationship_is_not_authority_transfer": true,
+    "bit_ids_and_indexes_are_unique_per_namespace": true,
+    "evidence_chain_is_acyclic": true
+  }
+}
