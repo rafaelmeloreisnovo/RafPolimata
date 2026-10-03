@@ -21,6 +21,9 @@ concurrency:
   group: rafci-v1-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  RAFCI_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
   contract:
     name: semantic contract
@@ -28,6 +31,8 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.RAFCI_SOURCE_SHA }}
       - name: Validate graph, unique bits, comments and wire layout
         run: |
           mkdir -p build/rafci
@@ -43,8 +48,8 @@ jobs:
           path: build/rafci/source-contract-receipt.json
           if-no-files-found: warn
 
-  linker-matrix:
-    name: linker anchors / ${{ matrix.id }}
+  object-matrix:
+    name: ELF anchors / ${{ matrix.id }}
     needs: contract
     runs-on: ubuntu-24.04
     timeout-minutes: 8
@@ -60,11 +65,11 @@ jobs:
             target: aarch64-linux-gnu
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.RAFCI_SOURCE_SHA }}
       - name: Toolchain identity
-        run: |
-          clang --version
-          ld.lld --version
-      - name: Compile and relocatable-link metadata anchors
+        run: clang --version
+      - name: Compile and inspect target metadata anchors
         env:
           RAFCI_TARGET: ${{ matrix.target }}
           RAFCI_ID: ${{ matrix.id }}
@@ -72,7 +77,6 @@ jobs:
           set -euo pipefail
           mkdir -p "build/rafci/${RAFCI_ID}"
           obj="build/rafci/${RAFCI_ID}/anchors.o"
-          linked="build/rafci/${RAFCI_ID}/anchors.linked.o"
 
           clang -target "${RAFCI_TARGET}" \
             -std=c11 -O2 -ffreestanding -fno-builtin -fno-stack-protector \
@@ -82,23 +86,21 @@ jobs:
             -c rafci/contracts/rafci_anchors_v1.c \
             -o "${obj}"
 
-          ld.lld -r "${obj}" -o "${linked}"
-
           NM_TOOL="$(command -v llvm-nm || command -v nm)"
           READELF_TOOL="$(command -v llvm-readelf || command -v readelf)"
           test -n "${NM_TOOL}"
           test -n "${READELF_TOOL}"
-          test -z "$("${NM_TOOL}" -u "${linked}")"
+          test -z "$("${NM_TOOL}" -u "${obj}")"
 
-          "${READELF_TOOL}" -SW "${linked}" | grep -F '.rafci.authority'
-          "${READELF_TOOL}" -SW "${linked}" | grep -F '.rafci.route'
-          "${READELF_TOOL}" -SW "${linked}" | grep -F '.rafci.gates'
+          "${READELF_TOOL}" -SW "${obj}" | grep -F '.rafci.authority'
+          "${READELF_TOOL}" -SW "${obj}" | grep -F '.rafci.route'
+          "${READELF_TOOL}" -SW "${obj}" | grep -F '.rafci.gates'
 
-          "${READELF_TOOL}" -sW "${linked}" | grep -F 'rafci_authority_anchor_v1'
-          "${READELF_TOOL}" -sW "${linked}" | grep -F 'rafci_route_anchor_v1'
-          "${READELF_TOOL}" -sW "${linked}" | grep -F 'rafci_gate_anchor_v1'
+          "${READELF_TOOL}" -sW "${obj}" | grep -F 'rafci_authority_anchor_v1'
+          "${READELF_TOOL}" -sW "${obj}" | grep -F 'rafci_route_anchor_v1'
+          "${READELF_TOOL}" -sW "${obj}" | grep -F 'rafci_gate_anchor_v1'
 
-          sha256sum "${obj}" "${linked}" > "build/rafci/${RAFCI_ID}/sha256.txt"
+          sha256sum "${obj}" > "build/rafci/${RAFCI_ID}/sha256.txt"
 
           python3 - <<'PY'
           import hashlib
@@ -109,16 +111,89 @@ jobs:
           ident = os.environ["RAFCI_ID"]
           target = os.environ["RAFCI_TARGET"]
           root = Path("build/rafci") / ident
+          obj = root / "anchors.o"
+          receipt = {
+              "schema": "rafaelia.rafci.object-receipt/v1",
+              "repository": "rafaelmeloreisnovo/RafPolimata",
+              "commit": os.environ["RAFCI_SOURCE_SHA"],
+              "target": target,
+              "artifact": str(obj),
+              "artifact_sha256": hashlib.sha256(obj.read_bytes()).hexdigest(),
+              "gate": "target-object-anchors+no-undefined",
+              "status": "PASS",
+              "relocatable_link": "TOKEN_VAZIO_NOT_PART_OF_CROSS_OBJECT_GATE",
+              "runtime_execution": "TOKEN_VAZIO",
+              "physical_execution": "TOKEN_VAZIO",
+              "claim_allowed": False,
+          }
+          (root / "receipt.json").write_text(
+              json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+      - name: Preserve target-object receipt
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: rafci-object-${{ matrix.id }}-${{ github.run_id }}
+          path: build/rafci/${{ matrix.id }}/
+          if-no-files-found: warn
+
+  host-linker:
+    name: hosted x86_64 relocatable linker
+    needs: contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.RAFCI_SOURCE_SHA }}
+      - name: Compile, relocatable-link and inspect
+        run: |
+          set -euo pipefail
+          mkdir -p build/rafci/host-linker
+          obj="build/rafci/host-linker/anchors.o"
+          linked="build/rafci/host-linker/anchors.linked.o"
+
+          clang -std=c11 -O2 -ffreestanding -fno-builtin -fno-stack-protector \
+            -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-ident \
+            -Wall -Wextra -Werror \
+            -I rafci/contracts \
+            -c rafci/contracts/rafci_anchors_v1.c \
+            -o "${obj}"
+
+          ld -r "${obj}" -o "${linked}"
+
+          NM_TOOL="$(command -v llvm-nm || command -v nm)"
+          READELF_TOOL="$(command -v llvm-readelf || command -v readelf)"
+          test -z "$("${NM_TOOL}" -u "${linked}")"
+
+          "${READELF_TOOL}" -SW "${linked}" | grep -F '.rafci.authority'
+          "${READELF_TOOL}" -SW "${linked}" | grep -F '.rafci.route'
+          "${READELF_TOOL}" -SW "${linked}" | grep -F '.rafci.gates'
+
+          "${READELF_TOOL}" -sW "${linked}" | grep -F 'rafci_authority_anchor_v1'
+          "${READELF_TOOL}" -sW "${linked}" | grep -F 'rafci_route_anchor_v1'
+          "${READELF_TOOL}" -sW "${linked}" | grep -F 'rafci_gate_anchor_v1'
+
+          sha256sum "${obj}" "${linked}" > build/rafci/host-linker/sha256.txt
+
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path("build/rafci/host-linker")
           linked = root / "anchors.linked.o"
-          digest = hashlib.sha256(linked.read_bytes()).hexdigest()
           receipt = {
               "schema": "rafaelia.rafci.linker-receipt/v1",
               "repository": "rafaelmeloreisnovo/RafPolimata",
-              "commit": os.environ.get("GITHUB_SHA", "TOKEN_VAZIO"),
-              "target": target,
+              "commit": os.environ["RAFCI_SOURCE_SHA"],
+              "target": "x86_64-hosted",
               "artifact": str(linked),
-              "artifact_sha256": digest,
-              "gate": "linker-anchors+no-undefined",
+              "artifact_sha256": hashlib.sha256(linked.read_bytes()).hexdigest(),
+              "gate": "host-relocatable-linker-anchors+no-undefined",
               "status": "PASS",
               "runtime_execution": "TOKEN_VAZIO",
               "physical_execution": "TOKEN_VAZIO",
@@ -129,10 +204,10 @@ jobs:
               encoding="utf-8",
           )
           PY
-      - name: Preserve linker receipt
+      - name: Preserve host-linker receipt
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
-          name: rafci-linker-${{ matrix.id }}-${{ github.run_id }}
-          path: build/rafci/${{ matrix.id }}/
+          name: rafci-host-linker-${{ github.run_id }}
+          path: build/rafci/host-linker/
           if-no-files-found: warn
