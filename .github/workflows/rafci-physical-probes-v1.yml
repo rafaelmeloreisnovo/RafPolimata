@@ -1,0 +1,94 @@
+name: RafCI Physical Probe Artifacts V1
+
+on:
+  pull_request:
+    paths:
+      - 'rafci/**'
+      - '.github/workflows/rafci-physical-probes-v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'rafci/**'
+      - '.github/workflows/rafci-physical-probes-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rafci-physical-probes-v1-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  RAFCI_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  deterministic-probes:
+    name: deterministic ARM32 ARM64 physical probe artifacts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.RAFCI_SOURCE_SHA }}
+
+      - name: Build exact bytes and verify ELF boundaries
+        run: |
+          set -euo pipefail
+          out=build/rafci/physical-probes
+          python3 rafci/tools/build_physical_probe_v1.py \
+            --selftest \
+            --source-sha "${RAFCI_SOURCE_SHA}" \
+            --out-dir "${out}"
+
+          python3 -m json.tool "${out}/manifest.json" >/dev/null
+          test "$(sha256sum "${out}/rafci-physical-probe-arm32.elf" | cut -d' ' -f1)" = \
+            "95030251a76a57341c8be9d0b9565692ba240b72b2253e57d7be166cf25b9b1d"
+          test "$(sha256sum "${out}/rafci-physical-probe-arm64.elf" | cut -d' ' -f1)" = \
+            "48d8d278f2565b4e5bb01f535b8e3c7b2e2b7963244c884dc99facf7b0fd8370"
+
+          readelf -hW "${out}/rafci-physical-probe-arm32.elf" | tee "${out}/arm32.readelf-header.txt"
+          readelf -lW "${out}/rafci-physical-probe-arm32.elf" | tee "${out}/arm32.readelf-programs.txt"
+          readelf -hW "${out}/rafci-physical-probe-arm64.elf" | tee "${out}/arm64.readelf-header.txt"
+          readelf -lW "${out}/rafci-physical-probe-arm64.elf" | tee "${out}/arm64.readelf-programs.txt"
+
+          grep -q 'Class:.*ELF32' "${out}/arm32.readelf-header.txt"
+          grep -q 'Machine:.*ARM' "${out}/arm32.readelf-header.txt"
+          grep -q 'Class:.*ELF64' "${out}/arm64.readelf-header.txt"
+          grep -q 'Machine:.*AArch64' "${out}/arm64.readelf-header.txt"
+          test "$(grep -c ' LOAD ' "${out}/arm32.readelf-programs.txt")" -eq 1
+          test "$(grep -c ' LOAD ' "${out}/arm64.readelf-programs.txt")" -eq 1
+          ! grep -q 'INTERP' "${out}/arm32.readelf-programs.txt"
+          ! grep -q 'DYNAMIC' "${out}/arm32.readelf-programs.txt"
+          ! grep -q 'INTERP' "${out}/arm64.readelf-programs.txt"
+          ! grep -q 'DYNAMIC' "${out}/arm64.readelf-programs.txt"
+
+          sha256sum \
+            "${out}/rafci-physical-probe-arm32.elf" \
+            "${out}/rafci-physical-probe-arm64.elf" \
+            > "${out}/sha256.txt"
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path('build/rafci/physical-probes/manifest.json').read_text(encoding='utf-8'))
+          assert manifest['state'] == 'PASS_ARTIFACT_CONSTRUCTION_ONLY'
+          assert manifest['source_commit'] == __import__('os').environ['RAFCI_SOURCE_SHA']
+          assert manifest['physical_execution_observed'].startswith('TOKEN_VAZIO')
+          assert manifest['claim_allowed'] is False
+          assert manifest['closure'] == 'CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE'
+          hashes = {item['scope']: item['sha256'] for item in manifest['artifacts']}
+          assert hashes == {
+              'arm32': '95030251a76a57341c8be9d0b9565692ba240b72b2253e57d7be166cf25b9b1d',
+              'arm64': '48d8d278f2565b4e5bb01f535b8e3c7b2e2b7963244c884dc99facf7b0fd8370',
+          }
+          PY
+
+      - name: Preserve exact-head physical probe artifacts
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: rafci-physical-probes-${{ github.run_id }}
+          path: build/rafci/physical-probes/
+          if-no-files-found: error

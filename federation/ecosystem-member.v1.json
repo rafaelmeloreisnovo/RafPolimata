@@ -4,7 +4,9 @@
   "authority": "semantic-governance-and-freestanding-language",
   "authority_sources": [
     "docs/canonical/2026-09-23/COMPONENT_CATALOG.md",
-    "federation/functional-freestanding-leaf.v1.json"
+    "federation/functional-freestanding-leaf.v1.json",
+    "rafci/README.md",
+    "rafci/graph.v1.json"
   ],
   "planes": [
     "knowledge",
@@ -46,6 +48,16 @@
     "authority_transfer_allowed": false,
     "body_copy_required": false,
     "local_gate_required_before_promotion": true
+  },
+  "rafci": {
+    "role": "contract-authority",
+    "entry": "rafci/README.md",
+    "graph": "rafci/graph.v1.json",
+    "wire_contract": "rafci/contracts/rafci_wire_v1.h",
+    "linker_anchors": "rafci/contracts/rafci_anchors_v1.c",
+    "ci": ".github/workflows/rafci-contract-v1.yml",
+    "provider_code_is_referenced_not_copied": true,
+    "claim_allowed": false
   },
   "claim_allowed": false,
   "closure_id": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY"
