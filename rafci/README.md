@@ -128,13 +128,52 @@ provider configuration readback
 
 The Actions job preserves the normalized readback and receipt and asserts that `claim_allowed=false`, `provider_enforcement_gate=TOKEN_VAZIO`, and closure L11 remain intact.
 
+## Physical evidence boundary
+
+`physical_route.v1.json` routes four evidence classes without collapsing them:
+
+```text
+PHYSICAL_ENVIRONMENT_READINESS
+    != PHYSICAL_STRUCTURAL_BUILD_ARM32
+    != FEDERATED_ANDROID_VM_RUNTIME
+    != PHYSICAL_SAME_ARTIFACT_EXECUTION_ACQUISITION
+```
+
+The first three reuse canonical producers already present in the repository. The fourth exists only because no prior canonical producer bound the exact evidence needed for `gate.physical-execution`.
+
+`tools/capture_physical_execution_v1.sh` is **manual and explicit**. It requires `--execute`, runs exactly one zero-argument executable, stores no raw device serial or raw artifact path, and records physical Termux shape, ABI, expected/measured SHA-256 before and after, exit code, stdout/stderr digests and a receipt manifest. It performs no package install, attach, hook, runtime patch, privilege escalation, APK build or VM boot.
+
+Example acquisition on a physical Termux target:
+
+```sh
+sh rafci/tools/capture_physical_execution_v1.sh \
+  --artifact ./TARGET \
+  --expected-sha256 EXPECTED_SHA256_FROM_PRIOR_ARTIFACT_RECEIPT \
+  --scope arm32 \
+  --out-dir ./rafci-physical-receipt \
+  --execute
+```
+
+The receipt does not appoint its own trust anchor. Verification additionally requires the **externally known** source HEAD and artifact SHA-256:
+
+```sh
+python3 rafci/tools/verify_physical_execution_v1.py \
+  --receipt-dir ./rafci-physical-receipt \
+  --expected-source-sha EXPECTED_40_HEX_HEAD \
+  --expected-artifact-sha256 EXPECTED_64_HEX_ARTIFACT
+```
+
+Only a verified receipt can produce `PASS_PHYSICAL_EXECUTION_BOUNDED`, scoped to those exact bytes, source HEAD and ABI. Even then `claim_allowed=false` remains and independent replication is still `TOKEN_VAZIO`.
+
+CI never runs the physical acquisition. It executes syntax checks and synthetic falsifiers only. `PASS_CONTRACT_ONLY` therefore proves the acquisition/verification logic, **not** a physical device run.
+
 ## Current explicit gaps
 
 The graph keeps these fail-closed:
 
 - provider/admin enforcement and zero-approval rejection evidence;
-- ARM32 physical execution receipt;
-- ARM64 physical execution receipt;
+- current-head ARM32 physical execution receipt;
+- current-head ARM64 physical execution receipt;
 - provider-independent runtime reproduction.
 
 They stay `TOKEN_VAZIO` until their own evidence rules are satisfied.
@@ -145,6 +184,6 @@ This subsystem is additive. Rollback is repository-local: revert the RafCI commi
 
 ## R3
 
-`F_ok` = source-level contract, semantic graph, unique bits, linker anchors, closure discipline and live provider readback machinery are defined.  
-`F_gap` = provider negative rejection evidence and physical/provider-independent execution remain separate until executed.  
-`F_next` = consume exact-head receipts; provider configuration may be observed, but promotion remains closed until an authorized negative rejection test exists.
+`F_ok` = source contract, semantic graph, unique bits, linker anchors, closure discipline, live provider readback, physical evidence routing and same-artifact physical acquisition contract are defined and falsifiable.  
+`F_gap` = provider negative rejection and actual current-head physical ARM32/ARM64 receipts remain unexecuted; independent reproduction remains open.  
+`F_next` = consume an externally pinned artifact on a physical target with the manual acquisition route, then verify the receipt against the expected HEAD/hash; do not infer PASS from CI selftests.
