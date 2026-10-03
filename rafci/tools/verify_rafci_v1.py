@@ -3,6 +3,9 @@
 
 Stdlib-only by design. This validates semantic wiring and can emit a bounded
 source-contract receipt. It does not execute target binaries or provider gates.
+Structural/operational unknowns bind to CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY;
+runtime/device evidence gaps bind to CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.
+Closure linkage classifies unknown evidence and never promotes it to PASS.
 """
 
 from __future__ import annotations
@@ -123,6 +126,7 @@ def validate_graph(graph: dict[str, Any]) -> None:
     _unique([g.get("id") for g in gaps], "gap id")
     for gap in gaps:
         require(gap.get("state") == "TOKEN_VAZIO", f"open gap must remain TOKEN_VAZIO: {gap.get('id')}")
+        require(bool(gap.get("closure")), f"gap lacks closure binding: {gap.get('id')}")
         require(bool(gap.get("evidence_rule")), f"gap lacks evidence rule: {gap.get('id')}")
 
     global_ids = [
@@ -213,6 +217,11 @@ def selftest(graph: dict[str, Any]) -> None:
         graph,
         lambda g: g["edges"][0].__setitem__("to", "stage.missing"),
         "missing route endpoint",
+    )
+    expect_rejected(
+        graph,
+        lambda g: g["gaps"][0].__setitem__("closure", ""),
+        "missing gap closure",
     )
 
 
