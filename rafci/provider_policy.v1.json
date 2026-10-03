@@ -1,0 +1,25 @@
+{
+  "schema": "rafaelia.rafci.provider-policy/v1",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "target_ref": "refs/heads/main",
+  "closure": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+  "truth_boundary": "provider readback is evidence of observed configuration; it is not a negative merge rejection test",
+  "required_configuration_for_readiness": {
+    "active_ruleset": true,
+    "applies_to_target_ref": true,
+    "zero_bypass_actors": true,
+    "deletion_protection": true,
+    "non_fast_forward_protection": true,
+    "pull_request_rule": true,
+    "minimum_required_approvals": 1,
+    "required_status_checks_rule": true,
+    "minimum_required_status_checks": 1
+  },
+  "full_gate_requires": [
+    "authorized provider readback receipt",
+    "configuration readiness",
+    "separate zero-approval rejection receipt against the protected promotion path"
+  ],
+  "promotion_state_if_incomplete": "TOKEN_VAZIO",
+  "claim_allowed": false
+}
