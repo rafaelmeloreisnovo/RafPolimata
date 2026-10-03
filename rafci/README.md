@@ -26,6 +26,8 @@ TOKEN_VAZIO != 0
 IMPLEMENTED_UNTESTED != PASS
 ```
 
+**Closure routing:** structural/operational unknowns in this subsystem bind to `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`; runtime/device evidence gaps bind to `CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE`. A closure classifies the open evidence obligation; it does not convert an unknown into PASS.
+
 A CI YAML, an ELF object, a linker section, a receipt file, and a physical-device observation are different evidence classes.
 
 ## Small route
