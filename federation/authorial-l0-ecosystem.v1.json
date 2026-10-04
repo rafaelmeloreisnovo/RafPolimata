@@ -1,0 +1,51 @@
+{
+  "schema": "rafcodephi.authorial-l0-ecosystem/v1",
+  "authority_repository": "rafaelmeloreisnovo/RafPolimata",
+  "semantic_contract": "federation/functional-freestanding-leaf.v1.json",
+  "rules": {
+    "relationship_is_not_authority_merge": true,
+    "source_body_copy_required": false,
+    "local_gate_required": true,
+    "missing_evidence_may_be_promoted": false,
+    "implemented_untested_is_pass": false,
+    "runtime_dependency_must_be_distinguished_from_factory_dependency": true,
+    "physical_execution_defaults_to": "TOKEN_VAZIO"
+  },
+  "leaves": [
+    {
+      "repository": "rafaelmeloreisnovo/actions",
+      "role": "orchestration-gate",
+      "contract": "rafcode/l0/contract.v1.json",
+      "source": "rafcode/l0/kernel.c",
+      "gate": "rafcode/l0/verify.sh",
+      "upstream_body": "THIRD_PARTY_LICENSED"
+    },
+    {
+      "repository": "rafaelmeloreisnovo/runner-images_RAFCODE",
+      "role": "image-route-gate",
+      "contract": "rafcode/l0/contract.v1.json",
+      "source": "rafcode/l0/kernel.c",
+      "gate": "rafcode/l0/verify.sh",
+      "upstream_body": "THIRD_PARTY_LICENSED"
+    },
+    {
+      "repository": "rafaelmeloreisnovo/gradle",
+      "role": "build-capability-gate",
+      "contract": "rafcode/l0/contract.v1.json",
+      "source": "rafcode/l0/kernel.c",
+      "gate": "rafcode/l0/verify.sh",
+      "upstream_body": "THIRD_PARTY_LICENSED"
+    },
+    {
+      "repository": "rafaelmeloreisnovo/openssl",
+      "role": "noncryptographic-capability-gate",
+      "contract": "rafcode/l0/contract.v1.json",
+      "source": "rafcode/l0/kernel.c",
+      "gate": "rafcode/l0/verify.sh",
+      "upstream_body": "THIRD_PARTY_LICENSED",
+      "cryptographic_replacement": false
+    }
+  ],
+  "claim_allowed": false,
+  "promotion_rule": "each leaf requires its own HEAD-bound execution receipt"
+}
