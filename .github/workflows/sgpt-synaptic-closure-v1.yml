@@ -1,0 +1,100 @@
+name: SGPT Synaptic Closure V1
+
+on:
+  pull_request:
+    paths:
+      - 'rafci/closures/sgpt_synaptic_closure_v1.json'
+      - 'rafci/tools/verify_sgpt_synaptic_closure_v1.py'
+      - 'rafci/README.md'
+      - '.github/workflows/sgpt-synaptic-closure-v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'rafci/closures/sgpt_synaptic_closure_v1.json'
+      - 'rafci/tools/verify_sgpt_synaptic_closure_v1.py'
+      - 'rafci/README.md'
+      - '.github/workflows/sgpt-synaptic-closure-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sgpt-synaptic-v1-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  RAFCI_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  closure-fire-gate:
+    name: closure contract + adversarial mutations
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.RAFCI_SOURCE_SHA }}
+
+      - name: Revalidate parent RafCI authority contract
+        run: |
+          set -euo pipefail
+          mkdir -p build/rafci/sgpt-synaptic
+          python3 rafci/tools/verify_rafci_v1.py \
+            --selftest \
+            --receipt build/rafci/sgpt-synaptic/rafci-parent-receipt.json
+
+      - name: Execute SGPT closure and negative-control selftests
+        run: |
+          set -euo pipefail
+          python3 rafci/tools/verify_sgpt_synaptic_closure_v1.py \
+            --closure rafci/closures/sgpt_synaptic_closure_v1.json \
+            --selftest \
+            --receipt build/rafci/sgpt-synaptic/receipt.json
+          python3 -m json.tool build/rafci/sgpt-synaptic/receipt.json >/dev/null
+
+      - name: Assert fail-closed evidence ceiling
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          p = Path("build/rafci/sgpt-synaptic/receipt.json")
+          r = json.loads(p.read_text(encoding="utf-8"))
+          assert r["status"] == "PASS_CONTRACT_ONLY"
+          assert r["structural_contract"] == "PASS"
+          assert len(r["selftest_rejected_mutations"]) >= 10
+          assert r["cross_repo_exact_pin_readback"] == "TOKEN_VAZIO"
+          assert r["mathematical_execution_receipt"] == "TOKEN_VAZIO"
+          assert r["sgpt_deterministic_execution_receipt"] == "TOKEN_VAZIO"
+          assert r["adversarial_execution_receipt"] == "TOKEN_VAZIO"
+          assert r["baseline_comparison"] == "TOKEN_VAZIO"
+          assert r["independent_provider_reproduction"] == "TOKEN_VAZIO"
+          assert r["held_out_prediction"] == "TOKEN_VAZIO"
+          assert r["scientific_validation"] == "TOKEN_VAZIO"
+          assert r["claim_allowed"] is False
+          PY
+
+      - name: Preserve bounded closure receipts
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: sgpt-synaptic-closure-${{ github.run_id }}
+          path: build/rafci/sgpt-synaptic/
+          if-no-files-found: error
+
+  source-shape:
+    name: immutable pin and hypothesis shape
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.RAFCI_SOURCE_SHA }}
+      - name: Validate JSON and source syntax
+        run: |
+          set -euo pipefail
+          python3 -m json.tool rafci/closures/sgpt_synaptic_closure_v1.json >/dev/null
+          python3 -m py_compile rafci/tools/verify_sgpt_synaptic_closure_v1.py
+          python3 rafci/tools/verify_sgpt_synaptic_closure_v1.py \
+            --closure rafci/closures/sgpt_synaptic_closure_v1.json

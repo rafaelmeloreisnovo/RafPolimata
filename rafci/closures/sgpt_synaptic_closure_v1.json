@@ -1,0 +1,210 @@
+{
+  "schema": "rafaelia.rafci.sgpt-synaptic-closure/v1",
+  "id": "SGPT_SYNAPTIC_CLOSURE_V1",
+  "date": "2026-10-04",
+  "authority": "rafaelmeloreisnovo/RafPolimata",
+  "closure_binding": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+  "closure_scope": "cross-repository scientific evidence routing",
+  "truth_boundary": "This closure validates identity, authority, gate and evidence wiring. It does not establish astrophysical truth, novelty, independent reproduction or claim eligibility.",
+  "claim_allowed": false,
+  "truth_invariants": [
+    "SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM",
+    "TOKEN_VAZIO != 0",
+    "IMPLEMENTED_UNTESTED != PASS",
+    "provider execution authority does not imply epistemic authority",
+    "synthetic falsifier success does not constitute natural-source evidence"
+  ],
+  "authorities": [
+    {
+      "id": "science.rll.sgpt",
+      "role": "SCIENCE_PRODUCER",
+      "repository": "instituto-Rafael/relativity-living-light",
+      "commit": "e287ef13be4d5e6d366f29e234c8a5d113d21729",
+      "source_head": "b7dd266ff6787696630ebe3cdd684905920e9854",
+      "scope": "strong-gravity photonic transport model, hypotheses and local deterministic falsifiers"
+    },
+    {
+      "id": "math.world69.sgpt",
+      "role": "MATHEMATICAL_PROOF",
+      "repository": "rafaelmeloreisnovo/Matem-tica-",
+      "commit": "03deff5b68123406fcca100791d404fe18fda23d",
+      "scope": "formal identities, lemmas, theorem hypotheses and dimensional boundaries"
+    },
+    {
+      "id": "theorems.sgpt",
+      "role": "THEOREM_CLASSIFICATION",
+      "repository": "rafaelmeloreisnovo/TeoremasTesesTeorias",
+      "commit": "49d542e6ea66d774485726a7fcc1666043538ed8",
+      "scope": "theorem/proposition/hypothesis classification boundary"
+    },
+    {
+      "id": "papers.sgpt",
+      "role": "SCHOLARLY_MANUSCRIPT",
+      "repository": "rafaelmeloreisnovo/papers",
+      "commit": "266675fb8ec346e05db87383ddc6b4234ce6b61b",
+      "scope": "SGPT manuscript, baselines, observables and falsifiability narrative"
+    },
+    {
+      "id": "papers.sgpt.fire",
+      "role": "ADVERSARIAL_TESTBED",
+      "repository": "rafaelmeloreisnovo/papers",
+      "commit": "801f95f0ced3baea54a3283eade757baf0365c70",
+      "scope": "multiscale collapse and GRRT parameter falsification testbed"
+    },
+    {
+      "id": "rafci.sgpt.authority",
+      "role": "CLOSURE_AUTHORITY",
+      "repository": "rafaelmeloreisnovo/RafPolimata",
+      "commit": "757dead806e9b91654553d5eebcda176f40d0473",
+      "contract_origin": "f336ca78b00de3fe85cdfff020040f46616ecfed",
+      "external_pin_hardening": "f4d1f162ebed36257fe41f89cb145e9006865112",
+      "evidence_garden_hardening": "0fb8fcf50baf2471f8a22f9c85063cf6c4992a59",
+      "scope": "identity, evidence, receipt and promotion boundary"
+    },
+    {
+      "id": "actions.sgpt.provider",
+      "role": "ACTION_PROVIDER",
+      "repository": "rafaelmeloreisnovo/actions",
+      "commit": "d2731ee6550eaa0d3939067d7a43d902b2f85c3e",
+      "authority_transfer": false,
+      "scope": "provider identity only; it does not define scientific truth or closure semantics"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H_down",
+      "class": "HYPOTHESIS",
+      "equation": "H_down=max(0,-Theta)*tau_flow*M_f*p_ram/(p_th+p_B+p_rad)",
+      "falsifier": "No held-out predictive gain for shock, heating or spectral hardening after conditioning on standard GRMHD/GRRT variables and complexity."
+    },
+    {
+      "id": "H_logistic_photonic",
+      "class": "HYPOTHESIS",
+      "equation": "f_gamma(chi)=1/(1+exp((chi-chi_t)/w_chi))",
+      "falsifier": "No penalized likelihood or predictive gain over physically motivated transition models after uncertainty propagation."
+    },
+    {
+      "id": "H_temporal_ordering",
+      "class": "HYPOTHESIS",
+      "equation": "compression -> hardening -> polarization_change -> flare_or_outflow",
+      "falsifier": "Preregistered lag analysis fails to reproduce the ordering across independent observations or simulations."
+    }
+  ],
+  "mandatory_baselines": [
+    "ideal_GRMHD",
+    "resistive_GRMHD",
+    "two_temperature_GRRMHD",
+    "GRPIC",
+    "general_relativistic_radiative_transfer"
+  ],
+  "adversarial_controls": [
+    "drop_Theta",
+    "drop_M_f",
+    "drop_R_ram",
+    "flip_Theta_sign",
+    "shuffle_predictor_variables",
+    "permute_temporal_targets",
+    "baseline_only"
+  ],
+  "gate_order": [
+    "G0_IDENTITY",
+    "G1_MATHEMATICS",
+    "G2_DETERMINISM",
+    "G3_ADVERSARIAL",
+    "G4_BASELINE",
+    "G5_REPRODUCTION",
+    "G6_PREDICTION",
+    "G7_CLAIM_PROMOTION"
+  ],
+  "gates": [
+    {
+      "id": "G0_IDENTITY",
+      "state": "TOKEN_VAZIO",
+      "requires": [
+        "cross-repository exact-pin readback receipt",
+        "same-hypothesis lineage binding"
+      ]
+    },
+    {
+      "id": "G1_MATHEMATICS",
+      "state": "TOKEN_VAZIO",
+      "requires": [
+        "exact-pin proof receipt",
+        "dimensional and domain checks",
+        "theorem-versus-hypothesis classification receipt"
+      ]
+    },
+    {
+      "id": "G2_DETERMINISM",
+      "state": "TOKEN_VAZIO",
+      "requires": [
+        "exact SGPT source-head deterministic execution receipt",
+        "implementation-to-definition consistency"
+      ]
+    },
+    {
+      "id": "G3_ADVERSARIAL",
+      "state": "TOKEN_VAZIO",
+      "requires": [
+        "all declared wrong-model controls executed",
+        "negative controls rejected or shown non-improving",
+        "no hidden skip or fail-open path"
+      ]
+    },
+    {
+      "id": "G4_BASELINE",
+      "state": "TOKEN_VAZIO",
+      "requires": [
+        "source-specific calibrated comparison against every mandatory baseline",
+        "uncertainty propagation",
+        "complexity penalty"
+      ]
+    },
+    {
+      "id": "G5_REPRODUCTION",
+      "state": "TOKEN_VAZIO",
+      "requires": [
+        "cross-environment reproduction",
+        "provider-independent reproduction"
+      ]
+    },
+    {
+      "id": "G6_PREDICTION",
+      "state": "TOKEN_VAZIO",
+      "requires": [
+        "preregistered held-out prediction",
+        "observable with explicit covariance or uncertainty model",
+        "look-elsewhere and post-hoc controls where applicable"
+      ]
+    },
+    {
+      "id": "G7_CLAIM_PROMOTION",
+      "state": "TOKEN_VAZIO",
+      "requires": [
+        "G0_IDENTITY=PASS",
+        "G1_MATHEMATICS=PASS",
+        "G2_DETERMINISM=PASS",
+        "G3_ADVERSARIAL=PASS",
+        "G4_BASELINE=PASS",
+        "G5_REPRODUCTION=PASS",
+        "G6_PREDICTION=PASS",
+        "explicit human authorization"
+      ]
+    }
+  ],
+  "promotion": {
+    "gate": "G7_CLAIM_PROMOTION",
+    "human_authorization_required": true,
+    "state": "TOKEN_VAZIO",
+    "automatic_promotion_forbidden": true
+  },
+  "unresolved": {
+    "cross_repo_receipts": "TOKEN_VAZIO",
+    "calibrated_source_solution": "TOKEN_VAZIO",
+    "baseline_comparison": "TOKEN_VAZIO",
+    "independent_provider_reproduction": "TOKEN_VAZIO",
+    "held_out_prediction": "TOKEN_VAZIO",
+    "exclusive_RLL_observable": "TOKEN_VAZIO"
+  },
+  "rollback": "Revert or supersede this closure contract in RafPolimata. Do not rewrite producer history and do not delete contradictory receipts."
+}
