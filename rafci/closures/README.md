@@ -3,7 +3,8 @@
 **Area:** execution-governance / scientific evidence federation  
 **Authority:** `rafaelmeloreisnovo/RafPolimata`  
 **Lifecycle:** `ACTIVE / fail-closed contracts`  
-**Claim state:** `claim_allowed=false`
+**Claim state:** `claim_allowed=false`  
+**Closure binding:** `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`
 
 This directory contains experiment-specific cross-repository closure contracts. A closure pins the exact producer revisions participating in one scientific claim path. It does not replace `rafci/graph.v1.json`, transfer implementation authority, or convert historical evidence into current evidence.
 
