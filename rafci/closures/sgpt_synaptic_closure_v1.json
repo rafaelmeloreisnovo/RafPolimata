@@ -3,6 +3,7 @@
   "id": "SGPT_SYNAPTIC_CLOSURE_V1",
   "date": "2026-10-04",
   "authority": "rafaelmeloreisnovo/RafPolimata",
+  "closure_binding": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
   "closure_scope": "cross-repository scientific evidence routing",
   "truth_boundary": "This closure validates identity, authority, gate and evidence wiring. It does not establish astrophysical truth, novelty, independent reproduction or claim eligibility.",
   "claim_allowed": false,
