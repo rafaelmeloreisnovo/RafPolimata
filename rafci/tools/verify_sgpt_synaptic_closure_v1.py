@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Fail-closed validator for SGPT Synaptic Closure V1.
 
+Governance binding: CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.
+
 This tool validates cross-repository identity/evidence wiring only. It never
 turns mathematical consistency, CI execution, synthetic falsifiers, provider
 identity, or document presence into astrophysical validation.
@@ -209,6 +211,7 @@ def validate_closure(closure: dict[str, Any]) -> None:
     require(closure.get("schema") == SCHEMA, "unexpected closure schema")
     require(closure.get("id") == "SGPT_SYNAPTIC_CLOSURE_V1", "unexpected closure id")
     require(closure.get("authority") == "rafaelmeloreisnovo/RafPolimata", "unexpected closure authority")
+    require(closure.get("closure_binding") == "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY", "closure binding drift")
     require(closure.get("claim_allowed") is False, "claim_allowed must remain false")
 
     invariants = closure.get("truth_invariants")
@@ -268,6 +271,7 @@ def write_receipt(path: Path, closure_path: Path, rejected: list[str]) -> None:
         "schema": RECEIPT_SCHEMA,
         "repository": "rafaelmeloreisnovo/RafPolimata",
         "source_commit": source_sha,
+        "closure_binding": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
         "closure_path": str(closure_path.relative_to(ROOT)) if closure_path.is_relative_to(ROOT) else str(closure_path),
         "closure_sha256": sha256_file(closure_path),
         "status": "PASS_CONTRACT_ONLY",
