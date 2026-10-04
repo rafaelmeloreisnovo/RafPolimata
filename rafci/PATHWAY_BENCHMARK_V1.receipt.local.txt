@@ -1,0 +1,12 @@
+RAFCI_PATHWAY_LOCAL_RECEIPT_V1
+branch=feat/rafci-pathway-benchmark-v1
+head_before_receipt=6bae72793c87cab82ae46bc4d8f664b8b3aaf289
+validator=rafci/tools/verify_pathways_v1.py --selftest
+state=PASS_LOCAL_CONTRACT_ONLY
+pathways=9
+falsifiers=12
+benchmark_execution=TOKEN_VAZIO
+physical_execution=TOKEN_VAZIO
+baremetal_execution=TOKEN_VAZIO
+claim_allowed=false
+note=Local contract selftest does not substitute exact-head GitHub CI; this receipt is source-local evidence only.
