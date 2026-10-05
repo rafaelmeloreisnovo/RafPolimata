@@ -28,7 +28,7 @@ env:
 
 jobs:
   pathway-contract:
-    name: admissibility + falsifiers
+    name: admissibility + comparability + falsifiers
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -53,16 +53,61 @@ jobs:
           from pathlib import Path
           r = json.loads(Path("build/rafci/pathways/receipt.json").read_text())
           assert r["contract_gate"] == "PASS"
+          assert r["selection_law"] == "ADMISSIBILITY_THEN_COMPARABILITY_THEN_PARETO"
           assert r["benchmark_execution"] == "TOKEN_VAZIO"
           assert r["physical_execution"] == "TOKEN_VAZIO"
           assert r["baremetal_execution"] == "TOKEN_VAZIO"
           assert r["claim_allowed"] is False
           PY
 
-      - name: Preserve pathway receipt
+      - name: Expose exact-head receipt in job summary
         if: always()
+        run: |
+          set -euo pipefail
+          {
+            echo "## RafCI Pathway Benchmark V1"
+            echo
+            echo "- exact_head: \`${RAFCI_SOURCE_SHA}\`"
+            if test -f build/rafci/pathways/receipt.json; then
+              receipt_sha="$(sha256sum build/rafci/pathways/receipt.json | cut -d' ' -f1)"
+              echo "- receipt_generation: \`PASS\`"
+              echo "- receipt_sha256: \`${receipt_sha}\`"
+              echo "- artifact archive transport is independent from the contract gate."
+              echo
+              echo '```json'
+              cat build/rafci/pathways/receipt.json
+              echo '```'
+            else
+              echo "- receipt_generation: \`FAIL\`"
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Preserve pathway receipt
+        id: archive
+        if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: rafci-pathway-contract-${{ github.run_id }}
           path: build/rafci/pathways/receipt.json
           if-no-files-found: warn
+
+      - name: Record receipt archive transport
+        if: always()
+        env:
+          ARCHIVE_OUTCOME: ${{ steps.archive.outcome }}
+        run: |
+          set -euo pipefail
+          if test "${ARCHIVE_OUTCOME}" = "success"; then
+            archive_state="PASS"
+          else
+            archive_state="TOKEN_VAZIO_ARCHIVE_TRANSPORT"
+          fi
+          {
+            echo
+            echo "### Receipt transport"
+            echo
+            echo "- receipt_archive: \`${archive_state}\`"
+            echo "- upload_outcome: \`${ARCHIVE_OUTCOME}\`"
+            echo "- claim_allowed remains \`false\`; archive transport cannot promote execution evidence."
+          } >> "${GITHUB_STEP_SUMMARY}"
