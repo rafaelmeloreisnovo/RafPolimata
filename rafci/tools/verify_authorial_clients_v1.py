@@ -4,6 +4,10 @@
 This verifier validates the control contract. It does not replace, copy, certify,
 or relicense Android SDK/NDK, Gradle, AGP, CMake, R8, JDK, Kotlin, or provider
 implementations, and it does not prove runtime execution.
+
+Gap routing is explicit: structural/operational unknowns bind to
+CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY and runtime/device unknowns bind to
+CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE. Closure linkage never promotes a gap.
 """
 
 from __future__ import annotations
@@ -43,6 +47,11 @@ REQUIRED_INVARIANTS = {
     "LICENSE_NOTICE_PRESERVED_ON_EXISTING_OR_IMPORTED_MATERIAL",
 }
 
+REQUIRED_CLOSURES = {
+    "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+    "CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE",
+}
+
 FACTORY_CLIENTS = {
     "gradle",
     "android_gradle_plugin",
@@ -72,6 +81,10 @@ def validate(data: dict[str, Any]) -> list[str]:
         errors.append("authority")
     if data.get("claim_allowed") is not False:
         errors.append("claim_allowed")
+
+    closure_routes = set(data.get("closure_routes", []))
+    if not REQUIRED_CLOSURES.issubset(closure_routes):
+        errors.append("closure_routes")
 
     invariants = set(data.get("invariants", []))
     missing_invariants = sorted(REQUIRED_INVARIANTS - invariants)
@@ -169,6 +182,10 @@ def run_selftest(spec: dict[str, Any]) -> None:
     assert "claim_allowed" in validate(mutated)
 
     mutated = copy.deepcopy(spec)
+    mutated["closure_routes"] = []
+    assert "closure_routes" in validate(mutated)
+
+    mutated = copy.deepcopy(spec)
     mutated["licensing_policy"]["third_party_notice_removal_allowed"] = True
     assert "third_party_notice_removal_allowed" in validate(mutated)
 
@@ -211,6 +228,7 @@ def main() -> int:
         "spec_sha256": canonical_digest(spec),
         "client_count": len(spec["clients"]),
         "client_ids": sorted(c["id"] for c in spec["clients"]),
+        "closure_routes": sorted(spec["closure_routes"]),
         "stdlib_only_validator": True,
         "provider_body_copied": False,
         "provider_relicensed": False,
