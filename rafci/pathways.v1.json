@@ -1,0 +1,154 @@
+{
+  "authority": "authority.rafpolimata.rafci",
+  "claim_allowed": false,
+  "comparison_keys": [
+    "workload_id",
+    "semantics_digest",
+    "protocol_version",
+    "artifact_role",
+    "hardware_class",
+    "runtime_state"
+  ],
+  "epistemic_operations": [
+    {"can_close_gate": false, "id": "infer", "output": "HYPOTHESIS_ONLY"},
+    {"can_close_gate": true, "id": "measure", "output": "OBSERVATION"},
+    {"can_close_gate": false, "id": "analyze", "output": "DERIVED_EVIDENCE"},
+    {"can_close_gate": true, "id": "examine", "output": "INSPECTION_EVIDENCE"},
+    {"can_close_gate": true, "id": "check", "output": "GATE_DECISION"},
+    {"can_close_gate": true, "id": "validate", "output": "GATE_DECISION"},
+    {"can_close_gate": false, "id": "condition", "output": "PRECONDITION_STATE"},
+    {"can_close_gate": true, "id": "observe", "output": "OBSERVATION"},
+    {"can_close_gate": false, "id": "doubt", "output": "FALSIFIER_CANDIDATE"},
+    {"can_close_gate": false, "id": "catalyze", "output": "NEXT_EXPERIMENT_PRIORITY"},
+    {"can_close_gate": false, "id": "heuristic", "output": "PRIORITY_HINT_ONLY"}
+  ],
+  "falsifiers": [
+    {"id": "F01", "result": "FAIL", "rule": "TOKEN_VAZIO_AS_ZERO_OR_PASS"},
+    {"id": "F02", "result": "FAIL", "rule": "HOSTED_OR_EMULATED_AS_PHYSICAL"},
+    {"id": "F03", "result": "FAIL", "rule": "PHYSICAL_USERSPACE_AS_BAREMETAL"},
+    {"id": "F04", "result": "FAIL", "rule": "HEAD_HASH_ABI_MISMATCH"},
+    {"id": "F05", "result": "FAIL", "rule": "TRANSFORM_WITHOUT_PROVENANCE"},
+    {"id": "F06", "result": "NO_PRECISION_CLAIM", "rule": "TIMING_BELOW_SAMPLE_FLOOR"},
+    {"id": "F07", "result": "INCOMPARABLE", "rule": "JIT_COLD_WARM_PROFILE_COLLAPSED"},
+    {"id": "F08", "result": "INCOMPARABLE", "rule": "CROSS_HARDWARE_WITHOUT_MATCHED_PROTOCOL"},
+    {"id": "F09", "result": "FAIL", "rule": "R8_OR_SDK_PROMOTED_TO_RUNTIME"},
+    {"id": "F10", "result": "FAIL", "rule": "NDK_NATIVE_PROMOTED_TO_FREESTANDING"},
+    {"id": "F11", "result": "FAIL", "rule": "HEURISTIC_PROMOTED_TO_GATE_EVIDENCE"},
+    {"id": "F12", "result": "FAIL", "rule": "UNPREREGISTERED_WEIGHTED_WINNER_SCORE"}
+  ],
+  "incomparable_state": "INCOMPARABLE",
+  "measurement_policy": {
+    "energy_claim_requires_measured_energy": true,
+    "missing_sensor_policy": "TOKEN_VAZIO",
+    "pmu_claim_requires_measured_pmu": true,
+    "required_distribution_fields": ["median", "p95", "p99", "mad", "min", "max", "failures"],
+    "thermal_claim_requires_measured_thermal": true,
+    "timing_min_samples": 31,
+    "timing_recommended_samples": 101
+  },
+  "operational_method_mapping": {
+    "data_quality": "ISO_8000_FAMILY_METHOD_MAPPING_NOT_CERTIFICATION",
+    "engineering": "IEEE_STYLE_REPRODUCIBILITY_AND_MEASUREMENT_NOT_CERTIFICATION",
+    "measurement": "SIX_SIGMA_DMAIC_MSA_STYLE_NOT_CERTIFICATION",
+    "normative_terms": "RFC_STYLE_MUST_SHOULD_MAY_NOT_IETF_CONFORMANCE",
+    "quality_traceability": "ISO_9001_METHOD_MAPPING_NOT_CERTIFICATION",
+    "risk_controls": "ISO_IEC_27000_FAMILY_METHOD_MAPPING_NOT_CERTIFICATION"
+  },
+  "pathways": [
+    {
+      "boundary": "No hosted Android/Java runtime is part of the freestanding execution claim.",
+      "claim_ceiling": "FREESTANDING_STRUCTURAL",
+      "class": "AUTHORIAL_FREESTANDING_CORE",
+      "comparability_group": "native_core",
+      "forbidden_promotions": ["PHYSICAL_USERSPACE", "PHYSICAL_BAREMETAL"],
+      "id": "freestanding_native",
+      "required_gates": ["source_identity", "artifact_identity", "no_dynamic_runtime", "no_undefined", "reproducible_build"],
+      "required_measurements": ["artifact_sha256", "allocated_bytes", "stack_bytes"]
+    },
+    {
+      "boundary": "Android NDK builds native Android components but does not by itself prove freestanding or bare-metal execution.",
+      "claim_ceiling": "ANDROID_NATIVE_HOSTED",
+      "class": "HOSTED_NATIVE_TOOLCHAIN_ADAPTER",
+      "comparability_group": "android_native",
+      "forbidden_promotions": ["FREESTANDING_STRUCTURAL", "PHYSICAL_BAREMETAL"],
+      "id": "android_ndk",
+      "required_gates": ["source_identity", "artifact_identity", "abi_identity", "native_dependency_inventory"],
+      "required_measurements": ["artifact_sha256", "abi", "needed_libraries"]
+    },
+    {
+      "boundary": "JNI crosses managed/native semantics; bridge correctness and overhead are distinct from native-core execution.",
+      "claim_ceiling": "MANAGED_NATIVE_BOUNDARY",
+      "class": "MANAGED_NATIVE_BOUNDARY",
+      "comparability_group": "android_bridge",
+      "forbidden_promotions": ["FREESTANDING_STRUCTURAL", "PHYSICAL_BAREMETAL"],
+      "id": "jni_bridge",
+      "required_gates": ["signature_identity", "argument_shape", "return_shape", "exception_state", "artifact_identity"],
+      "required_measurements": ["calls", "failures", "median", "p95", "p99", "mad"]
+    },
+    {
+      "boundary": "ART JIT/AOT/profile behavior is managed-runtime evidence and must separate cold, warm and profile-guided states.",
+      "claim_ceiling": "MANAGED_RUNTIME",
+      "class": "MANAGED_RUNTIME_COMPILER",
+      "comparability_group": "android_managed_runtime",
+      "forbidden_promotions": ["FREESTANDING_STRUCTURAL", "PHYSICAL_BAREMETAL"],
+      "id": "art_jit_aot",
+      "required_gates": ["runtime_identity", "runtime_state_identity", "workload_identity", "sample_floor"],
+      "required_measurements": ["runtime_state", "iterations", "median", "p95", "p99", "mad"]
+    },
+    {
+      "boundary": "SDK/Build Tools package, align and sign artifacts; packaging success is not runtime evidence.",
+      "claim_ceiling": "PACKAGING_TRANSFORM",
+      "class": "HOSTED_PACKAGING_TOOLCHAIN",
+      "comparability_group": "android_transform",
+      "forbidden_promotions": ["RUNTIME_PASS", "FREESTANDING_STRUCTURAL", "PHYSICAL_BAREMETAL"],
+      "id": "android_sdk_buildtools",
+      "required_gates": ["input_identity", "toolchain_identity", "output_identity", "transform_provenance"],
+      "required_measurements": ["input_sha256", "output_sha256", "tool_versions", "output_bytes"]
+    },
+    {
+      "boundary": "R8 transforms DEX/resources; size or transform success cannot be promoted to native or physical runtime evidence.",
+      "claim_ceiling": "DEX_TRANSFORM",
+      "class": "HOSTED_DEX_TRANSFORM",
+      "comparability_group": "android_transform",
+      "forbidden_promotions": ["NATIVE_RUNTIME_PASS", "FREESTANDING_STRUCTURAL", "PHYSICAL_BAREMETAL"],
+      "id": "r8_dex_optimizer",
+      "required_gates": ["input_identity", "rules_identity", "toolchain_identity", "output_identity", "semantic_test_binding"],
+      "required_measurements": ["input_sha256", "rules_sha256", "output_sha256", "dex_bytes", "mapping_digest"]
+    },
+    {
+      "boundary": "Physical Android/Termux execution is physical userspace evidence, not firmware/bare-metal evidence.",
+      "claim_ceiling": "PHYSICAL_USERSPACE",
+      "class": "PHYSICAL_USERSPACE_RUNTIME",
+      "comparability_group": "physical_native",
+      "forbidden_promotions": ["PHYSICAL_BAREMETAL"],
+      "id": "physical_termux_native",
+      "required_gates": ["external_head_pin", "artifact_identity_before_after", "abi_identity", "physical_observation", "exit_status"],
+      "required_measurements": ["artifact_sha256", "abi", "exit_status"]
+    },
+    {
+      "boundary": "QEMU execution is emulated runtime evidence and cannot close a physical-device gate.",
+      "claim_ceiling": "EMULATED_RUNTIME",
+      "class": "EMULATED_RUNTIME",
+      "comparability_group": "emulated_native",
+      "forbidden_promotions": ["PHYSICAL_USERSPACE", "PHYSICAL_BAREMETAL"],
+      "id": "qemu_emulated",
+      "required_gates": ["artifact_identity", "emulator_identity", "target_identity", "exit_status"],
+      "required_measurements": ["artifact_sha256", "emulator_version", "target", "exit_status"]
+    },
+    {
+      "boundary": "Requires a real boot/firmware execution target with hardware-bound evidence; hosted CI, Android, Termux and QEMU are insufficient.",
+      "claim_ceiling": "PHYSICAL_BAREMETAL",
+      "class": "PHYSICAL_BAREMETAL_RUNTIME",
+      "comparability_group": "baremetal_physical",
+      "forbidden_promotions": [],
+      "id": "baremetal_firmware",
+      "required_gates": ["source_identity", "artifact_identity", "boot_target_identity", "physical_boot_observation", "receipt_integrity"],
+      "required_measurements": ["artifact_sha256", "target_id_digest", "boot_status"]
+    }
+  ],
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "schema": "rafaelia.rafci.pathways/v1",
+  "selection_law": "ADMISSIBILITY_THEN_PARETO",
+  "unknown": "TOKEN_VAZIO",
+  "weighted_score_policy": "FORBIDDEN_UNTIL_OBJECTIVE_AND_WEIGHTS_ARE_PREREGISTERED"
+}
