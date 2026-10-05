@@ -18,6 +18,8 @@ CEIL = {
 }
 IDS={"freestanding_native","android_ndk","jni_bridge","art_jit_aot","android_sdk_buildtools","r8_dex_optimizer","physical_termux_native","qemu_emulated","baremetal_firmware"}
 NON_GATE={"infer","analyze","condition","doubt","catalyze","heuristic"}
+ART_STATES={"INTERPRETED","JIT_COLD","JIT_WARM","AOT","AOT_PROFILED"}
+NDK_MEASUREMENTS={"artifact_sha256","abi","needed_libraries","ndk_version","compiler_identity","linker_identity"}
 
 class E(RuntimeError): pass
 def req(v,m):
@@ -30,7 +32,7 @@ def validate(s):
     req(s.get("repository")=="rafaelmeloreisnovo/RafPolimata","repository")
     req(s.get("claim_allowed") is False,"claim_allowed")
     req(s.get("unknown")=="TOKEN_VAZIO" and not isinstance(s.get("unknown"),(int,float)),"TOKEN_VAZIO")
-    req(s.get("selection_law")=="ADMISSIBILITY_THEN_PARETO","selection")
+    req(s.get("selection_law")=="ADMISSIBILITY_THEN_COMPARABILITY_THEN_PARETO","selection")
     req(s.get("weighted_score_policy")=="FORBIDDEN_UNTIL_OBJECTIVE_AND_WEIGHTS_ARE_PREREGISTERED","weights")
     req(s.get("incomparable_state")=="INCOMPARABLE","incomparable")
     keys=s.get("comparison_keys",[]); uniq(keys,"comparison key")
@@ -58,7 +60,12 @@ def validate(s):
     req("PHYSICAL_USERSPACE" in by["qemu_emulated"]["forbidden_promotions"],"QEMU->physical")
     req("RUNTIME_PASS" in by["android_sdk_buildtools"]["forbidden_promotions"],"SDK->runtime")
     req("NATIVE_RUNTIME_PASS" in by["r8_dex_optimizer"]["forbidden_promotions"],"R8->runtime")
+    req("toolchain_identity" in by["android_ndk"]["required_gates"],"NDK toolchain gate")
+    req(NDK_MEASUREMENTS.issubset(by["android_ndk"]["required_measurements"]),"NDK reproducibility identity")
     req("runtime_state" in by["art_jit_aot"]["required_measurements"],"JIT state")
+    art_domain=by["art_jit_aot"].get("runtime_state_domain",[])
+    uniq(art_domain,"ART runtime state")
+    req(set(art_domain)==ART_STATES,"ART runtime state domain")
     fs=s.get("falsifiers",[]); uniq([f.get("id") for f in fs],"falsifier"); req(len(fs)>=12,"falsifiers")
     rules={f.get("rule"):f.get("result") for f in fs}
     expected={
@@ -79,10 +86,13 @@ def reject(s,fn,label):
 def selftest(s):
     reject(s,lambda x:x.__setitem__("unknown",0),"empty->zero")
     reject(s,lambda x:x.__setitem__("claim_allowed",True),"claim")
+    reject(s,lambda x:x.__setitem__("selection_law","ADMISSIBILITY_THEN_PARETO"),"comparability selection")
     reject(s,lambda x:next(p for p in x["pathways"] if p["id"]=="android_ndk").__setitem__("claim_ceiling","FREESTANDING_STRUCTURAL"),"NDK")
+    reject(s,lambda x:next(p for p in x["pathways"] if p["id"]=="android_ndk")["required_measurements"].remove("ndk_version"),"NDK identity")
     reject(s,lambda x:next(p for p in x["pathways"] if p["id"]=="physical_termux_native").__setitem__("claim_ceiling","PHYSICAL_BAREMETAL"),"baremetal")
     reject(s,lambda x:next(p for p in x["pathways"] if p["id"]=="qemu_emulated")["forbidden_promotions"].remove("PHYSICAL_USERSPACE"),"QEMU")
     reject(s,lambda x:next(p for p in x["pathways"] if p["id"]=="art_jit_aot")["required_measurements"].remove("runtime_state"),"JIT")
+    reject(s,lambda x:next(p for p in x["pathways"] if p["id"]=="art_jit_aot").__setitem__("runtime_state_domain",["JIT"]),"ART domain")
     reject(s,lambda x:x.__setitem__("weighted_score_policy","ALLOW"),"weights")
     reject(s,lambda x:next(o for o in x["epistemic_operations"] if o["id"]=="heuristic").__setitem__("can_close_gate",True),"heuristic")
 def receipt(path,s):
@@ -101,5 +111,5 @@ def main():
         if z.receipt:receipt(z.receipt,s)
     except (OSError,json.JSONDecodeError,E) as e:
         print(f"RAFCI_PATHWAY_FAIL: {e}",file=sys.stderr); return 1
-    print(f"RAFCI_PATHWAY_PASS pathways={len(s['pathways'])} falsifiers={len(s['falsifiers'])}"); return 0
+    print(f"RAFCI_PATHWAY_PASS pathways={len(s['pathways'])} falsifiers={len(s['falsifiers'])} selection={s['selection_law']}"); return 0
 if __name__=="__main__": raise SystemExit(main())

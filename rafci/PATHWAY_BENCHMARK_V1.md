@@ -81,6 +81,12 @@ A heuristic may decide **what to test next**. It cannot decide that a test passe
 
 ## Benchmark law
 
+The machine-readable selection law is:
+
+```text
+ADMISSIBILITY_THEN_COMPARABILITY_THEN_PARETO
+```
+
 ### Admissibility before ranking
 
 A pathway is eligible for ranking only when every MUST gate for its class is satisfied and no falsifier fired. Missing required evidence remains `TOKEN_VAZIO`.
@@ -89,7 +95,9 @@ A pathway is eligible for ranking only when every MUST gate for its class is sat
 
 Direct comparison requires matching `workload_id`, `semantics_digest`, `protocol_version`, `artifact_role`, `hardware_class` and `runtime_state`, unless an explicit normalization was pre-registered. Otherwise the result is `INCOMPARABLE`, not faster/slower/better/worse.
 
-For ART, JIT/AOT measurements keep cold, warm and profile-guided states separate.
+For ART, runtime state is closed to the V1 domain `INTERPRETED`, `JIT_COLD`, `JIT_WARM`, `AOT`, `AOT_PROFILED`; those states must never be collapsed into a single JIT/AOT score.
+
+For Android NDK, reproducibility identity includes the exact artifact digest, ABI, dependency inventory, NDK version, compiler identity and linker identity.
 
 ### Pareto before arbitrary scoring
 
@@ -147,14 +155,16 @@ baremetal_execution=TOKEN_VAZIO
 claim_allowed=false
 ```
 
+The exact-head CI also writes the generated receipt and its SHA-256 into the GitHub job summary. Artifact upload is a separate transport concern: if GitHub artifact storage is unavailable or quota-blocked, `receipt_archive` remains `TOKEN_VAZIO_ARCHIVE_TRANSPORT`; that transport failure does not rewrite a successful contract validation into a scientific failure and does not promote any execution claim.
+
 Real benchmark receipts remain separate execution evidence bound to exact source, artifact, toolchain, protocol and hardware/runtime identities.
 
 ## Highest information gain per engineering effort
 
 1. same-artifact ARM64 physical receipt, because the physical acquisition route already exists;
 2. JNI boundary benchmark with exact signature/argument/return validation;
-3. ART cold vs warm vs profile-guided timing on one workload/device class;
-4. NDK dependency/purity inventory against the freestanding reference artifact;
+3. ART state-separated runtime timing on one workload/device class;
+4. NDK dependency/purity and exact toolchain identity against the freestanding reference artifact;
 5. R8 before/after identity, rules/mapping digest, size and semantic regression binding;
 6. SDK packaging transform provenance and bit-level output inventory;
 7. matched QEMU vs physical experiment only as two distinct evidence classes;

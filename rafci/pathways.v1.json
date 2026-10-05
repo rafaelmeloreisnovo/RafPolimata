@@ -72,8 +72,8 @@
       "comparability_group": "android_native",
       "forbidden_promotions": ["FREESTANDING_STRUCTURAL", "PHYSICAL_BAREMETAL"],
       "id": "android_ndk",
-      "required_gates": ["source_identity", "artifact_identity", "abi_identity", "native_dependency_inventory"],
-      "required_measurements": ["artifact_sha256", "abi", "needed_libraries"]
+      "required_gates": ["source_identity", "artifact_identity", "abi_identity", "toolchain_identity", "native_dependency_inventory"],
+      "required_measurements": ["artifact_sha256", "abi", "needed_libraries", "ndk_version", "compiler_identity", "linker_identity"]
     },
     {
       "boundary": "JNI crosses managed/native semantics; bridge correctness and overhead are distinct from native-core execution.",
@@ -86,14 +86,15 @@
       "required_measurements": ["calls", "failures", "median", "p95", "p99", "mad"]
     },
     {
-      "boundary": "ART JIT/AOT/profile behavior is managed-runtime evidence and must separate cold, warm and profile-guided states.",
+      "boundary": "ART JIT/AOT/profile behavior is managed-runtime evidence and must separate interpreted, JIT cold/warm, AOT and profile-guided AOT states.",
       "claim_ceiling": "MANAGED_RUNTIME",
       "class": "MANAGED_RUNTIME_COMPILER",
       "comparability_group": "android_managed_runtime",
       "forbidden_promotions": ["FREESTANDING_STRUCTURAL", "PHYSICAL_BAREMETAL"],
       "id": "art_jit_aot",
       "required_gates": ["runtime_identity", "runtime_state_identity", "workload_identity", "sample_floor"],
-      "required_measurements": ["runtime_state", "iterations", "median", "p95", "p99", "mad"]
+      "required_measurements": ["runtime_state", "iterations", "median", "p95", "p99", "mad"],
+      "runtime_state_domain": ["INTERPRETED", "JIT_COLD", "JIT_WARM", "AOT", "AOT_PROFILED"]
     },
     {
       "boundary": "SDK/Build Tools package, align and sign artifacts; packaging success is not runtime evidence.",
@@ -148,7 +149,7 @@
   ],
   "repository": "rafaelmeloreisnovo/RafPolimata",
   "schema": "rafaelia.rafci.pathways/v1",
-  "selection_law": "ADMISSIBILITY_THEN_PARETO",
+  "selection_law": "ADMISSIBILITY_THEN_COMPARABILITY_THEN_PARETO",
   "unknown": "TOKEN_VAZIO",
   "weighted_score_policy": "FORBIDDEN_UNTIL_OBJECTIVE_AND_WEIGHTS_ARE_PREREGISTERED"
 }
