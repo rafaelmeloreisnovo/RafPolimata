@@ -3,7 +3,8 @@
 **Authority:** `rafaelmeloreisnovo/RafPolimata` for this control contract only  
 **Consumer authority:** each producer repository keeps implementation/test authority  
 **Lifecycle:** `DRAFT_CANDIDATE / claim_allowed=false`  
-**License state for this new file:** `TOKEN_VAZIO_FILE_LEVEL_SCOPE` until the repository's file-level licensing authority explicitly classifies it.
+**License state for this new file:** `TOKEN_VAZIO_FILE_LEVEL_SCOPE` until the repository's file-level licensing authority explicitly classifies it.  
+**Closure routing:** structural/licensing unknowns → `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`; runtime/device unknowns → `CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE`.
 
 ## Purpose
 
@@ -97,9 +98,17 @@ The guardrail is fail-closed:
 2. no third-party notice may be removed by this contract;
 3. no blanket relicense is inferred from repository ownership;
 4. a clean-room replacement needs a behavioral/format specification, independent implementation record, provenance, tests/falsifiers and an explicit file-level license decision;
-5. until that last decision exists, the new replacement license field remains `TOKEN_VAZIO`.
+5. until that last decision exists, the new replacement license field remains `TOKEN_VAZIO` under `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`.
 
 This is engineering governance, not legal certification or legal advice.
+
+## Gap / closure law
+
+`TOKEN_VAZIO` is preserved rather than erased:
+
+- file-level licensing, provider/tool availability and other structural obligations bind to `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`;
+- app/device/runtime execution gaps bind to `CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE`;
+- closure linkage classifies the obligation and never promotes it to `PASS`.
 
 ## Dependency reduction law
 
@@ -139,5 +148,5 @@ A PASS here proves the **control contract only**. Runtime, physical-device behav
 ## R3
 
 `F_ok` = twelve surfaces are classified without provider-body copying or authority transfer; freestanding and factory/runtime boundaries are explicit.  
-`F_gap` = file-level license for this new RafCI document/validator is intentionally unresolved; consumer execution evidence is not produced by this contract.  
+`F_gap` = file-level license for this new RafCI document/validator is intentionally unresolved under `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`; consumer runtime/device execution remains under `CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE`.  
 `F_next` = bind one consumer through a local no-network gate, then execute exact-head CI; preserve `TOKEN_VAZIO` for any unobserved runtime or physical state.
