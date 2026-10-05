@@ -6,6 +6,9 @@ on:
       - 'rafci/pathways.v1.json'
       - 'rafci/PATHWAY_BENCHMARK_V1.md'
       - 'rafci/tools/verify_pathways_v1.py'
+      - 'rafci/authorial_clients.v1.json'
+      - 'rafci/AUTHORIAL_CLIENTS_V1.md'
+      - 'rafci/tools/verify_authorial_clients_v1.py'
       - '.github/workflows/rafci-pathway-benchmark-v1.yml'
   push:
     branches: [main]
@@ -13,6 +16,9 @@ on:
       - 'rafci/pathways.v1.json'
       - 'rafci/PATHWAY_BENCHMARK_V1.md'
       - 'rafci/tools/verify_pathways_v1.py'
+      - 'rafci/authorial_clients.v1.json'
+      - 'rafci/AUTHORIAL_CLIENTS_V1.md'
+      - 'rafci/tools/verify_authorial_clients_v1.py'
       - '.github/workflows/rafci-pathway-benchmark-v1.yml'
   workflow_dispatch:
 
@@ -28,7 +34,7 @@ env:
 
 jobs:
   pathway-contract:
-    name: admissibility + comparability + falsifiers
+    name: admissibility + clients + comparability + falsifiers
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -60,7 +66,29 @@ jobs:
           assert r["claim_allowed"] is False
           PY
 
-      - name: Expose exact-head receipt in job summary
+      - name: Validate authorial client contract
+        run: |
+          set -euo pipefail
+          mkdir -p build/rafci/authorial-clients
+          test "$(git rev-parse HEAD)" = "${RAFCI_SOURCE_SHA}"
+          python3 rafci/tools/verify_authorial_clients_v1.py \
+            --selftest \
+            --receipt build/rafci/authorial-clients/receipt.json
+          python3 -m json.tool build/rafci/authorial-clients/receipt.json >/dev/null
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path("build/rafci/authorial-clients/receipt.json").read_text())
+          assert r["state"] == "PASS_CONTRACT_ONLY"
+          assert r["client_count"] == 12
+          assert r["provider_body_copied"] is False
+          assert r["provider_relicensed"] is False
+          assert r["runtime_execution"] == "TOKEN_VAZIO"
+          assert r["physical_execution"] == "TOKEN_VAZIO"
+          assert r["claim_allowed"] is False
+          PY
+
+      - name: Expose exact-head receipts in job summary
         if: always()
         run: |
           set -euo pipefail
@@ -70,26 +98,42 @@ jobs:
             echo "- exact_head: \`${RAFCI_SOURCE_SHA}\`"
             if test -f build/rafci/pathways/receipt.json; then
               receipt_sha="$(sha256sum build/rafci/pathways/receipt.json | cut -d' ' -f1)"
-              echo "- receipt_generation: \`PASS\`"
-              echo "- receipt_sha256: \`${receipt_sha}\`"
-              echo "- artifact archive transport is independent from the contract gate."
-              echo
+              echo "- pathway_receipt_generation: \`PASS\`"
+              echo "- pathway_receipt_sha256: \`${receipt_sha}\`"
+            else
+              echo "- pathway_receipt_generation: \`FAIL\`"
+            fi
+            if test -f build/rafci/authorial-clients/receipt.json; then
+              clients_sha="$(sha256sum build/rafci/authorial-clients/receipt.json | cut -d' ' -f1)"
+              echo "- authorial_clients_receipt_generation: \`PASS\`"
+              echo "- authorial_clients_receipt_sha256: \`${clients_sha}\`"
+            else
+              echo "- authorial_clients_receipt_generation: \`FAIL\`"
+            fi
+            echo "- artifact archive transport is independent from the contract gate."
+            echo
+            if test -f build/rafci/pathways/receipt.json; then
               echo '```json'
               cat build/rafci/pathways/receipt.json
               echo '```'
-            else
-              echo "- receipt_generation: \`FAIL\`"
+            fi
+            if test -f build/rafci/authorial-clients/receipt.json; then
+              echo '```json'
+              cat build/rafci/authorial-clients/receipt.json
+              echo '```'
             fi
           } >> "${GITHUB_STEP_SUMMARY}"
 
-      - name: Preserve pathway receipt
+      - name: Preserve RafCI receipts
         id: archive
         if: always()
         continue-on-error: true
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: rafci-pathway-contract-${{ github.run_id }}
-          path: build/rafci/pathways/receipt.json
+          path: |
+            build/rafci/pathways/receipt.json
+            build/rafci/authorial-clients/receipt.json
           if-no-files-found: warn
 
       - name: Record receipt archive transport
