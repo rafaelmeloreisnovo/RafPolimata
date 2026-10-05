@@ -1,0 +1,175 @@
+{
+  "schema": "rafaelia.rafci.authorial-clients/v1",
+  "authority": "authority.rafpolimata.rafci",
+  "claim_allowed": false,
+  "purpose": "Classify project-owned control clients separately from external factory tools, platform ABIs and runtime evidence.",
+  "invariants": [
+    "SOURCE!=ARTIFACT!=EXECUTION!=EVIDENCE!=CLAIM",
+    "TOKEN_VAZIO!=0",
+    "IMPLEMENTED_UNTESTED!=PASS",
+    "FACTORY_TOOL!=RUNTIME_DEPENDENCY",
+    "PROVIDER_CONTROL!=UPSTREAM_AUTHORSHIP",
+    "AUTHORIAL_CLIENT!=REIMPLEMENTED_PROVIDER",
+    "LICENSE_NOTICE_PRESERVED_ON_EXISTING_OR_IMPORTED_MATERIAL"
+  ],
+  "licensing_policy": {
+    "blanket_relicense_allowed": false,
+    "existing_path_notice_is_authoritative": true,
+    "third_party_notice_removal_allowed": false,
+    "fork_control_implies_authorship": false,
+    "clean_room_replacement_requires": [
+      "behavioral_or_format_specification",
+      "independent_implementation_record",
+      "source_provenance",
+      "tests_or_falsifiers",
+      "file_level_license_decision"
+    ],
+    "new_file_license": "TOKEN_VAZIO_UNTIL_FILE_LEVEL_SCOPE_IS_RESOLVED"
+  },
+  "quality_method": {
+    "method": "DMAIC_STYLE_ENGINEERING_NOT_CERTIFICATION",
+    "define": "Identify consumer intent, runtime boundary and replaceable friction.",
+    "measure": "Inventory imports, build declarations, tool versions, hashes and ABI edges.",
+    "analyze": "Separate runtime dependencies from factory tools, platform APIs and optional transforms.",
+    "improve": "Prefer the smallest reversible authorial control surface; never copy a provider body merely to rename it.",
+    "control": "Fail closed on drift, preserve notices, exact identities, receipts and rollback."
+  },
+  "clients": [
+    {
+      "id": "c",
+      "surface": "language",
+      "client_role": "AUTHORIAL_SOURCE_SURFACE",
+      "provider_role": "COMPILER_FACTORY_TOOL",
+      "runtime_dependency": false,
+      "freestanding_eligible": true,
+      "replacement_strategy": "AUTHORIAL_ALGORITHMS_WITH_BOUNDED_ABI",
+      "claim_ceiling": "SOURCE_AND_FREESTANDING_ARTIFACT_WHEN_GATED"
+    },
+    {
+      "id": "java",
+      "surface": "language",
+      "client_role": "AUTHORIAL_PLATFORM_EDGE_SOURCE",
+      "provider_role": "JDK_AND_ANDROID_PLATFORM_FACTORY",
+      "runtime_dependency": "ANDROID_PLATFORM_ART_RUNTIME",
+      "freestanding_eligible": false,
+      "replacement_strategy": "KEEP_UI_PLATFORM_EDGE_THIN_NO_THIRD_PARTY_LIBRARY_REQUIRED",
+      "claim_ceiling": "MANAGED_PLATFORM_EDGE"
+    },
+    {
+      "id": "kotlin",
+      "surface": "language",
+      "client_role": "OPTIONAL_AUTHORIAL_SOURCE_SURFACE",
+      "provider_role": "KOTLIN_COMPILER_FACTORY_IF_ENABLED",
+      "runtime_dependency": "TOKEN_VAZIO_UNTIL_CONSUMER_DECLARATION",
+      "freestanding_eligible": false,
+      "replacement_strategy": "DO_NOT_ENABLE_BY_DEFAULT_WHEN_JAVA_PLATFORM_EDGE_IS_SUFFICIENT",
+      "claim_ceiling": "MANAGED_PLATFORM_EDGE"
+    },
+    {
+      "id": "python",
+      "surface": "build_audit",
+      "client_role": "AUTHORIAL_STDLIB_ONLY_CONTROL_CLIENT",
+      "provider_role": "HOST_PYTHON_INTERPRETER",
+      "runtime_dependency": false,
+      "freestanding_eligible": false,
+      "replacement_strategy": "BUILD_OR_AUDIT_ONLY_NEVER_APP_RUNTIME",
+      "claim_ceiling": "CONTROL_PLANE_VALIDATION"
+    },
+    {
+      "id": "gradle",
+      "surface": "build_orchestration",
+      "client_role": "AUTHORIAL_TASK_CONTRACT",
+      "provider_role": "EXTERNAL_FACTORY_ORCHESTRATOR",
+      "runtime_dependency": false,
+      "freestanding_eligible": false,
+      "replacement_strategy": "PIN_AND_WRAP_DO_NOT_COPY_PROVIDER_IMPLEMENTATION",
+      "claim_ceiling": "BUILD_TRANSFORM"
+    },
+    {
+      "id": "android_gradle_plugin",
+      "surface": "build_plugin",
+      "client_role": "AUTHORIAL_CONFIGURATION_CONTRACT",
+      "provider_role": "EXTERNAL_FACTORY_PLUGIN",
+      "runtime_dependency": false,
+      "freestanding_eligible": false,
+      "replacement_strategy": "PIN_VERSION_AND_AUDIT_OUTPUT_BOUNDARY",
+      "claim_ceiling": "ANDROID_BUILD_TRANSFORM"
+    },
+    {
+      "id": "android_sdk",
+      "surface": "platform_build",
+      "client_role": "AUTHORIAL_CAPABILITY_AND_VERSION_CLIENT",
+      "provider_role": "ANDROID_PLATFORM_FACTORY_TOOLCHAIN",
+      "runtime_dependency": "ANDROID_PLATFORM_API_AT_DEVICE_EDGE",
+      "freestanding_eligible": false,
+      "replacement_strategy": "USE_PLATFORM_SPECIFIC_EDGE_ONLY_DO_NOT_REBRAND_PROVIDER",
+      "claim_ceiling": "PACKAGING_AND_PLATFORM_EDGE"
+    },
+    {
+      "id": "android_ndk",
+      "surface": "native_build",
+      "client_role": "AUTHORIAL_TARGET_AND_ABI_CLIENT",
+      "provider_role": "ANDROID_NATIVE_FACTORY_TOOLCHAIN",
+      "runtime_dependency": false,
+      "freestanding_eligible": false,
+      "replacement_strategy": "USE_FOR_ANDROID_LINK_EDGE_WHILE_KEEPING_CORE_SOURCE_FREESTANDING",
+      "claim_ceiling": "ANDROID_NATIVE_HOSTED"
+    },
+    {
+      "id": "cmake",
+      "surface": "native_build_orchestration",
+      "client_role": "AUTHORIAL_TARGET_GRAPH_CONTRACT",
+      "provider_role": "EXTERNAL_FACTORY_ORCHESTRATOR",
+      "runtime_dependency": false,
+      "freestanding_eligible": false,
+      "replacement_strategy": "KEEP_CONFIGURATION_MINIMAL_AND_CORE_FLAGS_EXPLICIT",
+      "claim_ceiling": "BUILD_TRANSFORM"
+    },
+    {
+      "id": "jni",
+      "surface": "managed_native_bridge",
+      "client_role": "AUTHORIAL_NARROW_BRIDGE_SOURCE",
+      "provider_role": "ANDROID_PLATFORM_ABI",
+      "runtime_dependency": "ANDROID_PLATFORM_JNI_ABI",
+      "freestanding_eligible": false,
+      "replacement_strategy": "ONE_CANONICAL_EDGE_POD_OR_BOUNDED_BUFFERS_AND_EXPLICIT_ERRORS",
+      "claim_ceiling": "MANAGED_NATIVE_BOUNDARY"
+    },
+    {
+      "id": "r8",
+      "surface": "dex_transform",
+      "client_role": "AUTHORIAL_ENABLEMENT_AND_RULES_CONTRACT",
+      "provider_role": "EXTERNAL_FACTORY_TRANSFORM",
+      "runtime_dependency": false,
+      "freestanding_eligible": false,
+      "replacement_strategy": "OPTIONAL_OFF_BY_DEFAULT_UNTIL_SEMANTIC_EQUIVALENCE_GATE",
+      "claim_ceiling": "DEX_TRANSFORM"
+    },
+    {
+      "id": "assemble",
+      "surface": "build_phase",
+      "client_role": "AUTHORIAL_BUILD_TARGET_CONTRACT",
+      "provider_role": "COMPOSITION_OF_DECLARED_FACTORY_TOOLS",
+      "runtime_dependency": false,
+      "freestanding_eligible": false,
+      "replacement_strategy": "RECEIPT_SOURCE_TO_ARTIFACT_TRANSFORMS_WITHOUT_PROMOTING_RUNTIME",
+      "claim_ceiling": "ARTIFACT_CONSTRUCTION"
+    }
+  ],
+  "consumer_policy": {
+    "third_party_runtime_dependency_default": "DENY",
+    "external_factory_tool_default": "ALLOW_ONLY_WHEN_DECLARED_AND_PINNED",
+    "optional_language_default": "DISABLED_UNLESS_IT_REDUCES_TOTAL_FRICTION_WITHOUT_NEW_RUNTIME_DEPENDENCY",
+    "r8_default": "OFF_UNTIL_SEPARATE_SEMANTIC_GATE",
+    "jni_default": "ONE_NARROW_CANONICAL_EDGE",
+    "core_default": "AUTHORIAL_FREESTANDING_WHERE_DOMAIN_ALLOWS"
+  },
+  "known_consumers": [
+    {
+      "repository": "rafaelmeloreisnovo/Est-dio-de-udio",
+      "authority": "PROVIDER_REPOSITORY_RETAINS_IMPLEMENTATION_AND_TEST_AUTHORITY",
+      "state": "POINTER_ONLY_NO_BODY_COPY"
+    }
+  ],
+  "unknown": "TOKEN_VAZIO"
+}
