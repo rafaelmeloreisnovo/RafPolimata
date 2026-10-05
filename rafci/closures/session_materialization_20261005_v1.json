@@ -1,0 +1,208 @@
+{
+  "schema": "rafaelia.rafci.session-materialization/v1",
+  "id": "RAFAELIA_SESSION_MATERIALIZATION_20261005_V1",
+  "event_id": "RAFAELIA-SESSION-MATERIALIZATION-2026-10-05-V1",
+  "date": "2026-10-05",
+  "authority": "rafaelmeloreisnovo/RafPolimata",
+  "closure_binding": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+  "claim_allowed": false,
+  "automatic_promotion_forbidden": true,
+  "human_authorization_required": true,
+  "truth_boundary": "Structural session governance only; no novelty, patentability, universality, performance, physical-sovereignty or valuation proof.",
+  "bindings": {
+    "evidence_garden": "docs/EVIDENCE_GARDEN_V1.md",
+    "synaptic_closure": "rafci/closures/sgpt_synaptic_closure_v1.json",
+    "synaptic_verifier": "rafci/tools/verify_sgpt_synaptic_closure_v1.py",
+    "drive_document": "https://docs.google.com/document/d/1gd_ntgMgchE-JVTKKUeEmRew8s5_IrRSPADeoN_bR4k/edit",
+    "drive_ledger": "https://docs.google.com/spreadsheets/d/1KmWADrhzdAHmivGHgOWVkvsNUFGnK4Qc27n1xbKqGrk/edit"
+  },
+  "truth_invariants": [
+    "SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM",
+    "TOKEN_VAZIO != 0",
+    "IMPLEMENTED_UNTESTED != PASS",
+    "provider failure does not imply source failure",
+    "root access does not imply boot-ROM or hardware sovereignty",
+    "market size does not imply asset valuation"
+  ],
+  "allowed_states": [
+    "PASS",
+    "FAIL",
+    "PENDING",
+    "NOT_RUN",
+    "OBSERVED_UNPROMOTED",
+    "TOKEN_VAZIO",
+    "CONTRADICTION",
+    "OUT_OF_SCOPE",
+    "RECOMMENDATION"
+  ],
+  "semantic_chain": [
+    "photonics->recombined_knowledge",
+    "recombined_knowledge->prior_art_patent_market",
+    "prior_art_patent_market->unix_bsd_linux_as_precedent",
+    "unix_bsd_linux_as_precedent->rafaelia_mathematical_machine",
+    "rafaelia_mathematical_machine->hardware_boundary",
+    "hardware_boundary->spec_reference_backend",
+    "spec_reference_backend->omega_closure"
+  ],
+  "locked_claims": {
+    "C03": {
+      "topic": "conventional_ARM_without_addresses_or_instructions",
+      "state": "FAIL",
+      "claim_allowed": false,
+      "falsifier": "conventional ARM still executes an ISA over machine state"
+    },
+    "C04": {
+      "topic": "root_implies_Boot_ROM_control",
+      "state": "FAIL",
+      "claim_allowed": false,
+      "falsifier": "immutable/signed/vendor boot stage remains outside root privilege"
+    },
+    "C06": {
+      "topic": "world_novelty",
+      "state": "TOKEN_VAZIO",
+      "claim_allowed": false,
+      "falsifier": "material prior art predates the claimed architecture"
+    },
+    "C07": {
+      "topic": "patentability",
+      "state": "TOKEN_VAZIO",
+      "claim_allowed": false,
+      "falsifier": "abstract/ineligible/obvious/anticipated technical claim"
+    },
+    "C08": {
+      "topic": "performance_or_energy_advantage",
+      "state": "NOT_RUN",
+      "claim_allowed": false,
+      "falsifier": "controlled baseline does not support advantage"
+    },
+    "C09": {
+      "topic": "turing_completeness",
+      "state": "NOT_RUN",
+      "claim_allowed": false,
+      "falsifier": "formal model is strictly weaker or universal construction fails"
+    },
+    "C10": {
+      "topic": "asset_valuation",
+      "state": "TOKEN_VAZIO",
+      "claim_allowed": false,
+      "falsifier": "valuation depends only on TAM or unobserved assumptions"
+    },
+    "C11": {
+      "topic": "evidence_garden_core_invariants_exist",
+      "state": "PASS",
+      "claim_allowed": true,
+      "evidence": "docs/EVIDENCE_GARDEN_V1.md source readback",
+      "falsifier": "source no longer contains the declared invariants"
+    }
+  },
+  "risk_policy": {
+    "rpn": "severity*likelihood*detectability",
+    "urgency": {
+      "U0": "blocks correctness/reconstructibility",
+      "U1": "blocks attribution/rigor",
+      "U2": "blocks generalization/market"
+    },
+    "mandatory_controls": [
+      "non_PASS_claims_are_not_promotable",
+      "provider_and_source_failures_are_separated",
+      "no_main_write_without_rollback",
+      "benchmark_requires_station_raw_samples_and_baseline",
+      "novelty_requires_prior_art_receipt",
+      "valuation_is_not_derived_from_TAM",
+      "typed_empty_does_not_collapse_to_zero_or_null",
+      "physical_backend_waits_for_reference_oracle",
+      "materialization_requires_EVENT_ID_and_receipts"
+    ]
+  },
+  "gate_order": [
+    "G0_ORIGIN",
+    "G1_CLAIM_BOUNDARY",
+    "G2_PRIOR_ART",
+    "G3_FORMAL_SPEC",
+    "G4_REFERENCE_MACHINE",
+    "G5_EQUIVALENCE",
+    "G6_MEASUREMENT",
+    "G7_PHYSICAL_SCOPE",
+    "G8_ROLLBACK",
+    "G9_PROMOTION"
+  ],
+  "gates": {
+    "G0_ORIGIN": "PASS",
+    "G1_CLAIM_BOUNDARY": "PASS",
+    "G2_PRIOR_ART": "TOKEN_VAZIO",
+    "G3_FORMAL_SPEC": "NOT_RUN",
+    "G4_REFERENCE_MACHINE": "NOT_RUN",
+    "G5_EQUIVALENCE": "NOT_RUN",
+    "G6_MEASUREMENT": "NOT_RUN",
+    "G7_PHYSICAL_SCOPE": "NOT_RUN",
+    "G8_ROLLBACK": "PASS",
+    "G9_PROMOTION": "TOKEN_VAZIO"
+  },
+  "custody": [
+    {
+      "seq": 0,
+      "surface": "conversation",
+      "class": "SOURCE",
+      "state": "PASS",
+      "receipt": "RAFAELIA-SESSION-MATERIALIZATION-2026-10-05-V1"
+    },
+    {
+      "seq": 1,
+      "surface": "github",
+      "class": "SOURCE_ARTIFACT",
+      "state": "PASS",
+      "receipt": "docs/EVIDENCE_GARDEN_V1.md"
+    },
+    {
+      "seq": 2,
+      "surface": "drive",
+      "class": "ARTIFACT",
+      "state": "PASS",
+      "receipt": "1gd_ntgMgchE-JVTKKUeEmRew8s5_IrRSPADeoN_bR4k"
+    },
+    {
+      "seq": 3,
+      "surface": "drive",
+      "class": "ARTIFACT",
+      "state": "PASS",
+      "receipt": "1KmWADrhzdAHmivGHgOWVkvsNUFGnK4Qc27n1xbKqGrk"
+    },
+    {
+      "seq": 4,
+      "surface": "github",
+      "class": "EXECUTION",
+      "state": "PENDING",
+      "receipt": "TOKEN_VAZIO"
+    },
+    {
+      "seq": 5,
+      "surface": "github",
+      "class": "EVIDENCE",
+      "state": "PENDING",
+      "receipt": "TOKEN_VAZIO"
+    },
+    {
+      "seq": 6,
+      "surface": "github",
+      "class": "CLAIM_CONTROL",
+      "state": "PENDING",
+      "receipt": "TOKEN_VAZIO"
+    }
+  ],
+  "unresolved": {
+    "world_novelty": "TOKEN_VAZIO",
+    "patentability": "TOKEN_VAZIO",
+    "turing_completeness": "NOT_RUN",
+    "performance_advantage": "NOT_RUN",
+    "energy_advantage": "NOT_RUN",
+    "physical_backend_equivalence": "NOT_RUN",
+    "asset_valuation": "TOKEN_VAZIO"
+  },
+  "promotion": {
+    "gate": "G9_PROMOTION",
+    "state": "TOKEN_VAZIO",
+    "automatic": false,
+    "human_authorization_required": true
+  },
+  "rollback": "Abandon or revert isolated branch/PR; retain contradictory receipts; never mutate source code solely because a provider failed."
+}
