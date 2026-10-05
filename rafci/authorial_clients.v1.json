@@ -2,6 +2,10 @@
   "schema": "rafaelia.rafci.authorial-clients/v1",
   "authority": "authority.rafpolimata.rafci",
   "claim_allowed": false,
+  "closure_routes": [
+    "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY",
+    "CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE"
+  ],
   "purpose": "Classify project-owned control clients separately from external factory tools, platform ABIs and runtime evidence.",
   "invariants": [
     "SOURCE!=ARTIFACT!=EXECUTION!=EVIDENCE!=CLAIM",
