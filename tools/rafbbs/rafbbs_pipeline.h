@@ -1,5 +1,9 @@
 #ifndef RAFBBS_PIPELINE_H
 #define RAFBBS_PIPELINE_H
+/* Governance: CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.
+ * TOKEN_VAZIO strings in this hosted adapter are governed gap states,
+ * not claim promotion.
+ */
 #include <stdio.h>
 #include "rafbbs_pipeline_core.h"
 #include "rafbbs_command_core.h"
