@@ -38,6 +38,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/rafbbs_log_core.h` — deterministic caller-owned log-line rendering with authorial 64-bit divmod and no printf/libgcc helper;
 - `tools/rafbbs/rafbbs_pipeline_core.h` — pipeline metadata + exact-byte lookup only; no context, status or execution callback;
 - `tools/rafbbs/rafbbs_cli_core.h` — deterministic CLI action routing over caller-owned argv; no terminal, clock, filesystem or command execution;
+- `tools/rafbbs/rafbbs_tui_core.h` — deterministic single-key TUI action/pipeline routing; no stdio, terminal input, rendering or execution;
 - `tools/rafbbs/rafbbs_baremetal.h` — fixed-buffer output and binary manifest value model;
 - `tools/rafbbs/rafbbs_manifest_bin_core.h` — deterministic 96-byte little-endian binary-manifest wire codec;
 - `tools/rafbbs/rafbbs_crc32_core.h` — pure CRC32;
@@ -50,6 +51,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/tests/rafbbs_log_core_test.c` — exact line, invalid-time, long-minute and overflow falsifier;
 - `tools/rafbbs/tests/rafbbs_pipeline_core_test.c` — exact/case-sensitive lookup, flags and not-found falsifier;
 - `tools/rafbbs/tests/rafbbs_cli_core_test.c` — help/list/run/invalid and case-sensitive CLI-route falsifier;
+- `tools/rafbbs/tests/rafbbs_tui_core_test.c` — quit/list/files/run/default TUI-route falsifier with exact pipeline ids;
 - `tools/rafbbs/tests/rafbbs_manifest_bin_core_test.c` — binary wire exact-byte/roundtrip/truncation falsifier.
 
 The hosted file wrappers remain deliberately outside the pure core:
@@ -63,6 +65,7 @@ The hosted file wrappers remain deliberately outside the pure core:
 - `tools/rafbbs/rafbbs_log.h` — hosted clock observation, varargs/detail formatting, console and FILE persistence adapter;
 - `tools/rafbbs/rafbbs_pipeline.h` — hosted handler binding, command execution and provider/file/hash adapters;
 - `tools/rafbbs/rafbbs_cli.h` — hosted terminal, wall-clock, filesystem, git observation and command dispatch adapter;
+- `tools/rafbbs/rafbbs_tui.h` — hosted stdio rendering/input adapter that delegates key semantics to `rafbbs_tui_core.h`;
 - POSIX file adapters.
 
 The monotonic boundary does not reimplement a provider clock.  POSIX supplies the
@@ -122,7 +125,7 @@ declared runtime surface has an equivalent source/build/runtime receipt.
 `F_ok` = authorial zero-include type/status substrate + pure CRC32/SHA-256 +
 RafBBS context/monotonic-time value layer + deterministic text-manifest renderer
 + static filepicker catalog/selection + theme/status + deterministic log-line rendering
-+ pipeline spec/lookup core + CLI route core + fixed 96-byte binary-manifest wire codec prepared for `-nostdinc` compilation,
++ pipeline spec/lookup core + CLI route core + TUI route core + fixed 96-byte binary-manifest wire codec prepared for `-nostdinc` compilation,
 with POSIX clock acquisition, varargs/detail formatting, filesystem persistence and
 console presentation isolated behind adapters.
 
@@ -130,5 +133,5 @@ console presentation isolated behind adapters.
 repository-wide component migration are not yet evidence-bound.
 
 `F_next` = execute the exact-head zero-dependency + semantic time/text/binary-manifest
-falsifiers, including filepicker, theme/status, log-line, pipeline-spec, CLI-route and binary-manifest;
+falsifiers, including filepicker, theme/status, log-line, pipeline-spec, CLI-route, TUI-route and binary-manifest;
 only after PASS select the next smallest runtime-bearing cut.
