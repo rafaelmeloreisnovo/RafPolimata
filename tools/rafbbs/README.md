@@ -285,3 +285,8 @@ and the POSIX monotonic observation remain hosted adapters and are not promoted
 to freestanding. The pure renderer is compiled under `-nostdinc` and exercised
 in the six-ISA no-undefined-symbol probe. Physical/device persistence remains
 `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.
+
+
+## Evidence-validity result core freestanding
+
+Pipeline finalization no longer infers whether CRC32 evidence exists from the numeric digest value. `rafbbs_result_core.h` receives explicit SHA256/CRC32 validity bits and produces final status/hash state without libc, filesystem or provider calls. This preserves `TOKEN_VAZIO != 0`: CRC32 value `0x00000000` can be valid evidence when its validity bit is set. Hosted file hashing remains an adapter; the core only classifies caller-supplied observations. Physical execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.
