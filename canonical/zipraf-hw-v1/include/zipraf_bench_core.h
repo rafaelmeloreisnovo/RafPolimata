@@ -18,7 +18,7 @@
 #define ZH_BENCH_SAMPLE_COUNT 31u
 #define ZH_BENCH_VALID_MASK 0x7fffffffu
 #define ZH_BENCH_MAX_VARIANTS 8u
-#define ZH_BENCH_RECEIPT_V1_SIZE 144u
+#define ZH_BENCH_RECEIPT_V1_SIZE 152u
 #define ZH_BENCH_FACTOR_COUNT 32u
 #define ZH_BENCH_QUALITY_COUNT 16u
 
@@ -54,6 +54,26 @@ enum zh_bench_layer {
     ZH_BENCH_LAYER_VIRTUALIZATION = 8,
     ZH_BENCH_LAYER_OBSERVER_IO = 9,
     ZH_BENCH_LAYER_PHYSICAL_EXTERNAL = 10
+};
+
+enum zh_bench_speed_group {
+    ZH_BENCH_SPEED_UNCLASSIFIED = 0,
+    ZH_BENCH_SPEED_PURE_MATH = 1,
+    ZH_BENCH_SPEED_ISA_COMPUTE = 2,
+    ZH_BENCH_SPEED_CACHE_MEMORY = 3,
+    ZH_BENCH_SPEED_OS_ABI = 4,
+    ZH_BENCH_SPEED_VIRTUALIZATION_TRANSLATION = 5,
+    ZH_BENCH_SPEED_IO_STORAGE = 6,
+    ZH_BENCH_SPEED_POWER_THERMAL = 7,
+    ZH_BENCH_SPEED_OBSERVER_INSTRUMENTATION = 8
+};
+
+enum zh_bench_unit {
+    ZH_BENCH_UNIT_RAW_TICKS = 0,
+    ZH_BENCH_UNIT_CYCLES = 1,
+    ZH_BENCH_UNIT_NANOSECONDS = 2,
+    ZH_BENCH_UNIT_BYTES_PER_SECOND = 3,
+    ZH_BENCH_UNIT_OPERATIONS_PER_SECOND = 4
 };
 
 enum zh_bench_factor {
@@ -123,6 +143,8 @@ struct zh_bench_stats {
 struct zh_bench_receipt_v1 {
     zh_u32 seed;
     zh_u32 variant_count;
+    zh_u32 speed_group;
+    zh_u32 unit;
     zh_u32 factor_observed_mask;
     zh_u32 factor_active_mask;
     zh_u32 quality_observed_mask;
@@ -151,6 +173,8 @@ zh_u32 zh_bench_compare(const struct zh_bench_stats *prehot,
 void zh_bench_receipt_init(struct zh_bench_receipt_v1 *out,
                            zh_u32 seed,
                            zh_u32 variant_count,
+                           zh_u32 speed_group,
+                           zh_u32 unit,
                            zh_u32 factor_observed_mask,
                            zh_u32 factor_active_mask,
                            zh_u32 quality_observed_mask,
