@@ -4,10 +4,10 @@
 /*
  * RAFAELIA-L0-FILE-CONTRACT
  * PURPOSE: Fixed-vector, branchless, one-block execution primitives.
- * SCOPE: SSE2, AVX2, AVX-512F, ARMv7 NEON and AArch64 Advanced SIMD; no OS/runtime contract.
+ * SCOPE: SSE2, AVX2, AVX-512F, ARMv7 NEON, AArch64 Advanced SIMD and IBM z/s390x z13 vector facility; no OS/runtime contract.
  * PRECONDITIONS: Selected compiler target enables the exact ISA profile; full-block operations expose one full block.
- * REGISTER_OWNERSHIP: Inline assembly owns only declared vector/predicate temporaries; C-vector selection owns compiler temporaries.
- * CLOBBERS: Declared XMM/YMM/ZMM/K or NEON temporary plus memory; compiler allocates select temporaries.
+ * REGISTER_OWNERSHIP: Inline assembly owns only declared vector/predicate temporaries; s390x is pinned to VR16..VR19 so FPR0..15 overlap is not touched; C-vector selection owns compiler temporaries elsewhere.
+ * CLOBBERS: Declared XMM/YMM/ZMM/K, NEON or s390x VR16..VR19 temporaries plus memory; compiler allocates select temporaries on non-s390x profiles.
  * MEMORY_ORDER: Ordinary data access; no fence implied. Use raf_fs_arch.h ordering primitives separately.
  * TAIL_SHADOW: Full-block paths never create scalar tail; AVX-512 residual may use K-mask bounded memory; other fixed profiles require explicit full accessible block/mask.
  * EVIDENCE: Source implementation; profile compile/codegen gates promote build evidence. CLOSURE_L11/CLOSURE_L12.
@@ -15,7 +15,9 @@
 
 #include "../include/raf_fs_types.h"
 #include "../include/raf_fs_abi.h"
-#include "raf_fs_arch.h"
+#ifndef RAF_FS_INLINE
+# define RAF_FS_INLINE static __inline__ __attribute__((__always_inline__, __unused__))
+#endif
 
 #if defined(__x86_64__) && defined(__AVX512F__)
 # define RAF_FS_NATIVE_VECTOR_BITS 512u
@@ -121,10 +123,49 @@ RAF_FS_INLINE void raf_fs_vec_zero_block(void *dst) {
         : : "r"(dst) : "d0", "d1", "memory");
 }
 
+#elif defined(__s390x__) && (defined(__VEC__) || defined(__VECTOR__))
+# define RAF_FS_NATIVE_VECTOR_BITS 128u
+# define RAF_FS_NATIVE_VECTOR_BYTES 16u
+# define RAF_FS_NATIVE_LANES_U32 4u
+# define RAF_FS_S390X_HIGH_VECTOR_PROFILE 1u
+typedef raf_u32 raf_fs_native_u32v __attribute__((__vector_size__(16), __may_alias__));
+
+/*
+ * z/Architecture FPR0..15 overlay the low halves of VR0..15. This profile
+ * therefore owns only VR16..VR19 and never mixes floating-point operations
+ * into the block executor.
+ */
+RAF_FS_INLINE void raf_fs_vec_copy_block(void *dst, const void *src) {
+    __asm__ __volatile__(
+        "vl %%v16, 0(%1)\n\t"
+        "vst %%v16, 0(%0)"
+        : : "a"(dst), "a"(src) : "v16", "memory");
+}
+RAF_FS_INLINE void raf_fs_vec_zero_block(void *dst) {
+    __asm__ __volatile__(
+        "vzero %%v16\n\t"
+        "vst %%v16, 0(%0)"
+        : : "a"(dst) : "v16", "memory");
+}
+
 #else
-# error "raf_fs_vector.h requires SSE2/AVX2/AVX-512F, ARMv7 NEON, or AArch64 Advanced SIMD"
+# error "raf_fs_vector.h requires an enabled fixed-vector profile (SSE2/AVX2/AVX-512F, ARMv7 NEON, AArch64 Advanced SIMD, or s390x z13 vector)"
 #endif
 
+#if defined(RAF_FS_S390X_HIGH_VECTOR_PROFILE)
+/* VSEL chooses operand A for mask=0 and B for mask=1: A=no, B=yes. */
+RAF_FS_INLINE void raf_fs_vec_select_u32_block(
+    void *dst, const void *mask, const void *yes, const void *no) {
+    __asm__ __volatile__(
+        "vl %%v16, 0(%1)\n\t"
+        "vl %%v17, 0(%2)\n\t"
+        "vl %%v18, 0(%3)\n\t"
+        "vsel %%v19, %%v18, %%v17, %%v16\n\t"
+        "vst %%v19, 0(%0)"
+        : : "a"(dst), "a"(mask), "a"(yes), "a"(no)
+        : "v16", "v17", "v18", "v19", "memory");
+}
+#else
 RAF_FS_INLINE void raf_fs_vec_select_u32_block(
     void *dst, const void *mask, const void *yes, const void *no) {
     raf_fs_native_u32v m = *(const raf_fs_native_u32v *)mask;
@@ -132,6 +173,7 @@ RAF_FS_INLINE void raf_fs_vec_select_u32_block(
     raf_fs_native_u32v n = *(const raf_fs_native_u32v *)no;
     *(raf_fs_native_u32v *)dst = (y & m) | (n & ~m);
 }
+#endif
 
 #define RAF_FS_VEC_STAGE(name) RAF_FS_INLINE void name(void *state)
 
