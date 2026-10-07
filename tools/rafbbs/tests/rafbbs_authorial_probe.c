@@ -11,6 +11,7 @@
 #include "rafbbs_filepicker_core.h"
 #include "rafbbs_theme.h"
 #include "rafbbs_log_core.h"
+#include "rafbbs_runlog_core.h"
 #include "rafbbs_pipeline_core.h"
 #include "rafbbs_command_core.h"
 #include "rafbbs_cli_core.h"
@@ -19,6 +20,7 @@
 static RafContext rafbbs_authorial_manifest_ctx;
 static char rafbbs_authorial_manifest_buf[128];
 static char rafbbs_authorial_log_buf[64];
+static char rafbbs_authorial_runlog_buf[1024];
 static const char *const rafbbs_authorial_cli_argv[] = {
     "rafbbs", "run", "arm"
 };
@@ -69,6 +71,7 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafU32 picker_state;
     RafU32 theme_state;
     RafU32 log_state;
+    RafU32 runlog_state;
     RafU32 pipeline_state;
     RafU32 cli_state;
     RafU32 tui_state;
@@ -171,6 +174,25 @@ RafU32 rafbbs_authorial_probe(void *state)
         log_state = log_text.pos ^ log_text.dropped ^
                     (RafU32)(unsigned char)rafbbs_authorial_log_buf[0];
     }
+    {
+        RafLogText runlog_text;
+        raf_log_text_init(
+            &runlog_text,
+            rafbbs_authorial_runlog_buf,
+            (RafU32)sizeof(rafbbs_authorial_runlog_buf)
+        );
+        raf_runlog_header_render(
+            &runlog_text, &rafbbs_authorial_manifest_ctx
+        );
+        raf_runlog_tail_render(
+            &runlog_text, &rafbbs_authorial_manifest_ctx
+        );
+        if (runlog_text.dropped != 0u)
+            return caller_word ^ 0x52554e31u;
+        runlog_state = runlog_text.pos ^
+                       raf_runlog_cstr_len(rafbbs_authorial_runlog_buf) ^
+                       (RafU32)(unsigned char)rafbbs_authorial_runlog_buf[0];
+    }
     pipeline_state = raf_pipeline_find_index(
         rafbbs_authorial_pipeline_specs, 2u, "arm"
     );
@@ -212,7 +234,7 @@ RafU32 rafbbs_authorial_probe(void *state)
            (RafU32)manifest_wire[0] ^ (RafU32)manifest_wire[95] ^
            output.pos ^ output.dropped ^ sink_state ^
            manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^
-           log_state ^ pipeline_state ^ cli_state ^ tui_state ^ context_state ^
+           log_state ^ runlog_state ^ pipeline_state ^ cli_state ^ tui_state ^ context_state ^
            command_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];

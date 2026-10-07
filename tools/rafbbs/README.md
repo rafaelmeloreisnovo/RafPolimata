@@ -93,13 +93,14 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_filepicker_core.h`: static catalog/selection state without hosted string/runtime calls;
 - `rafbbs_theme.h`: deterministic status-to-ANSI mapping without hosted headers;
 - `rafbbs_log_core.h`: caller-owned deterministic syslog-line composition with authorial 64-bit divmod;
+- `rafbbs_runlog_core.h`: deterministic persisted run-log header/artifact/gap byte rendering, including fixed-width CRC/hash hex, without stdio or filesystem;
 - `rafbbs_pipeline_core.h`: pipeline specs/flags and exact-byte lookup with no execution callback;
 - `rafbbs_cli_core.h`: deterministic CLI action routing with no hosted terminal/string runtime;
 - `rafbbs_tui_core.h`: deterministic single-key TUI routing with no stdio, terminal or execution dependency;
 - `rafbbs_baremetal.h`: fixed-buffer output and binary manifest value model;
 - `rafbbs_manifest_bin_core.h`: canonical 96-byte little-endian binary-manifest encode/decode;
 - `rafbbs_crc32_core.h` and `rafbbs_sha256_core.h`: pure algorithms;
-- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h`, `rafbbs_filepicker.h`, `rafbbs_log.h`, `rafbbs_pipeline.h`, `rafbbs_cli.h` and `rafbbs_tui.h`: hosted/provider adapters only.
+- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h`, `rafbbs_filepicker.h`, `rafbbs_log.h`, `rafbbs_pipeline.h`, `rafbbs_cli.h` and `rafbbs_tui.h`: hosted/provider adapters only. `rafbbs_log.h` no longer owns persisted run-log formatting through `fprintf`; it persists caller-buffer bytes rendered by `rafbbs_runlog_core.h`, while variadic live-detail formatting/console and FILE remain hosted.
 
 The freestanding build uses `-nostdinc -ffreestanding -fno-builtin -fno-stack-protector` and rejects unresolved symbols in the declared pure objects. A compiler, `nm`, shell or CI runner is a factory/evidence tool for this gate, not a runtime dependency of those objects. Full toolchain self-hosting remains `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`. Physical bare-metal execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)` until separately evidenced.
 
@@ -267,3 +268,20 @@ A decisão de estado após tentativa de comando foi separada da execução hoste
 a cópia limitada autoral já provada no context core, removendo `snprintf("%s")`
 dessas rotas. Portanto `COMMAND_POLICY != COMMAND_EXECUTION`.
 
+
+
+## Persisted run-log byte core freestanding
+
+The canonical persisted run-log text layout is now split from filesystem I/O.
+`rafbbs_runlog_core.h` renders the header, status, artifact fields, fixed-width
+lowercase CRC/hash state and gap section into caller-owned memory. Missing gaps
+are represented explicitly as `none=TOKEN_VAZIO`; buffer exhaustion increments
+the existing dropped counter and fails closed at the hosted persistence boundary.
+
+`rafbbs_log.h` keeps only host concerns for this path: opening/closing the FILE
+and writing already-rendered bytes. It no longer uses `fprintf` to define the
+persisted format. Live variadic detail formatting with `vsnprintf`, console I/O
+and the POSIX monotonic observation remain hosted adapters and are not promoted
+to freestanding. The pure renderer is compiled under `-nostdinc` and exercised
+in the six-ISA no-undefined-symbol probe. Physical/device persistence remains
+`TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.

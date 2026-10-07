@@ -16,6 +16,7 @@ not included in this claim.
 - rafbbs_filepicker_core.h
 - rafbbs_theme.h
 - rafbbs_log_core.h
+- rafbbs_runlog_core.h
 - rafbbs_pipeline_core.h
 - rafbbs_cli_core.h
 - rafbbs_tui_core.h
@@ -29,6 +30,7 @@ not included in this claim.
 - tests/rafbbs_filepicker_core_test.c
 - tests/rafbbs_theme_core_test.c
 - tests/rafbbs_log_core_test.c
+- tests/rafbbs_runlog_core_test.c
 - tests/rafbbs_pipeline_core_test.c
 - tests/rafbbs_cli_core_test.c
 - tests/rafbbs_tui_core_test.c
@@ -49,6 +51,8 @@ freestanding/tests/verify_authorial_zero_dep.sh:
 - proves that `RafContext` no longer requires a hosted time type;
 - renders the text manifest without stdio and fails closed on caller-buffer overflow;
 - checks exact manifest bytes plus invalid elapsed-time representation;
+- proves persisted run-log header/artifact/gap byte formatting without fprintf,
+  snprintf, hosted headers or filesystem access; the adapter only persists already-rendered bytes;
 - keeps POSIX/civil clock acquisition, git/filesystem observation, FILE persistence,
   terminal input/rendering and actual command execution in hosted adapters outside
   the pure set; only caller-supplied observations enter the seeded context core
