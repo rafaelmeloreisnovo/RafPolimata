@@ -18,6 +18,7 @@ tools/rafbbs/rafbbs_freestanding.h
 tools/rafbbs/rafbbs_core.h
 tools/rafbbs/rafbbs_manifest_core.h
 tools/rafbbs/rafbbs_filepicker_core.h
+tools/rafbbs/rafbbs_theme.h
 tools/rafbbs/rafbbs_baremetal.h
 tools/rafbbs/rafbbs_manifest_bin_core.h
 tools/rafbbs/rafbbs_crc32_core.h
