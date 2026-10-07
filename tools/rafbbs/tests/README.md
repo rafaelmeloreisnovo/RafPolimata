@@ -11,3 +11,5 @@
 - `rafbbs_watchdog_negative_test.c`: garante que watchdog expirado é detectado.
 - `rafbbs_baremetal_overflow_test.c`: valida saturação do buffer fixo e contador `dropped`.
 - `rafbbs_manifest_bin_test.c`: grava e relê fixture de manifesto binário compacto.
+
+- rafbbs_authorial_probe.c: caller-owned probe that exercises every declared pure module without hosted headers or external runtime symbols.
