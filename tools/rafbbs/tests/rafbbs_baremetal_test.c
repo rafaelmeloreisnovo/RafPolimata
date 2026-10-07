@@ -12,7 +12,10 @@ int main(void) {
     if ((state & RAFBBS_HASH_TOKEN_VAZIO) == 0u) return 2;
     state = raf_hash_failover_state(1u, 1u);
     if ((state & RAFBBS_HASH_TOKEN_VAZIO) != 0u) return 3;
-    manifest = raf_bin_manifest_make(0u, RAF_ARCH_ARM64, 0x11u, 0x22u, state, 0u);
+    raf_bin_manifest_init(
+        &manifest,
+        0u, RAF_ARCH_ARM64, 0x11u, 0x22u, state, 0u
+    );
     if (manifest.magic != RAFBBS_BIN_MANIFEST_MAGIC) return 4;
     if (manifest.input_crc32 != 0x11u || manifest.output_crc32 != 0x22u) return 5;
     arm64 = raf_arch_flags(RAF_ARCH_ARM64);
