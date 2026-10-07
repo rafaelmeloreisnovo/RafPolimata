@@ -304,3 +304,8 @@ divmod path, avoiding hidden divide helpers on 32-bit targets.
 
 This removes `<stdarg.h>` and `vsnprintf` from `rafbbs_log.h`. Console output,
 POSIX time observation and FILE persistence remain explicit hosted adapters.
+
+
+## Evidence-validity result core freestanding
+
+`rafbbs_result_core.h` separates digest value from evidence validity. A CRC32 value of `0x00000000` is valid when `input_crc32_valid=1`; numeric zero is never reused as missing evidence. The hosted adapters still acquire file hashes; the pure core only classifies caller-supplied validity and final status. Physical execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.
