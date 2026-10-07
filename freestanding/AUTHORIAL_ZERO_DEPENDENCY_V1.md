@@ -34,6 +34,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/rafbbs_core.h` — caller-owned context with no hosted time type;
 - `tools/rafbbs/rafbbs_context_core.h` — seeded context initialization, bounded text/path composition and watchdog setup without memset/snprintf/libc;
 - `tools/rafbbs/rafbbs_command_core.h` — deterministic executed/rc/optional → PASS/SKIP/FAIL/TOKEN_VAZIO policy with limited/failed bits; no command execution;
+- `tools/rafbbs/rafbbs_exec_core.h` — finite external-command IDs and explicit argv vectors; no shell grammar, process API or external-tool implementation;
 - `tools/rafbbs/rafbbs_result_core.h` — final-status/hash-state classification from explicit SHA/CRC validity bits; digest numeric zero never represents missing observation;
 - `tools/rafbbs/rafbbs_manifest_core.h` — deterministic text-manifest rendering into caller-owned memory;
 - `tools/rafbbs/rafbbs_filepicker_core.h` — static catalog + bounded selection state with no libc/string dependency;
@@ -65,6 +66,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/tests/rafbbs_tui_core_test.c` — quit/list/files/run/default TUI-route falsifier with exact pipeline ids;
 - `tools/rafbbs/tests/rafbbs_context_core_test.c` — seeded fields, deterministic paths, watchdog/zero state and truncation falsifier;
 - `tools/rafbbs/tests/rafbbs_command_core_test.c` — executed/unexecuted, success, optional failure and required failure policy falsifier;
+- `tools/rafbbs/tests/rafbbs_exec_core_test.c` — exact argv/argc/terminator and invalid-ID falsifier for the finite command grammar;
 - `tools/rafbbs/tests/rafbbs_result_core_test.c` — explicit evidence-validity, CRC32-zero-valid and failed-override falsifier under `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`;
 - `tools/rafbbs/tests/rafbbs_manifest_bin_core_test.c` — binary wire exact-byte/roundtrip/truncation falsifier.
 
@@ -78,6 +80,7 @@ The hosted file wrappers remain deliberately outside the pure core:
 - `tools/rafbbs/rafbbs_filepicker.h` — hosted presentation/printf adapter only;
 - `tools/rafbbs/rafbbs_log.h` — hosted clock observation, console and FILE persistence adapter; live detail formatting delegates to the typed pure formatter and persisted run-log byte layout delegates to the pure runlog core;
 - `tools/rafbbs/rafbbs_pipeline.h` — hosted handler binding, command execution and provider/file/hash adapters; result policy delegates to `rafbbs_command_core.h`;
+- `tools/rafbbs/rafbbs_host.h` — POSIX process adapter using explicit argv with fork/execvp/waitpid; external tools remain hosted dependencies;
 - `tools/rafbbs/rafbbs_git_posix.h` — hosted filesystem adapter for ordinary .git/HEAD, loose-ref and packed-refs observation; no external Git process;
 - `tools/rafbbs/rafbbs_recent_posix.h` — hosted directory/stdout adapter for log/manifest catalogs; no shell/find/sort/tail process chain;
 - `tools/rafbbs/rafbbs_cli.h` — hosted terminal, wall-clock, filesystem and command dispatch adapter; filesystem provenance observations seed the pure context core;
