@@ -70,7 +70,7 @@ Read in this order:
 
 ```text
 verify_contract.sh          -> zero-runtime/source/comment contract
-verify_authorial_zero_dep.sh -> zero hosted headers/runtime helpers in the declared authorial slice
+verify_authorial.sh         -> authorial item descriptor; external deps=0; six OS-neutral objects
 verify_matrix.sh            -> six primary scalar OS-neutral objects
 verify_profiles.sh          -> SSE2/AVX2/AVX-512/NEON/Advanced-SIMD codegen
 verify_scalable.sh          -> SVE/RVV predicate/VL codegen
@@ -84,6 +84,7 @@ Codegen gates reject unexpected helpers/calls/stack traffic in the relevant prob
 Canonical implementation entrypoints:
 
 - `include/raf_fs_core.h`;
+- `include/raf_fs_authorial.h`;
 - `include/raf_fs_abi.h`;
 - `include/raf_fs_registers.h`;
 - `arch/raf_fs_vector.h`;
