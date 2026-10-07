@@ -11,11 +11,16 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: zipraf-hw-canonical-v1-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   contract:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: C hosted selftest
         run: |
           cd canonical/zipraf-hw-v1
@@ -114,7 +119,7 @@ jobs:
           test -f /tmp/zipraf-install-test/share/zipraf/registry/crypto_algorithms.json
           test -f /tmp/zipraf-install-test/share/zipraf/policy/ZIPRAF_FS_V1.md
       - name: Upload ZIPRAF benchmark known-vector view
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: zipraf-benchmark-known-vector-${{ github.run_id }}
           path: |
