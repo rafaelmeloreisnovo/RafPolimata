@@ -1,61 +1,64 @@
 {
-  "schema":"RAFAELIA_AUTHORIAL_FEDERATION_V1",
-  "generated_at":"2026-10-07T12:59:00-03:00",
-  "target_repository":"rafaelmeloreisnovo/RafPolimata",
-  "target_base":"32220b1ce8353566835fdee2301657ca79366da2",
-  "policy":{
-    "source_artifact_execution_evidence_claim_distinct":true,
-    "token_vazio_not_zero":true,
-    "copy_only_with_verified_authorship_and_rights":true,
-    "imported_source_is_active_build":false
+  "schema": "RAFAELIA_AUTHORIAL_FEDERATION_V1",
+  "generated_at": "2026-10-07T12:59:00-03:00",
+  "target_repository": "rafaelmeloreisnovo/RafPolimata",
+  "target_base": "32220b1ce8353566835fdee2301657ca79366da2",
+  "policy": {
+    "source_artifact_execution_evidence_claim_distinct": true,
+    "token_vazio_not_zero": true,
+    "copy_only_with_verified_authorship_and_rights": true,
+    "imported_source_is_active_build": false
   },
-  "sources":[
+  "sources": [
     {
-      "repository":"rafaelmeloreisnovo/Vectras-VM-Android",
-      "ref":"6ccab6c8c884734472484f16a7efc18f9246d727",
-      "classification":"PARTIAL_AUTHORIAL_VERIFIED",
-      "candidate_count_observed":160,
-      "promoted_subtree":"conjunto_de_conceitos",
-      "authorship_evidence":"conjunto_de_conceitos/PROVENANCE_AND_LICENSES.md",
-      "license":"GPL-2.0-only",
-      "destination":"federation/authorial/vectras/conjunto_de_conceitos",
-      "state":"SOURCE_ARCHIVE_IMPORTED_NOT_IN_CANONICAL_BUILD",
-      "notes":"Contains direct Linux syscalls and hosted/ISA assumptions; import does not satisfy RafPolimata freestanding no-syscall gates."
+      "repository": "rafaelmeloreisnovo/Vectras-VM-Android",
+      "ref": "6ccab6c8c884734472484f16a7efc18f9246d727",
+      "classification": "PARTIAL_AUTHORIAL_VERIFIED",
+      "candidate_count_observed": 160,
+      "promoted_subtree": "conjunto_de_conceitos",
+      "authorship_evidence": "conjunto_de_conceitos/PROVENANCE_AND_LICENSES.md",
+      "license": "GPL-2.0-only",
+      "destination": "federation/authorial/vectras/conjunto_de_conceitos",
+      "state": "SOURCE_ARCHIVE_IMPORTED_NOT_IN_CANONICAL_BUILD",
+      "notes": "Contains direct Linux syscalls and hosted/ISA assumptions; import does not satisfy RafPolimata freestanding no-syscall gates."
     },
     {
-      "repository":"rafaelmeloreisnovo/Rafaelia_Private",
-      "ref":"b16f537b4d8af4e734419d4879a8ed2203bc31b4",
-      "classification":"PARTIAL_AUTHORIAL_VERIFIED",
-      "candidate_count_observed":103,
-      "promoted_subtree":"Ordernar/ra/aether_core.h",
-      "authorship_evidence":"file header + subtree LICENSE.md",
-      "license":"LicenseRef-Ordernar-ra-2025",
-      "destination":"federation/authorial/rafaelia_private/ordernar_ra",
-      "state":"SOURCE_ARCHIVE_IMPORTED_NOT_IN_CANONICAL_BUILD",
-      "notes":"License text calls itself MIT but adds extra mandatory conditions; therefore it is not classified as SPDX MIT."
+      "repository": "rafaelmeloreisnovo/Rafaelia_Private",
+      "ref": "b16f537b4d8af4e734419d4879a8ed2203bc31b4",
+      "classification": "PARTIAL_AUTHORIAL_VERIFIED",
+      "candidate_count_observed": 103,
+      "promoted_subtree": "Ordernar/ra/aether_core.h",
+      "authorship_evidence": "file header + subtree LICENSE.md",
+      "license": "LicenseRef-Ordernar-ra-2025",
+      "destination": "federation/authorial/rafaelia_private/ordernar_ra",
+      "state": "SOURCE_ARCHIVE_IMPORTED_NOT_IN_CANONICAL_BUILD",
+      "notes": "License text calls itself MIT but adds extra mandatory conditions; therefore it is not classified as SPDX MIT."
     },
     {
-      "repository":"rafaelmeloreisnovo/GaiaPhiRafcode",
-      "ref":"3862753e00a8b24e96f8656a7750c7c824887df1",
-      "classification":"RIGHTS_TOKEN_VAZIO",
-      "candidate_count_observed":0,
-      "state":"POINTER_ONLY_BLOCKED",
-      "reason":"No file-level author/license evidence returned by indexed searches for author/autoria/license/licenca/Rafael/RAFCODE."
+      "repository": "rafaelmeloreisnovo/GaiaPhiRafcode",
+      "ref": "3862753e00a8b24e96f8656a7750c7c824887df1",
+      "classification": "RIGHTS_TOKEN_VAZIO",
+      "candidate_count_observed": 0,
+      "state": "POINTER_ONLY_BLOCKED",
+      "reason": "No file-level author/license evidence returned by indexed searches for author/autoria/license/licenca/Rafael/RAFCODE.",
+      "closure": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY"
     },
     {
-      "repository":"rafaelmeloreisnovo/PCR_Rafaelia_Code_seed",
-      "ref":"6e15628b8382f832de08f3f08b2cab216b81ccaf",
-      "classification":"MIXED_DERIVATIVE",
-      "candidate_count_observed":102,
-      "state":"ROUTE_TO_RAFGITTOOLS_NOT_IMPORTED_HERE",
-      "reason":"Authorship analysis distinguishes Magisk upstream from RAFAELIA additions; governance/audit/telemetry fit RafGitTools better than RafPolimata."
+      "repository": "rafaelmeloreisnovo/PCR_Rafaelia_Code_seed",
+      "ref": "6e15628b8382f832de08f3f08b2cab216b81ccaf",
+      "classification": "MIXED_DERIVATIVE",
+      "candidate_count_observed": 102,
+      "state": "ROUTE_TO_RAFGITTOOLS_NOT_IMPORTED_HERE",
+      "reason": "Authorship analysis distinguishes Magisk upstream from RAFAELIA additions; governance/audit/telemetry fit RafGitTools better than RafPolimata."
     },
     {
-      "repository":"rafaelmeloreisnovo/Rafcodephi_Sdk_ndkJni_c_py_sh_asm_lua_rs_go_swift_perl_yml_",
-      "ref":"f0d5b6795670b69bfe978b55f36354c5c7de44d8",
-      "classification":"ALIAS_UNRESOLVED",
-      "state":"POINTER_ONLY_BLOCKED",
-      "reason":"User term Rafcodifi has no exact repository/code match. This repo is a plausible ecosystem candidate but identity equivalence is not assumed."
+      "repository": "rafaelmeloreisnovo/Rafcodephi_Sdk_ndkJni_c_py_sh_asm_lua_rs_go_swift_perl_yml_",
+      "ref": "f0d5b6795670b69bfe978b55f36354c5c7de44d8",
+      "classification": "ALIAS_UNRESOLVED",
+      "state": "POINTER_ONLY_BLOCKED",
+      "reason": "User term Rafcodifi has no exact repository/code match. This repo is a plausible ecosystem candidate but identity equivalence is not assumed.",
+      "closure": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY"
     }
-  ]
+  ],
+  "governance_closure": "CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY"
 }
