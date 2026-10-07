@@ -16,6 +16,7 @@ tools/rafbbs/rafbbs_freestanding.h
 tools/rafbbs/rafbbs_core.h
 tools/rafbbs/rafbbs_context_core.h
 tools/rafbbs/rafbbs_command_core.h
+tools/rafbbs/rafbbs_exec_core.h
 tools/rafbbs/rafbbs_result_core.h
 tools/rafbbs/rafbbs_manifest_core.h
 tools/rafbbs/rafbbs_filepicker_core.h
@@ -51,4 +52,4 @@ compile armv7a-none-eabi
 compile aarch64-none-elf
 compile riscv32-unknown-elf
 compile riscv64-unknown-elf
-echo "RAFAELIA RafBBS authorial zero-dependency gate: 23 pure modules; command-policy + context-seed + time + text/binary manifest + filepicker + theme + log-line + typed-format + git-provenance-parse + recent-catalog + persisted-runlog-byte + pipeline-spec + cli-route + tui-route cores included; 6/6 ISA objects; unresolved helpers=0"
+echo "RAFAELIA RafBBS authorial zero-dependency gate: 24 pure modules; command-policy + context-seed + time + text/binary manifest + filepicker + theme + log-line + typed-format + git-provenance-parse + recent-catalog + persisted-runlog-byte + pipeline-spec + cli-route + tui-route cores included; 6/6 ISA objects; unresolved helpers=0"
