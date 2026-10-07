@@ -88,6 +88,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_freestanding.h`: watchdog/rollback/flags;
 - `rafbbs_core.h`: caller-owned RafContext using `RafMonoTime`, not `struct timespec`;
 - `rafbbs_context_core.h`: seeded context/path initialization with authorial bounded copies and no memset/snprintf/libc;
+- `rafbbs_command_core.h`: deterministic command-outcome policy independent of `system()`/shell/provider execution;
 - `rafbbs_manifest_core.h`: deterministic text-manifest rendering into a caller-owned fixed buffer;
 - `rafbbs_filepicker_core.h`: static catalog/selection state without hosted string/runtime calls;
 - `rafbbs_theme.h`: deterministic status-to-ANSI mapping without hosted headers;
@@ -108,7 +109,7 @@ Run:
 sh freestanding/tests/verify_authorial_zero_dep.sh
 ```
 
-The gate enumerates sixteen pure modules plus a caller-owned probe, rejects host/runtime leakage, and compiles the same probe for six OS-neutral ISA targets. It checks the object for unresolved helpers and keeps hosted adapters outside the pure set.
+The gate enumerates eighteen pure modules plus a caller-owned probe, rejects host/runtime leakage, and compiles the same probe for six OS-neutral ISA targets. It checks the object for unresolved helpers and keeps hosted adapters outside the pure set.
 
 The monotonic-time boundary is intentionally split: `rafbbs_time.h` owns only
 representation, validity and elapsed arithmetic; `rafbbs_time_posix.h` owns
@@ -252,4 +253,17 @@ arquitetura do host, `git` e filesystem. Portanto
 O falsificador cobre campos exatos, caminhos, estado zerado e truncation flag;
 o probe 6-ISA continua rejeitando helpers externos. Isso não reivindica relógio,
 git ou filesystem freestanding.
+
+## Command-result policy core freestanding
+
+A decisão de estado após tentativa de comando foi separada da execução hosted.
+`rafbbs_command_core.h` recebe somente três fatos do caller:
+`executed`, `rc` e `optional`. O resultado é uma decisão tipada
+`status/limited/failed`: ausência de execução → `TOKEN_VAZIO`; rc=0 →
+`PASS`; falha opcional → `SKIP`; falha obrigatória → `FAIL`.
+
+`rafbbs_pipeline.h` continua dono de watchdog/rollback operacional, logging e
+`raf_host_exec/system()`. Cópias estáticas de command/input/gaps passaram a usar
+a cópia limitada autoral já provada no context core, removendo `snprintf("%s")`
+dessas rotas. Portanto `COMMAND_POLICY != COMMAND_EXECUTION`.
 

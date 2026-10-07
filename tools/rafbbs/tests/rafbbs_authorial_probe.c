@@ -12,6 +12,7 @@
 #include "rafbbs_theme.h"
 #include "rafbbs_log_core.h"
 #include "rafbbs_pipeline_core.h"
+#include "rafbbs_command_core.h"
 #include "rafbbs_cli_core.h"
 #include "rafbbs_tui_core.h"
 
@@ -72,6 +73,7 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafU32 cli_state;
     RafU32 tui_state;
     RafU32 context_state;
+    RafU32 command_state;
 
     if (state != (void *)0)
         caller_word = *(const RafU32 *)state;
@@ -177,6 +179,14 @@ RafU32 rafbbs_authorial_probe(void *state)
     pipeline_state ^= rafbbs_authorial_pipeline_specs[pipeline_state].requires_arm ^
                       rafbbs_authorial_pipeline_specs[pipeline_state].writes_artifacts;
     {
+        RafCommandDecision command_decision = raf_command_decide(0u, 0, 0u);
+        if (command_decision.status != RAF_TOKEN_VAZIO ||
+            command_decision.limited == 0u || command_decision.failed != 0u)
+            return caller_word ^ 0x434d4431u;
+        command_state = (RafU32)command_decision.status ^
+                        command_decision.limited ^ command_decision.failed;
+    }
+    {
         RafCliRoute cli_route = raf_cli_route(
             3u, rafbbs_authorial_cli_argv
         );
@@ -203,6 +213,7 @@ RafU32 rafbbs_authorial_probe(void *state)
            output.pos ^ output.dropped ^ sink_state ^
            manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^
            log_state ^ pipeline_state ^ cli_state ^ tui_state ^ context_state ^
+           command_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
 }
