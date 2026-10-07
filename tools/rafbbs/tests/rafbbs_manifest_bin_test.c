@@ -11,7 +11,8 @@ int main(void)
     size_t n;
 
     expected_hash_state = raf_hash_failover_state(0u, 0u);
-    src = raf_bin_manifest_make(
+    raf_bin_manifest_init(
+        &src,
         1u,
         RAF_ARCH_GENERIC,
         0xabu,
