@@ -56,6 +56,8 @@ jobs:
         run: sh freestanding/tests/verify_profiles.sh
       - name: IBM z/s390x high-vector executor
         run: sh freestanding/tests/verify_s390x_vector.sh
+      - name: x86 APX extended GPR profile
+        run: sh freestanding/tests/verify_apx_egpr.sh
       - name: Scalable-vector ABI/ISA profiles
         run: sh freestanding/tests/verify_scalable.sh
       - name: Matrix-register ABI/ISA profiles
