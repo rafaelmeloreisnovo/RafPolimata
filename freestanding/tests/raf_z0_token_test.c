@@ -2,6 +2,28 @@
 
 #define Z0_ASSERT(expr, code) do { if (!(expr)) return (code); } while (0)
 
+static raf_u32
+z0_class_count(const raf_fs_z0_view *views, raf_u32 count, raf_u8 mask)
+{
+    raf_u32 classes = 0u;
+    raf_u32 i;
+    raf_u32 j;
+
+    for (i = 0u; i < count; ++i) {
+        raf_u8 seen = 0u;
+        for (j = 0u; j < i; ++j) {
+            if (raf_fs_z0_equiv(views[i], views[j], mask) != 0u) {
+                seen = 1u;
+                break;
+            }
+        }
+        if (seen == 0u) {
+            ++classes;
+        }
+    }
+    return classes;
+}
+
 int main(void)
 {
     static const raf_u8 nul_byte[1] = { 0x00u };
@@ -16,6 +38,15 @@ int main(void)
     raf_fs_z0_view byte = { byte_value, 1u, 1u };
     raf_fs_z0_view sequence = { bytes, 3u, 1u };
     raf_fs_z0_view invalid = { (const raf_u8 *)0, 1u, 1u };
+    raf_fs_z0_view states[7];
+
+    states[0] = absent;
+    states[1] = empty;
+    states[2] = nul;
+    states[3] = space;
+    states[4] = byte;
+    states[5] = sequence;
+    states[6] = invalid;
 
     Z0_ASSERT(RAF_Z0_CONTEXT_LEFT == 0u, 1);
     Z0_ASSERT(RAF_Z0_CONTEXT_RIGHT == 0u, 2);
@@ -62,6 +93,25 @@ int main(void)
     Z0_ASSERT(raf_fs_z0_token_count(invalid) == 0u, 71);
     Z0_ASSERT(raf_fs_z0_token_at(invalid, 0u, &token) == RAF_FS_Z0_INVALID_VIEW, 72);
     Z0_ASSERT(raf_fs_z0_token_at(sequence, 0u, (raf_fs_z0_token *)0) == RAF_FS_Z0_INVALID_VIEW, 73);
+
+    Z0_ASSERT(z0_class_count(states, 7u, RAF_Z0_OBS_FULL) == 7u, 80);
+    Z0_ASSERT(z0_class_count(states, 7u,
+        RAF_Z0_OBS_PROVIDED | RAF_Z0_OBS_SIZE_CLASS | RAF_Z0_OBS_DATA_PRESENT) == 5u, 81);
+    Z0_ASSERT(z0_class_count(states, 7u,
+        RAF_Z0_OBS_PROVIDED | RAF_Z0_OBS_SIZE_CLASS) == 4u, 82);
+    Z0_ASSERT(z0_class_count(states, 7u, RAF_Z0_OBS_SIZE_CLASS) == 3u, 83);
+    Z0_ASSERT(z0_class_count(states, 7u, 0u) == 1u, 84);
+    Z0_ASSERT(z0_class_count(states, 7u, RAF_Z0_OBS_PROVIDED) == 2u, 85);
+
+    Z0_ASSERT(raf_fs_z0_equiv(absent, empty, RAF_Z0_OBS_SIZE_CLASS) != 0u, 90);
+    Z0_ASSERT(raf_fs_z0_equiv(absent, empty, RAF_Z0_OBS_PROVIDED) == 0u, 91);
+    Z0_ASSERT(raf_fs_z0_equiv(nul, space,
+        RAF_Z0_OBS_PROVIDED | RAF_Z0_OBS_SIZE_CLASS | RAF_Z0_OBS_DATA_PRESENT) != 0u, 92);
+    Z0_ASSERT(raf_fs_z0_equiv(nul, space, RAF_Z0_OBS_FULL) == 0u, 93);
+    Z0_ASSERT(raf_fs_z0_equiv(byte, invalid,
+        RAF_Z0_OBS_PROVIDED | RAF_Z0_OBS_SIZE_CLASS) != 0u, 94);
+    Z0_ASSERT(raf_fs_z0_equiv(byte, invalid,
+        RAF_Z0_OBS_PROVIDED | RAF_Z0_OBS_SIZE_CLASS | RAF_Z0_OBS_DATA_PRESENT) == 0u, 95);
 
     return 0;
 }
