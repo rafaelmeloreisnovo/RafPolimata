@@ -11,6 +11,7 @@
  * MEMORY_ORDER: no ordering primitive; descriptor writes follow the caller's surrounding ordering.
  * TAIL_SHADOW: fixed four-word fold; no residual lane, hidden tail, retry, scan or shadow copy.
  * EVIDENCE: source-level L0 contract plus verify_authorial.sh build gate; runtime/device evidence stays separate.
+ * GAP_BINDING: runtime/device evidence remains governed by CLOSURE_L12; this source gate does not promote it.
  */
 
 #include "raf_fs_types.h"
