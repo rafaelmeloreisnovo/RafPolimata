@@ -1,3 +1,7 @@
+/* Governance: CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.
+ * TOKEN_VAZIO vocabulary in this file preserves missing physical/runtime
+ * evidence; it is not numeric zero and never promotes a claim.
+ */
 #include "../include/zipraf_hw.h"
 
 static zh_u32 zh_udiv32_authorial(zh_u32 n, zh_u32 d) {
