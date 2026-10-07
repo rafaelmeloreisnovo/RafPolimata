@@ -13,6 +13,7 @@
 - `rafbbs_log_core_test.c`: falsifica linha exata, tempo inválido, minutos >99 e overflow; o divmod 64-bit autoral evita helper externo em alvos 32-bit.
 - `rafbbs_format_core_test.c`: falsifica texto prefixado, i32 mínimo/máximo, hex32 fixo, tamanho de string e overflow; sem stdarg/vsnprintf/div helper externo.
 - `rafbbs_git_core_test.c`: falsifica HEAD simbólico/detached, SHA-1 OID, loose ref, packed-ref match/mismatch, hexadecimal inválido e truncamento; zero execução de `git` e zero filesystem no core.
+- `rafbbs_recent_core_test.c`: falsifica filtro prefix/suffix, seleção bounded top-10, ordenação ascendente dos 10 maiores nomes, render e rejeição de nome acima do buffer; zero shell/find/sort/tail.
 - `rafbbs_runlog_core_test.c`: falsifica bytes exatos do cabeçalho/artefatos/gaps, CRC32 hexadecimal fixo, TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY) para gaps ausentes e overflow de buffer; zero FILE/fprintf/libc no core.
 - `rafbbs_pipeline_core_test.c`: falsifica igualdade exata/case-sensitive, flags, lookup por índice e not-found; nenhum callback/handler no core.
 - `rafbbs_cli_core_test.c`: falsifica HELP/LIST/RUN/INVALID, argumento de RUN e comparação case-sensitive; zero terminal/libc no core.
