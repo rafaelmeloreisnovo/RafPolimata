@@ -1,0 +1,32 @@
+{
+  "schema": "raf.root-file-decisions.v1",
+  "mode": "APPEND_ONLY_SUPPLEMENT",
+  "created_at": "2026-10-07",
+  "decisions": [
+    {
+      "path": "AGENTS.md",
+      "git_blob_sha": "3f9abafd70a6100e4788941e58c3b0530d2e5e97",
+      "supersedes_git_blob_sha": "f34288be28dd80997da071e12c400cd87e242e07",
+      "kind": "repository-agent-router",
+      "content_state": "ACTIVE_CANONICAL_GOVERNANCE",
+      "evidence_state": "IMPLEMENTATION_LINKED",
+      "route": "KEEP_AT_ROOT",
+      "target": "AGENTS.md",
+      "area": "automation",
+      "owner_role": "repository-governance",
+      "risk": "LOW",
+      "findings": [
+        "repository-wide agent router remains intentionally discoverable at the root",
+        "successor adds an explicit P0 route to federation/authorial/AGENTS.md for imported-source authorship, license and provenance work",
+        "authorial federation remains a source archive and does not promote imported material into native implementation or PASS"
+      ],
+      "required_gates": [
+        "preserve precedence of AGENTS.md and docs/AGENTES.md",
+        "preserve source, authorship, license and evidence boundaries when routing imported material",
+        "keep federation/authorial snapshots provenance-preserving and require separate successor adapters for active implementation"
+      ],
+      "delete_allowed": false,
+      "human_approval_required": true
+    }
+  ]
+}
