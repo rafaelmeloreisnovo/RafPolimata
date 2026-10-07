@@ -13,7 +13,7 @@ test -n "$NM_TOOL"
 
 COMMON="-O2 -ffreestanding -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-ident -fomit-frame-pointer"
 TARGET="armv8.1m.main-none-eabi"
-FLAGS="-march=armv8.1-m.main+mve"
+FLAGS="-march=armv8.1-m.main+mve -DRAF_FS_PROFILE_MVE=1"
 
 OBJ="$OUT/mve-vector.o"
 ASM="$OUT/mve-vector.s"
