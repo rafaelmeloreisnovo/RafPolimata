@@ -179,6 +179,11 @@ python3 scripts/document_governance.py --check --print-summary
 
 Do not commit regenerated governance outputs unless the task requires them and their provenance is clear.
 
+
+### Authorial federation / imported source
+
+For any task that reads, copies, adapts, relicenses or promotes `federation/authorial/**`, read `federation/authorial/AGENTS.md` first. The machine authority is `data/federation/authorial_sources.v1.json`; the human/AI route is `docs/federation/AUTHORIAL_FEDERATION_V1.md`. Imported snapshots are provenance evidence, not native implementation, and must not be edited in place to erase origin or license boundaries.
+
 ## Evidence discipline
 
 A valid technical receipt should identify, when applicable:
