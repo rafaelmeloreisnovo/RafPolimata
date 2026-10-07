@@ -11,11 +11,16 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: zipraf-hw-canonical-v1-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   contract:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: C hosted selftest
         run: |
           cd canonical/zipraf-hw-v1
@@ -24,8 +29,65 @@ jobs:
       - name: Freestanding C gate
         run: |
           cd canonical/zipraf-hw-v1
-          clang -std=c11 -ffreestanding -fno-builtin -fno-stack-protector -Wall -Wextra -Werror -Iinclude -c src/zipraf_hw.c -o /tmp/zipraf_hw.o
+          PURE_FLAGS="-std=c11 -O0 -ffreestanding -fno-builtin -fno-stack-protector -fno-vectorize -fno-slp-vectorize -Wall -Wextra -Werror -Iinclude"
+          clang $PURE_FLAGS -c src/zipraf_hw.c -o /tmp/zipraf_hw.o
+          clang $PURE_FLAGS -c src/zipraf_bench_core.c -o /tmp/zipraf_bench_core.o
           test -z "$(nm -u /tmp/zipraf_hw.o)"
+          test -z "$(nm -u /tmp/zipraf_bench_core.o)"
+      - name: Pure benchmark PREHOT HOT known-vector
+        run: |
+          cd canonical/zipraf-hw-v1
+          mkdir -p build
+          clang -std=c11 -O0 -fno-vectorize -fno-slp-vectorize -Wall -Wextra -Werror -Iinclude             src/zipraf_bench_core.c tests/bench_core_test.c             -o /tmp/zipraf-bench-core-test
+          /tmp/zipraf-bench-core-test
+          clang -std=c11 -O0 -fno-vectorize -fno-slp-vectorize -Wall -Wextra -Werror -Iinclude             src/zipraf_bench_core.c tools/zipraf_bench_fixture.c             -o /tmp/zipraf-bench-fixture
+          /tmp/zipraf-bench-fixture build/zipraf-bench-known-vector-v1.zipraf             | tee build/zipraf-bench-known-vector-v1.txt
+          test "$(wc -c < build/zipraf-bench-known-vector-v1.zipraf)" -eq 152
+          test "$(head -c 4 build/zipraf-bench-known-vector-v1.zipraf)" = "ZBR1"
+          sha256sum build/zipraf-bench-known-vector-v1.zipraf             | tee build/zipraf-bench-known-vector-v1.sha256
+      - name: Optimizer semantic parity only
+        run: |
+          cd canonical/zipraf-hw-v1
+          clang -std=c11 -O2 -Wall -Wextra -Werror -Iinclude             src/zipraf_bench_core.c tests/bench_core_test.c             -o /tmp/zipraf-bench-core-test-o2
+          /tmp/zipraf-bench-core-test-o2
+          echo "PARITY_PASS: O2 is semantic adversarial coverage only; no performance comparison is promoted."
+      - name: Six-ISA pure C no-helper matrix
+        run: |
+          cd canonical/zipraf-hw-v1
+          PURE_FLAGS="-std=c11 -O0 -ffreestanding -fno-builtin -fno-stack-protector -fno-vectorize -fno-slp-vectorize -Wall -Wextra -Werror -Iinclude"
+          for target in             x86_64-none-elf             i686-none-elf             armv7a-none-eabi             aarch64-none-elf             riscv32-none-elf             riscv64-none-elf
+          do
+            safe="$(printf '%s' "$target" | tr -c 'A-Za-z0-9_' '_')"
+            clang -target "$target" $PURE_FLAGS -c src/zipraf_hw.c -o "/tmp/zipraf_hw_$safe.o"
+            clang -target "$target" $PURE_FLAGS -c src/zipraf_bench_core.c -o "/tmp/zipraf_bench_$safe.o"
+            test -z "$(nm -u "/tmp/zipraf_hw_$safe.o")"
+            test -z "$(nm -u "/tmp/zipraf_bench_$safe.o")"
+            echo "PURE_ISA_PASS target=$target unresolved=0"
+          done
+      - name: Benchmark factor quality catalog gate
+        run: |
+          cd canonical/zipraf-hw-v1
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('registry/benchmark_interference_catalog.v1.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          assert d['schema']=='ZIPRAF-BENCH-INTERFERENCE-CATALOG-V1'
+          assert d['closure']=='CLOSURE_L12'
+          assert d['claim_allowed'] is False
+          assert d['sample_protocol']['sample_count_per_phase']==31
+          assert [x['id'] for x in d['layers']]==list(range(11))
+          assert [x['id'] for x in d['factors']]==list(range(32))
+          assert [x['id'] for x in d['quality_gates']]==list(range(16))
+          assert [x['id'] for x in d['speed_groups']]==list(range(9))
+          assert [x['id'] for x in d['units']]==list(range(5))
+          assert d['wire_receipt']['size_bytes']==152
+          vector=json.loads(Path('vectors/benchmark_prehot_hot_v1.json').read_text(encoding='utf-8'))
+          assert vector['expected']['prehot']['median']==115
+          assert vector['expected']['hot']['median']==95
+          assert vector['expected']['wire_size_bytes']==152
+          print('BENCH_CATALOG_PASS factors=32 quality=16 layers=11 speed_groups=9 units=5')
+          PY
       - name: ASM syntax matrix
         run: |
           cd canonical/zipraf-hw-v1
@@ -56,3 +118,14 @@ jobs:
           /tmp/zipraf-installer /tmp/zipraf-install-test
           test -f /tmp/zipraf-install-test/share/zipraf/registry/crypto_algorithms.json
           test -f /tmp/zipraf-install-test/share/zipraf/policy/ZIPRAF_FS_V1.md
+      - name: Upload ZIPRAF benchmark known-vector view
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        with:
+          name: zipraf-benchmark-known-vector-${{ github.run_id }}
+          path: |
+            canonical/zipraf-hw-v1/build/zipraf-bench-known-vector-v1.zipraf
+            canonical/zipraf-hw-v1/build/zipraf-bench-known-vector-v1.txt
+            canonical/zipraf-hw-v1/build/zipraf-bench-known-vector-v1.sha256
+            canonical/zipraf-hw-v1/registry/benchmark_interference_catalog.v1.json
+            canonical/zipraf-hw-v1/vectors/benchmark_prehot_hot_v1.json
+          if-no-files-found: error

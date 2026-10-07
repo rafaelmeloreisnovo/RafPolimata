@@ -19,8 +19,12 @@ int main(void) {
 
     rc |= check(zh_patch_u64(0xaaaaULL, 0x5555ULL, 0x00ffULL) == 0xaa55ULL, "masked_patch");
     rc |= check(zh_vector_lanes(256u, 32u) == 8u, "vector_lanes");
+    rc |= check(zh_vector_lanes(255u, 32u) == 7u, "vector_lanes_non_power");
     rc |= check(zh_block_fit(64u, 16u) == 4u, "block_fit");
+    rc |= check(zh_block_fit(1000u, 64u) == 15u, "block_fit_non_power");
     rc |= check(zh_write_amplification_q16(1u, 64u) == (64u << 16), "write_amplification");
+    rc |= check(zh_write_amplification_q16(3u, 10u) == 218453u, "write_amplification_non_power");
+    rc |= check(zh_cycles_per_byte_q16(1000u, 3u) == 21845333u, "cycles_per_byte_non_power");
     rc |= check(zh_select_measured_backend(&cap, m, 3u, &selected) == 0 && selected == 20u, "measured_backend_select");
     return rc ? 1 : 0;
 }

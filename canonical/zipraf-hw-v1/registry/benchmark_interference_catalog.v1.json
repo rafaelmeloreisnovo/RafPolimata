@@ -1,0 +1,587 @@
+{
+  "schema": "ZIPRAF-BENCH-INTERFERENCE-CATALOG-V1",
+  "status": "REFERENCE_CONTRACT",
+  "closure": "CLOSURE_L12",
+  "claim_allowed": false,
+  "invariants": [
+    "SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM",
+    "measurement != causality",
+    "missing observation = TOKEN_VAZIO",
+    "factor inactive != FAIL",
+    "compile flags != physical hardware state"
+  ],
+  "sample_protocol": {
+    "sample_count_per_phase": 31,
+    "valid_mask_hex": "0x7fffffff",
+    "phases": [
+      {
+        "id": 0,
+        "key": "CONTROL",
+        "meaning": "optional declared control before PREHOT"
+      },
+      {
+        "id": 1,
+        "key": "PREHOT",
+        "meaning": "31 measured samples before the declared sustained-hot condition"
+      },
+      {
+        "id": 2,
+        "key": "HOT",
+        "meaning": "31 measured samples after the declared stabilization/heating condition"
+      },
+      {
+        "id": 3,
+        "key": "POSTHOT",
+        "meaning": "optional recovery/cooldown observation"
+      }
+    ],
+    "statistics": [
+      "min",
+      "p05_index_1",
+      "median_index_15",
+      "p95_index_29",
+      "max"
+    ],
+    "missing_sample_policy": "TOKEN_VAZIO; never substitute numeric zero",
+    "order": "deterministic seeded rotate/reverse permutation; reproducible, not cryptographic randomness"
+  },
+  "speed_groups": [
+    {
+      "id": 0,
+      "key": "UNCLASSIFIED"
+    },
+    {
+      "id": 1,
+      "key": "PURE_MATH"
+    },
+    {
+      "id": 2,
+      "key": "ISA_COMPUTE"
+    },
+    {
+      "id": 3,
+      "key": "CACHE_MEMORY"
+    },
+    {
+      "id": 4,
+      "key": "OS_ABI"
+    },
+    {
+      "id": 5,
+      "key": "VIRTUALIZATION_TRANSLATION"
+    },
+    {
+      "id": 6,
+      "key": "IO_STORAGE"
+    },
+    {
+      "id": 7,
+      "key": "POWER_THERMAL"
+    },
+    {
+      "id": 8,
+      "key": "OBSERVER_INSTRUMENTATION"
+    }
+  ],
+  "units": [
+    {
+      "id": 0,
+      "key": "RAW_TICKS"
+    },
+    {
+      "id": 1,
+      "key": "CYCLES"
+    },
+    {
+      "id": 2,
+      "key": "NANOSECONDS"
+    },
+    {
+      "id": 3,
+      "key": "BYTES_PER_SECOND"
+    },
+    {
+      "id": 4,
+      "key": "OPERATIONS_PER_SECOND"
+    }
+  ],
+  "layers": [
+    {
+      "id": 0,
+      "key": "MATH",
+      "boundary": "pure deterministic transformation"
+    },
+    {
+      "id": 1,
+      "key": "SOURCE",
+      "boundary": "source/algorithm formulation"
+    },
+    {
+      "id": 2,
+      "key": "TOOLCHAIN",
+      "boundary": "compiler/link/profile transforms"
+    },
+    {
+      "id": 3,
+      "key": "ISA",
+      "boundary": "instruction-set specialization"
+    },
+    {
+      "id": 4,
+      "key": "MICROARCH",
+      "boundary": "prediction/pipeline behavior"
+    },
+    {
+      "id": 5,
+      "key": "MEMORY",
+      "boundary": "cache/prefetch/alignment/bandwidth/topology"
+    },
+    {
+      "id": 6,
+      "key": "POWER_THERMAL",
+      "boundary": "DVFS/boost/thermal/governor"
+    },
+    {
+      "id": 7,
+      "key": "OS_SCHEDULER",
+      "boundary": "scheduler/IRQ/page-fault/runtime OS effects"
+    },
+    {
+      "id": 8,
+      "key": "VIRTUALIZATION",
+      "boundary": "hypervisor/emulator/JIT translation"
+    },
+    {
+      "id": 9,
+      "key": "OBSERVER_IO",
+      "boundary": "timer/PMU/logging/filesystem observer effects"
+    },
+    {
+      "id": 10,
+      "key": "PHYSICAL_EXTERNAL",
+      "boundary": "load/battery/unclassified physical environment"
+    }
+  ],
+  "factors": [
+    {
+      "id": 0,
+      "key": "COMPILER_OPT",
+      "layer": 2,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 1,
+      "key": "AUTOVECTORIZE",
+      "layer": 2,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 2,
+      "key": "LTO",
+      "layer": 2,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 3,
+      "key": "PGO",
+      "layer": 2,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 4,
+      "key": "ISA_SPECIALIZATION",
+      "layer": 3,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 5,
+      "key": "INSTRUCTION_ALIGNMENT",
+      "layer": 3,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 6,
+      "key": "BRANCH_PREDICTOR",
+      "layer": 4,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 7,
+      "key": "CACHE_WARMTH",
+      "layer": 5,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 8,
+      "key": "HW_PREFETCH",
+      "layer": 5,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 9,
+      "key": "MEMORY_ALIGNMENT",
+      "layer": 5,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 10,
+      "key": "MEMORY_BANDWIDTH",
+      "layer": 5,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 11,
+      "key": "NUMA_TOPOLOGY",
+      "layer": 5,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 12,
+      "key": "DVFS",
+      "layer": 6,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 13,
+      "key": "TURBO_BOOST",
+      "layer": 6,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 14,
+      "key": "THERMAL_THROTTLE",
+      "layer": 6,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 15,
+      "key": "POWER_GOVERNOR",
+      "layer": 6,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 16,
+      "key": "SCHED_PREEMPTION",
+      "layer": 7,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 17,
+      "key": "CORE_MIGRATION",
+      "layer": 7,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 18,
+      "key": "SMT_CONTENTION",
+      "layer": 7,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 19,
+      "key": "IRQ_NOISE",
+      "layer": 7,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 20,
+      "key": "PAGE_FAULT",
+      "layer": 7,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 21,
+      "key": "VIRTUALIZATION",
+      "layer": 8,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 22,
+      "key": "QEMU_TCG",
+      "layer": 8,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 23,
+      "key": "JIT_TRANSLATION",
+      "layer": 8,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 24,
+      "key": "TIMER_SOURCE",
+      "layer": 9,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 25,
+      "key": "TIMER_OVERHEAD",
+      "layer": 9,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 26,
+      "key": "PMU_OBSERVER",
+      "layer": 9,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 27,
+      "key": "LOGGING_IO",
+      "layer": 9,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 28,
+      "key": "FILESYSTEM_IO",
+      "layer": 9,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 29,
+      "key": "BACKGROUND_LOAD",
+      "layer": 10,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 30,
+      "key": "BATTERY_POWER_STATE",
+      "layer": 10,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    },
+    {
+      "id": 31,
+      "key": "UNKNOWN_EXTERNAL",
+      "layer": 10,
+      "state_vocabulary": [
+        "UNKNOWN",
+        "INACTIVE",
+        "ACTIVE"
+      ]
+    }
+  ],
+  "quality_gates": [
+    {
+      "id": 0,
+      "key": "SOURCE_IDENTITY",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 1,
+      "key": "ARTIFACT_IDENTITY",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 2,
+      "key": "CORRECTNESS_ORACLE",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 3,
+      "key": "TIMER_VALID",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 4,
+      "key": "SAMPLE_COMPLETE",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 5,
+      "key": "FACTOR_STATE_RECORDED",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 6,
+      "key": "ORDER_SEED_RECORDED",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 7,
+      "key": "PHYSICAL_IDENTITY",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 8,
+      "key": "THERMAL_OBSERVED",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 9,
+      "key": "FREQUENCY_OBSERVED",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 10,
+      "key": "STABILITY_REPEATED",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 11,
+      "key": "INDEPENDENT_REPRO",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 12,
+      "key": "OPTIMIZER_STATE",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 13,
+      "key": "VIRTUALIZATION_STATE",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 14,
+      "key": "OS_STATE",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    },
+    {
+      "id": 15,
+      "key": "RAW_SAMPLES_PRESERVED",
+      "unknown_policy": "not PASS; preserve as unobserved"
+    }
+  ],
+  "optimizer_neutral_lane": {
+    "compile_profile": [
+      "-O0",
+      "-fno-builtin",
+      "-fno-vectorize",
+      "-fno-slp-vectorize"
+    ],
+    "interpretation": "proves the declared object build profile only; does not prove absence of microarchitectural acceleration",
+    "factor_requirement": "COMPILER_OPT/AUTOVECTORIZE must be observed and inactive for this lane"
+  },
+  "wire_receipt": {
+    "magic": "ZBR1",
+    "version": 1,
+    "size_bytes": 152,
+    "endian": "little",
+    "raw_samples_embedded": false,
+    "raw_samples_rule": "preserve alongside receipt and mark RAW_SAMPLES_PRESERVED only when actually retained"
+  }
+}
