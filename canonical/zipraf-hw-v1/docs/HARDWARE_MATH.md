@@ -1,5 +1,7 @@
 # Hardware-capability mathematics — execution, not mythology
 
+**Governance:** `CLOSURE_L12` for runtime/device evidence; `TOKEN_VAZIO` never means numeric zero.
+
 The math in this directory only models quantities that can be mapped to machine evidence.
 
 ## 1. Logical masked update
