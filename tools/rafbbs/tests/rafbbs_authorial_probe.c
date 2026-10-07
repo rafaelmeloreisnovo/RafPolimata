@@ -4,6 +4,7 @@
 #include "rafbbs_sha256_core.h"
 #include "rafbbs_manifest_core.h"
 #include "rafbbs_filepicker_core.h"
+#include "rafbbs_theme.h"
 
 static RafContext rafbbs_authorial_manifest_ctx;
 static char rafbbs_authorial_manifest_buf[128];
@@ -46,6 +47,7 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafManifestText manifest_text;
     RafFilePickerCore picker = raf_filepicker_core_init();
     RafU32 picker_state;
+    RafU32 theme_state;
 
     if (state != (void *)0)
         caller_word = *(const RafU32 *)state;
@@ -97,12 +99,16 @@ RafU32 rafbbs_authorial_probe(void *state)
     picker_state = picker.selected_index ^
                    raf_filepicker_core_is_selected(&picker, 4u) ^
                    (RafU32)(unsigned char)raf_filepicker_core_selected(&picker)[0];
+    theme_state =
+        (RafU32)(unsigned char)raf_status_color(RAF_PASS)[0] ^
+        (RafU32)(unsigned char)raf_status_color(RAF_TOKEN_VAZIO)[3] ^
+        (RafU32)(unsigned char)raf_status_name(RAF_PASS)[0];
 
     return caller_word ^ crc ^ rollback_step ^ watchdog_state ^
            flags_state ^ arch_state ^ time_state ^ status_state ^ arm_state ^
            manifest.magic ^ manifest.hash_state ^
            output.pos ^ output.dropped ^ sink_state ^
-           manifest_text.pos ^ manifest_text.dropped ^ picker_state ^
+           manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
 }

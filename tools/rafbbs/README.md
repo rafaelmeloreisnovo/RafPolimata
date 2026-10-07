@@ -163,3 +163,11 @@ A seleção do catálogo conhecido foi separada da apresentação hosted:
 - `rafbbs_filepicker.h`: somente adaptação de apresentação com `printf`.
 
 O core preserva a seleção atual quando recebe escolha fora de `1..5`. O gate autoral compila esse core com `-nostdinc` nas seis ISAs declaradas e rejeita símbolos externos. Isso não promove execução física: `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.
+
+
+## Theme/status rendering freestanding
+
+`rafbbs_theme.h` já era estruturalmente autoral e não precisava de reescrita.
+Este successor apenas o inclui no conjunto provado: `-nostdinc`, seis ISAs,
+unresolved helpers = 0 e falsificador de mapeamento status→ANSI. Console I/O
+continua fora do core e execução física continua `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.
