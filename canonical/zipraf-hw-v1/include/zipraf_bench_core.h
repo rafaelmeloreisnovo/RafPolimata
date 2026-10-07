@@ -22,6 +22,10 @@
 #define ZH_BENCH_FACTOR_COUNT 32u
 #define ZH_BENCH_QUALITY_COUNT 16u
 
+typedef char zh_bench_u8_must_be_1[(sizeof(zh_u8) == 1u) ? 1 : -1];
+typedef char zh_bench_u32_must_be_4[(sizeof(zh_u32) == 4u) ? 1 : -1];
+typedef char zh_bench_u64_must_be_8[(sizeof(zh_u64) == 8u) ? 1 : -1];
+
 enum zh_bench_phase {
     ZH_BENCH_PHASE_CONTROL = 0,
     ZH_BENCH_PHASE_PREHOT = 1,
