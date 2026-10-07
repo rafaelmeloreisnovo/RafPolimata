@@ -88,6 +88,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_freestanding.h`: watchdog/rollback/flags;
 - `rafbbs_core.h`: caller-owned RafContext using `RafMonoTime`, not `struct timespec`;
 - `rafbbs_context_core.h`: seeded context/path initialization with authorial bounded copies and no memset/snprintf/libc;
+- `rafbbs_git_core.h`: safe deterministic parser for symbolic/detached HEAD, loose refs and packed-refs metadata; no Git binary/shell/filesystem calls;
 - `rafbbs_command_core.h`: deterministic command-outcome policy independent of `system()`/shell/provider execution;
 - `rafbbs_manifest_core.h`: deterministic text-manifest rendering into a caller-owned fixed buffer;
 - `rafbbs_filepicker_core.h`: static catalog/selection state without hosted string/runtime calls;
@@ -101,7 +102,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_baremetal.h`: fixed-buffer output and binary manifest value model;
 - `rafbbs_manifest_bin_core.h`: canonical 96-byte little-endian binary-manifest encode/decode;
 - `rafbbs_crc32_core.h` and `rafbbs_sha256_core.h`: pure algorithms;
-- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h`, `rafbbs_filepicker.h`, `rafbbs_log.h`, `rafbbs_pipeline.h`, `rafbbs_cli.h` and `rafbbs_tui.h`: hosted/provider adapters only. `rafbbs_log.h` no longer owns persisted run-log formatting through `fprintf` and no longer uses `stdarg/vsnprintf` for live details. Typed wrappers delegate text/i32/hex32 formatting to `rafbbs_format_core.h`; console and FILE remain hosted.
+- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_git_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h`, `rafbbs_filepicker.h`, `rafbbs_log.h`, `rafbbs_pipeline.h`, `rafbbs_cli.h` and `rafbbs_tui.h`: hosted/provider adapters only. `rafbbs_log.h` no longer owns persisted run-log formatting through `fprintf` and no longer uses `stdarg/vsnprintf` for live details. Typed wrappers delegate text/i32/hex32 formatting to `rafbbs_format_core.h`; console and FILE remain hosted.
 
 The freestanding build uses `-nostdinc -ffreestanding -fno-builtin -fno-stack-protector` and rejects unresolved symbols in the declared pure objects. A compiler, `nm`, shell or CI runner is a factory/evidence tool for this gate, not a runtime dependency of those objects. Full toolchain self-hosting remains `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`. Physical bare-metal execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)` until separately evidenced.
 
@@ -111,7 +112,7 @@ Run:
 sh freestanding/tests/verify_authorial_zero_dep.sh
 ```
 
-The gate enumerates eighteen pure modules plus a caller-owned probe, rejects host/runtime leakage, and compiles the same probe for six OS-neutral ISA targets. It checks the object for unresolved helpers and keeps hosted adapters outside the pure set.
+The gate enumerates twenty-one pure modules plus a caller-owned probe, rejects host/runtime leakage, and compiles the same probe for six OS-neutral ISA targets. It checks the object for unresolved helpers and keeps hosted adapters outside the pure set.
 
 The monotonic-time boundary is intentionally split: `rafbbs_time.h` owns only
 representation, validity and elapsed arithmetic; `rafbbs_time_posix.h` owns
@@ -304,3 +305,20 @@ divmod path, avoiding hidden divide helpers on 32-bit targets.
 
 This removes `<stdarg.h>` and `vsnprintf` from `rafbbs_log.h`. Console output,
 POSIX time observation and FILE persistence remain explicit hosted adapters.
+
+
+## Git metadata core freestanding
+
+A observação de branch/commit deixou de depender do executável externo `git`.
+`rafbbs_git_core.h` interpreta bytes caller-owned de `.git/HEAD`, refs soltas
+e `packed-refs`, produz branch e OID curto deterministicamente e rejeita refs
+fora do subconjunto seguro `refs/heads/*`, incluindo traversal `..`.
+
+`rafbbs_git_posix.h` permanece adapter hosted exclusivamente para ler bytes do
+filesystem em buffers fixos. Ele não executa shell, não chama `git rev-parse`,
+não usa heap e não promove filesystem a freestanding. Detached HEAD é suportado;
+gitdir/worktree indirection não observada continua fail-closed/TOKEN_VAZIO quando
+a leitura direta de `.git/HEAD` não existe.
+
+Portanto:
+`GIT_METADATA_PARSE != FILESYSTEM_OBSERVATION != GIT_PROVIDER`.
