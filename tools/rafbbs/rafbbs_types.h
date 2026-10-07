@@ -22,10 +22,12 @@
 
 typedef unsigned char RafU8;
 typedef unsigned int RafU32;
+typedef int RafI32;
 typedef unsigned long long RafU64;
 
 typedef char rafbbs_u8_must_be_1_byte[(sizeof(RafU8) == 1u) ? 1 : -1];
 typedef char rafbbs_u32_must_be_4_bytes[(sizeof(RafU32) == 4u) ? 1 : -1];
+typedef char rafbbs_i32_must_be_4_bytes[(sizeof(RafI32) == 4u) ? 1 : -1];
 typedef char rafbbs_u64_must_be_8_bytes[(sizeof(RafU64) == 8u) ? 1 : -1];
 
 #endif
