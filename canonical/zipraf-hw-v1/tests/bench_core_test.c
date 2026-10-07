@@ -1,3 +1,7 @@
+/* Governance: CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.
+ * TOKEN_VAZIO vocabulary in this file preserves missing physical/runtime
+ * evidence; it is not numeric zero and never promotes a claim.
+ */
 #include <stdio.h>
 #include "../include/zipraf_bench_core.h"
 
