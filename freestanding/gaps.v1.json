@@ -25,7 +25,8 @@
     "separate six-ISA raw Linux syscall compile gate",
     "mandatory L0 file-comment contract",
     "zero-runtime source contract gate",
-    "RafBBS deterministic text-manifest rendering in caller-owned memory under the zero-dependency gate"
+    "RafBBS deterministic text-manifest rendering in caller-owned memory under the zero-dependency gate",
+    "RafBBS static filepicker catalog/selection core under the zero-dependency gate"
   ],
   "dynamic_evidence": {
     "current_head_ci": "external-github-actions-state",
