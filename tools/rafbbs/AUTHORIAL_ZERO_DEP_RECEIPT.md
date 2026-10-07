@@ -12,6 +12,7 @@ not included in this claim.
 - rafbbs_core.h
 - rafbbs_context_core.h
 - rafbbs_command_core.h
+- rafbbs_result_core.h
 - rafbbs_manifest_core.h
 - rafbbs_filepicker_core.h
 - rafbbs_theme.h
@@ -36,6 +37,7 @@ not included in this claim.
 - tests/rafbbs_tui_core_test.c
 - tests/rafbbs_context_core_test.c
 - tests/rafbbs_command_core_test.c
+- tests/rafbbs_result_core_test.c
 - tests/rafbbs_manifest_bin_core_test.c
 
 ## Gate contract
@@ -77,3 +79,5 @@ coverage, semantic equivalence on every target, or claim promotion.
 Unobserved runtime/device state remains TOKEN_VAZIO (CLOSURE_L12).
 Repository-wide migration beyond this named slice remains TOKEN_VAZIO
 (CLOSURE_L11).
+
+Evidence validity is explicit: digest numeric zero is never overloaded as missing observation. The result core is a policy/classification core; it does not read files or generate evidence.
