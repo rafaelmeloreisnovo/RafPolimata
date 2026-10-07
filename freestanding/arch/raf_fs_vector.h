@@ -4,10 +4,10 @@
 /*
  * RAFAELIA-L0-FILE-CONTRACT
  * PURPOSE: Fixed-vector, branchless, one-block execution primitives.
- * SCOPE: SSE2, AVX2, AVX-512F, ARMv7 NEON, AArch64 Advanced SIMD and IBM z/s390x z13 vector facility; no OS/runtime contract.
+ * SCOPE: SSE2, AVX2, AVX-512F, ARMv7 NEON, Arm M-profile MVE/Helium, AArch64 Advanced SIMD and IBM z/s390x z13 vector facility; no OS/runtime contract.
  * PRECONDITIONS: Selected compiler target enables the exact ISA profile; full-block operations expose one full block.
- * REGISTER_OWNERSHIP: Inline assembly owns only declared vector/predicate temporaries; s390x is pinned to VR16..VR19 so FPR0..15 overlap is not touched; C-vector selection owns compiler temporaries elsewhere.
- * CLOBBERS: Declared XMM/YMM/ZMM/K, NEON or s390x VR16..VR19 temporaries plus memory; compiler allocates select temporaries on non-s390x profiles.
+ * REGISTER_OWNERSHIP: Inline assembly owns only declared vector/predicate temporaries; MVE owns Q0..Q3, s390x owns VR16..VR19; C-vector selection owns compiler temporaries elsewhere.
+ * CLOBBERS: Declared XMM/YMM/ZMM/K, NEON/MVE or s390x vector temporaries plus memory; compiler allocates select temporaries on generic C-vector profiles.
  * MEMORY_ORDER: Ordinary data access; no fence implied. Use raf_fs_arch.h ordering primitives separately.
  * TAIL_SHADOW: Full-block paths never create scalar tail; AVX-512 residual may use K-mask bounded memory; other fixed profiles require explicit full accessible block/mask.
  * EVIDENCE: Source implementation; profile compile/codegen gates promote build evidence. CLOSURE_L11/CLOSURE_L12.
@@ -104,6 +104,27 @@ RAF_FS_INLINE void raf_fs_vec_zero_block(void *dst) {
         : : "r"(dst) : "v0", "memory");
 }
 
+#elif defined(__arm__) && defined(__ARM_FEATURE_MVE)
+# define RAF_FS_NATIVE_VECTOR_BITS 128u
+# define RAF_FS_NATIVE_VECTOR_BYTES 16u
+# define RAF_FS_NATIVE_LANES_U32 4u
+# define RAF_FS_MVE_PROFILE 1u
+typedef raf_u32 raf_fs_native_u32v __attribute__((__vector_size__(16), __may_alias__));
+
+/* MVE/Helium one-block path. Q0..Q7 are 128-bit vectors; this slice owns Q0..Q3 only. */
+RAF_FS_INLINE void raf_fs_vec_copy_block(void *dst, const void *src) {
+    __asm__ __volatile__(
+        "vldrb.u8 q0, [%1]\n\t"
+        "vstrb.8 q0, [%0]"
+        : : "r"(dst), "r"(src) : "q0", "memory");
+}
+RAF_FS_INLINE void raf_fs_vec_zero_block(void *dst) {
+    __asm__ __volatile__(
+        "veor q0, q0, q0\n\t"
+        "vstrb.8 q0, [%0]"
+        : : "r"(dst) : "q0", "memory");
+}
+
 #elif defined(__arm__) && (__ARM_ARCH >= 7) && (defined(__ARM_NEON) || defined(__ARM_NEON__))
 # define RAF_FS_NATIVE_VECTOR_BITS 128u
 # define RAF_FS_NATIVE_VECTOR_BYTES 16u
@@ -149,7 +170,7 @@ RAF_FS_INLINE void raf_fs_vec_zero_block(void *dst) {
 }
 
 #else
-# error "raf_fs_vector.h requires an enabled fixed-vector profile (SSE2/AVX2/AVX-512F, ARMv7 NEON, AArch64 Advanced SIMD, or s390x z13 vector)"
+# error "raf_fs_vector.h requires an enabled fixed-vector profile (SSE2/AVX2/AVX-512F, ARMv7 NEON, AArch64 Advanced SIMD, Arm MVE/Helium, or s390x z13 vector)"
 #endif
 
 #if defined(RAF_FS_S390X_HIGH_VECTOR_PROFILE)
@@ -164,6 +185,21 @@ RAF_FS_INLINE void raf_fs_vec_select_u32_block(
         "vst %%v19, 0(%0)"
         : : "a"(dst), "a"(mask), "a"(yes), "a"(no)
         : "v16", "v17", "v18", "v19", "memory");
+}
+#elif defined(RAF_FS_MVE_PROFILE)
+/* Bitwise select: (yes & mask) | (no & ~mask), no predicate/tail fallback. */
+RAF_FS_INLINE void raf_fs_vec_select_u32_block(
+    void *dst, const void *mask, const void *yes, const void *no) {
+    __asm__ __volatile__(
+        "vldrb.u8 q0, [%1]\n\t"
+        "vldrb.u8 q1, [%2]\n\t"
+        "vldrb.u8 q2, [%3]\n\t"
+        "vand q1, q1, q0\n\t"
+        "vbic q2, q2, q0\n\t"
+        "vorr q3, q1, q2\n\t"
+        "vstrb.8 q3, [%0]"
+        : : "r"(dst), "r"(mask), "r"(yes), "r"(no)
+        : "q0", "q1", "q2", "q3", "memory");
 }
 #else
 RAF_FS_INLINE void raf_fs_vec_select_u32_block(
