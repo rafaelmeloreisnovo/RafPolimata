@@ -1,7 +1,8 @@
 # Authorial Federation V1 — RafPolimata
 
 **State:** `SOURCE_ARCHIVE / RIGHTS_GATED / NOT_IN_CANONICAL_BUILD`  
-**Base:** `main@32220b1ce8353566835fdee2301657ca79366da2`
+**Base:** `main@32220b1ce8353566835fdee2301657ca79366da2`  
+**Governance closure:** `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`
 
 ## Read this first
 
@@ -10,7 +11,7 @@ This route collects only material whose authorship and governing rights were obs
 Canonical invariant:
 
 `SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM`  
-`TOKEN_VAZIO != 0`  
+`TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY) != 0`  
 `IMPORTED != INTEGRATED != TESTED != PASS`
 
 ## Human / AI route
