@@ -17,6 +17,7 @@ not included in this claim.
 - rafbbs_theme.h
 - rafbbs_log_core.h
 - rafbbs_format_core.h
+- rafbbs_git_core.h
 - rafbbs_runlog_core.h
 - rafbbs_pipeline_core.h
 - rafbbs_cli_core.h
@@ -32,6 +33,7 @@ not included in this claim.
 - tests/rafbbs_theme_core_test.c
 - tests/rafbbs_log_core_test.c
 - tests/rafbbs_format_core_test.c
+- tests/rafbbs_git_core_test.c
 - tests/rafbbs_runlog_core_test.c
 - tests/rafbbs_pipeline_core_test.c
 - tests/rafbbs_cli_core_test.c
@@ -54,9 +56,10 @@ freestanding/tests/verify_authorial_zero_dep.sh:
 - renders the text manifest without stdio and fails closed on caller-buffer overflow;
 - checks exact manifest bytes plus invalid elapsed-time representation;
 - proves typed operational detail formatting for the exact RafBBS value families (text, signed i32 and fixed-width hex32) without stdarg/vsnprintf/printf grammar;
+- parses caller-supplied Git HEAD, loose-ref and packed-ref bytes in the pure set; the external `git` executable is no longer needed for RafBBS branch/commit observation;
 - proves persisted run-log header/artifact/gap byte formatting without fprintf,
   snprintf, hosted headers or filesystem access; the adapter only persists already-rendered bytes;
-- keeps POSIX/civil clock acquisition, git/filesystem observation, FILE persistence,
+- keeps POSIX/civil clock acquisition, filesystem observation, FILE persistence,
   terminal input/rendering and actual command execution in hosted adapters outside
   the pure set; only caller-supplied observations enter the seeded context core
   and only caller-supplied execution outcome enters the command policy core.

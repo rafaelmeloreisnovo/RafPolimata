@@ -94,6 +94,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_theme.h`: deterministic status-to-ANSI mapping without hosted headers;
 - `rafbbs_log_core.h`: caller-owned deterministic syslog-line composition with authorial 64-bit divmod;
 - `rafbbs_format_core.h`: finite typed formatter for text, signed i32 and fixed-width hex32; no stdarg/vsnprintf/general printf grammar;
+- `rafbbs_git_core.h`: caller-byte parser for symbolic/detached HEAD, loose OID and packed-ref records; no Git executable/filesystem/provider access;
 - `rafbbs_runlog_core.h`: deterministic persisted run-log header/artifact/gap byte rendering, including fixed-width CRC/hash hex, without stdio or filesystem;
 - `rafbbs_pipeline_core.h`: pipeline specs/flags and exact-byte lookup with no execution callback;
 - `rafbbs_cli_core.h`: deterministic CLI action routing with no hosted terminal/string runtime;
@@ -101,7 +102,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_baremetal.h`: fixed-buffer output and binary manifest value model;
 - `rafbbs_manifest_bin_core.h`: canonical 96-byte little-endian binary-manifest encode/decode;
 - `rafbbs_crc32_core.h` and `rafbbs_sha256_core.h`: pure algorithms;
-- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h`, `rafbbs_filepicker.h`, `rafbbs_log.h`, `rafbbs_pipeline.h`, `rafbbs_cli.h` and `rafbbs_tui.h`: hosted/provider adapters only. `rafbbs_log.h` no longer owns persisted run-log formatting through `fprintf` and no longer uses `stdarg/vsnprintf` for live details. Typed wrappers delegate text/i32/hex32 formatting to `rafbbs_format_core.h`; console and FILE remain hosted.
+- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h`, `rafbbs_filepicker.h`, `rafbbs_log.h`, `rafbbs_git_posix.h`, `rafbbs_pipeline.h`, `rafbbs_cli.h` and `rafbbs_tui.h`: hosted/provider adapters only. `rafbbs_log.h` no longer owns persisted run-log formatting through `fprintf` and no longer uses `stdarg/vsnprintf` for live details. Typed wrappers delegate text/i32/hex32 formatting to `rafbbs_format_core.h`; console and FILE remain hosted.
 
 The freestanding build uses `-nostdinc -ffreestanding -fno-builtin -fno-stack-protector` and rejects unresolved symbols in the declared pure objects. A compiler, `nm`, shell or CI runner is a factory/evidence tool for this gate, not a runtime dependency of those objects. Full toolchain self-hosting remains `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`. Physical bare-metal execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)` until separately evidenced.
 
@@ -304,3 +305,25 @@ divmod path, avoiding hidden divide helpers on 32-bit targets.
 
 This removes `<stdarg.h>` and `vsnprintf` from `rafbbs_log.h`. Console output,
 POSIX time observation and FILE persistence remain explicit hosted adapters.
+
+
+## Git provenance parser core freestanding
+
+RafBBS no longer shells out to `git rev-parse` to seed branch/commit metadata.
+`rafbbs_git_core.h` owns only byte semantics supplied by a caller: symbolic or
+detached `.git/HEAD`, loose object-id lines and exact `packed-refs` records.
+It validates SHA-1/SHA-256-width hexadecimal OIDs, derives `refs/heads/*`
+branch names, detects truncation and never opens a file or executes a process.
+
+`rafbbs_git_posix.h` is the explicit filesystem adapter. It reads the ordinary
+`.git/HEAD` directory layout, then a loose ref or `.git/packed-refs`.
+Unsupported/missing layouts do not invoke an external Git executable: branch or
+commit remain missing and the hosted caller seeds `TOKEN_VAZIO
+(CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`. Git worktree/submodule `.git`
+indirection is not claimed by this slice.
+
+Therefore:
+`GIT_BYTE_SEMANTICS != GIT_PROVIDER != FILESYSTEM_IO`.
+The external `git` binary is removed from this provenance path, while the
+filesystem itself remains a hosted adapter and physical-device observation
+remains separately evidence-bound.
