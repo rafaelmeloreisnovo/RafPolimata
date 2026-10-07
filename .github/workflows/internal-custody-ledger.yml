@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 / Node 24
 
       - name: Syntax and adversarial unit tests
         run: |
@@ -183,7 +183,7 @@ jobs:
 
       - name: Upload custody evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 / Node 24
         with:
           name: internal-custody-ledger-${{ github.run_id }}
           path: |
