@@ -119,6 +119,17 @@ zh_u32 zh_bench_compare(const struct zh_bench_stats *prehot,
     return ZH_BENCH_REL_EQUAL;
 }
 
+static void zh_bench_stats_copy(struct zh_bench_stats *dst,
+                                const struct zh_bench_stats *src) {
+    dst->state = src->state;
+    dst->n = src->n;
+    dst->min = src->min;
+    dst->p05 = src->p05;
+    dst->median = src->median;
+    dst->p95 = src->p95;
+    dst->max = src->max;
+}
+
 void zh_bench_receipt_init(struct zh_bench_receipt_v1 *out,
                            zh_u32 seed,
                            zh_u32 variant_count,
@@ -139,7 +150,7 @@ void zh_bench_receipt_init(struct zh_bench_receipt_v1 *out,
     out->factor_active_mask = factor_active_mask & factor_observed_mask;
     out->quality_observed_mask = quality_observed_mask;
     out->quality_pass_mask = quality_pass_mask & quality_observed_mask;
-    if (prehot) out->prehot = *prehot;
+    if (prehot) zh_bench_stats_copy(&out->prehot, prehot);
     else {
         out->prehot.state = ZH_TOKEN_VAZIO;
         out->prehot.n = 0u;
@@ -149,7 +160,7 @@ void zh_bench_receipt_init(struct zh_bench_receipt_v1 *out,
         out->prehot.p95 = 0u;
         out->prehot.max = 0u;
     }
-    if (hot) out->hot = *hot;
+    if (hot) zh_bench_stats_copy(&out->hot, hot);
     else {
         out->hot.state = ZH_TOKEN_VAZIO;
         out->hot.n = 0u;
@@ -172,9 +183,14 @@ static void zh_put_u32le(zh_u8 *p, zh_u32 v) {
 }
 
 static void zh_put_u64le(zh_u8 *p, zh_u64 v) {
-    zh_u32 i;
-    for (i = 0u; i < 8u; ++i)
-        p[i] = (zh_u8)(v >> (i * 8u));
+    p[0] = (zh_u8)v;
+    p[1] = (zh_u8)(v >> 8);
+    p[2] = (zh_u8)(v >> 16);
+    p[3] = (zh_u8)(v >> 24);
+    p[4] = (zh_u8)(v >> 32);
+    p[5] = (zh_u8)(v >> 40);
+    p[6] = (zh_u8)(v >> 48);
+    p[7] = (zh_u8)(v >> 56);
 }
 
 static zh_u32 zh_get_u32le(const zh_u8 *p) {
@@ -185,11 +201,14 @@ static zh_u32 zh_get_u32le(const zh_u8 *p) {
 }
 
 static zh_u64 zh_get_u64le(const zh_u8 *p) {
-    zh_u32 i;
-    zh_u64 v = 0u;
-    for (i = 0u; i < 8u; ++i)
-        v |= ((zh_u64)p[i]) << (i * 8u);
-    return v;
+    return ((zh_u64)p[0]) |
+           ((zh_u64)p[1] << 8) |
+           ((zh_u64)p[2] << 16) |
+           ((zh_u64)p[3] << 24) |
+           ((zh_u64)p[4] << 32) |
+           ((zh_u64)p[5] << 40) |
+           ((zh_u64)p[6] << 48) |
+           ((zh_u64)p[7] << 56);
 }
 
 static void zh_put_stats(zh_u8 *p, const struct zh_bench_stats *s) {
