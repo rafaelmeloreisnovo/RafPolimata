@@ -11,7 +11,7 @@
 - `rafbbs_filepicker_core_test.c`: falsifica catálogo estático, seleção válida e preservação do estado sob escolhas inválidas; zero hosted headers.
 - `rafbbs_theme_core_test.c`: falsifica mapeamento status→ANSI e default vazio; zero hosted headers e zero símbolos externos.
 - `rafbbs_log_core_test.c`: falsifica linha exata, tempo inválido, minutos >99 e overflow; o divmod 64-bit autoral evita helper externo em alvos 32-bit.
-- `rafbbs_runlog_core_test.c`: falsifica bytes exatos do cabeçalho/artefatos/gaps, CRC32 hexadecimal fixo, TOKEN_VAZIO para gaps ausentes e overflow de buffer; zero FILE/fprintf/libc no core.
+- `rafbbs_runlog_core_test.c`: falsifica bytes exatos do cabeçalho/artefatos/gaps, CRC32 hexadecimal fixo, TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY) para gaps ausentes e overflow de buffer; zero FILE/fprintf/libc no core.
 - `rafbbs_pipeline_core_test.c`: falsifica igualdade exata/case-sensitive, flags, lookup por índice e not-found; nenhum callback/handler no core.
 - `rafbbs_cli_core_test.c`: falsifica HELP/LIST/RUN/INVALID, argumento de RUN e comparação case-sensitive; zero terminal/libc no core.
 - `rafbbs_tui_core_test.c`: falsifica QUIT/LIST/FILES, rotas 1/2/3 e default/tecla desconhecida preservando ids exatos; zero stdio/terminal no core.
