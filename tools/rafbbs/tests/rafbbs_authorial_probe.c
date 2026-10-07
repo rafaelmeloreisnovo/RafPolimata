@@ -1,3 +1,6 @@
+/* Governance: CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.
+ * RAF_TOKEN_VAZIO below is status vocabulary under test, not a promoted claim.
+ */
 #include "rafbbs_core.h"
 #include "rafbbs_baremetal.h"
 #include "rafbbs_crc32_core.h"
