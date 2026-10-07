@@ -87,6 +87,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_time.h`: monotonic timestamp/elapsed arithmetic with explicit validity;
 - `rafbbs_freestanding.h`: watchdog/rollback/flags;
 - `rafbbs_core.h`: caller-owned RafContext using `RafMonoTime`, not `struct timespec`;
+- `rafbbs_context_core.h`: seeded context/path initialization with authorial bounded copies and no memset/snprintf/libc;
 - `rafbbs_manifest_core.h`: deterministic text-manifest rendering into a caller-owned fixed buffer;
 - `rafbbs_filepicker_core.h`: static catalog/selection state without hosted string/runtime calls;
 - `rafbbs_theme.h`: deterministic status-to-ANSI mapping without hosted headers;
@@ -237,4 +238,18 @@ O default preserva o comportamento anterior: ENTER, tecla desconhecida ou `1`
 roteiam para `encoders`; `2` para `roundtrip`; `3` para `apkc_validate`.
 O falsificador compila sob `-nostdinc` e o probe 6-ISA rejeita símbolos externos.
 Isso não torna terminal/console freestanding e não promove execução física.
+
+## Seeded context core freestanding
+
+A inicialização determinística de `RafContext` saiu do adapter POSIX.
+`rafbbs_context_core.h` recebe observações já prontas do caller
+(`run_id/pipeline/host/arch/branch/commit/start`) e monta estado, watchdog e
+caminhos `run/manifest/bin` com cópia limitada autoral.
+
+`rafbbs_cli.h` continua responsável por observar hora civil, relógio monotônico,
+arquitetura do host, `git` e filesystem. Portanto
+`CONTEXT_SEMANTICS != CLOCK/GIT/FILESYSTEM_PROVIDER`.
+O falsificador cobre campos exatos, caminhos, estado zerado e truncation flag;
+o probe 6-ISA continua rejeitando helpers externos. Isso não reivindica relógio,
+git ou filesystem freestanding.
 
