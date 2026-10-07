@@ -85,12 +85,14 @@ sh freestanding/tests/verify_contract.sh
 sh freestanding/tests/verify_authorial_zero_dep.sh
 sh freestanding/tests/verify_matrix.sh
 sh freestanding/tests/verify_profiles.sh
+sh freestanding/tests/verify_s390x_vector.sh
 sh freestanding/tests/verify_scalable.sh
 sh freestanding/tests/verify_matrix_accel.sh
 sh freestanding/tests/verify_register_metadata.sh
 ```
 
 - `verify_profiles.sh`: SSE2/AVX2/AVX-512/K/NEON/Advanced-SIMD fixed-vector codegen.
+- `verify_s390x_vector.sh`: z13 fixed-vector codegen pinned to VR16..VR19; rejects VR0..VR15/FPR overlap, calls, stack traffic and unresolved helpers.
 - `verify_scalable.sh`: SVE/RVV one-stage predicate/VL codegen.
 - `verify_matrix_accel.sh`: direct AMX TMM and SME ZA register ownership/codegen; it does not imply complete matrix data paths.
 - `verify_register_metadata.sh`: POWER64/LoongArch64/s390x metadata only; it must never be reported as executor PASS.
