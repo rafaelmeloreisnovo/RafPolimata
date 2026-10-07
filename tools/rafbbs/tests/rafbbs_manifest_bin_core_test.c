@@ -7,7 +7,8 @@ int rafbbs_manifest_bin_core_test(void)
     RafU8 wire[RAFBBS_BIN_MANIFEST_V1_SIZE];
     RafU32 i;
 
-    src = raf_bin_manifest_make(
+    raf_bin_manifest_init(
+        &src,
         0x01020304u,
         RAF_ARCH_ARM64,
         0x11223344u,
