@@ -10,6 +10,7 @@
 #include "rafbbs_baremetal.h"
 #include "rafbbs_time_posix.h"
 #include "rafbbs_context_core.h"
+#include "rafbbs_git_posix.h"
 
 static void raf_print_help(void) {
     puts("RafBBS Operator Console\nuso:\n  rafbbs              abre menu BBS\n  rafbbs --help       mostra ajuda\n  rafbbs list         lista pipelines\n  rafbbs run <id>     executa pipeline\n  rafbbs logs         mostra logs recentes\n  rafbbs manifest     mostra manifestos recentes\n  rafbbs files        mostra entradas conhecidas");
@@ -22,16 +23,6 @@ static void raf_list_pipelines(void) {
                raf_pipeline_specs[i].title,
                raf_pipeline_specs[i].description);
 }
-static void raf_host_trim_eol(char *text) {
-    RafU32 i = 0u;
-    while (text[i] != 0) {
-        if (text[i] == '\n' || text[i] == '\r') {
-            text[i] = 0;
-            return;
-        }
-        ++i;
-    }
-}
 static void raf_init_context(RafContext *ctx, const char *pipeline) {
     time_t t = time(NULL);
     struct tm tmv;
@@ -41,6 +32,7 @@ static void raf_init_context(RafContext *ctx, const char *pipeline) {
     char commit[128] = {0};
     const char *arch;
     RafContextSeed seed;
+    RafU32 git_observation;
 
     localtime_r(&t, &tmv);
     (void)strftime(run_id, sizeof(run_id), "%Y%m%d-%H%M%S", &tmv);
@@ -51,12 +43,20 @@ static void raf_init_context(RafContext *ctx, const char *pipeline) {
 #else
     arch = "unknown";
 #endif
-    (void)system("git rev-parse --abbrev-ref HEAD > /tmp/rafbbs_branch.txt 2>/dev/null");
-    (void)system("git rev-parse --short HEAD > /tmp/rafbbs_commit.txt 2>/dev/null");
-    { FILE *f = fopen("/tmp/rafbbs_branch.txt", "r"); if (f) { (void)fgets(branch, sizeof(branch), f); fclose(f); } }
-    { FILE *f = fopen("/tmp/rafbbs_commit.txt", "r"); if (f) { (void)fgets(commit, sizeof(commit), f); fclose(f); } }
-    raf_host_trim_eol(branch);
-    raf_host_trim_eol(commit);
+    git_observation = raf_git_posix_observe(
+        branch, (RafU32)sizeof(branch),
+        commit, (RafU32)sizeof(commit)
+    );
+    if ((git_observation & RAFBBS_GIT_OBS_BRANCH) == 0u)
+        (void)raf_context_text_copy(
+            branch, (RafU32)sizeof(branch),
+            "TOKEN_VAZIO" /* CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY */
+        );
+    if ((git_observation & RAFBBS_GIT_OBS_COMMIT) == 0u)
+        (void)raf_context_text_copy(
+            commit, (RafU32)sizeof(commit),
+            "TOKEN_VAZIO" /* CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY */
+        );
     (void)mkdir("tools/rafbbs/logs", 0777);
 
     seed.run_id = run_id;
