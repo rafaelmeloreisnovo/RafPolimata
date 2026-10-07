@@ -36,7 +36,7 @@ Governance:
 |---|---|---|---|
 | L0-GAP-003 | SME/SME2 operational matrix data path beyond direct ZA zero; includes ZA load/compute/store strategy and SME2 `ZT0` where supported | `TOKEN_VAZIO (CLOSURE_L11)` | explicit state/precondition contract + target codegen/equivalence gate |
 | L0-GAP-005 | AMX operational tile data path beyond direct TMM0 zero (`tileloadd`/compute/`tilestored`) | `TOKEN_VAZIO (CLOSURE_L11)` | caller-owned tile config + bounded tile memory + codegen/equivalence gate |
-| L0-GAP-007 | POWER64 VSX/MMA executor profile | `TOKEN_VAZIO (CLOSURE_L11)` | VSX/MMA instruction path + no-helper/no-tail codegen gate |
+| L0-GAP-007 | POWER64 VSX/MMA executor profile | `VSX_SLICE_IMPLEMENTED_UNTESTED_CI; MMA=TOKEN_VAZIO (CLOSURE_L11)` | exact-head `verify_power_vsx.sh` PASS promotes VSX fixed-vector slice only; MMA remains separately open |
 | L0-GAP-008 | LoongArch64 LSX/LASX executor profile | `TOKEN_VAZIO (CLOSURE_L11)` | LSX/LASX instruction path + alias-safe codegen gate |
 | L0-GAP-010 | Qualcomm Hexagon/HVX register topology and executor | `TOKEN_VAZIO (CLOSURE_L11)` | available target toolchain + topology then executor gate |
 | L0-GAP-011 | ARM M-profile MVE/Helium register topology and executor | `TOKEN_VAZIO (CLOSURE_L11)` | explicit M-profile target + MVE instruction/codegen gate |
