@@ -35,6 +35,7 @@ static void raf_host_trim_eol(char *text) {
 static void raf_init_context(RafContext *ctx, const char *pipeline) {
     time_t t = time(NULL);
     struct tm tmv;
+    RafMonoTime mono_start = raf_mono_posix_now();
     char run_id[32] = {0};
     char branch[128] = {0};
     char commit[128] = {0};
@@ -64,7 +65,7 @@ static void raf_init_context(RafContext *ctx, const char *pipeline) {
     seed.arch = arch;
     seed.branch = branch;
     seed.commit = commit;
-    seed.start = raf_mono_posix_now();
+    seed.start = mono_start;
     (void)raf_context_init_seeded(ctx, &seed);
 }
 static int raf_execute_pipeline(const char *id) {
