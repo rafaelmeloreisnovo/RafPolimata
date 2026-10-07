@@ -28,7 +28,13 @@
 #if defined(__x86_64__)
 # define RAF_FS_ABI_ID RAF_FS_ABI_X86_64
 # define RAF_FS_ABI_PTR_BITS 64u
-# define RAF_FS_ABI_GPR_COUNT 16u
+# if defined(__APX_F__) || defined(__EGPR__)
+#  define RAF_FS_ABI_GPR_COUNT 32u
+#  define RAF_FS_ABI_APX_EGPR_COUNT 16u
+# else
+#  define RAF_FS_ABI_GPR_COUNT 16u
+#  define RAF_FS_ABI_APX_EGPR_COUNT 0u
+# endif
 # if defined(__AVX512F__)
 #  define RAF_FS_ABI_VECTOR_BITS 512u
 #  define RAF_FS_ABI_VECTOR_REGS 32u
