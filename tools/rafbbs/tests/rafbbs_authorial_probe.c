@@ -18,6 +18,7 @@
 #include "rafbbs_pipeline_core.h"
 #include "rafbbs_command_core.h"
 #include "rafbbs_exec_core.h"
+#include "rafbbs_runid_core.h"
 #include "rafbbs_result_core.h"
 #include "rafbbs_cli_core.h"
 #include "rafbbs_tui_core.h"
@@ -87,6 +88,7 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafU32 context_state;
     RafU32 command_state;
     RafU32 exec_state;
+    RafU32 runid_state;
     RafU32 result_state;
 
     if (state != (void *)0)
@@ -290,6 +292,26 @@ RafU32 rafbbs_authorial_probe(void *state)
                      (RafU32)(unsigned char)exec_spec.argv[9][0];
     }
     {
+        char run_id[RAFBBS_RUN_ID_CAP];
+        RafCivilStamp stamp;
+        stamp.year = 2026;
+        stamp.month = 10u;
+        stamp.day = 7u;
+        stamp.hour = 9u;
+        stamp.minute = 21u;
+        stamp.second = 5u;
+        stamp.valid = 1u;
+        if (raf_runid_render(
+                run_id, (RafU32)sizeof(run_id), &stamp
+            ) == 0u ||
+            run_id[0] != '2' || run_id[8] != '-' ||
+            run_id[14] != '5')
+            return caller_word ^ 0x52554e31u;
+        runid_state = (RafU32)(unsigned char)run_id[0] ^
+                      (RafU32)(unsigned char)run_id[8] ^
+                      (RafU32)(unsigned char)run_id[14];
+    }
+    {
         RafResultDecision result_decision = raf_result_decide(
             RAF_PASS_LIMITED, 0u, 0u, 1u
         );
@@ -327,7 +349,7 @@ RafU32 rafbbs_authorial_probe(void *state)
            output.pos ^ output.dropped ^ sink_state ^
            manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^
            log_state ^ format_state ^ git_state ^ recent_state ^ runlog_state ^ pipeline_state ^ cli_state ^ tui_state ^ context_state ^
-           command_state ^ exec_state ^ result_state ^
+           command_state ^ exec_state ^ runid_state ^ result_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
 }
