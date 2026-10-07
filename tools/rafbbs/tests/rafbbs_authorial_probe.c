@@ -70,7 +70,8 @@ RafU32 rafbbs_authorial_probe(void *state)
     raf_baremetal_flush(&output, port);
 
     hash_state = raf_hash_failover_state(1u, (RafU32)(crc != 0u));
-    manifest = raf_bin_manifest_make(
+    raf_bin_manifest_init(
+        &manifest,
         0u, RAF_ARCH_ARM64, crc, 0u, hash_state, 0u
     );
     if (raf_bin_manifest_encode_v1(
