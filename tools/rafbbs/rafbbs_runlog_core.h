@@ -85,7 +85,7 @@ static inline void raf_runlog_tail_render(
     if (ctx->gaps[0] != 0)
         raf_log_text_puts(out, ctx->gaps);
     else
-        raf_log_text_puts(out, "none=TOKEN_VAZIO");
+        raf_log_text_puts(out, "none=TOKEN_VAZIO"); /* CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY */
     raf_log_text_putc(out, '\n');
 }
 
