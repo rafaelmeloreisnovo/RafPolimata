@@ -3,9 +3,20 @@
 #include "rafbbs_crc32_core.h"
 #include "rafbbs_sha256_core.h"
 #include "rafbbs_manifest_core.h"
+#include "rafbbs_pipeline_core.h"
 
 static RafContext rafbbs_authorial_manifest_ctx;
 static char rafbbs_authorial_manifest_buf[128];
+
+static RafStatus rafbbs_authorial_pipeline_run(RafContext *ctx)
+{
+    return ctx != (RafContext *)0 ? RAF_PASS : RAF_TOKEN_VAZIO;
+}
+
+static RafPipeline rafbbs_authorial_pipelines[] = {
+    {"core", "Core", "authorial pipeline core", 0, 0, 0, rafbbs_authorial_pipeline_run},
+    {"device", "Device", "device-bound adapter", 0, 1, 1, rafbbs_authorial_pipeline_run}
+};
 
 static void rafbbs_authorial_probe_sink(RafU8 byte, void *user)
 {
@@ -43,6 +54,8 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafMonoTime mono_end = raf_mono_from_ns(2500000000ull);
     RafMonoElapsed mono_elapsed = raf_mono_elapsed_ms(mono_start, mono_end);
     RafManifestText manifest_text;
+    RafPipeline *pipeline;
+    RafU32 pipeline_state;
 
     if (state != (void *)0)
         caller_word = *(const RafU32 *)state;
@@ -82,6 +95,10 @@ RafU32 rafbbs_authorial_probe(void *state)
         mono_elapsed.ms,
         mono_elapsed.valid
     );
+    pipeline = raf_pipeline_find(rafbbs_authorial_pipelines, 2u, "device");
+    pipeline_state = pipeline != (RafPipeline *)0
+        ? ((RafU32)pipeline->requires_android ^ (RafU32)pipeline->writes_artifacts)
+        : 0xffffffffu;
 
     watchdog_state = raf_watchdog_step(&watchdog);
     flags_state = flags.no_heap ^ flags.no_gc ^ flags.syscall_free_hint;
@@ -95,7 +112,7 @@ RafU32 rafbbs_authorial_probe(void *state)
            flags_state ^ arch_state ^ time_state ^ status_state ^ arm_state ^
            manifest.magic ^ manifest.hash_state ^
            output.pos ^ output.dropped ^ sink_state ^
-           manifest_text.pos ^ manifest_text.dropped ^
+           manifest_text.pos ^ manifest_text.dropped ^ pipeline_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
 }
