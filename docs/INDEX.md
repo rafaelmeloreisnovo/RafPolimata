@@ -6,6 +6,18 @@
 > **Regra:** `README → CURRENT_DOCUMENTATION_STATE → INDEX → área → source/evidence`
 
 
+
+## 0B. Federação autoral — rota de proveniência P0
+
+| Rota | Papel | Limite |
+|---|---|---|
+| [AUTHORIAL_FEDERATION_V1](federation/AUTHORIAL_FEDERATION_V1.md) | entrada humano/IA para fontes autorais federadas | não integra build por si só |
+| `../data/federation/authorial_sources.v1.json` | fonte machine-readable repo/ref/path/licença/estado | ausência permanece `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)` |
+| `../federation/authorial/AGENTS.md` | regras escopadas para agentes dentro do archive | snapshot importado não vira implementação nativa |
+| `../federation/authorial/README.md` | layout e regra de promoção | `IMPORTED != INTEGRATED != TESTED != PASS` |
+
+Regra P0: `REPO_OWNER != AUTHOR`; autoria/licença são resolvidas por caminho e proveniência antes de qualquer adaptação ou promoção.
+
 ## 0A. Suplemento de maturidade corrente — 2026-09-28
 
 **Observed main base:** f840fde2de65edacf8b2abbee8ca9d1f9c912b6d  
