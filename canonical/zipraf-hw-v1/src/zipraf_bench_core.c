@@ -1,3 +1,7 @@
+/* Governance: CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE.
+ * TOKEN_VAZIO vocabulary in this file preserves missing physical/runtime
+ * evidence; it is not numeric zero and never promotes a claim.
+ */
 #include "../include/zipraf_bench_core.h"
 
 static zh_u32 zh_bench_mod_small(zh_u32 value, zh_u32 mod) {
