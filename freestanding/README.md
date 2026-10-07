@@ -27,6 +27,30 @@ syscall/      -> optional Linux ABI bindings, deliberately separate
 
 Freestanding gates compile with `unknown-none`, `none-eabi` or `unknown-elf` target triples. Linux target/ABI assumptions are confined to `syscall/`.
 
+## Z0 presence-token experiment
+
+`include/raf_fs_z0_token.h` isolates the smallest observable representation boundary without language-model context, attention, learned weights or normalization.
+
+```text
+ABSENT   = caller says no input was supplied
+EMPTY    = input was supplied with payload length 0
+SPACE    = one byte 0x20
+NUL      = one byte 0x00
+BYTE     = one non-space/non-NUL byte
+SEQUENCE = more than one payload byte
+INVALID  = payload length > 0 with no readable pointer
+```
+
+The experiment intentionally preserves:
+
+```text
+ABSENT != EMPTY != SPACE != NUL
+payload_length(ABSENT) = payload_length(EMPTY) = 0
+representation_of_nothing != proof_of_absolute_nothing
+```
+
+The classifier is a deterministic presence/byte-state tokenizer, not a language-model tokenizer. `verify_z0_token.sh` compiles the probe for six OS-neutral ISA targets with zero unresolved helpers and runs a hosted semantic selftest. Physical/device evidence remains a separate closure.
+
 ## Build/codegen-gated primary profiles
 
 - x86_64 SSE2 — XMM fixed block;
@@ -70,6 +94,7 @@ Read in this order:
 
 ```text
 verify_contract.sh          -> zero-runtime/source/comment contract
+verify_z0_token.sh          -> Z0 presence semantics + six OS-neutral objects + unresolved helpers=0
 verify_authorial.sh         -> authorial item descriptor; external deps=0; six OS-neutral objects
 verify_matrix.sh            -> six primary scalar OS-neutral objects
 verify_profiles.sh          -> SSE2/AVX2/AVX-512/NEON/Advanced-SIMD codegen
@@ -84,6 +109,7 @@ Codegen gates reject unexpected helpers/calls/stack traffic in the relevant prob
 Canonical implementation entrypoints:
 
 - `include/raf_fs_core.h`;
+- `include/raf_fs_z0_token.h`;
 - `include/raf_fs_authorial.h`;
 - `include/raf_fs_abi.h`;
 - `include/raf_fs_registers.h`;
