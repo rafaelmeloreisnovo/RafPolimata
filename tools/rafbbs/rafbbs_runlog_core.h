@@ -3,6 +3,7 @@
 
 #include "rafbbs_core.h"
 #include "rafbbs_log_core.h"
+#include "rafbbs_format_core.h"
 
 /*
  * Deterministic run-log byte rendering.
@@ -11,24 +12,6 @@
  * adapter. No FILE, filesystem, terminal, allocator, clock or provider API is
  * reachable from this module.
  */
-
-static inline RafU32 raf_runlog_cstr_len(const char *text)
-{
-    RafU32 n = 0u;
-    if (text == (const char *)0) return 0u;
-    while (text[n] != 0) n++;
-    return n;
-}
-
-static inline void raf_runlog_hex32(RafLogText *out, RafU32 value)
-{
-    static const char hex[] = "0123456789abcdef";
-    RafU32 shift = 32u;
-    while (shift > 0u) {
-        shift -= 4u;
-        raf_log_text_putc(out, hex[(value >> shift) & 0x0fu]);
-    }
-}
 
 static inline void raf_runlog_key_value(
     RafLogText *out,
@@ -67,18 +50,18 @@ static inline void raf_runlog_tail_render(
     raf_runlog_key_value(out, "output", ctx->output);
 
     raf_log_text_puts(out, "input_crc32=");
-    raf_runlog_hex32(out, ctx->input_crc32);
+    raf_format_hex32_fixed8(out, ctx->input_crc32);
     raf_log_text_putc(out, '\n');
 
     raf_log_text_puts(out, "output_crc32=");
-    raf_runlog_hex32(out, ctx->output_crc32);
+    raf_format_hex32_fixed8(out, ctx->output_crc32);
     raf_log_text_putc(out, '\n');
 
     raf_runlog_key_value(out, "input_sha256", ctx->input_sha256);
     raf_runlog_key_value(out, "output_sha256", ctx->output_sha256);
 
     raf_log_text_puts(out, "hash_state=");
-    raf_runlog_hex32(out, ctx->hash_state);
+    raf_format_hex32_fixed8(out, ctx->hash_state);
     raf_log_text_putc(out, '\n');
 
     raf_log_text_puts(out, "\n[GAPS]\n");

@@ -93,6 +93,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_filepicker_core.h`: static catalog/selection state without hosted string/runtime calls;
 - `rafbbs_theme.h`: deterministic status-to-ANSI mapping without hosted headers;
 - `rafbbs_log_core.h`: caller-owned deterministic syslog-line composition with authorial 64-bit divmod;
+- `rafbbs_format_core.h`: finite typed formatter for text, signed i32 and fixed-width hex32; no stdarg/vsnprintf/general printf grammar;
 - `rafbbs_runlog_core.h`: deterministic persisted run-log header/artifact/gap byte rendering, including fixed-width CRC/hash hex, without stdio or filesystem;
 - `rafbbs_pipeline_core.h`: pipeline specs/flags and exact-byte lookup with no execution callback;
 - `rafbbs_cli_core.h`: deterministic CLI action routing with no hosted terminal/string runtime;
@@ -100,7 +101,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_baremetal.h`: fixed-buffer output and binary manifest value model;
 - `rafbbs_manifest_bin_core.h`: canonical 96-byte little-endian binary-manifest encode/decode;
 - `rafbbs_crc32_core.h` and `rafbbs_sha256_core.h`: pure algorithms;
-- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h`, `rafbbs_filepicker.h`, `rafbbs_log.h`, `rafbbs_pipeline.h`, `rafbbs_cli.h` and `rafbbs_tui.h`: hosted/provider adapters only. `rafbbs_log.h` no longer owns persisted run-log formatting through `fprintf`; it persists caller-buffer bytes rendered by `rafbbs_runlog_core.h`, while variadic live-detail formatting/console and FILE remain hosted.
+- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h`, `rafbbs_filepicker.h`, `rafbbs_log.h`, `rafbbs_pipeline.h`, `rafbbs_cli.h` and `rafbbs_tui.h`: hosted/provider adapters only. `rafbbs_log.h` no longer owns persisted run-log formatting through `fprintf` and no longer uses `stdarg/vsnprintf` for live details. Typed wrappers delegate text/i32/hex32 formatting to `rafbbs_format_core.h`; console and FILE remain hosted.
 
 The freestanding build uses `-nostdinc -ffreestanding -fno-builtin -fno-stack-protector` and rejects unresolved symbols in the declared pure objects. A compiler, `nm`, shell or CI runner is a factory/evidence tool for this gate, not a runtime dependency of those objects. Full toolchain self-hosting remains `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`. Physical bare-metal execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)` until separately evidenced.
 
@@ -280,8 +281,26 @@ the existing dropped counter and fails closed at the hosted persistence boundary
 
 `rafbbs_log.h` keeps only host concerns for this path: opening/closing the FILE
 and writing already-rendered bytes. It no longer uses `fprintf` to define the
-persisted format. Live variadic detail formatting with `vsnprintf`, console I/O
+persisted format. Live detail formatting is now closed over typed authorial text/i32/hex32 helpers; console I/O
 and the POSIX monotonic observation remain hosted adapters and are not promoted
 to freestanding. The pure renderer is compiled under `-nostdinc` and exercised
 in the six-ISA no-undefined-symbol probe. Physical/device persistence remains
 `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.
+
+
+## Typed live-log formatter freestanding
+
+The remaining `stdarg/vsnprintf` dependency in RafBBS logging was removed instead
+of reimplementing general `printf`. The observed grammar was finite: literal
+text, one string, one signed integer, or one fixed-width 32-bit hexadecimal
+value. `rafbbs_format_core.h` implements exactly those typed operations over
+caller-owned `RafLogText` buffers.
+
+Hosted call sites now use `raf_log`, `raf_log_s`, `raf_log_i32` and
+`raf_log_hex32`. This preserves the emitted text while making unsupported
+format grammar unrepresentable at the API boundary. The signed formatter handles
+the minimum 32-bit value without signed overflow and reuses the authorial bitwise
+divmod path, avoiding hidden divide helpers on 32-bit targets.
+
+This removes `<stdarg.h>` and `vsnprintf` from `rafbbs_log.h`. Console output,
+POSIX time observation and FILE persistence remain explicit hosted adapters.
