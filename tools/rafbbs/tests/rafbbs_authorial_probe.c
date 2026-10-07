@@ -3,6 +3,7 @@
 #include "rafbbs_crc32_core.h"
 #include "rafbbs_sha256_core.h"
 #include "rafbbs_manifest_core.h"
+#include "rafbbs_manifest_bin_core.h"
 
 static RafContext rafbbs_authorial_manifest_ctx;
 static char rafbbs_authorial_manifest_buf[128];
@@ -38,6 +39,8 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafBaremetalOut output;
     RafBaremetalPort port;
     RafBinManifest manifest;
+    RafBinManifest manifest_decoded;
+    RafU8 manifest_wire[RAFBBS_BIN_MANIFEST_V1_SIZE];
     RafArchFlags arch;
     RafMonoTime mono_start = raf_mono_from_ns(1000000000ull);
     RafMonoTime mono_end = raf_mono_from_ns(2500000000ull);
@@ -70,6 +73,19 @@ RafU32 rafbbs_authorial_probe(void *state)
     manifest = raf_bin_manifest_make(
         0u, RAF_ARCH_ARM64, crc, 0u, hash_state, 0u
     );
+    if (raf_bin_manifest_encode_v1(
+            manifest_wire,
+            RAFBBS_BIN_MANIFEST_V1_SIZE,
+            &manifest
+        ) != 0)
+        return caller_word ^ 0x42494e31u;
+    if (raf_bin_manifest_decode_v1(
+            &manifest_decoded,
+            manifest_wire,
+            RAFBBS_BIN_MANIFEST_V1_SIZE
+        ) != 0)
+        return caller_word ^ 0x42494e32u;
+
     arch = raf_arch_flags(RAF_ARCH_ARM64);
     raf_manifest_text_init(
         &manifest_text,
@@ -94,6 +110,8 @@ RafU32 rafbbs_authorial_probe(void *state)
     return caller_word ^ crc ^ rollback_step ^ watchdog_state ^
            flags_state ^ arch_state ^ time_state ^ status_state ^ arm_state ^
            manifest.magic ^ manifest.hash_state ^
+           manifest_decoded.magic ^ manifest_decoded.hash_state ^
+           (RafU32)manifest_wire[0] ^ (RafU32)manifest_wire[95] ^
            output.pos ^ output.dropped ^ sink_state ^
            manifest_text.pos ^ manifest_text.dropped ^
            (RafU32)(unsigned char)digest[0] ^
