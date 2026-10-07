@@ -33,6 +33,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/rafbbs_freestanding.h` — watchdog/rollback/flags;
 - `tools/rafbbs/rafbbs_core.h` — caller-owned context with no hosted time type;
 - `tools/rafbbs/rafbbs_context_core.h` — seeded context initialization, bounded text/path composition and watchdog setup without memset/snprintf/libc;
+- `tools/rafbbs/rafbbs_command_core.h` — deterministic executed/rc/optional → PASS/SKIP/FAIL/TOKEN_VAZIO policy with limited/failed bits; no command execution;
 - `tools/rafbbs/rafbbs_manifest_core.h` — deterministic text-manifest rendering into caller-owned memory;
 - `tools/rafbbs/rafbbs_filepicker_core.h` — static catalog + bounded selection state with no libc/string dependency;
 - `tools/rafbbs/rafbbs_theme.h` — deterministic status-to-ANSI mapping over the authorial status vocabulary;
@@ -54,6 +55,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/tests/rafbbs_cli_core_test.c` — help/list/run/invalid and case-sensitive CLI-route falsifier;
 - `tools/rafbbs/tests/rafbbs_tui_core_test.c` — quit/list/files/run/default TUI-route falsifier with exact pipeline ids;
 - `tools/rafbbs/tests/rafbbs_context_core_test.c` — seeded fields, deterministic paths, watchdog/zero state and truncation falsifier;
+- `tools/rafbbs/tests/rafbbs_command_core_test.c` — executed/unexecuted, success, optional failure and required failure policy falsifier;
 - `tools/rafbbs/tests/rafbbs_manifest_bin_core_test.c` — binary wire exact-byte/roundtrip/truncation falsifier.
 
 The hosted file wrappers remain deliberately outside the pure core:
@@ -65,7 +67,7 @@ The hosted file wrappers remain deliberately outside the pure core:
 - `tools/rafbbs/rafbbs_manifest_bin.h` — binary FILE/filesystem persistence only;
 - `tools/rafbbs/rafbbs_filepicker.h` — hosted presentation/printf adapter only;
 - `tools/rafbbs/rafbbs_log.h` — hosted clock observation, varargs/detail formatting, console and FILE persistence adapter;
-- `tools/rafbbs/rafbbs_pipeline.h` — hosted handler binding, command execution and provider/file/hash adapters;
+- `tools/rafbbs/rafbbs_pipeline.h` — hosted handler binding, command execution and provider/file/hash adapters; result policy delegates to `rafbbs_command_core.h`;
 - `tools/rafbbs/rafbbs_cli.h` — hosted terminal, wall-clock, filesystem, git observation and command dispatch adapter; host observations seed the pure context core;
 - `tools/rafbbs/rafbbs_tui.h` — hosted stdio rendering/input adapter that delegates key semantics to `rafbbs_tui_core.h`;
 - POSIX file adapters.
@@ -125,7 +127,7 @@ declared runtime surface has an equivalent source/build/runtime receipt.
 ## R3
 
 `F_ok` = authorial zero-include type/status substrate + pure CRC32/SHA-256 +
-RafBBS context/monotonic-time value layer + seeded context/path core + deterministic text-manifest renderer
+RafBBS context/monotonic-time value layer + seeded context/path core + command-result policy core + deterministic text-manifest renderer
 + static filepicker catalog/selection + theme/status + deterministic log-line rendering
 + pipeline spec/lookup core + CLI route core + TUI route core + fixed 96-byte binary-manifest wire codec prepared for `-nostdinc` compilation,
 with POSIX clock acquisition, varargs/detail formatting, filesystem persistence and
@@ -135,5 +137,5 @@ console presentation isolated behind adapters.
 repository-wide component migration are not yet evidence-bound.
 
 `F_next` = execute the exact-head zero-dependency + semantic time/text/binary-manifest
-falsifiers, including seeded-context, filepicker, theme/status, log-line, pipeline-spec, CLI-route, TUI-route and binary-manifest;
+falsifiers, including command-policy, seeded-context, filepicker, theme/status, log-line, pipeline-spec, CLI-route, TUI-route and binary-manifest;
 only after PASS select the next smallest runtime-bearing cut.
