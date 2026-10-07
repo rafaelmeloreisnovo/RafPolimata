@@ -25,7 +25,7 @@ static RafStatus raf_run_cmd(RafContext *ctx, const char *module, const char *cm
     raf_rollback_push(&ctx->rollback, frame);
     if (raf_watchdog_step(&ctx->watchdog)) { ctx->failed = 1; raf_log(ctx, RAF_FAIL, module, "watchdog expirou antes do comando"); return RAF_FAIL; }
     (void)raf_context_text_copy(ctx->command, (RafU32)sizeof(ctx->command), cmd);
-    raf_log(ctx, RAF_STEP, module, "comando=%s", cmd);
+    raf_log_s(ctx, RAF_STEP, module, "comando=", cmd);
 #if defined(RAFBBS_FREESTANDING_MODE)
     (void)cmd;
     executed = 0u;
@@ -42,9 +42,9 @@ static RafStatus raf_run_cmd(RafContext *ctx, const char *module, const char *cm
     else if (decision.status == RAF_PASS)
         raf_log(ctx, RAF_PASS, module, "comando finalizado rc=0");
     else if (decision.status == RAF_SKIP)
-        raf_log(ctx, RAF_SKIP, module, "comando opcional indisponivel rc=%d", rc);
+        raf_log_i32(ctx, RAF_SKIP, module, "comando opcional indisponivel rc=", (RafI32)rc);
     else
-        raf_log(ctx, RAF_FAIL, module, "comando falhou rc=%d", rc);
+        raf_log_i32(ctx, RAF_FAIL, module, "comando falhou rc=", (RafI32)rc);
     return decision.status;
 }
 
@@ -62,16 +62,16 @@ static RafStatus raf_pipe_encoders(RafContext *ctx) {
         raf_log(ctx, RAF_SKIP, "encoder_c", "teste C ARM exige host ARM");
         raf_log(ctx, RAF_TOKEN_VAZIO, "android", "logcat ausente neste host");
     }
-    if (raf_crc32_file(ctx->input, &ctx->input_crc32) == 0) raf_log(ctx, RAF_HASH, "proof", "input_crc32=%08x", ctx->input_crc32);
-    if (raf_sha256_file(ctx->input, ctx->input_sha256) == 0) raf_log(ctx, RAF_HASH, "proof", "input_sha256=%s", ctx->input_sha256);
+    if (raf_crc32_file(ctx->input, &ctx->input_crc32) == 0) raf_log_hex32(ctx, RAF_HASH, "proof", "input_crc32=", ctx->input_crc32);
+    if (raf_sha256_file(ctx->input, ctx->input_sha256) == 0) raf_log_s(ctx, RAF_HASH, "proof", "input_sha256=", ctx->input_sha256);
     return ctx->limited ? RAF_PASS_LIMITED : RAF_PASS;
 }
 
 static RafStatus raf_pipe_roundtrip(RafContext *ctx) {
     (void)raf_context_text_copy(ctx->input, (RafU32)sizeof(ctx->input), "Apkc/hello.s.txt");
     if (raf_run_cmd(ctx, "roundtrip", "sh tests/test_asm_roundtrip.sh", 0) == RAF_FAIL) return RAF_FAIL;
-    if (raf_crc32_file(ctx->input, &ctx->input_crc32) == 0) raf_log(ctx, RAF_HASH, "proof", "input_crc32=%08x", ctx->input_crc32);
-    if (raf_sha256_file(ctx->input, ctx->input_sha256) == 0) raf_log(ctx, RAF_HASH, "proof", "input_sha256=%s", ctx->input_sha256);
+    if (raf_crc32_file(ctx->input, &ctx->input_crc32) == 0) raf_log_hex32(ctx, RAF_HASH, "proof", "input_crc32=", ctx->input_crc32);
+    if (raf_sha256_file(ctx->input, ctx->input_sha256) == 0) raf_log_s(ctx, RAF_HASH, "proof", "input_sha256=", ctx->input_sha256);
     ctx->limited = 1;
     (void)raf_context_text_copy(ctx->gaps, (RafU32)sizeof(ctx->gaps), "android_runtime=TOKEN_VAZIO;logcat=TOKEN_VAZIO");
     raf_log(ctx, RAF_TOKEN_VAZIO, "android", "runtime/logcat nao executados nesta rotina host");
@@ -81,8 +81,8 @@ static RafStatus raf_pipe_roundtrip(RafContext *ctx) {
 static RafStatus raf_pipe_apkc_validate(RafContext *ctx) {
     (void)raf_context_text_copy(ctx->input, (RafU32)sizeof(ctx->input), "scripts/apkc_validate.sh");
     if (raf_run_cmd(ctx, "apkc", "sh scripts/apkc_validate.sh", 0) == RAF_FAIL) return RAF_FAIL;
-    if (raf_crc32_file(ctx->input, &ctx->input_crc32) == 0) raf_log(ctx, RAF_HASH, "proof", "input_crc32=%08x", ctx->input_crc32);
-    if (raf_sha256_file(ctx->input, ctx->input_sha256) == 0) raf_log(ctx, RAF_HASH, "proof", "input_sha256=%s", ctx->input_sha256);
+    if (raf_crc32_file(ctx->input, &ctx->input_crc32) == 0) raf_log_hex32(ctx, RAF_HASH, "proof", "input_crc32=", ctx->input_crc32);
+    if (raf_sha256_file(ctx->input, ctx->input_sha256) == 0) raf_log_s(ctx, RAF_HASH, "proof", "input_sha256=", ctx->input_sha256);
     ctx->limited = 1;
     (void)raf_context_text_copy(ctx->gaps, (RafU32)sizeof(ctx->gaps), "apk_generation=TOKEN_VAZIO;apk_runtime=TOKEN_VAZIO");
     raf_log(ctx, RAF_TOKEN_VAZIO, "apkc", "validacao basica passou; geracao/runtime APK exigem evidencia adicional");
@@ -95,8 +95,8 @@ static RafStatus raf_pipe_proof_chain(RafContext *ctx) {
     ctx->limited = 1;
     (void)raf_context_text_copy(ctx->gaps, (RafU32)sizeof(ctx->gaps), "android_device_or_adb=TOKEN_VAZIO;human_audit=AUDIT");
     raf_log(ctx, RAF_AUDIT, "proof", "cadeia full-chain depende de dispositivo/prova humana");
-    if (raf_crc32_file(ctx->input, &ctx->input_crc32) == 0) raf_log(ctx, RAF_HASH, "proof", "input_crc32=%08x", ctx->input_crc32);
-    if (raf_sha256_file(ctx->input, ctx->input_sha256) == 0) raf_log(ctx, RAF_HASH, "proof", "input_sha256=%s", ctx->input_sha256);
+    if (raf_crc32_file(ctx->input, &ctx->input_crc32) == 0) raf_log_hex32(ctx, RAF_HASH, "proof", "input_crc32=", ctx->input_crc32);
+    if (raf_sha256_file(ctx->input, ctx->input_sha256) == 0) raf_log_s(ctx, RAF_HASH, "proof", "input_sha256=", ctx->input_sha256);
     return RAF_PASS_LIMITED;
 }
 
