@@ -15,7 +15,11 @@ static void raf_print_help(void) {
 }
 static void raf_list_pipelines(void) {
     int i;
-    for (i = 0; i < raf_pipeline_count; i++) printf("%-16s %s - %s\n", raf_pipelines[i].id, raf_pipelines[i].title, raf_pipelines[i].description);
+    for (i = 0; i < (int)raf_pipeline_count; i++)
+        printf("%-16s %s - %s\n",
+               raf_pipeline_specs[i].id,
+               raf_pipeline_specs[i].title,
+               raf_pipeline_specs[i].description);
 }
 static void raf_init_context(RafContext *ctx, const char *pipeline) {
     time_t t = time(NULL);
@@ -45,12 +49,19 @@ static void raf_init_context(RafContext *ctx, const char *pipeline) {
 }
 static int raf_execute_pipeline(const char *id) {
     RafContext ctx;
-    RafPipeline *p = raf_find_pipeline(id);
-    if (!p) { fprintf(stderr, "pipeline desconhecido: %s\n", id); return 2; }
+    RafPipelineBinding pipeline = raf_find_pipeline(id);
+    if (pipeline.spec == (const RafPipelineSpec *)0 ||
+        pipeline.run == (RafPipelineRun)0) {
+        fprintf(stderr, "pipeline desconhecido: %s\n", id);
+        return 2;
+    }
     raf_init_context(&ctx, id);
     raf_log(&ctx, RAF_INFO, "rafbbs", "iniciando pipeline %s", id);
-    ctx.final_status = p->run(&ctx);
-    ctx.hash_state = raf_hash_failover_state((uint32_t)(ctx.input_sha256[0] != 0), (uint32_t)(ctx.input_crc32 != 0));
+    ctx.final_status = pipeline.run(&ctx);
+    ctx.hash_state = raf_hash_failover_state(
+        (RafU32)(ctx.input_sha256[0] != 0),
+        (RafU32)(ctx.input_crc32 != 0)
+    );
     if (ctx.failed) ctx.final_status = RAF_FAIL;
     raf_log(&ctx, ctx.final_status == RAF_FAIL ? RAF_FAIL : RAF_DONE, "rafbbs", "pipeline finalizado status=%s", raf_status_name(ctx.final_status));
     if (raf_write_manifest(&ctx) != 0) fprintf(stderr, "manifesto nao gravado\n");
