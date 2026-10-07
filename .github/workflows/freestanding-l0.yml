@@ -50,6 +50,8 @@ jobs:
         run: sh freestanding/tests/verify_contract.sh
       - name: Authorial zero-dependency V1
         run: sh freestanding/tests/verify_authorial_zero_dep.sh
+      - name: Z0 contextless tokenization
+        run: sh freestanding/tests/verify_z0_token.sh
       - name: Freestanding six-ISA compile matrix
         run: sh freestanding/tests/verify_matrix.sh
       - name: Fixed-vector ABI/ISA profiles
