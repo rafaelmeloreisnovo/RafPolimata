@@ -24,6 +24,8 @@ typedef struct {
     RafRollbackRing rollback;
     RafU32 input_crc32;
     RafU32 output_crc32;
+    RafU32 input_crc32_valid;
+    RafU32 input_sha256_valid;
     RafU32 hash_state;
     RafStatus final_status;
     int limited;
