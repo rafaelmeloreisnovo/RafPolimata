@@ -1,27 +1,16 @@
 #ifndef RAFBBS_PIPELINE_H
 #define RAFBBS_PIPELINE_H
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "rafbbs_pipeline_core.h"
 #include "rafbbs_crc32.h"
 #include "rafbbs_manifest.h"
 #include "rafbbs_sha256.h"
 #include "rafbbs_host.h"
 
-typedef struct {
-    const char *id;
-    const char *title;
-    const char *description;
-    int requires_arm;
-    int requires_android;
-    int writes_artifacts;
-    RafStatus (*run)(RafContext *ctx);
-} RafPipeline;
-
 static RafStatus raf_run_cmd(RafContext *ctx, const char *module, const char *cmd, int optional) {
     int rc;
     RafRollbackFrame frame;
-    frame.step = (uint32_t)ctx->syslog_count;
+    frame.step = (RafU32)ctx->syslog_count;
     frame.status = RAF_STEP;
     frame.input_crc32 = ctx->input_crc32;
     frame.output_crc32 = ctx->output_crc32;
@@ -113,8 +102,10 @@ static RafPipeline raf_pipelines[] = {
 static const int raf_pipeline_count = (int)(sizeof(raf_pipelines) / sizeof(raf_pipelines[0]));
 
 static RafPipeline *raf_find_pipeline(const char *id) {
-    int i;
-    for (i = 0; i < raf_pipeline_count; i++) if (strcmp(raf_pipelines[i].id, id) == 0) return &raf_pipelines[i];
-    return NULL;
+    return raf_pipeline_find(
+        raf_pipelines,
+        (RafU32)raf_pipeline_count,
+        id
+    );
 }
 #endif
