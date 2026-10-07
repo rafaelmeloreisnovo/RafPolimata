@@ -65,12 +65,14 @@ Read in this order:
 9. `AUTHORIAL_ZERO_DEPENDENCY_V1.md`;
 10. `GAPS.md` / `gaps.v1.json`;
 11. `VALIDATION.md` / `CODEGEN_RECEIPT.md`.
+12. `../docs/experiments/Z0_CONTEXTLESS_TOKENIZATION_V1.md` for the zero-context byte-observation experiment.
 
 ## Gates
 
 ```text
 verify_contract.sh          -> zero-runtime/source/comment contract
 verify_authorial.sh         -> authorial item descriptor; external deps=0; six OS-neutral objects
+verify_z0_token.sh          -> Z0 ABSENT/EMPTY/NUL/SPACE falsifier + six-ISA zero-helper compile
 verify_matrix.sh            -> six primary scalar OS-neutral objects
 verify_profiles.sh          -> SSE2/AVX2/AVX-512/NEON/Advanced-SIMD codegen
 verify_scalable.sh          -> SVE/RVV predicate/VL codegen
@@ -87,6 +89,7 @@ Canonical implementation entrypoints:
 - `include/raf_fs_authorial.h`;
 - `include/raf_fs_abi.h`;
 - `include/raf_fs_registers.h`;
+- `include/raf_fs_z0_token.h` — zero-context byte observer/tokenizer; no vocabulary/attention/weights/history;
 - `arch/raf_fs_vector.h`;
 - `arch/raf_fs_scalable.h`;
 - `arch/raf_fs_matrix.h`.
