@@ -11,6 +11,7 @@ not included in this claim.
 - rafbbs_freestanding.h
 - rafbbs_core.h
 - rafbbs_context_core.h
+- rafbbs_command_core.h
 - rafbbs_manifest_core.h
 - rafbbs_filepicker_core.h
 - rafbbs_theme.h
@@ -32,6 +33,7 @@ not included in this claim.
 - tests/rafbbs_cli_core_test.c
 - tests/rafbbs_tui_core_test.c
 - tests/rafbbs_context_core_test.c
+- tests/rafbbs_command_core_test.c
 - tests/rafbbs_manifest_bin_core_test.c
 
 ## Gate contract
@@ -48,8 +50,9 @@ freestanding/tests/verify_authorial_zero_dep.sh:
 - renders the text manifest without stdio and fails closed on caller-buffer overflow;
 - checks exact manifest bytes plus invalid elapsed-time representation;
 - keeps POSIX/civil clock acquisition, git/filesystem observation, FILE persistence,
-  terminal input/rendering and pipeline execution in hosted adapters outside
-  the pure set; only caller-supplied observations enter the seeded context core.
+  terminal input/rendering and actual command execution in hosted adapters outside
+  the pure set; only caller-supplied observations enter the seeded context core
+  and only caller-supplied execution outcome enters the command policy core.
 
 `rafbbs_build.sh freestanding` compiles the monotonic-time and text-manifest
 falsifiers with hosted headers disabled and executes the same deterministic
