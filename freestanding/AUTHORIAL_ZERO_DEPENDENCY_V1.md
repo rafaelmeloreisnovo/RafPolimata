@@ -34,20 +34,23 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/rafbbs_core.h` — caller-owned context with no hosted time type;
 - `tools/rafbbs/rafbbs_manifest_core.h` — deterministic text-manifest rendering into caller-owned memory;
 - `tools/rafbbs/rafbbs_filepicker_core.h` — static catalog + bounded selection state with no libc/string dependency;
-- `tools/rafbbs/rafbbs_baremetal.h` — fixed-buffer output and binary manifest;
+- `tools/rafbbs/rafbbs_baremetal.h` — fixed-buffer output and binary manifest value model;
+- `tools/rafbbs/rafbbs_manifest_bin_core.h` — deterministic 96-byte little-endian binary-manifest wire codec;
 - `tools/rafbbs/rafbbs_crc32_core.h` — pure CRC32;
 - `tools/rafbbs/rafbbs_sha256_core.h` — pure SHA-256;
 - `tools/rafbbs/tests/rafbbs_zero_dependency_test.c` — known-vector falsifier;
 - `tools/rafbbs/tests/rafbbs_time_core_test.c` — monotonic arithmetic falsifier;
 - `tools/rafbbs/tests/rafbbs_manifest_core_test.c` — exact-byte, invalid-time and overflow falsifier;
-- `tools/rafbbs/tests/rafbbs_filepicker_core_test.c` — catalog, valid selection and invalid-choice preservation falsifier.
+- `tools/rafbbs/tests/rafbbs_filepicker_core_test.c` — catalog, valid selection and invalid-choice preservation falsifier;
+- `tools/rafbbs/tests/rafbbs_manifest_bin_core_test.c` — binary wire exact-byte/roundtrip/truncation falsifier.
 
 The hosted file wrappers remain deliberately outside the pure core:
 
 - `tools/rafbbs/rafbbs_crc32.h`;
 - `tools/rafbbs/rafbbs_sha256.h`;
 - `tools/rafbbs/rafbbs_time_posix.h`;
-- `tools/rafbbs/rafbbs_manifest.h` — FILE/filesystem persistence only;
+- `tools/rafbbs/rafbbs_manifest.h` — text FILE/filesystem persistence only;
+- `tools/rafbbs/rafbbs_manifest_bin.h` — binary FILE/filesystem persistence only;
 - `tools/rafbbs/rafbbs_filepicker.h` — hosted presentation/printf adapter only;
 - POSIX CLI/log/file adapters.
 
@@ -107,13 +110,13 @@ declared runtime surface has an equivalent source/build/runtime receipt.
 
 `F_ok` = authorial zero-include type/status substrate + pure CRC32/SHA-256 +
 RafBBS context/monotonic-time value layer + deterministic text-manifest renderer
-+ static filepicker catalog/selection core prepared for `-nostdinc` compilation,
++ static filepicker catalog/selection core + fixed 96-byte binary-manifest wire codec prepared for `-nostdinc` compilation,
 with POSIX clock acquisition, filesystem persistence and console presentation
 isolated behind adapters.
 
 `F_gap` = exact-head provider CI for this successor, physical execution and
 repository-wide component migration are not yet evidence-bound.
 
-`F_next` = execute the exact-head zero-dependency + semantic time/manifest
+`F_next` = execute the exact-head zero-dependency + semantic time/text/binary-manifest
 falsifiers, including filepicker catalog/selection; only after PASS select the
 next smallest runtime-bearing cut.
