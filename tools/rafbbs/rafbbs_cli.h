@@ -77,14 +77,14 @@ static int raf_execute_pipeline(const char *id) {
         return 2;
     }
     raf_init_context(&ctx, id);
-    raf_log(&ctx, RAF_INFO, "rafbbs", "iniciando pipeline %s", id);
+    raf_log_s(&ctx, RAF_INFO, "rafbbs", "iniciando pipeline ", id);
     ctx.final_status = pipeline.run(&ctx);
     ctx.hash_state = raf_hash_failover_state(
         (RafU32)(ctx.input_sha256[0] != 0),
         (RafU32)(ctx.input_crc32 != 0)
     );
     if (ctx.failed) ctx.final_status = RAF_FAIL;
-    raf_log(&ctx, ctx.final_status == RAF_FAIL ? RAF_FAIL : RAF_DONE, "rafbbs", "pipeline finalizado status=%s", raf_status_name(ctx.final_status));
+    raf_log_s(&ctx, ctx.final_status == RAF_FAIL ? RAF_FAIL : RAF_DONE, "rafbbs", "pipeline finalizado status=", raf_status_name(ctx.final_status));
     if (raf_write_manifest(&ctx) != 0) fprintf(stderr, "manifesto nao gravado\n");
     if (raf_write_log(&ctx) != 0) fprintf(stderr, "log nao gravado\n");
     printf("manifest=%s\nlog=%s\n", ctx.manifest_path, ctx.log_path);
