@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'freestanding/**'
+      - 'tools/rafbbs/**'
       - 'syscall/**'
       - 'Benchmark/raf_sys.h'
       - 'Benchmark/raf_bench.h'
@@ -18,6 +19,7 @@ on:
     branches: [main]
     paths:
       - 'freestanding/**'
+      - 'tools/rafbbs/**'
       - 'syscall/**'
       - 'Benchmark/raf_sys.h'
       - 'Benchmark/raf_bench.h'
@@ -46,6 +48,8 @@ jobs:
         run: clang --version
       - name: Freestanding source contract
         run: sh freestanding/tests/verify_contract.sh
+      - name: Authorial zero-dependency V1
+        run: sh freestanding/tests/verify_authorial_zero_dep.sh
       - name: Freestanding six-ISA compile matrix
         run: sh freestanding/tests/verify_matrix.sh
       - name: Fixed-vector ABI/ISA profiles
