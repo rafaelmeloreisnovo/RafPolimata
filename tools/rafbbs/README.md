@@ -90,6 +90,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_context_core.h`: seeded context/path initialization with authorial bounded copies and no memset/snprintf/libc;
 - `rafbbs_command_core.h`: deterministic command-outcome policy independent of `system()`/shell/provider execution;
 - `rafbbs_exec_core.h`: finite caller-owned argv specifications for the external pipeline tools; no generic shell grammar or command-string parsing;
+- `rafbbs_runid_core.h`: Gregorian civil validation and deterministic `YYYYMMDD-HHMMSS` rendering with no hosted time/string formatter;
 - `rafbbs_result_core.h`: deterministic final-status/hash-state policy from explicit evidence-validity bits; digest value zero is not a missing-data sentinel;
 - `rafbbs_manifest_core.h`: deterministic text-manifest rendering into a caller-owned fixed buffer;
 - `rafbbs_filepicker_core.h`: static catalog/selection state without hosted string/runtime calls;
@@ -385,3 +386,21 @@ shell interpretation is no longer an implicit runtime dependency or injection
 surface:
 
 `COMMAND_SPEC != PROCESS_EXECUTION != EXTERNAL_TOOL_IMPLEMENTATION`.
+
+
+## Civil run-id rendering freestanding
+
+The byte semantics of `run-YYYYMMDD-HHMMSS` no longer belong to libc
+`strftime`. `rafbbs_runid_core.h` validates the Gregorian civil tuple,
+including month lengths and leap years, and renders exactly
+`YYYYMMDD-HHMMSS` into caller-owned memory.
+
+`rafbbs_runid_posix.h` remains the hosted observation adapter for local civil
+time via `time/localtime_r`. The CLI no longer includes `<time.h>` and no
+longer owns timezone/calendar provider behavior.
+
+Therefore:
+`CIVIL_TIME_OBSERVATION != RUN_ID_BYTE_RENDERING`.
+
+This removes hosted formatting from the core path without changing the current
+local-time meaning of the run id.

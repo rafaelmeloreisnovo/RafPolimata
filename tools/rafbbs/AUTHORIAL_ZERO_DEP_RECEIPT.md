@@ -13,6 +13,7 @@ not included in this claim.
 - rafbbs_context_core.h
 - rafbbs_command_core.h
 - rafbbs_exec_core.h
+- rafbbs_runid_core.h
 - rafbbs_result_core.h
 - rafbbs_manifest_core.h
 - rafbbs_filepicker_core.h
@@ -45,6 +46,7 @@ not included in this claim.
 - tests/rafbbs_context_core_test.c
 - tests/rafbbs_command_core_test.c
 - tests/rafbbs_exec_core_test.c
+- tests/rafbbs_runid_core_test.c
 - tests/rafbbs_result_core_test.c
 - tests/rafbbs_manifest_bin_core_test.c
 
@@ -65,10 +67,11 @@ freestanding/tests/verify_authorial_zero_dep.sh:
 - parses caller-supplied Git HEAD, loose-ref and packed-ref bytes in the pure set; the external `git` executable is no longer needed for RafBBS branch/commit observation;
 - proves that digest value and evidence validity are independent: a CRC32 numeric zero can be valid when its explicit validity bit is set;
 - proves the finite external-command grammar as explicit argv data, with no generic shell command parser in the pure core;
+- proves Gregorian civil validation and exact `YYYYMMDD-HHMMSS` run-id rendering without hosted time formatting;
 - keeps the lexicographically greatest ten log/manifest filenames in a fixed caller-owned catalog and renders them without shell/find/sort/tail;
 - proves persisted run-log header/artifact/gap byte formatting without fprintf,
   snprintf, hosted headers or filesystem access; the adapter only persists already-rendered bytes;
-- keeps POSIX/civil clock acquisition, filesystem observation, FILE persistence,
+- keeps POSIX monotonic/civil observation, filesystem observation, FILE persistence,
   terminal input/rendering and actual POSIX process execution in hosted adapters outside
   the pure set; only caller-supplied observations enter the seeded context core
   and only caller-supplied execution outcome enters the command policy core.

@@ -21,6 +21,7 @@
 - `rafbbs_context_core_test.c`: falsifica seed exato, composição de caminhos, watchdog/zero-state e truncamento sem memset/snprintf/libc.
 - `rafbbs_command_core_test.c`: falsifica ausência de execução, rc=0, falha opcional e falha obrigatória sem shell/provider.
 - `rafbbs_exec_core_test.c`: falsifica a gramática finita de argv explícito para python3/cc/binário/sh/bash, sem parser ou metacaracteres de shell.
+- `rafbbs_runid_core_test.c`: falsifica calendário gregoriano, ano bissexto, limites e bytes exatos `YYYYMMDD-HHMMSS` sem libc/time/strftime.
 - `rafbbs_result_core_test.c`: falsifica validade explícita de SHA/CRC, incluindo CRC32 numérico zero válido, e override FAIL; governado por `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`.
 - `rafbbs_baremetal_test.c`: saída byte-a-byte, manifesto binário, failover de hash e flags de arquitetura.
 - `rafbbs_watchdog_negative_test.c`: garante que watchdog expirado é detectado.
