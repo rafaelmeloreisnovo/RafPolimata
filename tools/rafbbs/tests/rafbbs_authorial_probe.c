@@ -3,6 +3,7 @@
  */
 #include "rafbbs_core.h"
 #include "rafbbs_context_core.h"
+#include "rafbbs_git_core.h"
 #include "rafbbs_baremetal.h"
 #include "rafbbs_crc32_core.h"
 #include "rafbbs_sha256_core.h"
@@ -80,6 +81,7 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafU32 tui_state;
     RafU32 context_state;
     RafU32 command_state;
+    RafU32 git_state;
 
     if (state != (void *)0)
         caller_word = *(const RafU32 *)state;
@@ -219,6 +221,24 @@ RafU32 rafbbs_authorial_probe(void *state)
     pipeline_state ^= rafbbs_authorial_pipeline_specs[pipeline_state].requires_arm ^
                       rafbbs_authorial_pipeline_specs[pipeline_state].writes_artifacts;
     {
+        char git_branch[32];
+        char git_ref[64];
+        char git_oid[16];
+        RafGitHeadParse git_head = raf_git_parse_head(
+            "ref: refs/heads/main\n", 21u,
+            git_branch, (RafU32)sizeof(git_branch),
+            git_ref, (RafU32)sizeof(git_ref),
+            git_oid, (RafU32)sizeof(git_oid)
+        );
+        if (git_head.kind != RAF_GIT_HEAD_SYMBOLIC ||
+            git_head.dropped != 0u ||
+            git_branch[0] != 'm' || git_ref[0] != 'r')
+            return caller_word ^ 0x47495431u;
+        git_state = git_head.kind ^
+                    (RafU32)(unsigned char)git_branch[0] ^
+                    (RafU32)(unsigned char)git_ref[0];
+    }
+    {
         RafCommandDecision command_decision = raf_command_decide(0u, 0, 0u);
         if (command_decision.status != RAF_TOKEN_VAZIO ||
             command_decision.limited == 0u || command_decision.failed != 0u)
@@ -253,7 +273,7 @@ RafU32 rafbbs_authorial_probe(void *state)
            output.pos ^ output.dropped ^ sink_state ^
            manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^
            log_state ^ format_state ^ runlog_state ^ pipeline_state ^ cli_state ^ tui_state ^ context_state ^
-           command_state ^
+           command_state ^ git_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
 }
