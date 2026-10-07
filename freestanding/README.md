@@ -40,6 +40,7 @@ Freestanding gates compile with `unknown-none`, `none-eabi` or `unknown-elf` tar
 - x86 AMX-TILE — direct `TMM0` register primitive with external state/config precondition;
 - AArch64 SME — direct `ZA` register primitive with caller/environment state precondition.
 - IBM z/s390x z13 vector facility — 128-bit one-block copy/select/zero using only `VR16..VR19`, outside the `FPR0..15` overlap region.
+- POWER64 VSX/VMX — 128-bit one-block copy/select/zero pinned to `VR0..VR3` = `VSR32..VSR35`, outside the FPR-overlap view; MMA remains a separate open gap.
 
 `ARM64` and `AArch64` name the same 64-bit Arm execution state here.
 
@@ -49,7 +50,7 @@ Freestanding gates compile with `unknown-none`, `none-eabi` or `unknown-elf` tar
 - LoongArch64: GPR/FP/LSX/LASX/CSR topology;
 - IBM z/s390x: GPR/access/control/FP/vector/PSW topology; executor support is separately build/codegen-gated.
 
-POWER64 and LoongArch64 remain metadata-only today. s390x has a bounded z13 fixed-vector executor; physical runtime remains `TOKEN_VAZIO (CLOSURE_L12)`.
+LoongArch64 remains metadata-only today. POWER64 has a bounded VSX/VMX fixed-vector slice and s390x has a bounded z13 vector executor; physical runtime remains `TOKEN_VAZIO (CLOSURE_L12)`.
 
 ## Maintenance/navigation
 
@@ -75,6 +76,7 @@ verify_authorial.sh         -> authorial item descriptor; external deps=0; six O
 verify_matrix.sh            -> six primary scalar OS-neutral objects
 verify_profiles.sh          -> SSE2/AVX2/AVX-512/NEON/Advanced-SIMD codegen
 verify_s390x_vector.sh      -> z13 VR16..VR19-only fixed-vector codegen; rejects FPR/low-VR overlap
+verify_power_vsx.sh         -> POWER64 VR0..VR3/VSR32..35 fixed-vector codegen; FPR-overlap view excluded
 verify_scalable.sh          -> SVE/RVV predicate/VL codegen
 verify_matrix_accel.sh      -> AMX TMM / SME ZA direct register codegen
 verify_register_metadata.sh -> POWER/LoongArch/s390x topology objects
