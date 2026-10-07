@@ -12,7 +12,10 @@ sh "$ROOT/freestanding/tests/verify_contract.sh"
 
 PURE_FILES="
 tools/rafbbs/rafbbs_types.h
+tools/rafbbs/rafbbs_status.h
+tools/rafbbs/rafbbs_time.h
 tools/rafbbs/rafbbs_freestanding.h
+tools/rafbbs/rafbbs_core.h
 tools/rafbbs/rafbbs_baremetal.h
 tools/rafbbs/rafbbs_crc32_core.h
 tools/rafbbs/rafbbs_sha256_core.h
@@ -81,4 +84,4 @@ compile aarch64-none-elf
 compile riscv32-unknown-elf
 compile riscv64-unknown-elf
 
-echo "RAFAELIA RafBBS authorial zero-dependency gate: 5 pure modules; 6/6 ISA objects; unresolved helpers=0"
+echo "RAFAELIA RafBBS authorial zero-dependency gate: 8 pure modules; monotonic-time core included; 6/6 ISA objects; unresolved helpers=0"
