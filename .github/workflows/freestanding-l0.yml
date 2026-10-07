@@ -48,6 +48,8 @@ jobs:
         run: clang --version
       - name: Freestanding source contract
         run: sh freestanding/tests/verify_contract.sh
+      - name: Z0 presence-token semantics
+        run: sh freestanding/tests/verify_z0_token.sh
       - name: Authorial zero-dependency V1
         run: sh freestanding/tests/verify_authorial_zero_dep.sh
       - name: Freestanding six-ISA compile matrix
