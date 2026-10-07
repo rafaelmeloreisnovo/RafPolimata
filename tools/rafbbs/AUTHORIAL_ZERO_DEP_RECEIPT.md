@@ -12,6 +12,7 @@ not included in this claim.
 - rafbbs_core.h
 - rafbbs_context_core.h
 - rafbbs_command_core.h
+- rafbbs_result_core.h
 - rafbbs_manifest_core.h
 - rafbbs_filepicker_core.h
 - rafbbs_theme.h
@@ -38,6 +39,7 @@ not included in this claim.
 - tests/rafbbs_tui_core_test.c
 - tests/rafbbs_context_core_test.c
 - tests/rafbbs_command_core_test.c
+- tests/rafbbs_result_core_test.c
 - tests/rafbbs_manifest_bin_core_test.c
 
 ## Gate contract
@@ -80,3 +82,5 @@ coverage, semantic equivalence on every target, or claim promotion.
 Unobserved runtime/device state remains TOKEN_VAZIO (CLOSURE_L12).
 Repository-wide migration beyond this named slice remains TOKEN_VAZIO
 (CLOSURE_L11).
+
+Digest numeric zero is not an absence sentinel. Evidence validity is explicit and independently falsified in the pure result core.
