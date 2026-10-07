@@ -30,7 +30,7 @@ Canonical invariant:
 | Vectras `conjunto_de_conceitos` | explicit Rafael clean-room declaration + GPL-2.0-only | copied as source archive |
 | Rafaelia_Private `Ordernar/ra/aether_core.h` | explicit Rafael author + subtree license | copied as source archive |
 | PCR_Rafaelia_Code_seed | mixed Magisk derivative; RAFAELIA additions separately identified | routed to RafGitTools |
-| GaiaPhiRafcode | no indexed file-level rights evidence observed | pointer only / blocked |
+| GaiaPhiRafcode `native/raf_bl0/raf_bl0.c` | path-specific authorial declaration observed in PR #9; license remains `TOKEN_VAZIO` | pointer only / blocked on license |
 | “Rafcodifi” | exact identity unresolved; Rafcodephi SDK is only a plausible candidate | pointer only / blocked |
 
 ## Important technical boundaries
@@ -46,3 +46,17 @@ No build file outside the imported source archive was changed by this federation
 `federation/authorial/` answers **where did this authored source come from?**
 
 It does not answer **what should production use?** Production promotion needs a separate compatibility, dependency, build, test and evidence gate.
+
+## Gaia evidence refinement — 2026-10-07
+
+The earlier broad state “no indexed file-level rights evidence observed” was too coarse. A direct audit of GaiaPhiRafcode PR #9 established a bounded candidate:
+
+- source path: `native/raf_bl0/raf_bl0.c`;
+- source blob: `132f948d199f6679fcae4f33912e0a3ad69691a3`;
+- PR head: `41de864ec7ca47902c6b44e55033e5b0ae412f6c`;
+- merge commit: `3862753e00a8b24e96f8656a7750c7c824887df1`;
+- PR title/body: declares the change authorial and calls it a new authorial reference;
+- file header: repeats the authorial-reference boundary;
+- exact license/permission grant: `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`.
+
+Therefore the correct state is **authorship evidence present, redistribution rights unresolved**. The file is **not copied** into RafPolimata until an exact license or permission is materialized. Repository ownership and PR authorship wording are not treated as a substitute for a license grant.
