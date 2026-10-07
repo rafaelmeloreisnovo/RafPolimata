@@ -96,6 +96,8 @@ int main(void) {
         &receipt,
         0x52414631u,
         4u,
+        ZH_BENCH_SPEED_ISA_COMPUTE,
+        ZH_BENCH_UNIT_CYCLES,
         factors,
         zh_bench_factor_bit(ZH_FACTOR_TURBO_BOOST),
         quality,
@@ -118,6 +120,8 @@ int main(void) {
     rc |= check(
         zh_bench_receipt_decode(&decoded, wire, sizeof(wire)) == 0 &&
         decoded.seed == receipt.seed &&
+        decoded.speed_group == ZH_BENCH_SPEED_ISA_COMPUTE &&
+        decoded.unit == ZH_BENCH_UNIT_CYCLES &&
         decoded.prehot.median == 115u &&
         decoded.hot.median == 95u &&
         decoded.factor_active_mask ==
