@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 / Node 24
         with:
           fetch-depth: 0
 
@@ -295,7 +295,7 @@ jobs:
 
       - name: Upload watt-proxy report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 / Node 24
         with:
           name: watt-proxy-report
           path: ci/reports/watt-proxy.md
@@ -322,7 +322,7 @@ jobs:
 
       - name: Upload TOKEN_VAZIO validation report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 / Node 24
         with:
           name: token-vazio-validation-${{ github.run_id }}
           path: ci/reports/token-vazio-validation.json
@@ -330,7 +330,7 @@ jobs:
 
       - name: Upload APKc proof and HOTFIX artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 / Node 24
         with:
           name: apkc-proofs-and-hotfix-${{ github.run_id }}
           path: |
@@ -341,7 +341,7 @@ jobs:
 
       - name: Upload clean-proof-run snapshots
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 / Node 24
         with:
           name: apkc-proof-runs
           path: Apkc/proofs/runs/
