@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "rafbbs_pipeline.h"
+#include "rafbbs_cli_core.h"
 #include "rafbbs_filepicker.h"
 #include "rafbbs_baremetal.h"
 #include "rafbbs_time_posix.h"
@@ -70,12 +71,32 @@ static int raf_execute_pipeline(const char *id) {
     return ctx.final_status == RAF_FAIL ? 1 : 0;
 }
 static int raf_cli(int argc, char **argv) {
-    if (argc <= 1 || strcmp(argv[1], "--help") == 0) { raf_print_help(); return 0; }
-    if (strcmp(argv[1], "list") == 0) { raf_list_pipelines(); return 0; }
-    if (strcmp(argv[1], "run") == 0 && argc > 2) return raf_execute_pipeline(argv[2]);
-    if (strcmp(argv[1], "logs") == 0) return system("find tools/rafbbs/logs -maxdepth 1 -name 'run-*.txt' -type f | sort | tail -10");
-    if (strcmp(argv[1], "manifest") == 0) return system("find tools/rafbbs/logs -maxdepth 1 -name 'manifest-*.txt' -type f | sort | tail -10");
-    if (strcmp(argv[1], "files") == 0) { RafFilePicker fp; raf_filepicker_init(&fp); raf_filepicker_print(&fp); return 0; }
+    RafCliRoute route = raf_cli_route(
+        argc > 0 ? (RafU32)argc : 0u,
+        (const char *const *)argv
+    );
+
+    if (route.action == RAF_CLI_HELP) {
+        raf_print_help();
+        return 0;
+    }
+    if (route.action == RAF_CLI_LIST) {
+        raf_list_pipelines();
+        return 0;
+    }
+    if (route.action == RAF_CLI_RUN)
+        return raf_execute_pipeline(route.argument);
+    if (route.action == RAF_CLI_LOGS)
+        return system("find tools/rafbbs/logs -maxdepth 1 -name 'run-*.txt' -type f | sort | tail -10");
+    if (route.action == RAF_CLI_MANIFEST)
+        return system("find tools/rafbbs/logs -maxdepth 1 -name 'manifest-*.txt' -type f | sort | tail -10");
+    if (route.action == RAF_CLI_FILES) {
+        RafFilePicker fp;
+        raf_filepicker_init(&fp);
+        raf_filepicker_print(&fp);
+        return 0;
+    }
+
     raf_print_help();
     return 2;
 }

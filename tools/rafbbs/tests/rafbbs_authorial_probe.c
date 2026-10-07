@@ -11,10 +11,14 @@
 #include "rafbbs_theme.h"
 #include "rafbbs_log_core.h"
 #include "rafbbs_pipeline_core.h"
+#include "rafbbs_cli_core.h"
 
 static RafContext rafbbs_authorial_manifest_ctx;
 static char rafbbs_authorial_manifest_buf[128];
 static char rafbbs_authorial_log_buf[64];
+static const char *const rafbbs_authorial_cli_argv[] = {
+    "rafbbs", "run", "arm"
+};
 static const RafPipelineSpec rafbbs_authorial_pipeline_specs[] = {
     {"probe", "Probe", "authorial", 0u, 0u, 0u},
     {"arm", "ARM", "authorial", 1u, 0u, 1u}
@@ -63,6 +67,7 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafU32 theme_state;
     RafU32 log_state;
     RafU32 pipeline_state;
+    RafU32 cli_state;
 
     if (state != (void *)0)
         caller_word = *(const RafU32 *)state;
@@ -152,6 +157,16 @@ RafU32 rafbbs_authorial_probe(void *state)
         return caller_word ^ 0x50495045u;
     pipeline_state ^= rafbbs_authorial_pipeline_specs[pipeline_state].requires_arm ^
                       rafbbs_authorial_pipeline_specs[pipeline_state].writes_artifacts;
+    {
+        RafCliRoute cli_route = raf_cli_route(
+            3u, rafbbs_authorial_cli_argv
+        );
+        if (cli_route.action != RAF_CLI_RUN ||
+            cli_route.argument == (const char *)0)
+            return caller_word ^ 0x434c4931u;
+        cli_state = (RafU32)cli_route.action ^
+                    (RafU32)(unsigned char)cli_route.argument[0];
+    }
 
     return caller_word ^ crc ^ rollback_step ^ watchdog_state ^
            flags_state ^ arch_state ^ time_state ^ status_state ^ arm_state ^
@@ -160,7 +175,7 @@ RafU32 rafbbs_authorial_probe(void *state)
            (RafU32)manifest_wire[0] ^ (RafU32)manifest_wire[95] ^
            output.pos ^ output.dropped ^ sink_state ^
            manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^
-           log_state ^ pipeline_state ^
+           log_state ^ pipeline_state ^ cli_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
 }
