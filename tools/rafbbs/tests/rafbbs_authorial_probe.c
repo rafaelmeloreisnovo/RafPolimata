@@ -8,9 +8,20 @@
 #include "rafbbs_manifest_core.h"
 #include "rafbbs_filepicker_core.h"
 #include "rafbbs_theme.h"
+#include "rafbbs_pipeline_core.h"
 
 static RafContext rafbbs_authorial_manifest_ctx;
 static char rafbbs_authorial_manifest_buf[128];
+
+static RafStatus rafbbs_authorial_pipeline_run(RafContext *ctx)
+{
+    return ctx != (RafContext *)0 ? RAF_PASS : RAF_FAIL;
+}
+
+static RafPipeline rafbbs_authorial_pipelines[] = {
+    {"core", "Core", "authorial pipeline core", 0, 0, 0, rafbbs_authorial_pipeline_run},
+    {"device", "Device", "device-bound hosted adapter", 0, 1, 1, rafbbs_authorial_pipeline_run}
+};
 
 static void rafbbs_authorial_probe_sink(RafU8 byte, void *user)
 {
@@ -51,6 +62,8 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafFilePickerCore picker = raf_filepicker_core_init();
     RafU32 picker_state;
     RafU32 theme_state;
+    RafPipeline *pipeline;
+    RafU32 pipeline_state;
 
     if (state != (void *)0)
         caller_word = *(const RafU32 *)state;
@@ -106,12 +119,16 @@ RafU32 rafbbs_authorial_probe(void *state)
         (RafU32)(unsigned char)raf_status_color(RAF_PASS)[0] ^
         (RafU32)(unsigned char)raf_status_color(RAF_TOKEN_VAZIO)[3] ^
         (RafU32)(unsigned char)raf_status_name(RAF_PASS)[0];
+    pipeline = raf_pipeline_find(rafbbs_authorial_pipelines, 2u, "device");
+    pipeline_state = pipeline != (RafPipeline *)0
+        ? ((RafU32)pipeline->requires_android ^ (RafU32)pipeline->writes_artifacts)
+        : 0xffffffffu;
 
     return caller_word ^ crc ^ rollback_step ^ watchdog_state ^
            flags_state ^ arch_state ^ time_state ^ status_state ^ arm_state ^
            manifest.magic ^ manifest.hash_state ^
            output.pos ^ output.dropped ^ sink_state ^
-           manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^
+           manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^ pipeline_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
 }
