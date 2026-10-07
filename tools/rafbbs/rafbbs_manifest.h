@@ -4,18 +4,45 @@
 #include "rafbbs_core.h"
 #include "rafbbs_log.h"
 #include "rafbbs_manifest_bin.h"
+#include "rafbbs_manifest_core.h"
 
+/*
+ * Hosted persistence adapter.
+ * Deterministic text rendering is owned by rafbbs_manifest_core.h.
+ * FILE/filesystem behavior remains outside the authorial freestanding set.
+ */
 static int raf_write_manifest(RafContext *ctx) {
-    FILE *f = fopen(ctx->manifest_path, "w");
+    char text[RAFBBS_MANIFEST_TEXT_CAP];
+    RafManifestText out;
+    long elapsed = raf_elapsed_ms(ctx);
+    FILE *f;
+
+    raf_manifest_text_init(&out, text, (RafU32)sizeof(text));
+    raf_manifest_render(
+        &out,
+        ctx,
+        elapsed < 0L ? 0ull : (RafU64)elapsed,
+        (RafU32)(elapsed >= 0L)
+    );
+    if (out.dropped != 0u) return -1;
+
+    f = fopen(ctx->manifest_path, "w");
     if (!f) return -1;
-    fprintf(f, "[RAFBBS_MANIFEST]\n");
-    fprintf(f, "pipeline=%s\nstatus=%s\ninput=%s\noutput=%s\narch=%s\nhost=%s\ncommit=%s\nbranch=%s\ncommand=%s\nelapsed_ms=%ld\ninput_crc32=%08x\noutput_crc32=%08x\nhash_state=%08x\ninput_sha256=%s\noutput_sha256=%s\nlog=%s\nbin_manifest=%s\ngaps=%s\n",
-            ctx->pipeline, raf_status_name(ctx->final_status), ctx->input, ctx->output, ctx->arch, ctx->host,
-            ctx->commit, ctx->branch, ctx->command, raf_elapsed_ms(ctx), ctx->input_crc32, ctx->output_crc32, ctx->hash_state, ctx->input_sha256, ctx->output_sha256,
-            ctx->log_path, ctx->bin_manifest_path, ctx->gaps[0] ? ctx->gaps : "none");
+    if (fwrite(text, 1u, (size_t)out.pos, f) != (size_t)out.pos) {
+        fclose(f);
+        return -1;
+    }
     fclose(f);
+
     {
-        RafBinManifest bm = raf_bin_manifest_make((uint32_t)ctx->final_status, 0u, ctx->input_crc32, ctx->output_crc32, ctx->hash_state, (uint32_t)(ctx->gaps[0] != 0));
+        RafBinManifest bm = raf_bin_manifest_make(
+            (RafU32)ctx->final_status,
+            0u,
+            ctx->input_crc32,
+            ctx->output_crc32,
+            ctx->hash_state,
+            (RafU32)(ctx->gaps[0] != 0)
+        );
         (void)raf_write_bin_manifest_file(ctx->bin_manifest_path, &bm);
     }
     return 0;

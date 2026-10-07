@@ -13,8 +13,9 @@ case "${1:-host}" in
     cc $FS_CFLAGS -c tools/rafbbs/tests/rafbbs_baremetal_overflow_test.c -o /tmp/rafbbs_baremetal_overflow_test.o
     cc $FS_CFLAGS -c tools/rafbbs/tests/rafbbs_zero_dependency_test.c -o /tmp/rafbbs_zero_dependency_test.o
     cc $FS_CFLAGS -c tools/rafbbs/tests/rafbbs_time_core_test.c -o /tmp/rafbbs_time_core_test.o
+    cc $FS_CFLAGS -c tools/rafbbs/tests/rafbbs_manifest_core_test.c -o /tmp/rafbbs_manifest_core_test.o
 
-    for obj in       /tmp/rafbbs_freestanding_core_test.o       /tmp/rafbbs_baremetal_test.o       /tmp/rafbbs_baremetal_overflow_test.o       /tmp/rafbbs_zero_dependency_test.o       /tmp/rafbbs_time_core_test.o
+    for obj in       /tmp/rafbbs_freestanding_core_test.o       /tmp/rafbbs_baremetal_test.o       /tmp/rafbbs_baremetal_overflow_test.o       /tmp/rafbbs_zero_dependency_test.o       /tmp/rafbbs_time_core_test.o       /tmp/rafbbs_manifest_core_test.o
     do
       if nm -u "$obj" | grep -q .; then
         echo "FAIL: unresolved helper in $obj" >&2
@@ -26,6 +27,10 @@ case "${1:-host}" in
     cc -std=c11 -Wall -Wextra -Werror -DRAFBBS_TIME_TEST_MAIN -I tools/rafbbs \
       tools/rafbbs/tests/rafbbs_time_core_test.c -o /tmp/rafbbs_time_core_test
     /tmp/rafbbs_time_core_test
+
+    cc -std=c11 -Wall -Wextra -Werror -DRAFBBS_MANIFEST_TEST_MAIN -I tools/rafbbs \
+      tools/rafbbs/tests/rafbbs_manifest_core_test.c -o /tmp/rafbbs_manifest_core_test
+    /tmp/rafbbs_manifest_core_test
     ;;
 
   commandless)

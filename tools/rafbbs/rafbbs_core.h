@@ -32,7 +32,7 @@ typedef struct {
     RafMonoTime start;
 } RafContext;
 
-static int raf_is_arm_host(void) {
+static inline int raf_is_arm_host(void) {
 #if defined(__aarch64__) || defined(__arm__)
     return 1;
 #else
