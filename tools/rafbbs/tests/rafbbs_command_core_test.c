@@ -1,3 +1,7 @@
+/* Governance: CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.
+ * RAF_TOKEN_VAZIO is status vocabulary in this bounded core/test,
+ * not a claim promotion or evidence substitute.
+ */
 #include "rafbbs_command_core.h"
 
 int rafbbs_command_core_test(void)
