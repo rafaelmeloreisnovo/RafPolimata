@@ -20,6 +20,7 @@ Governance:
 | ARMv7-A NEON one-block executor | IMPLEMENTED + BUILD/CODEGEN_PROVEN | NEON D/Q path; no unresolved helper/call/stack in probe |
 | AArch64 Advanced SIMD one-block executor | IMPLEMENTED + BUILD/CODEGEN_PROVEN | Q/V path; no unresolved helper/call/stack in probe |
 | IBM z/s390x z13 vector one-block executor | IMPLEMENTED + BUILD/CODEGEN_PROVEN | VR16..VR19-only `vl/vst/vzero/vsel`; no unresolved helper/call/stack; low VR/FPR overlap rejected |
+| POWER64 VSX/VMX fixed-vector one-block slice | IMPLEMENTED + BUILD/CODEGEN_PROVEN | VR0..VR3 = VSR32..35; fixed-vector copy/select/zero; FPR-overlap view avoided |
 | AArch64 SVE one-stage predicated executor | IMPLEMENTED + BUILD/CODEGEN_PROVEN | `whilelo`/P0/Z0 path; explicit consumed lanes |
 | RV32/RV64 V one-stage VL executor | IMPLEMENTED + BUILD/CODEGEN_PROVEN | `vsetvli`/v0 path; explicit consumed lanes |
 | x86 AMX direct TMM register primitive | IMPLEMENTED + BUILD/CODEGEN_PROVEN | `tilezero TMM0`; external tile-state/configuration precondition |
