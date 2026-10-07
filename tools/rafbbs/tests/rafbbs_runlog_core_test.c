@@ -74,10 +74,10 @@ int rafbbs_runlog_core_test(void)
             "output_sha256=bb\n"
             "hash_state=10203040\n"
             "\n[GAPS]\n"
-            "none=TOKEN_VAZIO\n"
+            "none=TOKEN_VAZIO\n" /* CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY */
         )) return 4;
 
-    raf_runlog_test_copy(ctx.gaps, (RafU32)sizeof(ctx.gaps), "device=TOKEN_VAZIO");
+    raf_runlog_test_copy(ctx.gaps, (RafU32)sizeof(ctx.gaps), "device=TOKEN_VAZIO" /* CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE */);
     raf_log_text_init(&out, tail, (RafU32)sizeof(tail));
     raf_runlog_tail_render(&out, &ctx);
     if (out.dropped != 0u) return 5;
