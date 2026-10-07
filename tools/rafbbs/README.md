@@ -88,7 +88,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_crc32_core.h` and `rafbbs_sha256_core.h`: pure algorithms;
 - `rafbbs_crc32.h` and `rafbbs_sha256.h`: hosted file adapters only.
 
-The freestanding build uses `-nostdinc -ffreestanding -fno-builtin -fno-stack-protector` and rejects unresolved symbols in the declared pure objects. A compiler, `nm`, shell or CI runner is a factory/evidence tool for this gate, not a runtime dependency of those objects. Full toolchain self-hosting and physical bare-metal execution remain `TOKEN_VAZIO` until separately evidenced.
+The freestanding build uses `-nostdinc -ffreestanding -fno-builtin -fno-stack-protector` and rejects unresolved symbols in the declared pure objects. A compiler, `nm`, shell or CI runner is a factory/evidence tool for this gate, not a runtime dependency of those objects. Full toolchain self-hosting remains `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`. Physical bare-metal execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)` until separately evidenced.
 
 Run:
 
