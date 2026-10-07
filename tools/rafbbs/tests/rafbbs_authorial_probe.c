@@ -208,7 +208,7 @@ RafU32 rafbbs_authorial_probe(void *state)
         if (runlog_text.dropped != 0u)
             return caller_word ^ 0x52554e31u;
         runlog_state = runlog_text.pos ^
-                       raf_runlog_cstr_len(rafbbs_authorial_runlog_buf) ^
+                       raf_format_cstr_len(rafbbs_authorial_runlog_buf) ^
                        (RafU32)(unsigned char)rafbbs_authorial_runlog_buf[0];
     }
     pipeline_state = raf_pipeline_find_index(
