@@ -13,6 +13,7 @@
 - `rafbbs_log_core_test.c`: falsifica linha exata, tempo inválido, minutos >99 e overflow; o divmod 64-bit autoral evita helper externo em alvos 32-bit.
 - `rafbbs_pipeline_core_test.c`: falsifica igualdade exata/case-sensitive, flags, lookup por índice e not-found; nenhum callback/handler no core.
 - `rafbbs_cli_core_test.c`: falsifica HELP/LIST/RUN/INVALID, argumento de RUN e comparação case-sensitive; zero terminal/libc no core.
+- `rafbbs_tui_core_test.c`: falsifica QUIT/LIST/FILES, rotas 1/2/3 e default/tecla desconhecida preservando ids exatos; zero stdio/terminal no core.
 - `rafbbs_baremetal_test.c`: saída byte-a-byte, manifesto binário, failover de hash e flags de arquitetura.
 - `rafbbs_watchdog_negative_test.c`: garante que watchdog expirado é detectado.
 - `rafbbs_baremetal_overflow_test.c`: valida saturação do buffer fixo e contador `dropped`.
