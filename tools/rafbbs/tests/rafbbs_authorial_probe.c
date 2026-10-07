@@ -1,4 +1,4 @@
-#include "rafbbs_freestanding.h"
+#include "rafbbs_core.h"
 #include "rafbbs_baremetal.h"
 #include "rafbbs_crc32_core.h"
 #include "rafbbs_sha256_core.h"
@@ -21,6 +21,9 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafU32 flags_state;
     RafU32 arch_state;
     RafU32 hash_state;
+    RafU32 time_state;
+    RafU32 status_state;
+    RafU32 arm_state;
     RafSha256 sha;
     RafU8 digest[32];
     char hex[65];
@@ -32,6 +35,9 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafBaremetalPort port;
     RafBinManifest manifest;
     RafArchFlags arch;
+    RafMonoTime mono_start = raf_mono_from_ns(1000000000ull);
+    RafMonoTime mono_end = raf_mono_from_ns(2500000000ull);
+    RafMonoElapsed mono_elapsed = raf_mono_elapsed_ms(mono_start, mono_end);
 
     if (state != (void *)0)
         caller_word = *(const RafU32 *)state;
@@ -64,9 +70,14 @@ RafU32 rafbbs_authorial_probe(void *state)
     watchdog_state = raf_watchdog_step(&watchdog);
     flags_state = flags.no_heap ^ flags.no_gc ^ flags.syscall_free_hint;
     arch_state = arch.no_heap ^ arch.no_syscall ^ arch.simd;
+    time_state = (RafU32)mono_elapsed.ms ^ mono_elapsed.valid ^
+                 (RafU32)sizeof(RafContext);
+    status_state = (RafU32)(unsigned char)raf_status_name(RAF_PASS)[0];
+    arm_state = (RafU32)raf_is_arm_host();
 
     return caller_word ^ crc ^ rollback_step ^ watchdog_state ^
-           flags_state ^ arch_state ^ manifest.magic ^ manifest.hash_state ^
+           flags_state ^ arch_state ^ time_state ^ status_state ^ arm_state ^
+           manifest.magic ^ manifest.hash_state ^
            output.pos ^ output.dropped ^ sink_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];

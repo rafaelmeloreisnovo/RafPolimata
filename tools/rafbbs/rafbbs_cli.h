@@ -2,11 +2,13 @@
 #define RAFBBS_CLI_H
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "rafbbs_pipeline.h"
 #include "rafbbs_filepicker.h"
 #include "rafbbs_baremetal.h"
+#include "rafbbs_time_posix.h"
 
 static void raf_print_help(void) {
     puts("RafBBS Operator Console\nuso:\n  rafbbs              abre menu BBS\n  rafbbs --help       mostra ajuda\n  rafbbs list         lista pipelines\n  rafbbs run <id>     executa pipeline\n  rafbbs logs         mostra logs recentes\n  rafbbs manifest     mostra manifestos recentes\n  rafbbs files        mostra entradas conhecidas");
@@ -19,7 +21,7 @@ static void raf_init_context(RafContext *ctx, const char *pipeline) {
     time_t t = time(NULL);
     struct tm tmv;
     memset(ctx, 0, sizeof(*ctx));
-    clock_gettime(CLOCK_MONOTONIC, &ctx->start);
+    ctx->start = raf_mono_posix_now();
     localtime_r(&t, &tmv);
     strftime(ctx->run_id, sizeof(ctx->run_id), "%Y%m%d-%H%M%S", &tmv);
     mkdir("tools/rafbbs/logs", 0777);

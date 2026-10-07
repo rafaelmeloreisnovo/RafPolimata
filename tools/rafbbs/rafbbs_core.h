@@ -1,8 +1,8 @@
 #ifndef RAFBBS_CORE_H
 #define RAFBBS_CORE_H
-#include <time.h>
 #include "rafbbs_status.h"
 #include "rafbbs_freestanding.h"
+#include "rafbbs_time.h"
 
 typedef struct {
     char run_id[32];
@@ -29,7 +29,7 @@ typedef struct {
     int limited;
     int failed;
     int syslog_count;
-    struct timespec start;
+    RafMonoTime start;
 } RafContext;
 
 static int raf_is_arm_host(void) {
