@@ -17,7 +17,7 @@
 
 #define RAF_FS_AUTHORIAL_PROVIDER_RAFA      0x52414641u
 #define RAF_FS_AUTHORIAL_SOURCE_ELIA        0x454c4941u
-#define RAF_FS_AUTHORIAL_TOKEN_VAZIO        0xa0f10d2du
+#define RAF_FS_AUTHORIAL_TOKEN_VAZIO        0xa0f10d2du /* CLOSURE_L12 */
 #define RAF_FS_AUTHORIAL_EXTERNAL_DEPS_NONE 0u
 
 #define RAF_FS_AUTHORIAL_INLINE static __inline__ __attribute__((__always_inline__, __unused__))
@@ -38,7 +38,7 @@ typedef struct raf_fs_authorial_item {
 
 RAF_FS_AUTHORIAL_INLINE raf_u32 raf_fs_authorial_select_nonzero(raf_u32 value) {
     raf_u32 empty_mask = (raf_u32)0u - (raf_u32)(value == 0u);
-    return (value & ~empty_mask) | (RAF_FS_AUTHORIAL_TOKEN_VAZIO & empty_mask);
+    return (value & ~empty_mask) | ((raf_u32)(RAF_FS_AUTHORIAL_TOKEN_VAZIO /* CLOSURE_L12 */) & empty_mask);
 }
 
 RAF_FS_AUTHORIAL_INLINE raf_u32 raf_fs_authorial_rotl32(raf_u32 value, raf_u32 shift) {
