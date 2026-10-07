@@ -10,7 +10,7 @@ Before editing L0:
 
 1. repository `AGENTS.md` and `docs/AGENTES.md`;
 2. this file;
-3. `README.md`, `ARCH_CONTRACT.md`, `ABI_CONTRACT.md`, `REGISTER_TOPOLOGY.md`;
+3. `README.md`, `ARCH_CONTRACT.md`, `ABI_CONTRACT.md`, `REGISTER_TOPOLOGY.md`, `AUTHORIAL_ZERO_DEPENDENCY_V1.md`;
 4. `FLAGS.md`, `NO_SHADOW_NO_TAIL.md`, `COMMENT_CONTRACT.md`, `STUB_POLICY.md`, `GAPS.md`;
 5. the tests/gates under `freestanding/tests/`.
 
@@ -82,6 +82,7 @@ For a source change, run when applicable:
 
 ```sh
 sh freestanding/tests/verify_contract.sh
+sh freestanding/tests/verify_authorial_zero_dep.sh
 sh freestanding/tests/verify_matrix.sh
 sh freestanding/tests/verify_profiles.sh
 sh freestanding/tests/verify_scalable.sh

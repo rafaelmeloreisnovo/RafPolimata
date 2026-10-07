@@ -78,6 +78,24 @@ O executável POSIX continua existindo apenas como adaptador operacional para ch
 
 `rafbbs files` e a opção `F` na TUI mostram entradas conhecidas em tabela estática, sem varredura dinâmica nem heap. A fase seguinte pode trocar essa lista por uma tabela gerada em build-time.
 
+## Authorial zero-dependency V1
+
+The pure RafBBS slice is now structurally separated from hosted I/O:
+
+- `rafbbs_types.h`: zero-include authorial scalar types;
+- `rafbbs_freestanding.h`: watchdog/rollback/flags;
+- `rafbbs_baremetal.h`: fixed-buffer output and binary manifest;
+- `rafbbs_crc32_core.h` and `rafbbs_sha256_core.h`: pure algorithms;
+- `rafbbs_crc32.h` and `rafbbs_sha256.h`: hosted file adapters only.
+
+The freestanding build uses `-nostdinc -ffreestanding -fno-builtin -fno-stack-protector` and rejects unresolved symbols in the declared pure objects. A compiler, `nm`, shell or CI runner is a factory/evidence tool for this gate, not a runtime dependency of those objects. Full toolchain self-hosting remains `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`. Physical bare-metal execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)` until separately evidenced.
+
+Run:
+
+```sh
+sh freestanding/tests/verify_authorial_zero_dep.sh
+```
+
 ## SHA256 autoral
 
 Além de CRC32, o RafBBS calcula SHA256 por implementação local sem dependência externa para entradas conhecidas. SHA256 não remove `TOKEN_VAZIO`: ele só assina evidência existente.

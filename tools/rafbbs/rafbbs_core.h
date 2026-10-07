@@ -1,6 +1,5 @@
 #ifndef RAFBBS_CORE_H
 #define RAFBBS_CORE_H
-#include <stdint.h>
 #include <time.h>
 #include "rafbbs_status.h"
 #include "rafbbs_freestanding.h"
@@ -23,9 +22,9 @@ typedef struct {
     char output_sha256[65];
     RafWatchdog watchdog;
     RafRollbackRing rollback;
-    uint32_t input_crc32;
-    uint32_t output_crc32;
-    uint32_t hash_state;
+    RafU32 input_crc32;
+    RafU32 output_crc32;
+    RafU32 hash_state;
     RafStatus final_status;
     int limited;
     int failed;
