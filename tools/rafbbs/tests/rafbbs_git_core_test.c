@@ -11,7 +11,7 @@ static int raf_streq(const char *a, const char *b)
     return a[i] == b[i];
 }
 
-static int rafbbs_git_core_test(void)
+int rafbbs_git_core_test(void)
 {
     char branch[64];
     char ref_path[128];
