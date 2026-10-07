@@ -19,6 +19,7 @@ tools/rafbbs/rafbbs_core.h
 tools/rafbbs/rafbbs_manifest_core.h
 tools/rafbbs/rafbbs_filepicker_core.h
 tools/rafbbs/rafbbs_baremetal.h
+tools/rafbbs/rafbbs_manifest_bin_core.h
 tools/rafbbs/rafbbs_crc32_core.h
 tools/rafbbs/rafbbs_sha256_core.h
 "
@@ -86,4 +87,4 @@ compile aarch64-none-elf
 compile riscv32-unknown-elf
 compile riscv64-unknown-elf
 
-echo "RAFAELIA RafBBS authorial zero-dependency gate: 10 pure modules; monotonic-time + manifest + filepicker cores included; 6/6 ISA objects; unresolved helpers=0"
+echo "RAFAELIA RafBBS authorial zero-dependency gate: 11 pure modules; time + text/binary manifest + filepicker cores included; 6/6 ISA objects; unresolved helpers=0"
