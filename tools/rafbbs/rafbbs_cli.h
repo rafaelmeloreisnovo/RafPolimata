@@ -1,7 +1,6 @@
 #ifndef RAFBBS_CLI_H
 #define RAFBBS_CLI_H
 #include <stdio.h>
-#include <string.h>
 #include <time.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -10,6 +9,7 @@
 #include "rafbbs_filepicker.h"
 #include "rafbbs_baremetal.h"
 #include "rafbbs_time_posix.h"
+#include "rafbbs_context_core.h"
 
 static void raf_print_help(void) {
     puts("RafBBS Operator Console\nuso:\n  rafbbs              abre menu BBS\n  rafbbs --help       mostra ajuda\n  rafbbs list         lista pipelines\n  rafbbs run <id>     executa pipeline\n  rafbbs logs         mostra logs recentes\n  rafbbs manifest     mostra manifestos recentes\n  rafbbs files        mostra entradas conhecidas");
@@ -22,31 +22,51 @@ static void raf_list_pipelines(void) {
                raf_pipeline_specs[i].title,
                raf_pipeline_specs[i].description);
 }
+static void raf_host_trim_eol(char *text) {
+    RafU32 i = 0u;
+    while (text[i] != 0) {
+        if (text[i] == '\n' || text[i] == '\r') {
+            text[i] = 0;
+            return;
+        }
+        ++i;
+    }
+}
 static void raf_init_context(RafContext *ctx, const char *pipeline) {
     time_t t = time(NULL);
     struct tm tmv;
-    memset(ctx, 0, sizeof(*ctx));
-    ctx->start = raf_mono_posix_now();
+    RafMonoTime mono_start = raf_mono_posix_now();
+    char run_id[32] = {0};
+    char branch[128] = {0};
+    char commit[128] = {0};
+    const char *arch;
+    RafContextSeed seed;
+
     localtime_r(&t, &tmv);
-    strftime(ctx->run_id, sizeof(ctx->run_id), "%Y%m%d-%H%M%S", &tmv);
-    mkdir("tools/rafbbs/logs", 0777);
-    snprintf(ctx->log_path, sizeof(ctx->log_path), "tools/rafbbs/logs/run-%s.txt", ctx->run_id);
-    snprintf(ctx->manifest_path, sizeof(ctx->manifest_path), "tools/rafbbs/logs/manifest-%s.txt", ctx->run_id);
-    snprintf(ctx->bin_manifest_path, sizeof(ctx->bin_manifest_path), "tools/rafbbs/logs/manifest-%s.bin", ctx->run_id);
-    snprintf(ctx->pipeline, sizeof(ctx->pipeline), "%s", pipeline);
-    ctx->watchdog = raf_watchdog_start(RAFBBS_WATCHDOG_DEFAULT_TICKS);
-    snprintf(ctx->host, sizeof(ctx->host), "posix");
+    (void)strftime(run_id, sizeof(run_id), "%Y%m%d-%H%M%S", &tmv);
 #if defined(__x86_64__)
-    snprintf(ctx->arch, sizeof(ctx->arch), "x86_64");
+    arch = "x86_64";
 #elif defined(__aarch64__)
-    snprintf(ctx->arch, sizeof(ctx->arch), "aarch64");
+    arch = "aarch64";
 #else
-    snprintf(ctx->arch, sizeof(ctx->arch), "unknown");
+    arch = "unknown";
 #endif
     (void)system("git rev-parse --abbrev-ref HEAD > /tmp/rafbbs_branch.txt 2>/dev/null");
     (void)system("git rev-parse --short HEAD > /tmp/rafbbs_commit.txt 2>/dev/null");
-    { FILE *f = fopen("/tmp/rafbbs_branch.txt", "r"); if (f) { (void)fgets(ctx->branch, sizeof(ctx->branch), f); ctx->branch[strcspn(ctx->branch, "\n")] = 0; fclose(f); } }
-    { FILE *f = fopen("/tmp/rafbbs_commit.txt", "r"); if (f) { (void)fgets(ctx->commit, sizeof(ctx->commit), f); ctx->commit[strcspn(ctx->commit, "\n")] = 0; fclose(f); } }
+    { FILE *f = fopen("/tmp/rafbbs_branch.txt", "r"); if (f) { (void)fgets(branch, sizeof(branch), f); fclose(f); } }
+    { FILE *f = fopen("/tmp/rafbbs_commit.txt", "r"); if (f) { (void)fgets(commit, sizeof(commit), f); fclose(f); } }
+    raf_host_trim_eol(branch);
+    raf_host_trim_eol(commit);
+    (void)mkdir("tools/rafbbs/logs", 0777);
+
+    seed.run_id = run_id;
+    seed.pipeline = pipeline;
+    seed.host = "posix";
+    seed.arch = arch;
+    seed.branch = branch;
+    seed.commit = commit;
+    seed.start = mono_start;
+    (void)raf_context_init_seeded(ctx, &seed);
 }
 static int raf_execute_pipeline(const char *id) {
     RafContext ctx;

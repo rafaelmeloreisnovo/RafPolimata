@@ -2,6 +2,7 @@
  * RAF_TOKEN_VAZIO below is status vocabulary under test, not a promoted claim.
  */
 #include "rafbbs_core.h"
+#include "rafbbs_context_core.h"
 #include "rafbbs_baremetal.h"
 #include "rafbbs_crc32_core.h"
 #include "rafbbs_sha256_core.h"
@@ -70,6 +71,7 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafU32 pipeline_state;
     RafU32 cli_state;
     RafU32 tui_state;
+    RafU32 context_state;
 
     if (state != (void *)0)
         caller_word = *(const RafU32 *)state;
@@ -111,6 +113,21 @@ RafU32 rafbbs_authorial_probe(void *state)
         ) != 0)
         return caller_word ^ 0x42494e32u;
     arch = raf_arch_flags(RAF_ARCH_ARM64);
+    {
+        RafContextSeed context_seed;
+        context_seed.run_id = "probe";
+        context_seed.pipeline = "arm";
+        context_seed.host = "authorial";
+        context_seed.arch = "arm64";
+        context_seed.branch = "";
+        context_seed.commit = "";
+        context_seed.start = mono_start;
+        context_state = raf_context_init_seeded(
+            &rafbbs_authorial_manifest_ctx, &context_seed
+        );
+        context_state ^= (RafU32)(unsigned char)
+            rafbbs_authorial_manifest_ctx.log_path[0];
+    }
     raf_manifest_text_init(
         &manifest_text,
         rafbbs_authorial_manifest_buf,
@@ -185,7 +202,7 @@ RafU32 rafbbs_authorial_probe(void *state)
            (RafU32)manifest_wire[0] ^ (RafU32)manifest_wire[95] ^
            output.pos ^ output.dropped ^ sink_state ^
            manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^
-           log_state ^ pipeline_state ^ cli_state ^ tui_state ^
+           log_state ^ pipeline_state ^ cli_state ^ tui_state ^ context_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
 }
