@@ -2,7 +2,7 @@
 
 Status: `IMPLEMENTED_SOURCE / EXECUTION_PENDING_PROVIDER`  
 Authority: `RafPolimata` producer repository  
-Claim ceiling: source/build boundary only; physical execution remains `TOKEN_VAZIO`.
+Claim ceiling: source/build boundary only; physical execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.
 
 ## Intent
 
@@ -51,7 +51,7 @@ allocator / heap / GC        = 0
 syscall / OS ABI             = 0
 provider SDK at runtime      = 0
 caller-owned state/buffers   = required
-unobserved execution         = TOKEN_VAZIO
+unobserved execution         = TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)
 ```
 
 The build probe uses `-nostdinc -ffreestanding -fno-builtin`. Passing that
@@ -71,12 +71,12 @@ CLASSIFY
 → add a falsifier
 → compile with hosted headers disabled
 → inspect unresolved helpers
-→ preserve TOKEN_VAZIO for unexecuted targets
+→ preserve TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE) for unexecuted targets
 ```
 
 If a replacement would reduce correctness, security, interoperability or
 auditability, do not silently rewrite it. Record that item as
-`TOKEN_VAZIO / EXTERNAL_BOUNDARY_REQUIRES_AUTHORITY` and keep the boundary
+`TOKEN_VAZIO / EXTERNAL_BOUNDARY_REQUIRES_AUTHORITY (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)` and keep the boundary
 explicit.
 
 ## Evidence rule
