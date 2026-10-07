@@ -89,6 +89,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_core.h`: caller-owned RafContext using `RafMonoTime`, not `struct timespec`;
 - `rafbbs_context_core.h`: seeded context/path initialization with authorial bounded copies and no memset/snprintf/libc;
 - `rafbbs_command_core.h`: deterministic command-outcome policy independent of `system()`/shell/provider execution;
+- `rafbbs_exec_core.h`: finite caller-owned argv specifications for the external pipeline tools; no generic shell grammar or command-string parsing;
 - `rafbbs_result_core.h`: deterministic final-status/hash-state policy from explicit evidence-validity bits; digest value zero is not a missing-data sentinel;
 - `rafbbs_manifest_core.h`: deterministic text-manifest rendering into a caller-owned fixed buffer;
 - `rafbbs_filepicker_core.h`: static catalog/selection state without hosted string/runtime calls;
@@ -365,3 +366,22 @@ Filesystem hashing remains a hosted adapter. The pure result core receives only
 caller-supplied facts and is compiled under the same six-ISA no-undefined-symbol
 gate. Runtime/device evidence remains governed by
 `CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE`.
+
+
+## Explicit argv executor boundary
+
+The generic `system(command_string)` boundary has been removed from RafBBS
+pipeline execution. The finite command grammar is now represented by
+`rafbbs_exec_core.h` as typed IDs plus caller-owned argv vectors.
+
+The hosted adapter in `rafbbs_host.h` performs only the POSIX process boundary:
+`fork -> execvp -> waitpid`. The ARM encoder compound command was decomposed
+into compile and execute steps, so execution occurs only after successful
+compilation without relying on shell `&&` semantics.
+
+This does not promote `python3`, `cc`, `sh` or `bash` to freestanding.
+They remain explicit external tools used by hosted pipelines. The gain is that
+shell interpretation is no longer an implicit runtime dependency or injection
+surface:
+
+`COMMAND_SPEC != PROCESS_EXECUTION != EXTERNAL_TOOL_IMPLEMENTATION`.
