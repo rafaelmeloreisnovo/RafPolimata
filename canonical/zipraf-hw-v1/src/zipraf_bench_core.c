@@ -51,8 +51,10 @@ zh_u32 zh_bench_factor_state(zh_u32 observed_mask,
                              zh_u32 active_mask,
                              zh_u32 factor_id) {
     zh_u32 bit = zh_bench_factor_bit(factor_id);
-    if (bit == 0u || (observed_mask & bit) == 0u) return ZH_TOKEN_VAZIO;
-    return (active_mask & bit) != 0u ? ZH_PASS : ZH_FAIL;
+    if (bit == 0u || (observed_mask & bit) == 0u)
+        return ZH_BENCH_FACTOR_UNKNOWN;
+    return (active_mask & bit) != 0u ?
+        ZH_BENCH_FACTOR_ACTIVE : ZH_BENCH_FACTOR_INACTIVE;
 }
 
 zh_u32 zh_bench_order_index(zh_u32 seed,
