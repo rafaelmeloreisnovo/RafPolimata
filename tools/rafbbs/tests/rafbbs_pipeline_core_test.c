@@ -3,7 +3,7 @@
 static RafStatus rafbbs_pipeline_test_run(RafContext *ctx)
 {
     if (ctx == (RafContext *)0)
-        return RAF_TOKEN_VAZIO;
+        return RAF_FAIL;
     ctx->final_status = RAF_PASS;
     return RAF_PASS;
 }
@@ -40,6 +40,8 @@ int rafbbs_pipeline_core_test(void)
         return 9;
     if (raf_pipeline_find(rafbbs_pipeline_test_items, 2u, (const char *)0) != (RafPipeline *)0)
         return 10;
+    if (raf_status_name(RAF_PASS)[0] != 'P')
+        return 11;
 
     return 0;
 }
