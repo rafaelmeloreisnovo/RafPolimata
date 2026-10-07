@@ -37,7 +37,7 @@ Governance:
 | L0-GAP-005 | AMX operational tile data path beyond direct TMM0 zero (`tileloadd`/compute/`tilestored`) | `TOKEN_VAZIO (CLOSURE_L11)` | caller-owned tile config + bounded tile memory + codegen/equivalence gate |
 | L0-GAP-007 | POWER64 VSX/MMA executor profile | `TOKEN_VAZIO (CLOSURE_L11)` | VSX/MMA instruction path + no-helper/no-tail codegen gate |
 | L0-GAP-008 | LoongArch64 LSX/LASX executor profile | `TOKEN_VAZIO (CLOSURE_L11)` | LSX/LASX instruction path + alias-safe codegen gate |
-| L0-GAP-009 | IBM z/s390x vector executor profile | `TOKEN_VAZIO (CLOSURE_L11)` | vector-facility profile + FPR/VR overlap-safe codegen gate |
+| L0-GAP-009 | IBM z/s390x vector executor profile | `IMPLEMENTED_UNTESTED_CI (CLOSURE_L11)` | exact-head `verify_s390x_vector.sh` PASS + provider Freestanding L0 receipt |
 | L0-GAP-010 | Qualcomm Hexagon/HVX register topology and executor | `TOKEN_VAZIO (CLOSURE_L11)` | available target toolchain + topology then executor gate |
 | L0-GAP-011 | ARM M-profile MVE/Helium register topology and executor | `TOKEN_VAZIO (CLOSURE_L11)` | explicit M-profile target + MVE instruction/codegen gate |
 | L0-GAP-012 | x86 APX `R16..R31` explicit profile | `TOKEN_VAZIO (CLOSURE_L11)` | assembler/compiler APX profile + register-allocation/codegen gate |
