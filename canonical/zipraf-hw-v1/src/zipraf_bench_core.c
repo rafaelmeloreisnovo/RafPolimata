@@ -118,6 +118,8 @@ zh_u32 zh_bench_compare(const struct zh_bench_stats *prehot,
 void zh_bench_receipt_init(struct zh_bench_receipt_v1 *out,
                            zh_u32 seed,
                            zh_u32 variant_count,
+                           zh_u32 speed_group,
+                           zh_u32 unit,
                            zh_u32 factor_observed_mask,
                            zh_u32 factor_active_mask,
                            zh_u32 quality_observed_mask,
@@ -127,6 +129,8 @@ void zh_bench_receipt_init(struct zh_bench_receipt_v1 *out,
     if (!out) return;
     out->seed = seed;
     out->variant_count = variant_count;
+    out->speed_group = speed_group;
+    out->unit = unit;
     out->factor_observed_mask = factor_observed_mask;
     out->factor_active_mask = factor_active_mask & factor_observed_mask;
     out->quality_observed_mask = quality_observed_mask;
@@ -212,18 +216,20 @@ zh_i32 zh_bench_receipt_encode(const struct zh_bench_receipt_v1 *r,
     zh_put_u32le(out + 4u, 1u);
     zh_put_u32le(out + 8u, r->seed);
     zh_put_u32le(out + 12u, r->variant_count);
-    zh_put_u32le(out + 16u, r->factor_observed_mask);
-    zh_put_u32le(out + 20u, r->factor_active_mask);
-    zh_put_u32le(out + 24u, r->quality_observed_mask);
-    zh_put_u32le(out + 28u, r->quality_pass_mask);
-    zh_put_u32le(out + 32u, r->prehot.state);
-    zh_put_u32le(out + 36u, r->hot.state);
-    zh_put_u32le(out + 40u, r->relation);
-    zh_put_u32le(out + 44u, ZH_BENCH_SAMPLE_COUNT);
-    zh_put_stats(out + 48u, &r->prehot);
-    zh_put_stats(out + 88u, &r->hot);
-    zh_put_u64le(out + 128u, r->speed_ratio_num);
-    zh_put_u64le(out + 136u, r->speed_ratio_den);
+    zh_put_u32le(out + 16u, r->speed_group);
+    zh_put_u32le(out + 20u, r->unit);
+    zh_put_u32le(out + 24u, r->factor_observed_mask);
+    zh_put_u32le(out + 28u, r->factor_active_mask);
+    zh_put_u32le(out + 32u, r->quality_observed_mask);
+    zh_put_u32le(out + 36u, r->quality_pass_mask);
+    zh_put_u32le(out + 40u, r->prehot.state);
+    zh_put_u32le(out + 44u, r->hot.state);
+    zh_put_u32le(out + 48u, r->relation);
+    zh_put_u32le(out + 52u, ZH_BENCH_SAMPLE_COUNT);
+    zh_put_stats(out + 56u, &r->prehot);
+    zh_put_stats(out + 96u, &r->hot);
+    zh_put_u64le(out + 136u, r->speed_ratio_num);
+    zh_put_u64le(out + 144u, r->speed_ratio_den);
     return 0;
 }
 
@@ -236,20 +242,22 @@ zh_i32 zh_bench_receipt_decode(struct zh_bench_receipt_v1 *r,
     if (in[0] != 'Z' || in[1] != 'B' || in[2] != 'R' || in[3] != '1')
         return -2;
     if (zh_get_u32le(in + 4u) != 1u ||
-        zh_get_u32le(in + 44u) != ZH_BENCH_SAMPLE_COUNT)
+        zh_get_u32le(in + 52u) != ZH_BENCH_SAMPLE_COUNT)
         return -3;
     r->seed = zh_get_u32le(in + 8u);
     r->variant_count = zh_get_u32le(in + 12u);
-    r->factor_observed_mask = zh_get_u32le(in + 16u);
-    r->factor_active_mask = zh_get_u32le(in + 20u) & r->factor_observed_mask;
-    r->quality_observed_mask = zh_get_u32le(in + 24u);
-    r->quality_pass_mask = zh_get_u32le(in + 28u) & r->quality_observed_mask;
-    pre_state = zh_get_u32le(in + 32u);
-    hot_state = zh_get_u32le(in + 36u);
-    r->relation = zh_get_u32le(in + 40u);
-    zh_get_stats(&r->prehot, in + 48u, pre_state);
-    zh_get_stats(&r->hot, in + 88u, hot_state);
-    r->speed_ratio_num = zh_get_u64le(in + 128u);
-    r->speed_ratio_den = zh_get_u64le(in + 136u);
+    r->speed_group = zh_get_u32le(in + 16u);
+    r->unit = zh_get_u32le(in + 20u);
+    r->factor_observed_mask = zh_get_u32le(in + 24u);
+    r->factor_active_mask = zh_get_u32le(in + 28u) & r->factor_observed_mask;
+    r->quality_observed_mask = zh_get_u32le(in + 32u);
+    r->quality_pass_mask = zh_get_u32le(in + 36u) & r->quality_observed_mask;
+    pre_state = zh_get_u32le(in + 40u);
+    hot_state = zh_get_u32le(in + 44u);
+    r->relation = zh_get_u32le(in + 48u);
+    zh_get_stats(&r->prehot, in + 56u, pre_state);
+    zh_get_stats(&r->hot, in + 96u, hot_state);
+    r->speed_ratio_num = zh_get_u64le(in + 136u);
+    r->speed_ratio_den = zh_get_u64le(in + 144u);
     return 0;
 }
