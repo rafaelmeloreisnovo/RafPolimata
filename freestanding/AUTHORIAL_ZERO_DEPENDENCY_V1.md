@@ -37,6 +37,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/rafbbs_theme.h` — deterministic status-to-ANSI mapping over the authorial status vocabulary;
 - `tools/rafbbs/rafbbs_log_core.h` — deterministic caller-owned log-line rendering with authorial 64-bit divmod and no printf/libgcc helper;
 - `tools/rafbbs/rafbbs_pipeline_core.h` — pipeline metadata + exact-byte lookup only; no context, status or execution callback;
+- `tools/rafbbs/rafbbs_cli_core.h` — deterministic CLI action routing over caller-owned argv; no terminal, clock, filesystem or command execution;
 - `tools/rafbbs/rafbbs_baremetal.h` — fixed-buffer output and binary manifest value model;
 - `tools/rafbbs/rafbbs_manifest_bin_core.h` — deterministic 96-byte little-endian binary-manifest wire codec;
 - `tools/rafbbs/rafbbs_crc32_core.h` — pure CRC32;
@@ -48,6 +49,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/tests/rafbbs_theme_core_test.c` — status/color mapping and empty-default falsifier;
 - `tools/rafbbs/tests/rafbbs_log_core_test.c` — exact line, invalid-time, long-minute and overflow falsifier;
 - `tools/rafbbs/tests/rafbbs_pipeline_core_test.c` — exact/case-sensitive lookup, flags and not-found falsifier;
+- `tools/rafbbs/tests/rafbbs_cli_core_test.c` — help/list/run/invalid and case-sensitive CLI-route falsifier;
 - `tools/rafbbs/tests/rafbbs_manifest_bin_core_test.c` — binary wire exact-byte/roundtrip/truncation falsifier.
 
 The hosted file wrappers remain deliberately outside the pure core:
@@ -60,7 +62,8 @@ The hosted file wrappers remain deliberately outside the pure core:
 - `tools/rafbbs/rafbbs_filepicker.h` — hosted presentation/printf adapter only;
 - `tools/rafbbs/rafbbs_log.h` — hosted clock observation, varargs/detail formatting, console and FILE persistence adapter;
 - `tools/rafbbs/rafbbs_pipeline.h` — hosted handler binding, command execution and provider/file/hash adapters;
-- POSIX CLI/file adapters.
+- `tools/rafbbs/rafbbs_cli.h` — hosted terminal, wall-clock, filesystem, git observation and command dispatch adapter;
+- POSIX file adapters.
 
 The monotonic boundary does not reimplement a provider clock.  POSIX supplies the
 observation; the authorial core owns only the value contract and deterministic
@@ -119,7 +122,7 @@ declared runtime surface has an equivalent source/build/runtime receipt.
 `F_ok` = authorial zero-include type/status substrate + pure CRC32/SHA-256 +
 RafBBS context/monotonic-time value layer + deterministic text-manifest renderer
 + static filepicker catalog/selection + theme/status + deterministic log-line rendering
-+ pipeline spec/lookup core + fixed 96-byte binary-manifest wire codec prepared for `-nostdinc` compilation,
++ pipeline spec/lookup core + CLI route core + fixed 96-byte binary-manifest wire codec prepared for `-nostdinc` compilation,
 with POSIX clock acquisition, varargs/detail formatting, filesystem persistence and
 console presentation isolated behind adapters.
 
@@ -127,5 +130,5 @@ console presentation isolated behind adapters.
 repository-wide component migration are not yet evidence-bound.
 
 `F_next` = execute the exact-head zero-dependency + semantic time/text/binary-manifest
-falsifiers, including filepicker, theme/status, log-line, pipeline-spec and binary-manifest;
+falsifiers, including filepicker, theme/status, log-line, pipeline-spec, CLI-route and binary-manifest;
 only after PASS select the next smallest runtime-bearing cut.
