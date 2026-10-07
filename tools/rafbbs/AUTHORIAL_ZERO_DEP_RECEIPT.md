@@ -11,6 +11,7 @@ not included in this claim.
 - rafbbs_freestanding.h
 - rafbbs_core.h
 - rafbbs_context_core.h
+- rafbbs_git_core.h
 - rafbbs_command_core.h
 - rafbbs_manifest_core.h
 - rafbbs_filepicker_core.h
@@ -38,6 +39,7 @@ not included in this claim.
 - tests/rafbbs_tui_core_test.c
 - tests/rafbbs_context_core_test.c
 - tests/rafbbs_command_core_test.c
+- tests/rafbbs_git_core_test.c
 - tests/rafbbs_manifest_bin_core_test.c
 
 ## Gate contract
@@ -56,9 +58,10 @@ freestanding/tests/verify_authorial_zero_dep.sh:
 - proves typed operational detail formatting for the exact RafBBS value families (text, signed i32 and fixed-width hex32) without stdarg/vsnprintf/printf grammar;
 - proves persisted run-log header/artifact/gap byte formatting without fprintf,
   snprintf, hosted headers or filesystem access; the adapter only persists already-rendered bytes;
-- keeps POSIX/civil clock acquisition, git/filesystem observation, FILE persistence,
+- proves Git HEAD/ref/OID/packed-refs parsing without invoking Git, shell or libc;
+- keeps POSIX/civil clock acquisition, filesystem byte observation, FILE persistence,
   terminal input/rendering and actual command execution in hosted adapters outside
-  the pure set; only caller-supplied observations enter the seeded context core
+  the pure set; Git filesystem bytes enter through a hosted adapter and are parsed by the authorial core; only caller-supplied observations enter the seeded context core
   and only caller-supplied execution outcome enters the command policy core.
 
 `rafbbs_build.sh freestanding` compiles the monotonic-time and text-manifest
