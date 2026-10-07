@@ -50,10 +50,16 @@ jobs:
         run: sh freestanding/tests/verify_contract.sh
       - name: Authorial zero-dependency V1
         run: sh freestanding/tests/verify_authorial_zero_dep.sh
+      - name: Z0 contextless tokenization
+        run: sh freestanding/tests/verify_z0_token.sh
       - name: Freestanding six-ISA compile matrix
         run: sh freestanding/tests/verify_matrix.sh
       - name: Fixed-vector ABI/ISA profiles
         run: sh freestanding/tests/verify_profiles.sh
+      - name: IBM z/s390x high-vector executor
+        run: sh freestanding/tests/verify_s390x_vector.sh
+      - name: POWER64 VSX VMX fixed-vector slice
+        run: sh freestanding/tests/verify_power_vsx.sh
       - name: Scalable-vector ABI/ISA profiles
         run: sh freestanding/tests/verify_scalable.sh
       - name: Matrix-register ABI/ISA profiles
