@@ -1,9 +1,12 @@
 # RafBBS authorial zero-dependency receipt
 
-Scope: the pure RafBBS V1 slice only. Hosted operators remain adapters and are
-not included in this claim.
+Scope: the named pure RafBBS V1 slice only. Hosted operators remain adapters and
+are not included in this claim.
 
-## Declared pure set
+State: `SOURCE/BUILD_GATE_DECLARED`  
+Claim ceiling: `claim_allowed=false` beyond the named source/build slice.
+
+## Declared pure set — 14 modules
 
 - rafbbs_types.h
 - rafbbs_status.h
@@ -11,45 +14,74 @@ not included in this claim.
 - rafbbs_freestanding.h
 - rafbbs_core.h
 - rafbbs_manifest_core.h
+- rafbbs_filepicker_core.h
+- rafbbs_theme.h
+- rafbbs_log_core.h
+- rafbbs_pipeline_core.h
 - rafbbs_baremetal.h
+- rafbbs_manifest_bin_core.h
 - rafbbs_crc32_core.h
 - rafbbs_sha256_core.h
+
+## Falsifiers / probe
+
 - tests/rafbbs_authorial_probe.c
+- tests/rafbbs_zero_dependency_test.c
 - tests/rafbbs_time_core_test.c
 - tests/rafbbs_manifest_core_test.c
+- tests/rafbbs_filepicker_core_test.c
+- tests/rafbbs_theme_core_test.c
+- tests/rafbbs_log_core_test.c
+- tests/rafbbs_manifest_bin_core_test.c
+- tests/rafbbs_pipeline_core_test.c
 
 ## Gate contract
 
-freestanding/tests/verify_authorial_zero_dep.sh:
+`freestanding/tests/verify_authorial_zero_dep.sh`:
 
 - rejects hosted/system includes, host/runtime calls, syscall instruction
-  strings, inline assembly and external declarations in the declared set;
-- compiles the caller-owned probe with -ffreestanding -nostdinc -fno-builtin;
-- checks the six OS-neutral targets:
-  x86_64, i686, armv7a, aarch64, riscv32, riscv64;
+  strings, inline assembly and external declarations in the declared pure set;
+- compiles the caller-owned probe with `-ffreestanding -nostdinc -fno-builtin`;
+- checks six OS-neutral targets: x86_64, i686, armv7a, aarch64, riscv32, riscv64;
 - rejects undefined object symbols and requires the exported probe symbol;
-- proves that `RafContext` no longer requires a hosted time type;
-- renders the text manifest without stdio and fails closed on caller-buffer overflow;
-- checks exact manifest bytes plus invalid elapsed-time representation;
-- keeps POSIX clock acquisition in `rafbbs_time_posix.h` and FILE persistence in
-  `rafbbs_manifest.h`, outside the pure set.
+- exercises monotonic arithmetic, text/binary manifests, filepicker state,
+  status/theme rendering, deterministic log-line rendering and pipeline-spec
+  exact-byte lookup;
+- keeps POSIX clock acquisition, varargs/detail formatting, command execution,
+  provider/device access, console presentation and FILE/filesystem persistence
+  outside the pure set.
 
-`rafbbs_build.sh freestanding` compiles the monotonic-time and text-manifest
-falsifiers with hosted headers disabled and executes the same deterministic
-semantics as host-CI smokes.
-The host execution is not device evidence and does not make the POSIX clock part
-of the pure core.
+`tools/rafbbs/rafbbs_build.sh freestanding` compiles the semantic falsifiers
+with hosted headers disabled, audits unresolved object symbols and executes
+deterministic host smokes. Compiler, shell, `nm` and CI are evidence/factory
+tools, not runtime dependencies of the pure objects.
 
-rafbbs_build.sh freestanding remains a local known-vector and object-level
-falsifier. The compiler, shell and nm are evidence/factory tools, not runtime
-dependencies of the pure objects.
+## Adapter boundary
 
-## Boundary
+Hosted adapters intentionally remain outside the claim:
 
-This receipt establishes a source/build gate for the named RafBBS slice. It does
-not establish hosted-adapter purity, physical bare-metal execution, device
-coverage, semantic equivalence on every target, or claim promotion.
+- `rafbbs_time_posix.h`
+- `rafbbs_crc32.h`
+- `rafbbs_sha256.h`
+- `rafbbs_manifest.h`
+- `rafbbs_manifest_bin.h`
+- `rafbbs_filepicker.h`
+- `rafbbs_log.h`
+- `rafbbs_pipeline.h`
 
-Unobserved runtime/device state remains TOKEN_VAZIO (CLOSURE_L12).
-Repository-wide migration beyond this named slice remains TOKEN_VAZIO
-(CLOSURE_L11).
+The pipeline pure core owns only immutable specs/flags and exact-byte lookup.
+Handler binding, `RafContext`, status transitions, command execution and
+provider/file/hash orchestration remain hosted.
+
+## Evidence boundary
+
+`SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM`
+
+This receipt establishes a source/build gate for the named slice only. It does
+not establish physical bare-metal execution, device coverage, hosted-adapter
+purity, full toolchain self-hosting or repository-wide zero dependency.
+
+Unobserved runtime/device state remains
+`TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.
+Repository-wide migration beyond the named slice remains
+`TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`.
