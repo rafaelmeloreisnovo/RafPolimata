@@ -89,6 +89,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_core.h`: caller-owned RafContext using `RafMonoTime`, not `struct timespec`;
 - `rafbbs_context_core.h`: seeded context/path initialization with authorial bounded copies and no memset/snprintf/libc;
 - `rafbbs_command_core.h`: deterministic command-outcome policy independent of `system()`/shell/provider execution;
+- `rafbbs_result_core.h`: deterministic final-status/hash-state policy from explicit evidence-validity bits; digest value zero is not a missing-data sentinel;
 - `rafbbs_manifest_core.h`: deterministic text-manifest rendering into a caller-owned fixed buffer;
 - `rafbbs_filepicker_core.h`: static catalog/selection state without hosted string/runtime calls;
 - `rafbbs_theme.h`: deterministic status-to-ANSI mapping without hosted headers;
@@ -346,3 +347,21 @@ therefore still hosted I/O; only filtering, bounded selection, ordering and
 rendering are claimed as freestanding.
 
 `CATALOG_SELECTION != DIRECTORY_ENUMERATION != STDOUT_IO`.
+
+
+## Evidence-validity result core freestanding
+
+RafBBS no longer decides whether CRC32/SHA evidence exists by inspecting the
+numeric digest value. `RafContext` carries explicit validity bits set only after
+successful hosted acquisition, and `rafbbs_result_core.h` owns the pure
+classification into final status and hash-state.
+
+This closes the ambiguity where CRC32 `0x00000000` could previously be treated
+as absent evidence. Digest value and observation validity are independent:
+
+`DIGEST_VALUE != EVIDENCE_VALIDITY`
+
+Filesystem hashing remains a hosted adapter. The pure result core receives only
+caller-supplied facts and is compiled under the same six-ISA no-undefined-symbol
+gate. Runtime/device evidence remains governed by
+`CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE`.
