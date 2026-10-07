@@ -56,6 +56,47 @@ provided=0 != provided=1,size=0
 
 A NUL byte is data and emits one token. A space is data and emits one token. A sequence emits one identity-preserving token per byte, with no vocabulary lookup.
 
+## Information-loss projection ladder
+
+The successor experiment does not create a special "nothing token". Instead, it asks when two already-defined Z0 input states become observationally indistinguishable after selected observables are removed.
+
+The classifier-relevant observables are:
+
+- `P` = explicit `provided` bit;
+- `S` = size class `ZERO|ONE|MANY`;
+- `D` = whether a data pointer is present;
+- `U` = one-byte class `NUL|SPACE|BYTE` when safely observable.
+
+`raf_fs_z0_equiv(a,b,mask)` defines equality relative to that explicit observation mask. It does not mutate either input.
+
+For the seven canonical representatives `ABSENT|EMPTY|NUL|SPACE|BYTE|SEQUENCE|INVALID`, the gate requires:
+
+| projection | observed dimensions | equivalence classes |
+|---|---|---:|
+| `Ω0` | `P+S+D+U` | 7 |
+| `Ω1` | `P+S+D` | 5 |
+| `Ω2` | `P+S` | 4 |
+| `Ω3` | `S` | 3 |
+| `Ω4` | none | 1 |
+
+An orthogonal `P`-only projection must yield exactly 2 classes: `ABSENT` versus every supplied state.
+
+The monotone destructive path is therefore:
+
+```text
+7 -> 5 -> 4 -> 3 -> 1
+```
+
+Concrete falsifiers:
+
+- removing `U` collapses `NUL`, `SPACE` and ordinary one-byte data while `D` remains observable;
+- removing `D` additionally collapses a supplied invalid one-byte/null-pointer view with supplied valid one-byte views at that projection;
+- keeping only `S` collapses `ABSENT` with `EMPTY`, because both have size class `ZERO`;
+- retaining only `P` preserves exactly "not supplied" versus "supplied";
+- observing nothing makes all seven states one equivalence class.
+
+This measures loss of distinguishability in a representation system. It does not claim that underlying states become physically identical, and `Ω4` is not a metaphysical assertion of absolute nothingness.
+
 ## Hypotheses
 
 **H1:** after removing contextual/model machinery, deterministic identity-preserving presence and byte observation remain possible with zero external runtime symbols in the pure object.
@@ -69,7 +110,8 @@ A NUL byte is data and emits one token. A space is data and emits one token. A s
 1. no-hosted-header freestanding object compilation;
 2. unresolved-symbol rejection;
 3. executable semantic smoke for the presence and byte distinctions above;
-4. OS-neutral object compilation for x86_64, i686, ARMv7, AArch64, RV32 and RV64.
+4. projection-collapse falsifiers requiring class counts `7 -> 5 -> 4 -> 3 -> 1` plus `presence-only=2`;
+5. OS-neutral object compilation for x86_64, i686, ARMv7, AArch64, RV32 and RV64, including the projection-equivalence probe.
 
 Build PASS proves only this bounded source/object/semantic contract. It does not prove bare-metal or physical-device execution.
 
