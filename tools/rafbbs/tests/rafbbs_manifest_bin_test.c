@@ -6,15 +6,17 @@ int main(void)
     RafBinManifest src;
     RafBinManifest dst;
     RafU8 wire[RAFBBS_BIN_MANIFEST_V1_SIZE];
+    RafU32 expected_hash_state;
     FILE *f;
     size_t n;
 
+    expected_hash_state = raf_hash_failover_state(0u, 0u);
     src = raf_bin_manifest_make(
         1u,
         RAF_ARCH_GENERIC,
         0xabu,
         0xcdu,
-        RAFBBS_HASH_TOKEN_VAZIO,
+        expected_hash_state,
         1u
     );
 
@@ -53,7 +55,7 @@ int main(void)
 
     if (dst.magic != RAFBBS_BIN_MANIFEST_MAGIC)
         return 6;
-    if (dst.hash_state != RAFBBS_HASH_TOKEN_VAZIO)
+    if (dst.hash_state != expected_hash_state)
         return 7;
     if (dst.input_crc32 != 0xabu || dst.output_crc32 != 0xcdu)
         return 8;
