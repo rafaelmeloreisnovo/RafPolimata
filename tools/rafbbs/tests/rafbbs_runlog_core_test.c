@@ -81,7 +81,7 @@ int rafbbs_runlog_core_test(void)
     raf_log_text_init(&out, tail, (RafU32)sizeof(tail));
     raf_runlog_tail_render(&out, &ctx);
     if (out.dropped != 0u) return 5;
-    if (raf_runlog_cstr_len(tail) != out.pos) return 6;
+    if (raf_format_cstr_len(tail) != out.pos) return 6;
     if (tail[out.pos] != 0) return 7;
 
     raf_log_text_init(&out, small, (RafU32)sizeof(small));
