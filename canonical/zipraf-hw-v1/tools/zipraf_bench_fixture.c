@@ -31,13 +31,9 @@ int main(int argc, char **argv) {
         return 11;
 
     factors = zh_bench_factor_bit(ZH_FACTOR_COMPILER_OPT) |
-              zh_bench_factor_bit(ZH_FACTOR_AUTOVECTORIZE) |
-              zh_bench_factor_bit(ZH_FACTOR_TURBO_BOOST) |
-              zh_bench_factor_bit(ZH_FACTOR_TIMER_OVERHEAD);
+              zh_bench_factor_bit(ZH_FACTOR_AUTOVECTORIZE);
 
-    quality = (1u << ZH_QUALITY_SOURCE_IDENTITY) |
-              (1u << ZH_QUALITY_ARTIFACT_IDENTITY) |
-              (1u << ZH_QUALITY_CORRECTNESS_ORACLE) |
+    quality = (1u << ZH_QUALITY_CORRECTNESS_ORACLE) |
               (1u << ZH_QUALITY_SAMPLE_COMPLETE) |
               (1u << ZH_QUALITY_ORDER_SEED_RECORDED) |
               (1u << ZH_QUALITY_OPTIMIZER_STATE) |
