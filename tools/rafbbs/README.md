@@ -153,3 +153,13 @@ sh tools/rafbbs/rafbbs_test.sh
 ## Próximo ciclo recorrente implementado
 
 Este ciclo adiciona manifesto binário gravável, callback byte-a-byte para saída bare-metal, tabela constante de flags por arquitetura, alvo `commandless`, fixture binária, teste de overflow do buffer, `hash_state` em log/manifest e reforço do failover `SHA256 → CRC32 → TOKEN_VAZIO`.
+
+
+## Filepicker core freestanding
+
+A seleção do catálogo conhecido foi separada da apresentação hosted:
+
+- `rafbbs_filepicker_core.h`: catálogo estático e índice selecionado, sem libc/string/heap/syscall;
+- `rafbbs_filepicker.h`: somente adaptação de apresentação com `printf`.
+
+O core preserva a seleção atual quando recebe escolha fora de `1..5`. O gate autoral compila esse core com `-nostdinc` nas seis ISAs declaradas e rejeita símbolos externos. Isso não promove execução física: `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.
