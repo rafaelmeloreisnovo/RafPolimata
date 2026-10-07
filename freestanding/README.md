@@ -62,13 +62,15 @@ Read in this order:
 6. `NO_SHADOW_NO_TAIL.md`;
 7. `COMMENT_CONTRACT.md`;
 8. `STUB_POLICY.md`;
-9. `GAPS.md` / `gaps.v1.json`;
-10. `VALIDATION.md` / `CODEGEN_RECEIPT.md`.
+9. `AUTHORIAL_ZERO_DEPENDENCY_V1.md`;
+10. `GAPS.md` / `gaps.v1.json`;
+11. `VALIDATION.md` / `CODEGEN_RECEIPT.md`.
 
 ## Gates
 
 ```text
 verify_contract.sh          -> zero-runtime/source/comment contract
+verify_authorial_zero_dep.sh -> zero hosted headers/runtime helpers in the declared authorial slice
 verify_matrix.sh            -> six primary scalar OS-neutral objects
 verify_profiles.sh          -> SSE2/AVX2/AVX-512/NEON/Advanced-SIMD codegen
 verify_scalable.sh          -> SVE/RVV predicate/VL codegen
