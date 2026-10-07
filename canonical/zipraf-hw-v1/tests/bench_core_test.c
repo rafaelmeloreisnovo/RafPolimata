@@ -74,13 +74,13 @@ int main(void) {
     rc |= check(
         zh_bench_factor_state(factors,
                               zh_bench_factor_bit(ZH_FACTOR_TURBO_BOOST),
-                              ZH_FACTOR_TURBO_BOOST) == ZH_PASS &&
+                              ZH_FACTOR_TURBO_BOOST) == ZH_BENCH_FACTOR_ACTIVE &&
         zh_bench_factor_state(factors,
                               zh_bench_factor_bit(ZH_FACTOR_TURBO_BOOST),
-                              ZH_FACTOR_COMPILER_OPT) == ZH_FAIL &&
+                              ZH_FACTOR_COMPILER_OPT) == ZH_BENCH_FACTOR_INACTIVE &&
         zh_bench_factor_state(factors,
                               0u,
-                              ZH_FACTOR_DVFS) == ZH_TOKEN_VAZIO,
+                              ZH_FACTOR_DVFS) == ZH_BENCH_FACTOR_UNKNOWN,
         "factor_tristate"
     );
 
