@@ -9,7 +9,7 @@ Este perfil descreve os 10 passos operacionais pedidos para reduzir fricção, e
 5. **Full-chain proof honesto**: `proof_chain` chama a captura real no host e permanece `AUDIT/PASS_LIMITED` sem dispositivo/logcat.
 6. **Watchdog preventivo**: cada comando recebe checkpoint e tick antes da execução; expiração vira `FAIL`.
 7. **Rollback paliativo**: checkpoints guardam passo/status/hash em ring fixo para restauração ou auditoria.
-8. **Manifesto compacto**: `RafBinManifest` guarda status, arquitetura, hashes e lacunas em forma fixa para bare-metal.
+8. **Manifesto compacto**: `RafBinManifest` guarda status, arquitetura, hashes e lacunas; `rafbbs_manifest_bin_core.h` o codifica em wire V1 fixo de 96 bytes little-endian, independente do layout nativo da `struct`.
 9. **Flags por arquitetura**: `generic`, `arm32`, `arm32_neon`, `arm64` e `x86_64` têm perfil de cache/SIMD/watchdog.
 10. **Testes failsafe/failover**: o harness compila host e freestanding, testa watchdog negativo, rollback, hash e ausência de heap explícito.
 
@@ -25,7 +25,7 @@ Este perfil descreve os 10 passos operacionais pedidos para reduzir fricção, e
 
 ## Próximo ciclo implementado
 
-1. O manifesto binário agora tem gravador host (`rafbbs_manifest_bin.h`).
+1. O manifesto binário usa codec autoral puro (`rafbbs_manifest_bin_core.h`) e deixa o gravador host (`rafbbs_manifest_bin.h`) apenas como adaptador de persistência.
 2. A saída bare-metal tem porta de flush por callback byte-a-byte.
 3. `raf_arch_flags()` usa tabela constante indexada, reduzindo condicionais.
 4. O build tem alvo `commandless` para compilar o operador com `RAFBBS_FREESTANDING_MODE`.

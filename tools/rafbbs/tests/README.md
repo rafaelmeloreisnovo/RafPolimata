@@ -13,6 +13,7 @@
 - `rafbbs_baremetal_test.c`: saída byte-a-byte, manifesto binário, failover de hash e flags de arquitetura.
 - `rafbbs_watchdog_negative_test.c`: garante que watchdog expirado é detectado.
 - `rafbbs_baremetal_overflow_test.c`: valida saturação do buffer fixo e contador `dropped`.
-- `rafbbs_manifest_bin_test.c`: grava e relê fixture de manifesto binário compacto.
+- `rafbbs_manifest_bin_core_test.c`: valida bytes little-endian canônicos, roundtrip e rejeição de tamanho truncado sem headers hospedados.
+- `rafbbs_manifest_bin_test.c`: valida persistência host sobre o codec autoral, sem desserializar `struct` nativa diretamente.
 
 - rafbbs_authorial_probe.c: caller-owned probe that exercises every declared pure module without hosted headers or external runtime symbols.

@@ -35,7 +35,9 @@ static int raf_write_manifest(RafContext *ctx) {
     fclose(f);
 
     {
-        RafBinManifest bm = raf_bin_manifest_make(
+        RafBinManifest bm;
+        raf_bin_manifest_init(
+            &bm,
             (RafU32)ctx->final_status,
             0u,
             ctx->input_crc32,

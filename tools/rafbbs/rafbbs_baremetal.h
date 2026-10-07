@@ -84,24 +84,35 @@ static inline void raf_baremetal_flush(RafBaremetalOut *o, RafBaremetalPort port
     for (i = 0u; i < o->pos; i++) port.sink(o->buf[i], port.user);
 }
 
+static inline void raf_bin_manifest_init(
+    RafBinManifest *m,
+    RafU32 status, RafU32 arch, RafU32 in_crc, RafU32 out_crc,
+    RafU32 hash_state, RafU32 gaps
+) {
+    RafU32 i;
+    m->magic = RAFBBS_BIN_MANIFEST_MAGIC;
+    m->version = 1u;
+    m->status = status;
+    m->arch = arch;
+    m->input_crc32 = in_crc;
+    m->output_crc32 = out_crc;
+    for (i = 0u; i < 32u; i++) {
+        m->input_sha256[i] = 0u;
+        m->output_sha256[i] = 0u;
+    }
+    m->hash_state = hash_state;
+    m->gaps = gaps;
+}
+
+/* Compatibility constructor; authorial hot paths prefer caller-owned init. */
 static inline RafBinManifest raf_bin_manifest_make(
     RafU32 status, RafU32 arch, RafU32 in_crc, RafU32 out_crc,
     RafU32 hash_state, RafU32 gaps
 ) {
     RafBinManifest m;
-    RafU32 i;
-    m.magic = RAFBBS_BIN_MANIFEST_MAGIC;
-    m.version = 1u;
-    m.status = status;
-    m.arch = arch;
-    m.input_crc32 = in_crc;
-    m.output_crc32 = out_crc;
-    for (i = 0u; i < 32u; i++) {
-        m.input_sha256[i] = 0u;
-        m.output_sha256[i] = 0u;
-    }
-    m.hash_state = hash_state;
-    m.gaps = gaps;
+    raf_bin_manifest_init(
+        &m, status, arch, in_crc, out_crc, hash_state, gaps
+    );
     return m;
 }
 
