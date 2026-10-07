@@ -95,5 +95,25 @@
     "wire_magic": "ZBR1",
     "wire_size_bytes": 152
   },
-  "claim_allowed": false
+  "claim_allowed": false,
+  "factor_observed": [
+    "COMPILER_OPT",
+    "AUTOVECTORIZE"
+  ],
+  "factor_active": [],
+  "physical_factor_state": "TOKEN_VAZIO",
+  "quality_observed": [
+    "CORRECTNESS_ORACLE",
+    "SAMPLE_COMPLETE",
+    "ORDER_SEED_RECORDED",
+    "OPTIMIZER_STATE",
+    "RAW_SAMPLES_PRESERVED"
+  ],
+  "quality_pass": [
+    "CORRECTNESS_ORACLE",
+    "SAMPLE_COMPLETE",
+    "ORDER_SEED_RECORDED",
+    "OPTIMIZER_STATE",
+    "RAW_SAMPLES_PRESERVED"
+  ]
 }
