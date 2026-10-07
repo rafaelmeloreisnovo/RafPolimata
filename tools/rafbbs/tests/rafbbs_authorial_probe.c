@@ -10,7 +10,7 @@ static char rafbbs_authorial_manifest_buf[128];
 
 static RafStatus rafbbs_authorial_pipeline_run(RafContext *ctx)
 {
-    return ctx != (RafContext *)0 ? RAF_PASS : RAF_TOKEN_VAZIO;
+    return ctx != (RafContext *)0 ? RAF_PASS : RAF_FAIL;
 }
 
 static RafPipeline rafbbs_authorial_pipelines[] = {
