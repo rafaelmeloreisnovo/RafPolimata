@@ -10,11 +10,13 @@ not included in this claim.
 - rafbbs_time.h
 - rafbbs_freestanding.h
 - rafbbs_core.h
+- rafbbs_manifest_core.h
 - rafbbs_baremetal.h
 - rafbbs_crc32_core.h
 - rafbbs_sha256_core.h
 - tests/rafbbs_authorial_probe.c
 - tests/rafbbs_time_core_test.c
+- tests/rafbbs_manifest_core_test.c
 
 ## Gate contract
 
@@ -27,10 +29,14 @@ freestanding/tests/verify_authorial_zero_dep.sh:
   x86_64, i686, armv7a, aarch64, riscv32, riscv64;
 - rejects undefined object symbols and requires the exported probe symbol;
 - proves that `RafContext` no longer requires a hosted time type;
-- keeps POSIX clock acquisition in `rafbbs_time_posix.h`, outside the pure set.
+- renders the text manifest without stdio and fails closed on caller-buffer overflow;
+- checks exact manifest bytes plus invalid elapsed-time representation;
+- keeps POSIX clock acquisition in `rafbbs_time_posix.h` and FILE persistence in
+  `rafbbs_manifest.h`, outside the pure set.
 
-`rafbbs_build.sh freestanding` compiles the monotonic-time falsifier with hosted
-headers disabled and executes the same arithmetic as a host-CI semantic smoke.
+`rafbbs_build.sh freestanding` compiles the monotonic-time and text-manifest
+falsifiers with hosted headers disabled and executes the same deterministic
+semantics as host-CI smokes.
 The host execution is not device evidence and does not make the POSIX clock part
 of the pure core.
 
