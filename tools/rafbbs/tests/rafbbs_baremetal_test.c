@@ -1,11 +1,10 @@
 #include "rafbbs_baremetal.h"
-#include <string.h>
 
 int main(void) {
     RafBaremetalOut out;
     RafBinManifest manifest;
     RafArchFlags arm64;
-    uint32_t state;
+    RafU32 state;
     raf_baremetal_out_init(&out);
     raf_baremetal_write(&out, "RAF");
     if (out.pos != 3u) return 1;
