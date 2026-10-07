@@ -5,7 +5,7 @@
  * RAFAELIA-L0-FILE-CONTRACT
  * PURPOSE: Compile-time internal ABI/profile geometry for OS-agnostic L0.
  * SCOPE: ISA/register metadata and caller-owned `void *state`; never host/OS ABI glue.
- * PRECONDITIONS: GCC/Clang target macros identify the selected ISA/profile.
+ * PRECONDITIONS: GCC/Clang target macros identify the selected ISA/profile; optional MVE may also be selected explicitly by RAF_FS_PROFILE_MVE when the exact -march gate is authoritative.
  * REGISTER_OWNERSHIP: Caller owns architectural state; L0 owns only declared inline-asm temporaries.
  * CLOBBERS: None in this metadata header.
  * MEMORY_ORDER: None; ordering primitives live in arch/raf_fs_arch.h.
@@ -91,7 +91,7 @@
 #  define RAF_FS_ABI_MATRIX_REGS 0u
 # endif
 
-#elif defined(__arm__) && defined(__ARM_FEATURE_MVE)
+#elif defined(__arm__) && (defined(__ARM_FEATURE_MVE) || defined(RAF_FS_PROFILE_MVE))
 # define RAF_FS_ABI_ID RAF_FS_ABI_ARM_MVE
 # define RAF_FS_ABI_PTR_BITS 32u
 # define RAF_FS_ABI_GPR_COUNT 16u
