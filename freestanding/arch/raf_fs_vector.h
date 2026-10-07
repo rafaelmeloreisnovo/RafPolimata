@@ -5,7 +5,7 @@
  * RAFAELIA-L0-FILE-CONTRACT
  * PURPOSE: Fixed-vector, branchless, one-block execution primitives.
  * SCOPE: SSE2, AVX2, AVX-512F, ARMv7 NEON, Arm M-profile MVE/Helium, AArch64 Advanced SIMD and IBM z/s390x z13 vector facility; no OS/runtime contract.
- * PRECONDITIONS: Selected compiler target enables the exact ISA profile; full-block operations expose one full block.
+ * PRECONDITIONS: Selected compiler target enables the exact ISA profile; optional MVE may use RAF_FS_PROFILE_MVE only together with the exact MVE -march gate; full-block operations expose one full block.
  * REGISTER_OWNERSHIP: Inline assembly owns only declared vector/predicate temporaries; MVE owns Q0..Q3, s390x owns VR16..VR19; C-vector selection owns compiler temporaries elsewhere.
  * CLOBBERS: Declared XMM/YMM/ZMM/K, NEON/MVE or s390x vector temporaries plus memory; compiler allocates select temporaries on generic C-vector profiles.
  * MEMORY_ORDER: Ordinary data access; no fence implied. Use raf_fs_arch.h ordering primitives separately.
@@ -104,7 +104,7 @@ RAF_FS_INLINE void raf_fs_vec_zero_block(void *dst) {
         : : "r"(dst) : "v0", "memory");
 }
 
-#elif defined(__arm__) && defined(__ARM_FEATURE_MVE)
+#elif defined(__arm__) && (defined(__ARM_FEATURE_MVE) || defined(RAF_FS_PROFILE_MVE))
 # define RAF_FS_NATIVE_VECTOR_BITS 128u
 # define RAF_FS_NATIVE_VECTOR_BYTES 16u
 # define RAF_FS_NATIVE_LANES_U32 4u
