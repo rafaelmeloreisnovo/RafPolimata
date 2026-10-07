@@ -13,10 +13,11 @@
 #include "rafbbs_sha256.h"
 #include "rafbbs_host.h"
 
-static RafStatus raf_run_cmd(RafContext *ctx, const char *module, const char *cmd, int optional) {
+static RafStatus raf_run_cmd(RafContext *ctx, const char *module, const RafExecSpec *spec, int optional) {
     int rc = 0;
     RafU32 executed = 1u;
     RafCommandDecision decision;
+    RafLogText command_text;
     RafRollbackFrame frame;
     frame.step = (RafU32)ctx->syslog_count;
     frame.status = RAF_STEP;
@@ -24,13 +25,20 @@ static RafStatus raf_run_cmd(RafContext *ctx, const char *module, const char *cm
     frame.output_crc32 = ctx->output_crc32;
     raf_rollback_push(&ctx->rollback, frame);
     if (raf_watchdog_step(&ctx->watchdog)) { ctx->failed = 1; raf_log(ctx, RAF_FAIL, module, "watchdog expirou antes do comando"); return RAF_FAIL; }
-    (void)raf_context_text_copy(ctx->command, (RafU32)sizeof(ctx->command), cmd);
-    raf_log_s(ctx, RAF_STEP, module, "comando=", cmd);
+    raf_log_text_init(
+        &command_text, ctx->command, (RafU32)sizeof(ctx->command)
+    );
+    raf_exec_render(&command_text, spec);
+    if (raf_exec_spec_valid(spec) == 0u || command_text.dropped != 0u) {
+        ctx->failed = 1;
+        raf_log(ctx, RAF_FAIL, module, "plano argv invalido ou truncado");
+        return RAF_FAIL;
+    }
+    raf_log_s(ctx, RAF_STEP, module, "comando=", ctx->command);
 #if defined(RAFBBS_FREESTANDING_MODE)
-    (void)cmd;
     executed = 0u;
 #else
-    rc = raf_host_exec(cmd);
+    rc = raf_host_exec(spec);
 #endif
     decision = raf_command_decide(
         executed, rc, optional ? 1u : 0u
@@ -49,12 +57,28 @@ static RafStatus raf_run_cmd(RafContext *ctx, const char *module, const char *cm
 }
 
 static RafStatus raf_pipe_encoders(RafContext *ctx) {
+    static const char *const python_argv[] = {
+        "python3", "tests/test_arm64_encoders.py", (const char *)0
+    };
+    static const char *const compile_argv[] = {
+        "cc", "-std=c11", "-Wall", "-Wextra", "-Werror",
+        "-I", "Apkc", "tests/test_arm64_encoders.c",
+        "-o", "/tmp/test_arm64_encoders", (const char *)0
+    };
+    static const char *const run_argv[] = {
+        "/tmp/test_arm64_encoders", (const char *)0
+    };
+    const RafExecSpec python_spec = {python_argv, 2u};
+    const RafExecSpec compile_spec = {compile_argv, 10u};
+    const RafExecSpec run_spec = {run_argv, 1u};
     RafStatus s;
     (void)raf_context_text_copy(ctx->input, (RafU32)sizeof(ctx->input), "tests/test_arm64_encoders.py");
-    s = raf_run_cmd(ctx, "encoder", "python3 tests/test_arm64_encoders.py", 0);
+    s = raf_run_cmd(ctx, "encoder", &python_spec, 0);
     if (s == RAF_FAIL) return RAF_FAIL;
     if (raf_is_arm_host()) {
-        s = raf_run_cmd(ctx, "encoder_c", "cc -std=c11 -Wall -Wextra -Werror -I Apkc tests/test_arm64_encoders.c -o /tmp/test_arm64_encoders && /tmp/test_arm64_encoders", 0);
+        s = raf_run_cmd(ctx, "encoder_c_compile", &compile_spec, 0);
+        if (s == RAF_FAIL) return RAF_FAIL;
+        s = raf_run_cmd(ctx, "encoder_c_run", &run_spec, 0);
         if (s == RAF_FAIL) return RAF_FAIL;
     } else {
         ctx->limited = 1;
@@ -68,8 +92,12 @@ static RafStatus raf_pipe_encoders(RafContext *ctx) {
 }
 
 static RafStatus raf_pipe_roundtrip(RafContext *ctx) {
+    static const char *const argv[] = {
+        "sh", "tests/test_asm_roundtrip.sh", (const char *)0
+    };
+    const RafExecSpec spec = {argv, 2u};
     (void)raf_context_text_copy(ctx->input, (RafU32)sizeof(ctx->input), "Apkc/hello.s.txt");
-    if (raf_run_cmd(ctx, "roundtrip", "sh tests/test_asm_roundtrip.sh", 0) == RAF_FAIL) return RAF_FAIL;
+    if (raf_run_cmd(ctx, "roundtrip", &spec, 0) == RAF_FAIL) return RAF_FAIL;
     if (raf_crc32_file(ctx->input, &ctx->input_crc32) == 0) raf_log_hex32(ctx, RAF_HASH, "proof", "input_crc32=", ctx->input_crc32);
     if (raf_sha256_file(ctx->input, ctx->input_sha256) == 0) raf_log_s(ctx, RAF_HASH, "proof", "input_sha256=", ctx->input_sha256);
     ctx->limited = 1;
@@ -79,8 +107,12 @@ static RafStatus raf_pipe_roundtrip(RafContext *ctx) {
 }
 
 static RafStatus raf_pipe_apkc_validate(RafContext *ctx) {
+    static const char *const argv[] = {
+        "sh", "scripts/apkc_validate.sh", (const char *)0
+    };
+    const RafExecSpec spec = {argv, 2u};
     (void)raf_context_text_copy(ctx->input, (RafU32)sizeof(ctx->input), "scripts/apkc_validate.sh");
-    if (raf_run_cmd(ctx, "apkc", "sh scripts/apkc_validate.sh", 0) == RAF_FAIL) return RAF_FAIL;
+    if (raf_run_cmd(ctx, "apkc", &spec, 0) == RAF_FAIL) return RAF_FAIL;
     if (raf_crc32_file(ctx->input, &ctx->input_crc32) == 0) raf_log_hex32(ctx, RAF_HASH, "proof", "input_crc32=", ctx->input_crc32);
     if (raf_sha256_file(ctx->input, ctx->input_sha256) == 0) raf_log_s(ctx, RAF_HASH, "proof", "input_sha256=", ctx->input_sha256);
     ctx->limited = 1;
@@ -90,8 +122,12 @@ static RafStatus raf_pipe_apkc_validate(RafContext *ctx) {
 }
 
 static RafStatus raf_pipe_proof_chain(RafContext *ctx) {
+    static const char *const argv[] = {
+        "bash", "scripts/capture_android_proof_chain.sh", (const char *)0
+    };
+    const RafExecSpec spec = {argv, 2u};
     (void)raf_context_text_copy(ctx->input, (RafU32)sizeof(ctx->input), "scripts/capture_android_proof_chain.sh");
-    if (raf_run_cmd(ctx, "proof", "bash scripts/capture_android_proof_chain.sh", 1) == RAF_FAIL) return RAF_FAIL;
+    if (raf_run_cmd(ctx, "proof", &spec, 1) == RAF_FAIL) return RAF_FAIL;
     ctx->limited = 1;
     (void)raf_context_text_copy(ctx->gaps, (RafU32)sizeof(ctx->gaps), "android_device_or_adb=TOKEN_VAZIO;human_audit=AUDIT");
     raf_log(ctx, RAF_AUDIT, "proof", "cadeia full-chain depende de dispositivo/prova humana");
