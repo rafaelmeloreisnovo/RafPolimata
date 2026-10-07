@@ -12,7 +12,7 @@
 | Rota | Papel | Limite |
 |---|---|---|
 | [AUTHORIAL_FEDERATION_V1](federation/AUTHORIAL_FEDERATION_V1.md) | entrada humano/IA para fontes autorais federadas | não integra build por si só |
-| `../data/federation/authorial_sources.v1.json` | fonte machine-readable repo/ref/path/licença/estado | ausência permanece `TOKEN_VAZIO` |
+| `../data/federation/authorial_sources.v1.json` | fonte machine-readable repo/ref/path/licença/estado | ausência permanece `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)` |
 | `../federation/authorial/AGENTS.md` | regras escopadas para agentes dentro do archive | snapshot importado não vira implementação nativa |
 | `../federation/authorial/README.md` | layout e regra de promoção | `IMPORTED != INTEGRATED != TESTED != PASS` |
 
