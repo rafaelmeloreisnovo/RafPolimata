@@ -22,6 +22,8 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafU32 arch_state;
     RafU32 hash_state;
     RafU32 time_state;
+    RafU32 status_state;
+    RafU32 arm_state;
     RafSha256 sha;
     RafU8 digest[32];
     char hex[65];
@@ -70,9 +72,12 @@ RafU32 rafbbs_authorial_probe(void *state)
     arch_state = arch.no_heap ^ arch.no_syscall ^ arch.simd;
     time_state = (RafU32)mono_elapsed.ms ^ mono_elapsed.valid ^
                  (RafU32)sizeof(RafContext);
+    status_state = (RafU32)(unsigned char)raf_status_name(RAF_PASS)[0];
+    arm_state = (RafU32)raf_is_arm_host();
 
     return caller_word ^ crc ^ rollback_step ^ watchdog_state ^
-           flags_state ^ arch_state ^ time_state ^ manifest.magic ^ manifest.hash_state ^
+           flags_state ^ arch_state ^ time_state ^ status_state ^ arm_state ^
+           manifest.magic ^ manifest.hash_state ^
            output.pos ^ output.dropped ^ sink_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
