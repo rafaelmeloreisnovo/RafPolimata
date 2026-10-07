@@ -8,6 +8,7 @@ PROBE="$ROOT/tools/rafbbs/tests/rafbbs_authorial_probe.c"
 OUT=${TMPDIR:-/tmp}/rafbbs-authorial-zero-dep
 mkdir -p "$OUT"
 cd "$ROOT"
+sh "$ROOT/freestanding/tests/verify_contract.sh"
 
 PURE_FILES="
 tools/rafbbs/rafbbs_types.h
