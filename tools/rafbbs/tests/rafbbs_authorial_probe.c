@@ -13,6 +13,7 @@
 #include "rafbbs_log_core.h"
 #include "rafbbs_format_core.h"
 #include "rafbbs_git_core.h"
+#include "rafbbs_recent_core.h"
 #include "rafbbs_runlog_core.h"
 #include "rafbbs_pipeline_core.h"
 #include "rafbbs_command_core.h"
@@ -76,6 +77,7 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafU32 log_state;
     RafU32 format_state;
     RafU32 git_state;
+    RafU32 recent_state;
     RafU32 runlog_state;
     RafU32 pipeline_state;
     RafU32 cli_state;
@@ -218,6 +220,27 @@ RafU32 rafbbs_authorial_probe(void *state)
                     (RafU32)(unsigned char)git_oid[0];
     }
     {
+        RafRecentCatalog recent;
+        RafLogText recent_text;
+        char recent_buf[128];
+        raf_recent_init(&recent);
+        (void)raf_recent_offer(
+            &recent, "run-20261007-000002.txt", "run-", ".txt"
+        );
+        (void)raf_recent_offer(
+            &recent, "run-20261007-000001.txt", "run-", ".txt"
+        );
+        raf_log_text_init(
+            &recent_text, recent_buf, (RafU32)sizeof(recent_buf)
+        );
+        raf_recent_render(&recent_text, &recent);
+        if (recent.count != 2u || recent.dropped != 0u ||
+            recent_text.dropped != 0u)
+            return caller_word ^ 0x52454331u;
+        recent_state = recent.count ^ recent_text.pos ^
+                       (RafU32)(unsigned char)recent.names[0][0];
+    }
+    {
         RafLogText runlog_text;
         raf_log_text_init(
             &runlog_text,
@@ -277,7 +300,7 @@ RafU32 rafbbs_authorial_probe(void *state)
            (RafU32)manifest_wire[0] ^ (RafU32)manifest_wire[95] ^
            output.pos ^ output.dropped ^ sink_state ^
            manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^
-           log_state ^ format_state ^ git_state ^ runlog_state ^ pipeline_state ^ cli_state ^ tui_state ^ context_state ^
+           log_state ^ format_state ^ git_state ^ recent_state ^ runlog_state ^ pipeline_state ^ cli_state ^ tui_state ^ context_state ^
            command_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
