@@ -36,7 +36,7 @@ external hot helper    = 0
 - Do not confuse ISA profiles with host ABI. SysV, Windows x64, AAPCS/EABI and OS entry/exit rules stay outside generic L0.
 - Register aliases are geometry views, not independent storage: XMM/YMM/ZMM, S/D/Q, V/Q/D/S/H/B, FPR/VR/VSR and similar families must not be double-counted.
 - Privileged/control/debug/PMU/virtualization/security registers may be described as topology but generic L0 must not access them without a separately gated privilege contract.
-- Metadata compilation is not executor evidence. POWER/LoongArch/s390x metadata may be build-proven while their instruction executors remain `TOKEN_VAZIO (CLOSURE_L11)`.
+- Metadata compilation is not executor evidence. LoongArch metadata remains metadata-only; POWER64 VSX/VMX and s390x executor claims require their dedicated codegen gates. POWER MMA remains `TOKEN_VAZIO (CLOSURE_L11)`.
 
 ## Stub rule
 
@@ -86,6 +86,7 @@ sh freestanding/tests/verify_authorial_zero_dep.sh
 sh freestanding/tests/verify_matrix.sh
 sh freestanding/tests/verify_profiles.sh
 sh freestanding/tests/verify_s390x_vector.sh
+sh freestanding/tests/verify_power_vsx.sh
 sh freestanding/tests/verify_scalable.sh
 sh freestanding/tests/verify_matrix_accel.sh
 sh freestanding/tests/verify_register_metadata.sh
@@ -93,6 +94,7 @@ sh freestanding/tests/verify_register_metadata.sh
 
 - `verify_profiles.sh`: SSE2/AVX2/AVX-512/K/NEON/Advanced-SIMD fixed-vector codegen.
 - `verify_s390x_vector.sh`: z13 fixed-vector codegen pinned to VR16..VR19; rejects VR0..VR15/FPR overlap, calls, stack traffic and unresolved helpers.
+- `verify_power_vsx.sh`: POWER64 fixed-vector codegen pinned to VR0..VR3 = VSR32..35; does not promote the separate MMA path.
 - `verify_scalable.sh`: SVE/RVV one-stage predicate/VL codegen.
 - `verify_matrix_accel.sh`: direct AMX TMM and SME ZA register ownership/codegen; it does not imply complete matrix data paths.
 - `verify_register_metadata.sh`: POWER64/LoongArch64/s390x metadata only; it must never be reported as executor PASS.
