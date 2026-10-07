@@ -42,6 +42,7 @@ jobs:
           python3 -m json.tool build/rafci/source-contract-receipt.json >/dev/null
       - name: Preserve source-contract receipt
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: rafci-source-contract-${{ github.run_id }}
@@ -81,6 +82,7 @@ jobs:
           PY
       - name: Preserve provider observation receipt
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: rafci-provider-observation-${{ github.run_id }}
@@ -125,6 +127,7 @@ jobs:
           PY
       - name: Preserve physical-route receipt
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: rafci-physical-route-${{ github.run_id }}
@@ -216,6 +219,7 @@ jobs:
           PY
       - name: Preserve target-object receipt
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: rafci-object-${{ matrix.id }}-${{ github.run_id }}
@@ -289,6 +293,7 @@ jobs:
           PY
       - name: Preserve host-linker receipt
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: rafci-host-linker-${{ github.run_id }}
