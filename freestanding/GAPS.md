@@ -41,7 +41,7 @@ Governance:
 | L0-GAP-010 | Qualcomm Hexagon/HVX register topology and executor | `TOKEN_VAZIO (CLOSURE_L11)` | available target toolchain + topology then executor gate |
 | L0-GAP-011 | ARM M-profile MVE/Helium register topology and executor | `TOKEN_VAZIO (CLOSURE_L11)` | explicit M-profile target + MVE instruction/codegen gate |
 | L0-GAP-012 | x86 APX `R16..R31` explicit profile | `TOKEN_VAZIO (CLOSURE_L11)` | assembler/compiler APX profile + register-allocation/codegen gate |
-| L0-GAP-013 | repository-wide authorial zero-runtime-dependency migration beyond canonical L0 and the named RafBBS V1 slice | RafBBS V1 pure set now extends through status, context, monotonic-time arithmetic and deterministic text-manifest rendering; POSIX clock acquisition and FILE/filesystem persistence are explicit adapters; repository remainder stays `TOKEN_VAZIO (CLOSURE_L11)` | per-component classify → isolate pure core → explicit host/provider adapter → `-nostdinc`/no-undefined falsifier; never infer repository closure from one slice |
+| L0-GAP-013 | repository-wide authorial zero-runtime-dependency migration beyond canonical L0 and the named RafBBS V1 slice | RafBBS V1 pure set now extends through status, context, monotonic-time arithmetic, deterministic text rendering and a fixed 96-byte binary-manifest codec; POSIX clock acquisition and FILE/filesystem persistence are explicit adapters; repository remainder stays `TOKEN_VAZIO (CLOSURE_L11)` | per-component classify → isolate pure core → explicit host/provider adapter → `-nostdinc`/no-undefined falsifier; never infer repository closure from one slice |
 
 ## Open execution/evidence gaps — CLOSURE_L12
 
