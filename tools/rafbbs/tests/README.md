@@ -18,6 +18,7 @@
 - `rafbbs_tui_core_test.c`: falsifica QUIT/LIST/FILES, rotas 1/2/3 e default/tecla desconhecida preservando ids exatos; zero stdio/terminal no core.
 - `rafbbs_context_core_test.c`: falsifica seed exato, composição de caminhos, watchdog/zero-state e truncamento sem memset/snprintf/libc.
 - `rafbbs_command_core_test.c`: falsifica ausência de execução, rc=0, falha opcional e falha obrigatória sem shell/provider.
+- `rafbbs_git_core_test.c`: falsifica HEAD simbólico/detached, OID curto, caminho de ref seguro, packed-refs e rejeição de traversal sem libc/git/shell.
 - `rafbbs_baremetal_test.c`: saída byte-a-byte, manifesto binário, failover de hash e flags de arquitetura.
 - `rafbbs_watchdog_negative_test.c`: garante que watchdog expirado é detectado.
 - `rafbbs_baremetal_overflow_test.c`: valida saturação do buffer fixo e contador `dropped`.
