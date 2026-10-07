@@ -1,24 +1,62 @@
 #include "../include/zipraf_hw.h"
 
+static zh_u32 zh_udiv32_authorial(zh_u32 n, zh_u32 d) {
+    zh_u32 q = 0u;
+    zh_u32 bit = 1u;
+    if (d == 0u) return 0xffffffffu;
+    while (d <= (n >> 1)) {
+        d <<= 1;
+        bit <<= 1;
+    }
+    while (bit != 0u) {
+        if (n >= d) {
+            n -= d;
+            q |= bit;
+        }
+        d >>= 1;
+        bit >>= 1;
+    }
+    return q;
+}
+
+static zh_u64 zh_udiv64_authorial(zh_u64 n, zh_u64 d) {
+    zh_u64 q = 0u;
+    zh_u64 bit = 1u;
+    if (d == 0u) return 0xffffffffffffffffULL;
+    while (d <= (n >> 1)) {
+        d <<= 1;
+        bit <<= 1;
+    }
+    while (bit != 0u) {
+        if (n >= d) {
+            n -= d;
+            q |= bit;
+        }
+        d >>= 1;
+        bit >>= 1;
+    }
+    return q;
+}
+
 zh_u64 zh_patch_u64(zh_u64 current, zh_u64 value, zh_u64 mask) {
     return current ^ ((current ^ value) & mask);
 }
 
 zh_u32 zh_vector_lanes(zh_u32 register_bits, zh_u32 element_bits) {
     if (element_bits == 0u) return 0u;
-    return register_bits / element_bits;
+    return zh_udiv32_authorial(register_bits, element_bits);
 }
 
 zh_u32 zh_block_fit(zh_u32 container_bytes, zh_u32 block_bytes) {
     if (block_bytes == 0u) return 0u;
-    return container_bytes / block_bytes;
+    return zh_udiv32_authorial(container_bytes, block_bytes);
 }
 
 zh_u32 zh_write_amplification_q16(zh_u32 semantic_bytes, zh_u32 physical_granule_bytes) {
     zh_u64 num;
     if (semantic_bytes == 0u || physical_granule_bytes == 0u) return 0u;
     num = ((zh_u64)physical_granule_bytes) << 16;
-    num /= (zh_u64)semantic_bytes;
+    num = zh_udiv64_authorial(num, (zh_u64)semantic_bytes);
     return num > 0xffffffffULL ? 0xffffffffu : (zh_u32)num;
 }
 
@@ -26,7 +64,7 @@ zh_u32 zh_cycles_per_byte_q16(zh_u64 cycles, zh_u64 useful_bytes) {
     zh_u64 num;
     if (useful_bytes == 0ULL) return 0xffffffffu;
     if (cycles > (0xffffffffffffffffULL >> 16)) return 0xffffffffu;
-    num = (cycles << 16) / useful_bytes;
+    num = zh_udiv64_authorial(cycles << 16, useful_bytes);
     return num > 0xffffffffULL ? 0xffffffffu : (zh_u32)num;
 }
 
