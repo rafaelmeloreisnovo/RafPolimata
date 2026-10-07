@@ -34,6 +34,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/rafbbs_core.h` — caller-owned context with no hosted time type;
 - `tools/rafbbs/rafbbs_context_core.h` — seeded context initialization, bounded text/path composition and watchdog setup without memset/snprintf/libc;
 - `tools/rafbbs/rafbbs_command_core.h` — deterministic executed/rc/optional → PASS/SKIP/FAIL/TOKEN_VAZIO policy with limited/failed bits; no command execution;
+- `tools/rafbbs/rafbbs_result_core.h` — final-status/hash-state classification from explicit SHA/CRC validity bits; digest numeric zero never represents missing observation;
 - `tools/rafbbs/rafbbs_manifest_core.h` — deterministic text-manifest rendering into caller-owned memory;
 - `tools/rafbbs/rafbbs_filepicker_core.h` — static catalog + bounded selection state with no libc/string dependency;
 - `tools/rafbbs/rafbbs_theme.h` — deterministic status-to-ANSI mapping over the authorial status vocabulary;
@@ -62,6 +63,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/tests/rafbbs_tui_core_test.c` — quit/list/files/run/default TUI-route falsifier with exact pipeline ids;
 - `tools/rafbbs/tests/rafbbs_context_core_test.c` — seeded fields, deterministic paths, watchdog/zero state and truncation falsifier;
 - `tools/rafbbs/tests/rafbbs_command_core_test.c` — executed/unexecuted, success, optional failure and required failure policy falsifier;
+- `tools/rafbbs/tests/rafbbs_result_core_test.c` — explicit evidence-validity, CRC32-zero-valid and failed-override falsifier under `CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY`;
 - `tools/rafbbs/tests/rafbbs_manifest_bin_core_test.c` — binary wire exact-byte/roundtrip/truncation falsifier.
 
 The hosted file wrappers remain deliberately outside the pure core:
@@ -78,6 +80,11 @@ The hosted file wrappers remain deliberately outside the pure core:
 - `tools/rafbbs/rafbbs_cli.h` — hosted terminal, wall-clock, filesystem and command dispatch adapter; filesystem provenance observations seed the pure context core;
 - `tools/rafbbs/rafbbs_tui.h` — hosted stdio rendering/input adapter that delegates key semantics to `rafbbs_tui_core.h`;
 - POSIX file adapters.
+
+Evidence validity follows the same rule: hosted hashing may produce any digest
+value, including numeric zero. Observation presence is carried by explicit
+validity bits, and the authorial result core performs only deterministic
+classification from caller-supplied facts.
 
 The monotonic boundary does not reimplement a provider clock.  POSIX supplies the
 observation; the authorial core owns only the value contract and deterministic
