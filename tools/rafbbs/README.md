@@ -88,9 +88,11 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_freestanding.h`: watchdog/rollback/flags;
 - `rafbbs_core.h`: caller-owned RafContext using `RafMonoTime`, not `struct timespec`;
 - `rafbbs_manifest_core.h`: deterministic text-manifest rendering into a caller-owned fixed buffer;
-- `rafbbs_baremetal.h`: fixed-buffer output and binary manifest;
+- `rafbbs_filepicker_core.h`: static catalog/selection state without hosted string/runtime calls;
+- `rafbbs_baremetal.h`: fixed-buffer output and binary manifest value model;
+- `rafbbs_manifest_bin_core.h`: canonical 96-byte little-endian binary-manifest encode/decode;
 - `rafbbs_crc32_core.h` and `rafbbs_sha256_core.h`: pure algorithms;
-- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h` and `rafbbs_manifest.h`: hosted/provider adapters only.
+- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h` and `rafbbs_filepicker.h`: hosted/provider adapters only.
 
 The freestanding build uses `-nostdinc -ffreestanding -fno-builtin -fno-stack-protector` and rejects unresolved symbols in the declared pure objects. A compiler, `nm`, shell or CI runner is a factory/evidence tool for this gate, not a runtime dependency of those objects. Full toolchain self-hosting remains `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`. Physical bare-metal execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)` until separately evidenced.
 
@@ -100,7 +102,7 @@ Run:
 sh freestanding/tests/verify_authorial_zero_dep.sh
 ```
 
-The gate enumerates nine pure modules plus a caller-owned probe, rejects host/runtime leakage, and compiles the same probe for six OS-neutral ISA targets. It checks the object for unresolved helpers and keeps hosted adapters outside the pure set.
+The gate enumerates eleven pure modules plus a caller-owned probe, rejects host/runtime leakage, and compiles the same probe for six OS-neutral ISA targets. It checks the object for unresolved helpers and keeps hosted adapters outside the pure set.
 
 The monotonic-time boundary is intentionally split: `rafbbs_time.h` owns only
 representation, validity and elapsed arithmetic; `rafbbs_time_posix.h` owns
@@ -112,7 +114,13 @@ CI host. This is semantic host execution only; physical ARM/device timing remain
 The text-manifest boundary follows the same rule: `rafbbs_manifest_core.h`
 owns deterministic byte rendering, lowercase fixed-width CRC/hash formatting,
 explicit invalid elapsed output and overflow accounting. `rafbbs_manifest.h`
-owns `FILE`/filesystem persistence. Rendering PASS does not claim a
+owns text `FILE`/filesystem persistence.
+
+The binary-manifest boundary is equally explicit: `rafbbs_manifest_bin_core.h`
+owns the canonical 96-byte little-endian wire image and roundtrip validation;
+`rafbbs_manifest_bin.h` only persists already-encoded bytes. This removes native
+struct-layout/endianness dependence while preserving the historical little-endian
+byte representation used on project ARM/x86 hosts. Codec PASS does not claim a
 freestanding filesystem or provider.
 
 ## SHA256 autoral
