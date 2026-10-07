@@ -1,12 +1,12 @@
 #ifndef RAFBBS_LOG_H
 #define RAFBBS_LOG_H
-#include <stdarg.h>
 #include <stdio.h>
 #include "rafbbs_core.h"
 #include "rafbbs_time_posix.h"
 #include "rafbbs_theme.h"
 #include "rafbbs_log_core.h"
 #include "rafbbs_runlog_core.h"
+#include "rafbbs_format_core.h"
 #define RAFBBS_MAX_LOG_LINES 512
 static char rafbbs_lines[RAFBBS_MAX_LOG_LINES][RAFBBS_LOG_LINE];
 static long raf_elapsed_ms(RafContext *ctx) {
@@ -14,9 +14,8 @@ static long raf_elapsed_ms(RafContext *ctx) {
     if (elapsed.valid == 0u) return -1L;
     return (long)elapsed.ms;
 }
-static void raf_log(RafContext *ctx, RafStatus st, const char *module, const char *fmt, ...) {
-    char detail[160]; long ms = raf_elapsed_ms(ctx); va_list ap;
-    va_start(ap, fmt); vsnprintf(detail, sizeof(detail), fmt, ap); va_end(ap);
+static void raf_log(RafContext *ctx, RafStatus st, const char *module, const char *detail) {
+    long ms = raf_elapsed_ms(ctx);
     if (ctx->syslog_count < RAFBBS_MAX_LOG_LINES) {
         RafLogText line;
         raf_log_text_init(&line, rafbbs_lines[ctx->syslog_count], (RafU32)RAFBBS_LOG_LINE);
@@ -26,11 +25,32 @@ static void raf_log(RafContext *ctx, RafStatus st, const char *module, const cha
     printf("%s%s%s\n", raf_status_color(st), rafbbs_lines[ctx->syslog_count - 1], RAF_ANSI_RESET);
     fflush(stdout);
 }
+static void raf_log_s(RafContext *ctx, RafStatus st, const char *module, const char *prefix, const char *value) {
+    char detail[160];
+    RafLogText out;
+    raf_log_text_init(&out, detail, (RafU32)sizeof(detail));
+    raf_format_prefixed_text(&out, prefix, value);
+    raf_log(ctx, st, module, detail);
+}
+static void raf_log_i32(RafContext *ctx, RafStatus st, const char *module, const char *prefix, RafI32 value) {
+    char detail[160];
+    RafLogText out;
+    raf_log_text_init(&out, detail, (RafU32)sizeof(detail));
+    raf_format_prefixed_i32(&out, prefix, value);
+    raf_log(ctx, st, module, detail);
+}
+static void raf_log_hex32(RafContext *ctx, RafStatus st, const char *module, const char *prefix, RafU32 value) {
+    char detail[160];
+    RafLogText out;
+    raf_log_text_init(&out, detail, (RafU32)sizeof(detail));
+    raf_format_prefixed_hex32(&out, prefix, value);
+    raf_log(ctx, st, module, detail);
+}
 static int raf_file_write_exact(FILE *f, const char *buf, RafU32 len) {
     return fwrite(buf, 1u, (size_t)len, f) == (size_t)len ? 0 : -1;
 }
 static int raf_file_write_line(FILE *f, const char *text) {
-    RafU32 len = raf_runlog_cstr_len(text);
+    RafU32 len = raf_format_cstr_len(text);
     if (raf_file_write_exact(f, text, len) != 0) return -1;
     return raf_file_write_exact(f, "\n", 1u);
 }
