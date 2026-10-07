@@ -24,6 +24,7 @@
 #define RAF_FS_ABI_POWER64      7u
 #define RAF_FS_ABI_LOONGARCH64  8u
 #define RAF_FS_ABI_S390X        9u
+#define RAF_FS_ABI_ARM_MVE      10u
 
 #if defined(__x86_64__)
 # define RAF_FS_ABI_ID RAF_FS_ABI_X86_64
@@ -89,6 +90,15 @@
 # else
 #  define RAF_FS_ABI_MATRIX_REGS 0u
 # endif
+
+#elif defined(__arm__) && defined(__ARM_FEATURE_MVE)
+# define RAF_FS_ABI_ID RAF_FS_ABI_ARM_MVE
+# define RAF_FS_ABI_PTR_BITS 32u
+# define RAF_FS_ABI_GPR_COUNT 16u
+# define RAF_FS_ABI_VECTOR_BITS 128u
+# define RAF_FS_ABI_VECTOR_REGS 8u /* Q0..Q7, each 128 bits. */
+# define RAF_FS_ABI_PRED_REGS 1u /* VPR predicate/status register. */
+# define RAF_FS_ABI_MATRIX_REGS 0u
 
 #elif defined(__arm__) && (__ARM_ARCH >= 7)
 # define RAF_FS_ABI_ID RAF_FS_ABI_ARMV7
