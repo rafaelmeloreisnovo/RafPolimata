@@ -9,7 +9,7 @@ RAF_ARCH ?= arm64
 SRC ?= tests/fixtures/strict_kernel.c
 OUT ?= build/strict/libmain.so
 
-.PHONY: help syntax apkc-hardened-source verbovivo verbovivo-demo encoders proof audit execution-boundary-audit authorial-freestanding evidence-garden evidence-garden-falsifiers maturity-sdk maturity-equivalence maturity-repro maturity-gates maturity-benchmark maturity-all language-contract compile compile-plan compiler-contract compiler-selftest hotfix-audit library-audit strict-elf report clean
+.PHONY: help syntax apkc-hardened-source verbovivo verbovivo-demo encoders proof audit execution-boundary-audit authorial-freestanding authorial-zero-dependency evidence-garden evidence-garden-falsifiers maturity-sdk maturity-equivalence maturity-repro maturity-gates maturity-benchmark maturity-all language-contract compile compile-plan compiler-contract compiler-selftest hotfix-audit library-audit strict-elf report clean
 
 help:
 	@echo 'RafPolimata — make targets:'
@@ -23,6 +23,7 @@ help:
 	@echo '  audit             freestanding invariant audit (scripts/ci_freestanding_audit.sh)'
 	@echo '  execution-boundary-audit  L0/syscall/userspace separation + six-ISA + authorial gates'
 	@echo '  authorial-freestanding  L0 authorial item descriptor gate'
+	@echo '  authorial-zero-dependency  RafBBS pure six-ISA zero-dependency gate'
 	@echo '  evidence-garden   bounded correctness/observability/performance evidence runner'
 	@echo '  evidence-garden-falsifiers  negative tests + known-domain/pairwise void closure audit'
 	@echo '  maturity-sdk      build public SDK v1 + exact ABI symbol gate'
@@ -82,11 +83,15 @@ execution-boundary-audit:
 	sh scripts/verify_execution_boundaries.sh
 	sh freestanding/tests/verify_contract.sh
 	sh freestanding/tests/verify_authorial.sh
+	sh freestanding/tests/verify_authorial_zero_dep.sh
 	sh freestanding/tests/verify_matrix.sh
 	sh syscall/tests/verify_matrix.sh
 
 authorial-freestanding:
 	sh freestanding/tests/verify_authorial.sh
+
+authorial-zero-dependency:
+	sh freestanding/tests/verify_authorial_zero_dep.sh
 
 evidence-garden:
 	python3 -m unittest -v tests.test_evidence_garden tests.test_evidence_garden_falsifiers

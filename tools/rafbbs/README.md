@@ -96,6 +96,8 @@ Run:
 sh freestanding/tests/verify_authorial_zero_dep.sh
 ```
 
+The gate enumerates the five pure modules plus a caller-owned probe, rejects host/runtime leakage, and compiles the same probe for six OS-neutral ISA targets. It checks the object for unresolved helpers and keeps hosted adapters outside the pure set.
+
 ## SHA256 autoral
 
 Além de CRC32, o RafBBS calcula SHA256 por implementação local sem dependência externa para entradas conhecidas. SHA256 não remove `TOKEN_VAZIO`: ele só assina evidência existente.
