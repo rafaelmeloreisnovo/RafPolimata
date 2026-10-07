@@ -17,6 +17,7 @@ tools/rafbbs/rafbbs_core.h
 tools/rafbbs/rafbbs_context_core.h
 tools/rafbbs/rafbbs_command_core.h
 tools/rafbbs/rafbbs_exec_core.h
+tools/rafbbs/rafbbs_runid_core.h
 tools/rafbbs/rafbbs_result_core.h
 tools/rafbbs/rafbbs_manifest_core.h
 tools/rafbbs/rafbbs_filepicker_core.h
@@ -47,6 +48,14 @@ if grep -n -E '(^|[^A-Za-z0-9_])system[[:space:]]*[(]' tools/rafbbs/rafbbs_host.
   echo "FAIL: generic system shell remains in RafBBS executor path" >&2
   exit 1
 fi
+if grep -n -E 'strftime[[:space:]]*[(]' tools/rafbbs/rafbbs_cli.h tools/rafbbs/rafbbs_runid_posix.h; then
+  echo "FAIL: hosted strftime still owns RafBBS run-id byte semantics" >&2
+  exit 1
+fi
+if grep -n -E '^[[:space:]]*#include[[:space:]]*<time[.]h>' tools/rafbbs/rafbbs_cli.h; then
+  echo "FAIL: CLI directly owns civil-time provider header" >&2
+  exit 1
+fi
 sh "$ROOT/tools/rafbbs/rafbbs_build.sh" freestanding
 COMMON="-std=c11 -Wall -Wextra -Werror -O2 -ffreestanding -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-ident -fno-optimize-sibling-calls -fvisibility=hidden -ffunction-sections -fdata-sections -nostdinc -I$ROOT/tools/rafbbs"
 compile() { target=$1; obj="$OUT/${target}.o"; "$CC" -target "$target" $COMMON -c "$PROBE" -o "$obj"; if "$NM" -u "$obj" | grep -q '[^[:space:]]'; then echo "FAIL: unresolved helper(s) in authorial RafBBS $target" >&2; "$NM" -u "$obj" >&2; exit 1; fi; if ! "$NM" -g --defined-only "$obj" | grep -Eq '[[:space:]][Tt][[:space:]]+rafbbs_authorial_probe$'; then echo "FAIL: authorial probe symbol missing in $target" >&2; exit 1; fi; }
@@ -56,4 +65,4 @@ compile armv7a-none-eabi
 compile aarch64-none-elf
 compile riscv32-unknown-elf
 compile riscv64-unknown-elf
-echo "RAFAELIA RafBBS authorial zero-dependency gate: 24 pure modules; argv-exec-spec + result/evidence-validity + command-policy + context-seed + time + text/binary manifest + filepicker + theme + log-line + typed-format + git-provenance-parse + recent-catalog + persisted-runlog-byte + pipeline-spec + cli-route + tui-route cores included; 6/6 ISA objects; unresolved helpers=0"
+echo "RAFAELIA RafBBS authorial zero-dependency gate: 25 pure modules; civil-runid + argv-exec-spec + result/evidence-validity + command-policy + context-seed + time + text/binary manifest + filepicker + theme + log-line + typed-format + git-provenance-parse + recent-catalog + persisted-runlog-byte + pipeline-spec + cli-route + tui-route cores included; 6/6 ISA objects; unresolved helpers=0"
