@@ -57,18 +57,20 @@ int rafbbs_context_core_test(void)
     if (ctx.watchdog.budget != RAFBBS_WATCHDOG_DEFAULT_TICKS ||
         ctx.watchdog.tick != 0u || ctx.watchdog.tripped != 0u)
         return 8;
-    if (ctx.failed != 0 || ctx.limited != 0 || ctx.syslog_count != 0)
+    if (raf_status_name(ctx.final_status)[0] != 'P')
         return 9;
+    if (ctx.failed != 0 || ctx.limited != 0 || ctx.syslog_count != 0)
+        return 10;
 
     seed.run_id = "123456789012345678901234567890123456";
     dropped = raf_context_init_seeded(&ctx, &seed);
     if (dropped == 0u || ctx.run_id[31] != 0)
-        return 10;
+        return 11;
 
     if (raf_context_init_seeded(&ctx, (const RafContextSeed *)0) != 0u)
-        return 11;
-    if (ctx.start.valid != 0u || ctx.watchdog.tick != 0u)
         return 12;
+    if (ctx.start.valid != 0u || ctx.watchdog.tick != 0u)
+        return 13;
 
     return 0;
 }
