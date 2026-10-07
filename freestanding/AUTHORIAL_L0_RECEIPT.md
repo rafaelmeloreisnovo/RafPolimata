@@ -14,7 +14,7 @@ Base: `main@607272c8d69836678a5a7cf69d17d40e2418827b`.
 
 - `SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM`.
 - `external_dep_count` is explicitly set to `0` for the authorial item descriptor.
-- `TOKEN_VAZIO` is represented by `RAF_FS_AUTHORIAL_TOKEN_VAZIO`, a nonzero sentinel.
+- `TOKEN_VAZIO` is represented by `RAF_FS_AUTHORIAL_TOKEN_VAZIO`, a nonzero sentinel; governance `CLOSURE_L12`.
 - No hosted header, libc call, heap allocation, syscall instruction, inline assembly or external helper is introduced by the authorial primitive.
 - The fold is a deterministic local identity fold, not a cryptographic or scientific validation claim.
 
