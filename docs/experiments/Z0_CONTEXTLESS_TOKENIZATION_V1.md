@@ -2,7 +2,8 @@
 
 **State:** IMPLEMENTED / CI_PENDING  
 **Authority:** `rafaelmeloreisnovo/RafPolimata`  
-**Claim boundary:** structural byte observation only; `claim_allowed=false` for cognition, model behavior, physical-device runtime or scientific generalization.
+**Claim boundary:** structural byte observation only; `claim_allowed=false` for cognition, model behavior, physical-device runtime or scientific generalization.  
+**Governance closures:** conceptual/implementation gaps bind to `CLOSURE_L11`; runtime/device/scientific evidence gaps bind to `CLOSURE_L12`.
 
 ## Question
 
