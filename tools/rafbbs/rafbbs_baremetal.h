@@ -1,6 +1,6 @@
 #ifndef RAFBBS_BAREMETAL_H
 #define RAFBBS_BAREMETAL_H
-#include <stdint.h>
+
 #include "rafbbs_freestanding.h"
 
 #define RAFBBS_BAREMETAL_OUT_CAP 1024u
@@ -18,34 +18,34 @@ typedef enum {
 } RafArchProfile;
 
 typedef struct {
-    uint8_t buf[RAFBBS_BAREMETAL_OUT_CAP];
-    uint32_t pos;
-    uint32_t dropped;
+    RafU8 buf[RAFBBS_BAREMETAL_OUT_CAP];
+    RafU32 pos;
+    RafU32 dropped;
 } RafBaremetalOut;
 
 typedef struct {
-    uint32_t magic;
-    uint32_t version;
-    uint32_t status;
-    uint32_t arch;
-    uint32_t input_crc32;
-    uint32_t output_crc32;
-    uint8_t input_sha256[32];
-    uint8_t output_sha256[32];
-    uint32_t hash_state;
-    uint32_t gaps;
+    RafU32 magic;
+    RafU32 version;
+    RafU32 status;
+    RafU32 arch;
+    RafU32 input_crc32;
+    RafU32 output_crc32;
+    RafU8 input_sha256[32];
+    RafU8 output_sha256[32];
+    RafU32 hash_state;
+    RafU32 gaps;
 } RafBinManifest;
 
 typedef struct {
-    uint32_t cflags;
-    uint32_t no_heap;
-    uint32_t no_syscall;
-    uint32_t simd;
-    uint32_t cache_line;
-    uint32_t watchdog_budget;
+    RafU32 cflags;
+    RafU32 no_heap;
+    RafU32 no_syscall;
+    RafU32 simd;
+    RafU32 cache_line;
+    RafU32 watchdog_budget;
 } RafArchFlags;
 
-typedef void (*RafBaremetalSink)(uint8_t byte, void *user);
+typedef void (*RafBaremetalSink)(RafU8 byte, void *user);
 
 typedef struct {
     RafBaremetalSink sink;
@@ -65,42 +65,48 @@ static inline void raf_baremetal_out_init(RafBaremetalOut *o) {
     o->dropped = 0u;
 }
 
-static inline void raf_baremetal_putc(RafBaremetalOut *o, uint8_t c) {
-    uint32_t room = (uint32_t)(o->pos < RAFBBS_BAREMETAL_OUT_CAP);
+static inline void raf_baremetal_putc(RafBaremetalOut *o, RafU8 c) {
+    RafU32 room = (RafU32)(o->pos < RAFBBS_BAREMETAL_OUT_CAP);
     if (room) o->buf[o->pos++] = c;
-    o->dropped += (uint32_t)(room ^ 1u);
+    o->dropped += (RafU32)(room ^ 1u);
 }
 
 static inline void raf_baremetal_write(RafBaremetalOut *o, const char *s) {
     while (*s) {
-        raf_baremetal_putc(o, (uint8_t)*s);
+        raf_baremetal_putc(o, (RafU8)*s);
         s++;
     }
 }
 
 static inline void raf_baremetal_flush(RafBaremetalOut *o, RafBaremetalPort port) {
-    uint32_t i;
+    RafU32 i;
     if (!port.sink) return;
     for (i = 0u; i < o->pos; i++) port.sink(o->buf[i], port.user);
 }
 
-static inline RafBinManifest raf_bin_manifest_make(uint32_t status, uint32_t arch, uint32_t in_crc, uint32_t out_crc, uint32_t hash_state, uint32_t gaps) {
+static inline RafBinManifest raf_bin_manifest_make(
+    RafU32 status, RafU32 arch, RafU32 in_crc, RafU32 out_crc,
+    RafU32 hash_state, RafU32 gaps
+) {
     RafBinManifest m;
-    uint32_t i;
+    RafU32 i;
     m.magic = RAFBBS_BIN_MANIFEST_MAGIC;
     m.version = 1u;
     m.status = status;
     m.arch = arch;
     m.input_crc32 = in_crc;
     m.output_crc32 = out_crc;
-    for (i = 0u; i < 32u; i++) { m.input_sha256[i] = 0u; m.output_sha256[i] = 0u; }
+    for (i = 0u; i < 32u; i++) {
+        m.input_sha256[i] = 0u;
+        m.output_sha256[i] = 0u;
+    }
     m.hash_state = hash_state;
     m.gaps = gaps;
     return m;
 }
 
-static inline uint32_t raf_hash_failover_state(uint32_t sha_ok, uint32_t crc_ok) {
-    uint32_t state = 0u;
+static inline RafU32 raf_hash_failover_state(RafU32 sha_ok, RafU32 crc_ok) {
+    RafU32 state = 0u;
     state |= (sha_ok ? RAFBBS_HASH_SHA256_OK : 0u);
     state |= (crc_ok ? RAFBBS_HASH_CRC32_OK : 0u);
     state |= ((sha_ok | crc_ok) ? 0u : RAFBBS_HASH_TOKEN_VAZIO);
@@ -108,8 +114,8 @@ static inline uint32_t raf_hash_failover_state(uint32_t sha_ok, uint32_t crc_ok)
 }
 
 static inline RafArchFlags raf_arch_flags(RafArchProfile arch) {
-    uint32_t idx = (uint32_t)arch;
-    uint32_t max = (uint32_t)(sizeof(raf_arch_flag_table) / sizeof(raf_arch_flag_table[0]));
+    RafU32 idx = (RafU32)arch;
+    RafU32 max = (RafU32)(sizeof(raf_arch_flag_table) / sizeof(raf_arch_flag_table[0]));
     idx = (idx < max) ? idx : 0u;
     return raf_arch_flag_table[idx];
 }
