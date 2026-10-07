@@ -9,9 +9,16 @@
 #include "rafbbs_manifest_bin_core.h"
 #include "rafbbs_filepicker_core.h"
 #include "rafbbs_theme.h"
+#include "rafbbs_log_core.h"
+#include "rafbbs_pipeline_core.h"
 
 static RafContext rafbbs_authorial_manifest_ctx;
 static char rafbbs_authorial_manifest_buf[128];
+static char rafbbs_authorial_log_buf[64];
+static const RafPipelineSpec rafbbs_authorial_pipeline_specs[] = {
+    {"probe", "Probe", "authorial", 0u, 0u, 0u},
+    {"arm", "ARM", "authorial", 1u, 0u, 1u}
+};
 
 static void rafbbs_authorial_probe_sink(RafU8 byte, void *user)
 {
@@ -54,6 +61,8 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafFilePickerCore picker = raf_filepicker_core_init();
     RafU32 picker_state;
     RafU32 theme_state;
+    RafU32 log_state;
+    RafU32 pipeline_state;
 
     if (state != (void *)0)
         caller_word = *(const RafU32 *)state;
@@ -122,6 +131,27 @@ RafU32 rafbbs_authorial_probe(void *state)
         (RafU32)(unsigned char)raf_status_color(RAF_PASS)[0] ^
         (RafU32)(unsigned char)raf_status_color(RAF_TOKEN_VAZIO)[3] ^
         (RafU32)(unsigned char)raf_status_name(RAF_PASS)[0];
+    {
+        RafLogText log_text;
+        raf_log_text_init(
+            &log_text,
+            rafbbs_authorial_log_buf,
+            (RafU32)sizeof(rafbbs_authorial_log_buf)
+        );
+        raf_log_line_render(
+            &log_text, RAF_INFO, "probe", "ok",
+            mono_elapsed.ms, mono_elapsed.valid
+        );
+        log_state = log_text.pos ^ log_text.dropped ^
+                    (RafU32)(unsigned char)rafbbs_authorial_log_buf[0];
+    }
+    pipeline_state = raf_pipeline_find_index(
+        rafbbs_authorial_pipeline_specs, 2u, "arm"
+    );
+    if (pipeline_state == RAFBBS_PIPELINE_NOT_FOUND)
+        return caller_word ^ 0x50495045u;
+    pipeline_state ^= rafbbs_authorial_pipeline_specs[pipeline_state].requires_arm ^
+                      rafbbs_authorial_pipeline_specs[pipeline_state].writes_artifacts;
 
     return caller_word ^ crc ^ rollback_step ^ watchdog_state ^
            flags_state ^ arch_state ^ time_state ^ status_state ^ arm_state ^
@@ -130,6 +160,7 @@ RafU32 rafbbs_authorial_probe(void *state)
            (RafU32)manifest_wire[0] ^ (RafU32)manifest_wire[95] ^
            output.pos ^ output.dropped ^ sink_state ^
            manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^
+           log_state ^ pipeline_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
 }
