@@ -40,6 +40,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/rafbbs_log_core.h` — deterministic caller-owned log-line rendering with authorial 64-bit divmod and no printf/libgcc helper;
 - `tools/rafbbs/rafbbs_format_core.h` — finite typed text/i32/hex32 formatter with no stdarg/vsnprintf/general printf grammar;
 - `tools/rafbbs/rafbbs_git_core.h` — deterministic parser for caller-supplied HEAD/OID/packed-ref bytes; no filesystem or Git executable;
+- `tools/rafbbs/rafbbs_recent_core.h` — fixed-memory prefix/suffix filter, lexicographic top-10 selector and byte renderer; no shell/find/sort/tail;
 - `tools/rafbbs/rafbbs_runlog_core.h` — deterministic persisted run-log header/artifact/gap byte renderer with authorial fixed-width hex and no FILE/fprintf/libc;
 - `tools/rafbbs/rafbbs_pipeline_core.h` — pipeline metadata + exact-byte lookup only; no context, status or execution callback;
 - `tools/rafbbs/rafbbs_cli_core.h` — deterministic CLI action routing over caller-owned argv; no terminal, clock, filesystem or command execution;
@@ -56,6 +57,7 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/tests/rafbbs_log_core_test.c` — exact line, invalid-time, long-minute and overflow falsifier;
 - `tools/rafbbs/tests/rafbbs_format_core_test.c` — text/i32 extrema/fixed-hex/string-length/overflow formatter falsifier;
 - `tools/rafbbs/tests/rafbbs_git_core_test.c` — symbolic/detached HEAD, OID, packed-ref, invalid-hex and truncation falsifier;
+- `tools/rafbbs/tests/rafbbs_recent_core_test.c` — filter/top-10/order/render/overflow bounded-catalog falsifier;
 - `tools/rafbbs/tests/rafbbs_runlog_core_test.c` — exact persisted header/tail bytes, fixed-width CRC/hash, TOKEN_VAZIO gap and overflow falsifier;
 - `tools/rafbbs/tests/rafbbs_pipeline_core_test.c` — exact/case-sensitive lookup, flags and not-found falsifier;
 - `tools/rafbbs/tests/rafbbs_cli_core_test.c` — help/list/run/invalid and case-sensitive CLI-route falsifier;
@@ -75,6 +77,7 @@ The hosted file wrappers remain deliberately outside the pure core:
 - `tools/rafbbs/rafbbs_log.h` — hosted clock observation, console and FILE persistence adapter; live detail formatting delegates to the typed pure formatter and persisted run-log byte layout delegates to the pure runlog core;
 - `tools/rafbbs/rafbbs_pipeline.h` — hosted handler binding, command execution and provider/file/hash adapters; result policy delegates to `rafbbs_command_core.h`;
 - `tools/rafbbs/rafbbs_git_posix.h` — hosted filesystem adapter for ordinary .git/HEAD, loose-ref and packed-refs observation; no external Git process;
+- `tools/rafbbs/rafbbs_recent_posix.h` — hosted directory/stdout adapter for log/manifest catalogs; no shell/find/sort/tail process chain;
 - `tools/rafbbs/rafbbs_cli.h` — hosted terminal, wall-clock, filesystem and command dispatch adapter; filesystem provenance observations seed the pure context core;
 - `tools/rafbbs/rafbbs_tui.h` — hosted stdio rendering/input adapter that delegates key semantics to `rafbbs_tui_core.h`;
 - POSIX file adapters.
@@ -138,7 +141,7 @@ RafBBS context/monotonic-time value layer + seeded context/path core + command-r
 + static filepicker catalog/selection + theme/status + deterministic log-line rendering
 + deterministic persisted run-log byte rendering without fprintf/libc
 + pipeline spec/lookup core + CLI route core + TUI route core + fixed 96-byte binary-manifest wire codec prepared for `-nostdinc` compilation,
-with POSIX clock acquisition, filesystem persistence and console presentation isolated behind adapters; live detail formatting and Git provenance byte parsing are typed/authorial, and the external Git executable is not required by the provenance path.
+with POSIX clock acquisition, filesystem persistence and console presentation isolated behind adapters; live detail formatting, Git provenance byte parsing and recent-catalog selection are typed/authorial; neither the external Git executable nor find/sort/tail are required by these paths.
 
 `F_gap` = exact-head provider CI for this successor, physical execution and
 repository-wide component migration are not yet evidence-bound.

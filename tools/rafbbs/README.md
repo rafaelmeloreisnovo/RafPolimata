@@ -95,6 +95,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_log_core.h`: caller-owned deterministic syslog-line composition with authorial 64-bit divmod;
 - `rafbbs_format_core.h`: finite typed formatter for text, signed i32 and fixed-width hex32; no stdarg/vsnprintf/general printf grammar;
 - `rafbbs_git_core.h`: caller-byte parser for symbolic/detached HEAD, loose OID and packed-ref records; no Git executable/filesystem/provider access;
+- `rafbbs_recent_core.h`: fixed-memory prefix/suffix filter + lexicographic top-10 selector/render core; no shell/find/sort/tail or directory API;
 - `rafbbs_runlog_core.h`: deterministic persisted run-log header/artifact/gap byte rendering, including fixed-width CRC/hash hex, without stdio or filesystem;
 - `rafbbs_pipeline_core.h`: pipeline specs/flags and exact-byte lookup with no execution callback;
 - `rafbbs_cli_core.h`: deterministic CLI action routing with no hosted terminal/string runtime;
@@ -102,7 +103,7 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_baremetal.h`: fixed-buffer output and binary manifest value model;
 - `rafbbs_manifest_bin_core.h`: canonical 96-byte little-endian binary-manifest encode/decode;
 - `rafbbs_crc32_core.h` and `rafbbs_sha256_core.h`: pure algorithms;
-- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h`, `rafbbs_filepicker.h`, `rafbbs_log.h`, `rafbbs_git_posix.h`, `rafbbs_pipeline.h`, `rafbbs_cli.h` and `rafbbs_tui.h`: hosted/provider adapters only. `rafbbs_log.h` no longer owns persisted run-log formatting through `fprintf` and no longer uses `stdarg/vsnprintf` for live details. Typed wrappers delegate text/i32/hex32 formatting to `rafbbs_format_core.h`; console and FILE remain hosted.
+- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h`, `rafbbs_filepicker.h`, `rafbbs_log.h`, `rafbbs_git_posix.h`, `rafbbs_recent_posix.h`, `rafbbs_pipeline.h`, `rafbbs_cli.h` and `rafbbs_tui.h`: hosted/provider adapters only. `rafbbs_log.h` no longer owns persisted run-log formatting through `fprintf` and no longer uses `stdarg/vsnprintf` for live details. Typed wrappers delegate text/i32/hex32 formatting to `rafbbs_format_core.h`; console and FILE remain hosted.
 
 The freestanding build uses `-nostdinc -ffreestanding -fno-builtin -fno-stack-protector` and rejects unresolved symbols in the declared pure objects. A compiler, `nm`, shell or CI runner is a factory/evidence tool for this gate, not a runtime dependency of those objects. Full toolchain self-hosting remains `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`. Physical bare-metal execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)` until separately evidenced.
 
@@ -327,3 +328,21 @@ Therefore:
 The external `git` binary is removed from this provenance path, while the
 filesystem itself remains a hosted adapter and physical-device observation
 remains separately evidence-bound.
+
+
+## Recent logs/manifests catalog core freestanding
+
+The CLI no longer delegates `logs` and `manifest` listing to the shell pipeline
+`find | sort | tail`. `rafbbs_recent_core.h` accepts caller-supplied names,
+filters by exact prefix/suffix, maintains only the lexicographically greatest ten
+entries in fixed storage, sorts those ten ascending and renders them into a
+caller-owned byte buffer. That matches the previous timestamped-filename
+selection rule without importing a shell, `find`, `sort`, `tail`, heap or
+general-purpose sorting runtime.
+
+`rafbbs_recent_posix.h` is the explicit directory/stdout adapter using
+`opendir/readdir/closedir` and `fwrite`. Directory enumeration and stdout are
+therefore still hosted I/O; only filtering, bounded selection, ordering and
+rendering are claimed as freestanding.
+
+`CATALOG_SELECTION != DIRECTORY_ENUMERATION != STDOUT_IO`.
