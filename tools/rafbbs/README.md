@@ -89,10 +89,12 @@ The pure RafBBS slice is now structurally separated from hosted I/O:
 - `rafbbs_core.h`: caller-owned RafContext using `RafMonoTime`, not `struct timespec`;
 - `rafbbs_manifest_core.h`: deterministic text-manifest rendering into a caller-owned fixed buffer;
 - `rafbbs_filepicker_core.h`: static catalog/selection state without hosted string/runtime calls;
+- `rafbbs_theme.h`: deterministic status-to-ANSI mapping without hosted headers;
+- `rafbbs_log_core.h`: caller-owned deterministic syslog-line composition with authorial 64-bit divmod;
 - `rafbbs_baremetal.h`: fixed-buffer output and binary manifest value model;
 - `rafbbs_manifest_bin_core.h`: canonical 96-byte little-endian binary-manifest encode/decode;
 - `rafbbs_crc32_core.h` and `rafbbs_sha256_core.h`: pure algorithms;
-- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h` and `rafbbs_filepicker.h`: hosted/provider adapters only.
+- `rafbbs_crc32.h`, `rafbbs_sha256.h`, `rafbbs_time_posix.h`, `rafbbs_manifest.h`, `rafbbs_manifest_bin.h`, `rafbbs_filepicker.h` and `rafbbs_log.h`: hosted/provider adapters only.
 
 The freestanding build uses `-nostdinc -ffreestanding -fno-builtin -fno-stack-protector` and rejects unresolved symbols in the declared pure objects. A compiler, `nm`, shell or CI runner is a factory/evidence tool for this gate, not a runtime dependency of those objects. Full toolchain self-hosting remains `TOKEN_VAZIO (CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY)`. Physical bare-metal execution remains `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)` until separately evidenced.
 
@@ -102,7 +104,7 @@ Run:
 sh freestanding/tests/verify_authorial_zero_dep.sh
 ```
 
-The gate enumerates eleven pure modules plus a caller-owned probe, rejects host/runtime leakage, and compiles the same probe for six OS-neutral ISA targets. It checks the object for unresolved helpers and keeps hosted adapters outside the pure set.
+The gate enumerates thirteen pure modules plus a caller-owned probe, rejects host/runtime leakage, and compiles the same probe for six OS-neutral ISA targets. It checks the object for unresolved helpers and keeps hosted adapters outside the pure set.
 
 The monotonic-time boundary is intentionally split: `rafbbs_time.h` owns only
 representation, validity and elapsed arithmetic; `rafbbs_time_posix.h` owns
@@ -179,3 +181,15 @@ O core preserva a seleção atual quando recebe escolha fora de `1..5`. O gate a
 Este successor apenas o inclui no conjunto provado: `-nostdinc`, seis ISAs,
 unresolved helpers = 0 e falsificador de mapeamento status→ANSI. Console I/O
 continua fora do core e execução física continua `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.
+
+
+## Log-line core freestanding
+
+A composição determinística da linha de syslog agora é autoral e independente do host.
+`rafbbs_log_core.h` recebe tempo/status/módulo/detalhe e escreve em buffer do caller;
+`rafbbs_log.h` permanece adapter para relógio POSIX, `va_list/vsnprintf`, console e FILE.
+
+O primeiro protótipo foi falsificado em i686 porque divisão C de 64 bits produziu
+`__udivdi3`. Esse protótipo foi rejeitado. O successor usa divmod bit-a-bit autoral;
+o falsificador local observou `unresolved=0` em x86_64, i686, ARMv7-A, AArch64,
+RV32 e RV64. Execução física continua `TOKEN_VAZIO (CLOSURE_L12_DEVICE_RUNTIME_EVIDENCE)`.
