@@ -6,6 +6,7 @@
 #include "rafbbs_time_posix.h"
 #include "rafbbs_theme.h"
 #include "rafbbs_log_core.h"
+#include "rafbbs_runlog_core.h"
 #define RAFBBS_MAX_LOG_LINES 512
 static char rafbbs_lines[RAFBBS_MAX_LOG_LINES][RAFBBS_LOG_LINE];
 static long raf_elapsed_ms(RafContext *ctx) {
@@ -25,13 +26,38 @@ static void raf_log(RafContext *ctx, RafStatus st, const char *module, const cha
     printf("%s%s%s\n", raf_status_color(st), rafbbs_lines[ctx->syslog_count - 1], RAF_ANSI_RESET);
     fflush(stdout);
 }
+static int raf_file_write_exact(FILE *f, const char *buf, RafU32 len) {
+    return fwrite(buf, 1u, (size_t)len, f) == (size_t)len ? 0 : -1;
+}
+static int raf_file_write_line(FILE *f, const char *text) {
+    RafU32 len = raf_runlog_cstr_len(text);
+    if (raf_file_write_exact(f, text, len) != 0) return -1;
+    return raf_file_write_exact(f, "\n", 1u);
+}
 static int raf_write_log(RafContext *ctx) {
-    int i; FILE *f = fopen(ctx->log_path, "w"); if (!f) return -1;
-    fprintf(f, "# RafBBS Run Log\n\nrun_id=%s\npipeline=%s\nstatus=%s\nhost=%s\narch=%s\ncommit=%s\nbranch=%s\nmanifest=%s\nbin_manifest=%s\n\n[SYSLOG]\n",
-            ctx->run_id, ctx->pipeline, raf_status_name(ctx->final_status), ctx->host, ctx->arch, ctx->commit, ctx->branch, ctx->manifest_path, ctx->bin_manifest_path);
-    for (i = 0; i < ctx->syslog_count; i++) fprintf(f, "%s\n", rafbbs_lines[i]);
-    fprintf(f, "\n[ARTIFACTS]\ninput=%s\noutput=%s\ninput_crc32=%08x\noutput_crc32=%08x\ninput_sha256=%s\noutput_sha256=%s\nhash_state=%08x\n\n[GAPS]\n%s\n",
-            ctx->input, ctx->output, ctx->input_crc32, ctx->output_crc32, ctx->input_sha256, ctx->output_sha256, ctx->hash_state, ctx->gaps[0] ? ctx->gaps : "none=TOKEN_VAZIO");
-    fclose(f); return 0;
+    int i;
+    int rc = 0;
+    char section[4096];
+    RafLogText out;
+    FILE *f = fopen(ctx->log_path, "w");
+    if (!f) return -1;
+
+    raf_log_text_init(&out, section, (RafU32)sizeof(section));
+    raf_runlog_header_render(&out, ctx);
+    if (out.dropped != 0u || raf_file_write_exact(f, section, out.pos) != 0)
+        rc = -1;
+
+    for (i = 0; rc == 0 && i < ctx->syslog_count; i++)
+        if (raf_file_write_line(f, rafbbs_lines[i]) != 0) rc = -1;
+
+    if (rc == 0) {
+        raf_log_text_init(&out, section, (RafU32)sizeof(section));
+        raf_runlog_tail_render(&out, ctx);
+        if (out.dropped != 0u || raf_file_write_exact(f, section, out.pos) != 0)
+            rc = -1;
+    }
+
+    if (fclose(f) != 0) rc = -1;
+    return rc;
 }
 #endif
