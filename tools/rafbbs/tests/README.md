@@ -9,6 +9,7 @@
 - `rafbbs_zero_dependency_test.c`: known vectors CRC32/SHA-256 + bare-metal/watchdog sob `-nostdinc`, sem símbolos externos no objeto.
 - `rafbbs_time_core_test.c`: falsifica aritmética monotônica autoral, ordem reversa e estado inválido; compila sob `-nostdinc` e também executa como smoke semântico no host CI.
 - `rafbbs_filepicker_core_test.c`: falsifica catálogo estático, seleção válida e preservação do estado sob escolhas inválidas; zero hosted headers.
+- `rafbbs_theme_core_test.c`: falsifica mapeamento status→ANSI e default vazio; zero hosted headers e zero símbolos externos.
 - `rafbbs_baremetal_test.c`: saída byte-a-byte, manifesto binário, failover de hash e flags de arquitetura.
 - `rafbbs_watchdog_negative_test.c`: garante que watchdog expirado é detectado.
 - `rafbbs_baremetal_overflow_test.c`: valida saturação do buffer fixo e contador `dropped`.

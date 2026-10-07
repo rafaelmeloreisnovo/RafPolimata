@@ -34,13 +34,15 @@ This successor also closes the first RafBBS slice:
 - `tools/rafbbs/rafbbs_core.h` — caller-owned context with no hosted time type;
 - `tools/rafbbs/rafbbs_manifest_core.h` — deterministic text-manifest rendering into caller-owned memory;
 - `tools/rafbbs/rafbbs_filepicker_core.h` — static catalog + bounded selection state with no libc/string dependency;
+- `tools/rafbbs/rafbbs_theme.h` — deterministic status-to-ANSI mapping over the already-authorial status vocabulary;
 - `tools/rafbbs/rafbbs_baremetal.h` — fixed-buffer output and binary manifest;
 - `tools/rafbbs/rafbbs_crc32_core.h` — pure CRC32;
 - `tools/rafbbs/rafbbs_sha256_core.h` — pure SHA-256;
 - `tools/rafbbs/tests/rafbbs_zero_dependency_test.c` — known-vector falsifier;
 - `tools/rafbbs/tests/rafbbs_time_core_test.c` — monotonic arithmetic falsifier;
 - `tools/rafbbs/tests/rafbbs_manifest_core_test.c` — exact-byte, invalid-time and overflow falsifier;
-- `tools/rafbbs/tests/rafbbs_filepicker_core_test.c` — catalog, valid selection and invalid-choice preservation falsifier.
+- `tools/rafbbs/tests/rafbbs_filepicker_core_test.c` — catalog, valid selection and invalid-choice preservation falsifier;
+- `tools/rafbbs/tests/rafbbs_theme_core_test.c` — status/color mapping and empty-default falsifier.
 
 The hosted file wrappers remain deliberately outside the pure core:
 
@@ -107,13 +109,13 @@ declared runtime surface has an equivalent source/build/runtime receipt.
 
 `F_ok` = authorial zero-include type/status substrate + pure CRC32/SHA-256 +
 RafBBS context/monotonic-time value layer + deterministic text-manifest renderer
-+ static filepicker catalog/selection core prepared for `-nostdinc` compilation,
-with POSIX clock acquisition, filesystem persistence and console presentation
-isolated behind adapters.
++ static filepicker catalog/selection core + status/theme rendering prepared for
+`-nostdinc` compilation, with POSIX clock acquisition, filesystem persistence
+and console presentation isolated behind adapters.
 
 `F_gap` = exact-head provider CI for this successor, physical execution and
 repository-wide component migration are not yet evidence-bound.
 
 `F_next` = execute the exact-head zero-dependency + semantic time/manifest
-falsifiers, including filepicker catalog/selection; only after PASS select the
-next smallest runtime-bearing cut.
+falsifiers, including filepicker catalog/selection and theme/status rendering;
+only after PASS select the next smallest runtime-bearing cut.
