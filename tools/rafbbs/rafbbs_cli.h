@@ -11,6 +11,7 @@
 #include "rafbbs_time_posix.h"
 #include "rafbbs_context_core.h"
 #include "rafbbs_git_posix.h"
+#include "rafbbs_recent_posix.h"
 
 static void raf_print_help(void) {
     puts("RafBBS Operator Console\nuso:\n  rafbbs              abre menu BBS\n  rafbbs --help       mostra ajuda\n  rafbbs list         lista pipelines\n  rafbbs run <id>     executa pipeline\n  rafbbs logs         mostra logs recentes\n  rafbbs manifest     mostra manifestos recentes\n  rafbbs files        mostra entradas conhecidas");
@@ -107,9 +108,9 @@ static int raf_cli(int argc, char **argv) {
     if (route.action == RAF_CLI_RUN)
         return raf_execute_pipeline(route.argument);
     if (route.action == RAF_CLI_LOGS)
-        return system("find tools/rafbbs/logs -maxdepth 1 -name 'run-*.txt' -type f | sort | tail -10");
+        return raf_recent_posix_print("tools/rafbbs/logs", "run-", ".txt");
     if (route.action == RAF_CLI_MANIFEST)
-        return system("find tools/rafbbs/logs -maxdepth 1 -name 'manifest-*.txt' -type f | sort | tail -10");
+        return raf_recent_posix_print("tools/rafbbs/logs", "manifest-", ".txt");
     if (route.action == RAF_CLI_FILES) {
         RafFilePicker fp;
         raf_filepicker_init(&fp);
