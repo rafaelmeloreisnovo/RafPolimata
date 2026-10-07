@@ -36,6 +36,12 @@ enum zh_bench_relation {
     ZH_BENCH_REL_HOT_SLOWER = 3
 };
 
+enum zh_bench_factor_state {
+    ZH_BENCH_FACTOR_UNKNOWN = 0,
+    ZH_BENCH_FACTOR_INACTIVE = 1,
+    ZH_BENCH_FACTOR_ACTIVE = 2
+};
+
 enum zh_bench_layer {
     ZH_BENCH_LAYER_MATH = 0,
     ZH_BENCH_LAYER_SOURCE = 1,
