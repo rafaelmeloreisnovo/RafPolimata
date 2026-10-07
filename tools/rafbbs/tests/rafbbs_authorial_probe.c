@@ -12,6 +12,7 @@
 #include "rafbbs_theme.h"
 #include "rafbbs_log_core.h"
 #include "rafbbs_format_core.h"
+#include "rafbbs_git_core.h"
 #include "rafbbs_runlog_core.h"
 #include "rafbbs_pipeline_core.h"
 #include "rafbbs_command_core.h"
@@ -74,6 +75,7 @@ RafU32 rafbbs_authorial_probe(void *state)
     RafU32 theme_state;
     RafU32 log_state;
     RafU32 format_state;
+    RafU32 git_state;
     RafU32 runlog_state;
     RafU32 pipeline_state;
     RafU32 cli_state;
@@ -193,6 +195,29 @@ RafU32 rafbbs_authorial_probe(void *state)
                        (RafU32)(unsigned char)rafbbs_authorial_format_buf[0];
     }
     {
+        char git_ref[64];
+        char git_branch[32];
+        char git_oid[65];
+        RafGitHeadState git_head = raf_git_parse_head(
+            "ref: refs/heads/main\n",
+            git_ref, (RafU32)sizeof(git_ref),
+            git_branch, (RafU32)sizeof(git_branch),
+            git_oid, (RafU32)sizeof(git_oid)
+        );
+        if (git_head.kind != RAF_GIT_HEAD_SYMBOLIC ||
+            git_head.ref_valid == 0u || git_head.branch_valid == 0u)
+            return caller_word ^ 0x47495431u;
+        if (raf_git_match_packed_ref(
+                "0123456789abcdef0123456789abcdef01234567 refs/heads/main\n",
+                git_ref, git_oid, (RafU32)sizeof(git_oid)
+            ) == 0u)
+            return caller_word ^ 0x47495432u;
+        git_state = git_head.kind ^ git_head.ref_valid ^
+                    git_head.branch_valid ^
+                    (RafU32)(unsigned char)git_branch[0] ^
+                    (RafU32)(unsigned char)git_oid[0];
+    }
+    {
         RafLogText runlog_text;
         raf_log_text_init(
             &runlog_text,
@@ -252,7 +277,7 @@ RafU32 rafbbs_authorial_probe(void *state)
            (RafU32)manifest_wire[0] ^ (RafU32)manifest_wire[95] ^
            output.pos ^ output.dropped ^ sink_state ^
            manifest_text.pos ^ manifest_text.dropped ^ picker_state ^ theme_state ^
-           log_state ^ format_state ^ runlog_state ^ pipeline_state ^ cli_state ^ tui_state ^ context_state ^
+           log_state ^ format_state ^ git_state ^ runlog_state ^ pipeline_state ^ cli_state ^ tui_state ^ context_state ^
            command_state ^
            (RafU32)(unsigned char)digest[0] ^
            (RafU32)(unsigned char)hex[0];
