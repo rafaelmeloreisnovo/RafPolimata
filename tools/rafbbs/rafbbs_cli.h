@@ -1,14 +1,13 @@
 #ifndef RAFBBS_CLI_H
 #define RAFBBS_CLI_H
 #include <stdio.h>
-#include <time.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include "rafbbs_pipeline.h"
 #include "rafbbs_cli_core.h"
 #include "rafbbs_filepicker.h"
 #include "rafbbs_baremetal.h"
 #include "rafbbs_time_posix.h"
+#include "rafbbs_runid_posix.h"
 #include "rafbbs_context_core.h"
 #include "rafbbs_result_core.h"
 #include "rafbbs_git_posix.h"
@@ -26,8 +25,6 @@ static void raf_list_pipelines(void) {
                raf_pipeline_specs[i].description);
 }
 static void raf_init_context(RafContext *ctx, const char *pipeline) {
-    time_t t = time(NULL);
-    struct tm tmv;
     RafMonoTime mono_start = raf_mono_posix_now();
     char run_id[32] = {0};
     char branch[128] = {0};
@@ -36,8 +33,9 @@ static void raf_init_context(RafContext *ctx, const char *pipeline) {
     RafContextSeed seed;
     RafU32 git_observation;
 
-    localtime_r(&t, &tmv);
-    (void)strftime(run_id, sizeof(run_id), "%Y%m%d-%H%M%S", &tmv);
+    (void)raf_runid_posix_local(
+        run_id, (RafU32)sizeof(run_id)
+    );
 #if defined(__x86_64__)
     arch = "x86_64";
 #elif defined(__aarch64__)
