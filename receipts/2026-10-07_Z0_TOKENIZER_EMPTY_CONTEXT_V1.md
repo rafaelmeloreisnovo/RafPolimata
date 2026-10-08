@@ -4,6 +4,7 @@ Repository: `rafaelmeloreisnovo/RafPolimata`
 Observed base: `main@32220b1ce8353566835fdee2301657ca79366da2`
 Task class: code + evidence
 Governance: `SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM`; absence remains `TOKEN_VAZIO`.
+Gap ownership: `CLOSURE_L11` (operational gap topology governance only; the actual device/provenance gaps remain open and never become PASS through this reference).
 
 ## Intent
 
