@@ -32,6 +32,8 @@ jobs:
           make -C native/raf_hash_fabric_v1 source-contract-check
           python3 scripts/validate_coherence_protocol.py
           python3 -m unittest -v tests.test_validate_token_vazio_gates
+          # Pure-standard-library research fixture; no Android/NDK/long build.
+          python3 -m unittest -v tests.test_cognitive_spiral_cube_v1
           echo 'CI_LANE=FAST_SOURCE_HOST_ONLY'
           echo 'FULL_COHERENCE_GATE=NOT_RUN'
           echo 'APK_PHYSICAL=NOT_RUN'
