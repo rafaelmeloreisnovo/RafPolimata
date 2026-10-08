@@ -7,6 +7,19 @@
 
 
 
+## 0C. Geometria cognitiva exploratória — 10³ células / três espirais (2026-10-08)
+
+| Rota | Escopo e limite |
+|---|---|
+| [COGNITIVE_SPIRAL_CUBE_10X10X10_V1](COGNITIVE_SPIRAL_CUBE_10X10X10_V1.md) | vazio tipado; Fibonacci em caracteres; raízes/loglog; grade 10x10x10, 3 direções e entropia categórica — **sem alegação neurofísica** |
+| `../scripts/cognitive_spiral_cube_v1.py` | produtor determinístico auditável; Python hosted, não freestanding |
+| [COGNITIVE_SPIRAL_BASE14_PROFILE_V1](COGNITIVE_SPIRAL_BASE14_PROFILE_V1.md) | perfil adicional **14×14×14 = 1000₁₄ = 2744₁₀**, distinguindo representação e mudança geométrica |
+| `../scripts/cognitive_spiral_base14_v1.py` | codec base14 estrito, projeções vetoriais e estados das 14 camadas; não modifica o perfil decimal |
+| `../tests/test_cognitive_spiral_base14_v1.py` | 2744 índices, roundtrip, limites e EMA; participa do CI rápido |
+| `../tests/test_cognitive_spiral_cube_v1.py` | falsificadores 1000 posições + domínio + determinismo; integra draft quick CI |
+
+Estado: `SOURCE_IMPLEMENTED`; execução CI é separada, `claim_allowed=false`, evidência física `TOKEN_VAZIO`. Licença raiz segue decisão do titular.
+
 ## 0B. Federação autoral — rota de proveniência P0
 
 | Rota | Papel | Limite |
