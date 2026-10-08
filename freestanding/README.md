@@ -71,6 +71,8 @@ Read in this order:
 
 ## Evidence gate / typed missingness (authorial, no runtime dependencies)
 
+CLOSURE_L15 binds unresolved source/rights/runtime evidence in this exact scope; it does not promote any outcome.
+
 - `include/raf_fs_evidence_gate.h`: deterministic, caller-owned gate classifier. Required source, rights, authority, target, evidence rule, execution observation, outcome, artifact identity, exact HEAD and receipt each remain independently typed.
 - `tests/raf_fs_evidence_gate_test.c`: 21 positive and negative assertions, including `TOKEN_VAZIO != 0`, `NOT_RUN != FAIL` and invalid input rejection.
 - `tests/verify_evidence_gate.sh`: hosted semantic harness plus ARMv7/AArch64 freestanding object compile and unresolved-symbol inspection. Requires available host compiler, Clang and nm as **build tools only**.
