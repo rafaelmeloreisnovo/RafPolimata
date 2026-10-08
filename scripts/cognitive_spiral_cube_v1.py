@@ -5,6 +5,7 @@ Copyright (c) 2026 Rafael Melo Reis.
 Root licensing undecided: see docs/LICENSE_DECISION_RECORD.md.
 No neurophysiology or intrinsic LLM-state access is implied.
 Uses Python's standard library; NOT freestanding, and NOT an APK runtime.
+Governance anchor: CLOSURE_L11; physical/runtime absence also maps to CLOSURE_L2.
 """
 from __future__ import annotations
 
