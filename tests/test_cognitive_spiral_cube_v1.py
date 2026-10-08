@@ -106,6 +106,38 @@ class CognitiveSpiralCubeTests(unittest.TestCase):
         with self.assertRaises(model.DomainError):
             model.voxel(0, (0, 1))
 
+    def test_external_alpha_quarter_state_and_domain(self):
+        c, h, score = model.update_observed_state(0.0, 1.0, 1.0, 0.0)
+        self.assertEqual((c, h, score), (0.25, 0.75, 0.0625))
+        old = (0.23, 0.81)
+        self.assertEqual(model.update_observed_state(*old, 0.9, 0.1, alpha=0.0)[:2], old)
+        self.assertEqual(model.update_observed_state(*old, 0.9, 0.1, alpha=1.0)[:2], (0.9, 0.1))
+        for bad in (-0.1, 1.01, float("nan"), True):
+            with self.assertRaises(model.DomainError):
+                model.update_observed_state(0.1, 0.2, 0.3, 0.4, alpha=bad)
+        with self.assertRaises(model.DomainError):
+            model.update_observed_state(-0.1, 0.2, 0.3, 0.4)
+
+    def test_adaptive_spatial_layers_and_reversed_permutation(self):
+        fib = model.fibonacci_up_to(1000)
+        observations = model.layer_observations(fib)
+        self.assertEqual(len(observations), 10)
+        self.assertEqual([x["layer_z"] for x in observations], list(range(10)))
+        for row in observations:
+            self.assertTrue(0 <= row["coherence_observed"] <= 1)
+            self.assertTrue(0 <= row["entropy_observed"] <= 1)
+        forward = model.adaptive_layer_trace(observations)
+        backward = model.adaptive_layer_trace(list(reversed(observations)))
+        self.assertEqual(len(forward), 10)
+        self.assertEqual([x["layer_z"] for x in backward], list(range(9, -1, -1)))
+        self.assertTrue(all(0 <= row["C_ema"] <= 1 and 0 <= row["H_ema"] <= 1
+                            for row in forward))
+        # EMA is order-dependent; reversing measurements is not a symmetry.
+        self.assertNotEqual((forward[-1]["C_ema"], forward[-1]["H_ema"]),
+                            (backward[-1]["C_ema"], backward[-1]["H_ema"]))
+        with self.assertRaises(model.DomainError):
+            model.layer_observations((0, 1))
+
     def test_entropy_is_normalized_only_for_discrete_symbols(self):
         self.assertAlmostEqual(model.normalized_entropy((5, 0)), 0)
         self.assertAlmostEqual(model.normalized_entropy((5, 5)), 1)
@@ -127,6 +159,11 @@ class CognitiveSpiralCubeTests(unittest.TestCase):
         self.assertLessEqual(stats["min"], stats["median"])
         self.assertLessEqual(stats["median"], stats["max"])
         self.assertEqual(len(report["anchor_voxels"]), 16)
+        ema = report["adaptive_layer_ema"]
+        self.assertEqual(ema["alpha"], 0.25)
+        self.assertEqual(len(ema["forward"]), 10)
+        self.assertTrue(ema["permutation_delta_C"] != 0 or ema["permutation_delta_H"] != 0)
+        self.assertEqual(ema["ordering"], "z ascending, spatial not time")
         self.assertEqual(json.dumps(report, sort_keys=True),
                          json.dumps(model.calculate(), sort_keys=True))
 
