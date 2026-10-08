@@ -1,6 +1,7 @@
 """Falsifiers for the bounded geometric/semantic research fixture.
 
 Copyright (c) 2026 Rafael Melo Reis. No brain/LLM scientific claim.
+Governance anchor: CLOSURE_L11; runtime/device absence is CLOSURE_L2.
 """
 import json
 import math
