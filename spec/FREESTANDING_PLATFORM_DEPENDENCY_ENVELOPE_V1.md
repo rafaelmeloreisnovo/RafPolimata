@@ -81,6 +81,30 @@ Allowed patterns:
 | hosted wrapper tail | hosted only | cannot be used as L0 proof |
 | implicit runtime shadow | blocked | must become declared state or remain `TOKEN_VAZIO` |
 
+
+## Android ARM32/ARM64 instances
+
+The first concrete Android instances are recorded as data, not as runtime claims:
+
+| Manifest | ABI | CPU | Word bits | State | Limit |
+|---|---|---|---:|---|---|
+| `data/platform/arm32-android-freestanding-envelope.v1.json` | `armeabi-v7a` | `armv7` | 32 | `NOT_RUN` | no current ELF/APK/device proof |
+| `data/platform/arm64-android-freestanding-envelope.v1.json` | `arm64-v8a` | `aarch64` | 64 | `NOT_RUN` | no current ELF/APK/device proof |
+
+Both preserve:
+
+```text
+tail_policy   = explicit_residual_lane
+shadow_policy = none
+claim_allowed = false
+```
+
+Promotion requires a current-chain receipt:
+
+```text
+source -> ARM artifact -> APK -> embedded identity -> signature -> install -> launch/dlopen -> log/exit receipt
+```
+
 ## Change checklist
 
 Before a platform-dependent change is promoted beyond reference:
