@@ -258,5 +258,37 @@ class TestTokenVazioValidation(unittest.TestCase):
         self.assertNotIn("L0", validator.closure_map)
 
 
+    def test_freestanding_platform_exact_path_closure_and_sibling_rejection(self) -> None:
+        expected = {
+            "data/platform/arm32-android-freestanding-envelope.v1.json": "L2",
+            "data/platform/arm64-android-freestanding-envelope.v1.json": "L2",
+            "receipts/2026-10-08_ARM32_ARM64_ANDROID_ENVELOPES_V1.md": "L2",
+            "receipts/2026-10-08_FREESTANDING_FAILSAFE_WATCHDOG_ROLLBACK_V1.md": "L2",
+            "receipts/2026-10-08_FREESTANDING_PLATFORM_ENVELOPE_V1.md": "L11",
+            "schemas/freestanding-platform-envelope.v1.schema.json": "L11",
+            "spec/FREESTANDING_FAILSAFE_FAILOVER_WATCHDOG_ROLLBACK_V1.md": "L11",
+            "spec/FREESTANDING_PLATFORM_DEPENDENCY_ENVELOPE_V1.md": "L11",
+        }
+        validator = TokenVazioValidator(self.repo_root)
+        for relative, closure_id in expected.items():
+            with self.subTest(path=relative):
+                self.assertEqual(
+                    validator.STRUCTURED_CLOSURE_PATHS.get(relative), closure_id
+                )
+                path = self.repo_root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(f"state={TOKEN}\\n", encoding="utf-8")
+                findings = validator.scan_file(path, line_numbers={1})
+                self.assertEqual(len(findings), 1)
+                self.assertEqual(findings[0].severity, "WARNING")
+                self.assertEqual(findings[0].closure_file, f"CLOSURE_{closure_id}")
+
+        unrelated = self.repo_root / "spec" / "UNRELATED_ENVELOPE.md"
+        unrelated.write_text(f"state={TOKEN}\\n", encoding="utf-8")
+        findings = validator.scan_file(unrelated, line_numbers={1})
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0].severity, "ERROR")
+
+
 if __name__ == "__main__":
     unittest.main()

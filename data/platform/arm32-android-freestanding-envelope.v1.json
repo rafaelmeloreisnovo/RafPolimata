@@ -1,0 +1,36 @@
+{
+  "schema_version": "freestanding-platform-envelope/v1",
+  "source_ref": {
+    "repository": "rafaelmeloreisnovo/RafPolimata",
+    "ref": "architecture/freestanding-platform-envelope-v1-20261008",
+    "path": "data/platform/arm32-android-freestanding-envelope.v1.json"
+  },
+  "platform": "android",
+  "language": "c",
+  "dependency_class": "L0_FREESTANDING",
+  "architecture": {
+    "cpu_arch": "armv7",
+    "abi": "armeabi-v7a",
+    "endianness": "little",
+    "word_bits": 32
+  },
+  "tail_policy": "explicit_residual_lane",
+  "shadow_policy": "none",
+  "evidence_state": "NOT_RUN",
+  "claim_allowed": false,
+  "gates": [
+    {
+      "name": "static-freestanding-contract-arm32",
+      "state": "NOT_RUN",
+      "command": "TOKEN_VAZIO",
+      "receipt": "receipts/2026-10-08_ARM32_ARM64_ANDROID_ENVELOPES_V1.md"
+    },
+    {
+      "name": "android-physical-runtime-arm32",
+      "state": "TOKEN_VAZIO",
+      "command": "TOKEN_VAZIO",
+      "receipt": "TOKEN_VAZIO"
+    }
+  ],
+  "notes": "ARM32 Android route for moto e7 class devices. This record declares the intended freestanding envelope only; it does not prove ELF/APK packaging, install, dlopen, logcat or physical runtime."
+}

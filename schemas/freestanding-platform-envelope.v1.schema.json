@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rafaelmeloreisnovo/RafPolimata/schemas/freestanding-platform-envelope.v1.schema.json",
+  "title": "Freestanding Platform Dependency Envelope V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_ref",
+    "platform",
+    "language",
+    "dependency_class",
+    "architecture",
+    "evidence_state",
+    "claim_allowed"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "freestanding-platform-envelope/v1"
+    },
+    "source_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "ref", "path"],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "ref": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 }
+      }
+    },
+    "platform": {
+      "enum": ["android", "linux", "macos", "windows", "ios", "generic", "TOKEN_VAZIO"]
+    },
+    "language": {
+      "enum": ["c", "asm", "java", "sh", "python", "rust", "cpp", "kotlin_multiplatform", "TOKEN_VAZIO"]
+    },
+    "dependency_class": {
+      "enum": [
+        "L0_FREESTANDING",
+        "L1_ABI_ADAPTER",
+        "L2_OS_BOUNDARY",
+        "L3_HOST_TOOL",
+        "L4_APP_SHELL",
+        "L5_DISTRIBUTION",
+        "TOKEN_VAZIO"
+      ]
+    },
+    "architecture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cpu_arch", "abi", "endianness", "word_bits"],
+      "properties": {
+        "cpu_arch": {
+          "enum": ["armv7", "aarch64", "x86", "x86_64", "riscv64", "wasm32", "TOKEN_VAZIO"]
+        },
+        "abi": { "type": "string", "minLength": 1 },
+        "endianness": { "enum": ["little", "big", "bi", "TOKEN_VAZIO"] },
+        "word_bits": {
+          "oneOf": [
+            { "enum": [32, 64] },
+            { "const": "TOKEN_VAZIO" }
+          ]
+        }
+      }
+    },
+    "tail_policy": {
+      "enum": ["none", "explicit_residual_lane", "hosted_tail", "TOKEN_VAZIO"]
+    },
+    "shadow_policy": {
+      "enum": ["none", "declared_shadow_state", "host_runtime_shadow", "TOKEN_VAZIO"]
+    },
+    "evidence_state": {
+      "enum": ["REFERENCE", "IMPLEMENTED", "PASS", "FAIL", "NOT_RUN", "TOKEN_VAZIO"]
+    },
+    "claim_allowed": {
+      "type": "boolean"
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "state"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "state": { "enum": ["PASS", "FAIL", "NOT_RUN", "TOKEN_VAZIO"] },
+          "command": { "type": "string" },
+          "receipt": { "type": "string" }
+        }
+      },
+      "default": []
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}
