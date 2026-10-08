@@ -1,6 +1,7 @@
 """Radix-14 falsifiers: representation, geometry, 3 arms, 14³ census.
 
 Copyright (c) 2026 Rafael Melo Reis. No neural or LLM-internals claim.
+Governance anchor: CLOSURE_L11; runtime/device absence is CLOSURE_L2.
 """
 import json
 import math
