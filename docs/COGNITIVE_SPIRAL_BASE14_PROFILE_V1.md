@@ -82,6 +82,8 @@ Em particular, `12₁₄=16₁₀`, então `(12₁₄)²=144₁₄=256₁₀`. E
 
 Caso `1050` seja um numeral da matriz, o contrato precisa anotar sua base: `1050₁₄=2814₁₀`, enquanto `1050₁₀=550₁₄`; `100₁₄=196₁₀`. Nenhum destes números é intercambiável apenas pelo desenho dos caracteres.
 
+**Fração 1,5 e base 14:** no sistema decimal, `1,5₁₀=3/2`; na escrita posicional da base 14, esse mesmo valor é `1,7₁₄` porque `7/14=1/2`. O numeral `1,5₁₄` vale `1+5/14=19/14` em decimal, portanto **não representa um e meio**. O fator `3/2` nas equações foi definido como razão racional exata, independente de notação.
+
 **Hipótese vs prova:** as identidades acima são exatas em aritmética. Que elas determinem causalmente entropia, semântica ou dinâmica física continua `TOKEN_VAZIO`; o bloco matemático não altera pesos nem resultados do corpus.
 
 ## 3. Geometria e espirais comparáveis
