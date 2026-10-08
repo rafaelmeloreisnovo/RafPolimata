@@ -1,0 +1,43 @@
+name: 555 20 LATIN graph artifact (offline only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/555_20_latin_graph.yml'
+      - 'research/LATIN/**'
+      - 'scripts/latin/**'
+      - 'tests/latin/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: 555-latin-graph-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  graph:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      CLAIM_ALLOWED: 'false'
+      AUTOMATIC_PROMOTION: 'false'
+      TRAINING_EXECUTED: 'false'
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Strict deterministic tests
+        run: python3 -m unittest discover -s tests/latin -p 'test_*.py' -v
+      - name: Generate JSON and sha256 receipt
+        run: |
+          set -euo pipefail
+          python3 scripts/latin/build_latin_artifact.py --source-sha "$SOURCE_SHA"
+          python3 -m json.tool dist/latin/latin.graph.v1.json > /dev/null
+          python3 -m json.tool dist/latin/latin.receipt.v1.json > /dev/null
+      - name: Upload nonpromoted artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: latin-graph-${{ github.run_id }}-${{ github.run_attempt }}
+          path: dist/latin/*.json
+          if-no-files-found: error
+          retention-days: 14

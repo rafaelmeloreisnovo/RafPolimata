@@ -1,0 +1,73 @@
+{
+  "schema": "rafaelia.latin.seed.v1",
+  "owner": "rafaelmeloreisnovo/RafPolimata",
+  "source_ref": "USER_INTENT_LATIN_LOWFALA_2026-10-08",
+  "source_kind": "ORIGINAL_CONCEPT_METADATA_ONLY",
+  "rights": "ORIGINAL_SEED_NO_IMPORTED_PASSAGES",
+  "privacy_class": "PUBLIC_METADATA_ONLY",
+  "cultural_translation_state": "TOKEN_VAZIO_NO_LICENSED_EDITIONS",
+  "human_approved": false,
+  "claim_allowed": false,
+  "languages": [
+    "pt-BR",
+    "la",
+    "hbo",
+    "arc",
+    "grc"
+  ],
+  "nodes": [
+    {
+      "id": "n:verbo",
+      "kind": "semantic_concept",
+      "label": "verbo (concept)",
+      "state": "HYPOTHESIS"
+    },
+    {
+      "id": "n:parable",
+      "kind": "semantic_concept",
+      "label": "parable / parábola (concept)",
+      "state": "HYPOTHESIS"
+    },
+    {
+      "id": "n:prime",
+      "kind": "mathematical_operator_candidate",
+      "label": "prime-set structure",
+      "state": "HYPOTHESIS"
+    },
+    {
+      "id": "n:poincare",
+      "kind": "mathematical_operator_candidate",
+      "label": "Poincaré action (proposed analogy)",
+      "state": "HYPOTHESIS"
+    },
+    {
+      "id": "n:translation",
+      "kind": "cultural_context",
+      "label": "human cultural translation profile required",
+      "state": "METADATA_ONLY"
+    }
+  ],
+  "edges": [
+    {
+      "from": "n:verbo",
+      "to": "n:translation",
+      "relation": "requires_human_translation_profile",
+      "state": "HYPOTHESIS",
+      "evidence_ref": "TOKEN_VAZIO"
+    },
+    {
+      "from": "n:parable",
+      "to": "n:verbo",
+      "relation": "analogy_only",
+      "state": "HYPOTHESIS",
+      "evidence_ref": "TOKEN_VAZIO"
+    },
+    {
+      "from": "n:prime",
+      "to": "n:poincare",
+      "relation": "candidate_semantic_link",
+      "state": "HYPOTHESIS",
+      "evidence_ref": "TOKEN_VAZIO"
+    }
+  ]
+}
