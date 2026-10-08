@@ -1,13 +1,24 @@
 name: Formal Science Orchestrator
 
 on:
+  # Branch PRs are validated through pull_request only; avoid duplicate push+PR.
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
+    types: [opened, reopened, synchronize, ready_for_review, converted_to_draft]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rafpolimata-science-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   formal-science:
     name: Units, evidence, statistics and time gates
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

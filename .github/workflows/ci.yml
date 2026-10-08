@@ -1,20 +1,45 @@
 name: CI
 
 on:
+  # Branch PRs are validated through pull_request only; avoid duplicate push+PR.
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
+    types: [opened, reopened, synchronize, ready_for_review, converted_to_draft]
 
 permissions:
   contents: read
 
 concurrency:
-  group: rafpolimata-ci-${{ github.ref }}
+  group: rafpolimata-ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
+  draft-quick:
+    name: CI · quick source/host (NOT full)
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 / Node 24
+        with:
+          persist-credentials: false
+      - name: Short high-value invariant tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          make -C native/raf_hash_fabric_v1 source-contract-check
+          python3 scripts/validate_coherence_protocol.py
+          python3 -m unittest -v tests.test_validate_token_vazio_gates
+          echo 'CI_LANE=FAST_SOURCE_HOST_ONLY'
+          echo 'FULL_COHERENCE_GATE=NOT_RUN'
+          echo 'APK_PHYSICAL=NOT_RUN'
+          echo 'CLAIM_ALLOWED=false'
+
   semantic-coherence:
     name: Semantic coherence and falsifiability gates
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
