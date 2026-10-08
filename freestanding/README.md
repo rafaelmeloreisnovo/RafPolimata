@@ -69,9 +69,20 @@ Read in this order:
 11. `VALIDATION.md` / `CODEGEN_RECEIPT.md`.
 12. `../docs/experiments/Z0_CONTEXTLESS_TOKENIZATION_V1.md` for the zero-context byte-observation experiment.
 
+## Evidence gate / typed missingness (authorial, no runtime dependencies)
+
+CLOSURE_L15 binds unresolved source/rights/runtime evidence in this exact scope; it does not promote any outcome.
+
+- `include/raf_fs_evidence_gate.h`: deterministic, caller-owned gate classifier. Required source, rights, authority, target, evidence rule, execution observation, outcome, artifact identity, exact HEAD and receipt each remain independently typed.
+- `tests/raf_fs_evidence_gate_test.c`: 21 positive and negative assertions, including `TOKEN_VAZIO != 0`, `NOT_RUN != FAIL` and invalid input rejection.
+- `tests/verify_evidence_gate.sh`: hosted semantic harness plus ARMv7/AArch64 freestanding object compile and unresolved-symbol inspection. Requires available host compiler, Clang and nm as **build tools only**.
+- `RAF_FS_GATE_PASS_SCOPED` is a policy outcome for provided marks, not a verification of their authenticity or a runtime/provider/scientific claim.
+- P0: no root redistribution license was observed during this audit; new implementation does not grant reuse rights to other repositories. Resolve license/provenance per source before copying.
+
 ## Gates
 
 ```text
+verify_evidence_gate.sh     -> typed evidence gate + ARMv7/AArch64 no-undefined object
 verify_contract.sh          -> zero-runtime/source/comment contract
 verify_authorial.sh         -> authorial item descriptor; external deps=0; six OS-neutral objects
 verify_z0_token.sh          -> Z0 ABSENT/EMPTY/NUL/SPACE falsifier + six-ISA zero-helper compile
