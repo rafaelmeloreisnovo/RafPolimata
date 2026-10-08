@@ -87,6 +87,16 @@ class TokenVazioValidator:
         "native/raf_hash_fabric_v1/SPEC.md": "L12",
         "native/raf_hash_fabric_v1/evidence/BLAKE3_PORTABLE_LOCAL_KAT_2026-08-28.md": "L12",
         "native/raf_hash_fabric_v1/include/raf_hash_fabric.h": "L12",
+        # PR #426: exact-file closure bindings; no receipt or gate bypass.
+        # L2 governs physical runtime gaps; L11 governs operational routing.
+        "data/platform/arm32-android-freestanding-envelope.v1.json": "L2",
+        "data/platform/arm64-android-freestanding-envelope.v1.json": "L2",
+        "receipts/2026-10-08_ARM32_ARM64_ANDROID_ENVELOPES_V1.md": "L2",
+        "receipts/2026-10-08_FREESTANDING_FAILSAFE_WATCHDOG_ROLLBACK_V1.md": "L2",
+        "receipts/2026-10-08_FREESTANDING_PLATFORM_ENVELOPE_V1.md": "L11",
+        "schemas/freestanding-platform-envelope.v1.schema.json": "L11",
+        "spec/FREESTANDING_FAILSAFE_FAILOVER_WATCHDOG_ROLLBACK_V1.md": "L11",
+        "spec/FREESTANDING_PLATFORM_DEPENDENCY_ENVELOPE_V1.md": "L11",
     }
 
     def __init__(self, repo_root: Path = Path(".")):
