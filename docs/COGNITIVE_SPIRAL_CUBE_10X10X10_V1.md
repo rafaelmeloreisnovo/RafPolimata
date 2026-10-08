@@ -4,6 +4,7 @@
 **Copyright do código autoral desta implementação:** (c) 2026 Rafael Melo Reis.  
 **Licença:** `TOKEN_VAZIO_ROOT_LICENSE`; este módulo não altera os direitos, autorias, licenças nem o licenciamento raiz ainda não decidido. Ver `docs/LICENSE_DECISION_RECORD.md`.  
 **Estado:** `IMPLEMENTED_RESEARCH_FIXTURE`; `claim_allowed=false`.  
+**Governança de lacunas:** `CLOSURE_L11`; execução física/runtime permanece também vinculada a `CLOSURE_L2`.  
 **Proveniência:** formulação matemática escrita pelo usuário em 2026-10-08, analisada junto de `docs/DEZ_DIMENSOES_SEMANTICAS.md`, `docs/CONTEXTUAL_RELATIONAL_TENSOR_V1.md` e `docs/FORMULA_AUTHORITY_BRIDGE_V1.md`.
 
 ## 1. Fronteira epistemológica
