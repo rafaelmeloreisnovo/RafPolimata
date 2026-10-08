@@ -2,6 +2,8 @@
 
 Copyright (c) 2026 Rafael Melo Reis. Retain original project license and provenance.
 
+**Governance closure binding: CLOSURE_L11** — operational gap topology records the source-only CI boundary and missing physical evidence; this document does not promote skipped full tests to PASS.
+
 CI fastlane. Feature branch push+pull_request duplicated CI, Internal Custody Ledger and Formal Science. Change: automatic push on main only; draft PR runs quick source/coherence/TOKEN_VAZIO checks; ready_for_review and main run original full gates; stable PR concurrency cancels obsolete jobs. Quick is NOT full, Android physical NOT_RUN. Rights preserved; rollback by reverting PR. SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM.
 
 ## Steps for a human or AI operator
