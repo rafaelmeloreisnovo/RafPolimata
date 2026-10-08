@@ -1,6 +1,7 @@
 #include "../include/raf_fs_evidence_gate.h"
 
 /* Hosted test entrypoint only. Tested policy remains freestanding/no-CRT. */
+/* CLOSURE_L15: test marks are synthetic; missing P0/device evidence stays blocked. */
 #define CHECK(cond, code) do { if (!(cond)) return (code); } while (0)
 
 int main(void)
