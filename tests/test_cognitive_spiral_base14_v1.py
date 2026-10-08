@@ -48,6 +48,9 @@ class Radix14SpiralTests(unittest.TestCase):
         self.assertEqual(model.decode14("1050"), 2814)
         self.assertEqual(model.encode14(1050), "550")
         self.assertEqual(model.decode14("100"), 196)
+        # Decimal one-and-a-half is 1.7 in base14 (7/14 = 1/2).
+        self.assertEqual(Fraction(1, 1) + Fraction(7, 14), Fraction(3, 2))
+        self.assertNotEqual(Fraction(1, 1) + Fraction(5, 14), Fraction(3, 2))
 
     def test_numeral_pattern_12_square_is_144_in_each_base(self):
         # This digit pattern is base-parametric for all bases >= 5.
