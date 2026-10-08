@@ -35,6 +35,55 @@ Logo, `1000₁₄` **não representa** a grade anterior `10×10×10`; representa
 
 O ordenamento modular original `(7,3,35,10,13,70,14,50)` se escreve `(7,3,27,A,D,50,10,38)₁₄`. Converter **a aparência** do módulo não muda a operação `F_k mod m`, e dígito `'0'` segue diferente do inteiro 0 e do tipo `VOID`.
 
+## 2A. Relação estrutural 14³, 12², 1,5 — dois níveis de base
+
+**Convenção indispensável:** sem subscrito, os números desta primeira identidade são **decimais**:
+
+```text
+(12+2)^3
+ = 12^3 + 3*(12^2)*2 + 3*12*(2^2) + 2^3
+ = 1728 + 864 + 144 + 8
+ = (3/2)*12^3 + 12^2 + 2^3
+ = 2592 + 144 + 8
+ = 2744 = 14^3
+```
+
+O fator exato `3/2` surge porque `3*12^2*2 = 864 = 12^3/2`; o termo seguinte é também exatamente `12²` porque `3*12*2² = 144`. Portanto:
+
+```text
+(14³ - 12² - 2³)/12³ = 3/2            [igualdade exata]
+(14³ - 12²)/12³ = 3/2 + 1/216          [quase 1,5; NÃO exatamente]
+```
+
+A mesma decomposição, **sem trocar os valores**, em escrita de base 14 é:
+
+```text
+1000₁₄ = D32₁₄ + A4₁₄ + 8₁₄
+2744₁₀ = 2592₁₀ + 144₁₀ + 8₁₀
+```
+
+Um segundo particionamento exato aproxima explicitamente os números `10³` e `100` da matriz:
+
+```text
+14³ = 10³ + 12³ + 4² = 1000 + 1728 + 16
+14³ = 12² + (14+12)*10² = 144 + 26*100
+14³ - 10³ = 1744 = 12³ + 16
+```
+
+**Identidade de dígitos, separada da anterior:** se a expressão `12²=144` for escrita **inteiramente na base b**, ela é verdadeira em toda base `b>=5`:
+
+```text
+(12)_b = b+2
+(144)_b = b²+4b+4
+(12)_b² = (144)_b
+```
+
+Em particular, `12₁₄=16₁₀`, então `(12₁₄)²=144₁₄=256₁₀`. Este `144₁₄` **não é** o `144₁₀=A4₁₄` do particionamento decimal anterior. Igualmente `10₁₄=14₁₀` e `1000₁₄=2744₁₀`.
+
+Caso `1050` seja um numeral da matriz, o contrato precisa anotar sua base: `1050₁₄=2814₁₀`, enquanto `1050₁₀=550₁₄`; `100₁₄=196₁₀`. Nenhum destes números é intercambiável apenas pelo desenho dos caracteres.
+
+**Hipótese vs prova:** as identidades acima são exatas em aritmética. Que elas determinem causalmente entropia, semântica ou dinâmica física continua `TOKEN_VAZIO`; o bloco matemático não altera pesos nem resultados do corpus.
+
 ## 3. Geometria e espirais comparáveis
 
 Agora as coordenadas `(x,y,z)` estão em `[0,13]^3`. A indexação é `k=x+14y+196z`, `0<=k<2744`. Na ordem dos índices `0..2743`, os três braços permanecem deslocados por `2πa/3`, `a=0,1,2`:
