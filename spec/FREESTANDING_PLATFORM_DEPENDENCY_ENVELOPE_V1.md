@@ -82,6 +82,26 @@ Allowed patterns:
 | implicit runtime shadow | blocked | must become declared state or remain `TOKEN_VAZIO` |
 
 
+
+## Failsafe / failover / watchdog / rollback
+
+Operational safety for this envelope is defined by:
+
+- `spec/FREESTANDING_FAILSAFE_FAILOVER_WATCHDOG_ROLLBACK_V1.md`
+- `receipts/2026-10-08_FREESTANDING_FAILSAFE_WATCHDOG_ROLLBACK_V1.md`
+
+The rule is:
+
+```text
+observer != dependency
+watchdog != PASS
+failsafe != success
+rollback != hidden mutation
+hosted wrapper != L0 freestanding proof
+```
+
+A harness may observe, timeout, retry, fail over or roll back an artifact. It must not mutate the source under observation. If source changes are needed, they become a new commit and a new claim boundary.
+
 ## Android ARM32/ARM64 instances
 
 The first concrete Android instances are recorded as data, not as runtime claims:
