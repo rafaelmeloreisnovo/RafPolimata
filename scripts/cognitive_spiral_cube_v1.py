@@ -169,6 +169,64 @@ def ratios_and_domains() -> list[dict[str, object]]:
     return out
 
 
+def update_observed_state(coherence: float, entropy: float,
+                          input_coherence: float, input_entropy: float,
+                          alpha: float = 0.25) -> tuple[float, float, float]:
+    """External EMA state, NOT brain/plasticity/LLM model-weight training."""
+    values = (coherence, entropy, input_coherence, input_entropy, alpha)
+    if any(isinstance(x, bool) or not isinstance(x, (int, float))
+           or not math.isfinite(x) or not 0.0 <= x <= 1.0 for x in values):
+        raise DomainError("EMA requires finite [0,1] scalar states")
+    next_c = (1.0 - alpha) * coherence + alpha * input_coherence
+    next_h = (1.0 - alpha) * entropy + alpha * input_entropy
+    return next_c, next_h, (1.0 - next_h) * next_c
+
+
+def layer_observations(fib: tuple[int, ...]) -> list[dict[str, float | int]]:
+    """10 spatial z-layers; scan-order dependent by design, not temporal data."""
+    if len(fib) != CELL_COUNT:
+        raise DomainError("layer observations need exact recurrence")
+    result = []
+    weight_total = sum(ARM_COEFFICIENTS)
+    for z in range(SIDE):
+        histogram = [0] * SIDE
+        coherence_total = 0.0
+        for k in range(z * SIDE * SIDE, (z + 1) * SIDE * SIDE):
+            histogram[fib[k] % SIDE] += 1
+            components = [0.0, 0.0, 0.0]
+            for arm in range(3):
+                m = MODULI[(k + arm) % len(MODULI)]
+                direction = unit_direction(k, arm, fib[k] % m, m)
+                for axis in range(3):
+                    components[axis] += ARM_COEFFICIENTS[arm] * direction[axis]
+            coherence_total += math.sqrt(sum(v * v for v in components)) / weight_total
+        result.append({
+            "layer_z": z,
+            "coherence_observed": coherence_total / (SIDE * SIDE),
+            "entropy_observed": normalized_entropy(tuple(histogram)),
+        })
+    return result
+
+
+def adaptive_layer_trace(observations: list[dict[str, float | int]]) -> list[dict[str, object]]:
+    """An explicit ten-step spatial EMA; input order is intentionally observable."""
+    c, h = 0.0, 1.0
+    trace = []
+    for obs in observations:
+        c, h, score = update_observed_state(c, h,
+                                            float(obs["coherence_observed"]),
+                                            float(obs["entropy_observed"]))
+        trace.append({
+            "layer_z": obs["layer_z"],
+            "C_observed": _round(float(obs["coherence_observed"])),
+            "H_observed": _round(float(obs["entropy_observed"])),
+            "C_ema": _round(c),
+            "H_ema": _round(h),
+            "organization_coherence_proxy": _round(score),
+        })
+    return trace
+
+
 def calculate() -> dict[str, object]:
     fib = fibonacci_up_to(CELL_COUNT)
     magnitudes = []
@@ -179,6 +237,9 @@ def calculate() -> dict[str, object]:
         hist[fib[index] % SIDE] += 1
     h = normalized_entropy(tuple(hist))
     anchors = (0, 1, 2, 3, 7, 10, 13, 35, 50, 70, 144, 288, 555, 777, 936, 999)
+    observations = layer_observations(fib)
+    forward = adaptive_layer_trace(observations)
+    backward = adaptive_layer_trace(list(reversed(observations)))
     return {
         "schema": "rafaelia.cognitive-spiral-cube/v1",
         "state": "DETERMINISTIC_RESEARCH_FIXTURE",
@@ -212,6 +273,16 @@ def calculate() -> dict[str, object]:
             "min": _round(min(magnitudes)),
             "median": _round(median(magnitudes)),
             "max": _round(max(magnitudes)),
+        },
+        "adaptive_layer_ema": {
+            "alpha": 0.25,
+            "initial_C": 0.0, "initial_H": 1.0,
+            "ordering": "z ascending, spatial not time",
+            "forward": forward,
+            "reverse_order_final": backward[-1],
+            "permutation_delta_C": _round(forward[-1]["C_ema"] - backward[-1]["C_ema"]),
+            "permutation_delta_H": _round(forward[-1]["H_ema"] - backward[-1]["H_ema"]),
+            "scope": "external directional scan/proxy, not synaptic plasticity",
         },
         "anchor_voxels": [voxel(n, fib) for n in anchors],
     }
