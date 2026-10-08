@@ -10,6 +10,7 @@
  * MEMORY_ORDER: NONE; no concurrency or atomic publication semantics.
  * TAIL_SHADOW: No tail processing, heap, history, retry, mutable cache or hidden state.
  * EVIDENCE: Source-only until an exact-head gate runs; build PASS cannot assert device/science/provider PASS.
+ * CLOSURE_L15: unknown marks and P0 license/physical gaps remain explicitly unresolved.
  * AUTHORSHIP: New authorial implementation for RafPolimata; no upstream code imported.
  * RIGHTS: Repository-wide redistribution license remains a separate P0 owner decision.
  */
