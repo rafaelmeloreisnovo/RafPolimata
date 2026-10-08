@@ -17,8 +17,13 @@ for target in armv7a-none-eabi aarch64-none-elf; do
     "$CLANG" -target "$target" -std=c11 -ffreestanding -fno-builtin \
         -fno-stack-protector -nostdinc -O2 -I"$ROOT/freestanding/include" \
         -c "$ROOT/freestanding/tests/raf_fs_evidence_gate_test.c" -o "$TMP/$target.o"
-    if "$NM" -u "$TMP/$target.o" | grep -q '[[:alnum:]_]'; then
-        printf '%s\n' "FAIL: unresolved symbol in $target" >&2
+    if ! "$NM" -u "$TMP/$target.o" > "$TMP/undefined-$target.txt"; then
+        printf '%s\n' "FAIL: symbol inspection unavailable for $target" >&2
+        exit 1
+    fi
+    if [ -s "$TMP/undefined-$target.txt" ]; then
+        printf '%s\n' "FAIL: unresolved symbols in $target" >&2
+        cat "$TMP/undefined-$target.txt" >&2
         exit 1
     fi
     printf '%s\n' "PASS: $target freestanding object, no unresolved helpers"
