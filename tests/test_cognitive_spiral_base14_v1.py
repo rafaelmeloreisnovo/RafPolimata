@@ -49,6 +49,21 @@ class Radix14SpiralTests(unittest.TestCase):
         self.assertEqual(model.encode14(1050), "550")
         self.assertEqual(model.decode14("100"), 196)
 
+    def test_numeral_pattern_12_square_is_144_in_each_base(self):
+        # This digit pattern is base-parametric for all bases >= 5.
+        # (12)_b = b + 2; (144)_b = b*b + 4*b + 4.
+        for radix in (5, 6, 10, 12, 14, 16, 20, 36):
+            self.assertEqual((radix + 2)**2, radix**2 + 4*radix + 4)
+        self.assertEqual(model.decode14("12"), 16)
+        self.assertEqual(model.decode14("144"), 256)
+        self.assertEqual(model.decode14("12")**2, model.decode14("144"))
+        self.assertEqual(model.decode14("10"), 14)
+        self.assertEqual(model.decode14("10")**3, model.decode14("1000"))
+        # Decimal 144 and base-14 token 144 must remain distinct objects.
+        self.assertNotEqual(model.decode14("144"), 144)
+        self.assertEqual(model.encode14(144), "A4")
+        self.assertEqual(model.encode14(256), "144")
+
     def test_canonical_digits_and_moduli(self):
         self.assertEqual(model.DIGITS, "0123456789ABCD")
         examples = {0: "0", 7: "7", 10: "A", 13: "D", 14: "10",
