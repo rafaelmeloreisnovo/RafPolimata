@@ -4,6 +4,7 @@
 Copyright (c) 2026 Rafael Melo Reis. License: see root LICENSE_DECISION_RECORD.
 Research fixture only; hosted stdlib reference, no synaptic/LLM internal access.
 Crucial: changing digits != changing grid cardinality.
+Governance anchor: CLOSURE_L11; physical/runtime absence also maps to CLOSURE_L2.
 """
 from __future__ import annotations
 
