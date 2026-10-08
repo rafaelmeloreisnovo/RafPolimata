@@ -5,6 +5,7 @@ Copyright (c) 2026 Rafael Melo Reis. No neural or LLM-internals claim.
 import json
 import math
 import unittest
+from fractions import Fraction
 from scripts import cognitive_spiral_base14_v1 as model
 from scripts import cognitive_spiral_cube_v1 as legacy
 
@@ -18,6 +19,35 @@ class Radix14SpiralTests(unittest.TestCase):
         self.assertEqual(model.encode14(legacy.CELL_COUNT), "516")
         self.assertEqual(model.decode14("516"), 1000)
         self.assertEqual(legacy.CELL_COUNT, 1000)
+
+    def test_14_cube_12_square_three_halves_exact_relation(self):
+        # Binomial (12+2)^3: 12^3 + 6*12^2 + 12*2^2 + 2^3
+        # 6*12^2 == 12^3/2 and 12*2^2 == 12^2.
+        self.assertEqual(14**3, 12**3 + 3*12**2*2 + 3*12*2**2 + 2**3)
+        self.assertEqual(3*12**2*2, 12**3//2)
+        self.assertEqual(3*12*2**2, 12**2)
+        self.assertEqual(14**3, 3*12**3//2 + 12**2 + 2**3)
+        self.assertEqual(Fraction(14**3 - 12**2 - 2**3, 12**3),
+                         Fraction(3, 2))
+        # Without the +8 correction the factor is *close* to 1.5,
+        # but cannot be reported as exactly 1.5.
+        self.assertEqual(Fraction(14**3 - 12**2, 12**3),
+                         Fraction(3, 2) + Fraction(1, 216))
+        self.assertNotEqual(Fraction(14**3 - 12**2, 12**3), Fraction(3, 2))
+        # The same exact cube admits an alternate decimal matrix partition.
+        self.assertEqual(14**3, 10**3 + 12**3 + 4**2)
+        self.assertEqual(14**3, 12**2 + (14+12)*10**2)
+        self.assertEqual(14**3 - 10**3, 1744)
+        self.assertEqual(model.encode14(12**2), "A4")
+        self.assertEqual(model.encode14(3*12**3//2), "D32")
+        self.assertEqual(model.encode14(14**3), "1000")
+        self.assertEqual(model.decode14("D32") +
+                         model.decode14("A4") + model.decode14("8"),
+                         model.decode14("1000"))
+        # A number's base representation must not be confused with its magnitude.
+        self.assertEqual(model.decode14("1050"), 2814)
+        self.assertEqual(model.encode14(1050), "550")
+        self.assertEqual(model.decode14("100"), 196)
 
     def test_canonical_digits_and_moduli(self):
         self.assertEqual(model.DIGITS, "0123456789ABCD")
