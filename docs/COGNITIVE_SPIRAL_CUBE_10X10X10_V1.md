@@ -96,6 +96,26 @@ O10 = 1-H10
 
 A energia geométrica não é inferida de `H10`. Calculamos apenas `min A(k)`, `median A(k)`, `max A(k)` e mantemos as coordenadas de 16 pontos-âncora para inspeção/estabilidade. Resultados de três eixos não se transformam automaticamente em correlação cognitiva.
 
+## 4A. Atualização adaptativa explícita e sensibilidade a permutações
+
+Uma grade espacial não tem, por si mesma, dinâmica temporal. A V1 define somente uma **varredura ordenada** das dez camadas `z=0..9`, com cem observações por camada. A observação de coerência geométrica `C_obs(z)` é a média da norma da soma dos três vetores unitários ponderados, dividida pela soma dos pesos; o fator radial comum cancela. Assim `0<=C_obs<=1`. A observação `H_obs(z)` é a entropia categórica normalizada dos 100 resíduos `F_k mod 10` daquela camada.
+
+Aplicamos o contrato numérico explícito de mistura com `alpha=0.25`:
+
+```text
+C_next = 0.75*C_prev + 0.25*C_observed
+H_next = 0.75*H_prev + 0.25*H_observed
+P_next = (1 - H_next)*C_next
+C_initial = 0
+H_initial = 1
+```
+
+`P_next` é apenas um **proxy calculado de organização e coerência**; não a razão áurea `phi`, uma função cerebral, ou uma medida de aprendizagem neuronal. O parâmetro `alpha` aqui não ajusta pesos de um modelo, apenas suaviza observações sintéticas.
+
+A implementação produz os 10 estados e um **contrafactual por permutação**: percorre as mesmas dez camadas em ordem inversa e registra a diferença no estado final. Como uma média móvel exponencial depende da ordem, esse teste revela uma propriedade da regra de atualização, **não descoberta de uma direção temporal física**. Ele permite medir efeitos de ordem sem selecionar a posteriori apenas uma permutação favorável.
+
+Ambos os sinais `C` e `H` exigem escala normalizada `[0,1]`, valores finitos e transição determinística. Qualquer argumento inválido ou evidência ausente não é substituído por zero.
+
 ## 5. Logaritmos aninhados, derivadas e inversas
 
 `L(x)=ln(ln(x))` tem domínio real **`x>1`** (não apenas `x>0`). O resultado pode ser negativo quando `1<x<e`.
@@ -146,7 +166,8 @@ O oráculo testa:
 5. domínio real `ln ln x` e rejeição de valores inválidos;
 6. invariância angular de três braços igualmente espaçados;
 7. todas as 1000 saídas vetoriais, restos, raízes e limite `|sum D| <= sum |D|`;
-8. entropia normalizada e relatório JSON reproduzível.
+8. entropia normalizada e relatório JSON reproduzível;
+9. `alpha=0.25` de atualização, domínios, 10 camadas e contrafactual pela inversão da ordem.
 
 A execução produz **um mapa-síntese com 16 âncoras**, não despeja 1000×3 vetores completos no CI. O algoritmo percorre todas as mil células no teste. Esta escolha limita custo sem ocultar amostras falhas.
 
