@@ -15,6 +15,7 @@
 | [FREESTANDING_PLATFORM_DEPENDENCY_ENVELOPE_V1](../spec/FREESTANDING_PLATFORM_DEPENDENCY_ENVELOPE_V1.md) | matriz humano/IA para dependencias por plataforma, arquitetura e linguagem | rota/scaffold; nao prova build/runtime |
 | `../schemas/freestanding-platform-envelope.v1.schema.json` | contrato machine-readable para classificar plataforma, ABI, linguagem, tail/shadow e evidencia | schema; nao executa gates |
 | `../receipts/2026-10-08_FREESTANDING_PLATFORM_ENVELOPE_V1.md` | receipt append-only do delta | gates de runtime/build permanecem `TOKEN_VAZIO` quando nao executados |
+| [FREESTANDING_FAILSAFE_FAILOVER_WATCHDOG_ROLLBACK_V1](../spec/FREESTANDING_FAILSAFE_FAILOVER_WATCHDOG_ROLLBACK_V1.md) | contrato failsafe/failover/watchdog/rollback sem mutar source | referencia operacional; nao prova execucao |
 
 Regra: L0 freestanding nao importa libc, heap, syscall ou runtime hospedado; Android/Linux/macOS/Windows/iPhone entram como cascas/adaptadores somente quando a autoridade, artefato e evidencia forem declarados.
 
