@@ -6,6 +6,7 @@
  *
  * Scope: deterministic byte classification only. No model context, no
  * attention, no learned weights, no heap, no libc, no external tables.
+ * VISIBLE_FIELD means nonblank/non-underscore bytes, not printable text.
  */
 
 typedef enum raf_z0_token_kind {
@@ -25,7 +26,7 @@ typedef struct raf_z0_observation {
     raf_z0_token_kind kind;
 } raf_z0_observation;
 
-static int raf_z0_is_blank_byte(unsigned char byte)
+static inline int raf_z0_is_blank_byte(unsigned char byte)
 {
     return byte == (unsigned char)' ' ||
            byte == (unsigned char)'\t' ||
@@ -33,7 +34,7 @@ static int raf_z0_is_blank_byte(unsigned char byte)
            byte == (unsigned char)'\r';
 }
 
-static raf_z0_observation raf_z0_observe_bytes(const unsigned char *bytes,
+static inline raf_z0_observation raf_z0_observe_bytes(const unsigned char *bytes,
                                                unsigned long length)
 {
     raf_z0_observation observation;
