@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """Deterministic LATIN metadata graph builder, no corpus, promotion, runtime or training."""
+# CLOSURE_L14 binds unresolved source editions, cultural review and evidence gates.
+# This reference documents missing evidence; it never changes claim_allowed=False.
 import argparse
 import hashlib
 import json
