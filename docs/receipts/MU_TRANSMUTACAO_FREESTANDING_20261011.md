@@ -1,5 +1,7 @@
 # MU Transmutação Freestanding Receipt — 2026-10-11
 
+Closure: `CLOSURE_L13`
+
 mu_id: `MU-TRANSMUTACAO-FREESTANDING-CONTRACT-MANIFEST-FALSIFIERS-V1`  
 timestamp_local: `2026-10-11T15:40:00-03:00`  
 repo: `rafaelmeloreisnovo/RafPolimata`  
