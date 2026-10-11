@@ -51,6 +51,79 @@ static void numa_fixture(raf_fs_numa_snapshot *s) {
     s->capacity_pages[0]=20u;s->capacity_pages[1]=100u;s->capacity_pages[2]=100u;
     s->used_pages[0]=11u;s->used_pages[1]=5u;s->used_pages[2]=10u;
 }
+
+/* Adversarial model-property suite: fixed seed, no external corpus.
+ * CLOSURE_L11: rights/provenance remain typed unknown.
+ * CLOSURE_L12: structural view != ELF loader, ART VM, or NUMA placement.
+ * Metamorphic checks reject corruptions and verify outputs are commit-on-success.
+ */
+static raf_u32 doom_formats_rng(raf_u32 *seed)
+{
+    *seed=(*seed * 1664525u)+1013904223u;
+    return *seed;
+}
+static int doom_formats_properties(void)
+{
+    raf_u32 trial, seed=0x454C4644u;
+    for(trial=0u;trial<256u;++trial) {
+        raf_u32 rnd=doom_formats_rng(&seed);
+        raf_u32 cls=trial&1u, be=(trial>>1)&1u, selected=77u;
+        raf_u8 b[192], d[160];
+        raf_fs_elf_view ev;
+        raf_fs_dex_view dv;
+        raf_fs_numa_snapshot topo;
+        /* Valid synthetic ELF remains structurally accepted in both endian classes. */
+        elf_fixture(b,cls,be);
+        if(raf_fs_elf_inspect(b,144u,&ev)!=RAF_FS_ELF_OK ||
+           ev.word_class!=(cls?64u:32u) || ev.big_endian!=be ||
+           ev.machine!=183u || ev.load_count!=1u) return 101;
+        /* Malformed magic cannot mutate a previously validated output. */
+        b[(raf_usize)(rnd&3u)]=(raf_u8)(rnd>>16);
+        /* Guaranteed corruption, independent of randomized byte coincidence. */
+        b[0]=0u;
+        if(raf_fs_elf_inspect(b,144u,&ev)!=RAF_FS_ELF_BAD ||
+           ev.entry!=4096u || ev.load_count!=1u) return 102;
+        elf_fixture(b,cls,be);
+        if(cls) w64(b+72,0xfffffffffffffff0ULL,be);
+        else w32(b+56,0xfffffff0u,be);
+        if(raf_fs_elf_inspect(b,144u,&ev)!=RAF_FS_ELF_BAD ||
+           ev.entry!=4096u) return 103;
+        elf_fixture(b,cls,be);
+        if(cls) {
+            w64(b+80,0xfffffffffffffff0ULL,be);
+            if(raf_fs_elf_inspect(b,144u,&ev)!=RAF_FS_ELF_BAD ||
+               ev.entry!=4096u) return 104;
+        }
+
+        dex_fixture(d);
+        if(raf_fs_dex_inspect(d,140u,&dv)!=RAF_FS_DEX_OK ||
+           dv.version!=39u || dv.map_items!=2u) return 105;
+        w32(d+112,3u+(rnd&1023u),0u);
+        if(raf_fs_dex_inspect(d,140u,&dv)!=RAF_FS_DEX_BAD ||
+           dv.version!=39u || dv.map_items!=2u) return 106;
+        dex_fixture(d);
+        w16(d+116,0x1000u,0u); /* duplicate forged map_list */
+        if(raf_fs_dex_inspect(d,140u,&dv)!=RAF_FS_DEX_BAD ||
+           dv.version!=39u || dv.map_items!=2u) return 107;
+        dex_fixture(d);
+        d[6]='6'; /* 036 unsupported; never silently accepted as 035 */
+        if(raf_fs_dex_inspect(d,140u,&dv)!=RAF_FS_DEX_UNSUPPORTED ||
+           dv.version!=39u) return 108;
+
+        numa_fixture(&topo);
+        if(raf_fs_numa_choose(&topo,1u+(rnd%9u),&selected)!=RAF_FS_NUMA_SELECTED ||
+           selected!=0u) return 109;
+        topo.used_pages[2]=101u; /* invalid unused node must still fail */
+        if(raf_fs_numa_choose(&topo,1u+(rnd%9u),&selected)!=RAF_FS_NUMA_BAD_INPUT ||
+           selected!=0u) return 110;
+        numa_fixture(&topo);
+        topo.allowed_mask=0u;
+        if(raf_fs_numa_choose(&topo,1u+(rnd%9u),&selected)!=RAF_FS_NUMA_NO_ALLOWED ||
+           selected!=0u) return 111;
+    }
+    return 0;
+}
+
 int main(void) {
     raf_u8 b[192], d[160];
     raf_fs_elf_view e={0,0,0,0,0,0};
@@ -128,5 +201,6 @@ int main(void) {
     topo.node_count=0u;
     CHECK(raf_fs_numa_choose(&topo,5u,&v)==RAF_FS_NUMA_TOPOLOGY_UNKNOWN&&v==1u,29);
     CHECK(RAF_FS_NUMA_TOPOLOGY_UNKNOWN!=0u&&RAF_FS_NUMA_NO_ALLOWED!=RAF_FS_NUMA_NO_FIT,30);
+    { int doom=doom_formats_properties(); if(doom) return doom; }
     return 0;
 }
