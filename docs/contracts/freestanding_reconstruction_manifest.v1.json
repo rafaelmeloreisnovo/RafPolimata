@@ -1,0 +1,197 @@
+{
+  "schema": "rafaelia.freestanding.reconstruction_manifest.v1",
+  "id": "MU-TRANSMUTACAO-FREESTANDING-MANIFEST-V1",
+  "status": "CANONICAL_CANDIDATE",
+  "evidence_state": "DOCUMENTED",
+  "claim_allowed": false,
+  "created_local_time": "2026-10-11T15:40:00-03:00",
+  "producer_repo": "rafaelmeloreisnovo/RafPolimata",
+  "baseline": {
+    "branch": "main",
+    "commit": "be3e1e3cdf11a6f99104f94915b7b47562090a61",
+    "protected": true
+  },
+  "source_refs": [
+    {
+      "path": "freestanding/CANONICAL.md",
+      "sha": "98fffd38e271a278338a9a26b8c595f3313a4f2d",
+      "evidence": "readback"
+    },
+    {
+      "path": "freestanding/README.md",
+      "sha": "5be81177f51cff222c0b30f4d9b9f17cbe03fd3a",
+      "evidence": "readback"
+    },
+    {
+      "path": "freestanding/include/raf_fs_core.h",
+      "sha": "f216ba771647aa07a4627cf28a4a7d6b610ab037",
+      "evidence": "readback"
+    },
+    {
+      "path": "freestanding/tests/verify_contract.sh",
+      "sha": "291fd8477c35a82f8676a2f08ed51803cc8147bc",
+      "evidence": "readback"
+    },
+    {
+      "path": "freestanding/tests/verify_authorial_zero_dep.sh",
+      "sha": "e7e14ad3804399bf6103b814c192084ddbe34707",
+      "evidence": "readback"
+    },
+    {
+      "path": "scripts/audit_language_freestanding_contract.sh",
+      "sha": "65eabb8cb5835a116b7e09b12f99eaf527a74745",
+      "evidence": "readback"
+    },
+    {
+      "path": "docs/RAFGITTOOLS_CUSTODY_BRIDGE_V1.md",
+      "sha": "531f6486b929dc393ff304ab78b0a87df2db6408",
+      "evidence": "readback"
+    }
+  ],
+  "license_state": {
+    "root_LICENSE": "TOKEN_VAZIO",
+    "observed_error": "GitHub contents read for LICENSE returned 404",
+    "rule": "no relicensing or upstream authorship rewrite without per-surface license map"
+  },
+  "boundaries": [
+    {
+      "layer": "L0 core",
+      "dependency_policy": "no hosted runtime, no allocation, no syscall, caller-owned memory",
+      "claim_boundary": "source/codegen until execution receipt"
+    },
+    {
+      "layer": "adapters",
+      "dependency_policy": "may depend on platform/tooling",
+      "claim_boundary": "adapter dependencies do not promote or demote L0 without boundary violation"
+    },
+    {
+      "layer": "toolchain",
+      "dependency_policy": "Make/CMake/Gradle/R8/JVM/SDK/NDK/CI are orchestration/provider surfaces",
+      "claim_boundary": "tool availability is not runtime evidence"
+    },
+    {
+      "layer": "receipts",
+      "dependency_policy": "must bind source, artifact, command, env, hash, result",
+      "claim_boundary": "receipt scope only"
+    }
+  ],
+  "gates": [
+    {
+      "id": "G0",
+      "name": "source identity",
+      "command": "GitHub readback",
+      "current_state": "PARTIAL_DOCUMENTED"
+    },
+    {
+      "id": "G1",
+      "name": "provenance/license",
+      "command": "enumerate LICENSE*/COPYING*/NOTICE*/CITATION/package metadata",
+      "current_state": "TOKEN_VAZIO_ROOT_LICENSE"
+    },
+    {
+      "id": "G2",
+      "name": "freestanding source dependency scan",
+      "command": "make authorial-freestanding",
+      "current_state": "TOKEN_VAZIO_NOT_RUN"
+    },
+    {
+      "id": "G3",
+      "name": "authorial zero dependency object gate",
+      "command": "make authorial-zero-dependency",
+      "current_state": "TOKEN_VAZIO_NOT_RUN"
+    },
+    {
+      "id": "G4",
+      "name": "language freestanding contract",
+      "command": "make language-contract",
+      "current_state": "TOKEN_VAZIO_NOT_RUN"
+    },
+    {
+      "id": "G5",
+      "name": "strict ELF/ABI artifact gate",
+      "command": "make strict-elf ELF=<artifact>",
+      "current_state": "TOKEN_VAZIO_NO_ARTIFACT"
+    },
+    {
+      "id": "G6",
+      "name": "negative/adversarial falsifier suite",
+      "command": "see docs/evidence/FREESTANDING_RECONSTRUCTION_FALSIFIERS_V1.md",
+      "current_state": "DOCUMENTED_NOT_RUN"
+    },
+    {
+      "id": "G7",
+      "name": "exact-head CI/provider",
+      "command": "provider run readback",
+      "current_state": "EXTERNAL_GATE_OPEN"
+    },
+    {
+      "id": "G8",
+      "name": "physical ARM32/ARM64 runtime",
+      "command": "same-artifact device execution",
+      "current_state": "EXTERNAL_GATE_OPEN"
+    },
+    {
+      "id": "G9",
+      "name": "independent reproduction",
+      "command": "separate host/provider/reviewer rerun",
+      "current_state": "EXTERNAL_GATE_OPEN"
+    }
+  ],
+  "falsifier_sets": [
+    {
+      "id": "F-HOSTED-LEAK",
+      "invalidates_if": "claimed L0 source includes hosted/system headers or runtime calls",
+      "primary_probe": "freestanding/tests/verify_contract.sh"
+    },
+    {
+      "id": "F-UNRESOLVED-SYMBOL",
+      "invalidates_if": "claimed zero-dependency object has undefined helpers",
+      "primary_probe": "freestanding/tests/verify_authorial_zero_dep.sh"
+    },
+    {
+      "id": "F-SYSCALL-ALLOC",
+      "invalidates_if": "claimed L0 path performs syscall, allocation, inline asm or weak fallback outside contract",
+      "primary_probe": "grep gates in existing scripts"
+    },
+    {
+      "id": "F-ARTIFACT-MISMATCH",
+      "invalidates_if": "artifact hash or ABI receipt does not match claimed source/ref",
+      "primary_probe": "strict-elf + hash receipt"
+    },
+    {
+      "id": "F-LICENSE-OVERREACH",
+      "invalidates_if": "third-party/upstream material is rebranded or relicensed without license chain",
+      "primary_probe": "license map probe"
+    },
+    {
+      "id": "F-PROVIDER-CLAIM",
+      "invalidates_if": "provider/CI/device claim lacks exact run id, ref, env and log",
+      "primary_probe": "external provider readback"
+    }
+  ],
+  "open_gaps": [
+    "root LICENSE unresolved",
+    "provider dispatch/exact-head CI not executed here",
+    "runner visibility not closed here",
+    "physical ARM32/ARM64 runtime not executed here",
+    "independent reproduction not performed here"
+  ],
+  "next_probe": [
+    "make authorial-freestanding",
+    "make authorial-zero-dependency",
+    "make language-contract",
+    "enumerate license/notice map",
+    "attach logs and hashes as receipt"
+  ],
+  "r3": {
+    "F_ok": [
+      "contract, manifest and falsifier route documented against exact GitHub baseline"
+    ],
+    "F_gap": [
+      "execution, provider, physical device, independent review and license map remain open"
+    ],
+    "F_next": [
+      "run minimal commands on authorized checkout and attach exact receipts"
+    ]
+  }
+}
