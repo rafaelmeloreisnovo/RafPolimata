@@ -101,6 +101,15 @@ int main(void) {
     dex_fixture(d);w32(d+136,141u,0);
     CHECK(raf_fs_dex_inspect(d,140u,&dv)==RAF_FS_DEX_BAD,18);
     CHECK(raf_fs_dex_inspect((const raf_u8*)0,140u,&dv)==RAF_FS_DEX_BAD,19);
+    dex_fixture(d); w16(d+128,0x2000u,0);
+    CHECK(raf_fs_dex_inspect(d,140u,&dv)==RAF_FS_DEX_BAD,31);
+    dex_fixture(d); w32(d+136,116u,0);
+    CHECK(raf_fs_dex_inspect(d,140u,&dv)==RAF_FS_DEX_BAD,32);
+    dex_fixture(d); w16(d+130,1u,0);
+    CHECK(raf_fs_dex_inspect(d,140u,&dv)==RAF_FS_DEX_BAD,33);
+    elf_fixture(b,1u,0u);
+    w64(b+80,0xfffffffffffffff0ULL,0u);
+    CHECK(raf_fs_elf_inspect(b,144u,&e)==RAF_FS_ELF_BAD,34);
     numa_fixture(&topo);
     CHECK(raf_fs_numa_choose(&topo,5u,&v)==RAF_FS_NUMA_SELECTED&&v==0u,20);
     CHECK(raf_fs_numa_choose(&topo,15u,&v)==RAF_FS_NUMA_SELECTED&&v==1u,21);
