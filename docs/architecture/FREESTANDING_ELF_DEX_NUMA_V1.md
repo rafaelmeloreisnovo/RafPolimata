@@ -1,6 +1,7 @@
 # Freestanding ELF / DEX / NUMA — bounded structural tranche V1
 
 Lifecycle: `IMPLEMENTED_UNTESTED` until same-HEAD CI. Owner: RafPolimata `freestanding/`. Globally `claim_allowed=false`.
+Governed gaps: `CLOSURE_L11` binds uncertainty ownership/route; `CLOSURE_L12` preserves physical/device proof as open. A closure annotation never supplies the missing evidence.
 
 Route: `START HERE -> CURRENT_STATE -> freestanding/README.md -> this contract -> freestanding/tests/verify_formats_numa.sh -> exact-HEAD CI -> receipt`.
 
