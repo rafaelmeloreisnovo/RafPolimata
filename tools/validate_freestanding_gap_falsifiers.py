@@ -105,7 +105,7 @@ def scan_file(root: Path, path: Path, findings: List[Finding]) -> Dict[str, int]
     lines = text.splitlines()
 
     for idx, line in enumerate(lines, 1):
-        if CLAIM_ALLOWED_TRUE.search(line):
+        if CLAIM_ALLOWED_TRUE.search(line) and not is_prohibition_context(line):
             findings.append(Finding(rel, idx, "ERROR", "CLAIM_ALLOWED_TRUE", "claim_allowed=true is forbidden in this fail-closed tranche"))
         if DOCUMENTED_TO_PASS.search(line) and not is_prohibition_context(line):
             findings.append(Finding(rel, idx, "ERROR", "DOCUMENTED_PASS_OVERPROMOTION", "DOCUMENTED must not be described as PASS"))
