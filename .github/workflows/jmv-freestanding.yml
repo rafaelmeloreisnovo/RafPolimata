@@ -1,0 +1,46 @@
+name: JMV Freestanding Event Kernel
+
+on:
+  pull_request:
+    paths:
+      - 'freestanding/include/raf_fs_jmv.h'
+      - 'freestanding/tests/raf_fs_jmv_test.c'
+      - 'freestanding/tests/verify_jmv.sh'
+      - 'docs/architecture/JMV_EVENT_MAESTRO_V1.md'
+      - '.github/workflows/jmv-freestanding.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freestanding/include/raf_fs_jmv.h'
+      - 'freestanding/tests/raf_fs_jmv_test.c'
+      - 'freestanding/tests/verify_jmv.sh'
+      - 'docs/architecture/JMV_EVENT_MAESTRO_V1.md'
+      - '.github/workflows/jmv-freestanding.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jmv-freestanding-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  jmv-six-isa:
+    name: JMV six ISA and negative tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout scoped commit
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 / Node 24
+        with:
+          persist-credentials: false
+      - name: Toolchain identity
+        run: |
+          set -eu
+          clang --version
+          cc --version
+          nm --version
+          git rev-parse HEAD
+      - name: Fail-closed JMV source and object falsifiers
+        run: sh freestanding/tests/verify_jmv.sh
