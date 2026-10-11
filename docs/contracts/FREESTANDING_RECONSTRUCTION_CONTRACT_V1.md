@@ -3,6 +3,7 @@
 Status: `CANONICAL_CANDIDATE / DOCUMENTED / FAIL_CLOSED`  
 Evidence state: `DOCUMENTED`  
 claim_allowed: `false`  
+Closure: `CLOSURE_L13`  
 Baseline: `rafaelmeloreisnovo/RafPolimata@be3e1e3cdf11a6f99104f94915b7b47562090a61`  
 Created: `2026-10-11T15:40:00-03:00`
 
