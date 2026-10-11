@@ -1,5 +1,7 @@
 # MU Freestanding Falsifier Workflow Receipt — 2026-10-11
 
+Closure: `CLOSURE_L13`
+
 mu_id: `MU-FREESTANDING-FALSIFIER-WORKFLOW-V1`  
 timestamp_local: `2026-10-11T15:51:04-03:00`  
 repo: `rafaelmeloreisnovo/RafPolimata`  
