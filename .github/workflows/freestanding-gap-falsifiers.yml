@@ -1,0 +1,63 @@
+name: Freestanding Gap Falsifiers
+
+# CLOSURE_L13: workflow audit-readiness unknowns remain governed, not resolved.
+
+on:
+  pull_request:
+    paths:
+      - 'tools/validate_freestanding_gap_falsifiers.py'
+      - 'docs/contracts/**'
+      - 'docs/evidence/**'
+      - 'docs/receipts/**'
+      - '.github/workflows/freestanding-gap-falsifiers.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freestanding-gap-falsifiers-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  freestanding-gap-falsifiers:
+    name: freestanding gap falsifiers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 / Node 24
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run freestanding gap falsifiers
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_SHA="$PR_BASE_SHA"
+          if [ -z "$BASE_SHA" ]; then
+            BASE_SHA="$PUSH_BEFORE_SHA"
+          fi
+          if [ -z "$BASE_SHA" ] || [[ "$BASE_SHA" =~ ^0+$ ]]; then
+            git fetch --no-tags origin "$DEFAULT_BRANCH"
+            BASE_SHA="$(git merge-base HEAD "origin/$DEFAULT_BRANCH")"
+          fi
+          git cat-file -e "${BASE_SHA}^{commit}"
+          python3 tools/validate_freestanding_gap_falsifiers.py \
+            --repo . \
+            --changed-since "$BASE_SHA" \
+            --output ci/reports/freestanding-gap-falsifiers.json \
+            --summary --strict
+
+      - name: Upload freestanding gap falsifier report
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0 / Node 24
+        with:
+          name: freestanding-gap-falsifiers-${{ github.run_id }}
+          path: ci/reports/freestanding-gap-falsifiers.json
+          if-no-files-found: error
