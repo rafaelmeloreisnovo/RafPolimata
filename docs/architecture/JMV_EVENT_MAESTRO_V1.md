@@ -2,6 +2,7 @@
 
 Owner: `rafaelmeloreisnovo/RafPolimata`, `freestanding/include/raf_fs_jmv.h`.
 Lifecycle: `IMPLEMENTED_UNTESTED` until an exact-HEAD gate; `claim_allowed=false` globally.
+Gap governance: `CLOSURE_L11` binds source/authority/rights uncertainties; `CLOSURE_L12` leaves physical runtime/device evidence open. Binding is not promotion.
 Route: `START HERE -> CURRENT_STATE -> freestanding/README.md -> this file -> verify_jmv.sh -> exact-HEAD CI -> receipt`.
 
 ## The mechanical-piano metaphor
