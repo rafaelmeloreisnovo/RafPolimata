@@ -51,7 +51,8 @@
   "license_state": {
     "root_LICENSE": "TOKEN_VAZIO",
     "observed_error": "GitHub contents read for LICENSE returned 404",
-    "rule": "no relicensing or upstream authorship rewrite without per-surface license map"
+    "rule": "no relicensing or upstream authorship rewrite without per-surface license map",
+    "closure_id": "CLOSURE_L13"
   },
   "boundaries": [
     {
@@ -267,5 +268,6 @@
       "run_id": 38166390762,
       "head_sha": "5c1e315f6b098b2f50bfbb62e7fda4f6513ebb44"
     }
-  ]
+  ],
+  "closure_id": "CLOSURE_L13"
 }
