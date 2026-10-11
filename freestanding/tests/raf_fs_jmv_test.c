@@ -72,5 +72,24 @@ int main(void)
             &tick,&idx,&voice,&value,&mix) == RAF_FS_JMV_STEP && idx==0,18);
     }
     CHECK(RAF_FS_JMV_TOKEN_VAZIO != 0 && RAF_FS_JMV_TOKEN_VAZIO != RAF_FS_JMV_DONE,19);
+    /* Falsify the 32nd bit boundary and validate all tape entries before commit. */
+    {
+        raf_u32 tt[32], j;
+        raf_u8 vv[32], oo[32];
+        raf_i32 xx[32];
+        for (j=0u; j<32u; ++j) {
+            tt[j]=1u; vv[j]=0u; oo[j]=RAF_FS_JMV_NOTE; xx[j]=0;
+        }
+        used=0x7fffffffu;
+        CHECK(raf_fs_jmv_step(tt,vv,oo,xx,32u,&used,state,
+            &tick,&idx,&voice,&value,&mix)==RAF_FS_JMV_STEP && idx==31u,20);
+        CHECK(used==0xffffffffu,21);
+        CHECK(raf_fs_jmv_step(tt,vv,oo,xx,32u,&used,state,
+            &tick,&idx,&voice,&value,&mix)==RAF_FS_JMV_DONE,22);
+        used=0u; oo[31]=255u;
+        CHECK(raf_fs_jmv_step(tt,vv,oo,xx,32u,&used,state,
+            &tick,&idx,&voice,&value,&mix)==RAF_FS_JMV_BAD_TAPE,23);
+        CHECK(used==0u,24);
+    }
     return 0;
 }
