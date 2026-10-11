@@ -1,0 +1,273 @@
+{
+  "schema": "rafaelia.freestanding.reconstruction_manifest.v1",
+  "id": "MU-TRANSMUTACAO-FREESTANDING-MANIFEST-V1",
+  "status": "CANONICAL_CANDIDATE",
+  "evidence_state": "PARTIAL_MEASURED_LOCAL",
+  "claim_allowed": false,
+  "created_local_time": "2026-10-11T15:40:00-03:00",
+  "producer_repo": "rafaelmeloreisnovo/RafPolimata",
+  "baseline": {
+    "branch": "main",
+    "commit": "be3e1e3cdf11a6f99104f94915b7b47562090a61",
+    "protected": true
+  },
+  "source_refs": [
+    {
+      "path": "freestanding/CANONICAL.md",
+      "sha": "98fffd38e271a278338a9a26b8c595f3313a4f2d",
+      "evidence": "readback"
+    },
+    {
+      "path": "freestanding/README.md",
+      "sha": "5be81177f51cff222c0b30f4d9b9f17cbe03fd3a",
+      "evidence": "readback"
+    },
+    {
+      "path": "freestanding/include/raf_fs_core.h",
+      "sha": "f216ba771647aa07a4627cf28a4a7d6b610ab037",
+      "evidence": "readback"
+    },
+    {
+      "path": "freestanding/tests/verify_contract.sh",
+      "sha": "291fd8477c35a82f8676a2f08ed51803cc8147bc",
+      "evidence": "readback"
+    },
+    {
+      "path": "freestanding/tests/verify_authorial_zero_dep.sh",
+      "sha": "e7e14ad3804399bf6103b814c192084ddbe34707",
+      "evidence": "readback"
+    },
+    {
+      "path": "scripts/audit_language_freestanding_contract.sh",
+      "sha": "65eabb8cb5835a116b7e09b12f99eaf527a74745",
+      "evidence": "readback"
+    },
+    {
+      "path": "docs/RAFGITTOOLS_CUSTODY_BRIDGE_V1.md",
+      "sha": "531f6486b929dc393ff304ab78b0a87df2db6408",
+      "evidence": "readback"
+    }
+  ],
+  "license_state": {
+    "root_LICENSE": "TOKEN_VAZIO",
+    "observed_error": "GitHub contents read for LICENSE returned 404",
+    "rule": "no relicensing or upstream authorship rewrite without per-surface license map",
+    "closure_id": "CLOSURE_L13"
+  },
+  "boundaries": [
+    {
+      "layer": "L0 core",
+      "dependency_policy": "no hosted runtime, no allocation, no syscall, caller-owned memory",
+      "claim_boundary": "source/codegen until execution receipt"
+    },
+    {
+      "layer": "adapters",
+      "dependency_policy": "may depend on platform/tooling",
+      "claim_boundary": "adapter dependencies do not promote or demote L0 without boundary violation"
+    },
+    {
+      "layer": "toolchain",
+      "dependency_policy": "Make/CMake/Gradle/R8/JVM/SDK/NDK/CI are orchestration/provider surfaces",
+      "claim_boundary": "tool availability is not runtime evidence"
+    },
+    {
+      "layer": "receipts",
+      "dependency_policy": "must bind source, artifact, command, env, hash, result",
+      "claim_boundary": "receipt scope only"
+    }
+  ],
+  "gates": [
+    {
+      "id": "G0",
+      "name": "source identity",
+      "command": "GitHub readback",
+      "current_state": "PARTIAL_DOCUMENTED"
+    },
+    {
+      "id": "G1",
+      "name": "provenance/license",
+      "command": "enumerate LICENSE*/COPYING*/NOTICE*/CITATION/package metadata",
+      "current_state": "TOKEN_VAZIO_ROOT_LICENSE"
+    },
+    {
+      "id": "G2",
+      "name": "freestanding source dependency scan",
+      "command": "make authorial-freestanding",
+      "current_state": "MEASURED_LOCAL_PASS_RUN_38166390762"
+    },
+    {
+      "id": "G3",
+      "name": "authorial zero dependency object gate",
+      "command": "make authorial-zero-dependency",
+      "current_state": "MEASURED_LOCAL_PASS_RUN_38166390762"
+    },
+    {
+      "id": "G4",
+      "name": "language freestanding contract",
+      "command": "make language-contract",
+      "current_state": "MEASURED_LOCAL_PASS_RUN_38166390762"
+    },
+    {
+      "id": "G5",
+      "name": "strict ELF/ABI artifact gate",
+      "command": "make strict-elf ELF=<artifact>",
+      "current_state": "TOKEN_VAZIO_NO_ARTIFACT"
+    },
+    {
+      "id": "G6",
+      "name": "negative/adversarial falsifier suite",
+      "command": "see docs/evidence/FREESTANDING_RECONSTRUCTION_FALSIFIERS_V1.md",
+      "current_state": "MEASURED_LOCAL_PASS_RUN_38166390762"
+    },
+    {
+      "id": "G7",
+      "name": "exact-head CI/provider",
+      "command": "provider run readback",
+      "current_state": "EXTERNAL_GATE_OPEN"
+    },
+    {
+      "id": "G8",
+      "name": "physical ARM32/ARM64 runtime",
+      "command": "same-artifact device execution",
+      "current_state": "EXTERNAL_GATE_OPEN"
+    },
+    {
+      "id": "G9",
+      "name": "independent reproduction",
+      "command": "separate host/provider/reviewer rerun",
+      "current_state": "EXTERNAL_GATE_OPEN"
+    },
+    {
+      "id": "G10",
+      "name": "workflow materialization for falsifier gates",
+      "command": ".github/workflows/freestanding-reconstruction-falsifiers.yml",
+      "current_state": "MEASURED_LOCAL_SUCCESS_RUN_38166390762"
+    }
+  ],
+  "falsifier_sets": [
+    {
+      "id": "F-HOSTED-LEAK",
+      "invalidates_if": "claimed L0 source includes hosted/system headers or runtime calls",
+      "primary_probe": "freestanding/tests/verify_contract.sh"
+    },
+    {
+      "id": "F-UNRESOLVED-SYMBOL",
+      "invalidates_if": "claimed zero-dependency object has undefined helpers",
+      "primary_probe": "freestanding/tests/verify_authorial_zero_dep.sh"
+    },
+    {
+      "id": "F-SYSCALL-ALLOC",
+      "invalidates_if": "claimed L0 path performs syscall, allocation, inline asm or weak fallback outside contract",
+      "primary_probe": "grep gates in existing scripts"
+    },
+    {
+      "id": "F-ARTIFACT-MISMATCH",
+      "invalidates_if": "artifact hash or ABI receipt does not match claimed source/ref",
+      "primary_probe": "strict-elf + hash receipt"
+    },
+    {
+      "id": "F-LICENSE-OVERREACH",
+      "invalidates_if": "third-party/upstream material is rebranded or relicensed without license chain",
+      "primary_probe": "license map probe"
+    },
+    {
+      "id": "F-PROVIDER-CLAIM",
+      "invalidates_if": "provider/CI/device claim lacks exact run id, ref, env and log",
+      "primary_probe": "external provider readback"
+    }
+  ],
+  "open_gaps": [
+    "root LICENSE unresolved",
+    "provider dispatch/exact-head CI not executed here",
+    "runner visibility not closed here",
+    "physical ARM32/ARM64 runtime not executed here",
+    "independent reproduction not performed here",
+    "falsifier workflow terminal provider execution not observed here",
+    "CI workflow failure on same head",
+    "Workflow Graph Audit failure on same head",
+    "raw gate logs not embedded in manifest"
+  ],
+  "next_probe": [
+    "make authorial-freestanding",
+    "make authorial-zero-dependency",
+    "make language-contract",
+    "enumerate license/notice map",
+    "attach logs and hashes as receipt",
+    "observe terminal GitHub Actions run for freestanding-reconstruction-falsifiers",
+    "triage CI and Workflow Graph Audit failures by exact run logs"
+  ],
+  "r3": {
+    "F_ok": [
+      "contract, manifest and falsifier route documented against exact GitHub baseline",
+      "CI falsifier workflow materialized on PR branch",
+      "Freestanding Reconstruction Falsifiers workflow succeeded at exact head 5c1e315f6b098b2f50bfbb62e7fda4f6513ebb44"
+    ],
+    "F_gap": [
+      "execution, provider, physical device, independent review and license map remain open",
+      "workflow execution/log readback remains TOKEN_VAZIO until provider run",
+      "Global PR not promoted because CI and Workflow Graph Audit failed on same head"
+    ],
+    "F_next": [
+      "run minimal commands on authorized checkout and attach exact receipts",
+      "read terminal workflow logs and update evidence class from DOCUMENTED to measured status",
+      "Triage failing sibling workflows without source mutation unless a source-side falsifier is identified"
+    ]
+  },
+  "ci_workflow": {
+    "path": ".github/workflows/freestanding-reconstruction-falsifiers.yml",
+    "state": "MEASURED_LOCAL_SUCCESS",
+    "gate": "provider execution/log readback required before promotion",
+    "receipt": "docs/receipts/MU_FREESTANDING_FALSIFIER_WORKFLOW_20261011.md",
+    "commands": [
+      "make authorial-freestanding",
+      "make authorial-zero-dependency",
+      "make language-contract",
+      "make evidence-garden-falsifiers"
+    ],
+    "workflow_run": {
+      "id": 38166390762,
+      "name": "Freestanding Reconstruction Falsifiers",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "5c1e315f6b098b2f50bfbb62e7fda4f6513ebb44",
+      "event": "pull_request",
+      "url": "https://github.com/rafaelmeloreisnovo/RafPolimata/actions/runs/38166390762",
+      "job_id": 114549720653,
+      "job_url": "https://github.com/rafaelmeloreisnovo/RafPolimata/actions/runs/38166390762/job/114549720653",
+      "started_at": "2026-10-11T19:03:21Z",
+      "completed_at": "2026-10-11T19:03:45Z"
+    },
+    "run_receipt": "docs/receipts/MU_FREESTANDING_FALSIFIER_RUN_38166390762.md"
+  },
+  "measured_gates": [
+    {
+      "gate": "G2",
+      "command": "make authorial-freestanding",
+      "state": "MEASURED_LOCAL_PASS",
+      "run_id": 38166390762,
+      "head_sha": "5c1e315f6b098b2f50bfbb62e7fda4f6513ebb44"
+    },
+    {
+      "gate": "G3",
+      "command": "make authorial-zero-dependency",
+      "state": "MEASURED_LOCAL_PASS",
+      "run_id": 38166390762,
+      "head_sha": "5c1e315f6b098b2f50bfbb62e7fda4f6513ebb44"
+    },
+    {
+      "gate": "G4",
+      "command": "make language-contract",
+      "state": "MEASURED_LOCAL_PASS",
+      "run_id": 38166390762,
+      "head_sha": "5c1e315f6b098b2f50bfbb62e7fda4f6513ebb44"
+    },
+    {
+      "gate": "G6",
+      "command": "make evidence-garden-falsifiers",
+      "state": "MEASURED_LOCAL_PASS",
+      "run_id": 38166390762,
+      "head_sha": "5c1e315f6b098b2f50bfbb62e7fda4f6513ebb44"
+    }
+  ],
+  "closure_id": "CLOSURE_L13"
+}

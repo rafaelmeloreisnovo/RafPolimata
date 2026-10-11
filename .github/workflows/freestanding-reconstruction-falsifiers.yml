@@ -1,0 +1,136 @@
+name: Freestanding Reconstruction Falsifiers
+
+# CLOSURE_L13: workflow audit-readiness unknowns remain governed, not resolved.
+
+on:
+  pull_request:
+    paths:
+      - 'freestanding/**'
+      - 'tools/rafbbs/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'ci/contracts/**'
+      - 'docs/contracts/FREESTANDING_RECONSTRUCTION_CONTRACT_V1.md'
+      - 'docs/contracts/freestanding_reconstruction_manifest.v1.json'
+      - 'docs/evidence/FREESTANDING_RECONSTRUCTION_FALSIFIERS_V1.md'
+      - '.github/workflows/freestanding-reconstruction-falsifiers.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freestanding-reconstruction-falsifiers-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  falsifiers:
+    name: source-side falsifier gates
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CLAIM_ALLOWED: "false"
+      EVIDENCE_CLASS: "MEASURED_LOCAL_IF_RUN"
+      RECEIPT_DIR: ci/reports/freestanding-reconstruction
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 / Node 24
+        with:
+          persist-credentials: false
+
+      - name: Baseline and authority receipt
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p "$RECEIPT_DIR"
+          {
+            echo "receipt_id=FREESTANDING_RECONSTRUCTION_FALSIFIERS_V1"
+            echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "repo=$GITHUB_REPOSITORY"
+            echo "ref=$GITHUB_REF"
+            echo "sha=$GITHUB_SHA"
+            echo "event=$GITHUB_EVENT_NAME"
+            echo "runner_os=$RUNNER_OS"
+            echo "claim_allowed=$CLAIM_ALLOWED"
+            echo "source_ne_artifact_ne_execution_ne_evidence_ne_claim=true"
+          } | tee "$RECEIPT_DIR/baseline.env"
+          {
+            echo "## Freestanding Reconstruction Falsifiers"
+            echo
+            echo "- repo: `$GITHUB_REPOSITORY`"
+            echo "- sha: `$GITHUB_SHA`"
+            echo "- claim_allowed: `$CLAIM_ALLOWED`"
+            echo "- evidence: local GitHub runner measurement only if steps execute"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: License/provenance probe
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p "$RECEIPT_DIR"
+          {
+            echo "# license-probe"
+            find . -maxdepth 4 \( -iname 'LICENSE*' -o -iname 'COPYING*' -o -iname 'NOTICE*' -o -iname 'CITATION.cff' \) -type f | sort || true
+          } | tee "$RECEIPT_DIR/license-probe.txt"
+          if [ ! -f LICENSE ]; then
+            echo "TOKEN_VAZIO_ROOT_LICENSE=1" | tee -a "$RECEIPT_DIR/license-probe.txt"
+          fi
+
+      - name: Manifest JSON is parseable
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("docs/contracts/freestanding_reconstruction_manifest.v1.json")
+          data = json.loads(p.read_text(encoding="utf-8"))
+          assert data.get("claim_allowed") is False
+          assert data.get("schema") == "rafaelia.freestanding.reconstruction_manifest.v1"
+          print("manifest-json: PASS")
+          PY
+
+      - name: Run source-side falsifier gates
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p "$RECEIPT_DIR/logs"
+          fail=0
+          run_gate() {
+            gate="$1"
+            shift
+            log="$RECEIPT_DIR/logs/${gate}.log"
+            echo "::group::$gate"
+            set +e
+            "$@" >"$log" 2>&1
+            status=$?
+            set -e
+            cat "$log"
+            echo "::endgroup::"
+            echo "$gate=$status" | tee -a "$RECEIPT_DIR/status.env"
+            if [ "$status" -ne 0 ]; then
+              fail=1
+            fi
+          }
+          run_gate authorial-freestanding make authorial-freestanding
+          run_gate authorial-zero-dependency make authorial-zero-dependency
+          run_gate language-contract make language-contract
+          run_gate evidence-garden-falsifiers make evidence-garden-falsifiers
+          if [ "$fail" -ne 0 ]; then
+            echo "freestanding-reconstruction-falsifiers: FAIL" | tee "$RECEIPT_DIR/result.txt"
+            exit 1
+          fi
+          echo "freestanding-reconstruction-falsifiers: PASS" | tee "$RECEIPT_DIR/result.txt"
+
+      - name: Summarize receipt
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          echo "## Receipt files" >> "$GITHUB_STEP_SUMMARY"
+          find "$RECEIPT_DIR" -type f | sort | sed 's#^#- #' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f "$RECEIPT_DIR/status.env" ]; then
+            echo >> "$GITHUB_STEP_SUMMARY"
+            echo "## Gate statuses" >> "$GITHUB_STEP_SUMMARY"
+            sed 's/^/- /' "$RECEIPT_DIR/status.env" >> "$GITHUB_STEP_SUMMARY"
+          fi
