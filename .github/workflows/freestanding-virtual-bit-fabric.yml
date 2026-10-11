@@ -1,0 +1,31 @@
+name: Virtual Bit Fabric Freestanding
+on:
+  pull_request:
+    paths:
+      - 'freestanding/include/raf_fs_virtual_bit_fabric.h'
+      - 'freestanding/tests/raf_fs_virtual_bit_fabric_*.c'
+      - 'freestanding/tests/verify_virtual_bit_fabric.sh'
+      - 'docs/architecture/RAFAELIA_VIRTUAL_BIT_FABRIC_V1.md'
+      - '.github/workflows/freestanding-virtual-bit-fabric.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freestanding/include/raf_fs_virtual_bit_fabric.h'
+      - 'freestanding/tests/raf_fs_virtual_bit_fabric_*.c'
+      - 'freestanding/tests/verify_virtual_bit_fabric.sh'
+      - '.github/workflows/freestanding-virtual-bit-fabric.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-six-target:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify logical trace, watchdog and six OS-neutral objects
+        run: sh freestanding/tests/verify_virtual_bit_fabric.sh
+      - name: Confirm zero-real-hardware claim boundary
+        run: |
+          grep -Fq 'VBF_MODEL_ONLY' freestanding/include/raf_fs_virtual_bit_fabric.h
+          grep -Fq 'TOKEN_VAZIO' docs/architecture/RAFAELIA_VIRTUAL_BIT_FABRIC_V1.md
