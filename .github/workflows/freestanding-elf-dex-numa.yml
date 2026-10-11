@@ -1,0 +1,55 @@
+name: Freestanding ELF DEX NUMA
+
+on:
+  pull_request:
+    paths:
+      - 'freestanding/include/raf_fs_binary_view.h'
+      - 'freestanding/include/raf_fs_elf_view.h'
+      - 'freestanding/include/raf_fs_dex_view.h'
+      - 'freestanding/include/raf_fs_numa_plan.h'
+      - 'freestanding/tests/raf_fs_formats_numa_test.c'
+      - 'freestanding/tests/verify_formats_numa.sh'
+      - 'freestanding/README.md'
+      - 'docs/architecture/FREESTANDING_ELF_DEX_NUMA_V1.md'
+      - '.github/workflows/freestanding-elf-dex-numa.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freestanding/include/raf_fs_binary_view.h'
+      - 'freestanding/include/raf_fs_elf_view.h'
+      - 'freestanding/include/raf_fs_dex_view.h'
+      - 'freestanding/include/raf_fs_numa_plan.h'
+      - 'freestanding/tests/raf_fs_formats_numa_test.c'
+      - 'freestanding/tests/verify_formats_numa.sh'
+      - 'freestanding/README.md'
+      - 'docs/architecture/FREESTANDING_ELF_DEX_NUMA_V1.md'
+      - '.github/workflows/freestanding-elf-dex-numa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fs-elf-dex-numa-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bounded-formats-six-isa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact PR source
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5 Node24
+        with:
+          persist-credentials: false
+      - name: Tool identity and exact SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          clang --version
+          cc --version
+          nm --version
+      - name: Source contract, sanitizer and no-undefined six-ISA
+        shell: bash
+        run: sh freestanding/tests/verify_formats_numa.sh
