@@ -7,10 +7,17 @@ NM=${NM:-nm}
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT HUP INT TERM
 sh "$ROOT/freestanding/tests/verify_contract.sh"
-"$CC" -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
-    "$ROOT/freestanding/tests/raf_fs_virtual_bit_fabric_test.c" -o "$TMP/vbf"
-"$TMP/vbf"
-printf '%s\n' 'PASS: 11 abstract models x 16 steps + layered watchdog falsifiers'
+for opt in 0 2 3; do
+    "$CC" -std=c11 "-O$opt" -Wall -Wextra -Werror -pedantic \
+        "$ROOT/freestanding/tests/raf_fs_virtual_bit_fabric_test.c" -o "$TMP/vbf-O$opt"
+    "$TMP/vbf-O$opt"
+    printf 'PASS: host model + watchdog at -O%s\n' "$opt"
+done
+"$CLANG" -std=c11 -O1 -g -Wall -Wextra -Werror \
+    -fsanitize=undefined -fno-sanitize-recover=all \
+    "$ROOT/freestanding/tests/raf_fs_virtual_bit_fabric_test.c" -o "$TMP/vbf-ubsan"
+"$TMP/vbf-ubsan"
+printf '%s\n' 'PASS: host UBSan model + watchdog'
 for target in x86_64-unknown-none i686-unknown-none armv7a-none-eabi \
               aarch64-none-elf riscv32-unknown-elf riscv64-unknown-elf; do
     "$CLANG" -target "$target" -std=c11 -O2 -Wall -Wextra -Werror \
