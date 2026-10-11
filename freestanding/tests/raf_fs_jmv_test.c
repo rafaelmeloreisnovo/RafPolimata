@@ -1,5 +1,7 @@
 #include "../include/raf_fs_jmv.h"
-/* Hosted synthetic harness only. The include/ kernel stays freestanding. */
+/* Hosted synthetic harness only. The include/ kernel stays freestanding.
+ * CLOSURE_L11: synthetic evidence is scoped; CLOSURE_L12: physical proof stays open.
+ */
 #define CHECK(c, n) if (!(c)) return (n)
 #define STEP() raf_fs_jmv_step(t, v, o, x, n, &used, state, &tick, &idx, &voice, &value, &mix)
 
