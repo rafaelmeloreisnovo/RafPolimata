@@ -135,6 +135,12 @@
       "name": "independent reproduction",
       "command": "separate host/provider/reviewer rerun",
       "current_state": "EXTERNAL_GATE_OPEN"
+    },
+    {
+      "id": "G10",
+      "name": "workflow materialization for falsifier gates",
+      "command": ".github/workflows/freestanding-reconstruction-falsifiers.yml",
+      "current_state": "DOCUMENTED_NOT_RUN"
     }
   ],
   "falsifier_sets": [
@@ -174,24 +180,41 @@
     "provider dispatch/exact-head CI not executed here",
     "runner visibility not closed here",
     "physical ARM32/ARM64 runtime not executed here",
-    "independent reproduction not performed here"
+    "independent reproduction not performed here",
+    "falsifier workflow terminal provider execution not observed here"
   ],
   "next_probe": [
     "make authorial-freestanding",
     "make authorial-zero-dependency",
     "make language-contract",
     "enumerate license/notice map",
-    "attach logs and hashes as receipt"
+    "attach logs and hashes as receipt",
+    "observe terminal GitHub Actions run for freestanding-reconstruction-falsifiers"
   ],
   "r3": {
     "F_ok": [
-      "contract, manifest and falsifier route documented against exact GitHub baseline"
+      "contract, manifest and falsifier route documented against exact GitHub baseline",
+      "CI falsifier workflow materialized on PR branch"
     ],
     "F_gap": [
-      "execution, provider, physical device, independent review and license map remain open"
+      "execution, provider, physical device, independent review and license map remain open",
+      "workflow execution/log readback remains TOKEN_VAZIO until provider run"
     ],
     "F_next": [
-      "run minimal commands on authorized checkout and attach exact receipts"
+      "run minimal commands on authorized checkout and attach exact receipts",
+      "read terminal workflow logs and update evidence class from DOCUMENTED to measured status"
+    ]
+  },
+  "ci_workflow": {
+    "path": ".github/workflows/freestanding-reconstruction-falsifiers.yml",
+    "state": "DOCUMENTED_NOT_RUN",
+    "gate": "provider execution/log readback required before promotion",
+    "receipt": "docs/receipts/MU_FREESTANDING_FALSIFIER_WORKFLOW_20261011.md",
+    "commands": [
+      "make authorial-freestanding",
+      "make authorial-zero-dependency",
+      "make language-contract",
+      "make evidence-garden-falsifiers"
     ]
   }
 }
