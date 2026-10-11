@@ -26,7 +26,7 @@ typedef struct raf_fs_dex_view {
 static inline __attribute__((always_inline)) raf_u32
 raf_fs_dex_inspect(const raf_u8 *bytes, raf_usize length, raf_fs_dex_view *out)
 {
-    raf_u32 file, map, data, data_size, map_count, i;
+    raf_u32 file, map, data, data_size, map_count, i, map_self_count=0u;
     raf_u32 vers;
     static const raf_u8 stride[6]={4u,4u,12u,8u,8u,32u};
     raf_fs_dex_view tmp;
@@ -65,8 +65,16 @@ raf_fs_dex_inspect(const raf_u8 *bytes, raf_usize length, raf_fs_dex_view *out)
         const raf_u8 *item=bytes+map+4u+(raf_usize)i*12u;
         raf_u32 count=raf_fs_bv_u32(item+4,0);
         raf_u32 off=raf_fs_bv_u32(item+8,0);
-        if (!count || !raf_fs_bv_range(length,off,1u)) return RAF_FS_DEX_BAD;
+        raf_u32 type=raf_fs_bv_u16(item,0);
+        if (!count || !raf_fs_bv_range(length,off,1u) ||
+            raf_fs_bv_u16(item+2,0)!=0u) return RAF_FS_DEX_BAD;
+        /* A DEX map must identify its own map_list exactly once. */
+        if (type==0x1000u) {
+            if (count!=1u || off!=map || map_self_count) return RAF_FS_DEX_BAD;
+            ++map_self_count;
+        }
     }
+    if (map_self_count!=1u) return RAF_FS_DEX_BAD;
     tmp.file_size=file;
     tmp.map_offset=map;
     tmp.map_items=map_count;
