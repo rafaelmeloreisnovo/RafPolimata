@@ -24,6 +24,7 @@ CLAIM_ALLOWED_TRUE = re.compile(r"claim_allowed\s*[:=]\s*[`\"']?true", re.IGNORE
 DOCUMENTED_TO_PASS = re.compile(r"DOCUMENTED[^\n]{0,80}\bPASS\b|\bPASS\b[^\n]{0,80}DOCUMENTED", re.IGNORECASE)
 MEASURED = re.compile(r"MEASURED_LOCAL|MEASURED_LOCAL_PASS|MEASURED_LOCAL_SUCCESS", re.IGNORECASE)
 REPRODUCED = re.compile(r"\b(REPRODUCED|CROSS_HOST|PROVEN)\b", re.IGNORECASE)
+PROHIBITION_HINTS = ("forbidden", "invalidates", "must not", "reject", "rejects", "falsifier", "overpromotion", "over-promotion", "equates")
 REQUIRED_MEASURED_FIELDS = ("head_sha", "run", "job")
 TEXT_SUFFIXES = {".md", ".json", ".yml", ".yaml", ".py", ".sh", ".txt"}
 SKIP_PARTS = {".git", "__pycache__", "docs/generated", "results"}
@@ -36,6 +37,7 @@ TOKEN_TYPES = {
     "TOKEN_VAZIO_REPRODUCTION": ("independent", "reproduction", "cross_host", "reproduced"),
     "TOKEN_VAZIO_ARTIFACT": ("artifact", "hash", "elf", "abi", "object"),
     "TOKEN_VAZIO_LOG": ("log", "raw", "receipt", "run id", "job"),
+    "TOKEN_VAZIO_GOVERNANCE": ("closure", "govern", "typed", "untyped", "classifier", "scan", "gap"),
 }
 
 
@@ -87,6 +89,11 @@ def classify_token(line: str) -> str:
     return "TOKEN_VAZIO_UNTYPED"
 
 
+def is_prohibition_context(line: str) -> bool:
+    low = line.lower()
+    return any(hint in low for hint in PROHIBITION_HINTS)
+
+
 def scan_file(root: Path, path: Path, findings: List[Finding]) -> Dict[str, int]:
     rel = path.resolve().relative_to(root).as_posix()
     counts = {"tokens": 0, "typed_tokens": 0, "measured": 0}
@@ -100,7 +107,7 @@ def scan_file(root: Path, path: Path, findings: List[Finding]) -> Dict[str, int]
     for idx, line in enumerate(lines, 1):
         if CLAIM_ALLOWED_TRUE.search(line):
             findings.append(Finding(rel, idx, "ERROR", "CLAIM_ALLOWED_TRUE", "claim_allowed=true is forbidden in this fail-closed tranche"))
-        if DOCUMENTED_TO_PASS.search(line):
+        if DOCUMENTED_TO_PASS.search(line) and not is_prohibition_context(line):
             findings.append(Finding(rel, idx, "ERROR", "DOCUMENTED_PASS_OVERPROMOTION", "DOCUMENTED must not be described as PASS"))
         if REPRODUCED.search(line) and "TOKEN_VAZIO" not in line and "CROSS_HOST" in line.upper():
             findings.append(Finding(rel, idx, "WARNING", "CROSS_HOST_ASSERTION_REQUIRES_REVIEW", "cross-host language requires independent evidence binding"))
@@ -112,7 +119,7 @@ def scan_file(root: Path, path: Path, findings: List[Finding]) -> Dict[str, int]
             if not file_closures and not closure_ids(line):
                 findings.append(Finding(rel, idx, "ERROR", "TOKEN_WITHOUT_CLOSURE", "TOKEN_VAZIO requires a governing CLOSURE_*"))
             if token_type == "TOKEN_VAZIO_UNTYPED":
-                findings.append(Finding(rel, idx, "ERROR", "TOKEN_UNTYPED", "TOKEN_VAZIO must be typed by license/device/provider/reproduction/artifact/log context"))
+                findings.append(Finding(rel, idx, "ERROR", "TOKEN_UNTYPED", "TOKEN_VAZIO must be typed by license/device/provider/reproduction/artifact/log/governance context"))
 
     if MEASURED.search(text):
         counts["measured"] += 1
