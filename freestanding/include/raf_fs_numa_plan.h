@@ -9,6 +9,7 @@
  * MEMORY_ORDER: No synchronization/atomic reservation guarantees.
  * TAIL_SHADOW: Fixed maximum eight nodes, no hidden topology/device lookup.
  * EVIDENCE: Synthetic checks only; actual NUMA and physical placement TOKEN_VAZIO.
+ * CLOSURE_L11: topology/authority gap governed; CLOSURE_L12: physical placement remains unproven.
  */
 #include "raf_fs_types.h"
 #define RAF_FS_NUMA_MAX_NODES 8u
