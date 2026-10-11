@@ -65,7 +65,8 @@ raf_fs_elf_inspect(const raf_u8 *bytes, raf_usize length, raf_fs_elf_view *out)
             raf_u64 file=is64?raf_fs_bv_u64(p+32,be):(raf_u64)raf_fs_bv_u32(p+16,be);
             raf_u64 mem=is64?raf_fs_bv_u64(p+40,be):(raf_u64)raf_fs_bv_u32(p+20,be);
             raf_u64 align=is64?raf_fs_bv_u64(p+48,be):(raf_u64)raf_fs_bv_u32(p+28,be);
-            if (mem<file || !raf_fs_bv_range(length,off,file) ||
+            if (mem<file || addr>(~(raf_u64)0)-mem ||
+                !raf_fs_bv_range(length,off,file) ||
                 (align>1u && (((align & (align-1u))!=0u) ||
                               ((off & (align-1u))!=(addr & (align-1u))))))
                 return RAF_FS_ELF_BAD;
