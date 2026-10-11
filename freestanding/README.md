@@ -79,6 +79,17 @@ CLOSURE_L15 binds unresolved source/rights/runtime evidence in this exact scope;
 - `RAF_FS_GATE_PASS_SCOPED` is a policy outcome for provided marks, not a verification of their authenticity or a runtime/provider/scientific claim.
 - P0: no root redistribution license was observed during this audit; new implementation does not grant reuse rights to other repositories. Resolve license/provenance per source before copying.
 
+## ELF / DEX / NUMA structural L0
+
+- `include/raf_fs_binary_view.h`: caller-owned bytes, endian-neutral decoding and overflow-safe bounds.
+- `include/raf_fs_elf_view.h`: bounded ELF32/ELF64 structural header and PT_LOAD inspection; never loads an ELF.
+- `include/raf_fs_dex_view.h`: strict DEX 035/037–040 header/table/map subset; not ART/Java execution or integrity validation.
+- `include/raf_fs_numa_plan.h`: eight-node deterministic advisory placement from caller-provided capacity and distance; no OS affinity.
+- `tests/verify_formats_numa.sh`: synthetic adversarial tests, host sanitizers, six freestanding target objects and undefined-symbol check.
+- `../docs/architecture/FREESTANDING_ELF_DEX_NUMA_V1.md`: authoritative boundary, references, missing evidence and rollback.
+
+This is an additive source tranche; do not promote structural views into loader, DEX runtime, physical NUMA binding or scientific performance claims. Missing rights, independent review and device receipts stay `TOKEN_VAZIO`.
+
 ## Gates
 
 ```text
