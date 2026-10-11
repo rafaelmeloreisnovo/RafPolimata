@@ -3,7 +3,8 @@
 Status: `DOCUMENTED / NOT_RUN / FAIL_CLOSED`  
 Baseline: `rafaelmeloreisnovo/RafPolimata@be3e1e3cdf11a6f99104f94915b7b47562090a61`  
 Created: `2026-10-11T15:40:00-03:00`  
-claim_allowed: `false`
+claim_allowed: `false`  
+Closure: `CLOSURE_L13`
 
 This file defines the adversarial tests required before promoting the freestanding reconstruction path. It is intentionally stricter than a happy-path checklist: a single triggered falsifier must either invalidate the claim or hold it at `TOKEN_VAZIO`.
 
