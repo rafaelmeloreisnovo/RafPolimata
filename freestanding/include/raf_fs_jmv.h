@@ -11,6 +11,8 @@
  * TAIL_SHADOW: Explicit count <= 32 and consumed bitmask; no hidden tail, cache, retry or shadow.
  * EVIDENCE: New authorial source; host/cross-target probes required; no device proof.
  * RIGHTS: The repository-wide redistribution license remains separately unresolved.
+ * CLOSURE_L11: typed source/rights gaps retain owner and evidence routes.
+ * CLOSURE_L12: physical execution and device proof remain unresolved.
  */
 #include "raf_fs_types.h"
 
