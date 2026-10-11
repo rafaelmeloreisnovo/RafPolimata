@@ -24,7 +24,7 @@ CLAIM_ALLOWED_TRUE = re.compile(r"claim_allowed\s*[:=]\s*[`\"']?true", re.IGNORE
 DOCUMENTED_TO_PASS = re.compile(r"DOCUMENTED[^\n]{0,80}\bPASS\b|\bPASS\b[^\n]{0,80}DOCUMENTED", re.IGNORECASE)
 MEASURED = re.compile(r"MEASURED_LOCAL|MEASURED_LOCAL_PASS|MEASURED_LOCAL_SUCCESS", re.IGNORECASE)
 REPRODUCED = re.compile(r"\b(REPRODUCED|CROSS_HOST|PROVEN)\b", re.IGNORECASE)
-PROHIBITION_HINTS = ("forbidden", "invalidates", "must not", "reject", "rejects", "falsifier", "overpromotion", "over-promotion", "equates")
+PROHIBITION_HINTS = ("forbidden", "invalidates", "must not", "reject", "rejects", "falsifier", "overpromotion", "over-promotion", "promotion", "equates")
 REQUIRED_MEASURED_FIELDS = ("head_sha", "run", "job")
 TEXT_SUFFIXES = {".md", ".json", ".yml", ".yaml", ".py", ".sh", ".txt"}
 SKIP_PARTS = {".git", "__pycache__", "docs/generated", "results"}
