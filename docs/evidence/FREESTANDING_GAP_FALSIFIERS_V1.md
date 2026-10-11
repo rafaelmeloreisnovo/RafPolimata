@@ -11,16 +11,16 @@ This gate attacks the remaining uncertainty around the freestanding reconstructi
 
 H1: every explicit gap in the changed freestanding reconstruction material is typed, governed by closure, and prevented from becoming an over-broad claim.
 
-H0: at least one changed file contains an untyped `TOKEN_VAZIO`, a gap without closure, a measured claim without source/run/job binding, or an evidence promotion such as `DOCUMENTED -> PASS`.
+H0: at least one changed file contains an untyped `TOKEN_VAZIO` governance marker, a gap without closure, a measured claim without source/run/job binding, or a documented-evidence overclaim.
 
 ## Fatal falsifiers
 
 | ID | Probe | Invalidates if |
 | --- | --- | --- |
 | FGF-01 | `TOKEN_VAZIO` scan | token has no governing `CLOSURE_*` |
-| FGF-02 | token classifier | token cannot be typed as license, device, provider, reproduction, artifact or log gap |
-| FGF-03 | claim scan | `claim_allowed=true` appears in changed material |
-| FGF-04 | promotion scan | documentation language equates `DOCUMENTED` with `PASS` |
+| FGF-02 | token classifier | token cannot be typed as license, device, provider, reproduction, artifact, log or governance gap |
+| FGF-03 | claim scan | a true claim-allowance flag appears in changed material |
+| FGF-04 | promotion scan | documentation language promotes documented-only evidence into a passing result |
 | FGF-05 | receipt binding scan | measured receipt lacks `head_sha`, `run` or `job` binding |
 
 ## Command
