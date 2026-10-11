@@ -16,7 +16,7 @@ import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Set
+from typing import Dict, List, Optional, Set
 
 TOKEN = re.compile(r"TOKEN_VAZIO", re.IGNORECASE)
 CLOSURE = re.compile(r"CLOSURE_([LG]\d+)", re.IGNORECASE)
@@ -27,6 +27,7 @@ REPRODUCED = re.compile(r"\b(REPRODUCED|CROSS_HOST|PROVEN)\b", re.IGNORECASE)
 REQUIRED_MEASURED_FIELDS = ("head_sha", "run", "job")
 TEXT_SUFFIXES = {".md", ".json", ".yml", ".yaml", ".py", ".sh", ".txt"}
 SKIP_PARTS = {".git", "__pycache__", "docs/generated", "results"}
+SELF_PATH = "tools/validate_freestanding_gap_falsifiers.py"
 
 TOKEN_TYPES = {
     "TOKEN_VAZIO_LICENSE": ("license", "licen", "copying", "notice", "spdx"),
@@ -88,9 +89,12 @@ def classify_token(line: str) -> str:
 
 def scan_file(root: Path, path: Path, findings: List[Finding]) -> Dict[str, int]:
     rel = path.resolve().relative_to(root).as_posix()
+    counts = {"tokens": 0, "typed_tokens": 0, "measured": 0}
+    if rel == SELF_PATH:
+        return counts
+
     text = path.read_text(encoding="utf-8", errors="replace")
     file_closures = closure_ids(text)
-    counts = {"tokens": 0, "typed_tokens": 0, "measured": 0}
     lines = text.splitlines()
 
     for idx, line in enumerate(lines, 1):
