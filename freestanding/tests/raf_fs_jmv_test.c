@@ -5,6 +5,106 @@
 #define CHECK(c, n) if (!(c)) return (n)
 #define STEP() raf_fs_jmv_step(t, v, o, x, n, &used, state, &tick, &idx, &voice, &value, &mix)
 
+
+/* Independent oracle: arithmetic and arbitration are deliberately separate
+ * from the kernel. Deterministic seeded streams allow exact CI replay.
+ * CLOSURE_L11: source fuzz is NOT real-device evidence.
+ * CLOSURE_L12: rights, physical runtime, independent review remain open.
+ */
+static raf_i32 doom_jmv_saturate(raf_i64 x)
+{
+    if (x > 2147483647LL) return (raf_i32)2147483647;
+    if (x < (-2147483647LL-1LL)) return (raf_i32)(-2147483647-1);
+    return (raf_i32)x;
+}
+static raf_u32 doom_jmv_next(raf_u32 *seed)
+{
+    *seed = (*seed * 1664525u) + 1013904223u;
+    return *seed;
+}
+static int doom_jmv_reference(void)
+{
+    raf_u32 trial, i, k, seed = 0x4A4D5631u;
+    for (trial=0u; trial<64u; ++trial) {
+        raf_u32 ticks[32], used=0u, reported_tick=0u, reported_index=0u;
+        raf_u32 reported_voice=0u;
+        raf_u8 voices[32], ops[32];
+        raf_i32 values[32], actual[8], expected[8];
+        raf_i32 reported_value=0, reported_mix=0;
+        for (i=0u; i<8u; ++i) {
+            expected[i]=(i==0u)?2147483647:((i==1u)?(-2147483647-1):0);
+            actual[i]=expected[i];
+        }
+        for (i=0u; i<32u; ++i) {
+            raf_u32 r=doom_jmv_next(&seed);
+            ticks[i]=r>>27;
+            voices[i]=(raf_u8)((r>>16)&7u);
+            ops[i]=(raf_u8)(1u+((r>>12)&3u));
+            if (ops[i]==RAF_FS_JMV_NOTE) values[i]=(raf_i32)((r>>3)&127u);
+            else if (ops[i]==RAF_FS_JMV_DELTA) {
+                raf_i32 n=(raf_i32)(r&0x1fffffffu);
+                values[i]=(r&0x80000000u)?-n:n;
+            } else if (ops[i]==RAF_FS_JMV_GAIN) values[i]=(raf_i32)(r%33u)-16;
+            else values[i]=0;
+        }
+        for (k=0u; k<32u; ++k) {
+            raf_u32 best=32u, rc;
+            raf_i64 x, total=0;
+            raf_u32 v;
+            for (i=0u; i<32u; ++i) {
+                if (used & ((raf_u32)1u<<i)) continue;
+                if (best==32u || ticks[i]<ticks[best] ||
+                    (ticks[i]==ticks[best] && voices[i]<voices[best]))
+                    best=i;
+            }
+            if (best==32u) return 101;
+            v=voices[best];
+            x=(raf_i64)expected[v];
+            if (ops[best]==RAF_FS_JMV_NOTE) x=(raf_i64)values[best];
+            else if (ops[best]==RAF_FS_JMV_DELTA) x+=(raf_i64)values[best];
+            else if (ops[best]==RAF_FS_JMV_GAIN) x*=(raf_i64)values[best];
+            else x=0;
+            expected[v]=doom_jmv_saturate(x);
+            for (i=0u; i<8u; ++i) total+=(raf_i64)expected[i];
+            rc=raf_fs_jmv_step(ticks,voices,ops,values,32u,&used,actual,
+                              &reported_tick,&reported_index,&reported_voice,
+                              &reported_value,&reported_mix);
+            if (rc!=RAF_FS_JMV_STEP || reported_index!=best ||
+                reported_tick!=ticks[best] || reported_voice!=v ||
+                reported_value!=expected[v] ||
+                reported_mix!=doom_jmv_saturate(total)) return 102;
+            if (!(used & ((raf_u32)1u<<best))) return 103;
+            for (i=0u; i<8u; ++i) if (actual[i]!=expected[i]) return 104;
+        }
+        /* A complete tape must not mutate any output on DONE. */
+        {
+            raf_u32 old_tick=reported_tick, old_idx=reported_index;
+            raf_u32 old_voice=reported_voice;
+            raf_i32 old_val=reported_value, old_mix=reported_mix;
+            if (used!=0xffffffffu ||
+                raf_fs_jmv_step(ticks,voices,ops,values,32u,&used,actual,
+                    &reported_tick,&reported_index,&reported_voice,
+                    &reported_value,&reported_mix)!=RAF_FS_JMV_DONE ||
+                used!=0xffffffffu || reported_tick!=old_tick ||
+                reported_index!=old_idx || reported_voice!=old_voice ||
+                reported_value!=old_val || reported_mix!=old_mix) return 105;
+        }
+        /* Late poison: whole-tape validation must preempt all commits. */
+        used=0u;
+        ops[31]=255u;
+        {
+            raf_i32 copy[8];
+            for (i=0u;i<8u;++i) copy[i]=actual[i];
+            if (raf_fs_jmv_step(ticks,voices,ops,values,32u,&used,actual,
+                &reported_tick,&reported_index,&reported_voice,
+                &reported_value,&reported_mix)!=RAF_FS_JMV_BAD_TAPE ||
+                used!=0u) return 106;
+            for (i=0u;i<8u;++i) if (copy[i]!=actual[i]) return 107;
+        }
+    }
+    return 0;
+}
+
 int main(void)
 {
     const raf_u32 t[7] = {4u, 1u, 2u, 1u, 3u, 3u, 4u};
@@ -91,5 +191,6 @@ int main(void)
             &tick,&idx,&voice,&value,&mix)==RAF_FS_JMV_BAD_TAPE,23);
         CHECK(used==0u,24);
     }
+    { int doom=doom_jmv_reference(); if(doom) return doom; }
     return 0;
 }
