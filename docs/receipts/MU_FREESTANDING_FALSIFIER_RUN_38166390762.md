@@ -11,7 +11,8 @@ job: `https://github.com/rafaelmeloreisnovo/RafPolimata/actions/runs/38166390762
 status: `completed`  
 conclusion: `success`  
 evidence_state: `MEASURED_LOCAL`  
-claim_allowed: `false`
+claim_allowed: `false`  
+Closure: `CLOSURE_L13`
 
 ## What was measured
 
