@@ -114,3 +114,29 @@ ferramenta; `TOKEN_VAZIO_SOURCE_PATCH`. Este documento não substitui
 código, compilação nem teste no PR. Sem mudança de kernel ou adaptação
 hosted nesta etapa. Reabrir implementação só com autoridade e CI
 source-side reproduzível, em PR isolado e reversível.
+
+## S3 — contraprova de proveniência observada no Drive
+
+A busca global do Drive retornou charts que, após inspeção de
+`parent_ids` até seus ancestrais, **não pertencem ao ramo NOVOexport
+verificado**. A associação anterior era inferência indevida e fica
+explicitamente corrigida, com predecessor preservado.
+
+| Família | Ancestral observado | Regra de admissão |
+| --- | --- | --- |
+| XML Office chart1..6 | `metasploit-framework/data/exploits/CVE-2013-3906/word/charts` | Amostra de fixture de segurança de terceiros, jamais fonte científica/autorais sem novo vínculo |
+| Dart `charts/` | `dev/integration_tests/new_gallery/lib/studies/rally` | Exemplo upstream Flutter UI, não motor matemático RAFAELIA |
+| Graphviz DOT/PNG | `RAFAELIA_UPLOAD/DIAGRAMAS` | Diagrama roteável, autoria/execução não demonstradas |
+
+**Escopo da observação:** metadados e caminho de pastas do provedor,
+não análise jurídica/licença, abertura segura do pacote OOXML original,
+prova criptográfica completa ou inspeção de conteúdo executável.
+
+**Segurança:** não abrir/executar payload CVE, não processar macro,
+externalData, script ou extração automática fora de sandbox de origem.
+É proibido copiar a fixture de terceiros para implementação autoral.
+Sem consentimento e direitos, G011/G012 permanecem abertos.
+As seis amostras são **out-of-scope de NOVOexport** salvo novo
+`source_ref` independente e verificável. `GLOBAL_SEARCH !=
+NOVOEXPORT_MEMBERSHIP`.
+
