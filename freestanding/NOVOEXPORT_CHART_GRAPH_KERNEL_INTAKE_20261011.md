@@ -1,0 +1,83 @@
+# RafPolimata — L0 intake de charts, grafos e fórmulas via NOVOexport
+
+STATUS: **DOCUMENTED_INTERFACE_ONLY / NÃO PROMOVER / claim_allowed=false**.
+Autoridade de origem: Drive privado e produtor de cada dado/teoria. Mapa
+PR (NOVOexport chart-route audit) gere apenas projeção pública sanitizada.
+Este contrato é novo, sem fonte privada, parser ou executável transplantados.
+
+## Fronteiras do build
+
+- L0 autoral = C freestanding, estado e buffers do chamador, sem
+  libc/stdint.h/math.h/malloc/exceções/OS/JNI/Java/syscalls/extern nativo.
+- `void` não é estratégia de otimização: contratos de retorno tipados e
+  `static inline` devem preservar erro/estado observável. Comentários não
+  são pass de compilador. Usar flags/objdump/nm e gate de symbols.
+- OOXML zip, Drive API, parser XML e plotter de UI são adapters hospedados
+  de **RafGitTools/Termux**, não devem contaminar `freestanding/`.
+- Entrada futura L0 de gráfico seria uma `ChartSeriesView` de bytes
+  já validados, com comprimento, tipo escalar, origem opaca, unidade, escala,
+  missingness explícita, política de arredondamento e limite overflow.
+  A implementação **não existe neste PR**: `TOKEN_VAZIO_INTERFACE_IMPLEMENTED`.
+- Separar `SOURCE_RECEIPT`, `MODEL_COMPUTATION`, `PLOT_SPEC`, `RENDER`,
+  `RUNTIME_MEASUREMENT` e `SCIENCE_CLAIM`. Ao gerar plot não gerar prova.
+- Toda saída porta `claim_allowed=false` até gates de revisão e runtime.
+
+## Fonte de referência consultada
+
+O Sheets `Formula & Calculation Memory Index Ω` possui abas
+`FORMULAS`, `GRAPH_NAMESPACE_CROSSWALK_V2_20260915`,
+`JUNCTION_MATRIX_V1_20260915`, entre outras. A entrada
+`κ=√3/2` tipa constante real, `S(d)=κ^d` tipa domínio contínuo e
+`r_(n+1)=κ*r_n` tipa recorrência discreta. São espécies distintas.
+Exigir `domain`, `assumptions`, `derivative_operator`,
+`inverse_conditions`, `singularity` e `source_identity` antes de
+aceitar transformação matemática. Expressões não numéricas/sem
+condições vão para `TOKEN_VAZIO_NUMERIC_ENCODING`, não para zero.
+
+A matriz distingue:
+- C42(±6,±7): V42 E84 grau4;
+- Icosphere f=2: V42 E120 F80 Euler2, graus 5/6;
+- graph zone physical: 137 janelas, zona parcial final;
+- graph zone metrics histórico: 136 registros; isso não mede todas
+  as 137 janelas por identidade;
+- BitGraph: ObjectID→Digest→PayloadSpan→BlockOffset→ModuleEdge→Epoch;
+- grafo semântico: REL/CORR/INT/CTX/RAPPORT, evidência weight de
+  RAPPORT permanece zero.
+
+**Proibido**: colapsar pelo mesmo literal `42`, tratar `∆` runtime
+como discriminante, `φ` razão áurea como `Φ_ethica` ou
+Poincaré.disk como Poincaré.return.
+
+## Alvos falsificadores antes do primeiro código
+
+1. Dois grafos com V=42 e E diferentes não passam `ISOMORPHIC`.
+2. Evento `USER_INPUT` não vira `ASSISTANT_OUTPUT`.
+3. `UNKNOWN/TOKEN_VAZIO` preserva tipo e não vira 0.
+4. Eixo de tempo, unidade, escala e domínio incompatíveis falham.
+5. Roundtrip fonte→série→reconstrução preserva valores/ordem e hash
+   dos bytes autorizados, sem publicar material privado.
+6. Tipos `OBSERVED`, `MODELLED`, `SMOKE`, `PHYSICAL`, `SCIENTIFIC`
+   não se promovem uns aos outros por proximidade.
+7. Se input truncado/série sem workbook, barrar cálculo como dado real.
+8. Compilar L0 com flags freestanding para x86/ARM/RISC-V; verificar
+   símbolo indefinido vazio e sem caminho de syscall.
+9. RLL robust/fisica permanece BLOQUEADA sem parâmetros/priors,
+   covariâncias, comparadores LCDM/CPL, backend externo e reprodução.
+10. Reprodução independente não pode herdar oracle do código candidato.
+
+## Protocolos futuros — nenhum implícito
+
+`RafGitTools/private input adapter → typed borrowed view →
+RafPolimata/source-blind deterministic kernel → typed result →
+RafGitTools/private sealed receipt → Mapa/sanitized projection`
+
+Dependências: revisão de direitos por arquivo, source origin, sample de
+um chart original com workbook, sem dados privados na PR, aceite explícito
+do usuário, freestanding/cross compiler gate exact-head e dispositivo
+independente quando alegado.
+
+R3: F_ok = revisão de contrato e matriz concreta identificada no Drive.
+F_gap = interface implementada, dataset original e prova source-side
+`TOKEN_VAZIO`. F_next = primeiro test harness sintético e mínimo
+semantical oracle, a partir de licença e fonte liberadas.
+Rollback: fechar PR draft. Histórico intacto.
