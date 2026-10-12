@@ -140,3 +140,25 @@ As seis amostras são **out-of-scope de NOVOexport** salvo novo
 `source_ref` independente e verificável. `GLOBAL_SEARCH !=
 NOVOEXPORT_MEMBERSHIP`.
 
+## S4 — retomada da implementação efetiva de vazio tipado
+
+A tentativa anterior de escrever código L0 foi bloqueada por ferramenta;
+o histórico permanece. Nesta retomada, uma implementação C freestanding
+nova foi criada em `freestanding/include/raf_fs_typed_gap.h` com:
+10 discriminantes independentes; inicialização de lacuna somente para
+`TOKEN_VAZIO`; vínculo de evidência **CANDIDATE**, nunca estado
+`VERIFIED` ou `PASS`; predecessor intocado; rejeição de
+referências nulas/iguais, alias in-place e estados inválidos.
+
+`freestanding/tests/raf_fs_typed_gap_test.c` cobre 33 verificações,
+`verify_typed_gap.sh` executa host -O0/-O2/-O3, aplica contrato L0,
+compila x86_64, i686, ARMv7, AArch64, RV32 e RV64 e inspeciona
+`nm -u`. `.github/workflows/freestanding-typed-gap.yml` roda em PR.
+Primeiro readback de CI: run 38190911220 SUCCESS; zero undefined nos seis
+objetos, sem prova de dispositivo, assinatura ou observação externa.
+
+`claim_allowed=false`: direitos raiz, revisão independente e execução
+real continuam P0. Hash/IDs recebidos do chamador são opacos e **não**
+autenticados pela primitiva. G015/ G021 permanecem vazios para evidência
+externa e replay independente.
+
