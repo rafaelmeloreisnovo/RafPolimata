@@ -21,6 +21,24 @@ no technical or legal approval inferred.
 | termux-app-rafacodephi / packages | Termux upstream GPLv3 + exceptions; per-package build licensing | Hosted Android/packaging adapters; no source import into L0 |
 | RLL theory | original scholarly content CC BY-SA 4.0, software file-specific | Mathematics stays hypothesis; no runtime/scientific promotion |
 
+## LAMA (barro) — correção de identidade
+
+LAMA é **somente um plugin**, no sentido definido pelo proponente.
+Não é LLaMA, não é `ggml-org/llama.cpp` e não deve ser confundido
+com o fork `llamaRafaelia`. O caminho do código específico de LAMA-barro
+permanece `TOKEN_VAZIO_NOT_IDENTIFIED`; nenhum símbolo, adaptador
+ou arquivo foi importado por inferência do nome.
+
+O que o código visível prova é separado: `llamaRafaelia/CMakeLists.txt`
+(blob `4ea45cb2dc953a472df184bd63e0657257d42fb2`) define módulos
+RAFAELIA opcionais, default OFF, e `common/raf_inference.h`
+(blob `50a76fdcda88020f7fd751ee149506ca8ffb084e`)
+possui fallback inline sem lógica de fiscalização ao desativar os contratos.
+Nem essa extensão nem `BitStack` herdado no checkout podem ser
+promovidos como L0 freestanding puro sem depuração e provas específicas.
+Somente um contrato plugin ↔ núcleo, versionado e explicitamente rastreado,
+pode ser integrado depois de localizar sua fonte autoral.
+
 ## Valid L0 transformation sequence (without external runtime)
 `SOURCE_POINTER -> RIGHTS/PER_FILE_ANCESTRY -> CLEAN_SPEC ->
 ZERO-HEADER PURE-C -> CALLER_OWNED_STATE -> HOSTED_FALSIFIER ->
