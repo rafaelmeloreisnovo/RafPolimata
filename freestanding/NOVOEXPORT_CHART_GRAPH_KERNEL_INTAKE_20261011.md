@@ -81,3 +81,36 @@ F_gap = interface implementada, dataset original e prova source-side
 `TOKEN_VAZIO`. F_next = primeiro test harness sintético e mínimo
 semantical oracle, a partir de licença e fonte liberadas.
 Rollback: fechar PR draft. Histórico intacto.
+
+## S2 — integração da única interação lógica Ω (sem colapso de fonte)
+
+O produtor RafPolimata é a autoridade de **matemática tipada**, núcleo
+freestanding e falsificadores locais, enquanto o roteador público de
+sessão é `Mapa:data/assurance/rafaelia-unified-session-audit.v1.json`
+(PR #752 DRAFT). A matriz possui 26 famílias F01..F26, 25 lacunas
+G001..G025, 55 nós, 99 arestas **somente de roteamento**.
+
+Famílias produtoras relevantes: F03 geometria topológica, F04 zonas,
+F05 BitGraph, F10 gráficos RLL, F11 conjuntos/vazios, F12 fórmulas,
+F18 L0/ELF/DEX/NUMA/JMV, F21 replay/watchdogs, F26 validação acadêmica.
+
+G007 equivalência, G015 dispositivo e G021 replay permanecem
+`TOKEN_VAZIO` mesmo que o roteador passe seu CI. O núcleo **não**
+deve transformar `NUMERIC_ZERO`, `EMPTY_SET`, `NULL_VALUE`,
+`UNDEFINED`, `NO_REAL_SOLUTION`, `MISSING_OBSERVATION`,
+`NOT_APPLICABLE`, `APPROX_ZERO`, `RESIDUE_ZERO` e
+`TOKEN_VAZIO` num mesmo número: o discriminante e o motivo
+seguem preservados.
+
+Máquina de estados recomendada para um futuro contrato L0:
+`OPEN → STRUCTURALLY_BOUND_CANDIDATE → EXTERNAL_PROVIDER_REVIEW`.
+O segundo estado **não é PASS**. Cada novo estado deve ser
+impressão separada (predecessor + nova evidência), não reescrita da
+fonte. Um `uint64` preenchido, mesmo não nulo, não autentica
+uma pessoa, um dispositivo ou uma licença.
+
+Pendente: tentativa de escrita de fonte C desta rodada bloqueada pela
+ferramenta; `TOKEN_VAZIO_SOURCE_PATCH`. Este documento não substitui
+código, compilação nem teste no PR. Sem mudança de kernel ou adaptação
+hosted nesta etapa. Reabrir implementação só com autoridade e CI
+source-side reproduzível, em PR isolado e reversível.
