@@ -66,3 +66,9 @@ Rollback = close draft PR; no force push, deletion or upstream attribution chang
 F_next = independently examine GAIA BL0 input bounds and Vectras RMR arithmetic,
 build semantic *specifications*, then request scoped rights and implement
 an original clean-room L0 module with separate negative tests where warranted.
+
+## Tipagem do bloqueio autoral — vínculos de closure, sem licença concedida
+
+A referência `CLOSURE_L11` (`docs/closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md`) governa o registro de `TOKEN_VAZIO`, sua origem, papéis e próximos falsificadores. A referência `CLOSURE_L12` (`docs/closures/CLOSURE_L12_LEGAL_SERVICE_ASSURANCE.md`) é **estrutura de análise jurídica**, não prova de titularidade, permissão de redistribuição, licença-raiz compatível ou autorização para importar arquivos de terceiros.
+
+Os três vazios descritos nesta intake permanecem **materiais**: `TOKEN_VAZIO_LICENSE_ROOT`, `TOKEN_VAZIO_LAMA_SOURCE_ID`, `TOKEN_VAZIO_PHYSICAL_EXECUTION`. Nenhum foi transformado em zero ou PASS. A ligação de closure pode fechar exclusivamente a ausência de roteamento requerida pelo validador, enquanto a PR continua `NÃO PROMOVER` até recibos, rights e revisão independente. Não foi acrescentado conteúdo de outra autoria.
