@@ -86,3 +86,14 @@ Nesta PR, o fechamento máximo é `SOURCE+HOSTED_TEST+ARM32_OBJECT`; os demais e
 ## R3
 
 `F_ok`: ponte matemática definida e código/testes submetidos para verificação. `F_gap`: hipótese de subvalue5 não é canônica até ratificação; serialização com cabeçalho/versionamento de arquivo, ECC, FEC, performance/memória em aparelho, adaptador Android, envelope de compilação e autoridade de promoção ausentes. `F_next`: CI de PR no exato SHA; depois serialização sem padding com vetores; depois integração HOST/Android sem regressão; aparelho físico e recibos independentes por último. `rollback`: fechar a PR ou reverter apenas os novos arquivos; header e formatos existentes mantidos byte-a-byte.
+
+## Roteamento explícito dos vazios — não é execução física
+
+O validador canônico `tools/validate_token_vazio_gates.py` exige vinculação de cada `TOKEN_VAZIO` adicionado a uma closure válida. Esta fonte vincula **somente governança e tipagem** a `CLOSURE_L11` (`docs/closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md`) e o **plano de captura de evidência em Android** a `CLOSURE_L2` (`docs/closures/CLOSURE_L2_RUNTIME_EVIDENCE.md`). Uma closure documental de framework **não** demonstra execução no Motorola, mede desgaste do flash, completa ECC, autoriza APK ou fecha gaps materiais.
+
+- `CLOSURE_L11`: proprietário, distinção semântica, falsificador e próximos recibos para os vazios declarados nesta PR; não é promoção.
+- `CLOSURE_L2`: o estado `PHYSICAL_ARM32=TOKEN_VAZIO` somente muda mediante binário/ABI/SHAs do HEAD e receipt de execução física independente.
+- `ECC_GENERAL=false`: dois flips potencialmente indetectados continuam contraexemplo válido; este arquivo não concede correção de erro.
+- `claim_allowed=false` e `NÃO PROMOVER` persistem até gates próprios de direitos, revisão, provider e hardware.
+
+O registro de `CLOSURE_L11` e `CLOSURE_L2` satisfaz **apenas** o vínculo requerido pelo controle de lacunas, nunca a resolução dos valores ausentes.
