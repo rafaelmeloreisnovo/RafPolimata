@@ -1,3 +1,4 @@
+/* CLOSURE_L11: typed gap ownership only; this is not a scientific or runtime proof. */
 #ifndef RAF_FS_TYPED_GAP_H
 #define RAF_FS_TYPED_GAP_H
 /*
