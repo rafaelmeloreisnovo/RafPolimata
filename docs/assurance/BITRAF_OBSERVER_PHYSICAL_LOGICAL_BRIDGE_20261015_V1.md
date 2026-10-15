@@ -35,3 +35,9 @@ Distinções de domínio: `ZERO`, `TOKEN_VAZIO`, `BIT_FLIP`, `ERASURE_KNOWN_POSI
 7. Manter **falsificador source-side**, `CI_HEAD`, `DEVICE`, `INDEPENDENT_REVIEW`, `LICENSE` independentes.
 
 **F_ok:** contrato e pontes definidas; **F_gap:** adaptador/execução/telemetria/entropia não implementados aqui; **F_next:** fixture read-only source-side separando carrier de observação física. Nenhum código/bitraf existente foi substituído.
+
+## Custódia das lacunas: L11 e L2
+
+`CLOSURE_L11` em `docs/closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md` rege o **registro e o roteamento** de `TOKEN_VAZIO_PHYSICAL_ADDRESS`, `TOKEN_VAZIO_UTILITY` e da tipagem de bit flip/erasure/omissão. Esse contrato não converte os vazios em `0`, `PASS` ou previsão física.
+
+`CLOSURE_L2` em `docs/closures/CLOSURE_L2_RUNTIME_EVIDENCE.md` governa o **método** de obtenção de recibos Android; o experimento BITRAF desta PR não executou essa captura. No HEAD da PR, runtime físico, revisão independente, autorização de licença e aplicação de proteção GitHub permanecem não atestados. A referência a closure significa responsabilidade rastreável, jamais fechamento material dos gaps.
