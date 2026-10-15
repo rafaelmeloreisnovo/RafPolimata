@@ -4,7 +4,9 @@ on:
   pull_request:
     paths:
       - 'rafaelia/bitraf_w20_bridge_v1.h'
+      - 'rafaelia/bitraf_w20_pair40_v1.h'
       - 'tests/bitraf_w20_bridge_test.c'
+      - 'tests/bitraf_w20_pair40_test.c'
       - 'tests/bitraf_w20_bridge_freestanding.c'
       - 'docs/BITRAF_W20_DEVICE_RECONSTRUCTION_V1.md'
       - '.github/workflows/bitraf-w20-bridge.yml'
@@ -41,6 +43,19 @@ jobs:
           grep -Fx 'KNOWN_UNDETECTED_DOUBLE_FAULTS=1' /tmp/raf_w20_cc_receipt
           grep -Fx 'CLAIM_ALLOWED=false PHYSICAL_ARM32=TOKEN_VAZIO' /tmp/raf_w20_cc_receipt
           sha256sum /tmp/raf_w20_cc_receipt /tmp/raf_w20_clang_receipt
+      - name: Verify exact 40-bit serialization on 128000 pairs and 5120000 faults
+        shell: bash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror tests/bitraf_w20_pair40_test.c -o /tmp/raf_w20_pair_cc
+          clang -std=c11 -O2 -Wall -Wextra -Werror tests/bitraf_w20_pair40_test.c -o /tmp/raf_w20_pair_clang
+          /tmp/raf_w20_pair_cc > /tmp/raf_pair_cc_receipt
+          /tmp/raf_w20_pair_clang > /tmp/raf_pair_clang_receipt
+          cmp /tmp/raf_pair_cc_receipt /tmp/raf_pair_clang_receipt
+          grep -Fx 'W20_PAIR40=PASS_SCOPED' /tmp/raf_pair_cc_receipt
+          grep -Fx 'PAIRS=128000 BYTES=640000 SINGLE_BIT_FAULTS=5120000' /tmp/raf_pair_cc_receipt
+          grep -Fx 'CLAIM_ALLOWED=false ECC_GENERAL=false DEVICE=TOKEN_VAZIO' /tmp/raf_pair_cc_receipt
+          sha256sum /tmp/raf_pair_cc_receipt /tmp/raf_pair_clang_receipt
       - name: Compile pure freestanding ARM32 object and reject runtime imports
         shell: bash
         run: |
