@@ -162,3 +162,7 @@ real continuam P0. Hash/IDs recebidos do chamador são opacos e **não**
 autenticados pela primitiva. G015/ G021 permanecem vazios para evidência
 externa e replay independente.
 
+
+## Governança das lacunas tipadas — CLOSURE_L11
+
+Esta interface candidata usa `TOKEN_VAZIO` como estado **distinto** de zero, falha e não aplicável. A referência `CLOSURE_L11` (`docs/closures/CLOSURE_L11_OPERATIONAL_GAP_TOPOLOGY.md`) governa o registro de dono, origem, falsificador, next action e recibo das lacunas, **não** as resolve materialmente. O núcleo C do próprio PR continua sujeito a testes, direitos e revisão independente; `TOKEN_VAZIO_INTERFACE_IMPLEMENTED`, `TOKEN_VAZIO_SOURCE_PATCH` e observação em hardware não são promovidos pela existência desta referência. O fechamento de runtime, se pertinente, continua separado em `CLOSURE_L2` e no recibo do dispositivo.
