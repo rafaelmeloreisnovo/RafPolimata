@@ -1,3 +1,4 @@
+/* CLOSURE_L2 governs evidence-capture gap only; this is a hosted test, not a physical ARM32 execution receipt. */
 /*
  * Hosted test harness only. Freestanding logic under test is
  * rafaelia/bitraf_w20_bridge_v1.h; no private data or device ABI claim.
