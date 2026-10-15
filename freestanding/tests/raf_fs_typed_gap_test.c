@@ -1,3 +1,4 @@
+/* CLOSURE_L11: test the type separation; unresolved sources stay unresolved. */
 /* Host test checks candidate semantics only; no physical runtime claim. */
 #include "../include/raf_fs_typed_gap.h"
 #define CHECK(e,n) do { if (!(e)) return n; } while (0)
