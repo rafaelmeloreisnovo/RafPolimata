@@ -56,8 +56,8 @@ int main(void) {
             /* Two flips inside V8 can evade one parity equation. */
             if (k == 0u && i == 0u) {
                 r = raf_w20_unpack(word ^ (1u << 2u) ^ (1u << 3u), &decoded);
-                if (r || bitraf_equal(decoded.state, state) &&
-                    decoded.payload5 == k)
+                if (r || (bitraf_equal(decoded.state, state) &&
+                     decoded.payload5 == k))
                     return failure("double_bit_limitation_not_observed", i, k);
                 ++double_undetected;
             }
