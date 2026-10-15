@@ -45,7 +45,7 @@ Então `1000 * 4 * 2 * 32 = 256000` registros W20 válidos. A bijeção existe p
 **Distinções estritas:**
 
 - `MATRIX8000 = CORE4096 + SHELL3904`, com `10³*4*2` versus `8³*4*2`. `core_index4096` não é endereço de byte, nem `A10` é identidade de bit físico na RAM.
-- Palavra lógica de 20 bits necessita 3 bytes se armazenada isoladamente com padding; dois registros podem ser empacotados em 5 bytes. Esta versão implementa palavras em `unsigned int` de 32 bits com bits reservados altos zerados, **não** um serializador de 5 bytes.
+- Palavra lógica de 20 bits necessita 3 bytes se armazenada isoladamente com padding; dois registros podem ser empacotados em 5 bytes. A camada W20 implementa palavras em `unsigned int` de 32 bits com bits reservados altos zerados; o sucessor `bitraf_w20_pair40_v1.h` materializa adicionalmente o **serializador exato 2×W20 em 5 bytes**, em ordem de bits pouco-significativos primeiro, sem dependência de endianness do host. Não é um algoritmo de compressão nem armazenamento com correção de erro.
 - Paridade dual detecta todo **erro isolado de um bit**, mas não detecta necessariamente dois flips no mesmo campo e **não recupera payload perdido**. `CRC`, `ECC`, `FEC`, `erasure` e `TOKEN_VAZIO` são tipos separados.
 - Icosfera `f=2` tem `V=42,E=120,F=80`; igualdade entre 42 vértices e `6×7`, ou com outros índices, não fornece isomorfismo, ISA nem circuito.
 - `K64=8*(4+4)` em oito colunas é outra granularidade; ligação `K64 → W20` requer esquema explícito e vetor round-trip. Não assumir compatibilidade de layout.
@@ -56,6 +56,8 @@ Então `1000 * 4 * 2 * 32 = 256000` registros W20 válidos. A bijeção existe p
 - `rafaelia/bitraf_w20_bridge_v1.h`: núcleo C puro freestanding, sem libc, malloc, I/O, syscalls, tipos independentes de plataforma, valida limites/paridades/reserved bits antes de escrever a saída.
 - `tests/bitraf_w20_bridge_test.c`: `8000 × 32 = 256000` round-trips determinísticos, `256000 × 20 = 5120000` corrupções isoladas, verificações de parâmetros inválidos e preservação dos destinos em FAIL; demonstra 2-bit flip que escapa à paridade.
 - `tests/bitraf_w20_bridge_freestanding.c`: prova de compilação `armv7-none-eabi` e ausência de símbolos indefinidos em objeto ARM32.
+- `rafaelia/bitraf_w20_pair40_v1.h`: serializador freestanding 40-bit, dois registros validados para 5 bytes, leitura/gravação atômica da saída no escopo da chamada.
+- `tests/bitraf_w20_pair40_test.c`: 128000 pares, 640000 bytes, 5120000 mutações isoladas, dois compiladores e vetor golden da primeira dupla.
 - `.github/workflows/bitraf-w20-bridge.yml`: GCC/Clang, saída comparada, `readelf`, `nm -u`, hashes e exact-head PR.
 
 **Sequência obrigatória de evidência física para futuro dispositivo ARM32:**
@@ -83,4 +85,4 @@ Nesta PR, o fechamento máximo é `SOURCE+HOSTED_TEST+ARM32_OBJECT`; os demais e
 
 ## R3
 
-`F_ok`: ponte matemática definida e código/testes submetidos para verificação. `F_gap`: hipótese de subvalue5 não é canônica até ratificação; serialização contínua, ECC, FEC, performance/memória em aparelho, adaptador Android, envelope de compilação e autoridade de promoção ausentes. `F_next`: CI de PR no exato SHA; depois serialização sem padding com vetores; depois integração HOST/Android sem regressão; aparelho físico e recibos independentes por último. `rollback`: fechar a PR ou reverter apenas os novos arquivos; header e formatos existentes mantidos byte-a-byte.
+`F_ok`: ponte matemática definida e código/testes submetidos para verificação. `F_gap`: hipótese de subvalue5 não é canônica até ratificação; serialização com cabeçalho/versionamento de arquivo, ECC, FEC, performance/memória em aparelho, adaptador Android, envelope de compilação e autoridade de promoção ausentes. `F_next`: CI de PR no exato SHA; depois serialização sem padding com vetores; depois integração HOST/Android sem regressão; aparelho físico e recibos independentes por último. `rollback`: fechar a PR ou reverter apenas os novos arquivos; header e formatos existentes mantidos byte-a-byte.
