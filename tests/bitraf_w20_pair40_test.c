@@ -1,3 +1,4 @@
+/* CLOSURE_L2 governs the device evidence gap, not ECC_GENERAL correction capability. */
 /* Hosted exhaustive roundtrip and corruption harness for 5-byte W20 pairing. */
 #include <stdio.h>
 #include "../rafaelia/bitraf_w20_pair40_v1.h"
