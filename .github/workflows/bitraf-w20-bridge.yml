@@ -1,0 +1,78 @@
+name: BITRAF W20 Reversible Bridge (source scope only)
+
+on:
+  pull_request:
+    paths:
+      - 'rafaelia/bitraf_w20_bridge_v1.h'
+      - 'rafaelia/bitraf_w20_pair40_v1.h'
+      - 'tests/bitraf_w20_bridge_test.c'
+      - 'tests/bitraf_w20_pair40_test.c'
+      - 'tests/bitraf_w20_bridge_freestanding.c'
+      - 'docs/BITRAF_W20_DEVICE_RECONSTRUCTION_V1.md'
+      - '.github/workflows/bitraf-w20-bridge.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exhaustive_source_and_arm32_object:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout exact PR commit without persistent credentials
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - name: Display evidence scope and tool versions
+        run: |
+          printf 'HEAD=%s\n' "$(git rev-parse HEAD)"
+          cc --version | head -n 1
+          clang --version | head -n 1
+      - name: Build and execute independent GCC and Clang host falsifiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror tests/bitraf_w20_bridge_test.c -o /tmp/raf_w20_cc
+          clang -std=c11 -O2 -Wall -Wextra -Werror tests/bitraf_w20_bridge_test.c -o /tmp/raf_w20_clang
+          /tmp/raf_w20_cc > /tmp/raf_w20_cc_receipt
+          /tmp/raf_w20_clang > /tmp/raf_w20_clang_receipt
+          cmp /tmp/raf_w20_cc_receipt /tmp/raf_w20_clang_receipt
+          grep -Fx 'W20_BRIDGE=PASS_SCOPED' /tmp/raf_w20_cc_receipt
+          grep -Fx 'RECORDS=256000 SINGLE_BIT_FAULTS=5120000' /tmp/raf_w20_cc_receipt
+          grep -Fx 'KNOWN_UNDETECTED_DOUBLE_FAULTS=1' /tmp/raf_w20_cc_receipt
+          grep -Fx 'CLAIM_ALLOWED=false PHYSICAL_ARM32=TOKEN_VAZIO' /tmp/raf_w20_cc_receipt
+          sha256sum /tmp/raf_w20_cc_receipt /tmp/raf_w20_clang_receipt
+      - name: Verify exact 40-bit serialization on 128000 pairs and 5120000 faults
+        shell: bash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror tests/bitraf_w20_pair40_test.c -o /tmp/raf_w20_pair_cc
+          clang -std=c11 -O2 -Wall -Wextra -Werror tests/bitraf_w20_pair40_test.c -o /tmp/raf_w20_pair_clang
+          /tmp/raf_w20_pair_cc > /tmp/raf_pair_cc_receipt
+          /tmp/raf_w20_pair_clang > /tmp/raf_pair_clang_receipt
+          cmp /tmp/raf_pair_cc_receipt /tmp/raf_pair_clang_receipt
+          grep -Fx 'W20_PAIR40=PASS_SCOPED' /tmp/raf_pair_cc_receipt
+          grep -Fx 'PAIRS=128000 BYTES=640000 SINGLE_BIT_FAULTS=5120000' /tmp/raf_pair_cc_receipt
+          grep -Fx 'CLAIM_ALLOWED=false ECC_GENERAL=false DEVICE=TOKEN_VAZIO' /tmp/raf_pair_cc_receipt
+          sha256sum /tmp/raf_pair_cc_receipt /tmp/raf_pair_clang_receipt
+      - name: Compile pure freestanding ARM32 object and reject runtime imports
+        shell: bash
+        run: |
+          set -euo pipefail
+          clang --target=armv7-none-eabi -march=armv7-a -mfloat-abi=soft \
+            -std=c11 -O2 -Wall -Wextra -Werror -ffreestanding -fno-builtin \
+            -fno-stack-protector -nostdlib -c tests/bitraf_w20_bridge_freestanding.c \
+            -o /tmp/raf_w20_arm32.o
+          readelf -h /tmp/raf_w20_arm32.o | grep -E 'Machine:.*ARM'
+          if [ -n "$(nm -u /tmp/raf_w20_arm32.o)" ]; then
+            echo "FAIL_UNDEFINED_ARM32_SYMBOLS"
+            nm -u /tmp/raf_w20_arm32.o
+            exit 1
+          fi
+          sha256sum /tmp/raf_w20_arm32.o
+      - name: Declare bounded evidence and missing device proof
+        run: |
+          echo 'PASS_SCOPED = standalone W20 math/model + C host checks + ARM32 object'
+          echo 'TOKEN_VAZIO = Android APK, install/launch, battery/thermal/device runtime, hardware parity/ECC, provider enforcement, independent review'
+          echo 'claim_allowed=false; no promotion from this workflow'
