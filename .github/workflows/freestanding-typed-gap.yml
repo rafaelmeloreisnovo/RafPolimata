@@ -1,0 +1,19 @@
+name: Typed Gap Freestanding
+on:
+  pull_request:
+    paths:
+      - 'freestanding/include/raf_fs_typed_gap.h'
+      - 'freestanding/tests/raf_fs_typed_gap_test.c'
+      - 'freestanding/tests/verify_typed_gap.sh'
+      - '.github/workflows/freestanding-typed-gap.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  zero-runtime-typed-gap:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Six-target compile and host adversarial semantic checks
+        run: sh freestanding/tests/verify_typed_gap.sh
