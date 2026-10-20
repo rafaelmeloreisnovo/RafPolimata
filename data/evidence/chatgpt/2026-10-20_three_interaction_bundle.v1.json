@@ -101,37 +101,37 @@
   ],
   "token_vazios": [
     {
-      "id": "TOKEN_VAZIO_PSI_ELPD_RLL",
+      "id": "TOKEN_VAZIO_REPRODUCTION_PSI_ELPD_RLL",
       "type": "NOT_EXECUTED",
       "closure": "Run posterior leave-redshift-block-out/ELPD on the same RLL parameterization."
     },
     {
-      "id": "TOKEN_VAZIO_DESI_LYA_FULL_SHAPE",
+      "id": "TOKEN_VAZIO_REPRODUCTION_DESI_LYA_FULL_SHAPE",
       "type": "NOT_EXECUTED",
       "closure": "Bind non-overlapping DESI Lyα full-shape/AP likelihood."
     },
     {
-      "id": "TOKEN_VAZIO_RLL_GROWTH_PERTURBATIONS",
+      "id": "TOKEN_VAZIO_GOVERNANCE_RLL_GROWTH_PERTURBATIONS",
       "type": "MISSING_MODEL",
       "closure": "Derive and validate perturbation/growth equations before fσ8 claim."
     },
     {
-      "id": "TOKEN_VAZIO_RLL_BAYES_EVIDENCE",
+      "id": "TOKEN_VAZIO_REPRODUCTION_RLL_BAYES_EVIDENCE",
       "type": "NOT_EXECUTED",
       "closure": "Define physical priors and compute lnZ with independent algorithm cross-check."
     },
     {
-      "id": "TOKEN_VAZIO_PMF_PERTURBATIVE_LIKELIHOOD",
+      "id": "TOKEN_VAZIO_GOVERNANCE_PMF_PERTURBATIVE_LIKELIHOOD",
       "type": "MISSING_LIKELIHOOD",
       "closure": "Bind PMF spectrum/helicity/Faraday/CMB perturbation observables."
     },
     {
-      "id": "TOKEN_VAZIO_INTERACTION_BUNDLE_INDEPENDENT_REVIEW",
+      "id": "TOKEN_VAZIO_REPRODUCTION_INTERACTION_BUNDLE_INDEPENDENT_REVIEW",
       "type": "MISSING_REVIEW",
       "closure": "Independent human review before promotion."
     },
     {
-      "id": "TOKEN_VAZIO_TARGET_SPECIFIC_AUTO_CORRECTION",
+      "id": "TOKEN_VAZIO_GOVERNANCE_TARGET_SPECIFIC_AUTO_CORRECTION",
       "type": "MISSING_TARGET",
       "closure": "Supply exact repo/path/revision, reproducer, root cause, patch, tests and rollback."
     }
@@ -146,5 +146,6 @@
   ],
   "claim_allowed": false,
   "promotion_allowed": false,
-  "rollback": "Supersede append-only; never rewrite the three source interactions or predecessor receipts."
+  "rollback": "Supersede append-only; never rewrite the three source interactions or predecessor receipts.",
+  "governing_closure": "CLOSURE_L13"
 }
