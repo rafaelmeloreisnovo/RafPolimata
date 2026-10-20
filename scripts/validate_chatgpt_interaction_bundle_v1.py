@@ -33,7 +33,7 @@ def validate(bundle, contract):
     p0=bundle.get("convergence",{}).get("priority_p0_operator_ids",[])
     if len(p0)!=len(set(p0)) or any(not str(x).startswith("OP") for x in p0):
         errors.append("P0 operator IDs must be unique OP identifiers")
-    for tv in bundle.get("token_vazios",[]):
+    for tv in bundle.get("typed_gaps",[]):
         if not tv.get("id","").startswith("TOKEN_VAZIO_") or not tv.get("type") or not tv.get("closure"):
             errors.append("typed governance-gap entries require id/type/closure")
     if bundle.get("claim_allowed") is not False or bundle.get("promotion_allowed") is not False:
