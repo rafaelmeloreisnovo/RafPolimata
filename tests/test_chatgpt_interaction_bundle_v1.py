@@ -22,7 +22,7 @@ class T(unittest.TestCase):
         b=copy.deepcopy(B); b["interactions"][0],b["interactions"][1]=b["interactions"][1],b["interactions"][0]
         self.assertIn("interaction order must be I1,I2,I3",m.validate(b,C))
     def test_untyped_gap_rejected(self):
-        b=copy.deepcopy(B); b["token_vazios"][0]["closure"]=""
+        b=copy.deepcopy(B); b["typed_gaps"][0]["closure"]=""
         self.assertIn("typed governance-gap entries require id/type/closure",m.validate(b,C))
     def test_self_promotion_rejected(self):
         b=copy.deepcopy(B); b["promotion_allowed"]=True
