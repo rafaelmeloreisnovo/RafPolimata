@@ -1,0 +1,24 @@
+{
+  "schema": "rafaelia.observer-observation-intake.receipt/v1",
+  "governing_closure": "CLOSURE_L13",
+  "date": "2026-10-20",
+  "state": "IMPLEMENTED_SOURCE_ONLY",
+  "upstream": "RLL observer-observation science routing V1",
+  "claim_allowed": false,
+  "F_ok": [
+    "observer/observation separation",
+    "primary science route required",
+    "uncertain/unknown typed gap rule",
+    "new/opportunity nonpromotion",
+    "private-session pointer boundary"
+  ],
+  "F_gap": [
+    "TOKEN_VAZIO_REPRODUCTION_OBSERVER_INTAKE_EXACT_HEAD",
+    "TOKEN_VAZIO_GOVERNANCE_HUMAN_SCIENCE_ROUTE_REVIEW"
+  ],
+  "F_next": [
+    "exact-head CI",
+    "RafGitTools consumer routing"
+  ],
+  "rollback": "Revert only additive observer-observation intake files."
+}
