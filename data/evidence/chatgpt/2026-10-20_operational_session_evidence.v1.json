@@ -1,0 +1,55 @@
+{
+  "schema": "rafaelia.chatgpt-operational-evidence/v1",
+  "receipt_id": "CHATGPT-OP-EVID-20261020-001",
+  "observed_date": "2026-10-20",
+  "source": {
+    "source_surface": "ChatGPT",
+    "source_ref": "CHATGPT_CURRENT_SESSION/2026-10-20",
+    "instruction_sha256_utf8": "539fdb948ebde7b9163f1203411b9c9cd8f51c3e49b0f0ec5662f8c0cf4fef3a",
+    "digest_scope": "exact UTF-8 text of the user instruction beginning 'Cara, aqui no ChatGPT...'",
+    "training_use": false,
+    "dataset_use": false,
+    "operational_evidence_use": true,
+    "raw_private_payload_stored": false
+  },
+  "evidence": {
+    "state": "OBSERVED",
+    "interpretation": "ChatGPT session statement is operational evidence for governed program correction workflows, not a training dataset.",
+    "root_cause_proven": false,
+    "target_specific_failure_proven": false
+  },
+  "custody": {
+    "drive_document_id": "1lZKpVUxe2vh-ko_XcMKAQ6Hkz1mWhukwXoiOMB2GtQ0",
+    "append_only": true,
+    "historical_rewrite_forbidden": true
+  },
+  "automatic_correction": {
+    "state": "INSUFFICIENT_EVIDENCE",
+    "reason": "This receipt establishes evidence classification only; no target-specific reproducible failure or bounded patch is asserted.",
+    "eligible": false
+  },
+  "claims": {
+    "allowed": false,
+    "scope": []
+  },
+  "rollback": "Supersede with a successor receipt; do not rewrite or delete this evidence record.",
+  "R3": {
+    "F_ok": [
+      "session evidence classified",
+      "training_use=false",
+      "dataset_use=false",
+      "instruction digest bound",
+      "Drive custody receipt bound"
+    ],
+    "F_gap": [
+      "target-specific reproducer",
+      "root-cause evidence",
+      "bounded patch",
+      "post-patch execution receipt"
+    ],
+    "F_next": [
+      "validate this receipt in RafPolimata",
+      "consume only validated receipts in RafGitTools correction gate"
+    ]
+  }
+}
