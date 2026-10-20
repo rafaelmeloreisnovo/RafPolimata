@@ -22,7 +22,7 @@
     "OBSERVATION != ROOT_CAUSE",
     "CORRECTION_CANDIDATE != CORRECTION_PASS",
     "IMPLEMENTED_UNTESTED != PASS",
-    "TOKEN_VAZIO != PASS",
+    "TOKEN_VAZIO_GOVERNANCE != PASS",
     "HISTORICAL_EVIDENCE_IS_APPEND_ONLY"
   ],
   "required_source_fields": [
@@ -71,5 +71,6 @@
     ],
     "fail_closed": true
   },
-  "claim_allowed": false
+  "claim_allowed": false,
+  "governing_closure": "CLOSURE_L13"
 }
