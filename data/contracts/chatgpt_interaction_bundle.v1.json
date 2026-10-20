@@ -19,6 +19,7 @@
     "GATE_ROLLBACK_RECEIPT",
     "GATE_INDEPENDENT_REVIEW"
   ],
-  "token_vazio_policy": "Every known missing evidence item must have a typed state and closure condition; TOKEN_VAZIO != PASS.",
-  "claim_allowed": false
+  "token_vazio_policy": "Every known missing evidence item must have a typed state and closure condition; TOKEN_VAZIO_GOVERNANCE != PASS.",
+  "claim_allowed": false,
+  "governing_closure": "CLOSURE_L13"
 }
