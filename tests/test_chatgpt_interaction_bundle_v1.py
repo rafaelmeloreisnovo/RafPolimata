@@ -1,6 +1,8 @@
 import copy, importlib.util, json
 from pathlib import Path
 import unittest
+
+GOVERNING_CLOSURE="CLOSURE_L13"
 ROOT=Path(__file__).resolve().parents[1]
 P=ROOT/"scripts/validate_chatgpt_interaction_bundle_v1.py"
 spec=importlib.util.spec_from_file_location("bundle_validator",P)
@@ -19,9 +21,9 @@ class T(unittest.TestCase):
     def test_order_rejected(self):
         b=copy.deepcopy(B); b["interactions"][0],b["interactions"][1]=b["interactions"][1],b["interactions"][0]
         self.assertIn("interaction order must be I1,I2,I3",m.validate(b,C))
-    def test_untyped_void_rejected(self):
+    def test_untyped_gap_rejected(self):
         b=copy.deepcopy(B); b["token_vazios"][0]["closure"]=""
-        self.assertIn("typed TOKEN_VAZIO entries require id/type/closure",m.validate(b,C))
+        self.assertIn("typed governance-gap entries require id/type/closure",m.validate(b,C))
     def test_self_promotion_rejected(self):
         b=copy.deepcopy(B); b["promotion_allowed"]=True
         self.assertIn("bundle cannot self-promote",m.validate(b,C))
