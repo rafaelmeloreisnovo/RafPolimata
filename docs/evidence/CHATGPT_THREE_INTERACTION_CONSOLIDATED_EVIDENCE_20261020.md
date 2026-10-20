@@ -1,5 +1,7 @@
 # RAFAELIA — Consolidated ChatGPT Three-Interaction Evidence V1
 
+**Governing closure:** `CLOSURE_L13`
+
 **State:** `OBSERVED_CONSOLIDATED_NON_TRAINING / claim_allowed=false / promotion_allowed=false`
 
 This file treats the three immediately preceding ChatGPT interactions as **one ordered operational-evidence bundle**. It does not convert them into a training dataset.
@@ -56,13 +58,13 @@ THREE ORDERED CHATGPT INTERACTIONS
 
 ## Typed open gaps
 
-- `TOKEN_VAZIO_PSI_ELPD_RLL` = `NOT_EXECUTED` — close when: Run posterior leave-redshift-block-out/ELPD on the same RLL parameterization.
-- `TOKEN_VAZIO_DESI_LYA_FULL_SHAPE` = `NOT_EXECUTED` — close when: Bind non-overlapping DESI Lyα full-shape/AP likelihood.
-- `TOKEN_VAZIO_RLL_GROWTH_PERTURBATIONS` = `MISSING_MODEL` — close when: Derive and validate perturbation/growth equations before fσ8 claim.
-- `TOKEN_VAZIO_RLL_BAYES_EVIDENCE` = `NOT_EXECUTED` — close when: Define physical priors and compute lnZ with independent algorithm cross-check.
-- `TOKEN_VAZIO_PMF_PERTURBATIVE_LIKELIHOOD` = `MISSING_LIKELIHOOD` — close when: Bind PMF spectrum/helicity/Faraday/CMB perturbation observables.
-- `TOKEN_VAZIO_INTERACTION_BUNDLE_INDEPENDENT_REVIEW` = `MISSING_REVIEW` — close when: Independent human review before promotion.
-- `TOKEN_VAZIO_TARGET_SPECIFIC_AUTO_CORRECTION` = `MISSING_TARGET` — close when: Supply exact repo/path/revision, reproducer, root cause, patch, tests and rollback.
+- `TOKEN_VAZIO_REPRODUCTION_PSI_ELPD_RLL` = `NOT_EXECUTED` — close when: Run posterior leave-redshift-block-out/ELPD on the same RLL parameterization.
+- `TOKEN_VAZIO_REPRODUCTION_DESI_LYA_FULL_SHAPE` = `NOT_EXECUTED` — close when: Bind non-overlapping DESI Lyα full-shape/AP likelihood.
+- `TOKEN_VAZIO_GOVERNANCE_RLL_GROWTH_PERTURBATIONS` = `MISSING_MODEL` — close when: Derive and validate perturbation/growth equations before fσ8 claim.
+- `TOKEN_VAZIO_REPRODUCTION_RLL_BAYES_EVIDENCE` = `NOT_EXECUTED` — close when: Define physical priors and compute lnZ with independent algorithm cross-check.
+- `TOKEN_VAZIO_GOVERNANCE_PMF_PERTURBATIVE_LIKELIHOOD` = `MISSING_LIKELIHOOD` — close when: Bind PMF spectrum/helicity/Faraday/CMB perturbation observables.
+- `TOKEN_VAZIO_REPRODUCTION_INTERACTION_BUNDLE_INDEPENDENT_REVIEW` = `MISSING_REVIEW` — close when: Independent human review before promotion.
+- `TOKEN_VAZIO_GOVERNANCE_TARGET_SPECIFIC_AUTO_CORRECTION` = `MISSING_TARGET` — close when: Supply exact repo/path/revision, reproducer, root cause, patch, tests and rollback.
 
 ## Invariants
 
@@ -72,7 +74,7 @@ SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM
 OBSERVATION != ROOT_CAUSE
 CORRECTION_CANDIDATE != CORRECTION_PASS
 IMPLEMENTED_UNTESTED != PASS
-TOKEN_VAZIO != PASS
+TOKEN_VAZIO_GOVERNANCE != PASS
 AUTO_CORRECT != AUTO_MERGE
 ROLLBACK_REQUIRED
 ```
