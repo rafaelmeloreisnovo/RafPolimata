@@ -99,7 +99,7 @@
       "required_gate": "GATE_BOUNDED_AUTOMATIC_CORRECTION"
     }
   ],
-  "token_vazios": [
+  "typed_gaps": [
     {
       "id": "TOKEN_VAZIO_REPRODUCTION_PSI_ELPD_RLL",
       "type": "NOT_EXECUTED",
