@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse, json
 from pathlib import Path
 
+GOVERNING_CLOSURE="CLOSURE_L13"
 ROOT=Path(__file__).resolve().parents[1]
 DEFAULT_CONTRACT=ROOT/"data/contracts/chatgpt_interaction_bundle.v1.json"
 DEFAULT_BUNDLE=ROOT/"data/evidence/chatgpt/2026-10-20_three_interaction_bundle.v1.json"
@@ -34,7 +35,7 @@ def validate(bundle, contract):
         errors.append("P0 operator IDs must be unique OP identifiers")
     for tv in bundle.get("token_vazios",[]):
         if not tv.get("id","").startswith("TOKEN_VAZIO_") or not tv.get("type") or not tv.get("closure"):
-            errors.append("typed TOKEN_VAZIO entries require id/type/closure")
+            errors.append("typed governance-gap entries require id/type/closure")
     if bundle.get("claim_allowed") is not False or bundle.get("promotion_allowed") is not False:
         errors.append("bundle cannot self-promote")
     return errors
