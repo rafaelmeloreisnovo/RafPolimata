@@ -55,6 +55,15 @@ class ReceiptShapeFalsifiers(unittest.TestCase):
         mutated["convergence"]["priority_p0_operator_ids"] = [["OP1"]]
         self.assertTrue(MODULE.validate(mutated, self.contract))
 
+    def test_unhashable_urgency_and_typed_gap_ids_fail(self):
+        broken_urgency = copy.deepcopy(self.bundle)
+        broken_urgency["urgency"][0]["id"] = ["unhashable"]
+        self.assertTrue(MODULE.validate(broken_urgency, self.contract))
+        broken_gap = copy.deepcopy(self.bundle)
+        broken_gap["typed_gaps"] = [{"id": 77, "type": "UNKNOWN",
+                                      "closure": "review"}]
+        self.assertTrue(MODULE.validate(broken_gap, self.contract))
+
     def test_absence_distinct_from_valid_empty_observation(self):
         mutated = copy.deepcopy(self.bundle)
         mutated["interactions"][0]["prompt_text"] = None
