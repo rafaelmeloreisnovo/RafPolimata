@@ -25,6 +25,7 @@ def validate(bundle, contract):
         or any(not isinstance(x, dict) for x in bundle["interactions"])
         or not isinstance(bundle.get("urgency"), list)
         or any(not isinstance(x, dict) for x in bundle["urgency"])
+        or any(not isinstance(x.get("id"), str) for x in bundle["urgency"])
         or not isinstance(bundle.get("gates"), list)
         or any(not isinstance(x, str) for x in bundle["gates"])
         or not isinstance(bundle.get("convergence", {}), dict)
@@ -32,7 +33,8 @@ def validate(bundle, contract):
         or any(not isinstance(x, str) for x in
                bundle.get("convergence", {}).get("priority_p0_operator_ids", []))
         or not isinstance(bundle.get("typed_gaps", []), list)
-        or any(not isinstance(x, dict) for x in bundle.get("typed_gaps", []))):
+        or any(not isinstance(x, dict) or not isinstance(x.get("id"), str)
+               for x in bundle.get("typed_gaps", []))):
         return ["malformed nested interaction, urgency, gate or typed-gap records"]
     errors=[]
     if bundle.get("schema")!="rafaelia.chatgpt-interaction-bundle/v1": errors.append("unexpected bundle schema")
