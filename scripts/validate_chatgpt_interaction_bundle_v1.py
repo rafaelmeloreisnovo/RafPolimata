@@ -11,6 +11,29 @@ DEFAULT_BUNDLE=ROOT/"data/evidence/chatgpt/2026-10-20_three_interaction_bundle.v
 def load(p): return json.loads(Path(p).read_text(encoding="utf-8"))
 
 def validate(bundle, contract):
+    # Untrusted receipt data: malformed nested JSON must FAIL, never crash
+    # or get silently interpreted as an empty and therefore valid record.
+    if not isinstance(bundle, dict) or not isinstance(contract, dict):
+        return ["bundle and contract must be JSON objects"]
+    if (contract.get("required_interaction_count") != 3
+        or not isinstance(contract.get("required_urgency_ids"), list)
+        or not isinstance(contract.get("required_gates"), list)
+        or any(not isinstance(x, str) for x in
+               contract["required_urgency_ids"] + contract["required_gates"])):
+        return ["untrusted/malformed contract"]
+    if (not isinstance(bundle.get("interactions"), list)
+        or any(not isinstance(x, dict) for x in bundle["interactions"])
+        or not isinstance(bundle.get("urgency"), list)
+        or any(not isinstance(x, dict) for x in bundle["urgency"])
+        or not isinstance(bundle.get("gates"), list)
+        or any(not isinstance(x, str) for x in bundle["gates"])
+        or not isinstance(bundle.get("convergence", {}), dict)
+        or not isinstance(bundle.get("convergence", {}).get("priority_p0_operator_ids", []), list)
+        or any(not isinstance(x, str) for x in
+               bundle.get("convergence", {}).get("priority_p0_operator_ids", []))
+        or not isinstance(bundle.get("typed_gaps", []), list)
+        or any(not isinstance(x, dict) for x in bundle.get("typed_gaps", []))):
+        return ["malformed nested interaction, urgency, gate or typed-gap records"]
     errors=[]
     if bundle.get("schema")!="rafaelia.chatgpt-interaction-bundle/v1": errors.append("unexpected bundle schema")
     if bundle.get("interaction_count")!=contract["required_interaction_count"]: errors.append("interaction_count must equal 3")
