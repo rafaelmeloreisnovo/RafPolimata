@@ -1,0 +1,64 @@
+{
+  "schema": "rafaelia.observer-observation-intake/v1",
+  "governing_closure": "CLOSURE_L13",
+  "intake_id": "INTAKE-OBS-20261020-001",
+  "upstream_observation_ref": "RLL:data/observations/2026-10-20_observer_science_closure.v1.json",
+  "observer_id": "CHATGPT_OPERATIONAL_OBSERVER",
+  "observation_id": "OBS-20261020-CLOSURE-SCIENCE-ROUTING-001",
+  "epistemic_state": "NEW_OBSERVED",
+  "conduct": [
+    "ATTENTION",
+    "UPDATE",
+    "REVIEW",
+    "THINK",
+    "PERMUTE",
+    "DELTA",
+    "EMPTY_OR_GAP"
+  ],
+  "science_routes": [
+    {
+      "id": "SCI-NETWORK",
+      "role": "PRIMARY"
+    },
+    {
+      "id": "SCI-EPISTEMOLOGY",
+      "role": "PRIMARY"
+    },
+    {
+      "id": "SCI-METROLOGY",
+      "role": "PRIMARY"
+    },
+    {
+      "id": "SCI-SWE-FORMAL",
+      "role": "SECONDARY"
+    },
+    {
+      "id": "SCI-BAYES-STAT",
+      "role": "SECONDARY"
+    }
+  ],
+  "source_pointer": "CHATGPT_CURRENT_SESSION/semantic-pointer-only",
+  "raw_private_session_text_stored": false,
+  "typed_gaps": [
+    {
+      "id": "TOKEN_VAZIO_GOVERNANCE_SCIENCE_ROUTE_AUTOTAG_REVIEW",
+      "type": "MISSING_REVIEW",
+      "closure": "Human reviewer confirms or edits primary/secondary discipline tags before promotion."
+    },
+    {
+      "id": "TOKEN_VAZIO_REPRODUCTION_OBSERVER_GRAPH_EXECUTION",
+      "type": "NOT_EXECUTED",
+      "closure": "Execute one successor observation through graph validation and preserve receipt."
+    }
+  ],
+  "required_gates": [
+    "GATE_OBSERVER_OBSERVATION_SEPARATION",
+    "GATE_SCIENCE_ROUTE_PRESENT",
+    "GATE_EPISTEMIC_STATE_NON_PROMOTION",
+    "GATE_TYPED_GAPS_WITH_CLOSURE"
+  ],
+  "result_state": "INTAKE_ACCEPTED_NON_PROMOTING",
+  "claim_allowed": false,
+  "next_action": "Expose this validated intake envelope to RafGitTools correction routing; do not authorize mutation from observation alone.",
+  "rollback": "Supersede append-only or revert only this intake envelope and validator/test additions."
+}

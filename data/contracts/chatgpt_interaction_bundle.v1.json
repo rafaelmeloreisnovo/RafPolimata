@@ -1,0 +1,25 @@
+{
+  "schema": "rafaelia.chatgpt-interaction-bundle.contract/v1",
+  "required_interaction_count": 3,
+  "require_source_order_preserved": true,
+  "require_semantic_merge_as_one_interaction": true,
+  "require_training_use": false,
+  "require_dataset_use": false,
+  "require_operational_evidence_use": true,
+  "required_urgency_ids": [
+    "URG-P0-SCI-FALSE-POSITIVE",
+    "URG-P0-SESSION-MISCLASSIFICATION",
+    "URG-P0-AUTO-CORRECT-SAFETY"
+  ],
+  "required_gates": [
+    "GATE_OPERATIONAL_EVIDENCE_CLASSIFICATION",
+    "GATE_SCIENTIFIC_FALSIFICATION_MESH",
+    "GATE_BOUNDED_AUTOMATIC_CORRECTION",
+    "GATE_EXACT_HEAD_TESTS",
+    "GATE_ROLLBACK_RECEIPT",
+    "GATE_INDEPENDENT_REVIEW"
+  ],
+  "token_vazio_policy": "Every known missing evidence item must have a typed state and closure condition; TOKEN_VAZIO_GOVERNANCE != PASS.",
+  "claim_allowed": false,
+  "governing_closure": "CLOSURE_L13"
+}

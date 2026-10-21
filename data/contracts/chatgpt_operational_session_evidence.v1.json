@@ -1,0 +1,76 @@
+{
+  "schema": "rafaelia.chatgpt-operational-evidence.contract/v1",
+  "status": "SOURCE_CONTRACT",
+  "classification": "OPERATIONAL_SESSION_EVIDENCE",
+  "allowed_uses": [
+    "program_diagnosis",
+    "program_correction_trigger",
+    "custody_receipt",
+    "falsifier_input",
+    "rollback_reference"
+  ],
+  "forbidden_uses": [
+    "training_dataset",
+    "fine_tuning_corpus",
+    "implicit_model_training_authority",
+    "self_certifying_claim"
+  ],
+  "invariants": [
+    "SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM",
+    "SESSION_CONTEXT != TRAINING_DATASET",
+    "AI_GENERATED != VERIFIED",
+    "OBSERVATION != ROOT_CAUSE",
+    "CORRECTION_CANDIDATE != CORRECTION_PASS",
+    "IMPLEMENTED_UNTESTED != PASS",
+    "TOKEN_VAZIO_GOVERNANCE != PASS",
+    "HISTORICAL_EVIDENCE_IS_APPEND_ONLY"
+  ],
+  "required_source_fields": [
+    "source_surface",
+    "source_ref",
+    "instruction_sha256_utf8",
+    "digest_scope",
+    "training_use",
+    "dataset_use",
+    "operational_evidence_use"
+  ],
+  "source_policy": {
+    "source_surface": "ChatGPT",
+    "training_use": false,
+    "dataset_use": false,
+    "operational_evidence_use": true,
+    "raw_private_payload_required": false,
+    "privacy_minimization": true
+  },
+  "correction_gate": {
+    "states": [
+      "OBSERVED",
+      "REPRODUCED",
+      "AUTO_CORRECT_ELIGIBLE",
+      "PATCH_APPLIED",
+      "PASS",
+      "FAIL",
+      "INSUFFICIENT_EVIDENCE",
+      "BLOCKED"
+    ],
+    "auto_correct_requires": [
+      "explicit_target",
+      "exact_source_revision",
+      "reproducible_symptom_or_falsifier",
+      "root_cause_evidence",
+      "bounded_patch",
+      "pre_patch_receipt",
+      "rollback_condition",
+      "required_post_patch_tests"
+    ],
+    "pass_requires": [
+      "patch_applied_to_exact_source_revision",
+      "falsifier_pass_after_patch",
+      "required_regression_gates_pass",
+      "post_patch_receipt"
+    ],
+    "fail_closed": true
+  },
+  "claim_allowed": false,
+  "governing_closure": "CLOSURE_L13"
+}
