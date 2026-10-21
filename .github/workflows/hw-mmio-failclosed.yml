@@ -37,3 +37,23 @@ jobs:
           sh tests/hardware/run_mmio_failclosed.sh
           sh tests/hardware/run_gpio_stubs.sh
           bash -n Benchmark/build_mcu.sh
+
+  avr-object-compile:
+    name: AVR compile-only (never firmware)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install AVR compile toolchain (hosted CI only)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gcc-avr binutils-avr avr-libc
+          avr-gcc --version | head -1
+      - name: Compile AVR object modules and record evidence boundary
+        run: |
+          bash Benchmark/build_mcu.sh
+          test -f build_mcu/RAF_001_acesso_direto_a_ddrx_portx_pinx.o
+          test ! -e build_mcu/RAF_001_acesso_direto_a_ddrx_portx_pinx.elf
+          echo 'PASS_AVR_OBJECT_ONLY; LINK/HEX/DEVICE=NOT_RUN'
