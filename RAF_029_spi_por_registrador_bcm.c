@@ -1,4 +1,5 @@
 #include "RAF_rafaelia_common.h"
+#include "RAF_hw_status.h"
 
 /*
  * Método M029: SPI por registrador BCM
@@ -7,7 +8,7 @@
  * Ganho estimado: 5x-50x vs userspace alto
  *
  * Controla SPI0 diretamente via registradores mapeados em memória.
- * Gated em RASPBERRYPI — retorna TOKEN_VAZIO (0) em outros hosts.
+ * Gated em RASPBERRYPI. Sem hardware retorna erro tipado, nao sucesso.
  */
 
 /* SPI0 register offsets (in uint32_t words from spi_base) */
@@ -29,48 +30,44 @@
  * tx:       byte to transmit.
  * Returns:  received byte.
  */
-static uint8_t rafaelia_m029_spi_xfer(volatile uint32_t *spi_base, uint8_t tx)
+static int rafaelia_m029_spi_xfer(volatile uint32_t *spi_base, uint8_t tx,
+                                  uint8_t *rx)
 {
-    /* Clear FIFOs then assert Transfer Active */
+    uint32_t n;
+    if (!spi_base || !rx) return RAF_HW_ERR_INVALID;
+    /* Caller must supply a valid, independently mapped SPI0 register block. */
     spi_base[SPI0_CS_OFFSET] = SPI0_CS_CLEAR_RX | SPI0_CS_CLEAR_TX;
     spi_base[SPI0_CS_OFFSET] = SPI0_CS_TA;
 
-    /* Wait for TX FIFO to accept data (TXD=1) */
-    while (!(spi_base[SPI0_CS_OFFSET] & SPI0_CS_TXD))
-        ;
+    for (n = 0; n < RAF_HW_POLL_LIMIT; ++n)
+        if (spi_base[SPI0_CS_OFFSET] & SPI0_CS_TXD) break;
+    if (n == RAF_HW_POLL_LIMIT) {
+        spi_base[SPI0_CS_OFFSET] = 0u;
+        return RAF_HW_ERR_TIMEOUT;
+    }
 
-    /* Write byte into TX FIFO */
     spi_base[SPI0_FIFO_OFFSET] = (uint32_t)tx;
+    for (n = 0; n < RAF_HW_POLL_LIMIT; ++n)
+        if (spi_base[SPI0_CS_OFFSET] & SPI0_CS_DONE) break;
+    if (n == RAF_HW_POLL_LIMIT) {
+        spi_base[SPI0_CS_OFFSET] = 0u;
+        return RAF_HW_ERR_TIMEOUT;
+    }
 
-    /* Wait for transfer to complete (DONE=1) */
-    while (!(spi_base[SPI0_CS_OFFSET] & SPI0_CS_DONE))
-        ;
-
-    /* Read received byte from RX FIFO */
-    uint8_t rx = (uint8_t)(spi_base[SPI0_FIFO_OFFSET] & 0xFFu);
-
-    /* De-assert Transfer Active */
-    spi_base[SPI0_CS_OFFSET] &= ~(uint32_t)SPI0_CS_TA;
-
-    return rx;
+    *rx = (uint8_t)(spi_base[SPI0_FIFO_OFFSET] & 0xffu);
+    spi_base[SPI0_CS_OFFSET] = 0u;
+    return RAF_HW_OK;
 }
 
 int rafaelia_m029_spi_por_registrador_bcm(volatile uint32_t *mmio_base)
 {
-    if (!mmio_base) return 0; /* TOKEN_VAZIO — no BCM hardware present */
-
+    if (!mmio_base) return RAF_HW_ERR_NO_DEVICE;
 #if defined(RASPBERRYPI)
-    /*
-     * Clock divider: 250 MHz OSC / 256 ≈ 976 kHz SPI clock.
-     * Perform a loopback transfer (bridge MOSI→MISO for test).
-     */
+    uint8_t echo = 0u;
     mmio_base[SPI0_CLK_OFFSET] = 256u;
-    uint8_t echo = rafaelia_m029_spi_xfer(mmio_base, 0xA5u);
-    (void)echo;
-    return 0;
+    return rafaelia_m029_spi_xfer(mmio_base, 0xa5u, &echo);
 #else
-    /* Logic complete; hardware not present on this host. */
     (void)rafaelia_m029_spi_xfer;
-    return 0;
+    return RAF_HW_ERR_UNSUPPORTED;
 #endif
 }

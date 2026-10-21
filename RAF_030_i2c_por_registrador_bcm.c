@@ -1,4 +1,5 @@
 #include "RAF_rafaelia_common.h"
+#include "RAF_hw_status.h"
 
 /*
  * Método M030: I2C por registrador BCM
@@ -7,7 +8,7 @@
  * Ganho estimado: 2x-20x vs userspace
  *
  * Controla BSC1 (I2C bus) diretamente via registradores mapeados.
- * Gated em RASPBERRYPI — retorna TOKEN_VAZIO (0) em outros hosts.
+ * Gated em RASPBERRYPI. Sem hardware retorna erro tipado, nao sucesso.
  */
 
 /* BSC register offsets (in uint32_t words from bsc_base) */
@@ -43,50 +44,46 @@
  * reg:  register address within slave.
  * val:  value to write.
  */
-static void rafaelia_m030_i2c_write(volatile uint32_t *bsc,
-                                     uint8_t addr, uint8_t reg, uint8_t val)
+static int rafaelia_m030_i2c_write(volatile uint32_t *bsc,
+                                    uint8_t addr, uint8_t reg, uint8_t val)
 {
-    /* Clear DONE/ERR/CLKT flags by writing 1 to them in status */
+    uint32_t n, st;
+    if (!bsc || addr > 0x7fu) return RAF_HW_ERR_INVALID;
+    /* Caller must provide the separately mapped BSC1 register block. */
     bsc[BSC_S_OFFSET] = BSC_S_DONE | BSC_S_ERR | BSC_S_CLKT;
-
-    /* Set slave address */
     bsc[BSC_A_OFFSET] = (uint32_t)addr;
-
-    /* Two bytes to send: register address then value */
     bsc[BSC_DLEN_OFFSET] = 2u;
-
-    /* Clear FIFO and load data before starting */
     bsc[BSC_C_OFFSET] = BSC_C_I2CEN | BSC_C_CLEAR;
     bsc[BSC_FIFO_OFFSET] = (uint32_t)reg;
     bsc[BSC_FIFO_OFFSET] = (uint32_t)val;
-
-    /* Initiate write transfer (READ bit = 0) */
     bsc[BSC_C_OFFSET] = BSC_C_I2CEN | BSC_C_ST;
 
-    /* Wait for transfer to complete */
-    while (!(bsc[BSC_S_OFFSET] & BSC_S_DONE))
-        ;
-
-    /* Clear DONE flag */
-    bsc[BSC_S_OFFSET] = BSC_S_DONE;
+    for (n = 0; n < RAF_HW_POLL_LIMIT; ++n) {
+        st = bsc[BSC_S_OFFSET];
+        if (st & (BSC_S_ERR | BSC_S_CLKT)) {
+            bsc[BSC_S_OFFSET] = BSC_S_ERR | BSC_S_CLKT;
+            bsc[BSC_C_OFFSET] = 0u;
+            return RAF_HW_ERR_IO;
+        }
+        if (st & BSC_S_DONE) {
+            bsc[BSC_S_OFFSET] = BSC_S_DONE;
+            bsc[BSC_C_OFFSET] = 0u;
+            return RAF_HW_OK;
+        }
+    }
+    bsc[BSC_C_OFFSET] = 0u;
+    return RAF_HW_ERR_TIMEOUT;
 }
 
 int rafaelia_m030_i2c_por_registrador_bcm(volatile uint32_t *mmio_base)
 {
-    if (!mmio_base) return 0; /* TOKEN_VAZIO — no BCM hardware present */
-
+    if (!mmio_base) return RAF_HW_ERR_NO_DEVICE;
 #if defined(RASPBERRYPI)
-    /*
-     * Example: write 0x01 to register 0x00 of device at address 0x3C (SSD1306).
-     * Clock divider 0x05DC ≈ 100 kHz at 150 MHz APB clock.
-     */
-    mmio_base[BSC_DIV_OFFSET] = 0x05DCu;
-    mmio_base[BSC_C_OFFSET]   = BSC_C_I2CEN;
-    rafaelia_m030_i2c_write(mmio_base, 0x3Cu, 0x00u, 0x01u);
-    return 0;
+    mmio_base[BSC_DIV_OFFSET] = 0x05dcu;
+    mmio_base[BSC_C_OFFSET] = BSC_C_I2CEN;
+    return rafaelia_m030_i2c_write(mmio_base, 0x3cu, 0x00u, 0x01u);
 #else
-    /* Logic complete; hardware not present on this host. */
     (void)rafaelia_m030_i2c_write;
-    return 0;
+    return RAF_HW_ERR_UNSUPPORTED;
 #endif
 }
