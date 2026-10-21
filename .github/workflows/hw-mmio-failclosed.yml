@@ -1,0 +1,28 @@
+name: Hardware MMIO fail-closed (host mock only)
+
+on:
+  pull_request:
+    paths:
+      - 'RAF_hw_status.h'
+      - 'RAF_016_i2c_twi_com_timeout.c'
+      - 'RAF_029_spi_por_registrador_bcm.c'
+      - 'RAF_030_i2c_por_registrador_bcm.c'
+      - 'RAF_031_pwm_por_clock_manager.c'
+      - 'tests/hardware/**'
+      - '.github/workflows/hw-mmio-failclosed.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  negative-host-mmio:
+    name: Host-only MMIO falsifiers
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Compile and run both target profiles
+        run: sh tests/hardware/run_mmio_failclosed.sh
