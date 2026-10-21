@@ -8,6 +8,10 @@ on:
       - 'RAF_029_spi_por_registrador_bcm.c'
       - 'RAF_030_i2c_por_registrador_bcm.c'
       - 'RAF_031_pwm_por_clock_manager.c'
+      - 'RAF_021_gpio_por_mmap.c'
+      - 'RAF_022_gpio_por_dev_gpiomem.c'
+      - 'RAF_023_gpio_por_dev_mem_controlado.c'
+      - 'Benchmark/build_mcu.sh'
       - 'tests/hardware/**'
       - '.github/workflows/hw-mmio-failclosed.yml'
   workflow_dispatch:
@@ -29,4 +33,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Compile and run both target profiles
-        run: sh tests/hardware/run_mmio_failclosed.sh
+        run: |
+          sh tests/hardware/run_mmio_failclosed.sh
+          sh tests/hardware/run_gpio_stubs.sh
+          bash -n Benchmark/build_mcu.sh

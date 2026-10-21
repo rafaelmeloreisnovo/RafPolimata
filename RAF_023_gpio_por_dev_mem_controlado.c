@@ -1,4 +1,5 @@
 #include "RAF_rafaelia_common.h"
+#include "RAF_hw_status.h"
 
 /*
  * Método M023: GPIO por /dev/mem controlado
@@ -9,10 +10,10 @@
  * Demonstra controle de direção e nível de GPIO4 via /dev/mem (BCM2835/Pi3).
  * Escreve GPFSEL0, GPSET0, GPCLR0 para exercitar o pipeline completo.
  *
- * Status: implementação real Linux mmap — TOKEN_VAZIO se sem /dev/mem (não-RPi).
+ * Physical write disabled by default; an explicit audited build flag is required.
  */
 
-#if defined(__linux__) && !defined(__ANDROID__)
+#if defined(RASPBERRYPI) && defined(RAFAELIA_BCM2837) && defined(RAFAELIA_ALLOW_GPIO4_PHYSICAL_WRITE) && defined(__linux__) && !defined(__ANDROID__)
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -30,7 +31,7 @@ int rafaelia_m023_gpio_por_dev_mem_controlado(void) {
     int fd = open("/dev/mem", O_RDWR | O_SYNC);
     if (fd < 0) {
         /* No /dev/mem or no permission — TOKEN_VAZIO, not a failure */
-        return 0;
+        return RAF_HW_ERR_NO_DEVICE;
     }
 
     void *gpio_map = mmap(
@@ -44,7 +45,7 @@ int rafaelia_m023_gpio_por_dev_mem_controlado(void) {
     close(fd);
 
     if (gpio_map == MAP_FAILED) {
-        return 0;
+        return RAF_HW_ERR_MAPPING;
     }
 
     volatile uint32_t *gpio = (volatile uint32_t *)gpio_map;
@@ -65,14 +66,15 @@ int rafaelia_m023_gpio_por_dev_mem_controlado(void) {
     /* Clear GPIO4 (set low) */
     gpio[GPCLR0_OFF] = (1u << 4);
 
-    munmap(gpio_map, GPIO_BLOCK_SIZE);
-    return 0;
+    if (munmap(gpio_map, GPIO_BLOCK_SIZE) != 0) return RAF_HW_ERR_IO;
+    return RAF_HW_OK;
 }
 
 #else /* non-Linux stub */
 
 int rafaelia_m023_gpio_por_dev_mem_controlado(void) {
-    return 0;
+    /* Physical pin writes are never implicitly authorized. */
+    return RAF_HW_ERR_UNSUPPORTED;
 }
 
 #endif
