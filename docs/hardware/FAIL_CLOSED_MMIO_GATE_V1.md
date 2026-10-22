@@ -36,4 +36,4 @@ thermal/power safety, or no regressions outside this touched surface.
 
 **Rollback:** revert only this branch/PR; no upstream main mutation.
 **Claim boundary:** SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM;
-`IMPLEMENTED_UNTESTED != PASS`; `TOKEN_VAZIO != 0`.
+`IMPLEMENTED_UNTESTED != PASS`; `TOKEN_VAZIO != 0` (governance: `CLOSURE_L16`, still materially open).
