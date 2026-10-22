@@ -1,7 +1,7 @@
 #ifndef RAF_HW_STATUS_H
 #define RAF_HW_STATUS_H
 
-/* Hardware operation results. TOKEN_VAZIO is epistemic, never numeric zero.
+/* Hardware operation results. TOKEN_VAZIO is epistemic, never numeric zero (CLOSURE_L16).
  * OK means the targeted operation completed; it is not a physical receipt.
  */
 #define RAF_HW_OK                0
