@@ -42,7 +42,22 @@ for abi in armeabi-v7a arm64-v8a; do
   if command -v llvm-nm >/dev/null && test -n "$(llvm-nm -u "$lib")"; then
     echo "::error::L0+JNI imports undefined symbols ($abi)"; exit 6
   fi
-  readelf -Ws "$lib" | grep -F 'Java_io_rafaelia_fieldlab_FieldLabActivity_nativeSelfTest'
+  # JNI lookup resolves .dynsym, not the private/debug .symtab.
+  # Verify both ABI identity and a globally exported callable JNI entry.
+  case "$abi" in
+    armeabi-v7a) elf_class=ELF32; elf_machine=ARM ;;
+    arm64-v8a) elf_class=ELF64; elf_machine=AArch64 ;;
+    *) echo "::error::unexpected Android ABI: $abi"; exit 8 ;;
+  esac
+  readelf -h "$lib" | grep -Eq "Class:[[:space:]]*$elf_class" ||
+    { echo "::error::ELF class mismatch ($abi)"; exit 8; }
+  readelf -h "$lib" | grep -Eq "Machine:[[:space:]]*$elf_machine" ||
+    { echo "::error::ELF machine mismatch ($abi)"; exit 8; }
+  readelf --dyn-syms --wide "$lib" | awk '
+    $4=="FUNC" && $5=="GLOBAL" && $6=="DEFAULT" && $7!="UND" &&
+    $8=="Java_io_rafaelia_fieldlab_FieldLabActivity_nativeSelfTest" { found=1 }
+    END { exit !found }
+  ' || { echo "::error::JNI symbol not exported in .dynsym ($abi)"; exit 8; }
 done
 
 # Java is only the Android system-backed activity/loader; no third-party .jar.
@@ -94,24 +109,37 @@ grep -Fq "launchable-activity: name='io.rafaelia.fieldlab.FieldLabActivity'" "$o
 if grep -Eq '^uses-permission' "$out/install-debug-badging.txt"; then
   echo "::error::Unreviewed Android permission in debug app"; exit 7
 fi
-python3 - "$out/field-lab-install-debug.apk" "$out/install-debug-receipt.json" <<'PY'
-import hashlib,json,sys,zipfile
+python3 - "$out/field-lab-install-debug.apk" "$out/install-debug-receipt.json" "$scratch/abi" <<'PY'
+import hashlib,json,struct,sys,zipfile
 from pathlib import Path
-apk,receipt=map(Path,sys.argv[1:])
+apk,receipt,abi_dir=map(Path,sys.argv[1:])
 expected={"AndroidManifest.xml","classes.dex",
           "lib/armeabi-v7a/libraffieldlab.so",
           "lib/arm64-v8a/libraffieldlab.so"}
+abi_types={"armeabi-v7a":(1,40),"arm64-v8a":(2,183)}
 with zipfile.ZipFile(apk) as z:
     names=z.namelist()
-    if len(names)!=len(set(names)) or not expected.issubset(names):
-        raise SystemExit("debug APK inventory fail-closed")
+    payload_names={name for name in names if not name.startswith("META-INF/")}
+    if len(names)!=len(set(names)) or payload_names!=expected:
+        raise SystemExit("unexpected, duplicate or missing debug APK payload")
     if len(z.read("classes.dex"))<512:
         raise SystemExit("DEX still empty/skeleton")
     if any(z.getinfo(name).file_size>131072 for name in expected):
         raise SystemExit("unbounded component")
     dex=hashlib.sha256(z.read("classes.dex")).hexdigest()
-    libs={abi:hashlib.sha256(z.read(f"lib/{abi}/libraffieldlab.so")).hexdigest()
-          for abi in ("armeabi-v7a","arm64-v8a")}
+    libs={}
+    for abi,(elf_class,machine) in abi_types.items():
+        name=f"lib/{abi}/libraffieldlab.so"
+        embedded=z.read(name)
+        original=(abi_dir/abi/"libraffieldlab.so").read_bytes()
+        if embedded!=original:
+            raise SystemExit(f"packaged native binary differs from built {abi}")
+        if (len(embedded)<64 or embedded[:4]!=b"\x7fELF"
+            or embedded[4]!=elf_class or embedded[5]!=1
+            or struct.unpack_from("<H",embedded,16)[0]!=3
+            or struct.unpack_from("<H",embedded,18)[0]!=machine):
+            raise SystemExit(f"native ELF header ABI mismatch {abi}")
+        libs[abi]=hashlib.sha256(embedded).hexdigest()
 record={
  "schema":"rafpolimata.field-lab-android-installability.v1",
  "state":"PASS_SCOPED_SIGNED_DEBUG_AND_MANIFEST",
