@@ -1,0 +1,158 @@
+name: Field Lab | ApkC dual-ABI candidate, non-release
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/field-lab-apkc-candidate.yml'
+      - 'docs/field-lab/APKC_FIELD_LAB_BRIDGE_V1.md'
+      - 'Apkc/**'
+      - 'scripts/apkc_verified_build.py'
+      - 'scripts/validate_apkc_formats.py'
+      - 'tools/raf_source_to_binary_proof.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: field-lab-apkc-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  bounded-c04-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout exact candidate SHA, no stored credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.SOURCE_COMMIT }}
+          persist-credentials: false
+
+      - name: Reject wrong checkout/ref
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_COMMIT"
+          printf 'SOURCE_SHA=%s\n' "$SOURCE_COMMIT"
+
+      - name: Host compiler preflight (tools outside freestanding runtime)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v qemu-aarch64 >/dev/null || ! command -v ld.lld >/dev/null; then
+            sudo apt-get update
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install --yes qemu-user lld
+          fi
+          command -v clang
+          command -v ld.lld
+          command -v qemu-aarch64
+          command -v readelf
+
+      - name: Pre-existing ApkC negative-control tests
+        run: |
+          python3 -m unittest -v \
+            tests.test_apkc_verified_build \
+            tests.test_validate_apkc_formats \
+            tests.test_apkc_structural_closure_receipt
+
+      - name: Build reproducible L0 source binaries both target ABIs
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash tools/raf_source_to_binary_proof.sh
+
+      - name: Build bounded structural APK through existing verified wrapper
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_id="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path('Apkc/proofs/out/apkc-compile.status.json').read_text())
+          if p.get('state') != 'PASS':
+              raise SystemExit('L0 source proof must be PASS')
+          print(p['run_id'])
+          PY
+          )"
+          a64="Apkc/proofs/runs/${run_id}/source-to-binary/apkc-aarch64-run1.elf"
+          test -s "$a64"
+          mkdir -p artifacts/field-lab
+          runner="artifacts/field-lab/apkc-host-bridge.sh"
+          printf '#!/bin/sh\nexec "%s" "%s" "$@"\n' \
+            "$(command -v qemu-aarch64)" "$(readlink -f "$a64")" > "$runner"
+          chmod 700 "$runner"
+          python3 scripts/apkc_verified_build.py \
+            --apkc "$runner" \
+            --input Apkc/hello.dualabi.structural.s.txt \
+            --output artifacts/field-lab/field-lab-c04.apk \
+            --report artifacts/field-lab/apkc-verified-build.json \
+            --log artifacts/field-lab/apkc-build.log \
+            --require-both -- \
+            -lang asm -both -p com.rafaelia.polimata.c04 \
+            -l 'RafPolimata C04' -n rafpolimata_c04 -m 24 -t 35 --strict
+
+      - name: Cross-check exact-head dual-ABI proof; emit nonpromotable receipt
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          root = Path('artifacts/field-lab')
+          source = Path('Apkc/proofs/out/apkc-compile.status.json')
+          proof = json.loads(source.read_text())
+          apk_report = json.loads((root / 'apkc-verified-build.json').read_text())
+          apk = root / 'field-lab-c04.apk'
+          expected = os.environ['SOURCE_COMMIT']
+          assert len(expected) == 40
+          assert proof['state'] == 'PASS' and proof['commit'] == expected
+          assert apk_report['state'] == 'PASS'
+          assert apk_report['validation']['state'] == 'PASS'
+          assert apk_report['require_both'] is True
+          assert apk.is_file() and apk.stat().st_size > 0
+          digest = hashlib.sha256(apk.read_bytes()).hexdigest()
+          assert apk_report['output_sha256'] == digest
+          receipt = {
+              'schema':'rafpolimata.field-lab-apkc-candidate.v1',
+              'source_sha':expected,
+              'apk_sha256':digest,
+              'apk_bytes':apk.stat().st_size,
+              'source_proof_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
+              'state':'PASS_SCOPED_STRUCTURAL_ONLY',
+              'require_both_abis':True,
+              'host_compilation_only':True,
+              'android_installed':'TOKEN_VAZIO_NOT_RUN',
+              'android_launched':'TOKEN_VAZIO_NOT_RUN',
+              'device_arm32':'TOKEN_VAZIO_NOT_RUN',
+              'device_arm64':'TOKEN_VAZIO_NOT_RUN',
+              'signing':'TOKEN_VAZIO_NOT_VERIFIED',
+              'private_data_included':False,
+              'claim_allowed':False,
+              'release_allowed':False,
+              'f_next':'Independent reproducible build and physical exact-artifact install/launch evidence'
+          }
+          (root / 'candidate-receipt.json').write_text(
+              json.dumps(receipt, sort_keys=True, indent=2) + '\n')
+          print('FIELD_LAB_APK=PASS_SCOPED_STRUCTURAL_ONLY claim_allowed=false')
+          PY
+
+      - name: Preserve provenance/candidate, never publish a release
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: field-lab-apkc-candidate-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            Apkc/proofs/out/apkc-compile.status.json
+            artifacts/field-lab/apkc-verified-build.json
+            artifacts/field-lab/candidate-receipt.json
+            artifacts/field-lab/field-lab-c04.apk
+
+# No secrets, repository dispatch, write permission, release, signing or install.
+# A valid archive/ELF remains distinct from physically observed Android behavior.
