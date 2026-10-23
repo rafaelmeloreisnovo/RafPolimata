@@ -2,6 +2,8 @@
 # Build a signed DEBUG-only, minimal Android launcher around the authorial L0.
 # Do not call L0 hosted: it is in the APK as pure freestanding ELF.
 # SDK/D8/Java/keytool are HOST build-time tools, not core runtime dependencies.
+# CLOSURE_L2: android_install/launch/physical_device/runtime_ui are TOKEN_VAZIO until physical SHA-bound replay.
+# CLOSURE_L10: ephemeral debug signing verification does not imply authorial signing/release custody.
 set -euo pipefail
 sdk="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
 test -n "$sdk" || { echo "::error::ANDROID_SDK_ROOT missing"; exit 2; }
