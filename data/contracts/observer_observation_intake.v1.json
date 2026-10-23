@@ -1,0 +1,53 @@
+{
+  "schema": "rafaelia.observer-observation-intake.contract/v1",
+  "governing_closure": "CLOSURE_L13",
+  "status": "SOURCE_CONTRACT",
+  "upstream_authority": {
+    "repository": "instituto-Rafael/relativity-living-light",
+    "contract_path": "data/contracts/rll_observer_observation_science_routing.v1.json",
+    "role": "science-route and observer/observation semantics"
+  },
+  "accepted_states": [
+    "OBSERVED",
+    "NEW_OBSERVED",
+    "UNCERTAIN",
+    "UNKNOWN",
+    "OPPORTUNITY",
+    "CONTRADICTION",
+    "ANOMALY",
+    "REJECTED",
+    "VERIFIED_LIMITED",
+    "SUPERSEDED"
+  ],
+  "accepted_conduct": [
+    "ATTENTION",
+    "ATTEND",
+    "ACT",
+    "UPDATE",
+    "REVIEW",
+    "REFUSE",
+    "BUG",
+    "ERROR",
+    "EDIT",
+    "THINK",
+    "PERMUTE",
+    "ANOMALY",
+    "DELTA",
+    "EMPTY_OR_GAP"
+  ],
+  "intake_rules": [
+    "observer_id and observation_id must differ",
+    "science_routes must include at least one PRIMARY route",
+    "UNCERTAIN and UNKNOWN require typed governance or reproduction gaps with closure",
+    "NEW_OBSERVED and OPPORTUNITY remain claim-blocked",
+    "BUG and ERROR are correction candidates only; they do not prove root cause",
+    "REFUSE preserves source pointer and refusal reason",
+    "raw private session text is not required for public intake"
+  ],
+  "output_states": [
+    "INTAKE_ACCEPTED_NON_PROMOTING",
+    "INTAKE_HOLD_GAP",
+    "INTAKE_REJECTED"
+  ],
+  "claim_allowed": false
+}
