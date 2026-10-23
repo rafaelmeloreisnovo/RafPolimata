@@ -1,4 +1,6 @@
 name: Field Lab | ApkC dual-ABI candidate, non-release
+# CLOSURE_L2: device/launch/loader gaps remain unresolved until SHA-bound physical evidence.
+# CLOSURE_L10: debug signing verification is not authorial/release signing proof.
 
 on:
   pull_request:
