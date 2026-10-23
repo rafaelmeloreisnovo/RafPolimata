@@ -52,7 +52,17 @@ jobs:
         run: |
           set -euo pipefail
           if ! command -v qemu-aarch64 >/dev/null || ! command -v ld.lld >/dev/null; then
-            sudo apt-get update
+            # On hosted runners unrelated third-party apt feeds may fail (e.g. HTTP 403).
+            # Install only from the runner's official Ubuntu source; do not bypass
+            # the required QEMU/LLD gate, suppress errors or trust unrelated feeds.
+            if test -s /etc/apt/sources.list.d/ubuntu.sources; then
+              sudo apt-get update -o Dir::Etc::sourcelist="sources.list.d/ubuntu.sources" -o Dir::Etc::sourceparts="-"
+            elif test -s /etc/apt/sources.list; then
+              sudo apt-get update -o Dir::Etc::sourceparts="-"
+            else
+              echo "::error::official Ubuntu apt sources unavailable"
+              exit 9
+            fi
             sudo DEBIAN_FRONTEND=noninteractive apt-get install --yes qemu-user lld
           fi
           command -v clang
