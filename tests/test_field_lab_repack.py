@@ -1,4 +1,8 @@
-"""Repack negative tests: exact inventory, ABI identity, size and original bytes."""
+"""Repack negative tests: exact inventory, ABI identity, size and original bytes.
+
+CLOSURE_L2 binds loader/runtime TOKEN_VAZIO states as unresolved physical evidence;
+CLOSURE_L10 distinguishes unsigned structural APKs from verified signed APKs.
+"""
 import importlib.util
 import tempfile
 import unittest
