@@ -28,6 +28,11 @@ docs/AGENTES.md and docs/field-lab/APKC_FIELD_LAB_BRIDGE_V1.md.
   automatic promotion or device installation. Protect children and dignity;
   avoid personally identifying or sensitive observations entirely.
 
+## Gap-to-closure routing
+- `CLOSURE_L2` (`docs/closures/CLOSURE_L2_RUNTIME_EVIDENCE.md`) governs Android loader, launch and physical device `TOKEN_VAZIO` states; source, manifest, ELF and debug APK do not prove execution.
+- `CLOSURE_L10` governs non-authorial debug signing and unverified release custody. `CLOSURE_L5` governs typed JNI/FFI boundary; passing native symbol checks does not imply device JNI success.
+- These refs are strict evidence routing, not whitelists, and do not authorize claim or release.
+
 ## Evidence
 `SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM`.
 `TOKEN_VAZIO != 0`, `PASS_HOST != PASS_DEVICE`, `claim_allowed=false`.
