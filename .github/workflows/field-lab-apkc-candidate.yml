@@ -7,6 +7,8 @@ on:
       - 'docs/field-lab/APKC_FIELD_LAB_BRIDGE_V1.md'
       - 'Apkc/**'
       - 'field_lab/l0/**'
+      - 'field_lab/android/**'
+      - 'scripts/field_lab_android_installable.sh'
       - 'scripts/field_lab_repack.py'
       - 'tests/test_field_lab_l0.py'
       - 'tests/test_field_lab_repack.py'
@@ -219,3 +221,75 @@ jobs:
 
 # No secrets, repository dispatch, write permission, release, signing or install.
 # A valid archive/ELF remains distinct from physically observed Android behavior.
+
+
+  android-debug-installability:
+    name: "Android installability | real manifest, DEX, JNI and signed debug"
+    needs: [bounded-c04-build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - name: Exact-HEAD checkout without persisted token
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Fail on HEAD mismatch or missing native boundary
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test -s field_lab/l0/raf_field_lab_core.c
+          test -s field_lab/android/raf_field_lab_jni.c
+          test -s field_lab/android/app/AndroidManifest.xml
+          test -s field_lab/android/app/src/io/rafaelia/fieldlab/FieldLabActivity.java
+          bash -n scripts/field_lab_android_installable.sh
+      - name: Verify pre-provisioned Android SDK and Java
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          test -n "$sdk"
+          command -v javac
+          command -v clang
+          test -x "$sdk/build-tools/35.0.0/aapt2"
+          test -x "$sdk/build-tools/35.0.0/d8"
+          test -x "$sdk/build-tools/35.0.0/apksigner"
+          test -s "$sdk/platforms/android-35/android.jar"
+      - name: Assemble signed debug Android launcher and independently inspect package
+        shell: bash
+        run: bash scripts/field_lab_android_installable.sh
+      - name: Claim boundary and exact-source artifact receipt
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path("artifacts/field-lab/install-debug-receipt.json")
+          r=json.loads(p.read_text())
+          assert r["state"]=="PASS_SCOPED_SIGNED_DEBUG_AND_MANIFEST"
+          assert r["claim_allowed"] is False and r["release_allowed"] is False
+          assert r["native_jni_bridge"]=="SOURCE_COMPILED_AND_SYMBOL_PRESENT"
+          assert r["android_install"]=="TOKEN_VAZIO_NOT_RUN"
+          assert r["physical_device"]=="TOKEN_VAZIO_NOT_RUN"
+          r["source_sha"]=os.environ["EXPECTED_SHA"]
+          p.write_text(json.dumps(r,indent=2,sort_keys=True)+"\\n")
+          PY
+      - name: Preserve candidate and truth receipt (NO releases, installs or secrets)
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: field-lab-android-install-debug-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            artifacts/field-lab/field-lab-install-debug.apk
+            artifacts/field-lab/install-debug-badging.txt
+            artifacts/field-lab/install-debug-receipt.json
