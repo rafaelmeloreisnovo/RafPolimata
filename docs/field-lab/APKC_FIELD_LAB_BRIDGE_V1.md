@@ -57,3 +57,13 @@ A análise dos próprios repositórios foi feita antes da implementação:
 **Ausências tipadas:** `ANDROID_UI=TOKEN_VAZIO_NOT_CONNECTED`; `LOADER=TOKEN_VAZIO`; `APK_INSTALLABLE=TOKEN_VAZIO_NOT_TESTED`; `SIGNING=TOKEN_VAZIO`; `DEVICE_ARM32/ARM64=NOT_RUN`; `PRIVACY_LEGAL_COMPLETE=TOKEN_VAZIO`; `claim_allowed=false`.
 
 **F_next:** depois de CI exact-head e recibo V2 válido, construir ponte de interface/loader e testar instalação e observação física no aparelho com SHA idêntico. Não confundir esse estágio com aprovação ou publicação.
+
+## V3 — Vínculos de lacunas e sucessor Android (2026-10-23)
+
+A seção V2 acima descreve o estágio histórico sem launcher. O código da PR #441 agora contém `FieldLabActivity`, manifesto compilável e uma ponte JNI nativa com build de APK debug de teste; isto é *fonte candidata*, não execução física. Nenhum estado da V2 é apagado.
+
+- `CLOSURE_L2` (`docs/closures/CLOSURE_L2_RUNTIME_EVIDENCE.md`): governa os `TOKEN_VAZIO` de instalação, launch, loader e execução física, sem fechá-los. Evidência de fechamento: identidade SHA-256 de APK/ELF no aparelho, instalação, execução do JNI/autoteste, captura e readback.
+- `CLOSURE_L10` (`docs/closures/CLOSURE_L10_APK_SECURITY.md`): distingue verificação `apksigner` da assinatura de debug efêmera e da assinatura autoral/release ainda não observada.
+- `CLOSURE_L5` (`docs/closures/CLOSURE_L5_FFI_VALIDATION.md`): contrato de fronteira FFI; presença do símbolo JNI no ELF não prova chamada executada no aparelho.
+
+Gate CI afetado: `tools/validate_token_vazio_gates.py --changed-since <BASE_SHA> --strict`; CLOSURE é vínculo de governança, nunca conversão `TOKEN_VAZIO → PASS`. Reexecutar no HEAD deste hotfix, preservar relatórios de falha anteriores e manter `claim_allowed=false`, `no_release=true`.
