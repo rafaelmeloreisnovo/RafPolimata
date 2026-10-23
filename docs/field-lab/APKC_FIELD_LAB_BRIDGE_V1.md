@@ -33,3 +33,27 @@ Rollback: reverter os arquivos novos deste PR Draft; `main` continua intacta.
 `TOKEN_VAZIO != 0`
 `HOST_PASS != DEVICE_PASS`
 `claim_allowed=false, no_merge=true, no_release=true`
+
+## V2 — Corretivo de composição multifuncional (2026-10-22)
+
+A análise dos próprios repositórios foi feita antes da implementação:
+- BLAKE3 `rmr/android`: Gradle/NDK/JNI, três bibliotecas de provedores por ABI, licenças anexadas e assinatura de debug. Seus provedores não são três algoritmos distintos; todos fornecem BLAKE3.
+- EstudioAudio `app/src/main/cpp`: núcleo DSP/ZIP32/WAV, Java/Android de aplicação e player; o guia de teleprompter documenta síntese de **16 kHz**, e não uma alegação generalizada de 48 kHz para toda rota de voz.
+- RLL `core/lowlevel_runtime` e `app`: objetos C freestanding e provas matemáticas distintas de um APK Android Gradle.
+- Nenhuma medida exata de tamanho atual desses três APKs foi homologada por esta execução. Não inferir um valor a partir de tamanho de fonte/zip histórico.
+
+**Falha do V1:** o `Apkc/hello.dualabi.structural.s.txt` contém duas declarações de símbolo e `nop`, e o APK original de 4.454 bytes tinha só 4 entradas: `classes.dex`, `AndroidManifest.xml`, `lib/arm64-v8a/librafpolimata_c04.so`, `lib/armeabi-v7a/librafpolimata_c04.so`. Estrutura ZIP mínima NÃO constitui estação de laboratório em campo.
+
+**V2 aditivo, sem substituir o compilador autoral nem transferir implementações de outros repos:**
+- `field_lab/l0/raf_field_lab_core.c`: SHA3-256 (FIPS 202; distinguir de BLAKE3), PCM16 mono 48.000 amostras/s em buffer do chamador, cabeçalho WAV 44B, DFT de 16 amostras/8 bins (analisador de **janela curta**, não espectrometria calibrada), ZIP32 com um arquivo STORED e validação de nome/capacidade.
+- `tests/test_field_lab_l0.py`: roda a biblioteca freestanding real no host e cruza SHA3 com `hashlib.sha3_256`, WAV com `wave`, ZIP com `zipfile`, além de controles negativos, PCM e DFT. Não há chamada a essas bibliotecas Python no código L0 nem em tempo de execução Android.
+- `scripts/field_lab_repack.py` e `tests/test_field_lab_repack.py`: conservam os 4 itens do C04 original bit a bit; adicionam as bibliotecas ELF reais `lib/armeabi-v7a/libraffieldlab.so` e `lib/arm64-v8a/libraffieldlab.so`. Rejeita nomes duplicados, dados inesperados, ELF de arquitetura errada, entrada no mesmo caminho, limite de 256 KiB.
+- **Gate CI rigoroso:** `clang --target=armv7a-linux-androideabi24` e `--target=aarch64-linux-android24` com `-nostdinc -nostdlib -ffreestanding -fno-builtin -shared -Wl,--no-undefined`; audit `DT_NEEDED` e símbolos indefinidos, cabeçalho ELF, ambas ABIs, SHA e validação do APK final por validador já existente.
+- O ELF ativo é funcional **como código embarcado**; mas não existe, neste V2, um chamador Android/JNI/NativeActivity que encaminhe os controles da UI a esse L0. Logo, **biblioteca compilada ≠ módulo carregado ≠ funcionalidade visível**.
+- `Apkc/hello.dualabi.structural.s.txt` e as 4 entradas originais preservados; V1 original e todos os relatórios negativos preservados, V2 sucessor com receipt próprio. Limite 256 KiB é *teto de orçamento*, não razão para inserir bytes artificiais.
+
+**Hotfix não regressivo observado durante integração:** no ARM32, a inicialização C `a[25]={0}` do estado SHA3 foi transformada por Clang em `__aeabi_memclr8`, símbolo externo que o gate corretamente rejeitou. Corrigido com gravações escalares voláteis e novo exato SHA; o gate `--no-undefined` continua estrito e qualquer regressão reprova.
+
+**Ausências tipadas:** `ANDROID_UI=TOKEN_VAZIO_NOT_CONNECTED`; `LOADER=TOKEN_VAZIO`; `APK_INSTALLABLE=TOKEN_VAZIO_NOT_TESTED`; `SIGNING=TOKEN_VAZIO`; `DEVICE_ARM32/ARM64=NOT_RUN`; `PRIVACY_LEGAL_COMPLETE=TOKEN_VAZIO`; `claim_allowed=false`.
+
+**F_next:** depois de CI exact-head e recibo V2 válido, construir ponte de interface/loader e testar instalação e observação física no aparelho com SHA idêntico. Não confundir esse estágio com aprovação ou publicação.
