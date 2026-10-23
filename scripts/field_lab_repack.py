@@ -3,6 +3,9 @@
 
 The four source entries remain byte-identical. Code-free host packaging only;
 no signing, no private source, no command execution, no added permissions.
+CLOSURE_L2 governs loader/UI/install/runtime TOKEN_VAZIO receipt fields, not runtime success.
+CLOSURE_L10 governs absent authorial/signature verification for this unsigned structural APK.
+CLOSURE_L5 governs the unresolved JNI binding for this structural-only repack path.
 """
 from __future__ import annotations
 import argparse
