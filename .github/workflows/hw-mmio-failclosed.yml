@@ -1,0 +1,107 @@
+name: Hardware MMIO fail-closed (host mock only)
+
+on:
+  pull_request:
+    paths:
+      - 'RAF_hw_status.h'
+      - 'RAF_016_i2c_twi_com_timeout.c'
+      - 'RAF_029_spi_por_registrador_bcm.c'
+      - 'RAF_030_i2c_por_registrador_bcm.c'
+      - 'RAF_031_pwm_por_clock_manager.c'
+      - 'RAF_021_gpio_por_mmap.c'
+      - 'RAF_022_gpio_por_dev_gpiomem.c'
+      - 'RAF_023_gpio_por_dev_mem_controlado.c'
+      - 'Benchmark/build_mcu.sh'
+      - 'tests/hardware/**'
+      - 'docs/hardware/FAIL_CLOSED_MMIO_GATE_V1.md'
+      - 'docs/closures/CLOSURE_L16_HARDWARE_MMIO_EVIDENCE.md'
+      - '.github/workflows/hw-mmio-failclosed.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: hw-mmio-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  negative-host-mmio:
+    name: Host-only MMIO falsifiers
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Verify exact source SHA (no merge surrogate)
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$EXPECTED_SHA"
+          echo "EXACT_HEAD_HOST_ONLY=$actual"
+      - name: Strict changed-line TOKEN_VAZIO closure gate (PR exact head)
+        if: ${{ github.event_name == 'pull_request' }}
+        shell: bash
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          test -n "$PR_BASE_SHA"
+          git fetch --no-tags --depth=1 origin "$PR_BASE_SHA"
+          git cat-file -e "${PR_BASE_SHA}^{commit}"
+          python3 -m unittest -v tests.test_validate_token_vazio_gates
+          mkdir -p ci/reports
+          python3 tools/validate_token_vazio_gates.py \
+            --repo . \
+            --changed-since "$PR_BASE_SHA" \
+            --output ci/reports/token-vazio-hardware-l16.json \
+            --summary --strict
+          echo "STRICT_CHANGED_LINES_LINKAGE=PASS_SCOPED; PHYSICAL_MMIO=NOT_RUN"
+      - name: Upload closure gate receipt even on failure
+        if: ${{ always() && github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # exact v6 / Node 24
+        with:
+          name: hardware-token-vazio-l16-${{ github.run_id }}
+          path: ci/reports/token-vazio-hardware-l16.json
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Compile and run both target profiles
+        run: |
+          sh tests/hardware/run_mmio_failclosed.sh
+          sh tests/hardware/run_gpio_stubs.sh
+          bash -n Benchmark/build_mcu.sh
+
+  avr-object-compile:
+    name: AVR compile-only (never firmware)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Verify exact source SHA (no merge surrogate)
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$EXPECTED_SHA"
+          echo "EXACT_HEAD_HOST_ONLY=$actual"
+      - name: Install AVR compile toolchain (hosted CI only)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gcc-avr binutils-avr avr-libc
+          avr-gcc --version | head -1
+      - name: Compile AVR object modules and record evidence boundary
+        run: |
+          bash Benchmark/build_mcu.sh
+          test -f build_mcu/RAF_001_acesso_direto_a_ddrx_portx_pinx.o
+          test ! -e build_mcu/RAF_001_acesso_direto_a_ddrx_portx_pinx.elf
+          echo 'PASS_AVR_OBJECT_ONLY; LINK/HEX/DEVICE=NOT_RUN'

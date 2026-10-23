@@ -7,7 +7,7 @@
 #   bash Benchmark/build_mcu.sh                  # compila todos os M001-M020 para AVR
 #   bash Benchmark/build_mcu.sh RAF_003_*.c      # compila arquivo específico
 #
-# Saída: build_mcu/<arquivo>.elf + build_mcu/<arquivo>.size
+# Output: build_mcu/<file>.o (compile-only), no executable/firmware or physical evidence.
 
 set -euo pipefail
 
@@ -36,18 +36,23 @@ fi
 AVR_GCC=$(command -v avr-gcc 2>/dev/null || true)
 if [ -z "${AVR_GCC}" ]; then
     echo "SKIP: avr-gcc not found — install gcc-avr package to build MCU targets"
-    exit 0
+    exit 2  # NOT_RUN_NO_COMPILER, never success
+fi
+
+if ! command -v avr-objdump >/dev/null 2>&1; then
+    echo "NOT_RUN_NO_OBJDUMP: missing AVR disassembler"
+    exit 2
 fi
 
 for src in "${FILES[@]}"; do
     base=$(basename "${src}" .c)
-    elf="${OUTDIR}/${base}.elf"
+    obj="${OUTDIR}/${base}.o"
 
-    if ${AVR_GCC} ${CFLAGS} -I. "${src}" -o "${elf}" 2>/dev/null; then
-        size=$(avr-objdump -h "${elf}" 2>/dev/null \
+    if ${AVR_GCC} ${CFLAGS} -I. -c "${src}" -o "${obj}" 2>/dev/null; then
+        size=$(avr-objdump -h "${obj}" 2>/dev/null \
                | awk '/\.text/{print $3}' | head -1)
         size_dec=$((16#${size:-0}))
-        echo "PASS  ${base}  .text=${size_dec}B"
+        echo "COMPILE_ONLY  ${base}  .text=${size_dec}B (NOT_LINKED_NOT_FLASHED)"
         PASS=$((PASS + 1))
     else
         echo "FAIL  ${base}"
@@ -56,5 +61,5 @@ for src in "${FILES[@]}"; do
 done
 
 echo ""
-echo "MCU build: ${PASS} PASS  ${FAIL} FAIL  ${SKIP} SKIP"
+echo "MCU compile-only: ${PASS} COMPILE_OK  ${FAIL} FAIL  ${SKIP} SKIP; ELF/HEX/device=NOT_RUN"
 [ ${FAIL} -eq 0 ]
