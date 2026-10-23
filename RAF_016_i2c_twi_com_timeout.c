@@ -1,4 +1,5 @@
 #include "RAF_rafaelia_common.h"
+#include "RAF_hw_status.h"
 
 /*
  * Método M016: I2C/TWI com timeout
@@ -9,7 +10,7 @@
  * TWBR = ((F_CPU/100000)-16)/2 para SCL=100 kHz.
  * rafaelia_m016_twi_start: aguarda TWINT com timeout de 1000 iterações.
  * rafaelia_m016_twi_stop: envia condição STOP.
- * Retorno int: 0=ok, -1=timeout (AVR) ou 0 direto (non-AVR).
+ * Retorno: RAF_HW_OK somente com operacao AVR concluida; erros tipados.
  */
 
 #ifndef F_CPU
@@ -45,7 +46,7 @@ static int rafaelia_m016_twi_start(void) {
                                             (1u << M016_TWEN));
     while (!(RAFA_MMIO8(AVR_TWCR_ADDR) & (uint8_t)(1u << M016_TWINT))) {
         if (timeout == 0u) {
-            return -1;
+            return RAF_HW_ERR_TIMEOUT;
         }
         timeout--;
     }
@@ -70,14 +71,14 @@ int rafaelia_m016_i2c_twi_com_timeout(void) {
     /* Send START, wait with timeout */
     rc = rafaelia_m016_twi_start();
     if (rc != 0) {
-        return -1;
+        return RAF_HW_ERR_TIMEOUT;
     }
 
     /* Send STOP to release bus */
     rafaelia_m016_twi_stop();
     return 0;
 #else
-    /* Non-AVR: no hardware — return 0 to indicate pass */
-    return 0;
+    /* Non-AVR: hardware operation did not execute. */
+    return RAF_HW_ERR_UNSUPPORTED;
 #endif
 }

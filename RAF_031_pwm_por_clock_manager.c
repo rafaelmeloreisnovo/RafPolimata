@@ -1,4 +1,5 @@
 #include "RAF_rafaelia_common.h"
+#include "RAF_hw_status.h"
 
 /*
  * Método M031: PWM por clock manager
@@ -7,7 +8,7 @@
  * Ganho estimado: precisão de frequência
  *
  * Configura o clock manager (CM) e PWM peripheral diretamente.
- * Gated em RASPBERRYPI — retorna TOKEN_VAZIO (0) em outros hosts.
+ * RPi requires explicit independent PWM and CM memory mappings.
  */
 
 /* PWM register offsets (in uint32_t words from pwm_base) */
@@ -58,60 +59,59 @@
  * range:    PWM period in clock ticks (RNG1).
  * duty:     High ticks within period (DAT1).
  */
-static void rafaelia_m031_pwm_setup(volatile uint32_t *pwm_base,
-                                     volatile uint32_t *cm_base,
-                                     uint32_t range, uint32_t duty)
+/*
+ * Explicit mapping API. Both pointers must refer to separate mapped regions
+ * with at least 0x1000 bytes each and verified BCM variant/clock ownership.
+ * PWM must not be sharing the clock with another system consumer.
+ * Negative result leaves the PWM output disabled, not state-restored.
+ */
+int rafaelia_m031_pwm_configure_mapped(volatile uint32_t *pwm_base,
+                                      volatile uint32_t *cm_base,
+                                      uint32_t range, uint32_t duty)
 {
-    /* 1. Stop PWM channel 1 */
+#if defined(RASPBERRYPI)
+    uint32_t n;
+    if (!pwm_base || !cm_base || pwm_base == cm_base)
+        return RAF_HW_ERR_INVALID;
+    if (range == 0u || duty > range) return RAF_HW_ERR_INVALID;
+
+    /* No writes when clock is already busy: prevent stealing ownership. */
+    if (cm_base[CM_PWMCTL_OFFSET] & CM_PWMCTL_BUSY) return RAF_HW_ERR_IO;
     pwm_base[PWM_CTL_OFFSET] = 0u;
-
-    /* 2. Stop CM PWM clock: kill it */
     cm_base[CM_PWMCTL_OFFSET] = CM_PASSWD | CM_PWMCTL_KILL;
+    for (n = 0; n < RAF_HW_POLL_LIMIT; ++n)
+        if (!(cm_base[CM_PWMCTL_OFFSET] & CM_PWMCTL_BUSY)) break;
+    if (n == RAF_HW_POLL_LIMIT) return RAF_HW_ERR_TIMEOUT;
 
-    /* 3. Wait until clock is not busy */
-    while (cm_base[CM_PWMCTL_OFFSET] & CM_PWMCTL_BUSY)
-        ;
-
-    /*
-     * 4. Set divisor: PLLD (500 MHz) / 5 = 100 MHz PWM clock.
-     *    DIV register: bits 23:12 = integer part, bits 11:0 = fractional.
-     *    DIVI=5 => 0x00005000 | passwd
-     */
     cm_base[CM_PWMDIV_OFFSET] = CM_PASSWD | (5u << 12);
+    cm_base[CM_PWMCTL_OFFSET] =
+        CM_PASSWD | CM_PWMCTL_ENAB | CM_PWMCTL_SRC_PLLD;
+    for (n = 0; n < RAF_HW_POLL_LIMIT; ++n)
+        if (cm_base[CM_PWMCTL_OFFSET] & CM_PWMCTL_BUSY) break;
+    if (n == RAF_HW_POLL_LIMIT) {
+        cm_base[CM_PWMCTL_OFFSET] = CM_PASSWD | CM_PWMCTL_KILL;
+        return RAF_HW_ERR_TIMEOUT;
+    }
 
-    /* 5. Select PLLD source and enable */
-    cm_base[CM_PWMCTL_OFFSET] = CM_PASSWD | CM_PWMCTL_ENAB | CM_PWMCTL_SRC_PLLD;
-
-    /* 6. Wait for clock to lock */
-    while (!(cm_base[CM_PWMCTL_OFFSET] & CM_PWMCTL_BUSY))
-        ;
-
-    /* 7. Set PWM range and duty */
     pwm_base[PWM_RNG1_OFFSET] = range;
     pwm_base[PWM_DAT1_OFFSET] = duty;
-
-    /* 8. Enable PWM channel 1 in M/S mode */
     pwm_base[PWM_CTL_OFFSET] = PWM_CTL_MSEN1 | PWM_CTL_PWEN1;
+    return RAF_HW_OK;
+#else
+    (void)pwm_base; (void)cm_base; (void)range; (void)duty;
+    return RAF_HW_ERR_UNSUPPORTED;
+#endif
 }
 
+/* Legacy one-pointer API cannot safely derive CM virtual address from PWM.
+ * Fail closed without MMIO writes; callers must move to explicit mapped API.
+ */
 int rafaelia_m031_pwm_por_clock_manager(volatile uint32_t *mmio_base)
 {
-    if (!mmio_base) return 0; /* TOKEN_VAZIO — no BCM hardware present */
-
+    if (!mmio_base) return RAF_HW_ERR_NO_DEVICE;
 #if defined(RASPBERRYPI)
-    /*
-     * On real hardware the caller must separately map CM (0x3F101000).
-     * Here we use mmio_base as pwm_base and derive cm_base from a known
-     * physical offset. In a proper integration, pass both bases.
-     *
-     * PWM range=1024, duty=512 → 50% duty cycle.
-     */
-    volatile uint32_t *cm_base = mmio_base - ((0x3F20C000u - 0x3F101000u) / 4u);
-    rafaelia_m031_pwm_setup(mmio_base, cm_base, 1024u, 512u);
-    return 0;
+    return RAF_HW_ERR_CM_REQUIRED;
 #else
-    /* Logic complete; hardware not present on this host. */
-    (void)rafaelia_m031_pwm_setup;
-    return 0;
+    return RAF_HW_ERR_UNSUPPORTED;
 #endif
 }
