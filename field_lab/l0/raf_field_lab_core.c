@@ -51,9 +51,11 @@ static void permutation(raf_u64 a[25]){
 }
 /* NIST SHA3-256: rate 136, pad 0x06..0x80; no copied provider code. */
 int raf_lab_sha3_256(const raf_b8 *input,raf_u32 len,raf_b8 out[32]){
-  raf_u64 a[25]={0};
+  raf_u64 a[25];
   raf_u32 i,pos=0,remain=len;
   if(!out || (len&&!input) || len>1048576u)return 0;
+  /* Volatile element stores prevent LLVM from lowering zero initialization\n   * to an implicit __aeabi_memclr8 OS/ABI helper on ARM32. */
+  for(i=0;i<25u;i++)((volatile raf_u64 *)a)[i]=0ULL;
   while(remain>=136u){
     for(i=0;i<136u;i++)a[i>>3]^=(raf_u64)input[pos+i]<<((i&7u)*8u);
     permutation(a);pos+=136u;remain-=136u;
