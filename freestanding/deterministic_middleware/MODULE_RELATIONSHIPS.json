@@ -1,0 +1,41 @@
+{
+  "schema": "rafaelia.freestanding.middleware.relationships.v1",
+  "claim_allowed": false,
+  "node": "RafPolimata/freestanding/deterministic_middleware",
+  "status": "SOURCE_IMPLEMENTED_HOST_TESTED_DEVICE_NOT_RUN",
+  "owns": [
+    "raf_mw_route",
+    "fixed_16x32_matrix",
+    "deterministic_CPU_plan",
+    "dual_counter_alerts",
+    "fallback_failover_rollback_recommendations"
+  ],
+  "receives_from": [
+    "Mapa/intent_authority",
+    "RafGitTools/consumer_gate",
+    "S12/header_prefix_candidate",
+    "HOSTED_BOUNDARY/capability_evidence"
+  ],
+  "does_not_implement": [
+    "actual_NEON_processing",
+    "SIMD_execution",
+    "GPU_drivers",
+    "NUMA_placement",
+    "ELF_loader",
+    "DEX_parser",
+    "ART_JIT",
+    "Android_JNI",
+    "real_OS_watchdog",
+    "actual_rollback"
+  ],
+  "handoff": "plan_token_not_execution",
+  "security": [
+    "fail_closed",
+    "caller_owned_memory",
+    "no_syscalls",
+    "no_heap",
+    "no_undefined_symbols",
+    "human_gate_required"
+  ],
+  "rollback": "no_merge_reversible_branch_only"
+}
