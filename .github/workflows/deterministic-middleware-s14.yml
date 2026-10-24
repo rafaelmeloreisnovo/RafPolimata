@@ -1,0 +1,29 @@
+name: S14 Deterministic Middleware L0 Gate
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'freestanding/deterministic_middleware/**'
+      - '.github/workflows/deterministic-middleware-s14.yml'
+  pull_request:
+    paths:
+      - 'freestanding/deterministic_middleware/**'
+      - '.github/workflows/deterministic-middleware-s14.yml'
+permissions:
+  contents: read
+jobs:
+  pure_core:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # pinned checkout
+      - name: Exact-scope C11 safety/ABI tests
+        run: |
+          clang --version | head -n 1
+          sh freestanding/deterministic_middleware/tests/verify.sh
+      - name: Execution boundary
+        if: always()
+        run: |
+          echo 'This run does NOT execute an Android APK, GPU, NUMA allocation, live watchdog or rollback.'
+          echo 'Source/header prefix recognition is not ART/DEX/ELF validity.'
+          echo 'Human review and provider required-check enforcement remain separate.'
