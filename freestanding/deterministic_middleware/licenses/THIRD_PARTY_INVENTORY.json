@@ -1,0 +1,17 @@
+{
+  "schema": "rafaelia.middleware.third_party_inventory.v1",
+  "scope": "new S14 C pure kernel files only",
+  "copied_third_party_implementations": [],
+  "runtime_external_libraries": [],
+  "external_tooling": [
+    "clang",
+    "nm",
+    "readelf",
+    "GitHub Actions",
+    "hosted C sanitizer test runner"
+  ],
+  "upstream_repository_license": "TOKEN_VAZIO_REQUIRES_RIGHTS_REVIEW",
+  "new_redistribution_license": "NOT_GRANTED",
+  "human_authorization": "TOKEN_VAZIO_NOT_COMPLETED",
+  "claim_allowed": false
+}
