@@ -255,3 +255,8 @@ For every material dependency delta record:
 <!-- RAFAELIA_S12_L0_EXECUTABLE_GATE -->
 ## S12 specialized freestanding service matrix
 For bounded binary-prefix and dependency-friction changes under `freestanding/service_matrix/**`, agents **must** read `freestanding/service_matrix/AGENTS.md` after `freestanding/AGENTS.md` and run `sh freestanding/service_matrix/tests/verify_s12.sh`. Respect the 13 candidate prefixes as HEADER_ONLY, never APK/DEX/ART validation. External tooling belongs to TOOLING_TEST; Android to HOSTED_BOUNDARY. Compiler flags are not proof without `nm -u`, target-machine inspection and fixtures. Source-only work cannot advance runtime/device/authority gates. Never auto-merge.
+
+
+<!-- RAFAELIA_S14_DETERMINISTIC_MIDDLEWARE_ENTRY -->
+## S14 authorial freestanding deterministic middleware
+When handling capability routing, two watchdog counters, fallback/failover recommendations, or GPU/NUMA/NEON/SIMD/ELF/DEX/ART work, read `freestanding/deterministic_middleware/AGENTS.md`, `README.md`, `LICENSE-STATUS.md` and the S12 service_matrix boundary **before** changing a producer or adapter. The S14 PURE_CORE has one C entry with caller-owned arrays; it returns a plan but does not invoke OS/Android or GPU. External toolchain/build/OS modules stay in explicitly named HOSTED_BOUNDARY or TOOLING_TEST. Only independent exact-head builds/device checks can promote a stronger claim. No automatic merge, upstream relicensing, deletion or invented rights. `TOKEN_VAZIO != 0`; `claim_allowed=false`.
