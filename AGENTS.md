@@ -252,3 +252,6 @@ For every material dependency delta record:
 
 <!-- /RAFAELIA_FREESTANDING_POLICY_V1 -->
 
+<!-- RAFAELIA_S12_L0_EXECUTABLE_GATE -->
+## S12 specialized freestanding service matrix
+For bounded binary-prefix and dependency-friction changes under `freestanding/service_matrix/**`, agents **must** read `freestanding/service_matrix/AGENTS.md` after `freestanding/AGENTS.md` and run `sh freestanding/service_matrix/tests/verify_s12.sh`. Respect the 13 candidate prefixes as HEADER_ONLY, never APK/DEX/ART validation. External tooling belongs to TOOLING_TEST; Android to HOSTED_BOUNDARY. Compiler flags are not proof without `nm -u`, target-machine inspection and fixtures. Source-only work cannot advance runtime/device/authority gates. Never auto-merge.
