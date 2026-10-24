@@ -1,0 +1,28 @@
+name: Freestanding S12 Object ABI Gate
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'freestanding/service_matrix/**'
+      - '.github/workflows/freestanding-service-matrix-s12.yml'
+  pull_request:
+    paths:
+      - 'freestanding/service_matrix/**'
+      - '.github/workflows/freestanding-service-matrix-s12.yml'
+permissions:
+  contents: read
+jobs:
+  object_gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2 pinned
+      - name: Check compiler and supported targets
+        run: |
+          clang --version | head -1
+          sh freestanding/service_matrix/tests/verify_s12.sh
+      - name: Receipt boundary
+        if: always()
+        run: |
+          echo 'Workflow completion is evidence only for its exact run SHA.'
+          echo 'No APK, ART/JIT, JNI, SDK, Android physical device or runtime is tested here.'
