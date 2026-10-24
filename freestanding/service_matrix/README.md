@@ -29,3 +29,8 @@ Local observed: fixture PASS, ARMv7+AArch64 object compile PASS, undefined-symbo
 - Human must explicitly inspect independent local and CI results before merge.
 
 `SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM`. `TOKEN_VAZIO != 0`. `claim_allowed=false`.
+
+
+## S12 R2 — module boarding / flags admission (actual implementation)
+`raf_fs_admit.c/.h` is an additional authored **PURE_CORE admission stage** with a fixed 8-cell request/result and a `void` function. It admits contracts for the two implemented L0 module types (PREFIX_PROBE and FLAG_GATE) only when ABI=1 and external-capability mask=0. Its policy denies capability bits for libc, heap, syscalls, JNI, JVM, JIT, network, OS logging and dynamic linkage. PLATFORM_SYSCALL and ANDROID_BRIDGE module IDs are explicitly **NOT_IMPLEMENTED**, never silent stubs that return success. This stage does not execute a module, schedule it or issue syscalls, and result[5]=0 even on admission.
+The CI's `verify_s12.sh` now includes an additional 8-case negative/positive admission fixture gate, host sanitizer and ARMv7/AArch64 undefined-symbol checks for BOTH C objects. Human promotion remains blocked; no in-device execution.
