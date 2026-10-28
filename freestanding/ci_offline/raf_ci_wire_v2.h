@@ -12,6 +12,7 @@
  * bit11 ambiguous event. Flags preserve original v1 bits.
  */
 #include "raf_ci_core.h"
+#include "raf_ci_z0_view.h"
 #define RAF_CI_WIRE_SIZE 40u
 #define RAF_CI_WIRE_SCHEMA 2u
 #define RAF_CI_WRITE_REVIEW 1024u
@@ -80,6 +81,13 @@ RAF_CI_INLINE unsigned int raf_ci_extra_policy(const unsigned char *p,unsigned i
 RAF_CI_INLINE void raf_ci_wire_v2_encode(const unsigned char *p,unsigned int n,unsigned char out[RAF_CI_WIRE_SIZE]) {
     raf_ci_receipt_v1 r=raf_ci_probe(p,n);
     unsigned int flags=r.flags | raf_ci_extra_policy(p,n);
+    unsigned int z0=raf_ci_z0_classify(p,n);
+    if(z0==RAF_CI_Z0_ABSENT || z0==RAF_CI_Z0_EMPTY || z0==RAF_CI_Z0_NUL ||
+       z0==RAF_CI_Z0_SPACES || z0==RAF_CI_Z0_BLANK_ONLY || z0==RAF_CI_Z0_INVALID_UTF8 ||
+       z0==RAF_CI_Z0_TOO_LARGE || z0==RAF_CI_Z0_CONTROL ||
+       z0==RAF_CI_Z0_TOKEN_VAZIO || z0==RAF_CI_Z0_EMPTY_SET ||
+       z0==RAF_CI_Z0_ASCII_ZERO || z0==RAF_CI_Z0_DOUBLE_QUOTED_EMPTY ||
+       z0==RAF_CI_Z0_JSON_NULL_TEXT) flags|=RAF_CI_MALFORMED;
     if (n==0u) flags|=RAF_CI_MALFORMED; /* Empty source is evidence absence, not reviewable workflow. */
     unsigned int state= (flags & RAF_CI_V2_HOLD_BITS) ? RAF_CI_WIRE_STATE_HOLD : RAF_CI_WIRE_STATE_STATIC_REVIEW;
     unsigned int i;
