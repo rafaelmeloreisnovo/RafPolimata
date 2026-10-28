@@ -25,6 +25,29 @@ static int go(void) {
     g=raf_ci_gate_v4_check(bad,sizeof(bad));C(g.state==RAF_CI_G4_INVALID);
     g=raf_ci_gate_v4_check(0u,0u);C(g.state==RAF_CI_G4_INVALID);
     g=raf_ci_gate_v4_check(real,RAF_CI_MAX_INPUT+1u);C(g.state==RAF_CI_G4_INVALID);
+    /* Enterprise gate regressions: formerly incorrectly emitted REVIEW. */
+    {
+        const unsigned char blank_runner[]="on: push\njobs:\n  build:\n    runs-on: # absent\n    steps:\n      - run: echo ok\n";
+        const unsigned char blank_on[]="on: # absent\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo ok\n";
+        const unsigned char dup_on[]="on: push\non: pull_request\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo ok\n";
+        const unsigned char no_steps[]="on: push\njobs:\n  build:\n    runs-on: ubuntu-latest\n";
+        const unsigned char empty_steps[]="on: push\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n";
+        const unsigned char no_exec_step[]="on: push\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - name: only label\n";
+        const unsigned char positive[]="on: push\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo ok\n";
+        const unsigned char nested_event[]="on:\n  push:\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo ok\n";
+        const unsigned char split_step[]="on: push\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - name: checkout\n        run: echo ok\n";
+        const unsigned char many_jobs_bad[]="on: push\njobs:\n  first:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo ok\n  second:\n    runs-on: ubuntu-latest\n";
+        g=raf_ci_gate_v4_check(blank_runner,N(blank_runner)); C(g.state==RAF_CI_G4_HOLD && (g.gaps&RAF_CI_G4_GAP_EMPTY_BODY));
+        g=raf_ci_gate_v4_check(blank_on,N(blank_on)); C(g.state==RAF_CI_G4_HOLD && (g.gaps&RAF_CI_G4_GAP_ON));
+        g=raf_ci_gate_v4_check(dup_on,N(dup_on)); C(g.state==RAF_CI_G4_HOLD && (g.gaps&RAF_CI_G4_GAP_UNSUPPORTED));
+        g=raf_ci_gate_v4_check(no_steps,N(no_steps)); C(g.state==RAF_CI_G4_HOLD && (g.gaps&RAF_CI_G4_GAP_EMPTY_BODY));
+        g=raf_ci_gate_v4_check(empty_steps,N(empty_steps)); C(g.state==RAF_CI_G4_HOLD && (g.gaps&RAF_CI_G4_GAP_EMPTY_BODY));
+        g=raf_ci_gate_v4_check(no_exec_step,N(no_exec_step)); C(g.state==RAF_CI_G4_HOLD && (g.gaps&RAF_CI_G4_GAP_EMPTY_BODY));
+        g=raf_ci_gate_v4_check(positive,N(positive)); C(g.state==RAF_CI_G4_REVIEW && !g.gaps);
+        g=raf_ci_gate_v4_check(nested_event,N(nested_event)); C(g.state==RAF_CI_G4_REVIEW && !g.gaps);
+        g=raf_ci_gate_v4_check(split_step,N(split_step)); C(g.state==RAF_CI_G4_REVIEW && !g.gaps);
+        g=raf_ci_gate_v4_check(many_jobs_bad,N(many_jobs_bad)); C(g.state==RAF_CI_G4_HOLD && (g.gaps&RAF_CI_G4_GAP_EMPTY_BODY));
+    }
     return 0;
 }
 int main(void){return go();}
