@@ -15,7 +15,8 @@ static int test(void){
  CHECK(wire[24]==2u && (wire[8]&2u));
  CHECK((wire[8] & 2u)!=0u && (wire[9] & 12u)==12u); /* bits 10/11 */
  raf_ci_wire_v2_encode(absent,0u,wire);
- CHECK(wire[24]==1u && wire[28]==15u);
+ CHECK(wire[24]==2u && wire[28]==15u && (wire[8]&128u));
+ CHECK(raf_ci_crc32c((const unsigned char*)"123456789",9u)==0xe3069283u);
  return 0;
 }
 int main(void){return test();}
