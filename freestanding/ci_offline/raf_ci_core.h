@@ -34,9 +34,14 @@ typedef struct raf_ci_receipt_v1 {
     unsigned int fnv1a32; /* NOT an integrity signature. */
 } raf_ci_receipt_v1;
 /* ABI equality is checked at compile time, never inferred from tool name. */
-_Static_assert(sizeof(unsigned int) == 4u, "CI gate requires a 32-bit unsigned int");
-_Static_assert((unsigned char)256u == 0u, "CI gate requires 8-bit bytes");
-_Static_assert(sizeof(raf_ci_receipt_v1) == 20u, "CI receipt ABI mismatch");
+#if defined(__cplusplus)
+#define RAF_CI_COMPILE_ASSERT(x, msg) static_assert(x, msg)
+#else
+#define RAF_CI_COMPILE_ASSERT(x, msg) _Static_assert(x, msg)
+#endif
+RAF_CI_COMPILE_ASSERT(sizeof(unsigned int) == 4u, "CI gate requires a 32-bit unsigned int");
+RAF_CI_COMPILE_ASSERT((unsigned char)256u == 0u, "CI gate requires 8-bit bytes");
+RAF_CI_COMPILE_ASSERT(sizeof(raf_ci_receipt_v1) == 20u, "CI receipt ABI mismatch");
 
 #if defined(__GNUC__) || defined(__clang__)
 #define RAF_CI_INLINE static __inline__ __attribute__((always_inline))
