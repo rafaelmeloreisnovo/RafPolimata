@@ -43,7 +43,12 @@ typedef struct raf_ci_gate_v4 {
 RAF_CI_COMPILE_ASSERT(sizeof(raf_ci_gate_v4)==24u,"v4 ABI must not drift");
 /* Compare only ASCII exact characters at column 0/2. YAML quotes, aliases,
  * folded keys and flow maps intentionally remain unsupported and HOLD. */
-RAF_CI_INLINE int raf_ci_g4_colkey(const unsigned char *p,unsigned int n,const char *key,unsigned int k){
+#if defined(__GNUC__) || defined(__clang__)
+#define RAF_CI_G4_NOINLINE static __attribute__((noinline))
+#else
+#define RAF_CI_G4_NOINLINE static
+#endif
+RAF_CI_G4_NOINLINE int raf_ci_g4_colkey(const unsigned char *p,unsigned int n,const char *key,unsigned int k){
     unsigned int i;
     if(n<=k || p[k]!=':') return 0;
     for(i=0u;i<k;++i) if(p[i]!=(unsigned char)key[i]) return 0;
@@ -61,55 +66,117 @@ RAF_CI_INLINE int raf_ci_g4_job_key(const unsigned char *p,unsigned int n){
     }
     return i<n && i>2u && p[i]==':';
 }
+/* YAML subset only: a byte slice after a physical key. A scalar consisting
+ * solely of whitespace or comment is NOT evidence of a configured value.
+ * Deliberately no YAML expression evaluator or command execution. */
+RAF_CI_G4_NOINLINE int raf_ci_g4_value(const unsigned char *p,unsigned int n,unsigned int col){
+    unsigned int i=col;
+    if(i>=n || p[i]!=':') return 0;
+    ++i;
+    while(i<n && (p[i]==32u || p[i]==9u || p[i]==13u))++i;
+    return i<n && p[i]!='#';
+}
+RAF_CI_INLINE void raf_ci_g4_close_job(unsigned int active,unsigned int runner,
+    unsigned int reuse,unsigned int steps,unsigned int executable,unsigned int *gaps){
+    if(active && !((reuse && !runner && !steps) ||
+                   (!reuse && runner && steps && executable)))
+        *gaps|=RAF_CI_G4_GAP_EMPTY_BODY;
+    if(active && reuse && (runner || steps)) *gaps|=RAF_CI_G4_GAP_UNSUPPORTED;
+}
 RAF_CI_INLINE raf_ci_gate_v4 raf_ci_gate_v4_check(const unsigned char *p,unsigned int n){
     raf_ci_gate_v4 g={4u,RAF_CI_G4_HOLD,RAF_CI_G4_RISK_P1,0u,RAF_CI_G4_VOID_ALL,0u};
     unsigned char raw[RAF_CI_WIRE_SIZE];
-    unsigned int i=0u,seen_on=0u,seen_jobs=0u,seen_job=0u,jobs_scope=0u,job_pending=0u;
+    unsigned int i=0u,seen_on=0u,on_valid=0u,seen_jobs=0u,seen_job=0u;
+    unsigned int scope=0u,active=0u,runner=0u,reuse=0u,steps=0u,exe=0u,step=0u;
     unsigned int typ=raf_ci_z0_classify(p,n);
     if(typ!=RAF_CI_Z0_TEXT){
         g.state=RAF_CI_G4_INVALID;
         g.urgency=RAF_CI_G4_RISK_P0;
         g.gaps|=RAF_CI_G4_GAP_INPUT;
-        /* Avoid reading p when absent/overlength; still encode deterministic
-         * v2 HOLD for governance, never ABI changes or extra I/O. */
-        if(n<=RAF_CI_MAX_INPUT) {
+        if(n<=RAF_CI_MAX_INPUT){
             raf_ci_wire_v2_encode(p,n,raw);
             g.source_fingerprint=((unsigned int)raw[20])|((unsigned int)raw[21]<<8u)|
                 ((unsigned int)raw[22]<<16u)|((unsigned int)raw[23]<<24u);
         }
         return g;
     }
-    /* Valid text with no YAML topological evidence is never REVIEW. */
     while(i<n){
-        unsigned int e=i, b=i;
-        while(e<n && p[e]!='\n') ++e;
-        while(b<e && (p[b]==' '||p[b]=='\t')) ++b;
-        if(b<e && p[b]!='#') {
-            if(b==i) {
-                if(job_pending) { g.gaps|=RAF_CI_G4_GAP_EMPTY_BODY; job_pending=0u; }
-                if(raf_ci_g4_colkey(p+i,e-i,"on",2u)) seen_on=1u;
-                if(raf_ci_g4_colkey(p+i,e-i,"jobs",4u)) {
-                    seen_jobs=1u;
-                    jobs_scope=1u;
-                } else jobs_scope=0u;
-            } else if(jobs_scope && b==i+2u && raf_ci_g4_job_key(p+i,e-i)) {
-                if(job_pending) g.gaps|=RAF_CI_G4_GAP_EMPTY_BODY;
-                seen_job=1u;job_pending=1u;
-            } else if(jobs_scope && b==i+4u &&
-                   (raf_ci_g4_colkey(p+b,e-b,"runs-on",7u) ||
-                    raf_ci_g4_colkey(p+b,e-b,"uses",4u))) {
-                /* A runner or reusable workflow route is only a structural
-                 * hint; NEVER actual proof that a job can execute. */
-                job_pending=0u;
+        unsigned int e=i,b=i,indent;
+        while(e<n && p[e]!='\n')++e;
+        while(b<e && (p[b]==32u || p[b]==9u))++b;
+        indent=b-i;
+        if(b<e && p[b]!='#'){
+            /* Tabs in indentation and block scalars outside a YAML AST are
+             * not safely interpretable: review without positive claims. */
+            if(b!=i && p[b-1u]==9u) g.gaps|=RAF_CI_G4_GAP_UNSUPPORTED;
+            if(indent==0u){
+                raf_ci_g4_close_job(active,runner,reuse,steps,exe,&g.gaps);
+                active=runner=reuse=steps=exe=step=0u;
+                scope=0u;
+                if(raf_ci_g4_colkey(p+b,e-b,"on",2u)){
+                    if(seen_on)g.gaps|=RAF_CI_G4_GAP_UNSUPPORTED; /* duplicate root event */
+                    ++seen_on;scope=1u;
+                    if(raf_ci_g4_value(p+b,e-b,2u))on_valid=1u;
+                }else if(raf_ci_g4_colkey(p+b,e-b,"jobs",4u)){
+                    if(seen_jobs)g.gaps|=RAF_CI_G4_GAP_UNSUPPORTED;
+                    ++seen_jobs;scope=2u;
+                    if(raf_ci_g4_value(p+b,e-b,4u))g.gaps|=RAF_CI_G4_GAP_UNSUPPORTED;
+                }
+            }else if(scope==1u && indent==2u){
+                /* Nested event mapping, e.g. on:\n  push:. No scalar is
+                 * required for the event key itself. */
+                unsigned int k=0u;
+                while(b+k<e && p[b+k]!=':' && p[b+k]!=' ' && p[b+k]!='#')++k;
+                if(k && b+k<e && p[b+k]==':')on_valid=1u;
+            }else if(scope==2u){
+                if(indent==2u && raf_ci_g4_job_key(p+i,e-i)){
+                    raf_ci_g4_close_job(active,runner,reuse,steps,exe,&g.gaps);
+                    active=1u;runner=reuse=steps=exe=step=0u;
+                    seen_job=1u;
+                    /* Inline jobs require YAML interpretation (not this subset). */
+                    {unsigned int c=b;
+                     while(c<e && p[c]!=':')++c;
+                     if(raf_ci_g4_value(p+b,e-b,c-b))g.gaps|=RAF_CI_G4_GAP_UNSUPPORTED;
+                    }
+                }else if(active && indent==4u){
+                    step=0u;
+                    if(raf_ci_g4_colkey(p+b,e-b,"runs-on",7u)){
+                        if(raf_ci_g4_value(p+b,e-b,7u))runner=1u;
+                        else g.gaps|=RAF_CI_G4_GAP_EMPTY_BODY;
+                    }else if(raf_ci_g4_colkey(p+b,e-b,"uses",4u)){
+                        if(raf_ci_g4_value(p+b,e-b,4u))reuse=1u;
+                        else g.gaps|=RAF_CI_G4_GAP_EMPTY_BODY;
+                    }else if(raf_ci_g4_colkey(p+b,e-b,"steps",5u)){
+                        if(raf_ci_g4_value(p+b,e-b,5u))g.gaps|=RAF_CI_G4_GAP_UNSUPPORTED;
+                        else steps=1u;
+                    }
+                }else if(active && steps && indent==6u && p[b]=='-' && b+1u<e && p[b+1u]==' '){
+                    unsigned int v=b+2u;
+                    step=1u;
+                    if(raf_ci_g4_colkey(p+v,e-v,"run",3u)){
+                        if(raf_ci_g4_value(p+v,e-v,3u))exe=1u;
+                        else g.gaps|=RAF_CI_G4_GAP_EMPTY_BODY;
+                    }else if(raf_ci_g4_colkey(p+v,e-v,"uses",4u)){
+                        if(raf_ci_g4_value(p+v,e-v,4u))exe=1u;
+                        else g.gaps|=RAF_CI_G4_GAP_EMPTY_BODY;
+                    }
+                }else if(active && steps && step && indent==8u){
+                    if(raf_ci_g4_colkey(p+b,e-b,"run",3u)){
+                        if(raf_ci_g4_value(p+b,e-b,3u))exe=1u;
+                        else g.gaps|=RAF_CI_G4_GAP_EMPTY_BODY;
+                    }else if(raf_ci_g4_colkey(p+b,e-b,"uses",4u)){
+                        if(raf_ci_g4_value(p+b,e-b,4u))exe=1u;
+                        else g.gaps|=RAF_CI_G4_GAP_EMPTY_BODY;
+                    }
+                }
             }
         }
         i=e<n?e+1u:n;
     }
-    if(job_pending)g.gaps|=RAF_CI_G4_GAP_EMPTY_BODY;
-    if(!seen_on)g.gaps|=RAF_CI_G4_GAP_ON;
+    raf_ci_g4_close_job(active,runner,reuse,steps,exe,&g.gaps);
+    if(!seen_on || !on_valid)g.gaps|=RAF_CI_G4_GAP_ON;
     if(!seen_jobs)g.gaps|=RAF_CI_G4_GAP_JOBS;
     if(!seen_job)g.gaps|=RAF_CI_G4_GAP_JOB_DECL;
-    /* Retain V2 wire as an independent historical contract, no new layout. */
     raf_ci_wire_v2_encode(p,n,raw);
     g.source_fingerprint=((unsigned int)raw[20])|((unsigned int)raw[21]<<8u)|
         ((unsigned int)raw[22]<<16u)|((unsigned int)raw[23]<<24u);
@@ -120,4 +187,5 @@ RAF_CI_INLINE raf_ci_gate_v4 raf_ci_gate_v4_check(const unsigned char *p,unsigne
     if(!g.gaps)g.state=RAF_CI_G4_REVIEW;
     return g;
 }
+
 #endif
