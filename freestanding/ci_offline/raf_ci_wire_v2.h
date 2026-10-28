@@ -80,6 +80,7 @@ RAF_CI_INLINE unsigned int raf_ci_extra_policy(const unsigned char *p,unsigned i
 RAF_CI_INLINE void raf_ci_wire_v2_encode(const unsigned char *p,unsigned int n,unsigned char out[RAF_CI_WIRE_SIZE]) {
     raf_ci_receipt_v1 r=raf_ci_probe(p,n);
     unsigned int flags=r.flags | raf_ci_extra_policy(p,n);
+    if (n==0u) flags|=RAF_CI_MALFORMED; /* Empty source is evidence absence, not reviewable workflow. */
     unsigned int state= (flags & RAF_CI_V2_HOLD_BITS) ? RAF_CI_WIRE_STATE_HOLD : RAF_CI_WIRE_STATE_STATIC_REVIEW;
     unsigned int i;
     for (i=0u;i<RAF_CI_WIRE_SIZE;++i) out[i]=0u;
