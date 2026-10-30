@@ -92,7 +92,7 @@ static inline bitraf_u32 raf_ev3_digits20_to_index(bitraf_u8 d0,bitraf_u8 d1,
     return RAF_EV3_OK;
 }
 /* Resolve historical core coordinate without aliasing it to serialization page.
- * Returns 1 for a valid shell state, 2 for invalid input. Output unchanged
+ * Returns nonzero for a shell or invalid state. Output unchanged
  * on any failure, as the original core_index4096 contract requires. */
 static inline bitraf_u32 raf_ev3_historical_core_index(bitraf_state s,
         bitraf_u16 *out_core_index) {
