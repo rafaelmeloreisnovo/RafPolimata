@@ -97,6 +97,13 @@ This is an additive source tranche; do not promote structural views into loader,
 - `tests/verify_cognitive_v1.sh` — hosted O0/O2/O3 and six no-undefined architecture probes.
 - Provider adapter and physical device runtime remain TOKEN_VAZIO; this L0 contains no network or SQL.
 
+## Guard Supervisor L0 V1 — dual watchdog, fail-closed
+
+- [GUARD_SUPERVISOR_V1.md](GUARD_SUPERVISOR_V1.md) — threat model, academic falsifiers, fallback/failover/rollback boundaries and producer/adapter contract.
+- `include/raf_fs_guard_supervisor_v1.h` — pure dual-witness decision policy and typed TOKEN_VAZIO (not hardware watchdog implementation).
+- `tests/verify_guard_supervisor_v1.sh` — 51 host checks plus 256 watchdog combinations, six zero-runtime target object probes.
+- The ELF/DEX inspection and NUMA advisory caps are *declared metadata*, and ART requires hosted external observation. Supabase/storage, host clock, real failover and rollback remain outside L0.
+
 ## Gates
 
 ```text

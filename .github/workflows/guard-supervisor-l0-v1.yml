@@ -1,0 +1,27 @@
+name: Guard Supervisor L0 - double watchdog falsifiers
+on:
+  pull_request:
+    paths:
+      - "freestanding/include/raf_fs_guard_supervisor_v1.h"
+      - "freestanding/tests/raf_fs_guard_supervisor_v1_*"
+      - "freestanding/tests/verify_guard_supervisor_v1.sh"
+      - "freestanding/GUARD_SUPERVISOR_V1.md"
+      - "freestanding/README.md"
+      - ".github/workflows/guard-supervisor-l0-v1.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  supervisor-l0:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: L0 source and comment contract
+        run: sh freestanding/tests/verify_contract.sh
+      - name: Dual watchdog and failover falsifiers
+        run: sh freestanding/tests/verify_guard_supervisor_v1.sh
+      - name: Regression - cognitive Q16
+        run: sh freestanding/tests/verify_cognitive_v1.sh
+      - name: Regression - ELF DEX NUMA views
+        run: sh freestanding/tests/verify_formats_numa.sh
