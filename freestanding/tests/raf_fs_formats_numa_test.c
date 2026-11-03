@@ -201,6 +201,17 @@ int main(void) {
     topo.node_count=0u;
     CHECK(raf_fs_numa_choose(&topo,5u,&v)==RAF_FS_NUMA_TOPOLOGY_UNKNOWN&&v==1u,29);
     CHECK(RAF_FS_NUMA_TOPOLOGY_UNKNOWN!=0u&&RAF_FS_NUMA_NO_ALLOWED!=RAF_FS_NUMA_NO_FIT,30);
+    /* Full 8-node topology: bit 8 is out of range, not NO_FIT.
+     * Output must stay unchanged on rejected input. */
+    numa_fixture(&topo);
+    topo.node_count=8u;topo.allowed_mask=0x100u;
+    for (i=0u;i<8u;++i) {
+        raf_u32 j;
+        for (j=0u;j<8u;++j) topo.distance[i*8u+j]=(raf_u8)(i==j?10u:20u);
+    }
+    CHECK(raf_fs_numa_choose(&topo,1u,&v)==RAF_FS_NUMA_BAD_INPUT&&v==1u,35);
+    topo.allowed_mask=0x80u;topo.capacity_pages[7]=5u;
+    CHECK(raf_fs_numa_choose(&topo,1u,&v)==RAF_FS_NUMA_SELECTED&&v==7u,36);
     { int doom=doom_formats_properties(); if(doom) return doom; }
     return 0;
 }
