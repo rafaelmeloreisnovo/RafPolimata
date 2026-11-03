@@ -1,20 +1,12 @@
 #include "rafpolimata_v1.h"
+#include "../../../freestanding/include/raf_fs_crc32c.h"
 
-static rafp_u32 rafp_crc32c_byte(rafp_u32 crc, rafp_u8 byte) {
-    crc ^= byte;
-    for (rafp_u32 bit = 0; bit < 8u; bit++) {
-        rafp_u32 mask = 0u - (crc & 1u);
-        crc = (crc >> 1) ^ (0x82F63B78u & mask);
-    }
-    return crc;
-}
-
+/* Hosted SDK ABI wrapper; invalid NULL/nonzero-length retains v1 fail-closed return.
+ * CRC32C arithmetic is owned by the OS-neutral L0 kernel. */
 rafp_u32 rafp_v1_crc32c(const void *data, rafp_size len, rafp_u32 seed) {
     if (!data && len != 0u) return 0u;
-    const rafp_u8 *p = (const rafp_u8 *)data;
-    rafp_u32 crc = ~seed;
-    while (len--) crc = rafp_crc32c_byte(crc, *p++);
-    return ~crc;
+    return (rafp_u32)raf_fs_crc32c_update((const raf_u8 *)data,
+                                          (raf_usize)len, (raf_u32)seed);
 }
 
 rafp_q16 rafp_v1_q16_mul(rafp_q16 a, rafp_q16 b) {
