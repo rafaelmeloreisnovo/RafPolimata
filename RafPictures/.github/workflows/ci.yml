@@ -1,0 +1,33 @@
+name: RafPictures Standalone Contract
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Python roundtrip + tamper/fail-safe tests
+        run: |
+          python3 -m compileall -q rafpictures
+          python3 -m unittest discover -s tests -v
+          sh -n scripts/publish-standalone.sh
+      - name: C11 freestanding header smoke
+        shell: bash
+        run: |
+          cat > /tmp/rafp_smoke.c <<'C'
+          #include "rafpictures_sniff.h"
+          int main(void) {
+              const unsigned char png[] = {137,80,78,71,13,10,26,10};
+              return rafp_detect(png, sizeof(png)) == RAFP_PNG ? 0 : 1;
+          }
+          C
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -I include /tmp/rafp_smoke.c -o /tmp/rafp_smoke
+          /tmp/rafp_smoke
