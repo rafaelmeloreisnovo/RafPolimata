@@ -48,6 +48,8 @@ jobs:
         run: clang --version
       - name: Freestanding source contract
         run: sh freestanding/tests/verify_contract.sh
+      - name: Freestanding CRC32C KAT and six-ISA boundary
+        run: sh freestanding/tests/verify_crc32c.sh
       - name: Authorial zero-dependency V1
         run: sh freestanding/tests/verify_authorial_zero_dep.sh
       - name: Z0 contextless tokenization
