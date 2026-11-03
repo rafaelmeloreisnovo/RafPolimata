@@ -90,6 +90,13 @@ CLOSURE_L15 binds unresolved source/rights/runtime evidence in this exact scope;
 
 This is an additive source tranche; do not promote structural views into loader, DEX runtime, physical NUMA binding or scientific performance claims. Missing rights, independent review and device receipts stay `TOKEN_VAZIO`.
 
+## Cognitive L0 V1 — bounded authorial kernel
+
+- [COGNITIVE_L0_V1.md](COGNITIVE_L0_V1.md) — scope, 10x10x10/Q16, Supabase boundary, falsifiers and rollback.
+- `include/raf_fs_cognitive_v1.h` — deterministic caller-owned state with typed missingness, no libc/heap.
+- `tests/verify_cognitive_v1.sh` — hosted O0/O2/O3 and six no-undefined architecture probes.
+- Provider adapter and physical device runtime remain TOKEN_VAZIO; this L0 contains no network or SQL.
+
 ## Gates
 
 ```text
