@@ -47,7 +47,7 @@ int main(void) {
     n=sizeof out;
     CHECK(rf_sql(&d,"SELECT value FROM rafdb WHERE key='foo';",40,out,&n)==RF_OK &&
           n==3 && out[2]=='z');
-    CHECK(rf_sql(&d,"DELETE FROM rafdb WHERE key='foo';",33,out,&n)==RF_OK);
+    CHECK(rf_sql(&d,"DELETE FROM rafdb WHERE key='foo';",34,out,&n)==RF_OK);
     CHECK(rf_sql(&d,"INSERT INTO rafdb VALUES ('foo','bar');DROP",43,out,&n)==RF_INVALID);
     printf("RAFDB bounded core PASS; volatile+callback records; no persistence/Oracle/MySQL wire claim\n");
     return 0;
