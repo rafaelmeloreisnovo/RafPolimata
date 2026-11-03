@@ -39,7 +39,8 @@ raf_fs_numa_choose(const raf_fs_numa_snapshot *s, raf_u32 required_pages,
     if (s->node_count>RAF_FS_NUMA_MAX_NODES || s->origin>=s->node_count)
         return RAF_FS_NUMA_BAD_INPUT;
     n=s->node_count;
-    if ((n<8u && (s->allowed_mask >> n)!=0u)) return RAF_FS_NUMA_BAD_INPUT;
+    /* n is bounded to 1..8: reject out-of-topology bits even at n == 8. */
+    if ((s->allowed_mask >> n)!=0u) return RAF_FS_NUMA_BAD_INPUT;
     /* All topology constraints are checked before selection to avoid fabricated confidence. */
     for (i=0u;i<n;++i) {
         if (s->used_pages[i]>s->capacity_pages[i] ||
