@@ -11,3 +11,8 @@
 The probes must never be linked into production images unless explicitly requested.
 
 `raf_z0_token_test.c` and `raf_z0_probe.c` falsify the Z0 boundary: `ABSENT != EMPTY != NUL != SPACE`, no synthetic token for an empty view, byte-zero preserved as data, and exact zero counts for context/attention/learned-weight/vocabulary/history machinery. `verify_z0_token.sh` also rejects unresolved helpers and cross-compiles the probe for x86_64, i686, ARMv7, AArch64, RV32 and RV64.
+
+`verify_crc32c.sh` verifies the authorial bytewise CRC32C kernel with the
+Castagnoli `123456789` KAT, chunked-update equivalence, zero-length behavior,
+and six freestanding target object builds with no unresolved symbols. These are
+compile/equivalence gates, not physical ARM/RISC-V runtime receipts.
