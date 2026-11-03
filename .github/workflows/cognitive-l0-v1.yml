@@ -1,0 +1,21 @@
+name: Cognitive L0 V1 - bounded falsifiers
+on:
+  pull_request:
+    paths:
+      - "freestanding/include/raf_fs_cognitive_v1.h"
+      - "freestanding/tests/raf_fs_cognitive_v1_*"
+      - "freestanding/tests/verify_cognitive_v1.sh"
+      - "freestanding/COGNITIVE_L0_V1.md"
+      - ".github/workflows/cognitive-l0-v1.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cognitive-l0:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Host falsifiers and six target objects
+        shell: bash
+        run: sh freestanding/tests/verify_cognitive_v1.sh
