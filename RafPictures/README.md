@@ -55,3 +55,11 @@ Máximo 128 objetos, 512 MiB por objeto, total 4 GiB, manifesto <= 1 MiB. O V1 e
 **Licença:** consultar `LICENSE_POLICY.md`. **Proveniência:** imagem fonte ≠ pacote ≠ preview ≠ execução ≠ evidência.
 
 **Separação futura:** diretório autocontido para migração a um repositório independente `RafPictures`, sem alterar `main` nem apagar o módulo precursor.
+
+## Publicar um repositório GitHub independente (somente por execução explícita)
+
+O conector da sessão não tem permissão de provisionar um repositório. Em um checkout da branch `feat/rafpictures-v1-container` do RafPolimata, com `git` e `gh` autenticados como `rafaelmeloreisnovo`, execute:
+
+    sh RafPictures/scripts/publish-standalone.sh
+
+Por padrão, cria `rafaelmeloreisnovo/RafPictures` **privado**, inicializa com os arquivos da subpasta, acrescenta `SOURCE_REF.txt` com o commit de proveniência e publica `main`. O script **não** é executado pelo CI, recusa sobrescrever repositório existente e requer autenticação via `gh auth login`; para publicar abertamente, a decisão deve ser explícita com `VISIBILITY=public`. Se a criação ocorrer e o push falhar, o repositório recém-criado poderá existir vazio; verifique antes de repetir a operação. O histórico anterior continua acessível pelo commit de origem, mas não é transportado como ancestry para o repositório novo.
