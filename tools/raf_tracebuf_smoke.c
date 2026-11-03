@@ -33,6 +33,13 @@ int main(void) {
     raf_trace_sink_t s;
     raf_trace_event_t e;
 
+    /* 16/16 nibble equivalence; high nibble must not affect LUT indexing. */
+    static const char expected_digits[] = "0123456789abcdef";
+    for (unsigned i = 0u; i < 16u; ++i) {
+        if (raf_trace_hex4((uint8_t)i) != expected_digits[i]) return 7;
+        if (raf_trace_hex4((uint8_t)(i | 0xf0u)) != expected_digits[i]) return 8;
+    }
+
     mem.p = out;
     mem.cap = sizeof(out);
     mem.len = 0u;
