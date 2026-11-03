@@ -4,7 +4,12 @@
 #include "Benchmark/raf_trace_buffer.h"
 
 RAF_TRACEBUF_INLINE char raf_trace_hex4(uint8_t x) {
-    static const char lut[16] = "0123456789abcdef";
+    /* Indexed 16-byte alphabet: no terminating NUL is needed or stored.
+     * An initializer string would be 17 bytes and fails GCC -Werror. */
+    static const char lut[16] = {
+        '0', '1', '2', '3', '4', '5', '6', '7',
+        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+    };
     return lut[x & 15u];
 }
 
