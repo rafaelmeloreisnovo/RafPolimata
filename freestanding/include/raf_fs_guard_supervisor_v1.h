@@ -92,7 +92,9 @@ raf_fs_guard_pair(const raf_fs_guard_route *route,
     if (a->observer_ref==b->observer_ref ||
         a->evidence_ref==b->evidence_ref ||
         a->observer_ref==a->evidence_ref ||
-        b->observer_ref==b->evidence_ref)
+        b->observer_ref==b->evidence_ref ||
+        a->observer_ref==b->evidence_ref ||
+        b->observer_ref==a->evidence_ref)
         return RAF_FS_GUARD_INVALID;
     if (a->heartbeat_tick>policy->now_tick ||
         b->heartbeat_tick>policy->now_tick ||
@@ -154,7 +156,15 @@ raf_fs_guard_select(const raf_fs_guard_route *primary,
             primary->watchdog_a.evidence_ref==secondary->watchdog_a.evidence_ref ||
             primary->watchdog_a.evidence_ref==secondary->watchdog_b.evidence_ref ||
             primary->watchdog_b.evidence_ref==secondary->watchdog_a.evidence_ref ||
-            primary->watchdog_b.evidence_ref==secondary->watchdog_b.evidence_ref)
+            primary->watchdog_b.evidence_ref==secondary->watchdog_b.evidence_ref ||
+            primary->watchdog_a.observer_ref==secondary->watchdog_a.evidence_ref ||
+            primary->watchdog_a.observer_ref==secondary->watchdog_b.evidence_ref ||
+            primary->watchdog_b.observer_ref==secondary->watchdog_a.evidence_ref ||
+            primary->watchdog_b.observer_ref==secondary->watchdog_b.evidence_ref ||
+            primary->watchdog_a.evidence_ref==secondary->watchdog_a.observer_ref ||
+            primary->watchdog_a.evidence_ref==secondary->watchdog_b.observer_ref ||
+            primary->watchdog_b.evidence_ref==secondary->watchdog_a.observer_ref ||
+            primary->watchdog_b.evidence_ref==secondary->watchdog_b.observer_ref)
             return RAF_FS_GUARD_INVALID;
         b=raf_fs_guard_pair(secondary,policy);
         if (b==RAF_FS_GUARD_INVALID || b==RAF_FS_GUARD_TOKEN_VAZIO) return b;

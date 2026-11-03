@@ -127,6 +127,27 @@ int main(void) {
     p.watchdog_b.evidence_ref=0u;
     CHECK(raf_fs_guard_select(&p,&b,&policy,&out)==RAF_FS_GUARD_TOKEN_VAZIO,47);
     p.watchdog_b.evidence_ref=202u;
+    /* Reject cross-role witness/evidence collisions within primary pair. */
+    out.route_kind=0xFFFu;
+    p.watchdog_a.observer_ref=p.watchdog_b.evidence_ref;
+    CHECK(raf_fs_guard_select(&p,&b,&policy,&out)==RAF_FS_GUARD_INVALID &&
+          out.route_kind==0xFFFu,48);
+    p.watchdog_a.observer_ref=101u;
+    p.watchdog_b.observer_ref=p.watchdog_a.evidence_ref;
+    CHECK(raf_fs_guard_select(&p,&b,&policy,&out)==RAF_FS_GUARD_INVALID &&
+          out.route_kind==0xFFFu,49);
+    p.watchdog_b.observer_ref=102u;
+    /* Reject cross-role collisions across primary and secondary fault domains. */
+    p.watchdog_a.verdict=RAF_FS_WD_FAULT;
+    p.watchdog_b.verdict=RAF_FS_WD_FAULT;
+    b.watchdog_a.evidence_ref=p.watchdog_a.observer_ref;
+    CHECK(raf_fs_guard_select(&p,&b,&policy,&out)==RAF_FS_GUARD_INVALID &&
+          out.route_kind==0xFFFu,50);
+    b.watchdog_a.evidence_ref=203u;
+    b.watchdog_b.observer_ref=p.watchdog_b.evidence_ref;
+    CHECK(raf_fs_guard_select(&p,&b,&policy,&out)==RAF_FS_GUARD_INVALID &&
+          out.route_kind==0xFFFu,51);
+    b.watchdog_b.observer_ref=104u;
     /* Falsifier sweep: independent pair consensus; no accidental promotion. */
     p.watchdog_a.verdict=RAF_FS_WD_ALIVE;
     p.watchdog_b.verdict=RAF_FS_WD_ALIVE;

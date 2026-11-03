@@ -12,7 +12,7 @@ for opt in 0 2 3; do
   "$CC" -std=c11 -Wall -Wextra -Werror "-O$opt" "$SOURCE" -o "$TMP/test-$opt"
   "$TMP/test-$opt"
 done
-printf '%s\n' 'PASS: 47 assertions including 256 dual-watchdog combinations, O0/O2/O3'
+printf '%s\n' 'PASS: 51 assertions including 256 dual-watchdog combinations, O0/O2/O3'
 for target in x86_64-unknown-none i686-unknown-none armv7a-none-eabi aarch64-none-elf riscv32-unknown-elf riscv64-unknown-elf; do
   "$CC" -target "$target" -std=c11 -Wall -Wextra -Werror -O2 -ffreestanding -fno-builtin -fno-stack-protector -nostdinc -c "$PROBE" -o "$TMP/$target.o"
   "$NM" -u "$TMP/$target.o" > "$TMP/$target.undefined"

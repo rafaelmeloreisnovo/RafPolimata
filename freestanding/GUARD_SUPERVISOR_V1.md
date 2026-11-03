@@ -37,10 +37,11 @@ Source ≠ Artifact ≠ Execution ≠ Evidence ≠ Claim. A returned PRIMARY/FAI
 ## Falsification executed, reproducible gates
 
 Run `sh freestanding/tests/verify_guard_supervisor_v1.sh`:
-- 47 numbered host assertions at Clang O0/O2/O3, plus 256 repeated combinations of dual-watchdog statuses and unchanged-output rejection checks.
+- 51 numbered host assertions at Clang O0/O2/O3, plus 256 repeated combinations of dual-watchdog statuses and unchanged-output rejection checks.
 - Six target objects compiled with Clang -ffreestanding -nostdinc -fno-builtin: x86_64, i686, ARMv7, AArch64, RV32, RV64. Each must have zero unresolved imports.
 - Local additional GCC O2 and Clang ASan+UBSan tests; ARMv7/AArch64 inspected for direct call instructions.
-- Exact source blobs SHA1: header 26a502f8c6a91fe83cbbdd88658c059c0b4d37f9; test aca1714428472c09627499e33ca3d5dcd4533e30; probe f06edbaa15eea088eee196c5dbacbc1103baf7b0; shell 480a7aab6938fe8fd757614396d838efd1c9b810.
+- Predecessor V1 Git blob SHA1 refs (before the cross-role collision hotfix): header 26a502f8c6a91fe83cbbdd88658c059c0b4d37f9; test aca1714428472c09627499e33ca3d5dcd4533e30; probe f06edbaa15eea088eee196c5dbacbc1103baf7b0; shell 480a7aab6938fe8fd757614396d838efd1c9b810. Current exact-head source hashes must be read back after mutation.
+- Hotfix: all observer/evidence references must be distinct within each watchdog pair and across the two candidate routes. Four negative checks cover collision rejection with unchanged output; this is only identifier-level hygiene, not proof of independent physical fault domains.
 
 These establish host/test and compiler-object properties only. Supabase API E2E, physical watchdog independence, ART, NUMA placement, exact-head CI, mobile execution, formal verification and external falsification: TOKEN_VAZIO until executed.
 
