@@ -1,0 +1,42 @@
+name: Runtime morph v1 (scoped, no-device)
+on:
+  pull_request:
+    paths:
+      - 'Benchmark/raf_runtime_morph_v1.h'
+      - 'Benchmark/raf_runtime_morph_v1_test.c'
+      - 'Benchmark/raf_types.h'
+      - '.github/workflows/runtime-morph-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host-falsifiers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile, run, verify freestanding object dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          for cc in gcc clang; do
+            "$cc" -std=c11 -O2 -Wall -Wextra -Werror -ffreestanding -fno-builtin -fno-stack-protector \
+              -I Benchmark Benchmark/raf_runtime_morph_v1_test.c -o "${RUNNER_TEMP}/morph_${cc}"
+            "${RUNNER_TEMP}/morph_${cc}"
+            "$cc" -std=c11 -O2 -Wall -Wextra -Werror -ffreestanding -fno-builtin -fno-stack-protector \
+              -I Benchmark -c Benchmark/raf_runtime_morph_v1_test.c -o "${RUNNER_TEMP}/morph_${cc}.o"
+            test -z "$(nm -u "${RUNNER_TEMP}/morph_${cc}.o")"
+          done
+      - name: ARM32 and ARM64 compile-only (NOT device execution)
+        shell: bash
+        run: |
+          set -euo pipefail
+          clang -target armv7a-none-eabi -march=armv7-a -mfpu=neon -mfloat-abi=softfp \
+            -std=c11 -O2 -Wall -Wextra -Werror -ffreestanding -fno-builtin \
+            -I Benchmark -c Benchmark/raf_runtime_morph_v1_test.c -o "${RUNNER_TEMP}/morph_arm32.o"
+          clang -target aarch64-none-elf -march=armv8-a \
+            -std=c11 -O2 -Wall -Wextra -Werror -ffreestanding -fno-builtin \
+            -I Benchmark -c Benchmark/raf_runtime_morph_v1_test.c -o "${RUNNER_TEMP}/morph_arm64.o"
+          test -z "$(nm -u "${RUNNER_TEMP}/morph_arm32.o")"
+          test -z "$(nm -u "${RUNNER_TEMP}/morph_arm64.o")"
+          echo 'PASS_SCOPED host, object, cross-compile; DEVICE=TOKEN_VAZIO'
