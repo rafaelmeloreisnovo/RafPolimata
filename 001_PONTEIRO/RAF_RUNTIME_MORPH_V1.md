@@ -1,0 +1,12 @@
+# 001_PONTEIRO — Runtime Morph V1
+- SOURCE: Benchmark/raf_runtime_morph_v1.h
+- TEST: Benchmark/raf_runtime_morph_v1_test.c
+- CONTRACT: docs/architecture/RAF_RUNTIME_MORPH_V1.md
+- CI: .github/workflows/runtime-morph-v1.yml
+- BASE: RafPolimata main@88a6c840fc64271bb7d4f5854be42529ddffec85
+- MODE: additive, opt-in, DRAFT/HOLD; no previous code changed
+- DEPTH: 5 components inspected; 6 files deeper than 5 explicitly out of scope
+- EVIDENCE: local GCC/Clang host, ASan/UBSan, ARM32/ARM64 object compilation PASS_SCOPED
+- TOKEN_VAZIO: device NEON, actual executor, physical failover, persistent rollback, acoustics/quantum proof
+- ROLLBACK: close draft branch, keep main unchanged
+- CLAIM_ALLOWED: false
