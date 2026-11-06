@@ -1,0 +1,20 @@
+name: RAFDB bounded C11 contract
+on:
+  pull_request:
+    paths:
+      - 'RAFDB/**'
+      - '.github/workflows/rafdb-contract.yml'
+  workflow_dispatch:
+concurrency:
+  group: rafdb-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  l0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Bounded core and SQL subset
+        run: sh RAFDB/tests/run.sh
