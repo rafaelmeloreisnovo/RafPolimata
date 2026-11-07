@@ -1,0 +1,55 @@
+name: BITRAF checked base20 boundary (no promotion)
+on:
+  pull_request:
+    paths:
+      - 'rafaelia/bitraf_base20_checked_v1.h'
+      - 'tests/bitraf_base20_checked_v1_test.c'
+      - 'tests/bitraf_base20_checked_v1_freestanding.c'
+      - 'docs/FIAT_BITRAF_BASE20_BOUNDARY_20261106_V1.md'
+      - '.github/workflows/bitraf-base20-checked-v1.yml'
+permissions:
+  contents: read
+jobs:
+  exact-head-falsifiers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout exact HEAD without persisted credentials
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert source identity
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          git hash-object rafaelia/bitraf_matrix.h
+          git hash-object rafaelia/bitraf_base20_checked_v1.h
+      - name: GCC and Clang exhaustive strict boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic tests/bitraf_base20_checked_v1_test.c -o /tmp/b20c_cc
+          clang -std=c11 -O2 -Wall -Wextra -Werror -pedantic tests/bitraf_base20_checked_v1_test.c -o /tmp/b20c_clang
+          /tmp/b20c_cc > /tmp/b20c_cc.receipt
+          /tmp/b20c_clang > /tmp/b20c_clang.receipt
+          cmp /tmp/b20c_cc.receipt /tmp/b20c_clang.receipt
+          grep -Fx 'BITRAF_B20C=PASS_SCOPED' /tmp/b20c_cc.receipt
+          grep -Fx 'EXHAUSTIVE=8000 STRICT_CANONICAL=YES INVALID=REJECTED' /tmp/b20c_cc.receipt
+          grep -Fx 'CLAIM_ALLOWED=false PHYSICAL_ARM32=TOKEN_VAZIO' /tmp/b20c_cc.receipt
+          sha256sum /tmp/b20c_cc.receipt /tmp/b20c_clang.receipt
+      - name: Compile freestanding ARMv7 object without undefined references
+        shell: bash
+        run: |
+          set -euo pipefail
+          clang --target=armv7-none-eabi -march=armv7-a -mfloat-abi=soft \
+            -std=c11 -O2 -Wall -Wextra -Werror -pedantic -ffreestanding \
+            -fno-builtin -fno-stack-protector -nostdlib -c \
+            tests/bitraf_base20_checked_v1_freestanding.c -o /tmp/b20c_armv7.o
+          readelf -h /tmp/b20c_armv7.o | grep -E 'Machine:.*ARM'
+          test -z "$(nm -u /tmp/b20c_armv7.o)"
+          sha256sum /tmp/b20c_armv7.o
+          echo 'NOT_RUN: physical ARM32 device, FIAT64/base60 codec, BLAKE3'
