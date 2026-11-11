@@ -1,0 +1,77 @@
+name: ApkC release signature receipt
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sign-and-receipt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+
+      - name: Resolve signing gate
+        id: gate
+        shell: bash
+        env:
+          KEYSTORE: ${{ secrets.RLL_RELEASE_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.RLL_RELEASE_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RLL_RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.RLL_RELEASE_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$KEYSTORE" && -n "$STORE_PASSWORD" && -n "$KEY_ALIAS" && -n "$KEY_PASSWORD" ]]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'TOKEN_VAZIO_RELEASE_SIGNING_SECRETS'
+          fi
+
+      - name: Resolve apksigner
+        if: ${{ steps.gate.outputs.ready == 'true' }}
+        id: tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          apksigner="$(find "$ANDROID_HOME/build-tools" -mindepth 2 -maxdepth 2 -type f -name apksigner -print | sort -V | tail -n 1)"
+          test -x "$apksigner"
+          echo "apksigner=$apksigner" >> "$GITHUB_OUTPUT"
+
+      - name: Produce unsigned ApkC fixture
+        if: ${{ steps.gate.outputs.ready == 'true' }}
+        run: bash scripts/apkc_validate.sh
+
+      - name: Sign release APK
+        if: ${{ steps.gate.outputs.ready == 'true' }}
+        env:
+          APKSIGNER: ${{ steps.tools.outputs.apksigner }}
+          RLL_RELEASE_KEYSTORE_BASE64: ${{ secrets.RLL_RELEASE_KEYSTORE_BASE64 }}
+          RLL_RELEASE_STORE_PASSWORD: ${{ secrets.RLL_RELEASE_STORE_PASSWORD }}
+          RLL_RELEASE_KEY_ALIAS: ${{ secrets.RLL_RELEASE_KEY_ALIAS }}
+          RLL_RELEASE_KEY_PASSWORD: ${{ secrets.RLL_RELEASE_KEY_PASSWORD }}
+        run: sh scripts/apkc_sign_release.sh
+
+      - name: Emit bounded signature receipt
+        if: ${{ steps.gate.outputs.ready == 'true' }}
+        uses: rafaelmeloreisnovo/RafGitTools/actions/apk-signature-receipt@6f0bf9e513d6d8c4fa5f070b16c855cd2cba3f47
+        with:
+          apk-path: Apkc/proofs/out/hello-release-signed.apk
+          apksigner: ${{ steps.tools.outputs.apksigner }}
+          output-dir: Apkc/proofs/release-signature-receipt
+
+      - name: Upload signed APK and receipt
+        if: ${{ steps.gate.outputs.ready == 'true' }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: rafpolimata-release-signature-${{ github.run_id }}
+          path: |
+            Apkc/proofs/out/hello-release-signed.apk
+            Apkc/proofs/release-signature-receipt/
+          if-no-files-found: error
+          retention-days: 90
