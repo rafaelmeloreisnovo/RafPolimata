@@ -250,3 +250,10 @@ This documentation transaction does not claim those commands were executed again
 - **F_ok:** canonical index now routes current freestanding/PBIP state and explicitly separates historical generated outputs.
 - **F_gap:** full generator refresh/current review queue remains unexecuted in this docs-only transaction.
 - **F_next:** regenerate through the repository tool, then review/publish the resulting queue without manually editing derived files.
+
+## Roll-map de caminhos tipados e redes estruturais (candidato, 2026-11-21)
+
+- [Contrato de identidade e caminhos](ROLLMAP_TYPED_PATH_CONTRACT_V1.md) — busca multinível, Unicode, zero byte, fragmentos de hash, proveniência e STOPWALK.
+- `../contracts/rollmap-typed-path-v1.json` — contrato machine-readable; índices privados não incorporados.
+- `../tests/test_rollmap_typed_path_contract_v1.py` — teste sintético. Executor read-only de referência no RafGitTools; Mapa possui roteamento federado.
+- `IMPLEMENTED_UNTESTED` até gate atual; sem claim de runtime ARM ou acesso remoto Drive.
