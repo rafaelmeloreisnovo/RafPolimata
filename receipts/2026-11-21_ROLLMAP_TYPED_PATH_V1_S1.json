@@ -1,0 +1,39 @@
+{
+  "schema": "rafaelia.rollmap.consumer-contract-receipt.v1",
+  "date_utc": "2026-11-21",
+  "repository": "rafaelmeloreisnovo/RafPolimata",
+  "stage": "S1",
+  "source_base_main": "714be9f4f3058279c6ce50afb581c2bb7ea8e2cb",
+  "predecessor_commit": "848ff6a4791b6817d1236f73fc85aa89de5425eb",
+  "branch": "feature/rollmap-typed-path-v1-20261121",
+  "task": "typed identity, directory/path/query contracts, SHA fragments and STOPWALK gate",
+  "artifacts": {
+    "contract": {
+      "path": "contracts/rollmap-typed-path-v1.json",
+      "git_blob_sha1": "bbaef93d8811690cec0a1d4c799ae1bc4060389f"
+    },
+    "documentation": {
+      "path": "docs/ROLLMAP_TYPED_PATH_CONTRACT_V1.md",
+      "git_blob_sha1": "adfd2d882e527d558674040216a28600fecc81d1"
+    },
+    "test": {
+      "path": "tests/test_rollmap_typed_path_contract_v1.py",
+      "git_blob_sha1": "2ca64c4fa4167e15cba3752300676141320045af"
+    },
+    "index": {
+      "path": "docs/INDEX.md",
+      "git_blob_sha1": "97787f8e0ce3bd0c14ecf746b720c81c92a8197f"
+    }
+  },
+  "js_contract_structure_assertions": "PASS_SCOPED_15_OF_15_EXACT_BRANCH",
+  "python_unittest": "TOKEN_VAZIO_NOT_RUN",
+  "android": "TOKEN_VAZIO_NOT_RUN",
+  "contract_federation": "TOKEN_VAZIO_NOT_APPROVED",
+  "public_data_policy": "NO_PERSONAL_DRIVE_CONTENT",
+  "claim_allowed": false,
+  "automatic_merge": false,
+  "rolled_out": false,
+  "stop_condition": "No source-private metadata, no global claim, no codegen/runtime modification, no merge without human gate",
+  "rollback": "Keep main unchanged; use additive corrective successor/revert when authorized",
+  "next": "Cross-producer schema smoke, document governance and exact-HEAD CI after approval"
+}
