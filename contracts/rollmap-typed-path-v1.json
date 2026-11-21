@@ -1,0 +1,142 @@
+{
+  "schema": "rafaelia.rollmap.typed-path.v1",
+  "version": "1.0.0",
+  "authority": "rafaelmeloreisnovo/RafPolimata",
+  "consumer": "rafaelmeloreisnovo/RafGitTools",
+  "authority_boundary": "Mapa owns federated routing; producer data/ACL/cursors remain under source authority",
+  "purpose": "Typed structural observations and cross-level discovery hints, with no promotion from naming or hash fragments",
+  "claim_allowed": false,
+  "kinds": [
+    "directory",
+    "file",
+    "symbolic_link",
+    "virtual_directory",
+    "archive_member",
+    "pointer",
+    "receipt",
+    "manifest",
+    "checkpoint",
+    "unknown"
+  ],
+  "field_semantics": {
+    "node_id": "stable provider+scope+object identity; synthetic IDs must state algorithm and be scoped",
+    "provider_revision": "optional; TOKEN_VAZIO when absent",
+    "parent_id": "one observed parent link; multiple parents as separate typed edges",
+    "raw_name": "original byte sequence or safely escaped representation with encoding declaration",
+    "display_name": "lossless representation when possible; not authoritative for byte equality",
+    "path": "sequence of typed segments; not a normalized substitute for raw name",
+    "name_search_key": "derived NFC+casefold; collisions retained and never merged",
+    "size_bytes": "nonnegative integer (0 valid) or TOKEN_VAZIO; 0!=missing",
+    "content_sha256": "calculated SHA-256 of exact bytes, or TOKEN_VAZIO; remote provided digest separately",
+    "native_git_oid": "SHA-1/SHA-256 Git object identity labeled with algorithm; not interchangeable with content_sha256",
+    "directory_snapshot_digest": "domain-separated digest of sorted observed listing, with scope/revision; not provider-authentic",
+    "privacy_class": "C0,C1,C2,C3,C4,UNKNOWN; UNKNOWN denies cross-surface export",
+    "observed_at": "UTC observation clock, not proof of creation date"
+  },
+  "predicates": {
+    "implemented_consumer_v2": [
+      "NAME_GLOB",
+      "PATH_GLOB",
+      "SIZE_COMPARE",
+      "HASH_FRAGMENT_8PLUS",
+      "HAS_CHILD",
+      "HAS_DESC",
+      "CHILD_OF",
+      "DESC_OF",
+      "SIBLING_OF",
+      "LINKED_TO_TYPED_EDGE",
+      "AND",
+      "OR",
+      "NOT",
+      "PARENT_CHILD",
+      "BOTH_DIRECTION_EXPANSION"
+    ],
+    "contract_candidate_not_implemented": [
+      "HASH_PIECE_ORDERED_JOIN",
+      "HASH_PIECE_UNORDERED_PERMUTATION",
+      "MULTI_ROOT_CROSS_PROVIDER_JOIN",
+      "LANGUAGE_AWARE_SEMANTIC_CORRELATION",
+      "REMOTE_PROVIDER_PAGINATED_WALK",
+      "DISTRIBUTED_ATTESTATION"
+    ],
+    "logic": "Boolean conjunction combines node sets; HAS_DESC predicates may match distinct descendants; CANDIDATE cannot become VERIFIED solely by transitive closure"
+  },
+  "relations": {
+    "containment": [
+      "CONTAINS_PATH",
+      "CONTAINS_OBSERVED",
+      "CONTAINS_VIRTUAL_MEMBER"
+    ],
+    "observed": [
+      "HEADER_REFERENCES_PROVIDER_ID",
+      "MANIFEST_DECLARED_ROUTE"
+    ],
+    "candidates": [
+      "HASH_FRAGMENT_CANDIDATE",
+      "FULL_HASH_POINTER_CANDIDATE",
+      "SAME_BASENAME_CANDIDATE",
+      "SEMANTIC_ANALOGY_CANDIDATE",
+      "HASH_PIECE_CANDIDATE"
+    ],
+    "verified_scoped": [
+      "SAME_CONTENT_SHA256",
+      "BYTE_MATCH_SCOPED"
+    ],
+    "custody": [
+      "PREDECESSOR",
+      "SUCCESSOR",
+      "SUPERSEDES",
+      "EVIDENCE_FOR",
+      "MIRROR_OF",
+      "RESTORES"
+    ]
+  },
+  "invariants": [
+    "SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM",
+    "TOKEN_VAZIO != 0 != false != empty_bytes",
+    "naming_similarity != cryptographic_integrity",
+    "hash_fragment_match != content_identity",
+    "directory_manifest_digest != native Drive hash",
+    "content_sha256 != Git object ID",
+    "cross_repo_edge_requires_producer_and_consumer_receipts",
+    "privacy_unknown_prevents_export",
+    "append_only_log_cannot_be_replaced_by_disposable_index",
+    "stopwalk_before_any_mutating_operation"
+  ],
+  "transport": {
+    "ingest": "provider adapter returns bounded pages; no autonomous credential retrieval",
+    "serialize": "UTF-8 JSON with explicit schema and deterministic field handling; preserve byte encoding/escape",
+    "outputs": [
+      "metadata_index",
+      "typed_edges",
+      "checkpoint",
+      "receipt"
+    ],
+    "error_states": [
+      "TOKEN_VAZIO",
+      "OBSERVED_NOT_COMMITTED",
+      "CANDIDATE",
+      "BLOCKED",
+      "PASS_SCOPED"
+    ],
+    "policy": "read-only discovery by default; explicit authorization+lease+approval+version+readback before write"
+  },
+  "validation_contract": {
+    "positive": [
+      "distinct descendants satisfy AND",
+      "NFC query retains raw Unicode identifiers",
+      "zero-byte marker distinct unknown size",
+      "cross-file ref produces CANDIDATE",
+      "nested archive routes do not extract"
+    ],
+    "negative": [
+      "short fragment cannot attest",
+      "path traversal archive rejected",
+      "bad Unicode escape rejected",
+      "unknown state cannot promote",
+      "unapproved write STOPWALK",
+      "duplicate segment IDs do not silently overwrite"
+    ],
+    "release_gate": "producer+consumer exact commit, artifact hashes, privacy review, approval, rollback"
+  }
+}
