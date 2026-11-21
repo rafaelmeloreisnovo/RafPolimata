@@ -31,7 +31,8 @@
     "native_git_oid": "SHA-1/SHA-256 Git object identity labeled with algorithm; not interchangeable with content_sha256",
     "directory_snapshot_digest": "domain-separated digest of sorted observed listing, with scope/revision; not provider-authentic",
     "privacy_class": "C0,C1,C2,C3,C4,UNKNOWN; UNKNOWN denies cross-surface export",
-    "observed_at": "UTC observation clock, not proof of creation date"
+    "observed_at": "UTC observation clock, not proof of creation date",
+    "split_hash_path_hint": "opt-in path segments H<two-digit hex-nibble-offset>=<4..16 hex digits>; multiple segments may occur at different depths or in arbitrary order; compare labeled offsets only; always CANDIDATE"
   },
   "predicates": {
     "implemented_consumer_v2": [
@@ -49,7 +50,8 @@
       "OR",
       "NOT",
       "PARENT_CHILD",
-      "BOTH_DIRECTION_EXPANSION"
+      "BOTH_DIRECTION_EXPANSION",
+      "HASH_PIECE_EXPLICIT_OFFSET_CANDIDATE"
     ],
     "contract_candidate_not_implemented": [
       "HASH_PIECE_ORDERED_JOIN",
@@ -76,7 +78,8 @@
       "FULL_HASH_POINTER_CANDIDATE",
       "SAME_BASENAME_CANDIDATE",
       "SEMANTIC_ANALOGY_CANDIDATE",
-      "HASH_PIECE_CANDIDATE"
+      "HASH_PIECE_CANDIDATE",
+      "HASH_PIECES_PATH_CANDIDATE"
     ],
     "verified_scoped": [
       "SAME_CONTENT_SHA256",
