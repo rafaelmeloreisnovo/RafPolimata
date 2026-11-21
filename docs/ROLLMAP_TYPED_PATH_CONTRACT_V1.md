@@ -34,7 +34,7 @@ MATCH linked(type=HASH_FRAGMENT_CANDIDATE) WITH NO CLAIM PROMOTION
 
 Operadores são avaliados sobre conjuntos de nós, não apenas dentro de um filename. O nó ancestral pode combinar filhos distintos. Proximidade, coocorrência, permutação de tokens em subárvores, símbolos Unicode e fragmentos hexadecimais geram `CANDIDATE` até verificação explícita.
 
-**Fragmentação de hash:** para permitir pedaços de digest distribuídos entre subdiretórios, o codec futuro deve registrar `algorithm`, `total_hex_digits`, `fragment_offset`, `fragment_length`, `ordering_mode`, `encoding`, `scope` e `source_ref`. Sem esses campos, permutar pedaços não comprova reconstrução de hash; somente encontra possíveis rotas. Esse modo permanece **não implementado** no executor V2 e não deve virar PASS por documentação.
+**Fragmentação de hash:** uma implementação local escopada aceita segmentos de diretório `H00=abcd/H04=1234` com offset explícito em dígitos hexadecimais, extensão de 4 a 16 dígitos por parte, duas ou mais partes e cobertura total mínima de oito posições. A ordem física pode variar; o offset governa a posição. Esse cruzamento emite apenas `HASH_PIECES_PATH_CANDIDATE`, nunca igualdade provada. Reconstrução criptográfica completa, algoritmos diferentes, permutações sem offsets e integração distribuída ainda exigem `algorithm`, `scope`, `source_ref`, bytes validados, falsificadores e recibos; permanecem `TOKEN_VAZIO`.
 
 ## Unicode, símbolos e limites
 
